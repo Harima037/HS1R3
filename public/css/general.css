@@ -1,0 +1,163 @@
+body                                        { 
+                                                -webkit-user-select: none;
+                                                -moz-user-select: none;
+                                                -khtml-user-select: none;
+                                                cursor: default;
+                                                background-color: #E1E1E1;
+                                            }
+
+
+
+
+#loading 				                    { 
+                                                position: fixed; top: 0px; left: 0px; 
+                                                width: 100%; height: 100%; display: none; 
+                                                background: #777; 
+                                                background: rgba(0,0,0,0.7); 
+                                                z-index: 99999999;
+                                                text-align: center;
+                                            }
+#loading-icon  			                    { 
+                                                position: absolute; display: block; 
+                                                background: #000; top: 50%; left: 50%; 
+                                                margin-top: -36px; margin-left: -36px; 
+                                                padding: 20px; border-radius: 10px;  
+                                            }
+
+.datagrid table                             {  table-layout:fixed; }
+.datagrid table td,
+.datagrid table th                          { 
+                                      
+                                                overflow:hidden;
+                                                text-overflow:ellipsis;
+                                                white-space:nowrap;
+                                                cursor:default;
+                                                
+                                            }
+.datagrid table th                          { }
+
+.datagrid table tr td:first-child,
+.datagrid table tr th:first-child           { width:30px; }
+/*.datagrid table tr td:nth-last-child(2),
+.datagrid table tr th:nth-last-child(2)     { width:100px; text-align:center; }
+
+.datagrid table tr td:nth-last-child(1),
+.datagrid table tr th:nth-last-child(1)     { width:150px; text-align:center; }*/
+
+.datagrid table tr td:first-child,
+.datagrid table tr th:first-child,
+.datagrid table tr td:nth-child(2),
+.datagrid table tr th:nth-child(2)          { display:table-cell; }
+
+.datagrid table td,
+.datagrid table th                          { display:none; }
+
+.modal-dialog-fullscreen {
+  width: auto;
+  height: 100%;
+  padding: 0;
+  margin:0px;
+}
+
+.modal-content-fullscreen {
+  height: auto;
+  border-radius: 0;
+}
+
+.modal-dialog-85-screen {
+  width: auto;
+  height: 100%;
+  padding: 0;
+  margin:0px;
+}
+
+.modal-content-85-screen {
+  height: auto;
+  border-radius: 0;
+}
+.modal { overflow:auto; }
+
+
+.btn-file {
+            position: relative;
+            overflow: hidden;
+        }
+.btn-file input[type=file] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 100%;
+            min-height: 100%;
+            font-size: 999px;
+            text-align: right;
+            filter: alpha(opacity=0);
+            opacity: 0;
+            background: red;
+            cursor: inherit;
+            display: block;
+        }
+input[readonly] {
+            background-color: white !important;
+            cursor: text !important;
+        }
+
+
+.alert-container                { position: fixed; top: 0; z-index: 99999999;  width: 100%; }
+.alert-container .alert         { margin:5px; }
+.alert-container .alert-danger  { box-shadow: 0px 0px 10px #300; }
+.alert-container .alert-success { box-shadow: 0px 0px 10px #030; }
+.alert-container .alert-info    { box-shadow: 0px 0px 10px #003; }
+.alert-container .alert-warning { box-shadow: 0px 0px 10px #330; }
+
+.alert-success {
+  color: #fff;
+  background-color: #5cb85c;
+  border-color: #4cae4c;
+}
+.alert-info {
+  color: #fff;
+  background-color: #5bc0de;
+  border-color: #46b8da;
+}
+.alert-warning {
+  color: #fff;
+  background-color: #f0ad4e;
+  border-color: #eea236;
+}
+.alert-danger {
+  color: #fff;
+  background-color: #d9534f;
+  border-color: #d43f3a;
+}
+
+
+.typeahead { width: 100%;left:0px !important;   }
+ul.typeahead li a {  white-space: nowrap; overflow: hidden !important; text-overflow: ellipsis; }
+
+/* Prevenimos scroll en el body con ventanas modales */
+body.modal-open .page-container{
+  display: none;
+}
+
+/* Extra small devices (phones, up  to 480px) */
+/* No media query since this is the default in Bootstrap */     
+
+
+/* Small devices (tablets, 768px and up) */
+@media (min-width: 768px) { 
+    .datagrid table td,
+    .datagrid table th          { display:table-cell; }
+    .modal-dialog-fullscreen    { height:auto; margin:30px; height: auto; }
+    .modal-dialog-85-screen     { width: 85%; margin-top:30px; height: auto; margin-left:7.5%; }
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) { 
+     /* Desactivamos la prevención de scroll en el body con ventanas modales */
+     body.modal-open .page-container{
+       display: inherit;
+     }
+}
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {  }

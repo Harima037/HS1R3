@@ -1,0 +1,15 @@
+## Generic files to ignore
+*~
+*.lock
+*.DS_Store
+*.swp
+*.out
+
+app/config/local/*
+app/production/*
+app/storage/*.*
+app/storage/cache/*
+app/storage/logs/*
+app/storage/meta/*
+app/storage/sessions/*
+app/storage/views/*
