@@ -1,9 +1,9 @@
 <?php
 use Illuminate\Database\Eloquent\SoftDeletingTrait;
 
-class Catalogo extends BaseModel
+class Proyecto extends BaseModel
 {
 	use SoftDeletingTrait;
 	protected $dates = ['borradoAl'];
-	protected $table = "catalogo";
+	protected $table = "proyectos";
 }

@@ -42,10 +42,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::post('usuarios', array('uses' => 'UsuariosController@validar'));
 	});
 
-	//Modulos de Demostración
-	Route::group(array('prefix'=>'demo'),function(){
-		Route::get('catalogo',array('uses'=>'CatalogoController@index'));
-		Route::get('modulo',array('uses'=>'ModuloController@index'));
+	Route::group(array('prefix'=>'poa'), function(){
+		Route::get('proyectos',array('uses'=>'ProyectosController@index'));
 	});
 
 	Route::group(array('prefix'=>"v1"),function(){
@@ -58,10 +56,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('roles',			'V1\RolesController');
 		Route::resource('permisos',			'V1\PermisosController');
 		Route::resource('cuenta',			'V1\CuentaController');
-
-		//Controladores de Demostración
-		Route::resource('catalogo',			'V1\CatalogoController');
-		Route::resource('modulo',			'V1\ModuloController');
+		
+		Route::resource('proyectos',		'V1\ProyectosController');
 	});
 });
 

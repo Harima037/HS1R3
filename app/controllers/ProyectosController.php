@@ -1,6 +1,6 @@
 <?php
 
-class CatalogoController extends \BaseController {
+class ProyectosController extends \BaseController {
 
 	/**
 	 * Display a listing of the resource.
@@ -9,7 +9,6 @@ class CatalogoController extends \BaseController {
 	 */
 	public function index()
 	{
-		return parent::loadIndex('DEMO','CATALOGO');
+		return parent::loadIndex('POA','PROYECTOS');
 	}
-
 }

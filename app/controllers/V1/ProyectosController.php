@@ -4,12 +4,10 @@ namespace V1;
 
 use iWARE\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry;
-use Catalogo, Hash;
+use Proyecto, Hash;
 
-class CatalogoController extends \BaseController {
-	private $reglas = array(
-			'descripcion' => 'required'
-		);
+class ProyectosController extends BaseController {
+	private $reglas = array();
 
 	/**
 	 * Display a listing of the resource.
@@ -25,18 +23,18 @@ class CatalogoController extends \BaseController {
 		$parametros = Input::all();
 		if(isset($parametros['formatogrid'])){
 			
-			$rows = Catalogo::getModel();
+			$rows = Proyecto::getModel();
 
 			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 			
 			if(isset($parametros['buscar'])){				
-				$rows = $rows->where('catalogo.descripcion','like','%'.$parametros['buscar'].'%');
+				$rows = $rows->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%');
 				$total = $rows->count();
 			}else{				
 				$total = $rows->count();						
 			}
 
-			$rows = $rows->select('id','descripcion','creadoAl','modificadoAl')
+			$rows = $rows->select('id','nombreTecnico','unidadResponsable','idClasificacionProyecto',DB::raw('0'),'creadoAl','modificadoAl')
 								->orderBy('id', 'desc')
 								->skip(($parametros['pagina']-1)*10)->take(10)
 								->get();
@@ -51,7 +49,7 @@ class CatalogoController extends \BaseController {
 			return Response::json($data,$http_status);
 		}	
 
-		$rows = Catalogo::all();
+		$rows = Proyecto::all();
 
 		if(count($rows) == 0){
 			$http_status = 404;
