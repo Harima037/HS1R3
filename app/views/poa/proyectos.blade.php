@@ -32,7 +32,7 @@
                             @section('panel-botones')
                                 <div class="btn-group" style="margin:5px">
                                     <button type="button" class="btn btn-success btn-datagrid-agregar">
-                                        <span class="glyphicon glyphicon-plus"></span> Agregar
+                                        <span class="glyphicon glyphicon-plus"></span> Nuevo Proyecto
                                     </button>
                                     <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                                         <span class="caret"></span>
@@ -57,7 +57,7 @@
                     <tr>
                         <th><input type="checkbox" class="check-select-all-rows"></th>
                         <th>Clave</th>
-                        <th>Area</th>
+                        <th>Nombre Técnico</th>
                         <th>Tipo de Proyecto</th>
                         <th>Estatus</th>
                         <th style="text-align:center; width:150px;"><span class="glyphicon glyphicon-user"></span></th>
@@ -94,147 +94,61 @@
 @stop
 
 @section('modals')
-    <div class="modal fade" id="modalCaratulas" tabindex="-1" role="dialog" aria-labelledby="modalModuloLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal fade" id="modalCaratulas" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" data-backdrop="static">
         <div class="modal-dialog modal-dialog-75-screen">
             <div class="modal-content modal-content-75-screen">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="modalModuloLabel">Nuevo</h4>
+                    <h4 class="modal-title" id="modalLabel">Nuevo</h4>
                 </div>
                 <div class="modal-body">
-
-                    <form action="" id="formCaratula">
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li><a href="#tab-datos" role="tab" data-toggle="tab">Datos</a></li>
-                            <li><a href="#tab-seguridad" id="nav-tab-seguridad" role="tab" data-toggle="tab"><i class="fa fa-shield"></i> Seguridad</a></li>
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane active" id="tab-datos">
-                                <br>
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <label for="nombres" class="control-label">Nombre(s)</label>
-                                            <input type="text" class="form-control" id="nombres" name="nombres" maxlength="255"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="form-group">
-                                            <label for="apellido-paterno" class="control-label">Apellido Paterno</label>
-                                            <input type="text" class="form-control" id="apellido-paterno" name="apellido-paterno" maxlength="255"/>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="form-group">
-                                            <label for="apellido-materno" class="control-label">Apellido Materno</label>
-                                            <input type="text" class="form-control" id="apellido-materno" name="apellido-materno" maxlength="255"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <label for="cargo" class="control-label">Cargo</label>
-                                            <input type="text" class="form-control" id="cargo" name="cargo" maxlength="255"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                                                <input type="email" class="form-control" id="email" name="email" placeholder="e-mail" maxlength="255">
-                                            </div> 
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><i class="fa fa-phone"></i></span>
-                                                <input type="telefono" class="form-control" id="telefono" name="telefono" placeholder="Teléfono" maxlength="255">
-                                            </div> 
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <label for="username" class="control-label">Datos de acceso</label>
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                                                <input type="text" class="form-control" id="username" name="username" placeholder="Nombre de usuario" maxlength="25"/>
-                                            </div> 
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="form-group">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                                                <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" maxlength="12">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="form-group">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                                                <input type="password" class="form-control" id="password_confirm" name="password_confirm" placeholder="Confirmar Contraseña" maxlength="12" data-match="#password">
-                                            </div> 
-                                        </div>
-                                    </div>
-                                </div>
-                                
+                    <form action="" id="form_caratula">
+                        <div class="form-group">
+                            <label for="tipo_proyecto" class="control-label">Seleccione el tipo de proyecto</label>
+                            {{Form::select('tipo_proyecto',array(''=>'Seleccione una opción') + $tipos_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'tipo_proyecto'))}}
+                        </div>
+                        <div class="form-group">
+                            <label for="clasificacion_proyecto" class="control-label">Seleccione la clase de proyecto a capturar</label>
+                            {{Form::select('clasificacion_proyecto',array('' =>'Selecciona un tipo de proyecto') + $clasificacion_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'clasificacion_proyecto'))}}
+                        </div>
+                        <div class="form-group hidden" id="opciones_fibap">
+                            <div class="help-text">
+                                Para poder generar el proyecto de inversión se necesita capturar la Ficha de Información Básica del Proyecto (FIBAP).
                             </div>
-                            <div class="tab-pane" id="tab-seguridad">
-                                <br>
-                                <div class="row">
-                                        <div class="col-sm-12">
-                                            <div class="form-group">
-                                                <label for="rol" class="control-label">Rol</label>
-                                                <select class="form-control" multiple="multiple" onchange="cleanPermissionPanel()" name="rol[]" id="rol">
-                                                    <option value=''>No hay roles creados</option>
-                                                </select>
-                                                <p class="help-block">Para seleccionar multiples roles de usuario: Presione la tecla <kbd>Ctrl</kbd> al momento de hacer click sobre un rol.</p>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-12">
-                                            <div class="panel panel-default">
-                                                <div class="panel-heading">
-                                                    <span class="panel-title">
-                                                        Permisos individuales de usuario
-                                                        <div class="btn-group pull-right">
-                                                            <button type="button" title="Limpiar Permisos" class="btn btn-default" id="btn-limpiar-permisos">
-                                                                    <span class="fa fa-trash-o"></span>
-                                                            </button>
-                                                            <button type="button" title="Personalizar Permisos" class="btn btn-warning " id="btn-cargar-cat-permisos">
-                                                                <span class="fa fa-shield"></span>
-                                                            </button>
-                                                        </div>
-                                                    </span>
-                                                    <div class="clearfix"></div>
-                                                </div>
-                                                <table class="table" id="pnlPermissions" >                                        
-                                                    <tr><td>Aún no hay permisos individuales asignados.</td></tr>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
+                            <div id="orden_fibap" class="btn-group btn-group-justified" data-toggle="buttons">
+                                <label class="btn btn-primary active">
+                                    <input type="radio" name="fibap" id="fibap_despues" value="despues" autocomplete="off" checked> Capturar FIBAP después
+                                </label>
+                                <label class="btn btn-primary">
+                                    <input type="radio" name="fibap" id="fibap_antes" value="antes" autocomplete="off"> Capturar FIBAP
+                                </label>
                             </div>
-                        </div>      
-                        <input type="hidden" id="id" name="id">
-                        <!--button type="submit" class="btn btn-primary btn-guardar">Guardar</button-->
+                        </div>
                     </form>
+                    <div id="datos-proyecto">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label class="control-label">Nombre Técnico</label>
+                                <p id="lbl_nombre_tecnico" class="form-control-static">asdfjk </p>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="control-label">Clave Presupuestaria</label>
+                                <p id="lbl_clave_presupuestaria" class="form-control-static">asdfjk </p>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="control-label">Clasificación del Proyecto</label>
+                                <p id="lbl_nombre_tecnico" class="form-control-static">asdfjk </p>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="control-label">Estatus</label>
+                                <p id="lbl_clave_presupuestaria" class="form-control-static">asdfjk </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary btn-guardar">Guardar</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary btn-guardar">Ir a la caratula de captura</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->

@@ -1,10 +1,11 @@
+
 /*=====================================
 
     # Nombre:
         proyectos.js
 
     # Módulo:
-        poa/cproyectos
+        poa/proyectos
 
     # Descripción:
         Se utiliza para crear, editar y eliminar caratulas de captura para proyectos de inversión e institucionales
@@ -17,7 +18,7 @@ var moduloDatagrid = new Datagrid("#datagridCaratulas",moduloResource);
 moduloDatagrid.init();
 moduloDatagrid.actualizar();
 var modal_name = '#modalCaratulas';
-var form_name = '#formCaratula';
+var form_name = '#form_caratula';
 /*===================================*/
 // Implementación personalizada del módulo
 function editar (e){
@@ -31,6 +32,17 @@ function editar (e){
     });*/
 }
 
+$('#clasificacion_proyecto').on('change',function(){
+    if($(this).val() == 2){
+        $('#orden_fibap label').removeClass('active');
+        $('#fibap_despues').prop('checked',true);
+        $('#fibap_despues').parent().addClass('active');
+        $('#opciones_fibap').removeClass('hidden');
+    }else{
+        $('#opciones_fibap').addClass('hidden');
+    }
+});
+
 /*===================================*/
 // Configuración General para cualquier módulo
 
@@ -43,7 +55,7 @@ $(modal_name).on('hide.bs.modal',function(e){
 });
 
 $('.btn-datagrid-agregar').on('click', function () {
-    $(modal_name).find(".modal-title").html("Nuevo");
+    $(modal_name).find(".modal-title").html("Nuevo Proyecto");
     $(modal_name).modal('show');
 });
 
@@ -52,45 +64,27 @@ $(modal_name+' .btn-guardar-continuar').on('click', function (e) {
     submitModulo(true);
 });
 
-$(modal_name+' .btn-guardar-cerrar').on('click', function (e) {
-    e.preventDefault();
-    submitModulo();
-});
-
-$(form_name).on('submit',function(e){
+$(modal_name+' .btn-guardar').on('click', function (e) {
     e.preventDefault();
     submitModulo();
 });
 
 function resetModalModuloForm(){
     $(form_name).get(0).reset();
+    $('#opciones_fibap').addClass('hidden');
+    $('#orden_fibap label').removeClass('active');
+    $('#fibap_despues').parent().addClass('active');
     $(form_name +' #id').val("");
-    moduloDatagrid.cleanFormErrors(form_name);
 }
 
 function submitModulo(save_next){
-    moduloDatagrid.cleanFormErrors(form_name);
-
-    var parametros = $(form_name).serialize();
-    if($(form_name +' #id').val()==""){
-        moduloResource.post(parametros,{
-                        _success: function(response){
-                            moduloDatagrid.actualizar();
-                            if(!save_next){
-                                $(modal_name).modal('hide');
-                            }
-                            MessageManager.show({data:'Elemento creado con éxito',timer:5});
-                        }
-        },'Guardando');
-    }else{
-        moduloResource.put($(form_name +' #id').val(), parametros,{
-                        _success: function(response){
-                            moduloDatagrid.actualizar();
-                            if(!save_next){
-                                $(modal_name).modal('hide');
-                            }
-                            MessageManager.show({data:'Elemento actualizado con éxito',timer:5});
-                        }
-        },'Guardando');
+    if($('#clasificacion_proyecto').val() == 2){
+        if($('#fibap_antes').prop('checked')){
+            //TODO: Load FIBAP form -->
+            return;
+        }
     }
+    $(form_name).attr('action',SERVER_HOST+'/poa/caratula');
+    $(form_name).attr('method','POST');
+    $(form_name).submit();
 }

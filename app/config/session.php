@@ -96,7 +96,7 @@ return array(
 	|
 	*/
 
-	'cookie' => 'laravel_session_plataforma_base',
+	'cookie' => 'laravel_session_poa',
 
 	/*
 	|--------------------------------------------------------------------------

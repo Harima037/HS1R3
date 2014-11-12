@@ -44,6 +44,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 
 	Route::group(array('prefix'=>'poa'), function(){
 		Route::get('proyectos',array('uses'=>'ProyectosController@index'));
+		Route::any('caratula',array('uses'=>'ProyectosController@caratula'));
 	});
 
 	Route::group(array('prefix'=>"v1"),function(){
