@@ -90,6 +90,8 @@ $('#btn-proyecto-guardar').on('click',function(){
 	parametros = parametros + '&guardar=proyecto';
 	
 	if($('#id').val()){
+		
+	}else{
 		proyectoResource.post(parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:3});
