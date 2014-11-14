@@ -18,6 +18,7 @@ class ProyectosController extends \BaseController {
 
 	public function caratula()
 	{
+		
 		$clasificacion = ClasificacionProyecto::all()->lists('descripcion','id');
 		$tipo = TipoProyecto::all()->lists('descripcion','id');
 

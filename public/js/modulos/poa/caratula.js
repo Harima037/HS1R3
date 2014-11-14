@@ -19,40 +19,100 @@ var modal_actividad = '#modalActividad';
 var grid_componentes = '#datagridComponentes';
 var form_caratula = '#form_caratula';
 
-//Funcionalidad ejecutada al cargar la página
+//***********************     Funcionalidad ejecutada al cargar la página    ************************************
 if($('#id').val()){
 	$('#tablink-componentes').attr('data-toggle','tab');
 	$('#tablink-componentes').parent().removeClass('disabled');
+	//load data
+	proyectoResource.get($('#id').val(),null,{
+        _success: function(response){
+            $('#nombretecnico').val(response.data.nombreTecnico);
+
+            var clave = response.data.unidadResponsable + response.data.finalidad + response.data.funcion + response.data.subFuncion +
+                        response.data.subSubFuncion + response.data.programaSectorial + response.data.programaPresupuestario +
+                        response.data.programaEspecial + response.data.actividadInstitucional + response.data.proyectoEstrategico +
+                        response.data.numeroProyectoEstrategico;
+
+            //$('#lbl_clave_presupuestaria').text(clave);
+			/*$('#unidadresponsable').val(response.data.datos_unidad_responsable.clave);
+            $('#finalidad').val(response.data.datos_finalidad.clave + ' - ' + response.data.datos_finalidad.descripcion);
+            $('#funcion').val(response.data.datos_funcion.clave );
+            $('#subfuncion').val(response.data.datos_sub_funcion.clave );
+            $('#subsubfuncion').val(response.data.datos_sub_sub_funcion.clave );
+            $('#programasectorial').val(response.data.datos_programa_sectorial.clave );
+            $('#programapresupuestario').val(response.data.datos_programa_presupuestario.clave );
+            $('#programaespecial').val(response.data.datos_programa_especial.clave );
+            $('#actividadinstitucional').val(response.data.datos_actividad_institucional.clave );
+            $('#proyectoestrategico').val(response.data.datos_proyecto_estrategico.clave);*/
+
+            $('#unidadresponsable').selectpicker('val',response.data.datos_unidad_responsable.clave);
+            $('#funciongasto').selectpicker('val',response.data.datos_sub_sub_funcion.clave );
+            $('#programasectorial').selectpicker('val',response.data.datos_programa_sectorial.clave );
+            $('#programapresupuestario').selectpicker('val',response.data.datos_programa_presupuestario.clave );
+            $('#programaespecial').selectpicker('val',response.data.datos_programa_especial.clave );
+            $('#actividadinstitucional').selectpicker('val',response.data.datos_actividad_institucional.clave );
+            $('#proyectoestrategico').selectpicker('val',response.data.datos_proyecto_estrategico.clave);
+
+            $('#cobertura').selectpicker('val',response.data.cobertura.id);
+            $('#tipoaccion').selectpicker('val',response.data.tipo_accion.id);
+
+            $('#vinculacionped').selectpicker('val',response.data.objetivo_ped.id);
+
+            $('#tipobeneficiario').selectpicker('val',response.data.tipo_beneficiario.id);
+            $('#totalbeneficiarios').val(response.data.totalBeneficiarios);
+            $('#totalbeneficiariosf').val(response.data.totalBeneficiariosF);
+            $('#totalbeneficiariosm').val(response.data.totalBeneficiariosM);
+
+            var indx;
+            var sexo;
+            for( indx in response.data.beneficiarios ){
+                sexo = response.data.beneficiarios[indx].sexo;
+                $('#urbana'+sexo).val(response.data.beneficiarios[indx].urbana);
+                $('#rural'+sexo).val(response.data.beneficiarios[indx].rural);
+                $('#mestiza'+sexo).val(response.data.beneficiarios[indx].mestiza);
+                $('#indigena'+sexo).val(response.data.beneficiarios[indx].indigena);
+                $('#inmigrante'+sexo).val(response.data.beneficiarios[indx].inmigrante);
+                $('#otros'+sexo).val(response.data.beneficiarios[indx].otros);
+                $('#muyalta'+sexo).val(response.data.beneficiarios[indx].muyAlta);
+                $('#alta'+sexo).val(response.data.beneficiarios[indx].alta);
+                $('#media'+sexo).val(response.data.beneficiarios[indx].media);
+                $('#baja'+sexo).val(response.data.beneficiarios[indx].baja);
+                $('#muybaja'+sexo).val(response.data.beneficiarios[indx].muyBaja);
+            }
+        }
+    });
 }
 
-//Funcionalidad de botones y elementos del formulario
+//***********************     Funcionalidad de botones y elementos del formulario ++++++++++++++++++++++++++++++++++++
 $('#btn-proyecto-guardar').on('click',function(){
 
 	var parametros = $(form_caratula).serialize();
 	parametros = parametros + '&guardar=proyecto';
 	
-	proyectoResource.post(parametros,{
-        _success: function(response){
-            MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:3});
-            $(form_caratula + ' #id').val(response.data.id);
-            
-            $('#tablink-componentes').attr('data-toggle','tab');
-			$('#tablink-componentes').parent().removeClass('disabled');
-        },
-        _error: function(response){
-            try{
-                var json = $.parseJSON(response.responseText);
-                if(!json.code)
-                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-                else{
-                    MessageManager.show(json);
-                }
-                Validation.formValidate(json.data);
-            }catch(e){
-                console.log(e);
-            }                       
-        }
-    });
+	if($('#id').val()){
+		proyectoResource.post(parametros,{
+	        _success: function(response){
+	            MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:3});
+	            $(form_caratula + ' #id').val(response.data.id);
+	            
+	            $('#tablink-componentes').attr('data-toggle','tab');
+				$('#tablink-componentes').parent().removeClass('disabled');
+	        },
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
+	    });
+	}
 });
 
 
@@ -99,7 +159,7 @@ $('#proyectoestrategico').on('change',function(){
 	actualiza_clave('proyecto_estrategico',$(this).val(),'-');
 });
 
-//Funciones
+//***********************     Funciones             +++++++++++++++++++++++++++++++++
 /** Actualiza el span correspondiente al select actualizado, para ir construyendo la Clave Presupuestaria **/
 function actualiza_clave(id, clave, value){
 	if(clave != ''){

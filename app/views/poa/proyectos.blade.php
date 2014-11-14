@@ -102,46 +102,365 @@
                     <h4 class="modal-title" id="modalLabel">Nuevo</h4>
                 </div>
                 <div class="modal-body">
-                    <form action="" id="form_caratula">
-                        <div class="form-group">
-                            <label for="tipo_proyecto" class="control-label">Seleccione el tipo de proyecto</label>
-                            {{Form::select('tipo_proyecto',array(''=>'Seleccione una opción') + $tipos_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'tipo_proyecto'))}}
-                        </div>
-                        <div class="form-group">
-                            <label for="clasificacion_proyecto" class="control-label">Seleccione la clase de proyecto a capturar</label>
-                            {{Form::select('clasificacion_proyecto',array('' =>'Selecciona un tipo de proyecto') + $clasificacion_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'clasificacion_proyecto'))}}
-                        </div>
-                        <div class="form-group hidden" id="opciones_fibap">
-                            <div class="help-text">
-                                Para poder generar el proyecto de inversión se necesita capturar la Ficha de Información Básica del Proyecto (FIBAP).
+                    <div id="datos-formulario">
+                        <form action="" id="form_caratula">
+                            <div class="form-group">
+                                <label for="tipo_proyecto" class="control-label">Seleccione el tipo de proyecto</label>
+                                {{Form::select('tipo_proyecto',array(''=>'Seleccione una opción') + $tipos_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'tipo_proyecto'))}}
                             </div>
-                            <div id="orden_fibap" class="btn-group btn-group-justified" data-toggle="buttons">
-                                <label class="btn btn-primary active">
-                                    <input type="radio" name="fibap" id="fibap_despues" value="despues" autocomplete="off" checked> Capturar FIBAP después
-                                </label>
-                                <label class="btn btn-primary">
-                                    <input type="radio" name="fibap" id="fibap_antes" value="antes" autocomplete="off"> Capturar FIBAP
-                                </label>
+                            <div class="form-group">
+                                <label for="clasificacion_proyecto" class="control-label">Seleccione la clase de proyecto a capturar</label>
+                                {{Form::select('clasificacion_proyecto',array('' =>'Selecciona un tipo de proyecto') + $clasificacion_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'clasificacion_proyecto'))}}
                             </div>
-                        </div>
-                    </form>
+                            <div class="form-group hidden" id="opciones_fibap">
+                                <div class="help-text">
+                                    Para poder generar el proyecto de inversión se necesita capturar la Ficha de Información Básica del Proyecto (FIBAP).
+                                </div>
+                                <div id="orden_fibap" class="btn-group btn-group-justified" data-toggle="buttons">
+                                    <label class="btn btn-primary active">
+                                        <input type="radio" name="fibap" id="fibap_despues" value="despues" autocomplete="off" checked> Capturar FIBAP después
+                                    </label>
+                                    <label class="btn btn-primary">
+                                        <input type="radio" name="fibap" id="fibap_antes" value="antes" autocomplete="off"> Capturar FIBAP
+                                    </label>
+                                </div>
+                            </div>
+                            <input type="hidden" id="id" name="id">
+                        </form>
+                    </div>
                     <div id="datos-proyecto">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <label class="control-label">Nombre Técnico</label>
-                                <p id="lbl_nombre_tecnico" class="form-control-static">asdfjk </p>
-                            </div>
-                            <div class="col-sm-6">
-                                <label class="control-label">Clave Presupuestaria</label>
-                                <p id="lbl_clave_presupuestaria" class="form-control-static">asdfjk </p>
-                            </div>
-                            <div class="col-sm-6">
-                                <label class="control-label">Clasificación del Proyecto</label>
-                                <p id="lbl_nombre_tecnico" class="form-control-static">asdfjk </p>
-                            </div>
-                            <div class="col-sm-6">
-                                <label class="control-label">Estatus</label>
-                                <p id="lbl_clave_presupuestaria" class="form-control-static">asdfjk </p>
+                        <div role="tabpanel">
+                        <!-- Nav tabs -->
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active">
+                                    <a href="#tab-proyecto" aria-controls="tab-proyecto" role="tab" data-toggle="tab">
+                                        Datos del Proyecto
+                                    </a>
+                                </li>
+                                <li role="presentation">
+                                    <a href="#tab-componente" aria-controls="tab-componente" role="tab" data-toggle="tab">
+                                        Componentes
+                                    </a>
+                                </li>
+                            </ul>
+
+                        <!-- Tab panes -->
+                            <div class="tab-content">
+                                <div role="tabpanel" class="tab-pane active" id="tab-proyecto">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <label class="control-label">Nombre Técnico</label>
+                                            <p id="lbl_nombre_tecnico" class="form-control-static"></p>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="control-label">Cobertura</label>
+                                            <p id="lbl_cobertura" class="form-control-static"></p>
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label class="control-label">Tipo de Acción</label>
+                                            <p id="lbl_tipo_accion" class="form-control-static"></p>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <label class="control-label">Clave Presupuestaria</label>
+                                            <p id="lbl_clave_presupuestaria" class="form-control-static"></p>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#clave-desgloce" aria-expanded="true" aria-controls="clave-desgloce">
+                                                Mostrar/Ocultar desgloce de la clave
+                                            </button>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div id="clave-desgloce" class="well well-sm collapse" >
+                                                <div class="row">
+                                                    <div class="col-sm-6">
+                                                        <label class="control-label">Unidad Responsable</label>
+                                                        <p id="lbl_unidad_responsable" class="form-control-static"></p>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <label class="control-label">Finalidad/Función/SubFunción/SubSubFunción</label>
+                                                        <ul>
+                                                            <li>
+                                                                <p id="lbl_finalidad" class="form-control-static"></p>
+                                                                <ul>
+                                                                    <li>
+                                                                        <p id="lbl_funcion" class="form-control-static"></p>
+                                                                        <ul>
+                                                                            <li>
+                                                                                <p id="lbl_sub_funcion" class="form-control-static"></p>
+                                                                                <ul>
+                                                                                    <li>
+                                                                                        <p id="lbl_sub_sub_funcion" class="form-control-static"></p>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </li>
+                                                                </ul>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        <label class="control-label">Programa Sectorial</label>
+                                                        <p id="lbl_programa_sectorial" class="form-control-static"></p>
+                                                    </div>
+                                                    <div class="col-sm-8">
+                                                        <label class="control-label">Programa Presupuestario</label>
+                                                        <p id="lbl_programa_presupuestario" class="form-control-static"></p>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <label class="control-label">Programa Especial</label>
+                                                        <p id="lbl_programa_especial" class="form-control-static"></p>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <label class="control-label">Actividad Institucional</label>
+                                                        <p id="lbl_actividad_institucional" class="form-control-static"></p>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <label class="control-label">Proyecto Estratégico</label>
+                                                        <p id="lbl_proyecto_estrategico" class="form-control-static"></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-12">
+                                            <label class="control-label">Vinculacion al PED</label>
+                                            <p id="lbl_vinculacion_ped" class="form-control-static"></p>
+                                        </div>
+
+                                        <div class="col-sm-6">
+                                            <label class="control-label">Lider del Proyecto</label>
+                                            <p id="lbl_lider_proyecto" class="form-control-static"></p>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="control-label">Jefe Inmediato al Lider</label>
+                                            <p id="lbl_jefe_lider" class="form-control-static"></p>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="control-label">Jefe de Planeación</label>
+                                            <p id="lbl_jefe_ṕlaneacion" class="form-control-static"></p>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="control-label">Coordinador del Grupo Estratégico</label>
+                                            <p id="lbl_coordinador_grupo" class="form-control-static"></p>
+                                        </div>
+
+                                        <div class="col-sm-12">
+                                            <button type="button" class="btn btn-link" data-toggle="collapse" data-target="#datos-beneficiarios" aria-expanded="true" aria-controls="datos-beneficiarios">
+                                                Mostrar/Ocultar datos de los Beneficiarios
+                                            </button>
+
+                                            <div id="datos-beneficiarios" class="collapse" >
+                                                <table class="table table-condensed table-bordered">
+                                                    <tr>
+                                                        <th>Descripción de Beneficiario</th>
+                                                        <th>Total</th>
+                                                        <th colspan="2">Por Genero</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td rowspan="2"><p id="lbl_tipo_beneficiario" class="form-control-static"></p></td>
+                                                        <td rowspan="2"><p id="lbl_total_beneficiarios"></p></td>
+                                                        <td><span class="fa fa-female"></span></td>
+                                                        <td><p class="form-control-static" id="lbl_beneficiarios_f"></p></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span class="fa fa-male"></span></td>
+                                                        <td><p class="form-control-static" id="lbl_beneficiarios_m"></p></td>
+                                                    </tr>
+                                                </table>
+
+                                                <div role="tabpanel">
+                                                    <!-- Nav tabs -->
+                                                    <ul class="nav nav-pills" role="tablist">
+                                                        <li role="presentation" class="active">
+                                                            <a href="#benef-zona" aria-controls="benef-zona" role="tab" data-toggle="pill">
+                                                                Zona
+                                                            </a>
+                                                        </li>
+                                                        <li role="presentation">
+                                                            <a href="#benef-pob" aria-controls="benef-pob" role="tab" data-toggle="pill">
+                                                                Población
+                                                            </a>
+                                                        </li>
+                                                        <li role="presentation">
+                                                            <a href="#benef-marg" aria-controls="benef-marg" role="tab" data-toggle="pill">
+                                                                Marginación
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                    <!-- Tab panes -->
+                                                    <div class="tab-content">
+                                                        <div role="tabpanel" class="tab-pane active" id="benef-zona">
+                                                            <table class="table table-condensed table-bordered">
+                                                                <tr>
+                                                                    <th>Generos</th>
+                                                                    <th>Urbana</th>
+                                                                    <th>Rural</th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td><span class="fa fa-female"></span></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_urbana_f"></p></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_rural_f"></p></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td><span class="fa fa-male"></span></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_urbana_m"></p></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_rural_m"></p></td>
+                                                                </tr>
+                                                            </table>
+                                                        </div>
+                                                        <div role="tabpanel" class="tab-pane" id="benef-pob">
+                                                            <table class="table table-condensed table-bordered">
+                                                                <tr>
+                                                                    <th>Generos</th>
+                                                                    <th>Mestiza</th>
+                                                                    <th>Indigena</th>
+                                                                    <th>Inmigrante</th>
+                                                                    <th>Otros</th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td><span class="fa fa-female"></span></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_mestiza_f"></p></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_indigena_f"></p></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_inmigrante_f"></p></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_otros_f"></p></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td><span class="fa fa-male"></span></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_mestiza_m"></p></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_indigena_m"></p></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_inmigrante_m"></p></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_otros_m"></p></td>
+                                                                </tr>
+                                                            </table>
+                                                        </div>
+                                                        <div role="tabpanel" class="tab-pane" id="benef-marg">
+                                                            <table class="table table-condensed table-bordered">
+                                                                <tr>
+                                                                    <th>Generos</th>
+                                                                    <th>Muy Alta</th>
+                                                                    <th>Alta</th>
+                                                                    <th>Media</th>
+                                                                    <th>Baja</th>
+                                                                    <th>Muy Baja</th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td><span class="fa fa-female"></span></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_muy_alta_f"></p></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_alta_f"></p></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_media_f"></p></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_baja_f"></p></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_muy_baja_f"></p></td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td><span class="fa fa-male"></span></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_muy_alta_m"></p></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_alta_m"></p></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_media_m"></p></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_baja_m"></p></td>
+                                                                    <td><p class="form-control-static" id="lbl_benef_muy_baja_m"></p></td>
+                                                                </tr>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div role="tabpanel" class="tab-pane" id="tab-componente">
+                                    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                                      <div class="panel panel-default">
+                                        <div class="panel-heading" role="tab" id="headingOne">
+                                          <h4 class="panel-title">
+                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                              Componente 1
+                                            </a>
+                                          </h4>
+                                        </div>
+                                        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                                          <div class="panel-body">
+                                            Datos del componente 1<br>
+                                            Actividades:
+                                            <div class="panel-group" id="comp1_actividades" role="tablist" aria-multiselectable="true">
+                                              <div class="panel panel-default">
+                                                <div class="panel-heading" role="tab" id="act1">
+                                                  <h4 class="panel-title">
+                                                    <a data-toggle="collapse" data-parent="#comp1_actividades" href="#panel1" aria-expanded="true" aria-controls="panel1">
+                                                      Actividad 1
+                                                    </a>
+                                                  </h4>
+                                                </div>
+                                                <div id="panel1" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="act1">
+                                                  <div class="panel-body">
+                                                    Datos de la actividad 1
+                                                    
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <div class="panel panel-default">
+                                                <div class="panel-heading" role="tab" id="act2">
+                                                  <h4 class="panel-title">
+                                                    <a class="collapsed" data-toggle="collapse" data-parent="#comp1_actividades" href="#panel2" aria-expanded="false" aria-controls="panel2">
+                                                      Actividad 2
+                                                    </a>
+                                                  </h4>
+                                                </div>
+                                                <div id="panel2" class="panel-collapse collapse" role="tabpanel" aria-labelledby="act2">
+                                                  <div class="panel-body">
+                                                    Datos de la actividad 2
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <div class="panel panel-default">
+                                                <div class="panel-heading" role="tab" id="act3">
+                                                  <h4 class="panel-title">
+                                                    <a class="collapsed" data-toggle="collapse" data-parent="#comp1_actividades" href="#panel3" aria-expanded="false" aria-controls="panel3">
+                                                      Actividad 3
+                                                    </a>
+                                                  </h4>
+                                                </div>
+                                                <div id="panel3" class="panel-collapse collapse" role="tabpanel" aria-labelledby="act3">
+                                                  <div class="panel-body">
+                                                    Datos de la actividad 3
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="panel panel-default">
+                                        <div class="panel-heading" role="tab" id="headingTwo">
+                                          <h4 class="panel-title">
+                                            <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                              Componente 2
+                                            </a>
+                                          </h4>
+                                        </div>
+                                        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                                          <div class="panel-body">
+                                            Datos del componente 2
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div class="panel panel-default">
+                                        <div class="panel-heading" role="tab" id="headingThree">
+                                          <h4 class="panel-title">
+                                            <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                              Componente 3
+                                            </a>
+                                          </h4>
+                                        </div>
+                                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                                          <div class="panel-body">
+                                            Datos del componente 3
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

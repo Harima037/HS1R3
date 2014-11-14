@@ -22,9 +22,9 @@ class ProyectosController extends BaseController {
 		'proyectoestrategico'=>'required',
 		'vinculacionped'=>'required',
 		'tipobeneficiario'=>'required',
-		'totalbenficiarios'=>'required',
-		'totalbenficiariosf'=>'required',
-		'totalbenficiariosm'=>'required',
+		'totalbeneficiarios'=>'required',
+		'totalbeneficiariosf'=>'required',
+		'totalbeneficiariosm'=>'required',
 		'altaf' => 'required',
 		'altam' => 'required',
 		'bajaf' => 'required',
@@ -119,7 +119,7 @@ class ProyectosController extends BaseController {
 		$http_status = 200;
 		$data = array();
 
-		$recurso = Catalogo::find($id);
+		$recurso = Proyecto::contenidoCompleto()->find($id);
 
 		if(is_null($recurso)){
 			$http_status = 404;
@@ -168,8 +168,8 @@ class ProyectosController extends BaseController {
 					$recurso->unidadResponsable 			= $parametros['unidadresponsable'];
 					$recurso->finalidad 					= $funcion_gasto[0];
 					$recurso->funcion 						= $funcion_gasto[1];
-					$recurso->subfuncion 					= $funcion_gasto[2];
-					$recurso->subsubfuncion 				= $funcion_gasto[3];
+					$recurso->subFuncion 					= $funcion_gasto[2];
+					$recurso->subSubFuncion 				= $funcion_gasto[3];
 					$recurso->programaSectorial 			= $parametros['programasectorial'];
 					$recurso->programaPresupuestario 		= $parametros['programapresupuestario'];
 					$recurso->programaEspecial 				= $parametros['programaespecial'];
@@ -178,9 +178,9 @@ class ProyectosController extends BaseController {
 				  //$recurso->numeroProyectoEstrategico 	= $parametros['']; //Se genera automaticamente
 					$recurso->idObjetivoPED 				= $parametros['vinculacionped'];
 					$recurso->idTipoBeneficiario 			= $parametros['tipobeneficiario'];
-					$recurso->totalBeneficiarios 			= $parametros['totalbenficiarios'];
-					$recurso->totalBeneficiariosF 			= $parametros['totalbenficiariosf'];
-					$recurso->totalBeneficiariosM 			= $parametros['totalbenficiariosm'];
+					$recurso->totalBeneficiarios 			= $parametros['totalbeneficiarios'];
+					$recurso->totalBeneficiariosF 			= $parametros['totalbeneficiariosf'];
+					$recurso->totalBeneficiariosM 			= $parametros['totalbeneficiariosm'];
 					$recurso->idEstatusProyecto 			= 1;
 
 				  //$recurso->idLiderProyecto 				= $parametros[''];

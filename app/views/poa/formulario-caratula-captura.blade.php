@@ -55,10 +55,10 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-sm-4">
                             <b>Clave Presupuestaria</b> 
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-8">
                             <div class="input-group">
                                 <span id="unidad_responsable" class="input-group-addon" title="Unidad Responsable">
                                     --
@@ -197,7 +197,7 @@
         <div class="col-sm-3">
             <div class="form-group">
                 <label class="control-label" for="tipobeneficiario">Beneficiario</label>
-                {{Form::select('tipobeneficiario',array('' =>'Selecciona un beneficiario') + $tipos_beneficiarios->lists('descripcion','clave'),'',array('class'=>'form-control selectpicker','id'=>'tipobeneficiario','data-live-search'=>'true','data-container'=>'body'))}}
+                {{Form::select('tipobeneficiario',array('' =>'Selecciona un beneficiario') + $tipos_beneficiarios->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'tipobeneficiario','data-live-search'=>'true','data-container'=>'body'))}}
             </div>
         </div>
 
@@ -212,26 +212,26 @@
             <div class="row">
                 <div class="col-sm-3">
                     <div class="form-group">
-                        <label class="control-label" for="totalbenficiariosf">Femenino</label>
+                        <label class="control-label" for="totalbeneficiariosf">Femenino</label>
                         <div class="input-group">
                             <span class="input-group-addon"><span class="fa fa-female"></span></span>
-                            <input type="number" class="form-control" name="totalbenficiariosf" id="totalbenficiariosf">
+                            <input type="number" class="form-control" name="totalbeneficiariosf" id="totalbeneficiariosf">
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-3">
                     <div class="form-group">
-                        <label class="control-label" for="totalbenficiariosm">Masculino</label>
+                        <label class="control-label" for="totalbeneficiariosm">Masculino</label>
                         <div class="input-group">
                             <span class="input-group-addon"><span class="fa fa-male"></span></span>
-                            <input type="number" class="form-control" name="totalbenficiariosm" id="totalbenficiariosm">
+                            <input type="number" class="form-control" name="totalbeneficiariosm" id="totalbeneficiariosm">
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-3">
                     <div class="form-group">
-                        <label class="control-label" for="totalbenficiarios">Total</label>
-                        <input type="number" class="form-control" name="totalbenficiarios" id="totalbenficiarios">
+                        <label class="control-label" for="totalbeneficiarios">Total</label>
+                        <input type="number" class="form-control" name="totalbeneficiarios" id="totalbeneficiarios">
                     </div>
                 </div>
             </div>
