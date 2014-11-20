@@ -14,51 +14,65 @@
 // Declaracion de variables
 var proyectoResource = new RESTfulRequests(SERVER_HOST+'/v1/proyectos');
 var componenteDatagrid = new Datagrid("#datagridComponentes",proyectoResource);
+var actividadDatagrid = new Datagrid('#datagridActividades',proyectoResource);
+componenteDatagrid.init();
+actividadDatagrid.init();
 var modal_componente = '#modalComponente';
 var modal_actividad = '#modalActividad';
 var grid_componentes = '#datagridComponentes';
+var grid_actividades = '#datagridActividades';
 var form_caratula = '#form_caratula';
+var form_componente = '#form_componente';
+var form_actividad = '#form_actividad';
 
 //***********************     Funcionalidad ejecutada al cargar la página    ************************************
 if($('#id').val()){
-	$('#tablink-componentes').attr('data-toggle','tab');
-	$('#tablink-componentes').parent().removeClass('disabled');
 	//load data
 	proyectoResource.get($('#id').val(),null,{
         _success: function(response){
             $('#nombretecnico').val(response.data.nombreTecnico);
 
-            var clave = response.data.unidadResponsable + response.data.finalidad + response.data.funcion + response.data.subFuncion +
-                        response.data.subSubFuncion + response.data.programaSectorial + response.data.programaPresupuestario +
-                        response.data.programaEspecial + response.data.actividadInstitucional + response.data.proyectoEstrategico +
-                        response.data.numeroProyectoEstrategico;
+			$('#unidad_responsable').text(response.data.datos_unidad_responsable.clave);
+            $('#finalidad').text(response.data.datos_finalidad.clave.slice(-1));
+            $('#funcion').text(response.data.datos_funcion.clave.slice(-1));
+            $('#subfuncion').text(response.data.datos_sub_funcion.clave.slice(-1));
+            $('#subsubfuncion').text(response.data.datos_sub_sub_funcion.clave.slice(-1));
+            $('#programa_sectorial').text(response.data.datos_programa_sectorial.clave );
+            $('#programa_presupuestario').text(response.data.datos_programa_presupuestario.clave );
+            $('#programa_especial').text(response.data.datos_programa_especial.clave );
+            $('#actividad_institucional').text(response.data.datos_actividad_institucional.clave );
+            $('#proyecto_estrategico').text(response.data.datos_proyecto_estrategico.clave);
+            $('#no_proyecto_estrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
 
-            //$('#lbl_clave_presupuestaria').text(clave);
-			/*$('#unidadresponsable').val(response.data.datos_unidad_responsable.clave);
-            $('#finalidad').val(response.data.datos_finalidad.clave + ' - ' + response.data.datos_finalidad.descripcion);
-            $('#funcion').val(response.data.datos_funcion.clave );
-            $('#subfuncion').val(response.data.datos_sub_funcion.clave );
-            $('#subsubfuncion').val(response.data.datos_sub_sub_funcion.clave );
-            $('#programasectorial').val(response.data.datos_programa_sectorial.clave );
-            $('#programapresupuestario').val(response.data.datos_programa_presupuestario.clave );
-            $('#programaespecial').val(response.data.datos_programa_especial.clave );
-            $('#actividadinstitucional').val(response.data.datos_actividad_institucional.clave );
-            $('#proyectoestrategico').val(response.data.datos_proyecto_estrategico.clave);*/
+            $('#unidadresponsable').val(response.data.datos_unidad_responsable.clave);
+            $('#unidadresponsable').change();
+            $('#funciongasto').val(response.data.datos_sub_sub_funcion.clave);
+            $('#funciongasto').change();
+            $('#programasectorial').val(response.data.datos_programa_sectorial.clave);
+            $('#programasectorial').change();
+            $('#programapresupuestario').val(response.data.datos_programa_presupuestario.clave);
+            $('#programapresupuestario').change();
+            $('#programaespecial').val(response.data.datos_programa_especial.clave);
+            $('#programaespecial').change();
+            $('#actividadinstitucional').val(response.data.datos_actividad_institucional.clave);
+            $('#actividadinstitucional').change();
+            $('#proyectoestrategico').val(response.data.datos_proyecto_estrategico.clave);
+            $('#proyectoestrategico').change();
+            $('#numeroproyectoestrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
 
-            $('#unidadresponsable').selectpicker('val',response.data.datos_unidad_responsable.clave);
-            $('#funciongasto').selectpicker('val',response.data.datos_sub_sub_funcion.clave );
-            $('#programasectorial').selectpicker('val',response.data.datos_programa_sectorial.clave );
-            $('#programapresupuestario').selectpicker('val',response.data.datos_programa_presupuestario.clave );
-            $('#programaespecial').selectpicker('val',response.data.datos_programa_especial.clave );
-            $('#actividadinstitucional').selectpicker('val',response.data.datos_actividad_institucional.clave );
-            $('#proyectoestrategico').selectpicker('val',response.data.datos_proyecto_estrategico.clave);
+            $('#cobertura').val(response.data.cobertura.id);
+            $('#cobertura').change();
+            deshabilita_municipio($('#cobertura').val());
+            $('#municipio').val(response.data.claveMunicipio);
+            $('#municipio').change();
+            $('#tipoaccion').val(response.data.tipo_accion.id);
+            $('#tipoaccion').change();
 
-            $('#cobertura').selectpicker('val',response.data.cobertura.id);
-            $('#tipoaccion').selectpicker('val',response.data.tipo_accion.id);
+            $('#vinculacionped').val(response.data.objetivo_ped.id);
+            $('#vinculacionped').change();
 
-            $('#vinculacionped').selectpicker('val',response.data.objetivo_ped.id);
-
-            $('#tipobeneficiario').selectpicker('val',response.data.tipo_beneficiario.id);
+            $('#tipobeneficiario').val(response.data.tipo_beneficiario.id);
+            $('#tipobeneficiario').change();
             $('#totalbeneficiarios').val(response.data.totalBeneficiarios);
             $('#totalbeneficiariosf').val(response.data.totalBeneficiariosF);
             $('#totalbeneficiariosm').val(response.data.totalBeneficiariosM);
@@ -79,11 +93,123 @@ if($('#id').val()){
                 $('#baja'+sexo).val(response.data.beneficiarios[indx].baja);
                 $('#muybaja'+sexo).val(response.data.beneficiarios[indx].muyBaja);
             }
+
+            $('#tablink-componentes').attr('data-toggle','tab');
+			$('#tablink-componentes').parent().removeClass('disabled');
+
+			actualizar_grid_componentes(response.data.componentes);
+
+        }
+    });
+}
+
+/***********************************           Comportamiento de los datagrids          ***********************************/
+function editar_componente(e){
+	var parametros = {'ver':'componente'};
+	proyectoResource.get(e,parametros,{
+        _success: function(response){
+            var titulo_modal = 'Editar Componente';
+            $(modal_componente).find(".modal-title").html(titulo_modal);
+
+ 			$('#descripcion-obj-componente').val(response.data.objetivo);
+ 			$('#verificacion-componente').val(response.data.mediosVerificacion);
+ 			$('#supuestos-componente').val(response.data.supuestos);
+ 			$('#descripcion-ind-componente').val(response.data.indicador);
+ 			$('#numerador-ind-componente').val(response.data.numerador);
+ 			$('#denominador-ind-componente').val(response.data.denominador);
+ 			$('#interpretacion-componente').val(response.data.interpretacion);
+ 			$('#meta-componente').val(response.data.metaIndicador);
+ 			$('#trim1-componente').val(response.data.numeroTrim1);
+ 			$('#trim2-componente').val(response.data.numeroTrim2);
+ 			$('#trim3-componente').val(response.data.numeroTrim3);
+ 			$('#trim4-componente').val(response.data.numeroTrim4);
+ 			$('#numerador-componente').val(response.data.valorNumerador);
+ 			$('#denominador-componente').val(response.data.valorDenominador);
+ 			$('#linea-base-componente').val(response.data.lineaBase);
+ 			$('#anio-base-componente').val(response.data.anioBase);
+ 			$('#tipo-obj-componente').val(response.data.tipo);
+ 			$('#accion-componente').val(response.data.accion);
+
+ 			$('#formula-componente').val(response.data.idFormula);
+			$('#dimension-componente').val(response.data.idDimensionIndicador);
+			$('#frecuencia-componente').val(response.data.idFrecuenciaIndicador);
+			$('#tipo-ind-componente').val(response.data.idTipoIndicador);
+			$('#unidad-medida-componente').val(response.data.idUnidadMedida);
+			$('#entregable-componente').val(response.data.idEntregable);
+
+			$('#formula-componente').change();
+			$('#dimension-componente').change();
+			$('#frecuencia-componente').change();
+			$('#tipo-ind-componente').change();
+			$('#unidad-medida-componente').change();
+			$('#entregable-componente').change();
+
+            $('#id-componente').val(response.data.id);
+    		$('#tablink-componente-actividades').attr('data-toggle','tab');
+			$('#tablink-componente-actividades').parent().removeClass('disabled');
+			$('#tablink-componente-actividades').tab('show');
+
+			actualizar_grid_actividades(response.data.actividades);
+
+            $(modal_componente).modal('show');
+        }
+    });
+}
+
+function editar_actividad(e){
+	var parametros = {'ver':'actividad'};
+	proyectoResource.get(e,parametros,{
+        _success: function(response){
+            var titulo_modal = 'Editar Actividad';
+            $(modal_actividad).find(".modal-title").html(titulo_modal);
+
+ 			$('#descripcion-obj-actividad').val(response.data.objetivo);
+ 			$('#verificacion-actividad').val(response.data.mediosVerificacion);
+ 			$('#supuestos-actividad').val(response.data.supuestos);
+ 			$('#descripcion-ind-actividad').val(response.data.indicador);
+ 			$('#numerador-ind-actividad').val(response.data.numerador);
+ 			$('#denominador-ind-actividad').val(response.data.denominador);
+ 			$('#interpretacion-actividad').val(response.data.interpretacion);
+ 			$('#meta-actividad').val(response.data.metaIndicador);
+ 			$('#trim1-actividad').val(response.data.numeroTrim1);
+ 			$('#trim2-actividad').val(response.data.numeroTrim2);
+ 			$('#trim3-actividad').val(response.data.numeroTrim3);
+ 			$('#trim4-actividad').val(response.data.numeroTrim4);
+ 			$('#numerador-actividad').val(response.data.valorNumerador);
+ 			$('#denominador-actividad').val(response.data.valorDenominador);
+ 			$('#linea-base-actividad').val(response.data.lineaBase);
+ 			$('#anio-base-actividad').val(response.data.anioBase);
+
+ 			$('#formula-actividad').val(response.data.idFormula);
+			$('#dimension-actividad').val(response.data.idDimensionIndicador);
+			$('#frecuencia-actividad').val(response.data.idFrecuenciaIndicador);
+			$('#tipo-ind-actividad').val(response.data.idTipoIndicador);
+			$('#unidad-medida-actividad').val(response.data.idUnidadMedida);
+
+			$('#formula-actividad').change();
+			$('#dimension-actividad').change();
+			$('#frecuencia-actividad').change();
+			$('#tipo-ind-actividad').change();
+			$('#unidad-medida-actividad').change();
+
+            $(modal_actividad).modal('show');
         }
     });
 }
 
 //***********************     Funcionalidad de botones y elementos del formulario ++++++++++++++++++++++++++++++++++++
+$('#btn-componente-guardar-salir').on('click',function(){
+	guardar_datos_componente(true);
+});
+
+$('#btn-componente-guardar').on('click',function(){
+	guardar_datos_componente(false);
+});
+
+$('#btn-actividad-guardar').on('click',function(){
+	guardar_datos_actividad();
+});
+
 $('#btn-proyecto-guardar').on('click',function(){
 
 	var parametros = $(form_caratula).serialize();
@@ -96,7 +222,9 @@ $('#btn-proyecto-guardar').on('click',function(){
 	        _success: function(response){
 	            MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:3});
 	            $(form_caratula + ' #id').val(response.data.id);
-	            
+	            $(form_caratula + ' #no_proyecto_estrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
+	            $(form_caratula + ' #numeroproyectoestrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
+
 	            $('#tablink-componentes').attr('data-toggle','tab');
 				$('#tablink-componentes').parent().removeClass('disabled');
 	        },
@@ -117,13 +245,24 @@ $('#btn-proyecto-guardar').on('click',function(){
 	}
 });
 
+$('#btn-proyecto-cancelar').on('click',function(){
+	window.location.href = "proyectos";
+});
+
+$('#cobertura').on('change',function(){
+	deshabilita_municipio($(this).val());
+});
 
 /** Botones para mostrar los modales de Componente y Actividad **/
 $('.btn-agregar-actividad').on('click',function(){
 	$(modal_actividad).find(".modal-title").html("Nueva Actividad");
 	$(modal_actividad).modal('show');
 });
+
 $('.btn-agregar-componente').on('click',function(){
+	$('#tablink-componente-actividades').attr('data-toggle','');
+	$('#tablink-componente-actividades').parent().addClass('disabled');
+	$('#lista-tabs-componente a:first').tab('show');
 	$(modal_componente).find(".modal-title").html("Nuevo Componente");
 	$(modal_componente).modal('show');
 });
@@ -161,13 +300,169 @@ $('#proyectoestrategico').on('change',function(){
 	actualiza_clave('proyecto_estrategico',$(this).val(),'-');
 });
 
+/*******************************      Funcionalidad de los lementos de la pag     ********************************************/
+$(modal_componente).on('hide.bs.modal',function(e){
+	reset_modal_form(form_componente);
+});
+
+$(modal_actividad).on('hide.bs.modal',function(e){
+	reset_modal_form(form_actividad);
+});
+
 //***********************     Funciones             +++++++++++++++++++++++++++++++++
 /** Actualiza el span correspondiente al select actualizado, para ir construyendo la Clave Presupuestaria **/
+function guardar_datos_actividad(){
+	var parametros = $(form_actividad).serialize();
+	parametros = parametros + '&guardar=actividad&id-componente=' + $('#id-componente').val();
+
+	if($('#id-actividad').val()){
+			
+	}else{
+		proyectoResource.post(parametros,{
+	        _success: function(response){
+	            MessageManager.show({data:'Datos de la actividad almacenados con éxito',type:'OK',timer:3});
+	            $(form_actividad + ' #id-actividad').val(response.data.id);
+	            $(modal_actividad).modal('hide');
+
+				actualizar_grid_actividades(response.actividades);
+	        },
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                	json.container = modal_actividad + ' .modal-body';
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
+	    });
+	}
+}
+
+function guardar_datos_componente(cerrar){
+	var parametros = $(form_componente).serialize();
+	parametros = parametros + '&guardar=componente&id-proyecto=' + $('#id').val();
+	parametros = parametros + '&clasificacion='+$('#clasificacionproyecto').val();
+
+	if($('#id-componente').val()){
+			
+	}else{
+		proyectoResource.post(parametros,{
+	        _success: function(response){
+	            MessageManager.show({data:'Datos del componente almacenados con éxito',type:'OK',timer:3});
+	            $(form_componente + ' #id-componente').val(response.data.id);
+	            
+	            if(cerrar){
+					$(modal_componente).modal('hide');
+				}else{
+					$('#tablink-componente-actividades').attr('data-toggle','tab');
+					$('#tablink-componente-actividades').parent().removeClass('disabled');
+					$('#tablink-componente-actividades').tab('show');
+				}
+				actualizar_grid_componentes(response.componentes);
+	        },
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
+	    });
+	}
+}
+
 function actualiza_clave(id, clave, value){
 	if(clave != ''){
 		$('#'+id).text(clave);
 	}else{
 		$('#'+id).text(value);
+	}	
+}
+
+function deshabilita_municipio(id){
+	if(id == 1){
+		$('#municipio').prop('disabled',true);
+		$('#municipio').selectpicker('val','');
+	}else{
+		$('#municipio').prop('disabled',false);
 	}
-	
+}
+
+function actualizar_grid_actividades(datos){
+	$(grid_actividades + ' > table > tbody').empty();
+	var actividades = [];
+	for(indx in datos){
+		var actividad = {};
+
+		actividad.id = datos[indx].id;
+		actividad.descripcion = datos[indx].objetivo;
+		actividad.mediosVerificacion = datos[indx].mediosVerificacion;
+		actividad.supuestos = datos[indx].supuestos;
+		actividad.creadoPor = datos[indx].creadoPor;
+		actividad.creadoAl = datos[indx].creadoAl;
+
+		actividades.push(actividad);
+	}
+
+	$('#conteo-actividades').text(' ' + actividades.length + ' / 5 ');
+
+	if(actividades.length == 0){
+		$(grid_actividades + ' > table > tbody').append('<tr><td colspan="6" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
+	}
+
+	actividadDatagrid.cargarDatos(actividades);
+}
+
+function actualizar_grid_componentes(datos){
+	$(grid_componentes + ' > table > tbody').empty();
+	var componentes = [];
+	for(indx in datos){
+		var componente = {};
+
+		componente.id = datos[indx].id;
+		componente.descripcion = datos[indx].objetivo;
+		componente.mediosVerificacion = datos[indx].mediosVerificacion;
+		componente.supuestos = datos[indx].supuestos;
+		componente.creadoPor = datos[indx].creadoPor;
+		componente.creadoAl = datos[indx].creadoAl;
+
+		componentes.push(componente);
+	}
+
+	$('#tablink-componentes > span').text(componentes.length);
+
+	if(componentes.length == 0){
+		$(grid_componentes + ' > table > tbody').append('<tr><td colspan="6" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
+	}
+
+	componenteDatagrid.cargarDatos(componentes);
+}
+
+function reset_modal_form(formulario){
+    $(formulario).get(0).reset();
+    $(formulario + ' .selectpicker').change();
+    Validation.cleanFormErrors(formulario);
+    if(formulario == form_componente){
+    	$('#id-componente').val('');
+    	//$(grid_actividades + ' > table > tbody').empty();
+    	$('#conteo-actividades').text(' 0 / 5 ');
+    	$(grid_actividades + ' > table > tbody').html('<tr><td colspan="6" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
+    }
+    if(formulario == form_actividad){
+    	$('#id-actividad').val('');
+    	$('#lista-tabs-actividad a:first').tab('show');
+    	$(modal_actividad + ' .alert').remove();
+    }
 }

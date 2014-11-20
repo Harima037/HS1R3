@@ -55,45 +55,45 @@
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <div class="row">
-                        <div class="col-sm-4">
-                            <b>Clave Presupuestaria</b> 
-                        </div>
-                        <div class="col-sm-8">
-                            <div class="input-group">
-                                <span id="unidad_responsable" class="input-group-addon" title="Unidad Responsable">
-                                    --
-                                </span>
-                                <span id="finalidad" class="input-group-addon" title="Finalidad">
-                                    -
-                                </span>
-                                <span id="funcion" class="input-group-addon" title="Función">
-                                    -
-                                </span>
-                                <span id="subfuncion" class="input-group-addon" title="Subfunción">
-                                    -
-                                </span>
-                                <span id="subsubfuncion" class="input-group-addon" title="SubSubfunción">
-                                    -
-                                </span>
-                                <span id="programa_sectorial" class="input-group-addon" title="Programa Sectorial">
-                                    -
-                                </span>
-                                <span id="programa_presupuestario" class="input-group-addon" title="Programa Presupuestario">
-                                    ---
-                                </span>
-                                <span id="programa_especial" class="input-group-addon" title="Programa Especial">
-                                    ---
-                                </span>
-                                <span id="actividad_institucional" class="input-group-addon" title="Actividad Institucional">
-                                    ---
-                                </span>
-                                <span id="proyecto_estrategico" class="input-group-addon" title="Proyecto Estratégico">
-                                    -
-                                </span>
-                                <span id="no_proyecto_estrategico" class="input-group-addon" title="Número de Proyecto Estratégico">
-                                    000
-                                </span>
-                            </div>
+                        <div class="col-sm-12">
+                            <b>Clave Presupuestaria</b> <br>
+                            <strong>
+                                <kbd>
+                                    <kbd id="unidad_responsable" title="Unidad Responsable">
+                                        --
+                                    </kbd>
+                                    <kbd id="finalidad" title="Finalidad">
+                                        -
+                                    </kbd>
+                                    <kbd id="funcion" title="Función">
+                                        -
+                                    </kbd>
+                                    <kbd id="subfuncion" title="Subfunción">
+                                        -
+                                    </kbd>
+                                    <kbd id="subsubfuncion" title="SubSubfunción">
+                                        -
+                                    </kbd>
+                                    <kbd id="programa_sectorial" title="Programa Sectorial">
+                                        -
+                                    </kbd>
+                                    <kbd id="programa_presupuestario" title="Programa Presupuestario">
+                                        ---
+                                    </kbd>
+                                    <kbd id="programa_especial" title="Programa Especial">
+                                        ---
+                                    </kbd>
+                                    <kbd id="actividad_institucional" title="Actividad Institucional">
+                                        ---
+                                    </kbd>
+                                    <kbd id="proyecto_estrategico" title="Proyecto Estratégico">
+                                        -
+                                    </kbd>
+                                    <kbd id="no_proyecto_estrategico" title="Número de Proyecto Estratégico">
+                                        000
+                                    </kbd>
+                                </kbd>
+                            </strong>
                         </div>
                     </div>
                 </div>
@@ -176,7 +176,7 @@
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label class="control-label" for="numeroproyectoestrategico">Número de Proyecto Estratégico</label>
-                            <input type="number" class="form-control" id="numeroproyectoestrategico" name="numeroproyectoestrategico">
+                            <p class="form-control-static" id="numeroproyectoestrategico">000</p>
                         </div>
                     </div>
                 </div>

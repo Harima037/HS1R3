@@ -67,8 +67,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary btn-guardar-salir">Guardar</button>
-                <button type="button" class="btn btn-success btn-guardar-continuar">Guardar y Agregar Actividades</button>
+                <button type="button" class="btn btn-primary" id="btn-componente-guardar-salir">Guardar</button>
+                <button type="button" class="btn btn-success" id="btn-componente-guardar">Guardar y Agregar Actividades</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
@@ -86,7 +86,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary btn-guardar">Guardar</button>
+                <button type="button" class="btn btn-primary btn-guardar" id="btn-actividad-guardar">Guardar</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

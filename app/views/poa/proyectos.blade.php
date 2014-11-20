@@ -60,8 +60,8 @@
                         <th>Nombre Técnico</th>
                         <th>Tipo de Proyecto</th>
                         <th>Estatus</th>
-                        <th style="text-align:center; width:150px;"><span class="glyphicon glyphicon-user"></span></th>
-                        <th style="text-align:center; width:150px;"><span class="glyphicon glyphicon-calendar"></span></th>
+                        <th style="text-align:center; width:85px;"><span class="glyphicon glyphicon-user"></span></th>
+                        <th style="text-align:center; width:120px;"><span class="glyphicon glyphicon-calendar"></span></th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -173,7 +173,7 @@
                                         <div class="col-sm-12">
                                             <div id="clave-desgloce" class="well well-sm collapse" >
                                                 <div class="row">
-                                                    <div class="col-sm-6">
+                                                    <div class="col-sm-12">
                                                         <label class="control-label">Unidad Responsable</label>
                                                         <p id="lbl_unidad_responsable" class="form-control-static"></p>
                                                     </div>

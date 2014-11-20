@@ -7,6 +7,25 @@ class Proyecto extends BaseModel
 	protected $dates = ['borradoAl'];
 	protected $table = "proyectos";
 
+	public static function boot(){
+        parent::boot();
+
+        static::creating(function($item){
+        	$count = Proyecto::where('unidadResponsable',$item->unidadResponsable)
+        						->where('finalidad',$item->finalidad)
+        						->where('funcion',$item->funcion)
+        						->where('subFuncion',$item->subFuncion)
+        						->where('subSubFuncion',$item->subSubFuncion)
+        						->where('programaSectorial',$item->programaSectorial)
+        						->where('programaPresupuestario',$item->programaPresupuestario)
+        						->where('programaEspecial',$item->programaEspecial)
+        						->where('actividadInstitucional',$item->actividadInstitucional)
+        						->where('proyectoEstrategico',$item->proyectoEstrategico)
+        						->count();
+            $item->numeroProyectoEstrategico = ($count + 1);
+        });
+    }
+
 	public function getClavePresupuestariaAttribute(){
 		return $this->unidadResponsable . $this->finalidad . $this->funcion . $this->subfuncion . $this->subsubfuncion . $this->programaSectorial . $this->programaPresupuestario . $this->programaEspecial . $this->actividadInstitucional . $this->proyectoEstrategico . $this->numeroProyectoEstrategico;
 	}
@@ -24,14 +43,22 @@ class Proyecto extends BaseModel
 	}
 
 	public function scopeContenidoCompleto($query){
-		return $query->with('beneficiarios','clasificacionProyecto','tipoProyecto','cobertura','tipoAccion','datosUnidadResponsable',
-			'datosFinalidad','datosFuncion','datosSubFuncion','datosSubSubFuncion','datosProgramaSectorial','datosProgramaPresupuestario',
-			'datosProgramaEspecial','datosActividadInstitucional','datosProyectoEstrategico','objetivoPed','tipoBeneficiario',
-			'estatusProyecto');
+		return $query->with('componentes','beneficiarios','municipio','clasificacionProyecto','tipoProyecto','cobertura','tipoAccion',
+			'datosUnidadResponsable','datosFinalidad','datosFuncion','datosSubFuncion','datosSubSubFuncion','datosProgramaSectorial',
+			'datosProgramaPresupuestario','datosProgramaEspecial','datosActividadInstitucional','datosProyectoEstrategico',
+			'objetivoPed','tipoBeneficiario','estatusProyecto');
+	}
+
+	public function componentes(){
+		return $this->hasMany('Componente','idProyecto');
 	}
 
 	public function beneficiarios(){
 		return $this->hasMany('Beneficiario','idProyecto');
+	}
+
+	public function municipio(){
+		return $this->belongsTo('Municipio','claveMunicipio','clave');
 	}
 
 	public function clasificacionProyecto(){

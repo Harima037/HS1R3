@@ -35,7 +35,7 @@ function editar (e){
             var clave = response.data.unidadResponsable + response.data.finalidad + response.data.funcion + response.data.subFuncion +
                         response.data.subSubFuncion + response.data.programaSectorial + response.data.programaPresupuestario +
                         response.data.programaEspecial + response.data.actividadInstitucional + response.data.proyectoEstrategico +
-                        response.data.numeroProyectoEstrategico;
+                        ("000" + response.data.numeroProyectoEstrategico).slice(-3);
 
             $('#lbl_clave_presupuestaria').text(clave);
             $('#lbl_unidad_responsable').text(response.data.datos_unidad_responsable.clave + ' - ' + response.data.datos_unidad_responsable.descripcion);
@@ -47,9 +47,15 @@ function editar (e){
             $('#lbl_programa_presupuestario').text(response.data.datos_programa_presupuestario.clave + ' - ' + response.data.datos_programa_presupuestario.descripcion);
             $('#lbl_programa_especial').text(response.data.datos_programa_especial.clave + ' - ' + response.data.datos_programa_especial.descripcion);
             $('#lbl_actividad_institucional').text(response.data.datos_actividad_institucional.clave + ' - ' + response.data.datos_actividad_institucional.descripcion);
-            $('#lbl_proyecto_estrategico').text(response.data.datos_proyecto_estrategico.clave + ' - ' + response.data.datos_proyecto_estrategico.descripcion + response.data.numeroProyectoEstrategico);
+            $('#lbl_proyecto_estrategico').text(response.data.datos_proyecto_estrategico.clave + ' - ' + response.data.datos_proyecto_estrategico.descripcion);
 
-            $('#lbl_cobertura').text(response.data.cobertura.descripcion);
+            var cobertura = response.data.cobertura.descripcion;
+
+            if(response.data.claveMunicipio){
+                cobertura = cobertura + ' <small class="text-capitalize">('+response.data.municipio.nombre+')</small>'                
+            }
+
+            $('#lbl_cobertura').html(cobertura);
             $('#lbl_tipo_accion').text(response.data.tipo_accion.descripcion);
 
             $('#lbl_vinculacion_ped').text(response.data.objetivo_ped.descripcion);
