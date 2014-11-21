@@ -22,7 +22,8 @@ var form_name = '#form_caratula';
 /*===================================*/
 // Implementación personalizada del módulo
 function editar (e){
-    moduloResource.get(e,null,{
+    var parametros = {ver:'proyecto'};
+    moduloResource.get(e,parametros,{
         _success: function(response){
             var titulo_modal = response.data.clasificacion_proyecto.descripcion + ' <small>' + response.data.tipo_proyecto.descripcion + '</small>';
             $(modal_name).find(".modal-title").html(titulo_modal);
@@ -84,9 +85,12 @@ function editar (e){
 
             $('#id').val(response.data.id);
 
-            $(modal_name).modal('show');
+            construir_panel_componentes(response.data.componentes);
+            
             $('#datos-formulario').hide();
             $('#datos-proyecto').show();
+
+            $(modal_name).modal('show');
         }
     });
 }
@@ -152,4 +156,115 @@ function submitModulo(save_next){
     $(form_name).attr('action',SERVER_HOST+'/poa/caratula');
     $(form_name).attr('method','POST');
     $(form_name).submit();
+}
+
+function construir_panel_componentes(componentes){
+    var html = '<br><small><div class="panel-group" id="grupo_componentes" role="tablist" aria-multiselectable="true">'; //inico del panel
+    for(indx in componentes){
+        var actividades = '<div class="panel-group" id="grupo_actividades_'+componentes[indx].id+'" role="tablist" aria-multiselectable="true">'
+        for(idx in componentes[indx].actividades){
+            actividades += constructor_grupo_acordiones('grupo_actividades_'+componentes[indx].id,componentes[indx].actividades[idx],'actividad');
+        }
+        actividades += '</div>';
+
+        var elemento_componente = constructor_grupo_acordiones('grupo_componentes',componentes[indx],'componente',actividades);
+        html += elemento_componente;
+    }
+    html += '</div></small>'; //Fin del panel
+
+    $('#tab-componente').html(html);
+}
+
+function constructor_grupo_acordiones(padre,item,tipo,contenido_extra){ //tipo = 'componente' o 'actividad', contenido = contenido extra (grupo de actividades)
+    var contenido = '<div class="panel panel-default">';
+    
+    contenido += '<div class="panel-heading" role="tab" id="cabecera_'+tipo+'_'+item.id+'">';
+    contenido += '<h4 class="panel-title">';
+    contenido += '<a data-toggle="collapse" data-parent="#'+padre+'" href="#contenido_'+tipo+'_'+item.id+'" aria-controls="contenido_'+tipo+'_'+item.id+'">';
+    contenido += item.objetivo;
+    contenido += '</a>';
+    contenido += '</h4>';
+    contenido += '</div>';
+    contenido += '<div id="contenido_'+tipo+'_'+item.id+'" class="panel-collapse collapse" role="tabpanel" aria-labelledby="cabecera_'+tipo+'_'+item.id+'">';
+    contenido += '<div class="panel-body">';
+
+    contenido += '<address>';
+    contenido += '<div class="row">';
+    contenido += '<div class="col-sm-6">';
+    contenido += '<strong>Medios de Verificación:</strong> '+item.mediosVerificacion+'<br>';
+    contenido += '<strong>Supuestos:</strong> '+item.supuestos;
+    contenido += '</div>';
+    if(item.accion){
+        contenido += '<div class="col-sm-6">';
+        contenido += '<strong>Entregable:</strong> '+item.entregable.descripcion+'<br>';
+        contenido += '<strong>Tipo:</strong> '+item.tipo+'<br>';
+        contenido += '<strong>Accion:</strong> '+item.accion;
+        contenido += '</div>';
+    }
+    contenido += '</div>';
+
+    contenido += '<hr style="margin-bottom:5px; margin-top:5px;">';
+
+    contenido += '<div class="row">';
+    contenido += '<div class="col-sm-6">';
+    contenido += '<strong>Indicador:</strong> '+item.indicador+'<br>';
+    contenido += '<strong>Numerador:</strong> '+item.numerador+'<br>';
+    contenido += '<strong>Denominador:</strong> '+item.denominador+'<br>';
+    contenido += '<strong>Interpretación:</strong> '+item.interpretacion+'<br>';
+    contenido += '<strong>Meta Indicador:</strong> '+item.metaIndicador+'<br>';
+    contenido += '</div>';
+    contenido += '<div class="col-sm-6">';
+    contenido += '<strong>Formula:</strong> '+item.formula.descripcion+'<br>';
+    contenido += '<strong>Dimensión:</strong> '+item.dimension.descripcion+'<br>';
+    contenido += '<strong>Frecuencia:</strong> '+item.frecuencia.descripcion+'<br>';
+    contenido += '<strong>Tipo:</strong> '+item.tipo_indicador.descripcion+'<br>';
+    contenido += '<strong>Unidad de Medida:</strong> '+item.unidad_medida.descripcion+'<br>';    
+    contenido += '</div>';
+    contenido += '</div>';
+
+    contenido += '<hr style="margin-bottom:5px; margin-top:5px;">';
+
+    contenido += '<div class="row">';
+    contenido += '<div class="col-sm-3">';
+    contenido += '<strong>Trimestre 1:</strong> <br>'+item.numeroTrim1;
+    contenido += '</div>';
+    contenido += '<div class="col-sm-3">';
+    contenido += '<strong>Trimestre 2:</strong> <br>'+item.numeroTrim2;
+    contenido += '</div>';
+    contenido += '<div class="col-sm-3">';
+    contenido += '<strong>Trimestre 3:</strong> <br>'+item.numeroTrim3;
+    contenido += '</div>';
+    contenido += '<div class="col-sm-3">';
+    contenido += '<strong>Trimestre 4:</strong> <br>'+item.numeroTrim4;
+    contenido += '</div>';
+    contenido += '</div>';
+
+    contenido += '<div class="row">';
+    contenido += '<div class="col-sm-3">';
+    contenido += '<strong>Numerador:</strong> <br>'+item.valorNumerador;
+    contenido += '</div>';
+    contenido += '<div class="col-sm-3">';
+    contenido += '<strong>Denominador:</strong> <br>'+item.valorDenominador;
+    contenido += '</div>';
+    contenido += '<div class="col-sm-3">';
+    contenido += '<strong>Linea Base:</strong> <br>'+item.lineaBase;
+    contenido += '</div>';
+    contenido += '<div class="col-sm-3">';
+    contenido += '<strong>Año Base:</strong> <br>'+item.anioBase;
+    contenido += '</div>';
+    contenido += '</div>';
+
+    contenido += '</address>';
+
+    if(contenido_extra){
+        contenido += '<br><strong>Actividades:</strong><br>';
+        contenido += contenido_extra;
+    }
+
+    contenido += '</div>';
+    contenido += '</div>';
+
+    contenido += '</div>';
+
+    return contenido;
 }

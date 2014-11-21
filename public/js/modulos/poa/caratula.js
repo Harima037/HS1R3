@@ -163,6 +163,7 @@ function editar_actividad(e){
             var titulo_modal = 'Editar Actividad';
             $(modal_actividad).find(".modal-title").html(titulo_modal);
 
+            $('#id-actividad').val(response.data.id);
  			$('#descripcion-obj-actividad').val(response.data.objetivo);
  			$('#verificacion-actividad').val(response.data.mediosVerificacion);
  			$('#supuestos-actividad').val(response.data.supuestos);
@@ -207,16 +208,83 @@ $('#btn-componente-guardar').on('click',function(){
 });
 
 $('#btn-actividad-guardar').on('click',function(){
-	guardar_datos_actividad();
+	var parametros = $(form_actividad).serialize();
+	parametros = parametros + '&guardar=actividad&id-componente=' + $('#id-componente').val();
+
+	if($('#id-actividad').val()){
+		proyectoResource.put($('#id-actividad').val(),parametros,{
+	        _success: function(response){
+	            MessageManager.show({data:'Datos de la actividad almacenados con éxito',type:'OK',timer:3});
+	            $(modal_actividad).modal('hide');
+				actualizar_grid_actividades(response.actividades);
+	        },
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                	json.container = modal_actividad + ' .modal-body';
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
+	    });
+	}else{
+		proyectoResource.post(parametros,{
+	        _success: function(response){
+	            MessageManager.show({data:'Datos de la actividad almacenados con éxito',type:'OK',timer:3});
+	            $(form_actividad + ' #id-actividad').val(response.data.id);
+	            $(modal_actividad).modal('hide');
+
+				actualizar_grid_actividades(response.actividades);
+	        },
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                	json.container = modal_actividad + ' .modal-body';
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
+	    });
+	}
 });
 
 $('#btn-proyecto-guardar').on('click',function(){
-
 	var parametros = $(form_caratula).serialize();
 	parametros = parametros + '&guardar=proyecto';
 	
 	if($('#id').val()){
-		
+		proyectoResource.put($('#id').val(),parametros,{
+	        _success: function(response){
+	            MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:3});
+	            //$(form_caratula + ' #no_proyecto_estrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
+	            //$(form_caratula + ' #numeroproyectoestrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
+	        },
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
+	    });
 	}else{
 		proyectoResource.post(parametros,{
 	        _success: function(response){
@@ -310,21 +378,22 @@ $(modal_actividad).on('hide.bs.modal',function(e){
 });
 
 //***********************     Funciones             +++++++++++++++++++++++++++++++++
-/** Actualiza el span correspondiente al select actualizado, para ir construyendo la Clave Presupuestaria **/
-function guardar_datos_actividad(){
-	var parametros = $(form_actividad).serialize();
-	parametros = parametros + '&guardar=actividad&id-componente=' + $('#id-componente').val();
+function guardar_datos_componente(cerrar){
+	var parametros = $(form_componente).serialize();
+	parametros = parametros + '&guardar=componente';
+	parametros = parametros + '&clasificacion='+$('#clasificacionproyecto').val();
 
-	if($('#id-actividad').val()){
-			
-	}else{
-		proyectoResource.post(parametros,{
+	if($('#id-componente').val()){
+		proyectoResource.put($('#id-componente').val(),parametros,{
 	        _success: function(response){
-	            MessageManager.show({data:'Datos de la actividad almacenados con éxito',type:'OK',timer:3});
-	            $(form_actividad + ' #id-actividad').val(response.data.id);
-	            $(modal_actividad).modal('hide');
-
-				actualizar_grid_actividades(response.actividades);
+	            MessageManager.show({data:'Datos del componente almacenados con éxito',type:'OK',timer:3});
+	            
+	            if(cerrar){
+					$(modal_componente).modal('hide');
+				}else{
+					$('#tablink-componente-actividades').tab('show');
+				}
+				actualizar_grid_componentes(response.componentes);
 	        },
 	        _error: function(response){
 	            try{
@@ -332,7 +401,6 @@ function guardar_datos_actividad(){
 	                if(!json.code)
 	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
 	                else{
-	                	json.container = modal_actividad + ' .modal-body';
 	                    MessageManager.show(json);
 	                }
 	                Validation.formValidate(json.data);
@@ -341,16 +409,6 @@ function guardar_datos_actividad(){
 	            }                       
 	        }
 	    });
-	}
-}
-
-function guardar_datos_componente(cerrar){
-	var parametros = $(form_componente).serialize();
-	parametros = parametros + '&guardar=componente&id-proyecto=' + $('#id').val();
-	parametros = parametros + '&clasificacion='+$('#clasificacionproyecto').val();
-
-	if($('#id-componente').val()){
-			
 	}else{
 		proyectoResource.post(parametros,{
 	        _success: function(response){
@@ -383,6 +441,7 @@ function guardar_datos_componente(cerrar){
 	}
 }
 
+/** Actualiza el span correspondiente al select actualizado, para ir construyendo la Clave Presupuestaria **/
 function actualiza_clave(id, clave, value){
 	if(clave != ''){
 		$('#'+id).text(clave);
