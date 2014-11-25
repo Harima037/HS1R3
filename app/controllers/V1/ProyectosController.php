@@ -176,10 +176,12 @@ class ProyectosController extends BaseController {
 			}
 			if($parametros['ver'] == 'proyecto'){
 				$recurso = Proyecto::contenidoCompleto()->find($id);
-				foreach ($recurso->componentes as $key => $componente) {
-					$recurso->componentes[$key]->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable'));
-					foreach ($recurso->componentes[$key]->actividades as $llave => $actividad) {
-						$recurso->componentes[$key]->actividades[$llave]->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
+				if($recurso){
+					foreach ($recurso->componentes as $key => $componente) {
+						$recurso->componentes[$key]->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable'));
+						foreach ($recurso->componentes[$key]->actividades as $llave => $actividad) {
+							$recurso->componentes[$key]->actividades[$llave]->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
+						}
 					}
 				}
 			}
@@ -722,19 +724,57 @@ class ProyectosController extends BaseController {
 		$data = array();
 
 		try{
-			$ids = Input::get('rows');
+
+			$parametros = Input::all();
+
+			$ids = $parametros['rows'];
+			$id_padre = 0;
 			
-			$rows = Catalogo::wherein('id', $ids)->delete();
+			if(isset($parametros['eliminar'])){
+				if($parametros['eliminar'] == 'componente'){
+					$id_padre = $parametros['id-proyecto'];
+					$rows = DB::transaction(function() use ($ids){
+						Actividad::wherein('idComponente',$ids)->delete();
+						return Componente::wherein('id',$ids)->delete();
+					});
+				}
+				if($parametros['eliminar'] == 'actividad'){
+					$id_padre = $parametros['id-componente'];
+					$rows = Actividad::wherein('id',$ids)->delete();
+				}
+			}else{
+				$rows = DB::transaction(function() use ($ids){
+					//Actividad::wherein('idComponente',$ids)->delete();
+					$componentes = Componente::wherein('idProyecto',$ids)->get(); //Deleting
+					foreach ($componentes as $componente) {
+						$componente->actividades()->delete();
+					}
+					/*foreach (Componente::wherein('idProyecto',$ids)->actividades as $actividad) {
+						$actividad
+					}*/
+					Componente::wherein('idProyecto',$ids)->delete();
+					Beneficiario::wherein('idProyecto',$ids)->delete();
+					return Proyecto::wherein('id',$ids)->delete();
+				});
+			}
 
 			if($rows>0){
 				$data = array("data"=>"Se han eliminado los recursos.");
+				if(isset($parametros['eliminar'])){
+					if($parametros['eliminar'] == 'actividad'){
+						$data['actividades'] = Actividad::where('idComponente',$id_padre)->get();
+					}
+					if($parametros['eliminar'] == 'componente'){
+						$data['componentes'] = Componente::where('idProyecto',$id_padre)->get();
+					}
+				}
 			}else{
 				$http_status = 404;
 				$data = array('data' => "No se pueden eliminar los recursos.",'code'=>'S03');
 			}	
 		}catch(Exception $ex){
 			$http_status = 500;	
-			$data = array('data' => "No se pueden borrar los registros",'code'=>'S03');	
+			$data = array('data' => "No se pueden borrar los registros",'ex'=>$ex->getMessage(),'code'=>'S03');	
 		}
 
 		return Response::json($data,$http_status);

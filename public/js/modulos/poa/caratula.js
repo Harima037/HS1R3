@@ -381,6 +381,7 @@ $(modal_actividad).on('hide.bs.modal',function(e){
 function guardar_datos_componente(cerrar){
 	var parametros = $(form_componente).serialize();
 	parametros = parametros + '&guardar=componente';
+	parametros = parametros + '&id-proyecto='+$('#id').val();
 	parametros = parametros + '&clasificacion='+$('#clasificacionproyecto').val();
 
 	if($('#id-componente').val()){
@@ -441,6 +442,75 @@ function guardar_datos_componente(cerrar){
 	}
 }
 
+/**                            Reescribiendo comportamiento del datagrid                                 **/
+$(grid_componentes + " .btn-delete-rows").unbind('click');
+$(grid_componentes + " .btn-delete-rows").on('click',function(e){
+	e.preventDefault();
+	var rows = [];
+	var contador= 0;
+    
+    $(this).parents(".datagrid").find("tbody").find("input[type=checkbox]:checked").each(function () {
+		contador++;
+        rows.push($(this).parent().parent().data("id"));
+	});
+
+	if(contador>0){
+		Confirm.show({
+				titulo:"Eliminar componente",
+				//botones:[], 
+				mensaje: "¿Estás seguro que deseas eliminar los componentes seleccionados?",
+				//si: 'Actualizar',
+				//no: 'No, gracias',
+				callback: function(){
+					proyectoResource.delete(rows,{'rows': rows, 'eliminar': 'componente', 'id-proyecto': $('#id').val()},{
+                        _success: function(response){ 
+                        	actualizar_grid_componentes(response.componentes);
+                        },
+                        _error: function(jqXHR){ 
+                        	MessageManager.show(jqXHR.responseJSON);
+                        }
+        			});
+				}
+		});
+	}else{
+		MessageManager.show({data:'No has seleccionado ningún registro.',type:'ADV',timer:3});
+	}
+});
+
+$(grid_actividades + " .btn-delete-rows").unbind('click');
+$(grid_actividades + " .btn-delete-rows").on('click',function(e){
+	e.preventDefault();
+	var rows = [];
+	var contador= 0;
+    
+    $(this).parents(".datagrid").find("tbody").find("input[type=checkbox]:checked").each(function () {
+		contador++;
+        rows.push($(this).parent().parent().data("id"));
+	});
+
+	if(contador>0){
+		Confirm.show({
+				titulo:"Eliminar actividad",
+				//botones:[], 
+				mensaje: "¿Estás seguro que deseas eliminar las actividades seleccionadas?",
+				//si: 'Actualizar',
+				//no: 'No, gracias',
+				callback: function(){
+					proyectoResource.delete(rows,{'rows': rows, 'eliminar': 'actividad', 'id-componente': $('#id-componente').val()},{
+                        _success: function(response){ 
+                        	actualizar_grid_actividades(response.actividades);
+                        },
+                        _error: function(jqXHR){ 
+                        	MessageManager.show(jqXHR.responseJSON);
+                        }
+        			});
+				}
+		});
+	}else{
+		MessageManager.show({data:'No has seleccionado ningún registro.',type:'ADV',timer:3});
+	}
+});
+
 /** Actualiza el span correspondiente al select actualizado, para ir construyendo la Clave Presupuestaria **/
 function actualiza_clave(id, clave, value){
 	if(clave != ''){
@@ -451,9 +521,10 @@ function actualiza_clave(id, clave, value){
 }
 
 function deshabilita_municipio(id){
-	if(id == 1){
+	if(id < 2){
 		$('#municipio').prop('disabled',true);
-		$('#municipio').selectpicker('val','');
+		$('#municipio').val('');
+		$('#municipio').change();
 	}else{
 		$('#municipio').prop('disabled',false);
 	}

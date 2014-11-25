@@ -22,7 +22,7 @@
 @section('content')
 <div class="row">
     <div class="col-md-12">
-    	<div class="panel panel-default datagrid" id="datagridCaratulas" data-edit-row="editar">
+    	<div class="panel panel-default" id="datagridCaratulas">
             <div class="panel-heading"><h4><i class="fa fa-file"></i> <b>{{$clasificacion_proyecto}}</b> <small>({{$tipo_proyecto}})</small></h4></div>
             <div class="panel-body">
                 <ul class="nav nav-tabs" role="tablist">

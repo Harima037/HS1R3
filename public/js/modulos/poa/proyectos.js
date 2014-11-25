@@ -159,7 +159,7 @@ function submitModulo(save_next){
 }
 
 function construir_panel_componentes(componentes){
-    var html = '<br><small><div class="panel-group" id="grupo_componentes" role="tablist" aria-multiselectable="true">'; //inico del panel
+    var html = '<br><div class="panel-group" id="grupo_componentes" role="tablist" aria-multiselectable="true">'; //inico del panel
     for(indx in componentes){
         var actividades = '<div class="panel-group" id="grupo_actividades_'+componentes[indx].id+'" role="tablist" aria-multiselectable="true">'
         for(idx in componentes[indx].actividades){
@@ -170,13 +170,18 @@ function construir_panel_componentes(componentes){
         var elemento_componente = constructor_grupo_acordiones('grupo_componentes',componentes[indx],'componente',actividades);
         html += elemento_componente;
     }
-    html += '</div></small>'; //Fin del panel
+    html += '</div>'; //Fin del panel
 
     $('#tab-componente').html(html);
 }
 
 function constructor_grupo_acordiones(padre,item,tipo,contenido_extra){ //tipo = 'componente' o 'actividad', contenido = contenido extra (grupo de actividades)
-    var contenido = '<div class="panel panel-default">';
+    var clase_panel = 'success';
+    if(tipo == 'componente'){
+        clase_panel = 'info';
+    }
+
+    var contenido = '<div class="panel panel-'+clase_panel+'">';
     
     contenido += '<div class="panel-heading" role="tab" id="cabecera_'+tipo+'_'+item.id+'">';
     contenido += '<h4 class="panel-title">';
@@ -225,31 +230,31 @@ function constructor_grupo_acordiones(padre,item,tipo,contenido_extra){ //tipo =
     contenido += '<hr style="margin-bottom:5px; margin-top:5px;">';
 
     contenido += '<div class="row">';
-    contenido += '<div class="col-sm-3">';
+    contenido += '<div class="col-sm-3 col-xs-6">';
     contenido += '<strong>Trimestre 1:</strong> <br>'+item.numeroTrim1;
     contenido += '</div>';
-    contenido += '<div class="col-sm-3">';
+    contenido += '<div class="col-sm-3 col-xs-6">';
     contenido += '<strong>Trimestre 2:</strong> <br>'+item.numeroTrim2;
     contenido += '</div>';
-    contenido += '<div class="col-sm-3">';
+    contenido += '<div class="col-sm-3 col-xs-6">';
     contenido += '<strong>Trimestre 3:</strong> <br>'+item.numeroTrim3;
     contenido += '</div>';
-    contenido += '<div class="col-sm-3">';
+    contenido += '<div class="col-sm-3 col-xs-6">';
     contenido += '<strong>Trimestre 4:</strong> <br>'+item.numeroTrim4;
     contenido += '</div>';
     contenido += '</div>';
 
     contenido += '<div class="row">';
-    contenido += '<div class="col-sm-3">';
+    contenido += '<div class="col-sm-3 col-xs-6">';
     contenido += '<strong>Numerador:</strong> <br>'+item.valorNumerador;
     contenido += '</div>';
-    contenido += '<div class="col-sm-3">';
+    contenido += '<div class="col-sm-3 col-xs-6">';
     contenido += '<strong>Denominador:</strong> <br>'+item.valorDenominador;
     contenido += '</div>';
-    contenido += '<div class="col-sm-3">';
+    contenido += '<div class="col-sm-3 col-xs-6">';
     contenido += '<strong>Linea Base:</strong> <br>'+item.lineaBase;
     contenido += '</div>';
-    contenido += '<div class="col-sm-3">';
+    contenido += '<div class="col-sm-3 col-xs-6">';
     contenido += '<strong>Año Base:</strong> <br>'+item.anioBase;
     contenido += '</div>';
     contenido += '</div>';

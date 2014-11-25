@@ -182,19 +182,19 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-3">
+        <div class="col-sm-4">
             <div class="form-group">
                 <label class="control-label" for="cobertura">Cobertura</label>
                 {{Form::select('cobertura',array('' =>'Selecciona una cobertura') + $coberturas->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'cobertura'))}}
             </div>
         </div>
-        <div class="col-sm-3">
+        <div class="col-sm-4">
             <div class="form-group">
                 <label class="control-label" for="municipio">Municipio</label>
                 {{Form::select('municipio',array('' =>'Selecciona un municipio') + $municipios->lists('nombre','clave'),'',array('class'=>'form-control selectpicker','id'=>'municipio','data-live-search'=>'true','data-container'=>'body'))}}
             </div>
         </div>
-        <div class="col-sm-3">
+        <div class="col-sm-4">
             <div class="form-group">
                 <label class="control-label" for="tipobeneficiario">Beneficiario</label>
                 {{Form::select('tipobeneficiario',array('' =>'Selecciona un beneficiario') + $tipos_beneficiarios->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'tipobeneficiario','data-live-search'=>'true','data-container'=>'body'))}}
@@ -208,9 +208,9 @@
             </div>
         </div>
 
-        <div class="col-sm-12">
+        <div class="col-sm-5">
             <div class="row">
-                <div class="col-sm-3">
+                <div class="col-sm-6">
                     <div class="form-group">
                         <label class="control-label" for="totalbeneficiariosf">Femenino</label>
                         <div class="input-group">
@@ -219,7 +219,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-6">
                     <div class="form-group">
                         <label class="control-label" for="totalbeneficiariosm">Masculino</label>
                         <div class="input-group">
@@ -228,7 +228,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-12">
                     <div class="form-group">
                         <label class="control-label" for="totalbeneficiarios">Total</label>
                         <input type="number" class="form-control" name="totalbeneficiarios" id="totalbeneficiarios">
@@ -236,8 +236,7 @@
                 </div>
             </div>
         </div>
-
-        <div class="col-sm-3">
+        <div class="col-sm-4">
             <table class="table table-bordered table-condensed">
                 <tr>
                     <th rowspan="2"></th>
@@ -259,7 +258,7 @@
                 </tr>
             </table>
         </div>
-        <div class="col-sm-4">
+        <div class="col-sm-6">
             <table class="table table-bordered table-condensed">
                 <tr>
                     <th rowspan="2"></th>
@@ -287,7 +286,7 @@
                 </tr>
             </table>
         </div>
-        <div class="col-sm-5">
+        <div class="col-sm-6">
             <table class="table table-bordered table-condensed">
                 <tr>
                     <th rowspan="2"></th>
