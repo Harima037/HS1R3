@@ -12,7 +12,11 @@ class Componente extends BaseModel
 	}
 
 	public function actividades(){
-		return $this->hasMany('Actividad','idComponente');
+		return $this->hasMany('Actividad','idComponente')->with('usuario');
+	}
+
+	public function usuario(){
+		return $this->belongsTo('SentryUser','actualizadoPor');
 	}
 
 	public function formula(){

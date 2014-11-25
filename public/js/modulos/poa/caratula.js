@@ -323,8 +323,14 @@ $('#cobertura').on('change',function(){
 
 /** Botones para mostrar los modales de Componente y Actividad **/
 $('.btn-agregar-actividad').on('click',function(){
-	$(modal_actividad).find(".modal-title").html("Nueva Actividad");
-	$(modal_actividad).modal('show');
+	var actividades = $('#conteo-actividades').text().split('/');
+
+	if(actividades[0] >= actividades[1]){
+		MessageManager.show({code:'S03',data:"Las actividades para este componente ya estan completas.",timer:2});
+	}else{
+		$(modal_actividad).find(".modal-title").html("Nueva Actividad");
+		$(modal_actividad).modal('show');
+	}
 });
 
 $('.btn-agregar-componente').on('click',function(){
@@ -369,6 +375,15 @@ $('#proyectoestrategico').on('change',function(){
 });
 
 /*******************************      Funcionalidad de los lementos de la pag     ********************************************/
+$(modal_componente + ' #lista-tabs-componente').on('show.bs.tab',function(event){
+	var id = event.target.id;
+	if(id == 'tablink-componente-actividades'){
+		$('.btn-grupo-guardar').hide();
+	}else{
+		$('.btn-grupo-guardar').show();
+	}
+});
+
 $(modal_componente).on('hide.bs.modal',function(e){
 	reset_modal_form(form_componente);
 });
@@ -540,7 +555,7 @@ function actualizar_grid_actividades(datos){
 		actividad.descripcion = datos[indx].objetivo;
 		actividad.mediosVerificacion = datos[indx].mediosVerificacion;
 		actividad.supuestos = datos[indx].supuestos;
-		actividad.creadoPor = datos[indx].creadoPor;
+		actividad.creadoPor = datos[indx].usuario.username;
 		actividad.creadoAl = datos[indx].creadoAl;
 
 		actividades.push(actividad);
@@ -565,7 +580,7 @@ function actualizar_grid_componentes(datos){
 		componente.descripcion = datos[indx].objetivo;
 		componente.mediosVerificacion = datos[indx].mediosVerificacion;
 		componente.supuestos = datos[indx].supuestos;
-		componente.creadoPor = datos[indx].creadoPor;
+		componente.creadoPor = datos[indx].usuario.username;
 		componente.creadoAl = datos[indx].creadoAl;
 
 		componentes.push(componente);

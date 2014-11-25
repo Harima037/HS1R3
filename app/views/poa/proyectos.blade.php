@@ -152,6 +152,7 @@
                         <!-- Tab panes -->
                             <div class="tab-content">
                                 <div role="tabpanel" class="tab-pane active" id="tab-proyecto">
+                                    <br>
                                     <div class="row">
                                         <div class="col-sm-5 col-xs-12">
                                             <label class="control-label">Nombre Técnico</label>

@@ -50,7 +50,7 @@ class Proyecto extends BaseModel
 	}
 
 	public function componentes(){
-		return $this->hasMany('Componente','idProyecto');
+		return $this->hasMany('Componente','idProyecto')->with('usuario');
 	}
 
 	public function beneficiarios(){

@@ -11,6 +11,10 @@ class Actividad extends BaseModel
 		return $query->with('formula','dimension','frecuencia','tipoIndicador','unidadMedida');
 	}
 
+	public function usuario(){
+		return $this->belongsTo('SentryUser','actualizadoPor');
+	}
+
 	public function formula(){
 		return $this->belongsTo('Formula','idFormula');
 	}

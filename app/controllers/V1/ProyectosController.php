@@ -256,6 +256,8 @@ class ProyectosController extends BaseController {
 					$actividad->anioBase = $parametros['anio-base-actividad'];
 					
 					if($componente->actividades()->save($actividad)){
+						//$componente->load('actividades')->with('usuario');
+						$actividad->load('usuario');
 						$componente->actividades[] = $actividad;
 
 						$respuesta['data']['data'] = $actividad;
@@ -762,10 +764,10 @@ class ProyectosController extends BaseController {
 				$data = array("data"=>"Se han eliminado los recursos.");
 				if(isset($parametros['eliminar'])){
 					if($parametros['eliminar'] == 'actividad'){
-						$data['actividades'] = Actividad::where('idComponente',$id_padre)->get();
+						$data['actividades'] = Actividad::with('usuario')->where('idComponente',$id_padre)->get();
 					}
 					if($parametros['eliminar'] == 'componente'){
-						$data['componentes'] = Componente::where('idProyecto',$id_padre)->get();
+						$data['componentes'] = Componente::with('usuario')->where('idProyecto',$id_padre)->get();
 					}
 				}
 			}else{
