@@ -11,6 +11,10 @@ class Actividad extends BaseModel
 		return $query->with('formula','dimension','frecuencia','tipoIndicador','unidadMedida');
 	}
 
+	public function metasMes(){
+		return $this->hasMany('ActividadMetaMes','idActividad');
+	}
+
 	public function usuario(){
 		return $this->belongsTo('SentryUser','actualizadoPor');
 	}

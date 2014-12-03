@@ -21,7 +21,7 @@ class Proyecto extends BaseModel
         						->where('programaEspecial',$item->programaEspecial)
         						->where('actividadInstitucional',$item->actividadInstitucional)
         						->where('proyectoEstrategico',$item->proyectoEstrategico)
-        						->count();
+        						->max('numeroProyectoEstrategico');
             $item->numeroProyectoEstrategico = ($count + 1);
         });
     }
@@ -43,7 +43,7 @@ class Proyecto extends BaseModel
 	}
 
 	public function scopeContenidoCompleto($query){
-		return $query->with('componentes','beneficiarios','municipio','clasificacionProyecto','tipoProyecto','cobertura','tipoAccion',
+		return $query->with('componentes','beneficiarios','municipio','region','clasificacionProyecto','tipoProyecto','cobertura','tipoAccion',
 			'datosUnidadResponsable','datosFinalidad','datosFuncion','datosSubFuncion','datosSubSubFuncion','datosProgramaSectorial',
 			'datosProgramaPresupuestario','datosProgramaEspecial','datosActividadInstitucional','datosProyectoEstrategico',
 			'objetivoPed','tipoBeneficiario','estatusProyecto');
@@ -59,6 +59,10 @@ class Proyecto extends BaseModel
 
 	public function municipio(){
 		return $this->belongsTo('Municipio','claveMunicipio','clave');
+	}
+
+	public function region(){
+		return $this->belongsTo('Region','claveRegion','region');
 	}
 
 	public function clasificacionProyecto(){

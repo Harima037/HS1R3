@@ -27,6 +27,9 @@ var Validation = {
 	cleanFormErrors: function(formName){
 		$(formName+' .help-block.server-error-msg').remove();
 		$(formName).find('.form-group').removeClass('has-error');
+	},
+	cleanFieldErrors:function(form_field){
+		$('#'+form_field).parents('div[class*="form-group"]').find('.help-block.server-error-msg').remove();
+		$('#'+form_field).parents('div[class*="form-group"]').removeClass('has-error');
 	}
-
 }

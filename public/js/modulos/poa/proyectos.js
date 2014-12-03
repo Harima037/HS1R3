@@ -53,7 +53,9 @@ function editar (e){
             var cobertura = response.data.cobertura.descripcion;
 
             if(response.data.claveMunicipio){
-                cobertura = cobertura + ' <small class="text-capitalize">('+response.data.municipio.nombre+')</small>'                
+                cobertura = cobertura + ' <small class="text-capitalize">('+response.data.municipio.nombre+')</small>';
+            }else if(response.data.claveRegion){
+                cobertura = cobertura + ' <small class="text-capitalize">('+response.data.region.nombre+')</small>';
             }
 
             $('#lbl_cobertura').html(cobertura);
@@ -62,25 +64,25 @@ function editar (e){
             $('#lbl_vinculacion_ped').text(response.data.objetivo_ped.descripcion);
 
             $('#lbl_tipo_beneficiario').text(response.data.tipo_beneficiario.descripcion);
-            $('#lbl_total_beneficiarios').text(response.data.totalBeneficiarios);
-            $('#lbl_beneficiarios_f').text(response.data.totalBeneficiariosF);
-            $('#lbl_beneficiarios_m').text(response.data.totalBeneficiariosM);
+            $('#lbl_total_beneficiarios').text(response.data.totalBeneficiarios.format());
+            $('#lbl_beneficiarios_f').text(response.data.totalBeneficiariosF.format());
+            $('#lbl_beneficiarios_m').text(response.data.totalBeneficiariosM.format());
 
             var indx;
             var sexo;
             for( indx in response.data.beneficiarios ){
                 sexo = response.data.beneficiarios[indx].sexo;
-                $('#lbl_benef_urbana_'+sexo).text(response.data.beneficiarios[indx].urbana);
-                $('#lbl_benef_rural_'+sexo).text(response.data.beneficiarios[indx].rural);
-                $('#lbl_benef_mestiza_'+sexo).text(response.data.beneficiarios[indx].mestiza);
-                $('#lbl_benef_indigena_'+sexo).text(response.data.beneficiarios[indx].indigena);
-                $('#lbl_benef_inmigrante_'+sexo).text(response.data.beneficiarios[indx].inmigrante);
-                $('#lbl_benef_otros_'+sexo).text(response.data.beneficiarios[indx].otros);
-                $('#lbl_benef_muy_alta_'+sexo).text(response.data.beneficiarios[indx].muyAlta);
-                $('#lbl_benef_alta_'+sexo).text(response.data.beneficiarios[indx].alta);
-                $('#lbl_benef_media_'+sexo).text(response.data.beneficiarios[indx].media);
-                $('#lbl_benef_baja_'+sexo).text(response.data.beneficiarios[indx].baja);
-                $('#lbl_benef_muy_baja_'+sexo).text(response.data.beneficiarios[indx].muyBaja);
+                $('#lbl_benef_urbana_'+sexo).text(response.data.beneficiarios[indx].urbana.format());
+                $('#lbl_benef_rural_'+sexo).text(response.data.beneficiarios[indx].rural.format());
+                $('#lbl_benef_mestiza_'+sexo).text(response.data.beneficiarios[indx].mestiza.format());
+                $('#lbl_benef_indigena_'+sexo).text(response.data.beneficiarios[indx].indigena.format());
+                $('#lbl_benef_inmigrante_'+sexo).text(response.data.beneficiarios[indx].inmigrante.format());
+                $('#lbl_benef_otros_'+sexo).text(response.data.beneficiarios[indx].otros.format());
+                $('#lbl_benef_muy_alta_'+sexo).text(response.data.beneficiarios[indx].muyAlta.format());
+                $('#lbl_benef_alta_'+sexo).text(response.data.beneficiarios[indx].alta.format());
+                $('#lbl_benef_media_'+sexo).text(response.data.beneficiarios[indx].media.format());
+                $('#lbl_benef_baja_'+sexo).text(response.data.beneficiarios[indx].baja.format());
+                $('#lbl_benef_muy_baja_'+sexo).text(response.data.beneficiarios[indx].muyBaja.format());
             }
 
             $('#id').val(response.data.id);
@@ -139,6 +141,7 @@ $(modal_name+' .btn-guardar').on('click', function (e) {
 });
 
 function resetModalModuloForm(){
+    Validation.cleanFormErrors(form_name);
     $(form_name).get(0).reset();
     $('#opciones_fibap').addClass('hidden');
     $('#orden_fibap label').removeClass('active');
@@ -195,12 +198,12 @@ function constructor_grupo_acordiones(padre,item,tipo,contenido_extra){ //tipo =
 
     contenido += '<address>';
     contenido += '<div class="row">';
-    contenido += '<div class="col-sm-6">';
+    contenido += '<div class="col-sm-7">';
     contenido += '<strong>Medios de Verificación:</strong> '+item.mediosVerificacion+'<br>';
     contenido += '<strong>Supuestos:</strong> '+item.supuestos;
     contenido += '</div>';
     if(item.accion){
-        contenido += '<div class="col-sm-6">';
+        contenido += '<div class="col-sm-5">';
         contenido += '<strong>Entregable:</strong> '+item.entregable.descripcion+'<br>';
         contenido += '<strong>Tipo:</strong> '+item.tipo+'<br>';
         contenido += '<strong>Accion:</strong> '+item.accion;
@@ -273,3 +276,15 @@ function constructor_grupo_acordiones(padre,item,tipo,contenido_extra){ //tipo =
 
     return contenido;
 }
+
+/*             Extras               */
+/**
+ * Number.prototype.format(n, x)
+ * 
+ * @param integer n: length of decimal
+ * @param integer x: length of sections
+ */
+Number.prototype.format = function(n, x) {
+    var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\.' : '$') + ')';
+    return this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+};

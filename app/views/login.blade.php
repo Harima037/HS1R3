@@ -12,7 +12,7 @@
     <div class="container">
 
     <form class="form-signin" method="post">
-        <h2 class="form-signin-heading">Plataforma Base</h2>
+        <h2 class="form-signin-heading">POA</h2>
         @if($error)
         <div class="alert alert-danger"><span class="glyphicon glyphicon-ban-circle"></span> {{ $error }}</div>
         @endif

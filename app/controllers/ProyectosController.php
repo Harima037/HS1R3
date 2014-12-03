@@ -52,7 +52,8 @@ class ProyectosController extends \BaseController {
 			'objetivos_ped' => $objetivos_ped,
 			'coberturas' => Cobertura::all(),
 			'tipos_beneficiarios' => TipoBeneficiario::all(),
-			'municipios' => Municipio::all()
+			'municipios' => Municipio::all(),
+			'regiones' => Region::all()
 		);
 		
 		//Si hay un id etonces es edición
@@ -67,6 +68,21 @@ class ProyectosController extends \BaseController {
 
 		//Cargar el formulario para dar de alta actividades
 		$datos_componentes['identificador'] = 'actividad'; //El identificador se agrega al id de los elementos del formulario
+		//$datos_componentes['jurisdicciones'] = array('O.C.','I','II','III','IV','V','VI','VII','VIII','IX','X');
+		$datos_componentes['meses'] = array(
+				'ENE'=>'Enero',
+				'FEB'=>'Febrero',
+				'MAR'=>'Marzo',
+				'ABR'=>'Abril',
+				'MAY'=>'Mayo',
+				'JUN'=>'Junio',
+				'JUL'=>'Julio',
+				'AGO'=>'Agosto',
+				'SEP'=>'Septiembre',
+				'OCT'=>'Octubre',
+				'NOV'=>'Noviembre',
+				'DIC'=>'Diciembre'
+			);
 		$datos['formulario_actividades'] = View::make('poa.formulario-componente',$datos_componentes);
 
 		//Cargar el formulario para dar de alta compoenentes

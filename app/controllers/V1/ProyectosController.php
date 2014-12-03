@@ -4,97 +4,96 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry;
-use Proyecto, Componente, Actividad, Beneficiario,Hash, Exception;
+use Proyecto, Componente, Actividad, Beneficiario,ComponenteMetaMes,ActividadMetaMes, Hash, Exception;
 
 class ProyectosController extends BaseController {
 	private $reglasProyecto = array(
-		'funciongasto'=>'required',
-		'clasificacionproyecto'=>'required',
-		'nombretecnico'=>'required',
-		'tipoproyecto'=>'required',
-		'cobertura'=>'required',
-		'tipoaccion'=>'required',
-		'unidadresponsable'=>'required',
-		'programasectorial'=>'required',
-		'programapresupuestario'=>'required',
-		'programaespecial'=>'required',
-		'actividadinstitucional'=>'required',
-		'proyectoestrategico'=>'required',
-		'vinculacionped'=>'required',
-		'tipobeneficiario'=>'required',
-		'totalbeneficiarios'=>'required',
-		'totalbeneficiariosf'=>'required',
-		'totalbeneficiariosm'=>'required',
-		'altaf' => 'required',
-		'altam' => 'required',
-		'bajaf' => 'required',
-		'bajam' => 'required',
-		'indigenaf' => 'required',
-		'indigenam' => 'required',
-		'inmigrantef' => 'required',
-		'inmigrantem' => 'required',
-		'mediaf' => 'required',
-		'mediam' => 'required',
-		'mestizaf' => 'required',
-		'mestizam' => 'required',
-		'muyaltaf' => 'required',
-		'muyaltam' => 'required',
-		'muybajaf' => 'required',
-		'muybajam' => 'required',
-		'otrosf' => 'required',
-		'otrosm' => 'required',
-		'ruralf' => 'required',
-		'ruralm' => 'required',
-		'urbanaf' => 'required',
-		'urbanam' => 'required'
+		'funciongasto'				=> 'required',
+		'clasificacionproyecto'		=> 'required',
+		'nombretecnico'				=> 'required',
+		'tipoproyecto'				=> 'required',
+		'cobertura'					=> 'required',
+		'tipoaccion'				=> 'required',
+		'unidadresponsable'			=> 'required|digits:2',
+		'programasectorial'			=> 'required|alpha_num|size:1',
+		'programapresupuestario'	=> 'required|alpha_num|size:3',
+		'programaespecial'			=> 'required|alpha_num|size:3',
+		'actividadinstitucional'	=> 'required|alpha_num|size:3',
+		'proyectoestrategico'		=> 'required|alpha_num|size:1',
+		'vinculacionped'			=> 'required',
+		'tipobeneficiario'			=> 'required',
+		'totalbeneficiariosf'		=> 'required|integer|min:0',
+		'totalbeneficiariosm'		=> 'required|integer|min:0',
+		'altaf' 					=> 'required|integer|min:0',
+		'altam' 					=> 'required|integer|min:0',
+		'bajaf' 					=> 'required|integer|min:0',
+		'bajam' 					=> 'required|integer|min:0',
+		'indigenaf'					=> 'required|integer|min:0',
+		'indigenam'					=> 'required|integer|min:0',
+		'inmigrantef' 				=> 'required|integer|min:0',
+		'inmigrantem' 				=> 'required|integer|min:0',
+		'mediaf' 					=> 'required|integer|min:0',
+		'mediam' 					=> 'required|integer|min:0',
+		'mestizaf' 					=> 'required|integer|min:0',
+		'mestizam'					=> 'required|integer|min:0',
+		'muyaltaf' 					=> 'required|integer|min:0',
+		'muyaltam' 					=> 'required|integer|min:0',
+		'muybajaf' 					=> 'required|integer|min:0',
+		'muybajam' 					=> 'required|integer|min:0',
+		'otrosf' 					=> 'required|integer|min:0',
+		'otrosm' 					=> 'required|integer|min:0',
+		'ruralf' 					=> 'required|integer|min:0',
+		'ruralm' 					=> 'required|integer|min:0',
+		'urbanaf' 					=> 'required|integer|min:0',
+		'urbanam' 					=> 'required|integer|min:0'
 	);
 
 	private $reglasComponente = array(
-		'anio-base-componente' => 'required',
-		'denominador-componente' => 'required',
-		'denominador-ind-componente' => 'required',
-		'descripcion-ind-componente' => 'required',
-		'descripcion-obj-componente' => 'required',
-		'dimension-componente' => 'required',
-		'formula-componente' => 'required',
-		'frecuencia-componente' => 'required',
-		'interpretacion-componente' => 'required',
-		'linea-base-componente' => 'required',
-		'meta-componente' => 'required',
-		'numerador-componente' => 'required',
-		'numerador-ind-componente' => 'required',
-		'supuestos-componente' => 'required',
-		'tipo-ind-componente' => 'required',
-		'trim1-componente' => 'required',
-		'trim2-componente' => 'required',
-		'trim3-componente' => 'required',
-		'trim4-componente' => 'required',
-		'unidad-medida-componente' => 'required',
-		'verificacion-componente' => 'required'
+		'denominador-ind-componente' 	=> 'required',
+		'descripcion-ind-componente' 	=> 'required',
+		'descripcion-obj-componente' 	=> 'required',
+		'dimension-componente' 			=> 'required',
+		'formula-componente' 			=> 'required',
+		'frecuencia-componente' 		=> 'required',
+		'interpretacion-componente' 	=> 'required',
+		'meta-componente' 				=> 'required|numeric|min:1',
+		'numerador-componente' 			=> 'required',
+		'numerador-ind-componente' 		=> 'required',
+		'supuestos-componente' 			=> 'required',
+		'tipo-ind-componente' 			=> 'required',
+		'anio-base-componente' 			=> 'integer|min:0',
+		'denominador-componente' 		=> 'required_if:formula-componente,1,2,3,4,5,6|numeric|min:0',
+		'linea-base-componente' 		=> 'numeric|min:0',
+		'trim1-componente' 				=> 'numeric',
+		'trim2-componente' 				=> 'numeric',
+		'trim3-componente' 				=> 'numeric',
+		'trim4-componente' 				=> 'numeric',
+		'unidad-medida-componente' 		=> 'required',
+		'verificacion-componente' 		=> 'required'
 	);
 
 	private $reglasActividad = array(
-		'anio-base-actividad' => 'required',
-		'denominador-actividad' => 'required',
-		'denominador-ind-actividad' => 'required',
-		'descripcion-ind-actividad' => 'required',
-		'descripcion-obj-actividad' => 'required',
-		'dimension-actividad' => 'required',
-		'formula-actividad' => 'required',
-		'frecuencia-actividad' => 'required',
-		'interpretacion-actividad' => 'required',
-		'linea-base-actividad' => 'required',
-		'meta-actividad' => 'required',
-		'numerador-actividad' => 'required',
-		'numerador-ind-actividad' => 'required',
-		'supuestos-actividad' => 'required',
-		'tipo-ind-actividad' => 'required',
-		'trim1-actividad' => 'required',
-		'trim2-actividad' => 'required',
-		'trim3-actividad' => 'required',
-		'trim4-actividad' => 'required',
-		'unidad-medida-actividad' => 'required',
-		'verificacion-actividad' => 'required'
+		'denominador-ind-actividad' 	=> 'required',
+		'descripcion-ind-actividad' 	=> 'required',
+		'descripcion-obj-actividad' 	=> 'required',
+		'dimension-actividad' 			=> 'required',
+		'formula-actividad' 			=> 'required',
+		'frecuencia-actividad' 			=> 'required',
+		'interpretacion-actividad' 		=> 'required',
+		'meta-actividad' 				=> 'required|numeric|min:1',
+		'numerador-actividad' 			=> 'required',
+		'numerador-ind-actividad' 		=> 'required',
+		'supuestos-actividad' 			=> 'required',
+		'tipo-ind-actividad' 			=> 'required',
+		'anio-base-actividad' 			=> 'integer|min:0',
+		'denominador-actividad' 		=> 'required_if:formula-actividad,1,2,3,4,5,6|numeric|min:0',
+		'linea-base-actividad' 			=> 'numeric|min:0',
+		'trim1-actividad' 				=> 'numeric',
+		'trim2-actividad' 				=> 'numeric',
+		'trim3-actividad' 				=> 'numeric',
+		'trim4-actividad' 				=> 'numeric',
+		'unidad-medida-actividad' 		=> 'required',
+		'verificacion-actividad' 		=> 'required'
 	);
 	/**
 	 * Display a listing of the resource.
@@ -169,10 +168,10 @@ class ProyectosController extends BaseController {
 
 		if($parametros){
 			if($parametros['ver'] == 'componente'){
-				$recurso = Componente::with('actividades')->find($id);
+				$recurso = Componente::with('actividades','metasMes')->find($id);
 			}
 			if($parametros['ver'] == 'actividad'){
-				$recurso = Actividad::find($id);
+				$recurso = Actividad::with('metasMes')->find($id);
 			}
 			if($parametros['ver'] == 'proyecto'){
 				$recurso = Proyecto::contenidoCompleto()->find($id);
@@ -233,38 +232,55 @@ class ProyectosController extends BaseController {
 					$actividad = new Actividad;
 
 					//$componente->idProyecto = $parametros['id-proyecto'];
-					$actividad->objetivo = $parametros['descripcion-obj-actividad'];
-					$actividad->mediosVerificacion = $parametros['verificacion-actividad'];
-					$actividad->supuestos = $parametros['supuestos-actividad'];
-					$actividad->indicador = $parametros['descripcion-ind-actividad'];
-					$actividad->numerador = $parametros['numerador-ind-actividad'];
-					$actividad->denominador = $parametros['denominador-ind-actividad'];
-					$actividad->interpretacion = $parametros['interpretacion-actividad'];
-					$actividad->idFormula = $parametros['formula-actividad'];
-					$actividad->idDimensionIndicador = $parametros['dimension-actividad'];
-					$actividad->idFrecuenciaIndicador = $parametros['frecuencia-actividad'];
-					$actividad->idTipoIndicador = $parametros['tipo-ind-actividad'];
-					$actividad->idUnidadMedida = $parametros['unidad-medida-actividad'];
-					$actividad->metaIndicador = $parametros['meta-actividad'];
-					$actividad->numeroTrim1 = $parametros['trim1-actividad'];
-					$actividad->numeroTrim2 = $parametros['trim2-actividad'];
-					$actividad->numeroTrim3 = $parametros['trim3-actividad'];
-					$actividad->numeroTrim4 = $parametros['trim4-actividad'];
-					$actividad->valorNumerador = $parametros['numerador-actividad'];
-					$actividad->valorDenominador = $parametros['denominador-actividad'];
-					$actividad->lineaBase = $parametros['linea-base-actividad'];
-					$actividad->anioBase = $parametros['anio-base-actividad'];
+					$actividad->objetivo 				= $parametros['descripcion-obj-actividad'];
+					$actividad->mediosVerificacion 		= $parametros['verificacion-actividad'];
+					$actividad->supuestos 				= $parametros['supuestos-actividad'];
+					$actividad->indicador 				= $parametros['descripcion-ind-actividad'];
+					$actividad->numerador 				= $parametros['numerador-ind-actividad'];
+					$actividad->denominador 			= $parametros['denominador-ind-actividad'];
+					$actividad->interpretacion 			= $parametros['interpretacion-actividad'];
+					$actividad->idFormula 				= $parametros['formula-actividad'];
+					$actividad->idDimensionIndicador 	= $parametros['dimension-actividad'];
+					$actividad->idFrecuenciaIndicador 	= $parametros['frecuencia-actividad'];
+					$actividad->idTipoIndicador			= $parametros['tipo-ind-actividad'];
+					$actividad->idUnidadMedida 			= $parametros['unidad-medida-actividad'];
+					$actividad->metaIndicador 			= $parametros['meta-actividad'];
+					$actividad->numeroTrim1 			= $parametros['trim1-actividad'];
+					$actividad->numeroTrim2 			= $parametros['trim2-actividad'];
+					$actividad->numeroTrim3 			= $parametros['trim3-actividad'];
+					$actividad->numeroTrim4 			= $parametros['trim4-actividad'];
+					$actividad->valorNumerador 			= $parametros['numerador-actividad'];
+					$actividad->valorDenominador 		= $parametros['denominador-actividad'];
+					$actividad->lineaBase 				= $parametros['linea-base-actividad'];
+					$actividad->anioBase 				= $parametros['anio-base-actividad'];
 					
-					if($componente->actividades()->save($actividad)){
-						//$componente->load('actividades')->with('usuario');
-						$actividad->load('usuario');
-						$componente->actividades[] = $actividad;
+					$respuesta['data'] = DB::transaction(function() use ($parametros, $componente, $actividad){
+						if($componente->actividades()->save($actividad)){
+							$actividad->load('usuario');
+							$componente->actividades[] = $actividad;
 
-						$respuesta['data']['data'] = $actividad;
-						$respuesta['data']['actividades'] = $componente->actividades;
-					}else{
-						throw new Exception("Ocurrió un error al guardar la actividad.", 1);
-					}
+							$meses = $parametros['mes-actividad'];
+
+							$metasMes = array();
+
+							foreach ($meses as $mes => $valor) {
+								if($valor > 0){
+									$meta = new ActividadMetaMes;
+									$meta->mes = $mes;
+									$meta->meta = $valor;
+									$meta->idProyecto = $componente->idProyecto;
+									$metasMes[] = $meta;
+								}
+							}
+							
+							$actividad->metasMes()->saveMany($metasMes);
+
+							return array('data'=>$actividad,'actividades'=>$componente->actividades);
+						}else{
+							throw new Exception("Ocurrió un error al guardar la actividad.", 1);
+						}
+					});
+
 				}else{
 					//La Validación del Formulario encontro errores
 					$respuesta['http_status'] = $validacion['http_status'];
@@ -285,9 +301,15 @@ class ProyectosController extends BaseController {
 		if($parametros['guardar'] == 'componente'){
 			try{
 				$proyecto = Proyecto::find(Input::get('id-proyecto'));
+				$proyecto->load('componentes');
 
 				if(!$proyecto){
 					throw new Exception("No se pudo encontrar el proyecto al que pertenece este componente", 1);
+				}
+
+				if(count($proyecto->componentes) == 2){
+					$respuesta['data']['data'] = 'El proyecto no puede tener mas de 2 componentes.';
+					throw new Exception("No esta permitido guardar mas de 2 componentes por cada proyecto", 1);
 				}
 
 				if($parametros['clasificacion'] == 2){
@@ -302,27 +324,27 @@ class ProyectosController extends BaseController {
 					$componente = new Componente;
 
 					//$componente->idProyecto = $parametros['id-proyecto'];
-					$componente->objetivo = $parametros['descripcion-obj-componente'];
-					$componente->mediosVerificacion = $parametros['verificacion-componente'];
-					$componente->supuestos = $parametros['supuestos-componente'];
-					$componente->indicador = $parametros['descripcion-ind-componente'];
-					$componente->numerador = $parametros['numerador-ind-componente'];
-					$componente->denominador = $parametros['denominador-ind-componente'];
-					$componente->interpretacion = $parametros['interpretacion-componente'];
-					$componente->idFormula = $parametros['formula-componente'];
-					$componente->idDimensionIndicador = $parametros['dimension-componente'];
-					$componente->idFrecuenciaIndicador = $parametros['frecuencia-componente'];
-					$componente->idTipoIndicador = $parametros['tipo-ind-componente'];
-					$componente->idUnidadMedida = $parametros['unidad-medida-componente'];
-					$componente->metaIndicador = $parametros['meta-componente'];
-					$componente->numeroTrim1 = $parametros['trim1-componente'];
-					$componente->numeroTrim2 = $parametros['trim2-componente'];
-					$componente->numeroTrim3 = $parametros['trim3-componente'];
-					$componente->numeroTrim4 = $parametros['trim4-componente'];
-					$componente->valorNumerador = $parametros['numerador-componente'];
-					$componente->valorDenominador = $parametros['denominador-componente'];
-					$componente->lineaBase = $parametros['linea-base-componente'];
-					$componente->anioBase = $parametros['anio-base-componente'];
+					$componente->objetivo 				= $parametros['descripcion-obj-componente'];
+					$componente->mediosVerificacion 	= $parametros['verificacion-componente'];
+					$componente->supuestos 				= $parametros['supuestos-componente'];
+					$componente->indicador 				= $parametros['descripcion-ind-componente'];
+					$componente->numerador 				= $parametros['numerador-ind-componente'];
+					$componente->denominador 			= $parametros['denominador-ind-componente'];
+					$componente->interpretacion 		= $parametros['interpretacion-componente'];
+					$componente->idFormula 				= $parametros['formula-componente'];
+					$componente->idDimensionIndicador 	= $parametros['dimension-componente'];
+					$componente->idFrecuenciaIndicador 	= $parametros['frecuencia-componente'];
+					$componente->idTipoIndicador 		= $parametros['tipo-ind-componente'];
+					$componente->idUnidadMedida 		= $parametros['unidad-medida-componente'];
+					$componente->metaIndicador 			= $parametros['meta-componente'];
+					$componente->numeroTrim1 			= $parametros['trim1-componente'];
+					$componente->numeroTrim2 			= $parametros['trim2-componente'];
+					$componente->numeroTrim3 			= $parametros['trim3-componente'];
+					$componente->numeroTrim4 			= $parametros['trim4-componente'];
+					$componente->valorNumerador 		= $parametros['numerador-componente'];
+					$componente->valorDenominador 		= $parametros['denominador-componente'];
+					$componente->lineaBase 				= $parametros['linea-base-componente'];
+					$componente->anioBase 				= $parametros['anio-base-componente'];
 
 					if($parametros['clasificacion'] == 2){
 						$componente->idEntregable = $parametros['entregable-componente'];
@@ -330,22 +352,42 @@ class ProyectosController extends BaseController {
 						$componente->accion = $parametros['accion-componente'];
 					}
 
-					if($proyecto->componentes()->save($componente)){
-						$proyecto->load('componentes');
+					$respuesta['data'] = DB::transaction(function() use ($parametros, $proyecto, $componente){
+						if($proyecto->componentes()->save($componente)){
+							$componente->load('usuario');
+							$proyecto->componentes[] = $componente;
 
-						$respuesta['data']['data'] = $componente;
-						$respuesta['data']['componentes'] = $proyecto->componentes;
-					}else{
-						throw new Exception("Ocurrió un error al guardar el componente.", 1);
-					}
+							$meses = $parametros['mes-componente'];
+
+							$metasMes = array();
+
+							foreach ($meses as $mes => $valor) {
+								if($valor > 0){
+									$meta = new ComponenteMetaMes;
+									$meta->mes = $mes;
+									$meta->meta = $valor;
+									$meta->idProyecto = $componente->idProyecto;
+									$metasMes[] = $meta;
+								}
+							}
+							
+							$componente->metasMes()->saveMany($metasMes);
+
+							return array('data'=>$componente,'componentes'=>$proyecto->componentes);
+						}else{
+							throw new Exception("Ocurrió un error al guardar el componente.", 1);
+						}
+					});
 				}else{
 					//La Validación del Formulario encontro errores
 					$respuesta['http_status'] = $validacion['http_status'];
 					$respuesta['data'] = $validacion['data'];
 				}
 			}catch(\Exception $ex){
-				$respuesta['http_status'] = 500;	
-				$respuesta['data']['data'] = 'Ocurrio un error en el servidor, al guardar el componente.';
+				$respuesta['http_status'] = 500;
+				if($respuesta['data']['data'] == ''){
+					$respuesta['data']['data'] = 'Ocurrio un error en el servidor, al guardar el componente.';
+				}
 				$respuesta['data']['ex'] = $ex->getMessage();
 				if(!isset($respuesta['data']['code'])){
 					$respuesta['data']['code'] = 'S03';
@@ -355,9 +397,11 @@ class ProyectosController extends BaseController {
 
 		if($parametros['guardar'] == 'proyecto'){
 
-			if($parametros['cobertura'] != 1){
+			if($parametros['cobertura'] == 2){
 				//Si la cobertura es diferente a estatal, checamos que haya seleccionado un municipio
-				$this->reglasProyecto['municipio'] = 'required';
+				$this->reglasProyecto['municipio'] = 'required|digits_between:1,3';
+			}elseif($parametros['cobertura'] == 3){
+				$this->reglasProyecto['region'] = 'required|alpha';
 			}
 
 			$validacion = Validador::validar(Input::all(), $this->reglasProyecto);
@@ -386,13 +430,15 @@ class ProyectosController extends BaseController {
 					$recurso->proyectoEstrategico 			= $parametros['proyectoestrategico'];
 					$recurso->idObjetivoPED 				= $parametros['vinculacionped'];
 					$recurso->idTipoBeneficiario 			= $parametros['tipobeneficiario'];
-					$recurso->totalBeneficiarios 			= $parametros['totalbeneficiarios'];
+					$recurso->totalBeneficiarios 			= $parametros['totalbeneficiariosf'] + $parametros['totalbeneficiariosm'];
 					$recurso->totalBeneficiariosF 			= $parametros['totalbeneficiariosf'];
 					$recurso->totalBeneficiariosM 			= $parametros['totalbeneficiariosm'];
 					$recurso->idEstatusProyecto 			= 1;
 
-					if($parametros['cobertura'] != 1){
+					if($parametros['cobertura'] == 2){
 						$recurso->claveMunicipio = $parametros['municipio'];
+					}elseif($parametros['cobertura'] == 3){
+						$recurso->claveRegion = $parametros['region'];
 					}
 
 				  //$recurso->idLiderProyecto 				= $parametros[''];
@@ -615,9 +661,11 @@ class ProyectosController extends BaseController {
 
 		if($parametros['guardar'] == 'proyecto'){
 
-			if($parametros['cobertura'] != 1){
+			if($parametros['cobertura'] == 2){
 				//Si la cobertura es diferente a estatal, checamos que haya seleccionado un municipio
-				$this->reglasProyecto['municipio'] = 'required';
+				$this->reglasProyecto['municipio'] = 'required|digits_between:1,3';
+			}elseif($parametros['cobertura'] == 3){
+				$this->reglasProyecto['region'] = 'required|alpha';
 			}
 
 			$validacion = Validador::validar(Input::all(), $this->reglasProyecto);
@@ -651,15 +699,20 @@ class ProyectosController extends BaseController {
 					$recurso->proyectoEstrategico 			= $parametros['proyectoestrategico'];
 					$recurso->idObjetivoPED 				= $parametros['vinculacionped'];
 					$recurso->idTipoBeneficiario 			= $parametros['tipobeneficiario'];
-					$recurso->totalBeneficiarios 			= $parametros['totalbeneficiarios'];
+					$recurso->totalBeneficiarios 			= $parametros['totalbeneficiariosf'] + $parametros['totalbeneficiariosm'];
 					$recurso->totalBeneficiariosF 			= $parametros['totalbeneficiariosf'];
 					$recurso->totalBeneficiariosM 			= $parametros['totalbeneficiariosm'];
 					$recurso->idEstatusProyecto 			= 1;
 
-					if($parametros['cobertura'] != 1){
+					if($parametros['cobertura'] == 2){
 						$recurso->claveMunicipio = $parametros['municipio'];
+						$recurso->claveRegion = NULL;
+					}elseif($parametros['cobertura'] == 3){
+						$recurso->claveMunicipio = NULL;
+						$recurso->claveRegion = $parametros['region'];
 					}else{
 						$recurso->claveMunicipio = NULL;
+						$recurso->claveRegion = NULL;
 					}
 
 				  //$recurso->idLiderProyecto 				= $parametros[''];
@@ -746,14 +799,10 @@ class ProyectosController extends BaseController {
 				}
 			}else{
 				$rows = DB::transaction(function() use ($ids){
-					//Actividad::wherein('idComponente',$ids)->delete();
-					$componentes = Componente::wherein('idProyecto',$ids)->get(); //Deleting
+					$componentes = Componente::wherein('idProyecto',$ids)->get();
 					foreach ($componentes as $componente) {
 						$componente->actividades()->delete();
 					}
-					/*foreach (Componente::wherein('idProyecto',$ids)->actividades as $actividad) {
-						$actividad
-					}*/
 					Componente::wherein('idProyecto',$ids)->delete();
 					Beneficiario::wherein('idProyecto',$ids)->delete();
 					return Proyecto::wherein('id',$ids)->delete();

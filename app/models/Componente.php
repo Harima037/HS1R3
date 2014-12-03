@@ -15,6 +15,10 @@ class Componente extends BaseModel
 		return $this->hasMany('Actividad','idComponente')->with('usuario');
 	}
 
+	public function metasMes(){
+		return $this->hasMany('ComponenteMetaMes','idComponente');
+	}
+
 	public function usuario(){
 		return $this->belongsTo('SentryUser','actualizadoPor');
 	}

@@ -20,10 +20,10 @@
     </div>
     @section('mainmenu')
     @include('layouts.MainMenu')
-    @show    
+    @show
     <div class="page-container">
     <div id="mainAppContainer" class="container" >
-        @yield('content')        
+        @yield('content')
     </div> 
     </div>   
     <footer class="container">
@@ -45,8 +45,8 @@
                     <h4 class="modal-title" id="modalAcercaDeLabel">Acerca de...</h4>
                 </div>
                 <div class="modal-body">
-                    <h2>Plataforma Base beta 1.0</h2>
-                    <p>Plataforma limpia para usar en nuevos desarrollos del Área de Informática de la Sec. de Salud.</p>
+                    <h2>POA 1.0</h2>
+                    <p>Plataforma de administración del POA</p>
                     <p><small> <strong>Instituto de Salud</strong> Tuxtla Gutiérrez, 2014 &copy;. Desarrollado por: Área de Informática</small></p>
                 </div>
                 <div class="modal-footer">

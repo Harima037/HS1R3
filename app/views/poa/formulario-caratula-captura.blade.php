@@ -59,39 +59,17 @@
                             <b>Clave Presupuestaria</b> <br>
                             <strong>
                                 <kbd>
-                                    <kbd id="unidad_responsable" title="Unidad Responsable">
-                                        --
-                                    </kbd>
-                                    <kbd id="finalidad" title="Finalidad">
-                                        -
-                                    </kbd>
-                                    <kbd id="funcion" title="Función">
-                                        -
-                                    </kbd>
-                                    <kbd id="subfuncion" title="Subfunción">
-                                        -
-                                    </kbd>
-                                    <kbd id="subsubfuncion" title="SubSubfunción">
-                                        -
-                                    </kbd>
-                                    <kbd id="programa_sectorial" title="Programa Sectorial">
-                                        -
-                                    </kbd>
-                                    <kbd id="programa_presupuestario" title="Programa Presupuestario">
-                                        ---
-                                    </kbd>
-                                    <kbd id="programa_especial" title="Programa Especial">
-                                        ---
-                                    </kbd>
-                                    <kbd id="actividad_institucional" title="Actividad Institucional">
-                                        ---
-                                    </kbd>
-                                    <kbd id="proyecto_estrategico" title="Proyecto Estratégico">
-                                        -
-                                    </kbd>
-                                    <kbd id="no_proyecto_estrategico" title="Número de Proyecto Estratégico">
-                                        000
-                                    </kbd>
+                                    <kbd id="unidad_responsable" title="Unidad Responsable">--</kbd>
+                                    <kbd id="finalidad" title="Finalidad">-</kbd>
+                                    <kbd id="funcion" title="Función">-</kbd>
+                                    <kbd id="subfuncion" title="Subfunción">-</kbd>
+                                    <kbd id="subsubfuncion" title="SubSubfunción">-</kbd>
+                                    <kbd id="programa_sectorial" title="Programa Sectorial">-</kbd>
+                                    <kbd id="programa_presupuestario" title="Programa Presupuestario">---</kbd>
+                                    <kbd id="programa_especial" title="Programa Especial">---</kbd>
+                                    <kbd id="actividad_institucional" title="Actividad Institucional">---</kbd>
+                                    <kbd id="proyecto_estrategico" title="Proyecto Estratégico">-</kbd>
+                                    <kbd id="no_proyecto_estrategico" title="Número de Proyecto Estratégico">000</kbd>
                                 </kbd>
                             </strong>
                         </div>
@@ -189,9 +167,17 @@
             </div>
         </div>
         <div class="col-sm-4">
-            <div class="form-group">
+            <div id="select-estado-panel" class="form-group">
+                <label class="control-label" for="municipio">Estado</label>
+                <p class="form-control-static">Chiapas</p>
+            </div>
+            <div id="select-municipio-panel" class="form-group">
                 <label class="control-label" for="municipio">Municipio</label>
                 {{Form::select('municipio',array('' =>'Selecciona un municipio') + $municipios->lists('nombre','clave'),'',array('class'=>'form-control selectpicker','id'=>'municipio','data-live-search'=>'true','data-container'=>'body'))}}
+            </div>
+            <div id="select-region-panel" class="form-group">
+                <label class="control-label" for="region">Región</label>
+                {{Form::select('region',array('' =>'Selecciona una región') + $regiones->lists('nombre','region'),'',array('class'=>'form-control selectpicker','id'=>'region','data-container'=>'body'))}}
             </div>
         </div>
         <div class="col-sm-4">
@@ -214,7 +200,7 @@
                         <label class="control-label" for="totalbeneficiariosf">Femenino</label>
                         <div class="input-group">
                             <span class="input-group-addon"><span class="fa fa-female"></span></span>
-                            <input type="number" class="form-control" name="totalbeneficiariosf" id="totalbeneficiariosf">
+                            <input type="number" class="form-control benef-totales" name="totalbeneficiariosf" id="totalbeneficiariosf">
                         </div>
                     </div>
                 </div>
@@ -223,14 +209,14 @@
                         <label class="control-label" for="totalbeneficiariosm">Masculino</label>
                         <div class="input-group">
                             <span class="input-group-addon"><span class="fa fa-male"></span></span>
-                            <input type="number" class="form-control" name="totalbeneficiariosm" id="totalbeneficiariosm">
+                            <input type="number" class="form-control benef-totales" name="totalbeneficiariosm" id="totalbeneficiariosm">
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-3">
                     <div class="form-group">
                         <label class="control-label" for="totalbeneficiarios">Total</label>
-                        <input type="number" class="form-control" name="totalbeneficiarios" id="totalbeneficiarios">
+                        <span id="totalbeneficiarios" class="form-control"></span>
                     </div>
                 </div>
             </div>
@@ -238,21 +224,47 @@
 
         <div class="col-sm-4">
             <table class="table table-bordered table-condensed">
-                <tr><th colspan="3">Zona</th></tr>
+                <tr><th colspan="2">Zona</th></tr>
                 <tr>
-                    <th></th>
                     <th><span class="fa fa-female fa-2x"></span></th>
                     <th><span class="fa fa-male fa-2x"></span></th>
                 </tr>
                 <tr>
-                    <th><small>Urbana</small></th>
-                    <td><div class="form-group"><input type="number" class="form-control" name="urbanaf" id="urbanaf"></div></td>
-                    <td><div class="form-group"><input type="number" class="form-control" name="urbanam" id="urbanam"></div></td>
+                    <th colspan="2"><small>Urbana</small></th>
                 </tr>
                 <tr>
-                    <th><small>Rural</small></th>
-                    <td><div class="form-group"><input type="number" class="form-control" name="ruralf" id="ruralf"></div></td>
-                    <td><div class="form-group"><input type="number" class="form-control" name="ruralm" id="ruralm"></div></td>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-zona fem" name="urbanaf" id="urbanaf">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control  sub-total-zona masc" name="urbanam" id="urbanam">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th colspan="2"><small>Rural</small></th>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-zona fem" name="ruralf" id="ruralf">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-zona masc" name="ruralm" id="ruralm">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th colspan="2"><small>Totales</small></th>
+                </tr>
+                <tr>
+                    <td><div class="form-group"><span id="total-zona-f" class="form-control"></span></div></td>
+                    <td><div class="form-group"><span id="total-zona-m" class="form-control"></span></div></td>
                 </tr>
             </table>
         </div>
@@ -260,32 +272,78 @@
         <div class="col-sm-4">
             <table class="table table-bordered table-condensed">
                 <tr>
-                    <th colspan="3">Población</th>
+                    <th colspan="2">Población</th>
                 </tr>
                 <tr>
-                    <th></th>
                     <th><span class="fa fa-female fa-2x"></span></th>
                     <th><span class="fa fa-male fa-2x"></span></th>
                 </tr>
                 <tr>
-                    <th><small>Mestiza</small></th>
-                    <td><div class="form-group"><input type="number" class="form-control" name="mestizaf" id="mestizaf"></div></td>
-                    <td><div class="form-group"><input type="number" class="form-control" name="mestizam" id="mestizam"></div></td>
+                    <th colspan="2"><small>Mestiza</small></th>
                 </tr>
                 <tr>
-                    <th><small>Indigena</small></th>
-                    <td><div class="form-group"><input type="number" class="form-control" name="indigenaf" id="indigenaf"></div></td>
-                    <td><div class="form-group"><input type="number" class="form-control" name="indigenam" id="indigenam"></div></td>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-poblacion fem" name="mestizaf" id="mestizaf">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-poblacion masc" name="mestizam" id="mestizam">
+                        </div>
+                    </td>
                 </tr>
                 <tr>
-                    <th><small>Inmigrante</small></th>
-                    <td><div class="form-group"><input type="number" class="form-control" name="inmigrantef" id="inmigrantef"></div></td>
-                    <td><div class="form-group"><input type="number" class="form-control" name="inmigrantem" id="inmigrantem"></div></td>
+                    <th colspan="2"><small>Indigena</small></th>
                 </tr>
                 <tr>
-                    <th><small>Otros</small></th>
-                    <td><div class="form-group"><input type="number" class="form-control" name="otrosf" id="otrosf"></div></td>
-                    <td><div class="form-group"><input type="number" class="form-control" name="otrosm" id="otrosm"></div></td>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-poblacion fem" name="indigenaf" id="indigenaf">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-poblacion masc" name="indigenam" id="indigenam">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th colspan="2"><small>Inmigrante</small></th>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-poblacion fem" name="inmigrantef" id="inmigrantef">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-poblacion masc" name="inmigrantem" id="inmigrantem">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th colspan="2"><small>Otros</small></th>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-poblacion fem" name="otrosf" id="otrosf">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-poblacion masc" name="otrosm" id="otrosm">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th colspan="2"><small>Totales</small></th>
+                </tr>
+                <tr>
+                    <td><div class="form-group"><span id="total-poblacion-f" class="form-control"></span></div></td>
+                    <td><div class="form-group"><span id="total-poblacion-m" class="form-control"></span></div></td>
                 </tr>
             </table>
         </div>
@@ -293,37 +351,93 @@
         <div class="col-sm-4">
             <table class="table table-bordered table-condensed">
                 <tr>
-                    <th colspan="3">Marginación</th>
+                    <th colspan="2">Marginación</th>
                 </tr>
                 <tr>
-                    <th></th>
                     <th><span class="fa fa-female fa-2x"></span></th>
                     <th><span class="fa fa-male fa-2x"></span></th>
                 </tr>
                 <tr>
-                    <th><small>Muy alta</small></th>
-                    <td><div class="form-group"><input type="number" class="form-control" name="muyaltaf" id="muyaltaf"></div></td>
-                    <td><div class="form-group"><input type="number" class="form-control" name="muyaltam" id="muyaltam"></div></td>
+                    <th colspan="2"><small>Muy alta</small></th>
                 </tr>
                 <tr>
-                    <th><small>Alta</small></th>
-                    <td><div class="form-group"><input type="number" class="form-control" name="altaf" id="altaf"></div></td>
-                    <td><div class="form-group"><input type="number" class="form-control" name="altam" id="altam"></div></td>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-marginacion fem" name="muyaltaf" id="muyaltaf">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-marginacion masc" name="muyaltam" id="muyaltam">
+                        </div>
+                    </td>
                 </tr>
                 <tr>
-                    <th><small>Media</small></th>
-                    <td><div class="form-group"><input type="number" class="form-control" name="mediaf" id="mediaf"></div></td>
-                    <td><div class="form-group"><input type="number" class="form-control" name="mediam" id="mediam"></div></td>
+                    <th colspan="2"><small>Alta</small></th>
                 </tr>
                 <tr>
-                    <th><small>Baja</small></th>
-                    <td><div class="form-group"><input type="number" class="form-control" name="bajaf" id="bajaf"></div></td>
-                    <td><div class="form-group"><input type="number" class="form-control" name="bajam" id="bajam"></div></td>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-marginacion fem" name="altaf" id="altaf">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-marginacion masc" name="altam" id="altam">
+                        </div>
+                    </td>
                 </tr>
                 <tr>
-                    <th><small>Muy baja</small></th>
-                    <td><div class="form-group"><input type="number" class="form-control" name="muybajaf" id="muybajaf"></div></td>
-                    <td><div class="form-group"><input type="number" class="form-control" name="muybajam" id="muybajam"></div></td>
+                    <th colspan="2"><small>Media</small></th>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-marginacion fem" name="mediaf" id="mediaf">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-marginacion masc" name="mediam" id="mediam">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th colspan="2"><small>Baja</small></th>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-marginacion fem" name="bajaf" id="bajaf">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-marginacion masc" name="bajam" id="bajam">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th colspan="2"><small>Muy baja</small></th>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-marginacion fem" name="muybajaf" id="muybajaf">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <input type="number" class="form-control sub-total-marginacion masc" name="muybajam" id="muybajam">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th colspan="2"><small>Totales</small></th>
+                </tr>
+                <tr>
+                    <td><div class="form-group"><span id="total-marginacion-f" class="form-control"></span></div></td>
+                    <td><div class="form-group"><span id="total-marginacion-m" class="form-control"></span></div></td>
                 </tr>
             </table>
         </div>
