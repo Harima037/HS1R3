@@ -215,7 +215,7 @@
                 </div>
                 <div class="col-sm-3">
                     <div class="form-group">
-                        <label class="control-label" for="totalbeneficiarios">Total</label>
+                        <label class="control-label"><span class="fa fa-link"></span> Total</label>
                         <span id="totalbeneficiarios" class="form-control"></span>
                     </div>
                 </div>
@@ -230,7 +230,7 @@
                     <th><span class="fa fa-male fa-2x"></span></th>
                 </tr>
                 <tr>
-                    <th colspan="2"><small>Urbana</small></th>
+                    <th colspan="2">Urbana</th>
                 </tr>
                 <tr>
                     <td>
@@ -245,7 +245,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th colspan="2"><small>Rural</small></th>
+                    <th colspan="2">Rural</th>
                 </tr>
                 <tr>
                     <td>
@@ -260,7 +260,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th colspan="2"><small>Totales</small></th>
+                    <th colspan="2"><span class="fa fa-link"></span> Totales</th>
                 </tr>
                 <tr>
                     <td><div class="form-group"><span id="total-zona-f" class="form-control"></span></div></td>
@@ -279,7 +279,7 @@
                     <th><span class="fa fa-male fa-2x"></span></th>
                 </tr>
                 <tr>
-                    <th colspan="2"><small>Mestiza</small></th>
+                    <th colspan="2">Mestiza</th>
                 </tr>
                 <tr>
                     <td>
@@ -294,7 +294,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th colspan="2"><small>Indigena</small></th>
+                    <th colspan="2">Indigena</th>
                 </tr>
                 <tr>
                     <td>
@@ -309,7 +309,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th colspan="2"><small>Inmigrante</small></th>
+                    <th colspan="2">Inmigrante</th>
                 </tr>
                 <tr>
                     <td>
@@ -324,7 +324,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th colspan="2"><small>Otros</small></th>
+                    <th colspan="2">Otros</th>
                 </tr>
                 <tr>
                     <td>
@@ -339,7 +339,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th colspan="2"><small>Totales</small></th>
+                    <th colspan="2"><span class="fa fa-link"></span> Totales</th>
                 </tr>
                 <tr>
                     <td><div class="form-group"><span id="total-poblacion-f" class="form-control"></span></div></td>
@@ -358,7 +358,7 @@
                     <th><span class="fa fa-male fa-2x"></span></th>
                 </tr>
                 <tr>
-                    <th colspan="2"><small>Muy alta</small></th>
+                    <th colspan="2">Muy alta</th>
                 </tr>
                 <tr>
                     <td>
@@ -373,7 +373,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th colspan="2"><small>Alta</small></th>
+                    <th colspan="2">Alta</th>
                 </tr>
                 <tr>
                     <td>
@@ -388,7 +388,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th colspan="2"><small>Media</small></th>
+                    <th colspan="2">Media</th>
                 </tr>
                 <tr>
                     <td>
@@ -403,7 +403,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th colspan="2"><small>Baja</small></th>
+                    <th colspan="2">Baja</th>
                 </tr>
                 <tr>
                     <td>
@@ -418,7 +418,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th colspan="2"><small>Muy baja</small></th>
+                    <th colspan="2">Muy baja </th>
                 </tr>
                 <tr>
                     <td>
@@ -433,7 +433,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th colspan="2"><small>Totales</small></th>
+                    <th colspan="2"><span class="fa fa-link"></span> Totales</th>
                 </tr>
                 <tr>
                     <td><div class="form-group"><span id="total-marginacion-f" class="form-control"></span></div></td>

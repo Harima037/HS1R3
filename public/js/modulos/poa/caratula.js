@@ -35,30 +35,30 @@ $('.control-espejo').each(function(){
 
 $('.metas-mes').on('change',function(){
 	var meses = {'ENE':1,'FEB':2,'MAR':3,'ABR':4,'MAY':5,'JUN':6,'JUL':7,'AGO':8,'SEP':9,'OCT':10,'NOV':11,'DIC':12};
-	var mes = $(this).data('mes-id');
+	var mes = $(this).data('meta-mes');
 	var trimestre = Math.ceil(meses[mes]/3);
-	var identificador = $(this).data('identificador');
+	var identificador = $(this).data('meta-identificador');
 
 	var valor_1;
 	var valor_2;
 	var valor_3;
 
 	if(trimestre == 1){
-		valor_1 = parseInt($('.metas-mes[data-mes-id="ENE"][data-identificador="'+identificador+'"]').val()) || 0;
-		valor_2 = parseInt($('.metas-mes[data-mes-id="FEB"][data-identificador="'+identificador+'"]').val()) || 0;
-		valor_3 = parseInt($('.metas-mes[data-mes-id="MAR"][data-identificador="'+identificador+'"]').val()) || 0;
+		valor_1 = parseInt($('.metas-mes[data-meta-mes="ENE"][data-meta-identificador="'+identificador+'"]').val()) || 0;
+		valor_2 = parseInt($('.metas-mes[data-meta-mes="FEB"][data-meta-identificador="'+identificador+'"]').val()) || 0;
+		valor_3 = parseInt($('.metas-mes[data-meta-mes="MAR"][data-meta-identificador="'+identificador+'"]').val()) || 0;
 	}else if(trimestre == 2){
-		valor_1 = parseInt($('.metas-mes[data-mes-id="ABR"][data-identificador="'+identificador+'"]').val()) || 0;
-		valor_2 = parseInt($('.metas-mes[data-mes-id="MAY"][data-identificador="'+identificador+'"]').val()) || 0;
-		valor_3 = parseInt($('.metas-mes[data-mes-id="JUN"][data-identificador="'+identificador+'"]').val()) || 0;
+		valor_1 = parseInt($('.metas-mes[data-meta-mes="ABR"][data-meta-identificador="'+identificador+'"]').val()) || 0;
+		valor_2 = parseInt($('.metas-mes[data-meta-mes="MAY"][data-meta-identificador="'+identificador+'"]').val()) || 0;
+		valor_3 = parseInt($('.metas-mes[data-meta-mes="JUN"][data-meta-identificador="'+identificador+'"]').val()) || 0;
 	}else if(trimestre == 3){
-		valor_1 = parseInt($('.metas-mes[data-mes-id="JUL"][data-identificador="'+identificador+'"]').val()) || 0;
-		valor_2 = parseInt($('.metas-mes[data-mes-id="AGO"][data-identificador="'+identificador+'"]').val()) || 0;
-		valor_3 = parseInt($('.metas-mes[data-mes-id="SEP"][data-identificador="'+identificador+'"]').val()) || 0;
+		valor_1 = parseInt($('.metas-mes[data-meta-mes="JUL"][data-meta-identificador="'+identificador+'"]').val()) || 0;
+		valor_2 = parseInt($('.metas-mes[data-meta-mes="AGO"][data-meta-identificador="'+identificador+'"]').val()) || 0;
+		valor_3 = parseInt($('.metas-mes[data-meta-mes="SEP"][data-meta-identificador="'+identificador+'"]').val()) || 0;
 	}else if(trimestre == 4){
-		valor_1 = parseInt($('.metas-mes[data-mes-id="OCT"][data-identificador="'+identificador+'"]').val()) || 0;
-		valor_2 = parseInt($('.metas-mes[data-mes-id="NOV"][data-identificador="'+identificador+'"]').val()) || 0;
-		valor_3 = parseInt($('.metas-mes[data-mes-id="DIC"][data-identificador="'+identificador+'"]').val()) || 0;
+		valor_1 = parseInt($('.metas-mes[data-meta-mes="OCT"][data-meta-identificador="'+identificador+'"]').val()) || 0;
+		valor_2 = parseInt($('.metas-mes[data-meta-mes="NOV"][data-meta-identificador="'+identificador+'"]').val()) || 0;
+		valor_3 = parseInt($('.metas-mes[data-meta-mes="DIC"][data-meta-identificador="'+identificador+'"]').val()) || 0;
 	}
 
 	var suma = valor_1 + valor_2 + valor_3;
@@ -164,6 +164,14 @@ if($('#id').val()){
 	deshabilita_paneles('');
 }
 
+$('#denominador-componente').on('keyup',function(){
+	ejecutar_formula('componente');
+});
+
+$('#denominador-actividad').on('keyup',function(){
+	ejecutar_formula('actividad');
+});
+
 $('.benef-totales').on('keyup',function(){
 	if($(this).attr('id') == 'totalbeneficiariosf'){
 		var totalm = parseInt($('#totalbeneficiariosm').val());
@@ -257,6 +265,14 @@ function editar_componente(e){
 			$('#tablink-componente-actividades').parent().removeClass('disabled');
 			$('#tablink-componente-actividades').tab('show');
 
+			$(form_componente + ' .metas-mes').attr('data-meta-id','');
+
+			var indx;
+			for(indx in response.data.metas_mes){
+				$('#mes-componente-'+response.data.metas_mes[indx].mes).val(response.data.metas_mes[indx].meta);
+				$('#mes-componente-'+response.data.metas_mes[indx].mes).attr('data-meta-id',response.data.metas_mes[indx].id);
+			}
+
 			actualizar_grid_actividades(response.data.actividades);
 
             $(modal_componente).modal('show');
@@ -301,6 +317,14 @@ function editar_actividad(e){
 			$('#tipo-ind-actividad').change();
 			$('#unidad-medida-actividad').change();
 
+			$(form_actividad + ' .metas-mes').attr('data-meta-id','');
+
+			var indx;
+			for(indx in response.data.metas_mes){
+				$('#mes-actividad-'+response.data.metas_mes[indx].mes).val(response.data.metas_mes[indx].meta);
+				$('#mes-actividad-'+response.data.metas_mes[indx].mes).attr('data-meta-id',response.data.metas_mes[indx].id);
+			}
+
             $(modal_actividad).modal('show');
         }
     });
@@ -321,6 +345,13 @@ $('#btn-actividad-guardar').on('click',function(){
 	parametros = parametros + '&guardar=actividad&id-componente=' + $('#id-componente').val();
 
 	if($('#id-actividad').val()){
+		var cadena_metas = '';
+		$(form_actividad + ' .metas-mes').each(function(){
+			if($(this).data('meta-id')){
+				cadena_metas = cadena_metas + '&mes-actividad-id['+$(this).data('meta-mes')+']='+$(this).data('meta-id');
+			}
+		});
+		parametros = parametros + cadena_metas;
 		proyectoResource.put($('#id-actividad').val(),parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Datos de la actividad almacenados con éxito',type:'OK',timer:3});
@@ -457,7 +488,7 @@ $('.btn-agregar-actividad').on('click',function(){
 });
 
 $('.btn-agregar-componente').on('click',function(){
-	var componentes = $('#conteo-actividades').text().split('/');
+	var componentes = $('#tablink-componentes > span').text().split('/');
 
 	if(parseInt(componentes[0]) >= parseInt(componentes[1])){
 		MessageManager.show({code:'S03',data:"Los componentes para este proyecto ya estan completos.",timer:2});
@@ -530,10 +561,16 @@ function guardar_datos_componente(cerrar){
 	parametros = parametros + '&clasificacion='+$('#clasificacionproyecto').val();
 
 	if($('#id-componente').val()){
+		var cadena_metas = '';
+		$(form_componente + ' .metas-mes').each(function(){
+			if($(this).data('meta-id')){
+				cadena_metas = cadena_metas + '&mes-componente-id['+$(this).data('meta-mes')+']='+$(this).data('meta-id');
+			}
+		});
+		parametros = parametros + cadena_metas;
 		proyectoResource.put($('#id-componente').val(),parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Datos del componente almacenados con éxito',type:'OK',timer:3});
-	            
 	            if(cerrar){
 					$(modal_componente).modal('hide');
 				}else{
@@ -610,6 +647,7 @@ $(grid_componentes + " .btn-delete-rows").on('click',function(e){
 					proyectoResource.delete(rows,{'rows': rows, 'eliminar': 'componente', 'id-proyecto': $('#id').val()},{
                         _success: function(response){ 
                         	actualizar_grid_componentes(response.componentes);
+                        	MessageManager.show({data:'Componente eliminado con éxito.',timer:3});
                         },
                         _error: function(jqXHR){ 
                         	MessageManager.show(jqXHR.responseJSON);
@@ -644,6 +682,7 @@ $(grid_actividades + " .btn-delete-rows").on('click',function(e){
 					proyectoResource.delete(rows,{'rows': rows, 'eliminar': 'actividad', 'id-componente': $('#id-componente').val()},{
                         _success: function(response){ 
                         	actualizar_grid_actividades(response.actividades);
+                        	MessageManager.show({data:'Actividad eliminada con éxito.',timer:3});
                         },
                         _error: function(jqXHR){ 
                         	MessageManager.show(jqXHR.responseJSON);
@@ -737,6 +776,8 @@ function actualizar_grid_componentes(datos){
 
 function reset_modal_form(formulario){
     $(formulario).get(0).reset();
+    $(formulario + ' input[type="hidden"]').val('');
+    $(formulario + ' input[type="hidden"]').change();
     $(formulario + ' .selectpicker').change();
     Validation.cleanFormErrors(formulario);
     if(formulario == form_componente){

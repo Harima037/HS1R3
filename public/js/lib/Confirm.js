@@ -30,6 +30,7 @@ var Confirm = {
 		var markup = '';
 		for(i in this.opciones.botones){
 			markup += '<button id="'+this.opciones.botones[i].selector+'" type="button" class="btn '+this.opciones.botones[i].clase+'" data-dismiss="modal">'+this.opciones.botones[i].nombre+'</button> ';				
+			$(document).off("click","#"+this.opciones.botones[i].selector);
 			$(document).on("click","#"+this.opciones.botones[i].selector,this.opciones.botones[i].callback);
 		}
 		return markup;

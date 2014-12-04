@@ -161,7 +161,7 @@
                             <div class="col-sm-2">
                                 <div class="form-group">
                                     <label class="control-label">{{$mes}}</label>
-                                    <input id="mes-{{$identificador}}-{{$llave}}" name="mes-{{$identificador}}[{{$llave}}]" type="number" class="form-control input-sm metas-mes" data-mes-id="{{$llave}}" data-identificador="{{$identificador}}">
+                                    <input id="mes-{{$identificador}}-{{$llave}}" name="mes-{{$identificador}}[{{$llave}}]" type="number" class="form-control input-sm metas-mes" data-meta-mes="{{$llave}}" data-meta-identificador="{{$identificador}}" data-meta-id="">
                                 </div>
                             </div>
                         @endforeach

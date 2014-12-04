@@ -561,14 +561,36 @@ class ProyectosController extends BaseController {
 					$recurso->lineaBase 				= 	$parametros['linea-base-actividad'];
 					$recurso->anioBase 					= 	$parametros['anio-base-actividad'];
 					
-					if($recurso->save()){
-						$componente = Componente::with('actividades')->find($recurso->idComponente);
+					$respuesta['data'] = DB::transaction(function() use ($parametros, $recurso){
+						if($recurso->save()){
+							$componente = Componente::with('actividades')->find($recurso->idComponente);
 
-						$respuesta['data']['data'] = $recurso;
-						$respuesta['data']['actividades'] = $componente->actividades;
-					}else{
-						throw new Exception("Ocurrió un error al guardar la actividad.", 1);
-					}
+							$meses = $parametros['mes-actividad'];
+							$ides = $parametros['mes-actividad-id'];
+
+							$metasMes = array();
+
+							foreach ($meses as $mes => $valor) {
+								if(isset($ides[$mes])){
+									$meta = ActividadMetaMes::find($ides[$mes]);
+									$meta->meta = $valor;
+									$metasMes[] = $meta;
+								}elseif($valor > 0){
+									$meta = new ActividadMetaMes;
+									$meta->mes = $mes;
+									$meta->meta = $valor;
+									$meta->idProyecto = $componente->idProyecto;
+									$metasMes[] = $meta;
+								}
+							}
+
+							$recurso->metasMes()->saveMany($metasMes);
+
+							return array('data'=>$recurso,'actividades'=>$componente->actividades);
+						}else{
+							throw new Exception("Ocurrió un error al guardar la actividad.", 1);
+						}
+					});
 				}else{
 					//La Validación del Formulario encontro errores
 					$respuesta['http_status'] = $validacion['http_status'];
@@ -634,14 +656,35 @@ class ProyectosController extends BaseController {
 						$recurso->accion 		= 	$parametros['accion-componente'];
 					}
 
-					if($recurso->save()){
-						$proyecto = Proyecto::with('componentes')->find($recurso->idProyecto);
+					$respuesta['data'] = DB::transaction(function() use ($parametros, $recurso){
+						if($recurso->save()){
+							$meses = $parametros['mes-componente'];
+							$ides = $parametros['mes-componente-id'];
 
-						$respuesta['data']['data'] = $recurso;
-						$respuesta['data']['componentes'] = $proyecto->componentes;
-					}else{
-						throw new Exception("Ocurrió un error al guardar el componente.", 1);
-					}
+							$metasMes = array();
+
+							foreach ($meses as $mes => $valor) {
+								if(isset($ides[$mes])){
+									$meta = ComponenteMetaMes::find($ides[$mes]);
+									$meta->meta = $valor;
+									$metasMes[] = $meta;
+								}elseif($valor > 0){
+									$meta = new ComponenteMetaMes;
+									$meta->mes = $mes;
+									$meta->meta = $valor;
+									$meta->idProyecto = $recurso->idProyecto;
+									$metasMes[] = $meta;
+								}
+							}
+							$recurso->metasMes()->saveMany($metasMes);
+
+							$proyecto = Proyecto::with('componentes')->find($recurso->idProyecto);
+
+							return array('data'=>$recurso,'componentes'=>$proyecto->componentes);
+						}else{
+							throw new Exception("Ocurrió un error al guardar el componente.", 1);
+						}
+					});
 				}else{
 					//La Validación del Formulario encontro errores
 					$respuesta['http_status'] = $validacion['http_status'];
@@ -789,22 +832,46 @@ class ProyectosController extends BaseController {
 				if($parametros['eliminar'] == 'componente'){
 					$id_padre = $parametros['id-proyecto'];
 					$rows = DB::transaction(function() use ($ids){
-						Actividad::wherein('idComponente',$ids)->delete();
+						//Obtenemos los ids de las actividades de los componentes seleccionados
+						$actividades = Actividad::wherein('idComponente',$ids)->lists('id');
+						if(count($actividades) > 0){
+							//Eliminamos las metas de dichas actividades
+							ActividadMetaMes::wherein('idActividad',$actividades)->delete();
+							//Eliminamos las actividades de los componentes
+							Actividad::wherein('idComponente',$ids)->delete();
+						}
+						//Eliminamos las metas de los componentes
+						ComponenteMetaMes::wherein('idComponente',$ids)->delete();
+						//Eliminamos los componenetes
 						return Componente::wherein('id',$ids)->delete();
 					});
 				}
 				if($parametros['eliminar'] == 'actividad'){
 					$id_padre = $parametros['id-componente'];
-					$rows = Actividad::wherein('id',$ids)->delete();
+					$rows = DB::transaction(function() use ($ids){
+						//Eliminamos las metas de las actividades seleccionadas
+						ActividadMetaMes::wherein('idActividad',$ids)->delete();
+						//Eliminamos las actividades
+						return Actividad::wherein('id',$ids)->delete();
+					});
 				}
 			}else{
 				$rows = DB::transaction(function() use ($ids){
-					$componentes = Componente::wherein('idProyecto',$ids)->get();
-					foreach ($componentes as $componente) {
-						$componente->actividades()->delete();
+					//Eliminamos las metas de los componentes de los proyectos
+					ComponenteMetaMes::wherein('idProyecto',$ids)->delete();
+					//Eliminamos las metas de las actividades de los proyectos
+					ActividadMetaMes::wherein('idProyecto',$ids)->delete();
+					//Obtenemos los ids de los componentes de los proyectos
+					$componentes = Componente::wherein('idProyecto',$ids)->lists('id');
+					if(count($componentes) > 0){
+						//Eliminamos las actividades de los componentes
+						Actividad::wherein('idComponente',$componentes)->delete();
 					}
+					//Eliminamos los componentes de los proyectos
 					Componente::wherein('idProyecto',$ids)->delete();
+					//Eliminamos los beneficiarios de los proyectos
 					Beneficiario::wherein('idProyecto',$ids)->delete();
+					//Eliminamos los proyectos
 					return Proyecto::wherein('id',$ids)->delete();
 				});
 			}
