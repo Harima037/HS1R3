@@ -33,47 +33,6 @@ $('.control-espejo').each(function(){
 	});
 });
 
-$('.metas-mes').on('change',function(){
-	var meses = {'ENE':1,'FEB':2,'MAR':3,'ABR':4,'MAY':5,'JUN':6,'JUL':7,'AGO':8,'SEP':9,'OCT':10,'NOV':11,'DIC':12};
-	var mes = $(this).data('meta-mes');
-	var trimestre = Math.ceil(meses[mes]/3);
-	var identificador = $(this).data('meta-identificador');
-
-	var valor_1;
-	var valor_2;
-	var valor_3;
-
-	if(trimestre == 1){
-		valor_1 = parseInt($('.metas-mes[data-meta-mes="ENE"][data-meta-identificador="'+identificador+'"]').val()) || 0;
-		valor_2 = parseInt($('.metas-mes[data-meta-mes="FEB"][data-meta-identificador="'+identificador+'"]').val()) || 0;
-		valor_3 = parseInt($('.metas-mes[data-meta-mes="MAR"][data-meta-identificador="'+identificador+'"]').val()) || 0;
-	}else if(trimestre == 2){
-		valor_1 = parseInt($('.metas-mes[data-meta-mes="ABR"][data-meta-identificador="'+identificador+'"]').val()) || 0;
-		valor_2 = parseInt($('.metas-mes[data-meta-mes="MAY"][data-meta-identificador="'+identificador+'"]').val()) || 0;
-		valor_3 = parseInt($('.metas-mes[data-meta-mes="JUN"][data-meta-identificador="'+identificador+'"]').val()) || 0;
-	}else if(trimestre == 3){
-		valor_1 = parseInt($('.metas-mes[data-meta-mes="JUL"][data-meta-identificador="'+identificador+'"]').val()) || 0;
-		valor_2 = parseInt($('.metas-mes[data-meta-mes="AGO"][data-meta-identificador="'+identificador+'"]').val()) || 0;
-		valor_3 = parseInt($('.metas-mes[data-meta-mes="SEP"][data-meta-identificador="'+identificador+'"]').val()) || 0;
-	}else if(trimestre == 4){
-		valor_1 = parseInt($('.metas-mes[data-meta-mes="OCT"][data-meta-identificador="'+identificador+'"]').val()) || 0;
-		valor_2 = parseInt($('.metas-mes[data-meta-mes="NOV"][data-meta-identificador="'+identificador+'"]').val()) || 0;
-		valor_3 = parseInt($('.metas-mes[data-meta-mes="DIC"][data-meta-identificador="'+identificador+'"]').val()) || 0;
-	}
-
-	var suma = valor_1 + valor_2 + valor_3;
-	$('#trim'+trimestre+'-'+identificador).val(suma).change();
-
-	var trim1 = parseInt($('#trim1-'+identificador).val()) || 0;
-	var trim2 = parseInt($('#trim2-'+identificador).val()) || 0;
-	var trim3 = parseInt($('#trim3-'+identificador).val()) || 0;
-	var trim4 = parseInt($('#trim4-'+identificador).val()) || 0;
-
-	suma = trim1 + trim2 + trim3 + trim4;
-
-	$('#numerador-'+identificador).val(suma).change();
-});
-
 if($('#id').val()){
 	//load data
 	proyectoResource.get($('#id').val(),null,{
@@ -153,6 +112,9 @@ if($('#id').val()){
             }
 
             cargar_totales();
+
+            actualizar_tabla_metas('actividad',response.data.jurisdicciones);
+            actualizar_tabla_metas('componente',response.data.jurisdicciones);
 
             $('#tablink-componentes').attr('data-toggle','tab');
 			$('#tablink-componentes').parent().removeClass('disabled');
@@ -266,12 +228,8 @@ function editar_componente(e){
 			$('#tablink-componente-actividades').tab('show');
 
 			$(form_componente + ' .metas-mes').attr('data-meta-id','');
-
-			var indx;
-			for(indx in response.data.metas_mes){
-				$('#mes-componente-'+response.data.metas_mes[indx].mes).val(response.data.metas_mes[indx].meta);
-				$('#mes-componente-'+response.data.metas_mes[indx].mes).attr('data-meta-id',response.data.metas_mes[indx].id);
-			}
+			
+			actualizar_metas('componente',response.data.metas_mes);
 
 			actualizar_grid_actividades(response.data.actividades);
 
@@ -319,11 +277,7 @@ function editar_actividad(e){
 
 			$(form_actividad + ' .metas-mes').attr('data-meta-id','');
 
-			var indx;
-			for(indx in response.data.metas_mes){
-				$('#mes-actividad-'+response.data.metas_mes[indx].mes).val(response.data.metas_mes[indx].meta);
-				$('#mes-actividad-'+response.data.metas_mes[indx].mes).attr('data-meta-id',response.data.metas_mes[indx].id);
-			}
+			actualizar_metas('actividad',response.data.metas_mes);
 
             $(modal_actividad).modal('show');
         }
@@ -348,7 +302,7 @@ $('#btn-actividad-guardar').on('click',function(){
 		var cadena_metas = '';
 		$(form_actividad + ' .metas-mes').each(function(){
 			if($(this).data('meta-id')){
-				cadena_metas = cadena_metas + '&mes-actividad-id['+$(this).data('meta-mes')+']='+$(this).data('meta-id');
+				cadena_metas = cadena_metas + '&mes-actividad-id['+$(this).data('meta-jurisdiccion')+']['+$(this).data('meta-mes')+']='+$(this).data('meta-id');
 			}
 		});
 		parametros = parametros + cadena_metas;
@@ -357,6 +311,7 @@ $('#btn-actividad-guardar').on('click',function(){
 	            MessageManager.show({data:'Datos de la actividad almacenados con éxito',type:'OK',timer:3});
 	            $(modal_actividad).modal('hide');
 				actualizar_grid_actividades(response.actividades);
+				//actualizar_metas('actividad',response.metas);
 	        },
 	        _error: function(response){
 	            try{
@@ -379,8 +334,8 @@ $('#btn-actividad-guardar').on('click',function(){
 	            MessageManager.show({data:'Datos de la actividad almacenados con éxito',type:'OK',timer:3});
 	            $(form_actividad + ' #id-actividad').val(response.data.id);
 	            $(modal_actividad).modal('hide');
-
 				actualizar_grid_actividades(response.actividades);
+				//actualizar_metas('actividad',response.metas);
 	        },
 	        _error: function(response){
 	            try{
@@ -414,8 +369,10 @@ $('#btn-proyecto-guardar').on('click',function(){
 		proyectoResource.put($('#id').val(),parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:3});
-	            //$(form_caratula + ' #no_proyecto_estrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
-	            //$(form_caratula + ' #numeroproyectoestrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
+	            if(response.data.jurisdicciones){
+	            	actualizar_tabla_metas('actividad',response.data.jurisdicciones);
+            		actualizar_tabla_metas('componente',response.data.jurisdicciones);
+	            }
 	        },
 	        _error: function(response){
 	            try{
@@ -438,6 +395,9 @@ $('#btn-proyecto-guardar').on('click',function(){
 	            $(form_caratula + ' #id').val(response.data.id);
 	            $(form_caratula + ' #no_proyecto_estrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
 	            $(form_caratula + ' #numeroproyectoestrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
+
+	            actualizar_tabla_metas('actividad',response.data.jurisdicciones);
+            	actualizar_tabla_metas('componente',response.data.jurisdicciones);
 
 	            $('#tablink-componentes').attr('data-toggle','tab');
 				$('#tablink-componentes').parent().removeClass('disabled');
@@ -564,7 +524,7 @@ function guardar_datos_componente(cerrar){
 		var cadena_metas = '';
 		$(form_componente + ' .metas-mes').each(function(){
 			if($(this).data('meta-id')){
-				cadena_metas = cadena_metas + '&mes-componente-id['+$(this).data('meta-mes')+']='+$(this).data('meta-id');
+				cadena_metas = cadena_metas + '&mes-componente-id['+$(this).data('meta-jurisdiccion')+']['+$(this).data('meta-mes')+']='+$(this).data('meta-id');
 			}
 		});
 		parametros = parametros + cadena_metas;
@@ -577,6 +537,7 @@ function guardar_datos_componente(cerrar){
 					$('#tablink-componente-actividades').tab('show');
 				}
 				actualizar_grid_componentes(response.componentes);
+				actualizar_metas('componente',response.metas);
 	        },
 	        _error: function(response){
 	            try{
@@ -606,6 +567,7 @@ function guardar_datos_componente(cerrar){
 					$('#tablink-componente-actividades').tab('show');
 				}
 				actualizar_grid_componentes(response.componentes);
+				actualizar_metas('componente',response.metas);
 	        },
 	        _error: function(response){
 	            try{
@@ -721,6 +683,36 @@ function deshabilita_paneles(id){
 		$('#select-estado-panel').hide();
 		$('#select-municipio-panel').hide();
 		$('#select-region-panel').hide();
+	}
+}
+
+function actualizar_tabla_metas(identificador,jurisdicciones){
+	var tabla_id = '#tabla-'+identificador+'-metas-mes';
+	var meses = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+
+	var html = '';
+	var indx,idx;
+	var llaves = Object.keys(jurisdicciones).sort(); //Se ordenan las llaves
+	for(var index in llaves){
+		indx = llaves[index];
+		html += '<tr>';
+		html += '<th>'+jurisdicciones[indx]+'</th>';
+		for(idx in meses){
+			html += '<td><input id="mes-'+identificador+'-'+indx+'-'+meses[idx]+'" name="mes-'+identificador+'['+indx+']['+meses[idx]+']" type="number" class="form-control input-sm metas-mes" data-meta-mes="'+meses[idx]+'" data-meta-jurisdiccion="'+indx+'" data-meta-identificador="'+identificador+'" data-meta-id=""></td>';
+		}
+		html += '</tr>';
+	}
+
+	$(tabla_id + ' tbody').empty();
+	$(tabla_id + ' tbody').html(html);
+	actualizar_eventos_metas();
+}
+
+function actualizar_metas(identificador,metas){
+	var indx;
+	for(indx in metas){
+		$('#mes-'+identificador+'-'+metas[indx].claveJurisdiccion+'-'+metas[indx].mes).val(metas[indx].meta);
+		$('#mes-'+identificador+'-'+metas[indx].claveJurisdiccion+'-'+metas[indx].mes).attr('data-meta-id',metas[indx].id);
 	}
 }
 
@@ -875,4 +867,75 @@ function ejecutar_formula(identificador){
 			break;
 	}
 	$('#meta-'+identificador).val(total).change();
+}
+
+function actualizar_eventos_metas(){
+	$('.metas-mes').on('change',function(){
+		var meses = {'ENE':1,'FEB':2,'MAR':3,'ABR':4,'MAY':5,'JUN':6,'JUL':7,'AGO':8,'SEP':9,'OCT':10,'NOV':11,'DIC':12};
+		var mes = $(this).data('meta-mes');
+		var trimestre = Math.ceil(meses[mes]/3);
+		var identificador = $(this).data('meta-identificador');
+
+		var valor_1 = 0;
+		var valor_2 = 0;
+		var valor_3 = 0;
+
+		if(trimestre == 1){
+			$('.metas-mes[data-meta-mes="ENE"][data-meta-identificador="'+identificador+'"]').each(function(){
+				valor_1 += parseInt($(this).val()) || 0;
+			});
+			$('.metas-mes[data-meta-mes="FEB"][data-meta-identificador="'+identificador+'"]').each(function(){
+				valor_2 += parseInt($(this).val()) || 0;
+			});
+			$('.metas-mes[data-meta-mes="MAR"][data-meta-identificador="'+identificador+'"]').each(function(){
+				valor_3 += parseInt($(this).val()) || 0;
+			});
+		}else if(trimestre == 2){
+			$('.metas-mes[data-meta-mes="ABR"][data-meta-identificador="'+identificador+'"]').each(function(){
+				valor_1 += parseInt($(this).val()) || 0;
+			});
+			$('.metas-mes[data-meta-mes="MAY"][data-meta-identificador="'+identificador+'"]').each(function(){
+				valor_2 += parseInt($(this).val()) || 0;
+			});
+			$('.metas-mes[data-meta-mes="JUN"][data-meta-identificador="'+identificador+'"]').each(function(){
+				valor_3 += parseInt($(this).val()) || 0;
+			});
+		}else if(trimestre == 3){
+			$('.metas-mes[data-meta-mes="JUL"][data-meta-identificador="'+identificador+'"]').each(function(){
+				valor_1 += parseInt($(this).val()) || 0;
+			});
+			$('.metas-mes[data-meta-mes="AGO"][data-meta-identificador="'+identificador+'"]').each(function(){
+				valor_2 += parseInt($(this).val()) || 0;
+			});
+			$('.metas-mes[data-meta-mes="SEP"][data-meta-identificador="'+identificador+'"]').each(function(){
+				valor_3 += parseInt($(this).val()) || 0;
+			});
+		}else if(trimestre == 4){
+			$('.metas-mes[data-meta-mes="OCT"][data-meta-identificador="'+identificador+'"]').each(function(){
+				valor_1 += parseInt($(this).val()) || 0;
+			});
+			$('.metas-mes[data-meta-mes="NOV"][data-meta-identificador="'+identificador+'"]').each(function(){
+				valor_2 += parseInt($(this).val()) || 0;
+			});
+			$('.metas-mes[data-meta-mes="DIC"][data-meta-identificador="'+identificador+'"]').each(function(){
+				valor_3 += parseInt($(this).val()) || 0;
+			});
+		}
+
+		var suma = valor_1 + valor_2 + valor_3;
+		$('#trim'+trimestre+'-'+identificador).val(suma).change();
+
+		var trim1 = parseInt($('#trim1-'+identificador).val()) || 0;
+		var trim2 = parseInt($('#trim2-'+identificador).val()) || 0;
+		var trim3 = parseInt($('#trim3-'+identificador).val()) || 0;
+		var trim4 = parseInt($('#trim4-'+identificador).val()) || 0;
+
+		suma = trim1 + trim2 + trim3 + trim4;
+
+		$('#numerador-'+identificador).val(suma).change();
+
+		if($('#denominador-'+identificador).val()){
+			ejecutar_formula(identificador);
+		}
+	});
 }

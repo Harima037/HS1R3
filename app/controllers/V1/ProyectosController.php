@@ -4,7 +4,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry;
-use Proyecto, Componente, Actividad, Beneficiario,ComponenteMetaMes,ActividadMetaMes, Hash, Exception;
+use Proyecto, Componente, Actividad, Beneficiario, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, Hash, Exception;
 
 class ProyectosController extends BaseController {
 	private $reglasProyecto = array(
@@ -186,13 +186,24 @@ class ProyectosController extends BaseController {
 			}
 		}else{
 			$recurso = Proyecto::contenidoCompleto()->find($id);
+			if($recurso->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
+				$jurisdicciones = Jurisdiccion::all();
+			}elseif($recurso->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
+				$jurisdicciones = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
+			}elseif($recurso->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
+				$jurisdicciones = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
+			}
 		}
 
 		if(is_null($recurso)){
 			$http_status = 404;
 			$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
 		}else{
-			$data = array("data"=>$recurso->toArray());
+			$recurso = $recurso->toArray();
+			if(!$parametros){
+				$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
+			}
+			$data = array("data"=>$recurso);
 		}
 
 		return Response::json($data,$http_status);
@@ -245,37 +256,40 @@ class ProyectosController extends BaseController {
 					$actividad->idTipoIndicador			= $parametros['tipo-ind-actividad'];
 					$actividad->idUnidadMedida 			= $parametros['unidad-medida-actividad'];
 					$actividad->metaIndicador 			= $parametros['meta-actividad'];
-					$actividad->numeroTrim1 			= $parametros['trim1-actividad'];
-					$actividad->numeroTrim2 			= $parametros['trim2-actividad'];
-					$actividad->numeroTrim3 			= $parametros['trim3-actividad'];
-					$actividad->numeroTrim4 			= $parametros['trim4-actividad'];
+					$actividad->numeroTrim1 			= ($parametros['trim1-actividad'])?$parametros['trim1-actividad']:NULL;
+					$actividad->numeroTrim2 			= ($parametros['trim2-actividad'])?$parametros['trim2-actividad']:NULL;
+					$actividad->numeroTrim3 			= ($parametros['trim3-actividad'])?$parametros['trim3-actividad']:NULL;
+					$actividad->numeroTrim4 			= ($parametros['trim4-actividad'])?$parametros['trim4-actividad']:NULL;
 					$actividad->valorNumerador 			= $parametros['numerador-actividad'];
 					$actividad->valorDenominador 		= $parametros['denominador-actividad'];
-					$actividad->lineaBase 				= $parametros['linea-base-actividad'];
-					$actividad->anioBase 				= $parametros['anio-base-actividad'];
+					$actividad->lineaBase 				= ($parametros['linea-base-actividad'])?$parametros['linea-base-actividad']:NULL;
+					$actividad->anioBase 				= ($parametros['anio-base-actividad'])?$parametros['anio-base-actividad']:NULL;
 					
 					$respuesta['data'] = DB::transaction(function() use ($parametros, $componente, $actividad){
 						if($componente->actividades()->save($actividad)){
 							$actividad->load('usuario');
 							$componente->actividades[] = $actividad;
 
-							$meses = $parametros['mes-actividad'];
+							$jurisdicciones = $parametros['mes-actividad'];
 
 							$metasMes = array();
 
-							foreach ($meses as $mes => $valor) {
-								if($valor > 0){
-									$meta = new ActividadMetaMes;
-									$meta->mes = $mes;
-									$meta->meta = $valor;
-									$meta->idProyecto = $componente->idProyecto;
-									$metasMes[] = $meta;
+							foreach ($jurisdicciones as $clave => $meses) {
+								foreach ($meses as $mes => $valor) {
+									if($valor > 0){
+										$meta = new ActividadMetaMes;
+										$meta->claveJurisdiccion = $clave;
+										$meta->mes = $mes;
+										$meta->meta = $valor;
+										$meta->idProyecto = $componente->idProyecto;
+										$metasMes[] = $meta;
+									}
 								}
 							}
 							
 							$actividad->metasMes()->saveMany($metasMes);
 
-							return array('data'=>$actividad,'actividades'=>$componente->actividades);
+							return array('data'=>$actividad,'actividades'=>$componente->actividades,'metas'=>$metasMes);
 						}else{
 							throw new Exception("Ocurrió un error al guardar la actividad.", 1);
 						}
@@ -337,14 +351,14 @@ class ProyectosController extends BaseController {
 					$componente->idTipoIndicador 		= $parametros['tipo-ind-componente'];
 					$componente->idUnidadMedida 		= $parametros['unidad-medida-componente'];
 					$componente->metaIndicador 			= $parametros['meta-componente'];
-					$componente->numeroTrim1 			= $parametros['trim1-componente'];
-					$componente->numeroTrim2 			= $parametros['trim2-componente'];
-					$componente->numeroTrim3 			= $parametros['trim3-componente'];
-					$componente->numeroTrim4 			= $parametros['trim4-componente'];
+					$componente->numeroTrim1 			= ($parametros['trim1-componente'])?$parametros['trim1-componente']:NULL;
+					$componente->numeroTrim2 			= ($parametros['trim2-componente'])?$parametros['trim2-componente']:NULL;
+					$componente->numeroTrim3 			= ($parametros['trim3-componente'])?$parametros['trim3-componente']:NULL;
+					$componente->numeroTrim4 			= ($parametros['trim4-componente'])?$parametros['trim4-componente']:NULL;
 					$componente->valorNumerador 		= $parametros['numerador-componente'];
 					$componente->valorDenominador 		= $parametros['denominador-componente'];
-					$componente->lineaBase 				= $parametros['linea-base-componente'];
-					$componente->anioBase 				= $parametros['anio-base-componente'];
+					$componente->lineaBase 				= ($parametros['linea-base-componente'])?$parametros['linea-base-componente']:NULL;
+					$componente->anioBase 				= ($parametros['anio-base-componente'])?$parametros['anio-base-componente']:NULL;
 
 					if($parametros['clasificacion'] == 2){
 						$componente->idEntregable = $parametros['entregable-componente'];
@@ -357,23 +371,26 @@ class ProyectosController extends BaseController {
 							$componente->load('usuario');
 							$proyecto->componentes[] = $componente;
 
-							$meses = $parametros['mes-componente'];
+							$jurisdicciones = $parametros['mes-componente']; //Arreglo que contiene los datos [jurisdiccion][mes] = valor
 
 							$metasMes = array();
 
-							foreach ($meses as $mes => $valor) {
-								if($valor > 0){
-									$meta = new ComponenteMetaMes;
-									$meta->mes = $mes;
-									$meta->meta = $valor;
-									$meta->idProyecto = $componente->idProyecto;
-									$metasMes[] = $meta;
+							foreach ($jurisdicciones as $clave => $meses) {
+								foreach ($meses as $mes => $valor) {
+									if($valor > 0){
+										$meta = new ComponenteMetaMes;
+										$meta->claveJurisdiccion = $clave;
+										$meta->mes = $mes;
+										$meta->meta = $valor;
+										$meta->idProyecto = $componente->idProyecto;
+										$metasMes[] = $meta;
+									}
 								}
 							}
 							
 							$componente->metasMes()->saveMany($metasMes);
 
-							return array('data'=>$componente,'componentes'=>$proyecto->componentes);
+							return array('data'=>$componente,'componentes'=>$proyecto->componentes,'metas'=>$metasMes);
 						}else{
 							throw new Exception("Ocurrió un error al guardar el componente.", 1);
 						}
@@ -490,8 +507,18 @@ class ProyectosController extends BaseController {
 							throw new Exception("Error al intentar guardar los datos del proyecto", 1);
 						}
 					});
+					
+					if($recurso->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
+						$jurisdicciones = Jurisdiccion::all();
+					}elseif($recurso->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
+						$jurisdicciones = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
+					}elseif($recurso->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
+						$jurisdicciones = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
+					}
 					//Proyecto guardado con éxito
-					$respuesta['data'] = array('data'=>$recurso->toArray());
+					$recurso = $recurso->toArray();
+					$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
+					$respuesta['data'] = array('data'=>$recurso);
 				}else{
 					//La Validación del Formulario encontro errores
 					$respuesta['http_status'] = $validacion['http_status'];
@@ -565,28 +592,31 @@ class ProyectosController extends BaseController {
 						if($recurso->save()){
 							$componente = Componente::with('actividades')->find($recurso->idComponente);
 
-							$meses = $parametros['mes-actividad'];
+							$jurisdicciones = $parametros['mes-actividad'];
 							$ides = $parametros['mes-actividad-id'];
 
 							$metasMes = array();
 
-							foreach ($meses as $mes => $valor) {
-								if(isset($ides[$mes])){
-									$meta = ActividadMetaMes::find($ides[$mes]);
-									$meta->meta = $valor;
-									$metasMes[] = $meta;
-								}elseif($valor > 0){
-									$meta = new ActividadMetaMes;
-									$meta->mes = $mes;
-									$meta->meta = $valor;
-									$meta->idProyecto = $componente->idProyecto;
-									$metasMes[] = $meta;
+							foreach ($jurisdicciones as $clave => $meses) {
+								foreach ($meses as $mes => $valor) {
+									if(isset($ides[$clave][$mes])){
+										$meta = ActividadMetaMes::find($ides[$clave][$mes]);
+										$meta->meta = $valor;
+										$metasMes[] = $meta;
+									}elseif($valor > 0){
+										$meta = new ActividadMetaMes;
+										$meta->claveJurisdiccion = $clave;
+										$meta->mes = $mes;
+										$meta->meta = $valor;
+										$meta->idProyecto = $componente->idProyecto;
+										$metasMes[] = $meta;
+									}
 								}
 							}
 
 							$recurso->metasMes()->saveMany($metasMes);
 
-							return array('data'=>$recurso,'actividades'=>$componente->actividades);
+							return array('data'=>$recurso,'actividades'=>$componente->actividades,'metas'=>$metasMes);
 						}else{
 							throw new Exception("Ocurrió un error al guardar la actividad.", 1);
 						}
@@ -658,29 +688,38 @@ class ProyectosController extends BaseController {
 
 					$respuesta['data'] = DB::transaction(function() use ($parametros, $recurso){
 						if($recurso->save()){
-							$meses = $parametros['mes-componente'];
-							$ides = $parametros['mes-componente-id'];
+							$jurisdicciones = $parametros['mes-componente'];
+							if(isset($parametros['mes-componente-id'])){
+								$ides = $parametros['mes-componente-id'];
+							}else{
+								$ides = array();
+							}
 
 							$metasMes = array();
 
-							foreach ($meses as $mes => $valor) {
-								if(isset($ides[$mes])){
-									$meta = ComponenteMetaMes::find($ides[$mes]);
-									$meta->meta = $valor;
-									$metasMes[] = $meta;
-								}elseif($valor > 0){
-									$meta = new ComponenteMetaMes;
-									$meta->mes = $mes;
-									$meta->meta = $valor;
-									$meta->idProyecto = $recurso->idProyecto;
-									$metasMes[] = $meta;
-								}
+							foreach ($jurisdicciones as $clave => $meses) {
+								foreach ($meses as $mes => $valor) {
+									if(isset($ides[$clave][$mes])){
+										$meta = ComponenteMetaMes::find($ides[$clave][$mes]);
+										$meta->meta = $valor;
+										$metasMes[] = $meta;
+									}elseif($valor > 0){
+										$meta = new ComponenteMetaMes;
+										$meta->claveJurisdiccion = $clave;
+										$meta->mes = $mes;
+										$meta->meta = $valor;
+										$meta->idProyecto = $recurso->idProyecto;
+										$metasMes[] = $meta;
+									}
+								}	
 							}
+
 							$recurso->metasMes()->saveMany($metasMes);
+							//$recurso->load('metasMes');
 
 							$proyecto = Proyecto::with('componentes')->find($recurso->idProyecto);
 
-							return array('data'=>$recurso,'componentes'=>$proyecto->componentes);
+							return array('data'=>$recurso,'componentes'=>$proyecto->componentes,'metas'=>$metasMes);
 						}else{
 							throw new Exception("Ocurrió un error al guardar el componente.", 1);
 						}
@@ -728,7 +767,6 @@ class ProyectosController extends BaseController {
 					$recurso->idClasificacionProyecto 		= $parametros['clasificacionproyecto'];
 					$recurso->nombreTecnico 				= $parametros['nombretecnico'];
 					$recurso->idTipoProyecto 				= $parametros['tipoproyecto'];
-					$recurso->idCobertura 					= $parametros['cobertura'];
 					$recurso->idTipoAccion 					= $parametros['tipoaccion'];
 					$recurso->unidadResponsable 			= $parametros['unidadresponsable'];
 					$recurso->finalidad 					= $funcion_gasto[0];
@@ -746,16 +784,30 @@ class ProyectosController extends BaseController {
 					$recurso->totalBeneficiariosF 			= $parametros['totalbeneficiariosf'];
 					$recurso->totalBeneficiariosM 			= $parametros['totalbeneficiariosm'];
 					$recurso->idEstatusProyecto 			= 1;
+					$recurso->idCobertura 					= $parametros['cobertura'];
 
+					if($recurso->idCobertura != $parametros['cobertura']){
+						$recurso->idCobertura 				= $parametros['cobertura'];
+					}
+					$jurisdicciones = NULL;
 					if($parametros['cobertura'] == 2){
-						$recurso->claveMunicipio = $parametros['municipio'];
-						$recurso->claveRegion = NULL;
+						if($recurso->claveMunicipio != $parametros['municipio']){
+							$recurso->claveRegion = NULL;
+							$recurso->claveMunicipio = $parametros['municipio'];
+							$jurisdicciones = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
+						}
 					}elseif($parametros['cobertura'] == 3){
-						$recurso->claveMunicipio = NULL;
-						$recurso->claveRegion = $parametros['region'];
+						if($recurso->claveRegion != $parametros['region']){
+							$recurso->claveMunicipio = NULL;
+							$recurso->claveRegion = $parametros['region'];
+							$jurisdicciones = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
+						}
 					}else{
-						$recurso->claveMunicipio = NULL;
-						$recurso->claveRegion = NULL;
+						if(!is_null($recurso->claveRegion) || !is_null($recurso->claveMunicipio)){
+							$recurso->claveMunicipio = NULL;
+							$recurso->claveRegion = NULL;
+							$jurisdicciones = Jurisdiccion::all();
+						}
 					}
 
 				  //$recurso->idLiderProyecto 				= $parametros[''];
@@ -763,7 +815,7 @@ class ProyectosController extends BaseController {
 				  //$recurso->idJefePlaneacion 				= $parametros[''];
 				  //$recurso->idCoordinadorGrupoEstrategico = $parametros[''];
 
-					DB::transaction(function() use ($parametros, $recurso, $respuesta){
+					DB::transaction(function() use ($parametros, $recurso, $respuesta, $jurisdicciones){
 						if($recurso->save()){
 							$recurso->load('beneficiarios');
 
@@ -782,14 +834,25 @@ class ProyectosController extends BaseController {
 
 								$recurso->beneficiarios[$key]->save();
 							}
+
+							if($jurisdicciones){
+								$claves = $jurisdicciones->lists('clave');
+								ComponenteMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
+								ActividadMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
+							}
 						}else{
 							//No se pudieron guardar los datos del proyecto
 							$respuesta['data']['code'] = 'S01';
 							throw new Exception("Error al intentar guardar los datos del proyecto", 1);
 						}
 					});
+					
+					$recurso = $recurso->toArray();
+					if($jurisdicciones){
+						$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
+					}
 					//Proyecto guardado con éxito
-					$respuesta['data'] = array('data'=>$recurso->toArray());
+					$respuesta['data'] = array('data'=>$recurso);
 				}else{
 					//La Validación del Formulario encontro errores
 					$respuesta['http_status'] = $validacion['http_status'];

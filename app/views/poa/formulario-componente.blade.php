@@ -10,6 +10,11 @@
                 <span class="fa fa-line-chart"></span> Indicador
             </a>
         </li>
+        <li role="presentation">
+            <a href="#desgloce_{{$identificador}}" role="tab" data-toggle="tab">
+                <span class="fa fa-table"></span> Desglose de Metas
+            </a>
+        </li>
         @if(isset($lista_actividades))
         <li role="presentation" class="pull-right disabled">
             <a id="tablink-{{$identificador}}-actividades" href="#actividades_{{$identificador}}" role="tab" >
@@ -122,79 +127,95 @@
                                 {{Form::select('unidad-medida-'.$identificador,array(''=>'Seleccione una unidad') + $unidades_medida->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'unidad-medida-'.$identificador,'data-live-search'=>'true'))}}
                             </div>
                         </div>
-                        <div class="col-sm-2">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="desgloce_{{$identificador}}">
+            <br>
+            <div class="row">
+                <div class="col-sm-2">
+                    <div class="form-group">
+                        <label class="control-label" for="linea-base-{{$identificador}}">Linea Base</label>
+                        <input type="text" class="form-control" id="linea-base-{{$identificador}}" name="linea-base-{{$identificador}}">
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="form-group">
+                        <label class="control-label" for="anio-base-{{$identificador}}">Año Base</label>
+                        <input type="text" class="form-control" id="anio-base-{{$identificador}}" name="anio-base-{{$identificador}}">
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div clasS="form-group">
+                        <label class="control-label" for="formula-{{$identificador}}">
+                            Formula
+                        </label>
+                        {{Form::select('formula-'.$identificador,array(''=>'Seleccione una formula') + $formulas->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'formula-'.$identificador))}}
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div clasS="form-group">
+                        <label class="control-label" for="frecuencia-{{$identificador}}">
+                            Frecuencia
+                        </label>
+                        {{Form::select('frecuencia-'.$identificador,array(''=>'Seleccione una frecuencia') + $frecuencias->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'frecuencia-'.$identificador))}}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <table id="tabla-{{$identificador}}-metas-mes" class="table table-condensed table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th>Mes</th>
+                                @foreach ($meses as $clave => $mes)
+                                    <th>{{$clave}}</th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($jurisdicciones as $llave => $jurisdiccion)
+                                <tr>
+                                    <th>{{$jurisdiccion}}</th>
+                                    @foreach ($meses as $clave => $mes)
+                                        <td>
+                                            <input id="mes-{{$identificador}}-{{$llave}}-{{$clave}}" name="mes-{{$identificador}}[{{$llave}}][{{$clave}}]" type="number" class="form-control input-sm metas-mes" data-meta-mes="{{$clave}}" data-meta-jurisdiccion="{{$llave}}" data-meta-identificador="{{$identificador}}" data-meta-id="">
+                                        </td>
+                                    @endforeach
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-sm-6 bg-info">
+                    <div class="row">
+                        <div class="col-sm-3">
                             <div class="form-group">
-                                <label class="control-label" for="linea-base-{{$identificador}}">Linea Base</label>
-                                <input type="text" class="form-control" id="linea-base-{{$identificador}}" name="linea-base-{{$identificador}}">
-                            </div>
-                        </div>
-                        <div class="col-sm-2">
-                            <div class="form-group">
-                                <label class="control-label" for="anio-base-{{$identificador}}">Año Base</label>
-                                <input type="text" class="form-control" id="anio-base-{{$identificador}}" name="anio-base-{{$identificador}}">
-                            </div>
-                        </div>
-                        <div class="col-sm-5">
-                            <div clasS="form-group">
-                                <label class="control-label" for="formula-{{$identificador}}">
-                                    Formula
-                                </label>
-                                {{Form::select('formula-'.$identificador,array(''=>'Seleccione una formula') + $formulas->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'formula-'.$identificador))}}
+                                <label class="control-label"><span class="fa fa-link"></span> Trimestre 1</label>
+                                <span class="form-control control-espejo" data-espejo-id="#trim1-{{$identificador}}"></span>
+                                <input type="hidden" id="trim1-{{$identificador}}" name="trim1-{{$identificador}}">
                             </div>
                         </div>
                         <div class="col-sm-3">
-                            <div clasS="form-group">
-                                <label class="control-label" for="frecuencia-{{$identificador}}">
-                                    Frecuencia
-                                </label>
-                                {{Form::select('frecuencia-'.$identificador,array(''=>'Seleccione una frecuencia') + $frecuencias->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'frecuencia-'.$identificador))}}
+                            <div class="form-group">
+                                <label class="control-label"><span class="fa fa-link"></span> Trimestre 2</label>
+                                <span class="form-control control-espejo" data-espejo-id="#trim2-{{$identificador}}"></span>
+                                <input type="hidden" id="trim2-{{$identificador}}" name="trim2-{{$identificador}}">
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="col-sm-10">
-                    <div class="row">
-                        <div class="col-sm-12 bg-primary">
-                            <strong>Distribución de Metas por Mes</strong>
-                        </div>
-                        @foreach ($meses as $llave => $mes)
-                            <div class="col-sm-2">
-                                <div class="form-group">
-                                    <label class="control-label">{{$mes}}</label>
-                                    <input id="mes-{{$identificador}}-{{$llave}}" name="mes-{{$identificador}}[{{$llave}}]" type="number" class="form-control input-sm metas-mes" data-meta-mes="{{$llave}}" data-meta-identificador="{{$identificador}}" data-meta-id="">
-                                </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="control-label"><span class="fa fa-link"></span> Trimestre 3</label>
+                                <span class="form-control control-espejo" data-espejo-id="#trim3-{{$identificador}}"></span>
+                                <input type="hidden" id="trim3-{{$identificador}}" name="trim3-{{$identificador}}">
                             </div>
-                        @endforeach
-                        <div class="col-sm-12 bg-info">
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <div class="form-group">
-                                        <label class="control-label"><span class="fa fa-link"></span> Trimestre 1</label>
-                                        <span class="form-control control-espejo" data-espejo-id="#trim1-{{$identificador}}"></span>
-                                        <input type="hidden" id="trim1-{{$identificador}}" name="trim1-{{$identificador}}">
-                                    </div>
-                                </div>
-                                <div class="col-sm-3">
-                                    <div class="form-group">
-                                        <label class="control-label"><span class="fa fa-link"></span> Trimestre 2</label>
-                                        <span class="form-control control-espejo" data-espejo-id="#trim2-{{$identificador}}"></span>
-                                        <input type="hidden" id="trim2-{{$identificador}}" name="trim2-{{$identificador}}">
-                                    </div>
-                                </div>
-                                <div class="col-sm-3">
-                                    <div class="form-group">
-                                        <label class="control-label"><span class="fa fa-link"></span> Trimestre 3</label>
-                                        <span class="form-control control-espejo" data-espejo-id="#trim3-{{$identificador}}"></span>
-                                        <input type="hidden" id="trim3-{{$identificador}}" name="trim3-{{$identificador}}">
-                                    </div>
-                                </div>
-                                <div class="col-sm-3">
-                                    <div class="form-group">
-                                        <label class="control-label"><span class="fa fa-link"></span> Trimestre 4</label>
-                                        <span class="form-control control-espejo" data-espejo-id="#trim4-{{$identificador}}"></span>
-                                        <input type="hidden" id="trim4-{{$identificador}}" name="trim4-{{$identificador}}">
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="control-label"><span class="fa fa-link"></span> Trimestre 4</label>
+                                <span class="form-control control-espejo" data-espejo-id="#trim4-{{$identificador}}"></span>
+                                <input type="hidden" id="trim4-{{$identificador}}" name="trim4-{{$identificador}}">
                             </div>
                         </div>
                     </div>
@@ -205,10 +226,14 @@
                         <span class="form-control control-espejo" data-espejo-id="#numerador-{{$identificador}}"></span>
                         <input type="hidden" id="numerador-{{$identificador}}" name="numerador-{{$identificador}}">
                     </div>
+                </div>
+                <div class="col-sm-2">
                     <div class="form-group">
                         <label class="control-label" for="denominador-{{$identificador}}">Denominador</label>
                         <input type="text" class="form-control" id="denominador-{{$identificador}}" name="denominador-{{$identificador}}">
                     </div>
+                </div>
+                <div class="col-sm-2">
                     <div class="form-group">
                         <label class="control-label"><span class="fa fa-link"></span> Meta Indicador</label>
                         <span class="form-control control-espejo" data-espejo-id="#meta-{{$identificador}}"></span>

@@ -68,7 +68,7 @@ class ProyectosController extends \BaseController {
 
 		//Cargar el formulario para dar de alta actividades
 		$datos_componentes['identificador'] = 'actividad'; //El identificador se agrega al id de los elementos del formulario
-		//$datos_componentes['jurisdicciones'] = array('O.C.','I','II','III','IV','V','VI','VII','VIII','IX','X');
+		$datos_componentes['jurisdicciones'] = array('OC'=>'O.C.','I'=>'I','II'=>'II','III'=>'III','IV'=>'IV','V'=>'V','VI'=>'VI','VII'=>'VII','VIII'=>'VIII','IX'=>'IX','X'=>'X');
 		$datos_componentes['meses'] = array(
 				'ENE'=>'Enero',
 				'FEB'=>'Febrero',
