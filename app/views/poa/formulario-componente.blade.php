@@ -11,7 +11,7 @@
             </a>
         </li>
         <li role="presentation">
-            <a href="#desgloce_{{$identificador}}" role="tab" data-toggle="tab">
+            <a id="tablink-{{$identificador}}-desgloce-metas"  href="#desgloce_{{$identificador}}" role="tab" data-toggle="tab">
                 <span class="fa fa-table"></span> Desglose de Metas
             </a>
         </li>

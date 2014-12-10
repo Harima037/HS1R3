@@ -196,13 +196,7 @@ function editar_componente(e){
  			$('#numerador-ind-componente').val(response.data.numerador);
  			$('#denominador-ind-componente').val(response.data.denominador);
  			$('#interpretacion-componente').val(response.data.interpretacion);
- 			$('#meta-componente').val(response.data.metaIndicador).trigger('change');
- 			$('#trim1-componente').val(response.data.numeroTrim1).change();
- 			$('#trim2-componente').val(response.data.numeroTrim2).change();
- 			$('#trim3-componente').val(response.data.numeroTrim3).change();
- 			$('#trim4-componente').val(response.data.numeroTrim4).change();
- 			$('#numerador-componente').val(response.data.valorNumerador).trigger('change');
- 			$('#denominador-componente').val(response.data.valorDenominador).trigger('change');
+ 			$('#denominador-componente').val(response.data.valorDenominador).change();
  			$('#linea-base-componente').val(response.data.lineaBase);
  			$('#anio-base-componente').val(response.data.anioBase);
  			$('#tipo-obj-componente').val(response.data.tipo);
@@ -225,17 +219,60 @@ function editar_componente(e){
             $('#id-componente').val(response.data.id);
     		$('#tablink-componente-actividades').attr('data-toggle','tab');
 			$('#tablink-componente-actividades').parent().removeClass('disabled');
-			$('#tablink-componente-actividades').tab('show');
 
 			$(form_componente + ' .metas-mes').attr('data-meta-id','');
 			
 			actualizar_metas('componente',response.data.metas_mes);
+			
+			var tab_id = cargar_formulario_componente_actividad('componente',response.data);
+
+			$(tab_id).tab('show');
 
 			actualizar_grid_actividades(response.data.actividades);
 
             $(modal_componente).modal('show');
         }
     });
+}
+
+function cargar_formulario_componente_actividad(identificador,datos){
+	var errores_metas = false;
+	if($('#trim1-'+identificador).val() != datos.numeroTrim1){
+		Validation.printFieldsErrors('trim1-'+identificador,'Valor anterior de '+datos.numeroTrim1+'.');
+		errores_metas = true;
+	}
+	if($('#trim2-'+identificador).val() != datos.numeroTrim2){
+		Validation.printFieldsErrors('trim2-'+identificador,'Valor anterior de '+datos.numeroTrim2+'.');
+		errores_metas = true;
+	}
+	if($('#trim3-'+identificador).val() != datos.numeroTrim3){
+		Validation.printFieldsErrors('trim3-'+identificador,'Valor anterior de '+datos.numeroTrim3+'.');
+		errores_metas = true;
+	}
+	if($('#trim4-'+identificador).val() != datos.numeroTrim4){
+		Validation.printFieldsErrors('trim4-'+identificador,'Valor anterior de '+datos.numeroTrim4+'.');
+		errores_metas = true;
+	}
+	if($('#numerador-'+identificador).val() != datos.valorNumerador){
+		Validation.printFieldsErrors('numerador-'+identificador,'Valor anterior de '+datos.valorNumerador+'.');
+		errores_metas = true;
+	}
+	if($('#meta-'+identificador).val() != datos.metaIndicador){
+		Validation.printFieldsErrors('meta-'+identificador,'Valor anterior de '+datos.metaIndicador+'.');
+		errores_metas = true;
+	}
+
+	if(errores_metas){
+		if(identificador == 'actividad'){
+			var modal_identificador = modal_actividad;
+		}else{
+			var modal_identificador = modal_componente;
+		}
+		MessageManager.show({data:'Se ha detectado una anomalidad en los totales de los trimestres, esto puede deberse a que las jurisdicciones pertenecientes a la cobertura del proyecto cambiaron, por favor corrobore que la información sea correcta y de ser necesario actualize los valores requeridos para poder resolver el conflicto.',container:modal_identificador + ' .modal-body',type:'ADV'});
+		return '#tablink-'+identificador+'-desgloce-metas';
+	}else{
+		return '#tablink-'+identificador+'-actividades';
+	}
 }
 
 function editar_actividad(e){
@@ -253,15 +290,16 @@ function editar_actividad(e){
  			$('#numerador-ind-actividad').val(response.data.numerador);
  			$('#denominador-ind-actividad').val(response.data.denominador);
  			$('#interpretacion-actividad').val(response.data.interpretacion);
+ 			$('#denominador-actividad').val(response.data.valorDenominador).change();
+ 			$('#linea-base-actividad').val(response.data.lineaBase);
+ 			$('#anio-base-actividad').val(response.data.anioBase);
+
  			$('#meta-actividad').val(response.data.metaIndicador).change();
  			$('#trim1-actividad').val(response.data.numeroTrim1).change();
  			$('#trim2-actividad').val(response.data.numeroTrim2).change();
  			$('#trim3-actividad').val(response.data.numeroTrim3).change();
  			$('#trim4-actividad').val(response.data.numeroTrim4).change();
  			$('#numerador-actividad').val(response.data.valorNumerador).change();
- 			$('#denominador-actividad').val(response.data.valorDenominador).change();
- 			$('#linea-base-actividad').val(response.data.lineaBase);
- 			$('#anio-base-actividad').val(response.data.anioBase);
 
  			$('#formula-actividad').val(response.data.idFormula);
 			$('#dimension-actividad').val(response.data.idDimensionIndicador);
@@ -278,6 +316,10 @@ function editar_actividad(e){
 			$(form_actividad + ' .metas-mes').attr('data-meta-id','');
 
 			actualizar_metas('actividad',response.data.metas_mes);
+
+			var tab_id = cargar_formulario_componente_actividad('actividad',response.data);
+
+			$(tab_id).tab('show');
 
             $(modal_actividad).modal('show');
         }
@@ -714,6 +756,7 @@ function actualizar_metas(identificador,metas){
 		$('#mes-'+identificador+'-'+metas[indx].claveJurisdiccion+'-'+metas[indx].mes).val(metas[indx].meta);
 		$('#mes-'+identificador+'-'+metas[indx].claveJurisdiccion+'-'+metas[indx].mes).attr('data-meta-id',metas[indx].id);
 	}
+	$('.metas-mes[data-meta-jurisdiccion="OC"][data-meta-identificador="'+identificador+'"]').change();
 }
 
 function actualizar_grid_actividades(datos){
@@ -735,10 +778,10 @@ function actualizar_grid_actividades(datos){
 	$('#conteo-actividades').text(' ' + actividades.length + ' / 5 ');
 
 	if(actividades.length == 0){
-		$(grid_actividades + ' > table > tbody').append('<tr><td colspan="6" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
+		$(grid_actividades + ' > table > tbody').html('<tr><td colspan="6" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
+	}else{
+		actividadDatagrid.cargarDatos(actividades);
 	}
-
-	actividadDatagrid.cargarDatos(actividades);
 }
 
 function actualizar_grid_componentes(datos){
@@ -773,6 +816,7 @@ function reset_modal_form(formulario){
     $(formulario + ' .selectpicker').change();
     Validation.cleanFormErrors(formulario);
     if(formulario == form_componente){
+    	$(modal_componente + ' .alert').remove();
     	$('#id-componente').val('');
     	//$(grid_actividades + ' > table > tbody').empty();
     	$('#conteo-actividades').text(' 0 / 5 ');

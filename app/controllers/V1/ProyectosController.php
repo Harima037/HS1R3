@@ -57,7 +57,7 @@ class ProyectosController extends BaseController {
 		'frecuencia-componente' 		=> 'required',
 		'interpretacion-componente' 	=> 'required',
 		'meta-componente' 				=> 'required|numeric|min:1',
-		'numerador-componente' 			=> 'required',
+		'numerador-componente' 			=> 'required|numeric|min:1',
 		'numerador-ind-componente' 		=> 'required',
 		'supuestos-componente' 			=> 'required',
 		'tipo-ind-componente' 			=> 'required',
@@ -81,7 +81,7 @@ class ProyectosController extends BaseController {
 		'frecuencia-actividad' 			=> 'required',
 		'interpretacion-actividad' 		=> 'required',
 		'meta-actividad' 				=> 'required|numeric|min:1',
-		'numerador-actividad' 			=> 'required',
+		'numerador-actividad' 			=> 'required|numeric|min:1',
 		'numerador-ind-actividad' 		=> 'required',
 		'supuestos-actividad' 			=> 'required',
 		'tipo-ind-actividad' 			=> 'required',
@@ -837,8 +837,17 @@ class ProyectosController extends BaseController {
 
 							if($jurisdicciones){
 								$claves = $jurisdicciones->lists('clave');
-								ComponenteMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
-								ActividadMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
+								//throw new Exception(print_r($claves,false), 1);
+								if(count($claves) > 0){
+									$claves[] = 'OC';
+									//throw new Exception(print_r($claves,false), 1);
+									ComponenteMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
+									ActividadMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
+									//$queries = DB::getQueryLog();
+									//$last_query = end($queries);
+									//throw new Exception(print_r($last_query,false), 1);
+									
+								}
 							}
 						}else{
 							//No se pudieron guardar los datos del proyecto
