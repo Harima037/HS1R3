@@ -24,19 +24,13 @@ var grid_actividades = '#datagridActividades';
 var form_caratula = '#form_caratula';
 var form_componente = '#form_componente';
 var form_actividad = '#form_actividad';
-
 //***********************     Funcionalidad ejecutada al cargar la página    ************************************
-$('.control-espejo').each(function(){
-	var control_id = $(this).data('espejo-id');
-	$(control_id).on('change',function(){
-		$('.control-espejo[data-espejo-id="'+control_id+'"]').text($(this).val());
-	});
-});
-
 if($('#id').val()){
 	//load data
 	proyectoResource.get($('#id').val(),null,{
         _success: function(response){
+        	inicializar_comportamiento_caratula();
+
             $('#nombretecnico').val(response.data.nombreTecnico);
 
 			$('#unidad_responsable').text(response.data.datos_unidad_responsable.clave);
@@ -123,62 +117,57 @@ if($('#id').val()){
         }
     });
 }else{
+	inicializar_comportamiento_caratula();
 	deshabilita_paneles('');
 }
 
-$('#denominador-componente').on('keyup',function(){
-	ejecutar_formula('componente');
-});
-
-$('#denominador-actividad').on('keyup',function(){
-	ejecutar_formula('actividad');
-});
-
-$('.benef-totales').on('keyup',function(){
-	if($(this).attr('id') == 'totalbeneficiariosf'){
-		var totalm = parseInt($('#totalbeneficiariosm').val());
-		$('#totalbeneficiarios').text(totalm + parseInt($(this).val()));
-	}
-	if($(this).attr('id') == 'totalbeneficiariosm'){
-		var totalf = parseInt($('#totalbeneficiariosf').val());
-		$('#totalbeneficiarios').text(totalf + parseInt($(this).val()));
-	}
-});
-
-$('.sub-total-zona').on('change',function(){
-	if($(this).hasClass('fem')){
-		sumar_totales('.sub-total-zona.fem','total-zona-f','totalbeneficiariosf','Los subtotales de Zona no concuerdan.');
-	}
-	if($(this).hasClass('masc')){
-		sumar_totales('.sub-total-zona.masc','total-zona-m','totalbeneficiariosm','Los subtotales de Zona no concuerdan.');
-	}
-});
-
-$('.sub-total-poblacion').on('change',function(){
-	if($(this).hasClass('fem')){
-		sumar_totales('.sub-total-poblacion.fem','total-poblacion-f','totalbeneficiariosf','Los subtotales de Población no concuerdan.');
-	}
-	if($(this).hasClass('masc')){
-		sumar_totales('.sub-total-poblacion.masc','total-poblacion-m','totalbeneficiariosm','Los subtotales de Población no concuerdan.');
-	}
-});
-
-$('.sub-total-marginacion').on('change',function(){
-	if($(this).hasClass('fem')){
-		sumar_totales('.sub-total-marginacion.fem','total-marginacion-f','totalbeneficiariosf','Los subtotales de Marginación no concuerdan.');
-	}
-	if($(this).hasClass('masc')){
-		sumar_totales('.sub-total-marginacion.masc','total-marginacion-m','totalbeneficiariosm','Los subtotales de Marginación no concuerdan.');
-	}
-});
-
-function cargar_totales(){
-	sumar_totales('.sub-total-zona.fem','total-zona-f','totalbeneficiariosf','Los subtotales de Zona no concuerdan.');
-	sumar_totales('.sub-total-zona.masc','total-zona-m','totalbeneficiariosm','Los subtotales de Zona no concuerdan.');
-	sumar_totales('.sub-total-poblacion.fem','total-poblacion-f','totalbeneficiariosf','Los subtotales de Población no concuerdan.');
-	sumar_totales('.sub-total-poblacion.masc','total-poblacion-m','totalbeneficiariosm','Los subtotales de Población no concuerdan.');
-	sumar_totales('.sub-total-marginacion.fem','total-marginacion-f','totalbeneficiariosf','Los subtotales de Marginación no concuerdan.');
-	sumar_totales('.sub-total-marginacion.masc','total-marginacion-m','totalbeneficiariosm','Los subtotales de Marginación no concuerdan.');
+function inicializar_comportamiento_caratula(){
+	$('.control-espejo').each(function(){
+		var control_id = $(this).data('espejo-id');
+		$(control_id).on('change',function(){
+			$('.control-espejo[data-espejo-id="'+control_id+'"]').text($(this).val());
+		});
+	});
+	$('#denominador-componente').on('keyup',function(){
+		ejecutar_formula('componente');
+	});
+	$('#denominador-actividad').on('keyup',function(){
+		ejecutar_formula('actividad');
+	});
+	$('.benef-totales').on('keyup',function(){
+		if($(this).attr('id') == 'totalbeneficiariosf'){
+			var totalm = parseInt($('#totalbeneficiariosm').val());
+			$('#totalbeneficiarios').text(totalm + parseInt($(this).val()));
+		}
+		if($(this).attr('id') == 'totalbeneficiariosm'){
+			var totalf = parseInt($('#totalbeneficiariosf').val());
+			$('#totalbeneficiarios').text(totalf + parseInt($(this).val()));
+		}
+	});
+	$('.sub-total-zona').on('change',function(){
+		if($(this).hasClass('fem')){
+			sumar_totales('.sub-total-zona.fem','total-zona-f','totalbeneficiariosf','Los subtotales de Zona no concuerdan.');
+		}
+		if($(this).hasClass('masc')){
+			sumar_totales('.sub-total-zona.masc','total-zona-m','totalbeneficiariosm','Los subtotales de Zona no concuerdan.');
+		}
+	});
+	$('.sub-total-poblacion').on('change',function(){
+		if($(this).hasClass('fem')){
+			sumar_totales('.sub-total-poblacion.fem','total-poblacion-f','totalbeneficiariosf','Los subtotales de Población no concuerdan.');
+		}
+		if($(this).hasClass('masc')){
+			sumar_totales('.sub-total-poblacion.masc','total-poblacion-m','totalbeneficiariosm','Los subtotales de Población no concuerdan.');
+		}
+	});
+	$('.sub-total-marginacion').on('change',function(){
+		if($(this).hasClass('fem')){
+			sumar_totales('.sub-total-marginacion.fem','total-marginacion-f','totalbeneficiariosf','Los subtotales de Marginación no concuerdan.');
+		}
+		if($(this).hasClass('masc')){
+			sumar_totales('.sub-total-marginacion.masc','total-marginacion-m','totalbeneficiariosm','Los subtotales de Marginación no concuerdan.');
+		}
+	});
 }
 
 /***********************************           Comportamiento de los datagrids          ***********************************/
@@ -268,7 +257,7 @@ function cargar_formulario_componente_actividad(identificador,datos){
 		}else{
 			var modal_identificador = modal_componente;
 		}
-		MessageManager.show({data:'Se ha detectado una anomalidad en los totales de los trimestres, esto puede deberse a que las jurisdicciones pertenecientes a la cobertura del proyecto cambiaron, por favor corrobore que la información sea correcta y de ser necesario actualize los valores requeridos para poder resolver el conflicto.',container:modal_identificador + ' .modal-body',type:'ADV'});
+		MessageManager.show({data:'Se ha detectado una irregularidad en los totales de los trimestres, esto puede deberse a que las jurisdicciones pertenecientes a la cobertura del proyecto cambiaron, por favor corrobore que la información sea correcta y de ser necesario actualize los valores requeridos para poder resolver el conflicto.',container:modal_identificador + ' .modal-body',type:'ADV'});
 		return '#tablink-'+identificador+'-desgloce-metas';
 	}else{
 		return '#tablink-'+identificador+'-actividades';
@@ -982,4 +971,13 @@ function actualizar_eventos_metas(){
 			ejecutar_formula(identificador);
 		}
 	});
+}
+
+function cargar_totales(){
+	sumar_totales('.sub-total-zona.fem','total-zona-f','totalbeneficiariosf','Los subtotales de Zona no concuerdan.');
+	sumar_totales('.sub-total-zona.masc','total-zona-m','totalbeneficiariosm','Los subtotales de Zona no concuerdan.');
+	sumar_totales('.sub-total-poblacion.fem','total-poblacion-f','totalbeneficiariosf','Los subtotales de Población no concuerdan.');
+	sumar_totales('.sub-total-poblacion.masc','total-poblacion-m','totalbeneficiariosm','Los subtotales de Población no concuerdan.');
+	sumar_totales('.sub-total-marginacion.fem','total-marginacion-f','totalbeneficiariosf','Los subtotales de Marginación no concuerdan.');
+	sumar_totales('.sub-total-marginacion.masc','total-marginacion-m','totalbeneficiariosm','Los subtotales de Marginación no concuerdan.');
 }

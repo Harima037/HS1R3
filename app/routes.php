@@ -45,6 +45,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 	Route::group(array('prefix'=>'poa'), function(){
 		Route::get('proyectos',array('uses'=>'ProyectosController@index'));
 		Route::any('caratula',array('uses'=>'ProyectosController@caratula'));
+		Route::get('fibap',array('uses'=>'FibapController@index'));
+		Route::any('formulario-fibap',array('uses'=>'FibapController@formulario'));
 	});
 
 	Route::group(array('prefix'=>"v1"),function(){
@@ -59,6 +61,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('cuenta',			'V1\CuentaController');
 		
 		Route::resource('proyectos',		'V1\ProyectosController');
+		Route::resource('fibap',		'V1\FibapController');
 	});
 });
 
@@ -69,9 +72,13 @@ App::missing(function($exception)
 		return Redirect::to('login');
 	}
 
+	if(Request::ajax()){
+		return Response::json(array('data'=>'El recurso que solicita no se encuentra o no esta disponible. Si el problema persiste por favor consulte con sorpote técnico'),404);
+	}
+
 	$sys_sistemas = SysGrupoModulo::all();	
 	$usuario = Sentry::getUser();
-	
+
     return Response::view('errors.404', array('usuario'=>$usuario,'sys_activo'=>null,'sys_sistemas'=>$sys_sistemas,'sys_mod_activo'=>null), 404);
     						
 });
