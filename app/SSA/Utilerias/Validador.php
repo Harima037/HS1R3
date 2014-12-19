@@ -7,6 +7,7 @@ class Validador
 {
 	public static $mensajes = array(
 			'required'  		=> '{"field":":attribute","error":"Este campo es requerido."}',
+			'required_without'	=> '{"field":":attribute","error":"Este campo es requerido."}',
 			'required_if'		=> '{"field":":attribute","error":"Este campo es requerido."}',
 			'same'      		=> '{"field":":attribute","error":"Estos campos deben ser iguales.","other":":other"}',
 			'size'      		=> '{"field":":attribute","error":"Este campo no puede sobrepasar los :size caracteres."}',
@@ -22,7 +23,6 @@ class Validador
 			'image' 			=> '{"field":":attribute","error":"El archivo debe ser una imagen."}',
 			'min'				=> '{"field":":attribute","error":"Este campo debe tener un valor mayor o igual a :min"}',
 			'digits_between'	=> '{"field":":attribute","error":"Este campo debe ser ser de :min a :max caracteres de largo."}'
-
 		);
 	
 	public static function guardar($_inputs,$_reglas, $_obj){	

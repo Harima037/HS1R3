@@ -130,11 +130,6 @@ $('.btn-datagrid-agregar').on('click', function () {
     $('#datos-proyecto').hide();
 });
 
-$(modal_name+' .btn-guardar-continuar').on('click', function (e) {
-    e.preventDefault();
-    submitModulo(true);
-});
-
 $(modal_name+' .btn-guardar').on('click', function (e) {
     e.preventDefault();
     submitModulo();
@@ -149,7 +144,7 @@ function resetModalModuloForm(){
     $(form_name +' #id').val("");
 }
 
-function submitModulo(save_next){
+function submitModulo(){
     if($('#clasificacion_proyecto').val() == 2){
         if($('#fibap_antes').prop('checked')){
             //TODO: Load FIBAP form -->

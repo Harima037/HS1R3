@@ -116,6 +116,12 @@
                                 </button>
                             </div>
                         </div>
+                        <div class="form-group" id="editar_fibap">
+                            <div class="help-text">
+                                <b>Editar FIBAP</b>
+                                <input type="hidden" id="id" name="id">
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">

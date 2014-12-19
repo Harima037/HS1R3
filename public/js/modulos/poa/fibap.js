@@ -21,6 +21,13 @@ var form_name = '#form-fibap';
 
 /*===================================*/
 // Configuración General para cualquier módulo
+function editar(e){
+    $('#opciones_fibap').hide();
+    $('#editar_fibap').show();
+    $('#id').val(e);
+    $(modal_name).find(".modal-title").html("Editar FIBAP");
+    $(modal_name).modal('show');
+};
 
 $(modal_name).on('shown.bs.modal', function () {
     $(modal_name).find('input').eq(0).focus();
@@ -31,6 +38,8 @@ $(modal_name).on('hide.bs.modal',function(e){
 });
 
 $('.btn-datagrid-agregar').on('click', function () {
+    $('#opciones_fibap').show();
+    $('#editar_fibap').hide();
     $(modal_name).find(".modal-title").html("Nuevo FIBAP");
     $(modal_name).modal('show');
 });

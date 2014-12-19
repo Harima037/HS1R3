@@ -26,6 +26,10 @@ class Proyecto extends BaseModel
         });
     }
 
+    public function fibap(){
+        return $this->hasOne('FIBAP','idProyecto');
+    }
+
 	public function getClavePresupuestariaAttribute(){
 		return $this->unidadResponsable . $this->finalidad . $this->funcion . $this->subfuncion . $this->subsubfuncion . $this->programaSectorial . $this->programaPresupuestario . $this->programaEspecial . $this->actividadInstitucional . $this->proyectoEstrategico . $this->numeroProyectoEstrategico;
 	}
