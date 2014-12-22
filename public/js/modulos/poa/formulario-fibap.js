@@ -16,7 +16,7 @@ var fibapResource = new RESTfulRequests(SERVER_HOST+'/v1/fibap');
 //var componenteDatagrid = new Datagrid("#datagridComponentes",proyectoResource);
 var presupuestoDatagrid = new Datagrid("#datagridPresupuesto",fibapResource);
 var antecedenteDatagrid = new Datagrid("#datagridAntecedentes",fibapResource);
-
+antecedenteDatagrid.init();
 //componenteDatagrid.init();
 //var modal_componente = '#modalComponente';
 //var grid_componentes = '#datagridComponentes';
@@ -32,11 +32,17 @@ var modal_presupuesto = '#modal-presupuesto';
 
 //Formularios de las ventanas modales
 var form_antecedente = 'form-antecedente';
-var form_presupuesto = '#form-presupuesto';
+var form_presupuesto = 'form-presupuesto';
 
 deshabilita_paneles('');
 
 //*********************************   Funcionalidad al cargar el formulario   *********************************
+$('.origen-financiamiento').on('keyup',function(){
+	sumar_valores('.origen-financiamiento','#presupuesto-requerido');
+});
+$('.presupuesto-mes').on('keyup',function(){
+	sumar_valores('.presupuesto-mes','#cantidad-presupuesto');
+});
 $('#cobertura').on('change',function(){
 	deshabilita_paneles($(this).val());
 });
@@ -48,7 +54,13 @@ $('.benef-totales').on('keyup',function(){
 	});
 	$('#total-beneficiarios').text(total);
 });
-
+$('.control-espejo').each(function(){
+	var control_id = $(this).data('espejo-id');
+	$(control_id).on('change',function(){
+		var id = $(this).attr('id');
+		$('.control-espejo[data-espejo-id="#'+id+'"]').text($(this).val());
+	});
+});
 if($('#id').val()){
 	var parametros = {ver:'fibap'};
 	fibapResource.get($('#id').val(),parametros,{
@@ -65,6 +77,7 @@ if($('#id').val()){
 			$('#resultados-obtenidos').val(response.data.resultadosObtenidos);
 			$('#resultados-esperados').val(response.data.resultadosEsperados);
 			$('#presupuesto-requerido').val(response.data.presupuestoRequerido);
+			$('#presupuesto-requerido').change();
 			$('#periodo-ejecucion').val(response.data.periodoEjecucion);
 
 			var datosProyecto = null;
@@ -131,6 +144,7 @@ if($('#id').val()){
             cambiar_icono_tabs('#tab-link-datos-fibap','fa-check-square-o');
 
             llenar_datagrid_antecedentes(response.data.antecedentes_financieros);
+            llenar_datagrid_presupuestos(response.data.distribucion_presupuesto);
 
             if(response.data.resultadosObtenidos || response.data.resultadosEsperados){
             	cambiar_icono_tabs('#tab-link-antecedentes-fibap','fa-check-square-o');
@@ -143,12 +157,94 @@ if($('#id').val()){
 	});
 }
 
+//*********************************   Funcionalidad de los DataGrids (Editar y Eliminar)   *********************************
+function editar_antecedente(e){
+	var parametros = {'ver':'antecedente'};
+	fibapResource.get(e,parametros,{
+        _success: function(response){
+            $(modal_antecedente).find(".modal-title").html("Editar Antecedente");
+
+            $('#anio-antecedente').val(response.data.anio);
+			$('#autorizado-antecedente').val(response.data.autorizado);
+			$('#ejercido-antecedente').val(response.data.ejercido);
+			$('#fecha-corte-antecedente').val(response.data.fechaCorte);
+			$('#id-antecedente').val(response.data.id);
+
+            $(modal_antecedente).modal('show');
+        }
+    });
+}
+
 //*********************************   Funcionalidad de Botones principales (Guardar y Cancelar)   *********************************
+$('#btn-presupuesto-guardar').on('click',function(){
+	var parametros = $('#'+form_presupuesto).serialize();
+	parametros += '&formulario='+form_presupuesto + '&fibap-id=' + $('#id').val();
+	if($('#id-presupuesto').val()){
+		fibapResource.put($('#id-presupuesto').val(),parametros,{
+	        _success: function(response){
+	            MessageManager.show({data:'Cambios almacenados con éxito',type:'OK',timer:3});
+	            llenar_datagrid_presupuestos(response.distribucion);
+	        },
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
+	    });
+	}else{
+		fibapResource.post(parametros,{
+	        _success: function(response){
+	            MessageManager.show({data:'Presupuesto almacenado con éxito',type:'OK',timer:3});
+	            llenar_datagrid_presupuestos(response.distribucion);
+	            cambiar_icono_tabs('#tab-link-presupuesto-fibap','fa-check-square-o');
+	        },
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
+	    });
+	}
+});
 $('#btn-antecedente-guardar').on('click',function(){
 	var parametros = $('#'+form_antecedente).serialize();
 	parametros += '&formulario='+form_antecedente + '&fibap-id=' + $('#id').val();
-	if($('#antecedente-id').val()){
-
+	if($('#id-antecedente').val()){
+		fibapResource.put($('#id-antecedente').val(),parametros,{
+	        _success: function(response){
+	            MessageManager.show({data:'Cambios almacenados con éxito',type:'OK',timer:3});
+	            llenar_datagrid_antecedentes(response.antecedentes);
+	        },
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
+	    });
 	}else{
 		fibapResource.post(parametros,{
 	        _success: function(response){
@@ -172,7 +268,6 @@ $('#btn-antecedente-guardar').on('click',function(){
 	        }
 	    });
 	}
-
 });
 $('#btn-fibap-guardar').on('click',function(){
 	var formulario = $('#fibap-grupo-formularios > .tab-pane.active').data('form-id');
@@ -255,7 +350,41 @@ $('#btn-agregar-presupuesto').on('click',function(){
 	$(modal_presupuesto).modal('show');
 });
 
+$(modal_antecedente).on('hide.bs.modal',function(e){
+	reset_modal_form(form_antecedente);
+});
+
+$(modal_presupuesto).on('hide.bs.modal',function(e){
+	reset_modal_form(form_presupuesto);
+});
+
 //********************************************   Funciones   ********************************************
+function llenar_datagrid_presupuestos(datos){
+	var distribucion = [];
+	$('#datagridPresupuesto > table > tbody').empty();
+
+	for(var indx in datos){
+		var presupuesto = {};
+
+		var porcentaje = (datos[indx].cantidad * 100) / parseInt($('#presupuesto-requerido').val());
+
+		presupuesto.id = datos[indx].id;
+		presupuesto.partida = datos[indx].objeto_gasto.clave;
+		presupuesto.descripcion = datos[indx].objeto_gasto.descripcion;
+		presupuesto.cantidad = datos[indx].cantidad;
+		presupuesto.porcentaje = parseFloat(porcentaje.toFixed(2));
+
+		distribucion.push(presupuesto);
+	}
+
+	if(distribucion.length == 0){
+		$('#datagridPresupuesto > table > tbody').html('<tr><td colspan="6" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
+	}else{
+		presupuestoDatagrid.cargarDatos(distribucion);
+	}
+	
+}
+
 function llenar_datagrid_antecedentes(datos){
 	var antecedentes = [];
 	$('#datagridAntecedentes > table > tbody').empty();
@@ -267,7 +396,7 @@ function llenar_datagrid_antecedentes(datos){
 		antecedente.anio = datos[indx].anio;
 		antecedente.autorizado = datos[indx].autorizado;
 		antecedente.ejercido = datos[indx].ejercido;
-		antecedente.porcentaje = datos[indx].porcentaje;
+		antecedente.porcentaje = parseFloat(datos[indx].porcentaje.toFixed(2));
 		antecedente.fechaCorte = datos[indx].fechaCorte;
 
 		antecedentes.push(antecedente);
@@ -321,4 +450,28 @@ function deshabilita_paneles(id){
 		$('#select-municipio-panel').hide();
 		$('#select-region-panel').hide();
 	}
+}
+
+function reset_modal_form(formulario){
+    $('#'+formulario).get(0).reset();
+    Validation.cleanFormErrors('#'+formulario);
+    if(formulario == form_antecedente){
+    	$(modal_antecedente + ' .alert').remove();
+    	$('#id-antecedente').val('');
+    }
+    if(formulario == form_presupuesto){
+    	$('input[type="hidden"]').val('');
+    	$('input[type="hidden"]').change();
+    	$('.selectpicker').change();
+    	//$('#id-presupuesto').val('');
+    	$(modal_presupuesto + ' .alert').remove();
+    }
+}
+
+function sumar_valores(identificador,resultado){
+	var sumatoria = 0;
+	$(identificador).each(function(){
+		sumatoria += parseFloat($(this).val()) || 0;
+	});
+	$(resultado).val(sumatoria).change();
 }

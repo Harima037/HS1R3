@@ -339,8 +339,11 @@
         <div class="row">
             <div class="col-sm-6">
                 <div class="form-group">
-                    <label for="presupuesto-requerido" class="control-label">Presupuesto Requerido</label>
-                    <input type="text" class="form-control" id="presupuesto-requerido" name="presupuesto-requerido"/>
+                    <label for="presupuesto-requerido" class="control-label">
+                        <span class="fa fa-link"></span> Presupuesto Requerido
+                    </label>
+                    <span class="form-control control-espejo" data-espejo-id="#presupuesto-requerido"></span>
+                    <input type="hidden" id="presupuesto-requerido" name="presupuesto-requerido"/>
                 </div>
             </div>
             <div class="col-sm-6">
@@ -402,12 +405,10 @@
                         <thead>
                             <tr>
                                 <th><input type="checkbox" class="check-select-all-rows"></th>
-                                <th>Capitulo</th>
-                                <th>Concepto</th>
-                                <th>Partida</th>
+                                <th width="100px">Partida</th>
                                 <th>Descripción</th>
-                                <th>Cantidad</th>
-                                <th>%</th>
+                                <th width="100px">Cantidad</th>
+                                <th width="90px">%</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -487,8 +488,8 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 <div class="modal fade" id="modal-presupuesto" tabindex="-1" role="dialog" aria-labelledby="modalPresupLabel" aria-hidden="true" data-backdrop="static">
-    <div class="modal-dialog">
-        <div class="modal-content">
+    <div class="modal-dialog modal-dialog-85-screen">
+        <div class="modal-content modal-content-85-screen">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title" id="modalPresupLabel">Nuevo</h4>
@@ -498,23 +499,59 @@
                     <div class="row">
                         <div class="col-sm-12">
                             <div class="form-group">
-                                <label for="capitulo-presupuesto" class="control-label">Capitulo, Concepto, Partida</label>
-                                <input type="text" class="form-control" id="capitulo-presupuesto" name="capitulo-presupuesto"/>
-                            </div>
-                        </div>
-                        <div class="col-sm-7">
-                            <div class="form-group">
-                                <label for="descripcion-presupuesto" class="control-label">Descripción</label>
-                                <input type="text" class="form-control" id="descripcion-presupuesto" name="descripcion-presupuesto"/>
+                                <label for="objeto-gasto-presupuesto" class="control-label">Capitulo, Concepto, Partida</label>
+                                <select class="form-control selectpicker" id="objeto-gasto-presupuesto" name="objeto-gasto-presupuesto" data-live-search="true">
+                                    <option value="">Seleciona una partida</option>
+                                    @foreach ($objetos_gasto as $capitulo)
+                                        @if(count($capitulo->hijos))
+                                            @foreach ($capitulo->hijos as $concepto)
+                                                @if(count($concepto->hijos))
+                                                    @foreach ($concepto->hijos as $generica)
+                                                        @if(count($generica->hijos))
+                                                            <optgroup label="{{$capitulo->clave . ' ' . $capitulo->descripcion . '<br>' . $concepto->clave . ' ' . $concepto->descripcion . '<br>' . $generica->clave . ' ' . $generica->descripcion}}">
+                                                                @foreach ($generica->hijos as $especifica)
+                                                                    <option value="{{$especifica->id}}">
+                                                                        {{$especifica->clave . ' ' . $especifica->descripcion}}
+                                                                    </option>
+                                                                @endforeach
+                                                            </optgroup>
+                                                        @endif
+                                                    @endforeach
+                                                @endif
+                                            @endforeach
+                                        @endif
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                         <div class="col-sm-5">
                             <div class="form-group">
-                                <label for="cantidad-presupuesto" class="control-label">Cantidad</label>
-                                <input type="text" class="form-control" id="cantidad-presupuesto" name="cantidad-presupuesto"/>
+                                <label for="cantidad-presupuesto" class="control-label">
+                                    <span class="fa fa-link"></span> Cantidad
+                                </label>
+                                <span class="form-control control-espejo" data-espejo-id="#cantidad-presupuesto"></span>
+                                <input type="hidden" id="cantidad-presupuesto" name="cantidad-presupuesto"/>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label">Calanderizado de Ministraciones</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="row">
+                                @foreach ($meses as $clave => $mes)
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label for="mes-{{$clave}}" class="control-label">{{$mes}}</label>
+                                            <input id="mes-{{$clave}}" name="mes[{{$clave}}]" type="number" class="form-control input-sm presupuesto-mes" data-presupuesto-mes="{{$clave}}" data-presupuesto-id="">
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>
+                    <input type="hidden" name="id-presupuesto" id="id-presupuesto">
                 </form>
             </div>
             <div class="modal-footer">

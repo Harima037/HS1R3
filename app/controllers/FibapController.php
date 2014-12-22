@@ -22,6 +22,7 @@ class FibapController extends \BaseController {
 			'tipos_proyectos'=>TipoProyecto::all(),
 			'programa_presupuestario'=>ProgramaPresupuestario::all(),
 			'objetivos_ped'=>ObjetivoPED::whereNull('idPadre')->where('id','=',25)->with('hijos')->get(),
+			'objetos_gasto'=>ObjetoGasto::whereNull('idPadre')->with('hijos')->get(),
 			'coberturas' => Cobertura::all(),
 			'tipos_beneficiarios' => TipoBeneficiario::all(),
 			'municipios' => Municipio::all(),
@@ -29,6 +30,11 @@ class FibapController extends \BaseController {
 			'documentos_soporte' => DocumentoSoporte::all(),
 			'origenes_financiamiento' => OrigenFinanciamiento::all()
 		);
+
+		$datos['meses'] = array(
+				'ENE'=>'Enero','FEB'=>'Febrero','MAR'=>'Marzo','ABR'=>'Abril','MAY'=>'Mayo','JUN'=>'Junio',
+				'JUL'=>'Julio','AGO'=>'Agosto','SEP'=>'Septiembre','OCT'=>'Octubre','NOV'=>'Noviembre','DIC'=>'Diciembre'
+			);
 
 		//Si hay un id etonces es edición
 		if(Input::get('id')){

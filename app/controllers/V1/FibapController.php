@@ -3,8 +3,8 @@
 namespace V1;
 
 use SSA\Utilerias\Validador;
-use BaseController, Input, Response, DB, Sentry;
-use FIBAP, Proyecto, FibapDatosProyecto, PropuestaFinanciamiento, AntecedenteFinanciero, Exception;
+use BaseController, Input, Response, DB, Sentry, Exception;
+use FIBAP, Proyecto, FibapDatosProyecto, PropuestaFinanciamiento, AntecedenteFinanciero, DistribucionPresupuesto, Ministracion;
 
 class FibapController extends BaseController {
 	private $reglasFibap = array(
@@ -38,15 +38,15 @@ class FibapController extends BaseController {
 	);
 
 	private $reglasAntecedentes = array(
-		'anio-antecedente'				=> 'required',
+		'anio-antecedente'				=> 'required|integer|min:0',
 		'autorizado-antecedente'		=> 'required',
 		'ejercido-antecedente'			=> 'required',
 		'fecha-corte-antecedente'		=> 'required'
 	);
 
 	private $reglasPresupuesto = array(
-		'presupuesto-requerido'		=> 'required',
-		'periodo-ejecucion'			=> 'required'
+		'objeto-gasto-presupuesto'	=> 'required',
+		'cantidad-presupuesto'		=> 'required'
 	);
 
 	/**
@@ -124,12 +124,17 @@ class FibapController extends BaseController {
 
 		if($parametros){
 			if($parametros['ver'] == 'fibap'){
-				$recurso = FIBAP::with('documentos','propuestasFinanciamiento','antecedentesFinancieros')->find($id);
+				$recurso = FIBAP::with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuesto')->find($id);
+				$recurso->distribucionPresupuesto->load('objetoGasto');
 				if($recurso->idProyecto){
 					$recurso->load('proyecto');
 				}else{
 					$recurso->load('datosProyecto');
 				}
+			}elseif($parametros['ver'] == 'antecedente'){
+				$recurso = AntecedenteFinanciero::find($id);
+			}elseif($parametros['ver'] == 'distribucion-presupuesto'){
+				$recurso = DistribucionPresupuesto::find($id);
 			}
 		}else{
 			
@@ -164,7 +169,7 @@ class FibapController extends BaseController {
 				$validacion = Validador::validar(Input::all(), $this->reglasFibap);
 			}elseif($parametros['formulario'] == 'form-antecedente'){
 				$validacion = Validador::validar(Input::all(), $this->reglasAntecedentes);
-			}elseif($parametros['formulario'] == 'form-fibap-presupuesto'){
+			}elseif($parametros['formulario'] == 'form-presupuesto'){
 				$validacion = Validador::validar(Input::all(), $this->reglasPresupuesto);
 			}
 
@@ -232,7 +237,6 @@ class FibapController extends BaseController {
 						});
 						
 					}elseif($parametros['formulario'] == 'form-antecedente'){
-						$respuesta['data'] = 'guardado';
 						$recurso = new AntecedenteFinanciero;
 						$recurso->anio = $parametros['anio-antecedente'];
 						$recurso->autorizado = $parametros['autorizado-antecedente'];
@@ -244,8 +248,50 @@ class FibapController extends BaseController {
 						$fibap->antecedentesFinancieros()->save($recurso);
 
 						$respuesta['data'] = array('data'=>$recurso,'antecedentes' => $fibap->antecedentesFinancieros);
-					}elseif($parametros['formulario'] == 'form-fibap-presupuesto'){
-						
+					}elseif($parametros['formulario'] == 'form-presupuesto'){ //Nuevo Presupuesto
+						$fibap = FIBAP::with('distribucionPresupuesto')->find($parametros['fibap-id']);
+
+						$suma_distribucion = $fibap->distribucionPresupuesto->sum('cantidad');
+
+						if(($suma_distribucion + $parametros['cantidad-presupuesto']) > $fibap->presupuestoRequerido){
+							$respuesta['data']['data'] = 'La distribución del presupuesto sobrepasa el presupuesto requerido.';
+							throw new Exception('La distribución del presupuesto sobrepasa el presupuesto requerido.', 1);
+						}
+
+						$recurso = new DistribucionPresupuesto;
+						$recurso->idObjetoGasto = $parametros['objeto-gasto-presupuesto'];
+						$recurso->cantidad = $parametros['cantidad-presupuesto'];
+						//$recurso->porcentaje = ($recurso->cantidad * 100) / $fibap->presupuestoRequerido;
+
+						$calendarizado = array();
+						$suma_ministracion = 0;
+						foreach ($parametros['mes'] as $mes => $cantidad) {
+							if($cantidad > 0){
+								$ministracion = new Ministracion;
+								$ministracion->idObjetoGasto = $parametros['objeto-gasto-presupuesto'];
+								$ministracion->mes = $mes;
+								$ministracion->cantidad = $cantidad;
+								$calendarizado[] = $ministracion;
+								$suma_ministracion += $cantidad;
+							}
+						}
+
+						if($suma_ministracion != $recurso->cantidad){
+							$respuesta['data']['data']='La distribución de las ministraciones no corresponde con el total a repartir.';
+							throw new Exception('La distribución de las ministraciones no corresponde con el total a repartir.', 1);
+						}
+
+						$respuesta['data'] = DB::transaction(function() use ($fibap,$recurso,$calendarizado){
+							if($fibap->distribucionPresupuesto()->save($recurso)){
+								$fibap->calendarizadoMinistraciones()->saveMany($calendarizado);
+								$fibap->load('distribucionPresupuesto');
+								$fibap->distribucionPresupuesto->load('objetoGasto');
+								return array('data'=>$recurso,'distribucion' => $fibap->distribucionPresupuesto);
+							}else{
+								$respuesta['data']['code'] = 'S01';
+								throw new Exception("Error al intentar guardar los datos de la ficha: Error en el guardado de la ficha", 1);
+							}
+						});
 					}
 				}catch(\Exception $ex){
 					$respuesta['http_status'] = 500;
@@ -288,6 +334,8 @@ class FibapController extends BaseController {
 				$validacion = Validador::validar(Input::all(), $this->reglasFibapAntecedentes);
 			}elseif($parametros['formulario'] == 'form-fibap-presupuesto'){
 				$validacion = Validador::validar(Input::all(), $this->reglasFibapPresupuesto);
+			}elseif($parametros['formulario'] == 'form-antecedente'){
+				$validacion = Validador::validar(Input::all(), $this->reglasAntecedentes);
 			}
 
 			if($validacion === TRUE){
@@ -409,6 +457,21 @@ class FibapController extends BaseController {
 								throw new Exception("Error al intentar guardar los datos de la ficha: Error en el guardado de los datos antecedentes", 1);
 							}
 						});
+					}elseif($parametros['formulario'] == 'form-antecedente'){ //Editar antecedente
+						$recurso = AntecedenteFinanciero::find($id);
+						$recurso->anio = $parametros['anio-antecedente'];
+						$recurso->autorizado = $parametros['autorizado-antecedente'];
+						$recurso->ejercido = $parametros['ejercido-antecedente'];
+						$recurso->fechaCorte = $parametros['fecha-corte-antecedente'];
+						$recurso->porcentaje = ($recurso->ejercido * 100) / $recurso->autorizado;
+
+						if($recurso->save()){
+							$fibap = FIBAP::with('antecedentesFinancieros')->find($parametros['fibap-id']);
+							$respuesta['data'] = array('data'=>$recurso,'antecedentes' => $fibap->antecedentesFinancieros);
+						}else{
+							//No se pudieron guardar los datos del proyecto
+							throw new Exception("Error al intentar guardar los datos del antecedente", 1);
+						}
 					}
 				}catch(\Exception $ex){
 					$respuesta['http_status'] = 500;

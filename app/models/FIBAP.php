@@ -26,4 +26,12 @@ class FIBAP extends BaseModel
     public function antecedentesFinancieros(){
         return $this->hasMany('AntecedenteFinanciero','idFibap');
     }
+
+    public function distribucionPresupuesto(){
+        return $this->hasMany('DistribucionPresupuesto','idFibap');
+    }
+
+    public function calendarizadoMinistraciones(){
+        return $this->hasMany('Ministracion','idFibap');
+    }
 }
