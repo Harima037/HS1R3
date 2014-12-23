@@ -41,6 +41,11 @@ class FibapController extends \BaseController {
 			$datos['id'] = Input::get('id');
 		}
 
+		//Si hay un proyecto-id se bloquean algunos campos
+		if(Input::get('proyecto-id')){
+			$datos['proyecto_id'] = Input::get('proyecto-id');
+		}
+
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
 		$datos['sys_activo'] = SysGrupoModulo::findByKey('POA');
 		$datos['sys_mod_activo'] = SysModulo::findByKey('FIBAP');

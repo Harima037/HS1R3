@@ -424,7 +424,7 @@
     </div><!-- tab-panel -->
     
     <input type="hidden" id="id" name="id" value="{{{ $id or '' }}}">
-    <input type="hidden" id="proyecto-id" name="proyecto-id">
+    <input type="hidden" id="proyecto-id" name="proyecto-id" value="{{{ $proyecto_id or '' }}}">
     <div class="panel-footer">
         <div class="row">
             <div class="col-sm-12">

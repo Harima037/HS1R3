@@ -60,8 +60,8 @@
                         <th>Proyecto</th>
                         <th>Tipo</th>
                         <th>Descripción</th>
-                        <th style="text-align:center; width:150px;"><span class="glyphicon glyphicon-user"></span></th>
-                        <th style="text-align:center; width:150px;"><span class="glyphicon glyphicon-calendar"></span></th>
+                        <th style="text-align:center; width:90px;"><span class="glyphicon glyphicon-user"></span></th>
+                        <th style="text-align:center; width:120px;"><span class="glyphicon glyphicon-calendar"></span></th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -111,8 +111,8 @@
                                 Proyecto Nuevo
                             </div>
                             <div>
-                                <button type="button" class="btn btn-info">
-                                    <span class="fa fa-upload"></span> Proyecto existente
+                                <button type="button" class="btn btn-info btn-block">
+                                    <span class="fa fa-upload"></span> Cargar proyectos de inversión existentes disponibles
                                 </button>
                             </div>
                         </div>

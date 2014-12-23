@@ -226,19 +226,19 @@ function editar_componente(e){
 
 function cargar_formulario_componente_actividad(identificador,datos){
 	var errores_metas = false;
-	if($('#trim1-'+identificador).val() != datos.numeroTrim1){
+	if($('#trim1-'+identificador).val() != datos.numeroTrim1 && datos.numeroTrim1 != null){
 		Validation.printFieldsErrors('trim1-'+identificador,'Valor anterior de '+datos.numeroTrim1+'.');
 		errores_metas = true;
 	}
-	if($('#trim2-'+identificador).val() != datos.numeroTrim2){
+	if($('#trim2-'+identificador).val() != datos.numeroTrim2 && datos.numeroTrim2 != null){
 		Validation.printFieldsErrors('trim2-'+identificador,'Valor anterior de '+datos.numeroTrim2+'.');
 		errores_metas = true;
 	}
-	if($('#trim3-'+identificador).val() != datos.numeroTrim3){
+	if($('#trim3-'+identificador).val() != datos.numeroTrim3 && datos.numeroTrim3 != null){
 		Validation.printFieldsErrors('trim3-'+identificador,'Valor anterior de '+datos.numeroTrim3+'.');
 		errores_metas = true;
 	}
-	if($('#trim4-'+identificador).val() != datos.numeroTrim4){
+	if($('#trim4-'+identificador).val() != datos.numeroTrim4 && datos.numeroTrim4 != null){
 		Validation.printFieldsErrors('trim4-'+identificador,'Valor anterior de '+datos.numeroTrim4+'.');
 		errores_metas = true;
 	}

@@ -130,6 +130,10 @@ $('.btn-datagrid-agregar').on('click', function () {
     $('#datos-proyecto').hide();
 });
 
+$('#btn-capturar-fibap').on('click',function(){
+    window.location.href = "formulario-fibap";
+});
+
 $(modal_name+' .btn-guardar').on('click', function (e) {
     e.preventDefault();
     submitModulo();
@@ -145,12 +149,6 @@ function resetModalModuloForm(){
 }
 
 function submitModulo(){
-    if($('#clasificacion_proyecto').val() == 2){
-        if($('#fibap_antes').prop('checked')){
-            //TODO: Load FIBAP form -->
-            return;
-        }
-    }
     $(form_name).attr('action',SERVER_HOST+'/poa/caratula');
     $(form_name).attr('method','POST');
     $(form_name).submit();

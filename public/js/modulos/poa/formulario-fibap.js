@@ -17,14 +17,7 @@ var fibapResource = new RESTfulRequests(SERVER_HOST+'/v1/fibap');
 var presupuestoDatagrid = new Datagrid("#datagridPresupuesto",fibapResource);
 var antecedenteDatagrid = new Datagrid("#datagridAntecedentes",fibapResource);
 antecedenteDatagrid.init();
-//componenteDatagrid.init();
-//var modal_componente = '#modalComponente';
-//var grid_componentes = '#datagridComponentes';
-
-//Formularios
-//var form_fibap_datos = '#form-fibap-datos';
-//var form_fibap_antecedentes = '#form-fibap-antecedentes';
-//var form_fibap_presupuesto = '#form-fibap-presupuesto';
+presupuestoDatagrid.init();
 
 //Ventanas modales
 var modal_antecedente = '#modal-antecedente';
@@ -155,6 +148,58 @@ if($('#id').val()){
             }
 		}
 	});
+}else if($('proyecto-id').val()){
+	var parametros = {ver:'datos-proyecto'};
+	fibapResource.get($('#proyecto-id').val(),parametros,{
+		_success:function(response){
+			//
+			var datosProyecto = null;
+
+			datosProyecto = response.data;
+			//Marcamos los campos que vamos a bloquear
+			$('#tipo-proyecto').addClass('control-bloqueado');
+			$('#programa-presupuestal').addClass('control-bloqueado');
+			$('#vinculacion-ped').addClass('control-bloqueado');
+			$('#cobertura').addClass('control-bloqueado');
+			$('#municipio').addClass('control-bloqueado');
+			$('#region').addClass('control-bloqueado');
+			$('#proyecto').addClass('control-bloqueado');
+			$('#tipo-beneficiario').addClass('control-bloqueado');
+			$('#total-beneficiarios-f').addClass('control-bloqueado');
+			$('#total-beneficiarios-m').addClass('control-bloqueado');
+
+			$('#tipo-proyecto').val(datosProyecto.idTipoProyecto);
+			$('#tipo-proyecto').change();
+
+			$('#programa-presupuestal').val(datosProyecto.programaPresupuestario);
+            $('#programa-presupuestal').change();
+
+			$('#vinculacion-ped').val(datosProyecto.idObjetivoPED);
+            $('#vinculacion-ped').change();
+			$('#cobertura').val(datosProyecto.idCobertura);
+            $('#cobertura').change();
+
+			if(datosProyecto.claveMunicipio){
+				$('#municipio').val(datosProyecto.claveMunicipio);
+            	$('#municipio').change();
+            }
+
+            if(datosProyecto.claveRegion){
+            	$('#region').val(datosProyecto.claveRegion);
+            	$('#region').change();
+            }
+
+			$('#proyecto').val(datosProyecto.nombreTecnico);
+
+			$('#tipo-beneficiario').val(datosProyecto.idTipoBeneficiario);
+            $('#tipo-beneficiario').change();
+            $('#total-beneficiarios').text(datosProyecto.totalBeneficiarios);
+            $('#total-beneficiarios-f').val(datosProyecto.totalBeneficiariosF);
+            $('#total-beneficiarios-m').val(datosProyecto.totalBeneficiariosM);
+
+            bloquear_controles();
+		}
+	});
 }
 
 //*********************************   Funcionalidad de los DataGrids (Editar y Eliminar)   *********************************
@@ -175,15 +220,54 @@ function editar_antecedente(e){
     });
 }
 
+function editar_presupuesto(e){
+	var parametros = {'ver':'distribucion-presupuesto'};
+	fibapResource.get(e,parametros,{
+        _success: function(response){
+            $(modal_presupuesto).find(".modal-title").html("Editar Presupuesto");
+
+            $('#objeto-gasto-presupuesto').val(response.data.idObjetoGasto);
+            $('#objeto-gasto-presupuesto').change();
+			$('#cantidad-presupuesto').val(response.data.cantidad);
+			$('#cantidad-presupuesto').change();
+			$('#id-presupuesto').val(response.data.id);
+
+			//llenar_calendario_presupuesto(response.calendarizado);
+			var calendarizacion = response.calendarizado;
+			for(var indx in calendarizacion){
+				$('#mes-'+calendarizacion[indx].mes).val(calendarizacion[indx].cantidad);
+				$('#mes-'+calendarizacion[indx].mes).attr('data-presupuesto-id',calendarizacion[indx].id);
+			}
+
+            $(modal_presupuesto).modal('show');
+        }
+    });
+}
+/*function llenar_calendario_presupuesto(datos){
+	var calendarizacion = response.calendarizado;
+	for(var indx in datos){
+		$('#mes-'+datos[indx].mes).val(datos[indx].cantidad);
+		$('#mes-'+datos[indx].mes).attr('data-presupuesto-id',datos[indx].id);
+	}
+}*/
+
 //*********************************   Funcionalidad de Botones principales (Guardar y Cancelar)   *********************************
 $('#btn-presupuesto-guardar').on('click',function(){
 	var parametros = $('#'+form_presupuesto).serialize();
 	parametros += '&formulario='+form_presupuesto + '&fibap-id=' + $('#id').val();
 	if($('#id-presupuesto').val()){
+		var meses_capturados = '';
+		$('.presupuesto-mes').each(function(){
+			if($(this).attr('data-presupuesto-id')){
+				meses_capturados += '&meses-capturados['+$(this).attr('data-presupuesto-mes')+']='+$(this).attr('data-presupuesto-id');
+			}
+		});
+		parametros += meses_capturados;
 		fibapResource.put($('#id-presupuesto').val(),parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Cambios almacenados con éxito',type:'OK',timer:3});
 	            llenar_datagrid_presupuestos(response.distribucion);
+	            $(modal_presupuesto).modal('hide');
 	        },
 	        _error: function(response){
 	            try{
@@ -205,6 +289,7 @@ $('#btn-presupuesto-guardar').on('click',function(){
 	            MessageManager.show({data:'Presupuesto almacenado con éxito',type:'OK',timer:3});
 	            llenar_datagrid_presupuestos(response.distribucion);
 	            cambiar_icono_tabs('#tab-link-presupuesto-fibap','fa-check-square-o');
+	            $(modal_presupuesto).modal('hide');
 	        },
 	        _error: function(response){
 	            try{
@@ -230,6 +315,7 @@ $('#btn-antecedente-guardar').on('click',function(){
 	        _success: function(response){
 	            MessageManager.show({data:'Cambios almacenados con éxito',type:'OK',timer:3});
 	            llenar_datagrid_antecedentes(response.antecedentes);
+	            $(modal_antecedente).modal('hide');
 	        },
 	        _error: function(response){
 	            try{
@@ -252,6 +338,7 @@ $('#btn-antecedente-guardar').on('click',function(){
 	            response.antecedentes.push(response.data);
 	            llenar_datagrid_antecedentes(response.antecedentes);
 	            cambiar_icono_tabs('#tab-link-antecedentes-fibap','fa-check-square-o');
+	            $(modal_antecedente).modal('hide');
 	        },
 	        _error: function(response){
 	            try{
@@ -317,6 +404,7 @@ $('#btn-fibap-guardar').on('click',function(){
 	            MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:3});
 	            habilitar_tabs();
 	            cambiar_icono_tabs('#tab-link-datos-fibap','fa-check-square-o');
+	            $('#id').val(response.data.id);
 	        },
 	        _error: function(response){
 	            try{
@@ -346,7 +434,7 @@ $('#btn-agregar-antecedente').on('click',function(){
 });
 
 $('#btn-agregar-presupuesto').on('click',function(){
-	$(modal_presupuesto).find(".modal-title").html("Nuevo Elemento");
+	$(modal_presupuesto).find(".modal-title").html("Nuevo Presupuesto");
 	$(modal_presupuesto).modal('show');
 });
 
@@ -378,7 +466,7 @@ function llenar_datagrid_presupuestos(datos){
 	}
 
 	if(distribucion.length == 0){
-		$('#datagridPresupuesto > table > tbody').html('<tr><td colspan="6" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
+		$('#datagridPresupuesto > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
 	}else{
 		presupuestoDatagrid.cargarDatos(distribucion);
 	}
@@ -460,9 +548,12 @@ function reset_modal_form(formulario){
     	$('#id-antecedente').val('');
     }
     if(formulario == form_presupuesto){
-    	$('input[type="hidden"]').val('');
-    	$('input[type="hidden"]').change();
-    	$('.selectpicker').change();
+    	$('#' + formulario + ' input[type="hidden"]').val('');
+    	$('#' + formulario + ' input[type="hidden"]').change();
+    	$('#' + formulario + ' .selectpicker').change();
+    	$('.presupuesto-mes').each(function(){
+			$(this).attr('data-presupuesto-id','');
+		});
     	//$('#id-presupuesto').val('');
     	$(modal_presupuesto + ' .alert').remove();
     }

@@ -114,15 +114,11 @@
                             </div>
                             <div class="form-group hidden" id="opciones_fibap">
                                 <div class="help-text">
-                                    Para poder generar el proyecto de inversión se necesita capturar la Ficha de Información Básica del Proyecto (FIBAP).
+                                    Para poder generar el proyecto de inversión se necesita capturar la Ficha de Información Básica del Proyecto (FIBAP). <br>
+                                    Esta se puede capturar después de capturar los datos del proyecto de inversión, solo de click en el boton "Ir a la caratula de captura", o si da click en el enlace "Capturar FIBAP" puede iniciar la captura de la FIBAP para posteriormente continuar con la captura del proyecto de Inversión.
                                 </div>
-                                <div id="orden_fibap" class="btn-group btn-group-justified" data-toggle="buttons">
-                                    <label class="btn btn-primary active">
-                                        <input type="radio" name="fibap" id="fibap_despues" value="despues" autocomplete="off" checked> Capturar FIBAP después
-                                    </label>
-                                    <label class="btn btn-primary">
-                                        <input type="radio" name="fibap" id="fibap_antes" value="antes" autocomplete="off"> Capturar FIBAP
-                                    </label>
+                                <div>
+                                    <button type="button" id="btn-capturar-fibap" class="btn btn-link"><span class="fa fa-file"></span> Capturar FIBAP</button>
                                 </div>
                             </div>
                             <input type="hidden" id="id" name="id">
