@@ -13,7 +13,7 @@ class ProyectosController extends \BaseController {
 				'clasificacion_proyectos'=>ClasificacionProyecto::all(),
 				'tipos_proyectos'=>TipoProyecto::all()
 			);
-		return parent::loadIndex('POA','PROYECTOS',$catalogos);
+		return parent::loadIndex('EXP','PROYECTOS',$catalogos);
 	}
 
 	public function caratula()
@@ -62,9 +62,9 @@ class ProyectosController extends \BaseController {
 		}
 
 		//Se Pre-carga formulario general de la caratula
-		$datos['formulario'] = View::make('poa.formulario-caratula-captura',$datos);
+		$datos['formulario'] = View::make('expediente.formulario-caratula-captura',$datos);
 		//Se Pre-carga el datagrid de los componentes
-		$datos['grid_componentes'] = View::make('poa.listado-componentes');
+		$datos['grid_componentes'] = View::make('expediente.listado-componentes');
 
 		//Cargar el formulario para dar de alta actividades
 		$datos_componentes['identificador'] = 'actividad'; //El identificador se agrega al id de los elementos del formulario
@@ -83,18 +83,18 @@ class ProyectosController extends \BaseController {
 				'NOV'=>'Noviembre',
 				'DIC'=>'Diciembre'
 			);
-		$datos['formulario_actividades'] = View::make('poa.formulario-componente',$datos_componentes);
+		$datos['formulario_actividades'] = View::make('expediente.formulario-componente',$datos_componentes);
 
 		//Cargar el formulario para dar de alta compoenentes
-		$datos_componentes['lista_actividades'] = View::make('poa.listado-actividades'); //Se carga el datagrid de actividades
+		$datos_componentes['lista_actividades'] = View::make('expediente.listado-actividades'); //Se carga el datagrid de actividades
 		$datos_componentes['identificador'] = 'componente';
-		$datos['formulario_componente'] = View::make('poa.formulario-componente',$datos_componentes);
+		$datos['formulario_componente'] = View::make('expediente.formulario-componente',$datos_componentes);
 
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
-		$datos['sys_activo'] = SysGrupoModulo::findByKey('POA');
+		$datos['sys_activo'] = SysGrupoModulo::findByKey('EXP');
 		$datos['sys_mod_activo'] = SysModulo::findByKey('PROYECTOS');
-		$uri = 'poa.caratula';
-		$permiso = 'POA.PROYECTOS.C';
+		$uri = 'expediente.caratula';
+		$permiso = 'EXP.PROYECTOS.C';
 		$datos['usuario'] = Sentry::getUser();
 
 		if(Sentry::hasAccess($permiso)){

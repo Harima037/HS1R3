@@ -6,7 +6,7 @@
 @parent
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
-<script src="{{ URL::to('js/modulos/poa/proyectos.js')}}"></script>
+<script src="{{ URL::to('js/modulos/expediente/proyectos.js')}}"></script>
 @stop
 
 @section('aside')
@@ -106,11 +106,11 @@
                         <form action="" id="form_caratula">
                             <div class="form-group">
                                 <label for="tipo_proyecto" class="control-label">Seleccione el tipo de proyecto</label>
-                                {{Form::select('tipo_proyecto',array(''=>'Seleccione una opción') + $tipos_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'tipo_proyecto'))}}
+                                {{Form::select('tipo_proyecto',$tipos_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'tipo_proyecto'))}}
                             </div>
                             <div class="form-group">
                                 <label for="clasificacion_proyecto" class="control-label">Seleccione la clase de proyecto a capturar</label>
-                                {{Form::select('clasificacion_proyecto',array('' =>'Selecciona un tipo de proyecto') + $clasificacion_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'clasificacion_proyecto'))}}
+                                {{Form::select('clasificacion_proyecto',$clasificacion_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'clasificacion_proyecto'))}}
                             </div>
                             <div class="form-group hidden" id="opciones_fibap">
                                 <div class="help-text">
@@ -118,7 +118,7 @@
                                     Esta se puede capturar después de capturar los datos del proyecto de inversión, solo de click en el boton "Ir a la caratula de captura", o si da click en el enlace "Capturar FIBAP" puede iniciar la captura de la FIBAP para posteriormente continuar con la captura del proyecto de Inversión.
                                 </div>
                                 <div>
-                                    <button type="button" id="btn-capturar-fibap" class="btn btn-link"><span class="fa fa-file"></span> Capturar FIBAP</button>
+                                    <button type="button" id="btn-capturar-fibap" class="btn btn-link"><span class="fa fa-file"></span> Ir al Formulario de Captura de la FIBAP</button>
                                 </div>
                             </div>
                             <input type="hidden" id="id" name="id">

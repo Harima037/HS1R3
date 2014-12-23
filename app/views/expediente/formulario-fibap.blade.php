@@ -13,7 +13,7 @@
 <script src="{{ URL::to('bootstrap/js/bootstrap-select.min.js') }}"></script>
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
-<script src="{{ URL::to('js/modulos/poa/formulario-fibap.js')}}"></script>
+<script src="{{ URL::to('js/modulos/expediente/formulario-fibap.js')}}"></script>
 @stop
 
 @section('aside')

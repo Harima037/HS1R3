@@ -6,7 +6,7 @@
 @parent
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
-<script src="{{ URL::to('js/modulos/poa/fibap.js')}}"></script>
+<script src="{{ URL::to('js/modulos/expediente/fibap.js')}}"></script>
 @stop
 
 @section('aside')

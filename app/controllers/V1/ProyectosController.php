@@ -596,14 +596,14 @@ class ProyectosController extends BaseController {
 					$recurso->idTipoIndicador 			= 	$parametros['tipo-ind-actividad'];
 					$recurso->idUnidadMedida 			= 	$parametros['unidad-medida-actividad'];
 					$recurso->metaIndicador 			= 	$parametros['meta-actividad'];
-					$recurso->numeroTrim1 				= 	$parametros['trim1-actividad'];
-					$recurso->numeroTrim2 				= 	$parametros['trim2-actividad'];
-					$recurso->numeroTrim3 				= 	$parametros['trim3-actividad'];
-					$recurso->numeroTrim4 				= 	$parametros['trim4-actividad'];
+					$recurso->numeroTrim1 				= 	($parametros['trim1-actividad'])?$parametros['trim1-actividad']:NULL;
+					$recurso->numeroTrim2 				= 	($parametros['trim2-actividad'])?$parametros['trim2-actividad']:NULL;
+					$recurso->numeroTrim3 				= 	($parametros['trim3-actividad'])?$parametros['trim3-actividad']:NULL;
+					$recurso->numeroTrim4 				= 	($parametros['trim4-actividad'])?$parametros['trim4-actividad']:NULL;
 					$recurso->valorNumerador 			= 	$parametros['numerador-actividad'];
 					$recurso->valorDenominador 			= 	$parametros['denominador-actividad'];
-					$recurso->lineaBase 				= 	$parametros['linea-base-actividad'];
-					$recurso->anioBase 					= 	$parametros['anio-base-actividad'];
+					$recurso->lineaBase 				= 	($parametros['linea-base-actividad'])?$parametros['linea-base-actividad']:NULL;
+					$recurso->anioBase 					= 	($parametros['anio-base-actividad'])?$parametros['anio-base-actividad']:NULL;
 					
 					$respuesta['data'] = DB::transaction(function() use ($parametros, $recurso){
 						if($recurso->save()){
@@ -688,14 +688,14 @@ class ProyectosController extends BaseController {
 					$recurso->idTipoIndicador 			= 	$parametros['tipo-ind-componente'];
 					$recurso->idUnidadMedida 			= 	$parametros['unidad-medida-componente'];
 					$recurso->metaIndicador 			= 	$parametros['meta-componente'];
-					$recurso->numeroTrim1 				= 	$parametros['trim1-componente'];
-					$recurso->numeroTrim2 				= 	$parametros['trim2-componente'];
-					$recurso->numeroTrim3 				= 	$parametros['trim3-componente'];
-					$recurso->numeroTrim4 				= 	$parametros['trim4-componente'];
+					$recurso->numeroTrim1 				= 	($parametros['trim1-componente'])?$parametros['trim1-componente']:NULL;
+					$recurso->numeroTrim2 				= 	($parametros['trim2-componente'])?$parametros['trim2-componente']:NULL;
+					$recurso->numeroTrim3 				= 	($parametros['trim3-componente'])?$parametros['trim3-componente']:NULL;
+					$recurso->numeroTrim4 				= 	($parametros['trim4-componente'])?$parametros['trim4-componente']:NULL;
 					$recurso->valorNumerador 			= 	$parametros['numerador-componente'];
 					$recurso->valorDenominador 			= 	$parametros['denominador-componente'];
-					$recurso->lineaBase 				= 	$parametros['linea-base-componente'];
-					$recurso->anioBase 					= 	$parametros['anio-base-componente'];
+					$recurso->lineaBase 				= 	($parametros['linea-base-componente'])?$parametros['linea-base-componente']:NULL;
+					$recurso->anioBase 					= 	($parametros['anio-base-componente'])?$parametros['anio-base-componente']:NULL;
 
 					if($parametros['clasificacion'] == 2){
 						$recurso->idEntregable 	= 	$parametros['entregable-componente'];

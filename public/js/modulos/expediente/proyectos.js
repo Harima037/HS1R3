@@ -5,7 +5,7 @@
         proyectos.js
 
     # Módulo:
-        poa/proyectos
+        expediente/proyectos
 
     # Descripción:
         Se utiliza para crear, editar y eliminar caratulas de captura para proyectos de inversión e institucionales
@@ -149,7 +149,7 @@ function resetModalModuloForm(){
 }
 
 function submitModulo(){
-    $(form_name).attr('action',SERVER_HOST+'/poa/caratula');
+    $(form_name).attr('action',SERVER_HOST+'/expediente/caratula');
     $(form_name).attr('method','POST');
     $(form_name).submit();
 }

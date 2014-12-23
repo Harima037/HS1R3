@@ -5,7 +5,7 @@
         formulario-fibap.js
 
     # Módulo:
-        poa/formulario-fibap
+        expediente/formulario-fibap
 
     # Descripción:
         Para el formulario de captura del FIBAP de un proyecto

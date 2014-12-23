@@ -5,7 +5,7 @@
         fibap.js
 
     # Módulo:
-        poa/fibap
+        expediente/fibap
 
     # Descripción:
         Para el formulario de captura de la Ficha de Información Básica del Proyecto de Inversión
@@ -71,7 +71,7 @@ function resetModalModuloForm(){
 }
 
 function submitModulo(save_next){
-    $(form_name).attr('action',SERVER_HOST+'/poa/formulario-fibap');
+    $(form_name).attr('action',SERVER_HOST+'/expediente/formulario-fibap');
     $(form_name).attr('method','POST');
     $(form_name).submit();
 }

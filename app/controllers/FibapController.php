@@ -13,7 +13,7 @@ class FibapController extends \BaseController {
 				'programa_presupuestal'=>ClasificacionProyecto::all(),
 				'objetivos_ped'=>TipoProyecto::all()
 			);
-		return parent::loadIndex('POA','FIBAP',$catalogos);
+		return parent::loadIndex('EXP','FIBAP',$catalogos);
 	}
 
 	public function formulario()
@@ -47,12 +47,12 @@ class FibapController extends \BaseController {
 		}
 
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
-		$datos['sys_activo'] = SysGrupoModulo::findByKey('POA');
+		$datos['sys_activo'] = SysGrupoModulo::findByKey('EXP');
 		$datos['sys_mod_activo'] = SysModulo::findByKey('FIBAP');
-		$uri = 'poa.formulario-fibap';
+		$uri = 'expediente.formulario-fibap';
 		$datos['usuario'] = Sentry::getUser();
 
-		if(Sentry::hasAccess('POA.FIBAP.C')){
+		if(Sentry::hasAccess('EXP.FIBAP.C')){
 			return View::make($uri)->with($datos);
 		}else{
 			return Response::view('errors.403', array(

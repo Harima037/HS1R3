@@ -42,7 +42,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::post('usuarios', array('uses' => 'UsuariosController@validar'));
 	});
 
-	Route::group(array('prefix'=>'poa'), function(){
+	Route::group(array('prefix'=>'expediente'), function(){
 		Route::get('proyectos',array('uses'=>'ProyectosController@index'));
 		Route::any('caratula',array('uses'=>'ProyectosController@caratula'));
 		Route::get('fibap',array('uses'=>'FibapController@index'));
