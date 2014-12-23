@@ -148,7 +148,7 @@ if($('#id').val()){
             }
 		}
 	});
-}else if($('proyecto-id').val()){
+}else if($('#proyecto-id').val()){
 	var parametros = {ver:'datos-proyecto'};
 	fibapResource.get($('#proyecto-id').val(),parametros,{
 		_success:function(response){

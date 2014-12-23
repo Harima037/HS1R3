@@ -121,7 +121,7 @@ class ProyectosController extends BaseController {
 			}
 
 			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
-				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS casificacionProyecto',
+				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto',
 				'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
 								->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
 								->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
@@ -138,7 +138,24 @@ class ProyectosController extends BaseController {
 			}
 			
 			return Response::json($data,$http_status);
-		}	
+		}elseif(isset($parametros['proyectos_inversion'])){
+			$rows = Proyecto::getModel();
+			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
+				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto',
+				'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username')
+								->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
+								->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
+								->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
+								->leftjoin('fibap','proyectos.id','=','fibap.idProyecto')
+								->orderBy('proyectos.id','desc')
+								->where('proyectos.idClasificacionProyecto','=',DB::raw('2'))
+								->whereNull('fibap.id')
+								//->whereNotIn('proyectos.id',DB::raw('select idProyecto from fibap where borradoAl is null'))
+								->get();
+			$data = array('data'=>$rows);
+			
+			return Response::json($data,$http_status);
+		}
 
 		$rows = Proyecto::all();
 

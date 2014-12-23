@@ -102,7 +102,7 @@ class FibapController extends BaseController {
 			}
 			
 			return Response::json($data,$http_status);
-		}	
+		}
 
 		$rows = FIBAP::all();
 

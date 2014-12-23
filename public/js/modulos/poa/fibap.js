@@ -13,6 +13,7 @@
 =====================================*/
 // Declaracion de variables
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/fibap');
+var proyectoResource = new RESTfulRequests(SERVER_HOST+'/v1/proyectos');
 var moduloDatagrid = new Datagrid("#datagridFibaps",moduloResource);
 moduloDatagrid.init();
 moduloDatagrid.actualizar();
@@ -35,6 +36,20 @@ $(modal_name).on('shown.bs.modal', function () {
 
 $(modal_name).on('hide.bs.modal',function(e){ 
     resetModalModuloForm();
+});
+
+$('#btn-cargar-proyectos').on('click',function(){
+    var parametros = {proyectos_inversion:1};
+    proyectoResource.get(null,parametros,{
+        _success: function(response){
+            $('#lista-proyectos').empty();
+            var lista_radios = '';
+            for(var i in response.data){
+                lista_radios += '<div><label><input type="radio" name="proyecto-id" value="'+response.data[i].id+'" > <span class="fa fa-file"></span> ' + response.data[i].nombreTecnico + ' ['+response.data[i].clavePresup+']</label></div>';
+            }
+            $('#lista-proyectos').html(lista_radios);
+        }
+    })
 });
 
 $('.btn-datagrid-agregar').on('click', function () {

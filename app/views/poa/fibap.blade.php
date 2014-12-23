@@ -108,10 +108,17 @@
                                 Datos del proyecto a capturar:
                             </div>
                             <div class="well well-sm">
-                                Proyecto Nuevo
+                                <div>
+                                    <label>
+                                        <input type="radio" name="proyecto-id" checked="checked" value="">
+                                         <span class="fa fa-file-o"></span> Proyecto Nuevo
+                                    </label>
+                                </div>
+                                <div id="lista-proyectos">
+                                </div>
                             </div>
                             <div>
-                                <button type="button" class="btn btn-info btn-block">
+                                <button type="button" class="btn btn-info btn-block" id="btn-cargar-proyectos">
                                     <span class="fa fa-upload"></span> Cargar proyectos de inversión existentes disponibles
                                 </button>
                             </div>
