@@ -102,24 +102,40 @@
                     <h4 class="modal-title" id="modalLabel">Nuevo</h4>
                 </div>
                 <div class="modal-body">
-                    <div id="datos-formulario">
+                    <div class="row" id="datos-formulario">
                         <form action="" id="form_caratula">
-                            <div class="form-group">
-                                <label for="tipo_proyecto" class="control-label">Seleccione el tipo de proyecto</label>
-                                {{Form::select('tipo_proyecto',$tipos_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'tipo_proyecto'))}}
-                            </div>
-                            <div class="form-group">
-                                <label for="clasificacion_proyecto" class="control-label">Seleccione la clase de proyecto a capturar</label>
-                                {{Form::select('clasificacion_proyecto',$clasificacion_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'clasificacion_proyecto'))}}
-                            </div>
-                            <div class="form-group hidden" id="opciones_fibap">
-                                <div class="help-text">
-                                    Para poder generar el proyecto de inversión se necesita capturar la Ficha de Información Básica del Proyecto (FIBAP). <br>
-                                    Esta se puede capturar después de capturar los datos del proyecto de inversión, solo de click en el boton "Ir a la caratula de captura", o si da click en el enlace "Capturar FIBAP" puede iniciar la captura de la FIBAP para posteriormente continuar con la captura del proyecto de Inversión.
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="tipo_proyecto" class="control-label">Tipo de proyecto</label>
+                                    {{Form::select('tipo_proyecto',$tipos_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'tipo_proyecto'))}}
                                 </div>
-                                <div>
-                                    <button type="button" id="btn-capturar-fibap" class="btn btn-link"><span class="fa fa-file"></span> Ir al Formulario de Captura de la FIBAP</button>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="clasificacion_proyecto" class="control-label">Clase de proyecto a capturar</label>
+                                    {{Form::select('clasificacion_proyecto',$clasificacion_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'clasificacion_proyecto'))}}
                                 </div>
+                            </div>
+                            
+                            <div class="col-sm-12">
+                                <div class="form-group hidden" id="opciones_fibap">
+                                    <div class="help-text">
+                                        Para poder generar el proyecto de inversión es necesaria la Ficha de Información Básica del Proyecto (FIBAP). Puede seleccionar una dando click en el siguiente boton.
+                                        <br>
+                                        <button type="button" id="btn-seleccionar-fibap" class="btn btn-info btn-block">
+                                            <span class="fa fa-file"></span> Seleccionar FIBAP
+                                        </button>
+                                        <br>
+                                        Si desea utilizar una nueva FIBAP debe hacer click en el siguiente enlace para iniciar la captura.
+                                        <br>
+                                        <button type="button" id="btn-capturar-fibap" class="btn btn-link btn-block">
+                                            <span class="fa fa-file"></span> Ir al Formulario de Captura de la FIBAP
+                                        </button>
+                                        <br>
+                                        También se puede capturar después de capturar los datos del proyecto de inversión, solo debe hacer click en el boton "Ir a la caratula de captura", para continuar con la captura de los datos del proyecto de Inversión.
+                                    </div>
+                                </div>
+                                <div class="well well-sm hidden" id="lista_fibap"></div>
                             </div>
                             <input type="hidden" id="id" name="id">
                         </form>

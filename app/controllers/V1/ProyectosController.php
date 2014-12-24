@@ -3,8 +3,8 @@
 namespace V1;
 
 use SSA\Utilerias\Validador;
-use BaseController, Input, Response, DB, Sentry;
-use Proyecto, Componente, Actividad, Beneficiario, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, Hash, Exception;
+use BaseController, Input, Response, DB, Sentry, Hash, Exception;
+use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, FibapDatosProyecto;
 
 class ProyectosController extends BaseController {
 	private $reglasProyecto = array(
@@ -150,7 +150,6 @@ class ProyectosController extends BaseController {
 								->orderBy('proyectos.id','desc')
 								->where('proyectos.idClasificacionProyecto','=',DB::raw('2'))
 								->whereNull('fibap.id')
-								//->whereNotIn('proyectos.id',DB::raw('select idProyecto from fibap where borradoAl is null'))
 								->get();
 			$data = array('data'=>$rows);
 			
@@ -186,11 +185,9 @@ class ProyectosController extends BaseController {
 		if($parametros){
 			if($parametros['ver'] == 'componente'){
 				$recurso = Componente::with('actividades','metasMes')->find($id);
-			}
-			if($parametros['ver'] == 'actividad'){
+			}elseif($parametros['ver'] == 'actividad'){
 				$recurso = Actividad::with('metasMes')->find($id);
-			}
-			if($parametros['ver'] == 'proyecto'){
+			}elseif($parametros['ver'] == 'proyecto'){
 				$recurso = Proyecto::contenidoCompleto()->find($id);
 				if($recurso){
 					foreach ($recurso->componentes as $key => $componente) {
@@ -200,6 +197,9 @@ class ProyectosController extends BaseController {
 						}
 					}
 				}
+			}elseif($parametros['ver'] == 'datos-fibap'){
+				$recurso = FibapDatosProyecto::where('idFibap','=',$id)->get();
+				$recurso = $recurso[0];
 			}
 		}else{
 			$recurso = Proyecto::contenidoCompleto()->find($id);
@@ -517,6 +517,18 @@ class ProyectosController extends BaseController {
 							if(!$recurso->beneficiarios()->saveMany($beneficiarios)){
 								$respuesta['data']['code'] = 'S01';
 								throw new Exception("Error al intentar guardar los beneficiarios del proyecto", 1);
+							}
+
+							if($parametros['id-fibap']){
+								$fibap = FIBAP::find($parametros['id-fibap']);
+								if($fibap){
+									$fibap->idProyecto = $recurso->id;
+									$fibap->save();
+									FibapDatosProyecto::where('idFibap','=',$fibap->id)->delete();
+								}else{
+									$respuesta['data']['data'] = 'La Fibap seleccionada no se encuentra, es posible que haya sido eliminada.';
+									throw new Exception("La FIBAP no existe, o fue eliminada.", 1);
+								}
 							}
 						}else{
 							//No se pudieron guardar los datos del proyecto

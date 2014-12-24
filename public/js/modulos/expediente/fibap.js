@@ -67,7 +67,7 @@ $(modal_name+' .btn-guardar').on('click', function (e) {
 function resetModalModuloForm(){
     //Validation.cleanFormErrors(form_name);
     $(form_name).get(0).reset();
-    //$(form_name +' #id').val("");
+    $(form_name +' #id').val("");
 }
 
 function submitModulo(save_next){

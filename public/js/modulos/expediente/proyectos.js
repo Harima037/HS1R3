@@ -13,6 +13,7 @@
 =====================================*/
 
 // Inicialización General para casi cualquier módulo
+var fibapResource = new RESTfulRequests(SERVER_HOST+'/v1/fibap');
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/proyectos');
 var moduloDatagrid = new Datagrid("#datagridCaratulas",moduloResource);
 moduloDatagrid.init();
@@ -99,12 +100,13 @@ function editar (e){
 
 $('#clasificacion_proyecto').on('change',function(){
     if($(this).val() == 2){
-        $('#orden_fibap label').removeClass('active');
-        $('#fibap_despues').prop('checked',true);
-        $('#fibap_despues').parent().addClass('active');
         $('#opciones_fibap').removeClass('hidden');
+        $('#lista_fibap').addClass('hidden');
+        $('#lista_fibap').empty();
     }else{
         $('#opciones_fibap').addClass('hidden');
+        $('#lista_fibap').addClass('hidden');
+        $('#lista_fibap').empty();
     }
 });
 
@@ -139,12 +141,32 @@ $(modal_name+' .btn-guardar').on('click', function (e) {
     submitModulo();
 });
 
+$('#btn-seleccionar-fibap').on('click',function(){
+    var parametros = {lista_fibap:1};
+    fibapResource.get(null,parametros,{
+        _success: function(response){
+            $('#lista_fibap').empty();
+            var lista_radios = '';
+            for(var i in response.data){
+                lista_radios += '<div><label><input type="radio" onChange="cambiar_tipo_proyecto('+response.data[i].idTipoProyecto+')" name="fibap-id" value="'+response.data[i].id+'" > <span class="fa fa-file"></span> ' + response.data[i].nombreTecnico + ' ['+response.data[i].tipoProyecto+'] <br><small>'+response.data[i].descripcionProyecto+'</small></label></div>';
+            }
+            $('#lista_fibap').html(lista_radios);
+            $('#opciones_fibap').addClass('hidden');
+            $('#lista_fibap').removeClass('hidden');
+        }
+    })
+});
+
+function cambiar_tipo_proyecto(tipo_proyecto){
+    $('#tipo_proyecto').val(tipo_proyecto);
+}
+
 function resetModalModuloForm(){
     Validation.cleanFormErrors(form_name);
     $(form_name).get(0).reset();
     $('#opciones_fibap').addClass('hidden');
-    $('#orden_fibap label').removeClass('active');
-    $('#fibap_despues').parent().addClass('active');
+    $('#lista_fibap').addClass('hidden');
+    $('#lista_fibap').empty();
     $(form_name +' #id').val("");
 }
 

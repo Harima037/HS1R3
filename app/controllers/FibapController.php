@@ -41,8 +41,7 @@ class FibapController extends \BaseController {
 			$datos['id'] = Input::get('id');
 		}
 
-		//Si hay un proyecto-id se bloquean algunos campos
-		if(Input::get('proyecto-id')){
+		if(Input::get('proyecto-id')){ //Si hay un proyecto-id se bloquean algunos campos
 			$datos['proyecto_id'] = Input::get('proyecto-id');
 		}
 

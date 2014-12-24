@@ -27,6 +27,11 @@ var modal_presupuesto = '#modal-presupuesto';
 var form_antecedente = 'form-antecedente';
 var form_presupuesto = 'form-presupuesto';
 
+window.onload = function () { 
+	$('#mensaje-espera').addClass('hidden');
+	$('#panel-principal-formulario').removeClass('hidden');
+};
+
 deshabilita_paneles('');
 
 //*********************************   Funcionalidad al cargar el formulario   *********************************
@@ -89,6 +94,8 @@ if($('#id').val()){
 				$('#tipo-beneficiario').addClass('control-bloqueado');
 				$('#total-beneficiarios-f').addClass('control-bloqueado');
 				$('#total-beneficiarios-m').addClass('control-bloqueado');
+
+				$('#clave-presupuestaria').text('[ '+response.clavePresupuestaria+' ]');
 			}else{
 				datosProyecto = response.data.datos_proyecto;
 			}

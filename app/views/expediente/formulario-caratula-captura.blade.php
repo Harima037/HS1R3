@@ -443,6 +443,7 @@
         </div>
     </div>
     <input type="hidden" id="id" name="id" value="{{{ $id or '' }}}">
+    <input type="hidden" id="id-fibap" name="id-fibap" value="{{{ $fibap_id or '' }}}">
     <input type="hidden" id="clasificacionproyecto" name="clasificacionproyecto" value="{{$clasificacion_proyecto_id}}">
     <input type="hidden" id="tipoproyecto" name="tipoproyecto" value="{{$tipo_proyecto_id}}">
     <div class="panel-footer">

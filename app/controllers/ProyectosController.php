@@ -61,6 +61,10 @@ class ProyectosController extends \BaseController {
 			$datos['id'] = Input::get('id');
 		}
 
+		if(Input::get('fibap-id')){
+			$datos['fibap_id'] = Input::get('fibap-id');
+		}
+
 		//Se Pre-carga formulario general de la caratula
 		$datos['formulario'] = View::make('expediente.formulario-caratula-captura',$datos);
 		//Se Pre-carga el datagrid de los componentes

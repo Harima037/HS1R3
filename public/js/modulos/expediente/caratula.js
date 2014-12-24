@@ -24,6 +24,11 @@ var grid_actividades = '#datagridActividades';
 var form_caratula = '#form_caratula';
 var form_componente = '#form_componente';
 var form_actividad = '#form_actividad';
+
+window.onload = function () { 
+	$('#mensaje-espera').addClass('hidden');
+	$('#panel-principal-formulario').removeClass('hidden');
+};
 //***********************     Funcionalidad ejecutada al cargar la página    ************************************
 if($('#id').val()){
 	//load data
@@ -116,6 +121,36 @@ if($('#id').val()){
 			actualizar_grid_componentes(response.data.componentes);
         }
     });
+}else if($('#id-fibap').val()){
+	var parametros = {ver:'datos-fibap'};
+	proyectoResource.get($('#id-fibap').val(),parametros,{
+		_success:function(response){
+			inicializar_comportamiento_caratula();
+			
+			$('#nombretecnico').val(response.data.nombreTecnico);
+			$('#vinculacionped').val(response.data.idObjetivoPED);
+			$('#vinculacionped').change();
+			$('#programa_presupuestario').text(response.data.programaPresupuestario);
+			$('#programapresupuestario').val(response.data.programaPresupuestario);
+            $('#programapresupuestario').change();
+			$('#cobertura').val(response.data.idCobertura);
+			$('#cobertura').change();
+			deshabilita_paneles($('#cobertura').val());
+			if(response.data.claveMunicipio){
+				$('#municipio').val(response.data.claveMunicipio);
+				$('#municipio').change();
+			}
+			if(response.data.claveRegion){
+				$('#region').val(response.data.claveRegion);
+				$('#region').change();
+			}
+			$('#tipobeneficiario').val(response.data.idTipoBeneficiario);
+			$('#tipobeneficiario').change();
+			$('#totalbeneficiarios').text(response.data.totalBeneficiarios);
+			$('#totalbeneficiariosf').val(response.data.totalBeneficiariosF);
+			$('#totalbeneficiariosm').val(response.data.totalBeneficiariosM);
+		}
+	});
 }else{
 	inicializar_comportamiento_caratula();
 	deshabilita_paneles('');

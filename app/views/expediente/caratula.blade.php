@@ -23,8 +23,15 @@
 <div class="row">
     <div class="col-md-12">
     	<div class="panel panel-default" id="datagridCaratulas">
-            <div class="panel-heading"><h4><i class="fa fa-file"></i> <b>{{$clasificacion_proyecto}}</b> <small>({{$tipo_proyecto}})</small></h4></div>
-            <div class="panel-body">
+            <div class="panel-heading">
+                <h4><i class="fa fa-file"></i> <b>{{$clasificacion_proyecto}}</b> <small>({{$tipo_proyecto}})</small></h4>
+            </div>
+            <div class="panel-body" id="mensaje-espera">
+                <div class="alert alert-info">
+                    <h2><span class="fa fa-cog fa-spin"></span> Cargando información del formulario... por favor espere...</h2>
+                </div>
+            </div>
+            <div class="panel-body hidden" id="panel-principal-formulario">
                 <ul class="nav nav-tabs" role="tablist">
                     <li role="presentation" class="active">
                         <a id="tablink-caratula" href="#caratula-captura" role="tab" data-toggle="tab">

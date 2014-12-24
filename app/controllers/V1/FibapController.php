@@ -102,6 +102,19 @@ class FibapController extends BaseController {
 			}
 			
 			return Response::json($data,$http_status);
+		}elseif(isset($parametros['lista_fibap'])){
+			$rows = FIBAP::getModel();
+			$rows = $rows->select('fibap.id','fp.nombreTecnico','ftp.descripcion AS tipoProyecto',
+								'descripcionProyecto','fp.idTipoProyecto')
+								->leftjoin('fibapDatosProyecto AS fp','fp.idFibap','=','fibap.id')
+								->leftjoin('catalogoTiposProyectos AS ftp','ftp.id','=','fp.idTipoProyecto')
+								->whereNull('fibap.idProyecto')
+								->orderBy('fibap.id', 'desc')
+								->get();
+
+			$data = array('data'=>$rows);
+			
+			return Response::json($data,$http_status);
 		}
 
 		$rows = FIBAP::all();
@@ -130,12 +143,14 @@ class FibapController extends BaseController {
 
 		$parametros = Input::all();
 		$calendarizado = FALSE;
+		$clave_presupuestaria = FALSE;
 		if($parametros){
 			if($parametros['ver'] == 'fibap'){
 				$recurso = FIBAP::with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuesto')->find($id);
 				$recurso->distribucionPresupuesto->load('objetoGasto');
 				if($recurso->idProyecto){
 					$recurso->load('proyecto');
+					$clave_presupuestaria = $recurso->proyecto->clavePresupuestaria;
 				}else{
 					$recurso->load('datosProyecto');
 				}
@@ -160,6 +175,9 @@ class FibapController extends BaseController {
 			$data = array("data"=>$recurso);
 			if($calendarizado){
 				$data['calendarizado'] = $calendarizado->toArray();
+			}
+			if($clave_presupuestaria){
+				$data['clavePresupuestaria'] = $clave_presupuestaria;
 			}
 		}
 
