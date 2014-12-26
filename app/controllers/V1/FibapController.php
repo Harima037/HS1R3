@@ -164,7 +164,15 @@ class FibapController extends BaseController {
 				$recurso = Proyecto::find($id);
 			}
 		}else{
-			
+			$recurso = FIBAP::with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuesto')->find($id);
+			$recurso->distribucionPresupuesto->load('objetoGasto');
+			$recurso->propuestasFinanciamiento->load('origen');
+			if($recurso->idProyecto){
+				$recurso->load('proyectoCompleto');
+				$clave_presupuestaria = $recurso->proyectoCompleto->clavePresupuestaria;
+			}else{
+				$recurso->load('datosProyectoCompleto');
+			}
 		}
 
 		if(is_null($recurso)){
@@ -580,5 +588,90 @@ class FibapController extends BaseController {
 			}	
 		}
 		return Response::json($respuesta['data'],$respuesta['http_status']);
+	}
+
+	/**
+	 * Remove the specified resource from storage.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function destroy($id)
+	{
+		//
+		$http_status = 200;
+		$data = array();
+
+		try{
+			$parametros = Input::all();
+
+			$ids = $parametros['rows'];
+			$id_padre = 0;
+			
+			if(isset($parametros['eliminar'])){ //Con parametros, el delete viene de dentro de Editar Fibap
+				if($parametros['eliminar'] == 'presupuesto'){ //Eliminar Presupuesto(s) y Ministracion(es)
+					$id_padre = $parametros['id-fibap'];
+					$rows = DB::transaction(function() use ($ids,$id_padre){
+						//Obtenemos los ids de las actividades de los componentes seleccionados
+						$objetos_gastos_ids = DistribucionPresupuesto::wherein('id',$ids)->lists('idObjetoGasto');
+						if(count($objetos_gastos_ids) > 0){
+							//Eliminamos las ministraciones por mes
+							Ministracion::where('idFibap',$id_padre)->whereIn('idObjetoGasto',$objetos_gastos_ids)->delete();
+						}
+						//Eliminamos los componenetes
+						return DistribucionPresupuesto::wherein('id',$ids)->delete();
+					});
+				}
+				if($parametros['eliminar'] == 'antecedente'){ //Eliminar Antecedente(s)
+					$id_padre = $parametros['id-fibap'];
+					$rows = DB::transaction(function() use ($ids){
+						//Eliminamos las actividades
+						return AntecedenteFinanciero::wherein('id',$ids)->delete();
+					});
+				}
+			}else{ //Sin parametros el delete viene de la lista de fibaps
+				$rows = DB::transaction(function() use ($ids){
+					//Eliminamos los datos del proyecto, en caso de que el FIBAP no haya sido asignado a ningun proyecto
+					FibapDatosProyecto::whereIn('idFibap',$ids)->delete();
+					//Eliminamos los documentos de soporte asignados al fibap
+					$fibaps = FIBAP::whereIn('id',$ids)->with('documentos')->get();
+					foreach ($fibaps as $fibap) {
+						$fibap->documentos()->detach();
+					}
+					//Eliminamos los antecedentes financieros
+					AntecedenteFinanciero::whereIn('idFibap',$ids)->delete();
+					//Eliminamos la distribución del presupuesto
+					DistribucionPresupuesto::whereIn('idFibap',$ids)->delete();
+					//Eliminamos la propuesta de financiamiento
+					PropuestaFinanciamiento::whereIn('idFibap',$ids)->delete();
+					//Eliminamos las ministraciones de la fibap
+					Ministracion::whereIn('idFibap',$ids)->delete();
+					//Eliminamos los FIBAPs
+					return FIBAP::whereIn('id',$ids)->delete();
+				});
+			}
+
+			if($rows>0){
+				$data = array("data"=>"Se han eliminado los recursos.");
+				if(isset($parametros['eliminar'])){
+					if($parametros['eliminar'] == 'antecedente'){
+						$data['antecedentes'] = AntecedenteFinanciero::where('idFibap',$id_padre)->get();
+					}
+					if($parametros['eliminar'] == 'presupuesto'){
+						$fibap = FIBAP::find($id_padre);
+						$fibap->load('distribucionPresupuesto');
+						$fibap->distribucionPresupuesto->load('objetoGasto');
+						$data['presupuesto'] = $fibap->distribucionPresupuesto;
+					}
+				}
+			}else{
+				$http_status = 404;
+				$data = array('data' => "No se pueden eliminar los recursos.",'code'=>'S03');
+			}	
+		}catch(Exception $ex){
+			$http_status = 500;	
+			$data = array('data' => "No se pueden borrar los registros",'ex'=>$ex->getMessage(),'code'=>'S03');	
+		}
+		return Response::json($data,$http_status);
 	}
 }

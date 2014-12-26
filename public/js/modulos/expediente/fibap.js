@@ -25,9 +25,36 @@ var form_name = '#form-fibap';
 function editar(e){
     $('#opciones_fibap').hide();
     $('#editar_fibap').show();
-    $('#id').val(e);
-    $(modal_name).find(".modal-title").html("Editar FIBAP");
-    $(modal_name).modal('show');
+    moduloResource.get(e,null,{
+        _success: function(response){
+            console.log(response);
+
+
+            $('#lbl-tipo-proyecto').text(response.data.datos_proyecto_completo.tipo_proyecto.descripcion);
+            $('#lbl-proyecto').text(response.data.datos_proyecto_completo.nombreTecnico);
+            $('#lbl-justificacion-proyecto').text(response.data.justificacionProyecto);
+            $('#lbl-descripcion-proyecto').text(response.data.descripcionProyecto);
+            $('#lbl-programa-presupuestario').text(response.data.datos_proyecto_completo.datos_programa_presupuestario.descripcion);
+            $('#lbl-alineacion-ped').text(response.data.datos_proyecto_completo.objetivo_ped.descripcion);
+            $('#lbl-alineacion-especifica').html(response.data.alineacionEspecifica);
+            $('#lbl-alineacion-general').html(response.data.alineacionGeneral || '&nbsp;');
+            $('#lbl-organismo-publico').text(response.data.organismoPublico);
+            $('#lbl-sector').text(response.data.sector);
+            $('#lbl-subcomite').text(response.data.subcomite);
+            $('#lbl-grupo-trabajo').text(response.data.grupoTrabajo);
+            $('#lbl-cobertura-municipio').text(response.data.datos_proyecto_completo.cobertura.descripcion + '/moa');
+            $('#lbl-tipo-beneficiario').text(response.data.datos_proyecto_completo.tipo_beneficiario.descripcion);
+            $('#lbl-beneficiario-f').text(response.data.datos_proyecto_completo.totalBeneficiariosF);
+            $('#lbl-beneficiario-m').text(response.data.datos_proyecto_completo.totalBeneficiariosM);
+            $('#lbl-total-beneficiario').text(response.data.datos_proyecto_completo.totalBeneficiarios);
+
+            //$('#lbl-lista-documentos').text(response.data);
+
+            $('#id').val(response.data.id);
+            $(modal_name).find(".modal-title").html("Editar FIBAP");
+            $(modal_name).modal('show');
+        }
+    });
 };
 
 $(modal_name).on('shown.bs.modal', function () {
@@ -49,7 +76,7 @@ $('#btn-cargar-proyectos').on('click',function(){
             }
             $('#lista-proyectos').html(lista_radios);
         }
-    })
+    });
 });
 
 $('.btn-datagrid-agregar').on('click', function () {

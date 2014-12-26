@@ -239,7 +239,6 @@ function editar_presupuesto(e){
 			$('#cantidad-presupuesto').change();
 			$('#id-presupuesto').val(response.data.id);
 
-			//llenar_calendario_presupuesto(response.calendarizado);
 			var calendarizacion = response.calendarizado;
 			for(var indx in calendarizacion){
 				$('#mes-'+calendarizacion[indx].mes).val(calendarizacion[indx].cantidad);
@@ -250,13 +249,58 @@ function editar_presupuesto(e){
         }
     });
 }
-/*function llenar_calendario_presupuesto(datos){
-	var calendarizacion = response.calendarizado;
-	for(var indx in datos){
-		$('#mes-'+datos[indx].mes).val(datos[indx].cantidad);
-		$('#mes-'+datos[indx].mes).attr('data-presupuesto-id',datos[indx].id);
-	}
-}*/
+/**                            Reescribiendo comportamiento del datagrid                                 **/
+$("#datagridAntecedentes .btn-delete-rows").unbind('click');
+$("#datagridAntecedentes .btn-delete-rows").on('click',function(e){
+	e.preventDefault();
+	var rows = [];
+	var contador= 0;
+    $(this).parents(".datagrid").find("tbody").find("input[type=checkbox]:checked").each(function () {
+		contador++;
+        rows.push($(this).parent().parent().data("id"));
+	});
+	if(contador>0){
+		Confirm.show({
+				titulo:"Eliminar antecedente",
+				mensaje: "¿Estás seguro que deseas eliminar los antecedentes seleccionados?",
+				callback: function(){
+					fibapResource.delete(rows,{'rows': rows, 'eliminar': 'antecedente', 'id-fibap': $('#id').val()},{
+                        _success: function(response){ 
+                        	llenar_datagrid_antecedentes(response.antecedentes);
+                        	MessageManager.show({data:'Antecedente eliminado con éxito.',timer:3});
+                        },
+                        _error: function(jqXHR){  MessageManager.show(jqXHR.responseJSON); }
+        			});
+				}
+		});
+	}else{ MessageManager.show({data:'No has seleccionado ningún registro.',type:'ADV',timer:3}); }
+});
+
+$("#datagridPresupuesto .btn-delete-rows").unbind('click');
+$("#datagridPresupuesto .btn-delete-rows").on('click',function(e){
+	e.preventDefault();
+	var rows = [];
+	var contador= 0;
+    $(this).parents(".datagrid").find("tbody").find("input[type=checkbox]:checked").each(function () {
+		contador++;
+        rows.push($(this).parent().parent().data("id"));
+	});
+	if(contador>0){
+		Confirm.show({
+				titulo:"Eliminar presupuesto",
+				mensaje: "¿Estás seguro que deseas eliminar los presupuestos seleccionados?",
+				callback: function(){
+					fibapResource.delete(rows,{'rows': rows, 'eliminar': 'presupuesto', 'id-fibap': $('#id').val()},{
+                        _success: function(response){ 
+                        	llenar_datagrid_presupuestos(response.presupuesto);
+                        	MessageManager.show({data:'Presupuesto eliminado con éxito.',timer:3});
+                        },
+                        _error: function(jqXHR){  MessageManager.show(jqXHR.responseJSON); }
+        			});
+				}
+		});
+	}else{ MessageManager.show({data:'No has seleccionado ningún registro.',type:'ADV',timer:3}); }
+});
 
 //*********************************   Funcionalidad de Botones principales (Guardar y Cancelar)   *********************************
 $('#btn-presupuesto-guardar').on('click',function(){
