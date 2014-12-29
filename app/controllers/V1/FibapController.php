@@ -4,7 +4,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Exception;
-use FIBAP, Proyecto, FibapDatosProyecto, PropuestaFinanciamiento, AntecedenteFinanciero, DistribucionPresupuesto, Ministracion;
+use FIBAP, Proyecto, FibapDatosProyecto, PropuestaFinanciamiento, AntecedenteFinanciero, DistribucionPresupuesto, Ministracion, OrigenFinanciamiento;
 
 class FibapController extends BaseController {
 	private $reglasFibap = array(
@@ -162,6 +162,7 @@ class FibapController extends BaseController {
 				$calendarizado = Ministracion::where('idFibap',$recurso->idFibap)->where('idObjetoGasto',$recurso->idObjetoGasto)->get();
 			}elseif($parametros['ver'] == 'datos-proyecto'){
 				$recurso = Proyecto::find($id);
+				$clave_presupuestaria = $recurso->clavePresupuestaria;
 			}
 		}else{
 			$recurso = FIBAP::with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuesto')->find($id);

@@ -11,7 +11,8 @@ class FibapController extends \BaseController {
 	{
 		$catalogos = array(
 				'programa_presupuestal'=>ClasificacionProyecto::all(),
-				'objetivos_ped'=>TipoProyecto::all()
+				'objetivos_ped'=>TipoProyecto::all(),
+				'origenes_financiamiento' => OrigenFinanciamiento::all()
 			);
 		return parent::loadIndex('EXP','FIBAP',$catalogos);
 	}

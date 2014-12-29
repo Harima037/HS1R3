@@ -28,30 +28,95 @@ function editar(e){
     moduloResource.get(e,null,{
         _success: function(response){
             console.log(response);
+            var fibap = response.data;
+            var proyecto;
+            if(response.data.datos_proyecto_completo){
+                proyecto = response.data.datos_proyecto_completo;
+            }else{
+                proyecto = response.data.proyecto_completo;
+            }
 
+            var titulo_modal = proyecto.clasificacion_proyecto.descripcion + ' <small>' + proyecto.tipo_proyecto.descripcion + '</small>';
+            $(modal_name).find(".modal-title").html(titulo_modal);
 
-            $('#lbl-tipo-proyecto').text(response.data.datos_proyecto_completo.tipo_proyecto.descripcion);
-            $('#lbl-proyecto').text(response.data.datos_proyecto_completo.nombreTecnico);
-            $('#lbl-justificacion-proyecto').text(response.data.justificacionProyecto);
-            $('#lbl-descripcion-proyecto').text(response.data.descripcionProyecto);
-            $('#lbl-programa-presupuestario').text(response.data.datos_proyecto_completo.datos_programa_presupuestario.descripcion);
-            $('#lbl-alineacion-ped').text(response.data.datos_proyecto_completo.objetivo_ped.descripcion);
-            $('#lbl-alineacion-especifica').html(response.data.alineacionEspecifica);
-            $('#lbl-alineacion-general').html(response.data.alineacionGeneral || '&nbsp;');
-            $('#lbl-organismo-publico').text(response.data.organismoPublico);
-            $('#lbl-sector').text(response.data.sector);
-            $('#lbl-subcomite').text(response.data.subcomite);
-            $('#lbl-grupo-trabajo').text(response.data.grupoTrabajo);
-            $('#lbl-cobertura-municipio').text(response.data.datos_proyecto_completo.cobertura.descripcion + '/moa');
-            $('#lbl-tipo-beneficiario').text(response.data.datos_proyecto_completo.tipo_beneficiario.descripcion);
-            $('#lbl-beneficiario-f').text(response.data.datos_proyecto_completo.totalBeneficiariosF);
-            $('#lbl-beneficiario-m').text(response.data.datos_proyecto_completo.totalBeneficiariosM);
-            $('#lbl-total-beneficiario').text(response.data.datos_proyecto_completo.totalBeneficiarios);
+            $('#lbl-justificacion-proyecto').text(fibap.justificacionProyecto);
+            $('#lbl-descripcion-proyecto').text(fibap.descripcionProyecto);
+            $('#lbl-alineacion-especifica').html(fibap.alineacionEspecifica);
+            $('#lbl-alineacion-general').html(fibap.alineacionGeneral || '&nbsp;');
+            $('#lbl-organismo-publico').text(fibap.organismoPublico);
+            $('#lbl-sector').text(fibap.sector);
+            $('#lbl-subcomite').text(fibap.subcomite);
+            $('#lbl-grupo-trabajo').text(fibap.grupoTrabajo);
+            $('#lbl-resultados-obtenidos').text(fibap.resultadosObtenidos || '');
+            $('#lbl-resultados-esperados').text(fibap.resultadosEsperados || '');
+            $('#lbl-periodo-ejecucion').text(fibap.periodoEjecucion || '');
+            var presupuesto_requerido = fibap.presupuestoRequerido || 0;
+            $('#lbl-presupuesto-requerido').text(presupuesto_requerido.format());
 
-            //$('#lbl-lista-documentos').text(response.data);
+            var html_antecedentes = '';
+            for(var i in fibap.antecedentes_financieros){
+                var porcentaje = (fibap.antecedentes_financieros[i].ejercido * 100) / fibap.antecedentes_financieros[i].autorizado;
+                html_antecedentes += '<tr>';
+                html_antecedentes += '<td>' + fibap.antecedentes_financieros[i].anio + '</td>';
+                html_antecedentes += '<td>' + fibap.antecedentes_financieros[i].autorizado.format() + '</td>';
+                html_antecedentes += '<td>' + fibap.antecedentes_financieros[i].ejercido.format() + '</td>';
+                html_antecedentes += '<td>' + porcentaje + '% </td>';
+                html_antecedentes += '<td>' + fibap.antecedentes_financieros[i].fechaCorte + '</td>';
+                html_antecedentes += '</tr>';
+            }
+            $('#tabla-antecedentes > tbody').html(html_antecedentes);
 
-            $('#id').val(response.data.id);
-            $(modal_name).find(".modal-title").html("Editar FIBAP");
+            var html_distribucion = '';
+            for(var i in fibap.distribucion_presupuesto){
+                var presupuesto = fibap.distribucion_presupuesto[i];
+                var porcentaje = (presupuesto.cantidad * 100) / presupuesto_requerido;
+                html_distribucion += '<tr>';
+                html_distribucion += '<td>' + presupuesto.objeto_gasto.clave + '</td>';
+                html_distribucion += '<td>' + presupuesto.objeto_gasto.descripcion + '</td>';
+                html_distribucion += '<td>' + presupuesto.cantidad.format() + '</td>';
+                html_distribucion += '<td>' + porcentaje + '% </td>';
+                html_distribucion += '</tr>';
+            }
+            $('#tabla-distribucion > tbody').html(html_distribucion);
+
+            $('.valores-origenes').text('0');
+
+            for(var i in fibap.propuestas_financiamiento){
+                $('#lbl-origen-'+fibap.propuestas_financiamiento[i].idOrigenFinanciamiento).text(fibap.propuestas_financiamiento[i].cantidad.format());
+            }
+
+            if(response.clavePresupuestaria){
+                $('#lbl-clave-presupuestaria').text(response.clavePresupuestaria);
+                $('#lbl-clave-presupuestaria').parent().show();
+            }else{
+                $('#lbl-clave-presupuestaria').text('');
+                $('#lbl-clave-presupuestaria').parent().hide();
+            }
+
+            $('#lbl-proyecto').text(proyecto.nombreTecnico);
+            $('#lbl-programa-presupuestario').text(proyecto.datos_programa_presupuestario.descripcion);
+            $('#lbl-alineacion-ped').text(proyecto.objetivo_ped.descripcion);
+            var cobertura_detalle = '';
+            if(proyecto.claveMunicipio){
+                cobertura_detalle = proyecto.municipio.nombre;
+            }else if(proyecto.claveRegion){
+                cobertura_detalle = proyecto.region.nombre;
+            }else{
+                cobertura_detalle = 'Chiapas';
+            }
+            $('#lbl-cobertura-municipio').text(proyecto.cobertura.descripcion + ' / ' + cobertura_detalle);
+            $('#lbl-tipo-beneficiario').text(proyecto.tipo_beneficiario.descripcion);
+            $('#lbl-beneficiario-f').text(proyecto.totalBeneficiariosF.format());
+            $('#lbl-beneficiario-m').text(proyecto.totalBeneficiariosM.format());
+            $('#lbl-total-beneficiario').text(proyecto.totalBeneficiarios.format());
+
+            var html_list = '';
+            for(var indx in fibap.documentos){
+                html_list += '<div class="col-sm-4"><span class="fa fa-file-o"></span> '+fibap.documentos[indx].descripcion+'</div>';
+            }
+            $('#lbl-lista-documentos').html(html_list);
+
+            $('#id').val(fibap.id);
             $(modal_name).modal('show');
         }
     });
@@ -102,3 +167,15 @@ function submitModulo(save_next){
     $(form_name).attr('method','POST');
     $(form_name).submit();
 }
+
+/*             Extras               */
+/**
+ * Number.prototype.format(n, x)
+ * 
+ * @param integer n: length of decimal
+ * @param integer x: length of sections
+ */
+Number.prototype.format = function(n, x) {
+    var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\.' : '$') + ')';
+    return this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+};

@@ -204,6 +204,8 @@ if($('#id').val()){
             $('#total-beneficiarios-f').val(datosProyecto.totalBeneficiariosF);
             $('#total-beneficiarios-m').val(datosProyecto.totalBeneficiariosM);
 
+            $('#clave-presupuestaria').text('[ '+response.clavePresupuestaria+' ]');
+
             bloquear_controles();
 		}
 	});
@@ -554,6 +556,8 @@ function habilitar_tabs(){
 	$('#tab-link-antecedentes-fibap').parent().removeClass('disabled');
 	$('#tab-link-presupuesto-fibap').attr('data-toggle','tab');
 	$('#tab-link-presupuesto-fibap').parent().removeClass('disabled');
+	//$('#tab-link-info-proyecto').attr('data-toggle','tab');
+	//$('#tab-link-info-proyecto').parent().removeClass('disabled');
 }
 
 function bloquear_controles(){

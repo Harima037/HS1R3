@@ -128,7 +128,12 @@
                                 <ul class="nav nav-tabs" role="tablist">
                                     <li role="presentation" class="active">
                                         <a href="#datos-fibap" aria-controls="datos-fibap" role="tab" data-toggle="tab">
-                                            <span class="fa fa-file"></span> Datos del Proyecto
+                                            <span class="fa fa-file-o"></span> FIBAP
+                                        </a>
+                                    </li>
+                                    <li role="presentation">
+                                        <a href="#datos-proyecto" aria-controls="datos-proyecto" role="tab" data-toggle="tab">
+                                            <span class="fa fa-file"></span> Proyecto
                                         </a>
                                     </li>
                                     <li role="presentation">
@@ -144,16 +149,56 @@
                                 </ul>
                             <!-- Tab panes -->
                                 <div class="tab-content">
-                                    <div role="tabpanel" class="tab-pane active" id="datos-fibap">
+                                    <div role="tabpanel" class="tab-pane" id="datos-proyecto">
+                                        <br>
                                         <div class="row">
-                                            <div class="col-sm-4">
-                                                <b>Tipo Proyecto</b><br>
-                                                <span class="form-control-static" id="lbl-tipo-proyecto"></span>
-                                            </div>
                                             <div class="col-sm-8">
                                                 <b>Proyecto</b><br>
                                                 <span class="form-control-static" id="lbl-proyecto"></span>
                                             </div>
+                                            <div class="col-sm-4">
+                                                <b>Clave Presupuestaria</b><br>
+                                                <span class="form-control-static" id="lbl-clave-presupuestaria"></span>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <b>Programa Presupuestario</b><br>
+                                                <span class="form-control-static" id="lbl-programa-presupuestario"></span>
+                                            </div>
+                                            <!--div class="col-sm-4">
+                                                <button type="button" class="btn btn-info" id="btn-capturar-proyecto">
+                                                    <span class="fa fa-file"></span> Caratula del Proyecto
+                                                </button>
+                                            </div-->
+                                            <div class="col-sm-12">
+                                                <b>Alineación al PED</b><br>
+                                                <span class="form-control-static" id="lbl-alineacion-ped"></span>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <b>Cobertura / Municipio</b><br>
+                                                <span class="form-control-static" id="lbl-cobertura-municipio"></span>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <b>Beneficiarios</b>
+                                                <table class="table table-condensed table-bordered">
+                                                    <tr>
+                                                        <th>Tipo Beneficiario</th>
+                                                        <th>Femenino</th>
+                                                        <th>Masculino</th>
+                                                        <th>Total</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span id="lbl-tipo-beneficiario"></span></td>
+                                                        <td><span id="lbl-beneficiario-f"></span></td>
+                                                        <td><span id="lbl-beneficiario-m"></span></td>
+                                                        <td><span id="lbl-total-beneficiario"></span></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div role="tabpanel" class="tab-pane active" id="datos-fibap">
+                                        <br>
+                                        <div class="row">
                                             <div class="col-sm-6">
                                                 <b>Justificación del Proyecto</b><br>
                                                 <span class="form-control-static" id="lbl-justificacion-proyecto"></span>
@@ -161,14 +206,6 @@
                                             <div class="col-sm-6">
                                                 <b>Descripción del Proyecto</b><br>
                                                 <span class="form-control-static" id="lbl-descripcion-proyecto"></span>
-                                            </div>
-                                            <div class="col-sm-12">
-                                                <b>Programa Presupuestario</b><br>
-                                                <span class="form-control-static" id="lbl-programa-presupuestario"></span>
-                                            </div>
-                                            <div class="col-sm-12">
-                                                <b>Alineación al PED</b><br>
-                                                <span class="form-control-static" id="lbl-alineacion-ped"></span>
                                             </div>
                                             <div class="col-sm-12">
                                                 <b>Alineación a los Objetivos de Desarrollo del Milenio</b>
@@ -198,39 +235,80 @@
                                                 <span class="form-control-static" id="lbl-grupo-trabajo"></span>
                                             </div>
                                             <div class="col-sm-12">
-                                                <b>Cobertura / Municipio</b><br>
-                                                <span class="form-control-static" id="lbl-cobertura-municipio"></span>
-                                            </div>
-                                            <div class="col-sm-12">
-                                                <b>Beneficiarios</b>
-                                                <table class="table table-condensed table-bordered">
-                                                    <tr>
-                                                        <th>Tipo Beneficiario</th>
-                                                        <th>Femenino</th>
-                                                        <th>Masculino</th>
-                                                        <th>Total</th>
-                                                    </tr>
-                                                    <tr>
-                                                        <td><span id="lbl-tipo-beneficiario"></span></td>
-                                                        <td><span id="lbl-beneficiario-f"></span></td>
-                                                        <td><span id="lbl-beneficiario-m"></span></td>
-                                                        <td><span id="lbl-total-beneficiario"></span></td>
-                                                    </tr>
-                                                </table>
-                                            </div>
-                                            <div class="col-sm-12">
                                                 <b>Documentación de Soporte</b>
-                                                <div class="row" id="lbl-lista-documentos">
-                                                    <div class="col-sm-4">
-                                                        <span class="fa fa-file-o"></span> Documento
-                                                    </div>
-                                                </div>
+                                                <div class="row" id="lbl-lista-documentos"></div>
                                             </div>
                                         </div>
                                     </div>
                                     <div role="tabpanel" class="tab-pane" id="antecedentes-fibap">
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <b>Resultados Obtenidos</b><br>
+                                                <span class="form-control-static" id="lbl-resultados-obtenidos"></span>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <b>Resultados Esperados</b><br>
+                                                <span class="form-control-static" id="lbl-resultados-esperados"></span>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <br>
+                                                <b>Antecedentes Financieros</b>
+                                                <table class="table table-condensed table-bordered" id="tabla-antecedentes">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Año</th>
+                                                            <th>Autorizado</th>
+                                                            <th>Ejercido</th>
+                                                            <th>%</th>
+                                                            <th>Fecha de Corte</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div role="tabpanel" class="tab-pane" id="presupuesto-fibap">
+                                        <br>
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <b>Periodo de Ejecuación</b><br>
+                                                <span class="form-control-static" id="lbl-periodo-ejecucion"></span>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <b>Presupuesto Requerido</b><br>
+                                                <span class="form-control-static" id="lbl-presupuesto-requerido"></span>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <b>Origen</b>
+                                                <div class="row" id="lbl-origen-financiamiento">
+                                                    @foreach ($origenes_financiamiento as $origen)
+                                                        <div class="col-sm-3">
+                                                            <div class="form-group">
+                                                                <b>{{$origen->descripcion}}</b><br>
+                                                                <span class="valores-origenes" id="lbl-origen-{{$origen->id}}">0</span>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <br>
+                                                <b>Distribución del Presupuesto Estatal</b>
+                                                <table class="table table-condensed table-bordered" id="tabla-distribucion">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Partida</th>
+                                                            <th>Descripcion</th>
+                                                            <th>Cantidad</th>
+                                                            <th>%</th>                                                            
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

@@ -39,7 +39,7 @@
             <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active">
                     <a href="#datos-fibap" aria-controls="datos-fibap" role="tab" data-toggle="tab" id="tab-link-datos-fibap">
-                        <span class="fa fa-square-o"></span> Datos del Proyecto
+                        <span class="fa fa-square-o"></span> Datos Generales
                     </a>
                 </li>
                 <li role="presentation" class="disabled">
@@ -52,6 +52,11 @@
                         <span class="fa fa-square-o"></span> Presupuesto
                     </a>
                 </li>
+                <!--li role="presentation" class="disabled">
+                    <a href="#info-proyecto" aria-controls="info-proyecto" role="tab" id="tab-link-info-proyecto">
+                        <span class="fa fa-info-circle"></span> Información del Proyecto
+                    </a>
+                </li-->
             </ul>
 
             <div class="tab-content" id="fibap-grupo-formularios">
@@ -426,6 +431,12 @@
         </form>
         </div><!-- tab-pane -->
         <!--  End Tab Panel: Presupuesto y Propuesta  -->
+
+        <!--  Begin Tab Panel: Información del Proyecto  -->
+        <!--div role="tabpanel" class="tab-pane" id="info-proyecto" data-from-id="form-info-proyecto">
+
+        </div-->
+        <!--  End Tab Panel: Información del Proyecto  -->
 
             </div><!-- tab-content -->
         </div><!-- tab-panel -->
