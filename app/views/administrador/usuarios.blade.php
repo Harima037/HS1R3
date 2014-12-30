@@ -145,15 +145,22 @@
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
+                                            <label for="unidad" class="control-label">Unidad Asignada</label>
+                                            {{Form::select('unidad',array(''=>'Selecciona una unidad') + $unidades_responsables->lists('descripcion','clave'),0,array('class'=>'form-control','id'=>'unidad'))}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12"><label class="control-label">Información de Contacto</label></div>
+                                    <div class="col-sm-7">
+                                        <div class="form-group">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
                                                 <input type="email" class="form-control" id="email" name="email" placeholder="e-mail" maxlength="255">
                                             </div> 
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-12">
+                                    <div class="col-sm-5">
                                         <div class="form-group">
                                             <div class="input-group">
                                                 <span class="input-group-addon"><i class="fa fa-phone"></i></span>
@@ -165,7 +172,7 @@
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <label for="username" class="control-label">Datos de acceso</label>
+                                            <label for="username" class="control-label"><span class="fa fa-keyboard-o"></span> Datos de acceso</label>
                                             <div class="input-group">
                                                 <span class="input-group-addon"><i class="fa fa-user"></i></span>
                                                 <input type="text" class="form-control" id="username" name="username" placeholder="Nombre de usuario" maxlength="25"/>

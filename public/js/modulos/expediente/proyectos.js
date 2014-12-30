@@ -64,6 +64,12 @@ function editar (e){
 
             $('#lbl_vinculacion_ped').text(response.data.objetivo_ped.descripcion);
 
+            $('#lbl_lider_proyecto').text((response.data.lider_proyecto)?response.data.lider_proyecto.nombre:'No asignado');
+            $('#lbl_jefe_lider').text((response.data.jefe_inmediato)?response.data.jefe_inmediato.nombre:'No asignado');
+            $('#lbl_jefe_ṕlaneacion').text((response.data.jefe_planeacion)?response.data.jefe_planeacion.nombre:'No asignado');
+            $('#lbl_coordinador_grupo').text((response.data.coordinador_grupo_estrategico)?response.data.coordinador_grupo_estrategico.nombre:'No asignado');
+
+
             $('#lbl_tipo_beneficiario').text(response.data.tipo_beneficiario.descripcion);
             $('#lbl_total_beneficiarios').text(response.data.totalBeneficiarios.format());
             $('#lbl_beneficiarios_f').text(response.data.totalBeneficiariosF.format());

@@ -50,7 +50,23 @@ class Proyecto extends BaseModel
 		return $query->with('componentes','beneficiarios','municipio','region','clasificacionProyecto','tipoProyecto','cobertura','tipoAccion',
 			'datosUnidadResponsable','datosFinalidad','datosFuncion','datosSubFuncion','datosSubSubFuncion','datosProgramaSectorial',
 			'datosProgramaPresupuestario','datosProgramaEspecial','datosActividadInstitucional','datosProyectoEstrategico',
-			'objetivoPed','tipoBeneficiario','estatusProyecto');
+			'objetivoPed','tipoBeneficiario','estatusProyecto','jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico');
+	}
+
+	public function jefeInmediato(){
+		return $this->belongsTo('Titular','idJefeInmediato');
+	}
+
+	public function liderProyecto(){
+		return $this->belongsTo('Titular','idLiderProyecto');
+	}
+
+	public function jefePlaneacion(){
+		return $this->belongsTo('Titular','idJefePlaneacion');
+	}
+
+	public function coordinadorGrupoEstrategico(){
+		return $this->belongsTo('Titular','idCoordinadorGrupoEstrategico');
 	}
 
 	public function componentes(){

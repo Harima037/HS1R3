@@ -25,7 +25,6 @@ class UsuariosController extends \BaseController {
 			'nombres' => 'required',
 			'apellido-paterno' => 'required',
 			'apellido-materno' => 'required',
-						
 			'username' => 'required',
 			'rol' => 'required',
 			'email' => 'required|email',
@@ -214,6 +213,7 @@ class UsuariosController extends \BaseController {
 					'nombres' => Input::get('nombres'),
 					'apellidoPaterno' => Input::get('apellido-paterno'),
 					'apellidoMaterno' => Input::get('apellido-materno'),
+					'claveUnidad' => Input::get('unidad'),
 					'cargo' => Input::get('cargo'),
 					'telefono' => Input::get('telefono'),
 					'email' => Input::get('email'),
@@ -303,8 +303,9 @@ class UsuariosController extends \BaseController {
 				$recurso->nombres	= Input::get('nombres');
 				$recurso->apellidoPaterno		= Input::get('apellido-paterno');
 				$recurso->apellidoMaterno		= Input::get('apellido-materno');
-				$recurso->cargo					= Input::get('cargo');
-				$recurso->telefono				= Input::get('telefono');
+				$recurso->claveUnidad			= (Input::get('unidad'))?Input::get('unidad'):NULL;
+				$recurso->cargo					= (Input::get('cargo'))?Input::get('cargo'):NULL;
+				$recurso->telefono				= (Input::get('telefono'))?Input::get('telefono'):NULL;
 
 				if($recurso->email != Input::get('email') || $recurso->username != Input::get('username')){
 					$usuario = Sentry::getUserProvider()->createModel()

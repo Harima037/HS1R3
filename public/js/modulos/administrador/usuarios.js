@@ -47,6 +47,7 @@ function editar (e){
                         $('#formModulo #nombres').val(response.data.nombres);
                         $('#formModulo #apellido-paterno').val(response.data.apellidoPaterno);
                         $('#formModulo #apellido-materno').val(response.data.apellidoMaterno);
+                        $('#formModulo #unidad').val(response.data.claveUnidad);
                         $('#formModulo #cargo').val(response.data.cargo);
                         $('#formModulo #email').val(response.data.email);
                         $('#formModulo #telefono').val(response.data.telefono);

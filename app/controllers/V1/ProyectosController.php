@@ -4,7 +4,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception;
-use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, FibapDatosProyecto;
+use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMe, Region, Municipio, Jurisdiccion, FibapDatosProyecto, Titular;
 
 class ProyectosController extends BaseController {
 	private $reglasProyecto = array(
@@ -119,6 +119,7 @@ class ProyectosController extends BaseController {
 			}else{				
 				$total = $rows->count();						
 			}
+			$user = Sentry::getUser();
 
 			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto',
@@ -128,6 +129,7 @@ class ProyectosController extends BaseController {
 								->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
 								->orderBy('id', 'desc')
 								->skip(($parametros['pagina']-1)*10)->take(10)
+								->where('unidadResponsable','=',$user->claveUnidad)
 								->get();
 			
 			$data = array('resultados'=>$total,'data'=>$rows);
@@ -473,6 +475,22 @@ class ProyectosController extends BaseController {
 						$recurso->claveMunicipio = $parametros['municipio'];
 					}elseif($parametros['cobertura'] == 3){
 						$recurso->claveRegion = $parametros['region'];
+					}
+
+					$titulares = Titular::whereIn('claveUnidad',array('00','01', Sentry::getUser()->claveUnidad))->get();
+					
+					foreach ($titulares as $titular) {
+						if($titular->claveUnidad == '00'){ //Dirección General
+							$recurso->idJefeInmediato 				= $titular->id;
+						}elseif ($titular->claveUnidad == '01') { //Dirección de Planeación y Desarrollo
+							$recurso->idJefePlaneacion 				= $titular->id;
+				  			$recurso->idCoordinadorGrupoEstrategico = $titular->id;
+							if($recurso->idLiderProyecto == NULL){
+								$recurso->idLiderProyecto = $titular->id;
+							}
+						}else{
+							$recurso->idLiderProyecto = $titular->id;
+						}
 					}
 
 				  //$recurso->idLiderProyecto 				= $parametros[''];

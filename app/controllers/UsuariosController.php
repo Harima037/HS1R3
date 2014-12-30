@@ -9,6 +9,10 @@ class UsuariosController extends \BaseController {
 	 */
 	public function index()
 	{
-		return parent::loadIndex('ADMIN','USUARIOS',array('sys_roles'=>Sentry::findAllGroups()));
+		$catalogos = array(
+				'sys_roles'=>Sentry::findAllGroups(),
+				'unidades_responsables'=>UnidadResponsable::all()
+			);
+		return parent::loadIndex('ADMIN','USUARIOS',$catalogos);
 	}
 }

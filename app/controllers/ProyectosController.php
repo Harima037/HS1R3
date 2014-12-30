@@ -18,6 +18,28 @@ class ProyectosController extends \BaseController {
 
 	public function caratula()
 	{
+		//Obtener los titulares para firmas: de las unidades de Planeacion y Desarrollo, Direccion General y Director de la Unidad Responsable
+		$titulares = Titular::whereIn('claveUnidad',array('00','01', Sentry::getUser()->claveUnidad))->get();
+		$firmas = array(
+				'LiderProyecto' 	=> NULL,
+				'JefeInmediato' 	=> NULL,
+				'JefePlaneacion'	=> NULL,
+				'CoordinadorGrupo' 	=> NULL
+			);
+
+		foreach ($titulares as $titular) {
+			if($titular->claveUnidad == '00'){ //Dirección General
+				$firmas['JefeInmediato'] = $titular;
+			}elseif ($titular->claveUnidad == '01') { //Dirección de Planeación y Desarrollo
+				$firmas['JefePlaneacion'] = $titular;
+				$firmas['CoordinadorGrupo'] = $titular;
+				if($firmas['LiderProyecto'] == NULL){
+					$firmas['LiderProyecto'] = $titular;
+				}
+			}else{
+				$firmas['LiderProyecto'] = $titular;
+			}
+		}
 		
 		$clasificacion = ClasificacionProyecto::all()->lists('descripcion','id');
 		$tipo = TipoProyecto::all()->lists('descripcion','id');
@@ -37,6 +59,7 @@ class ProyectosController extends \BaseController {
 		);
 
 		$datos = array(
+			'firmas' => $firmas,
 			'clasificacion_proyecto_id' => Input::get('clasificacion_proyecto'),
 			'tipo_proyecto_id' => Input::get('tipo_proyecto'),
 			'clasificacion_proyecto' => $clasificacion[Input::get('clasificacion_proyecto')],

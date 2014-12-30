@@ -60,7 +60,7 @@ function editar(e){
                 html_antecedentes += '<td>' + fibap.antecedentes_financieros[i].anio + '</td>';
                 html_antecedentes += '<td>' + fibap.antecedentes_financieros[i].autorizado.format() + '</td>';
                 html_antecedentes += '<td>' + fibap.antecedentes_financieros[i].ejercido.format() + '</td>';
-                html_antecedentes += '<td>' + porcentaje + '% </td>';
+                html_antecedentes += '<td>' + parseFloat(porcentaje.toFixed(2)) + '% </td>';
                 html_antecedentes += '<td>' + fibap.antecedentes_financieros[i].fechaCorte + '</td>';
                 html_antecedentes += '</tr>';
             }
@@ -74,7 +74,7 @@ function editar(e){
                 html_distribucion += '<td>' + presupuesto.objeto_gasto.clave + '</td>';
                 html_distribucion += '<td>' + presupuesto.objeto_gasto.descripcion + '</td>';
                 html_distribucion += '<td>' + presupuesto.cantidad.format() + '</td>';
-                html_distribucion += '<td>' + porcentaje + '% </td>';
+                html_distribucion += '<td>' + parseFloat(porcentaje.toFixed(2)) + '% </td>';
                 html_distribucion += '</tr>';
             }
             $('#tabla-distribucion > tbody').html(html_distribucion);
