@@ -4,7 +4,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception;
-use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMe, Region, Municipio, Jurisdiccion, FibapDatosProyecto, Titular;
+use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, FibapDatosProyecto, Titular;
 
 class ProyectosController extends BaseController {
 	private $reglasProyecto = array(
@@ -110,7 +110,8 @@ class ProyectosController extends BaseController {
 		if(isset($parametros['formatogrid'])){
 
 			$rows = Proyecto::getModel();
-
+			$rows = $rows->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
+			
 			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 			
 			if(isset($parametros['buscar'])){				
@@ -119,8 +120,7 @@ class ProyectosController extends BaseController {
 			}else{				
 				$total = $rows->count();						
 			}
-			$user = Sentry::getUser();
-
+			
 			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto',
 				'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
@@ -129,7 +129,6 @@ class ProyectosController extends BaseController {
 								->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
 								->orderBy('id', 'desc')
 								->skip(($parametros['pagina']-1)*10)->take(10)
-								->where('unidadResponsable','=',$user->claveUnidad)
 								->get();
 			
 			$data = array('resultados'=>$total,'data'=>$rows);

@@ -220,14 +220,14 @@ function constructor_grupo_acordiones(padre,item,tipo,contenido_extra){ //tipo =
     contenido += '<address>';
     contenido += '<div class="row">';
     contenido += '<div class="col-sm-7">';
-    contenido += '<strong>Medios de Verificación:</strong> '+item.mediosVerificacion+'<br>';
-    contenido += '<strong>Supuestos:</strong> '+item.supuestos;
+    contenido += '<span class="label label-default">Medios de Verificación :</span> '+item.mediosVerificacion+'<br>';
+    contenido += '<span class="label label-default">Supuestos :</span> '+item.supuestos;
     contenido += '</div>';
     if(item.accion){
         contenido += '<div class="col-sm-5">';
-        contenido += '<strong>Entregable:</strong> '+item.entregable.descripcion+'<br>';
-        contenido += '<strong>Tipo:</strong> '+item.tipo+'<br>';
-        contenido += '<strong>Accion:</strong> '+item.accion;
+        contenido += '<span class="label label-default">Entregable :</span> '+item.entregable.descripcion+'<br>';
+        contenido += '<span class="label label-default">Tipo :</span> '+item.tipo+'<br>';
+        contenido += '<span class="label label-default">Accion :</span> '+item.accion;
         contenido += '</div>';
     }
     contenido += '</div>';
@@ -236,18 +236,18 @@ function constructor_grupo_acordiones(padre,item,tipo,contenido_extra){ //tipo =
 
     contenido += '<div class="row">';
     contenido += '<div class="col-sm-6">';
-    contenido += '<strong>Indicador:</strong> '+item.indicador+'<br>';
-    contenido += '<strong>Numerador:</strong> '+item.numerador+'<br>';
-    contenido += '<strong>Denominador:</strong> '+item.denominador+'<br>';
-    contenido += '<strong>Interpretación:</strong> '+item.interpretacion+'<br>';
-    contenido += '<strong>Meta Indicador:</strong> '+item.metaIndicador+'<br>';
+    contenido += '<span class="label label-default">Indicador :</span> '+item.indicador+'<br>';
+    contenido += '<span class="label label-default">Numerador :</span> '+item.numerador+'<br>';
+    contenido += '<span class="label label-default">Denominador :</span> '+item.denominador+'<br>';
+    contenido += '<span class="label label-default">Interpretación :</span> '+item.interpretacion+'<br>';
+    contenido += '<span class="label label-default">Meta Indicador :</span> '+item.metaIndicador+'<br>';
     contenido += '</div>';
     contenido += '<div class="col-sm-6">';
-    contenido += '<strong>Formula:</strong> '+item.formula.descripcion+'<br>';
-    contenido += '<strong>Dimensión:</strong> '+item.dimension.descripcion+'<br>';
-    contenido += '<strong>Frecuencia:</strong> '+item.frecuencia.descripcion+'<br>';
-    contenido += '<strong>Tipo:</strong> '+item.tipo_indicador.descripcion+'<br>';
-    contenido += '<strong>Unidad de Medida:</strong> '+item.unidad_medida.descripcion+'<br>';    
+    contenido += '<span class="label label-default">Formula :</span> '+item.formula.descripcion+'<br>';
+    contenido += '<span class="label label-default">Dimensión :</span> '+item.dimension.descripcion+'<br>';
+    contenido += '<span class="label label-default">Frecuencia :</span> '+item.frecuencia.descripcion+'<br>';
+    contenido += '<span class="label label-default">Tipo :</span> '+item.tipo_indicador.descripcion+'<br>';
+    contenido += '<span class="label label-default">Unidad de Medida :</span> '+item.unidad_medida.descripcion+'<br>';    
     contenido += '</div>';
     contenido += '</div>';
 
@@ -255,31 +255,31 @@ function constructor_grupo_acordiones(padre,item,tipo,contenido_extra){ //tipo =
 
     contenido += '<div class="row">';
     contenido += '<div class="col-sm-3 col-xs-6">';
-    contenido += '<strong>Trimestre 1:</strong> <br>'+item.numeroTrim1;
+    contenido += '<span class="label label-default">Trimestre 1 :</span> <br>' + (item.numeroTrim1 || 0);
     contenido += '</div>';
     contenido += '<div class="col-sm-3 col-xs-6">';
-    contenido += '<strong>Trimestre 2:</strong> <br>'+item.numeroTrim2;
+    contenido += '<span class="label label-default">Trimestre 2 :</span> <br>' + (item.numeroTrim2 || 0);
     contenido += '</div>';
     contenido += '<div class="col-sm-3 col-xs-6">';
-    contenido += '<strong>Trimestre 3:</strong> <br>'+item.numeroTrim3;
+    contenido += '<span class="label label-default">Trimestre 3 :</span> <br>' + (item.numeroTrim3 || 0);
     contenido += '</div>';
     contenido += '<div class="col-sm-3 col-xs-6">';
-    contenido += '<strong>Trimestre 4:</strong> <br>'+item.numeroTrim4;
+    contenido += '<span class="label label-default">Trimestre 4 :</span> <br>' + (item.numeroTrim4 || 0);
     contenido += '</div>';
     contenido += '</div>';
 
     contenido += '<div class="row">';
     contenido += '<div class="col-sm-3 col-xs-6">';
-    contenido += '<strong>Numerador:</strong> <br>'+item.valorNumerador;
+    contenido += '<span class="label label-default">Numerador :</span> <br>'+item.valorNumerador;
     contenido += '</div>';
     contenido += '<div class="col-sm-3 col-xs-6">';
-    contenido += '<strong>Denominador:</strong> <br>'+item.valorDenominador;
+    contenido += '<span class="label label-default">Denominador :</span> <br>'+item.valorDenominador;
     contenido += '</div>';
     contenido += '<div class="col-sm-3 col-xs-6">';
-    contenido += '<strong>Linea Base:</strong> <br>'+item.lineaBase;
+    contenido += '<span class="label label-default">Linea Base :</span> <br>' + (item.lineaBase || 0);
     contenido += '</div>';
     contenido += '<div class="col-sm-3 col-xs-6">';
-    contenido += '<strong>Año Base:</strong> <br>'+item.anioBase;
+    contenido += '<span class="label label-default">Año Base :</span> <br>' + (item.anioBase || 0);
     contenido += '</div>';
     contenido += '</div>';
 

@@ -3,25 +3,25 @@
         <div class="col-sm-6">
             <div class="form-group">
                 <label class="control-label">Lider del Proyecto</label>
-                <p class="form-control-static">{{$firmas['LiderProyecto']->nombre}}</p>
+                <p id="lbl-lider-proyecto" class="form-control-static">{{$firmas['LiderProyecto']->nombre}}</p>
             </div>
         </div>
         <div class="col-sm-6">
             <div class="form-group">
                 <label class="control-label">Jefe Inmediato al Lider</label>
-                <p class="form-control-static">{{$firmas['JefeInmediato']->nombre}}</p>
+                <p id="lbl-jefe-inmediato" class="form-control-static">{{$firmas['JefeInmediato']->nombre}}</p>
             </div>
         </div>
         <div class="col-sm-6">
             <div class="form-group">
                 <label class="control-label">Jefe de Planeación</label>
-                <p class="form-control-static">{{$firmas['JefePlaneacion']->nombre}}</p>
+                <p id="lbl-jefe-planeacion" class="form-control-static">{{$firmas['JefePlaneacion']->nombre}}</p>
             </div>
         </div>
         <div class="col-sm-6">
             <div class="form-group">
                 <label class="control-label">Coordinador del Grupo Estratégico</label>
-                <p class="form-control-static">{{$firmas['CoordinadorGrupo']->nombre}}</p>
+                <p id="lbl-coordinador-grupo" class="form-control-static">{{$firmas['CoordinadorGrupo']->nombre}}</p>
             </div>
         </div>
     </div>

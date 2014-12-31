@@ -95,8 +95,8 @@
 
 @section('modals')
     <div class="modal fade" id="modalCaratulas" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" data-backdrop="static">
-        <div class="modal-dialog modal-dialog-75-screen">
-            <div class="modal-content modal-content-75-screen">
+        <div class="modal-dialog modal-dialog-85-screen">
+            <div class="modal-content modal-content-85-screen">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 class="modal-title" id="modalLabel">Nuevo</h4>
@@ -167,22 +167,26 @@
                                     <br>
                                     <div class="row">
                                         <div class="col-sm-5 col-xs-12">
-                                            <label class="control-label">Nombre Técnico</label>
+                                            <!--label class="control-label"></label-->
+                                            <span class="label label-default"><b>Nombre Técnico</b></span>
                                             <p id="lbl_nombre_tecnico"></p>
                                         </div>
                                         <div class="col-sm-4 col-xs-6">
-                                            <label class="control-label">Cobertura</label>
+                                            <!--label class="control-label"></label-->
+                                            <span class="label label-default"><b>Cobertura</b></span>
                                             <p id="lbl_cobertura"></p>
                                         </div>
                                         <div class="col-sm-3 col-xs-6">
-                                            <label class="control-label">Tipo de Acción</label>
+                                            <!--label class="control-label"></label-->
+                                            <span class="label label-default"><b>Tipo de Acción</b></span>
                                             <p id="lbl_tipo_accion"></p>
                                         </div>
                                         <div class="clearfix"></div>
                                         <div class="col-sm-12">
                                             <div class="panel panel-primary">
                                                 <div class="panel-heading">
-                                                    <span id="lbl_clave_presupuestaria" class="form-control-static"></span>
+                                                    <b>Clave:</b> 
+                                                    [<span id="lbl_clave_presupuestaria" class="form-control-static"></span>]
                                                     <button type="button" class="btn btn-info pull-right" data-toggle="collapse" data-target="#clave-desgloce" aria-expanded="true" aria-controls="clave-desgloce">
                                                         Desgloce de la clave <span class="fa fa-toggle-down"></span>
                                                     </button>
@@ -190,50 +194,45 @@
                                                 <div id="clave-desgloce" class="panel-body collapse">
                                                     <div class="row">
                                                         <div class="col-sm-12">
-                                                            <label class="control-label">Unidad Responsable</label>
+                                                            <!--label class="control-label"></label-->
+                                                            <span class="label label-default"><b>Unidad Responsable</b></span>
                                                             <p id="lbl_unidad_responsable"></p>
                                                         </div>
                                                         <div class="col-sm-12">
-                                                            <label class="control-label">Finalidad/Función/SubFunción/SubSubFunción</label>
-                                                            <ul>
-                                                                <li>
-                                                                    <p id="lbl_finalidad"></p>
-                                                                    <ul>
-                                                                        <li>
-                                                                            <p id="lbl_funcion"></p>
-                                                                            <ul>
-                                                                                <li>
-                                                                                    <p id="lbl_sub_funcion"></p>
-                                                                                    <ul>
-                                                                                        <li>
-                                                                                            <p id="lbl_sub_sub_funcion"></p>
-                                                                                        </li>
-                                                                                    </ul>
-                                                                                </li>
-                                                                            </ul>
-                                                                        </li>
-                                                                    </ul>
-                                                                </li>
-                                                            </ul>
+                                                            <!--label class="control-label"></label-->
+                                                            <span class="label label-default"> 
+                                                                <b>Finalidad / Función / SubFunción / SubSubFunción</b>
+                                                            </span>
+                                                            <p>
+                                                                <span id="lbl_finalidad"></span><br>
+                                                                <span id="lbl_funcion"></span><br>
+                                                                <span id="lbl_sub_funcion"></span><br>
+                                                                <span id="lbl_sub_sub_funcion"></span>
+                                                            </p>
                                                         </div>
                                                         <div class="col-sm-4">
-                                                            <label class="control-label">Programa Sectorial</label>
+                                                            <!--label class="control-label"></label-->
+                                                            <span class="label label-default"><b>Programa Sectorial</b></span>
                                                             <p id="lbl_programa_sectorial"></p>
                                                         </div>
                                                         <div class="col-sm-8">
-                                                            <label class="control-label">Programa Presupuestario</label>
+                                                            <!--label class="control-label"></label-->
+                                                            <span class="label label-default"><b>Programa Presupuestario</b></span>
                                                             <p id="lbl_programa_presupuestario"></p>
                                                         </div>
-                                                        <div class="col-sm-6">
-                                                            <label class="control-label">Programa Especial</label>
+                                                        <div class="col-sm-4">
+                                                            <!--label class="control-label"></label-->
+                                                            <span class="label label-default"><b>Programa Especial</b></span>
                                                             <p id="lbl_programa_especial"></p>
                                                         </div>
-                                                        <div class="col-sm-6">
-                                                            <label class="control-label">Actividad Institucional</label>
+                                                        <div class="col-sm-5">
+                                                            <!--label class="control-label"></label-->
+                                                            <span class="label label-default"><b>Actividad Institucional</b></span>
                                                             <p id="lbl_actividad_institucional"></p>
                                                         </div>
-                                                        <div class="col-sm-6">
-                                                            <label class="control-label">Proyecto Estratégico</label>
+                                                        <div class="col-sm-3">
+                                                            <!--label class="control-label"></label-->
+                                                            <span class="label label-default"><b>Proyecto Estratégico</b></span>
                                                             <p id="lbl_proyecto_estrategico"></p>
                                                         </div>
                                                     </div>
@@ -241,24 +240,29 @@
                                             </div>
                                         </div>
                                         <div class="col-sm-12">
-                                            <label class="control-label">Vinculacion al PED</label>
+                                            <!--label class="control-label"></label-->
+                                            <span class="label label-default"><b>Vinculacion al PED</b></span>
                                             <p id="lbl_vinculacion_ped"></p>
                                         </div>
 
-                                        <div class="col-sm-6">
-                                            <label class="control-label">Lider del Proyecto</label>
+                                        <div class="col-lg-3 col-md-4 col-sm-6">
+                                            <!--label class="control-label"></label-->
+                                            <span class="label label-default"><b>Lider del Proyecto</b></span>
                                             <p id="lbl_lider_proyecto"></p>
                                         </div>
-                                        <div class="col-sm-6">
-                                            <label class="control-label">Jefe Inmediato al Lider</label>
+                                        <div class="col-lg-3 col-md-4 col-sm-6">
+                                            <!--label class="control-label"></label-->
+                                            <span class="label label-default"><b>Jefe Inmediato al Lider</b></span>
                                             <p id="lbl_jefe_lider"></p>
                                         </div>
-                                        <div class="col-sm-6">
-                                            <label class="control-label">Jefe de Planeación</label>
+                                        <div class="col-lg-3 col-md-4 col-sm-6">
+                                            <!--label class="control-label"></label-->
+                                            <span class="label label-default"><b>Jefe de Planeación</b></span>
                                             <p id="lbl_jefe_ṕlaneacion"></p>
                                         </div>
-                                        <div class="col-sm-6">
-                                            <label class="control-label">Coordinador del Grupo Estratégico</label>
+                                        <div class="col-lg-3 col-md-4 col-sm-6">
+                                            <!--label class="control-label"></label-->
+                                            <span class="label label-default"><b>Coordinador del Grupo Estratégico</b></span>
                                             <p id="lbl_coordinador_grupo"></p>
                                         </div>
                                     </div>

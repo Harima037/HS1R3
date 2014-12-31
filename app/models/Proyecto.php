@@ -54,19 +54,19 @@ class Proyecto extends BaseModel
 	}
 
 	public function jefeInmediato(){
-		return $this->belongsTo('Titular','idJefeInmediato');
+		return $this->belongsTo('Titular','idJefeInmediato')->withTrashed();
 	}
 
 	public function liderProyecto(){
-		return $this->belongsTo('Titular','idLiderProyecto');
+		return $this->belongsTo('Titular','idLiderProyecto')->withTrashed();
 	}
 
 	public function jefePlaneacion(){
-		return $this->belongsTo('Titular','idJefePlaneacion');
+		return $this->belongsTo('Titular','idJefePlaneacion')->withTrashed();
 	}
 
 	public function coordinadorGrupoEstrategico(){
-		return $this->belongsTo('Titular','idCoordinadorGrupoEstrategico');
+		return $this->belongsTo('Titular','idCoordinadorGrupoEstrategico')->withTrashed();
 	}
 
 	public function componentes(){

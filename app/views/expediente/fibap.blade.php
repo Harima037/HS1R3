@@ -153,16 +153,16 @@
                                         <br>
                                         <div class="row">
                                             <div class="col-sm-8">
-                                                <b>Proyecto</b><br>
-                                                <span class="form-control-static" id="lbl-proyecto"></span>
+                                                <span class="label label-default">Proyecto</span>
+                                                <p id="lbl-proyecto"></p>
                                             </div>
                                             <div class="col-sm-4">
-                                                <b>Clave Presupuestaria</b><br>
-                                                <span class="form-control-static" id="lbl-clave-presupuestaria"></span>
+                                                <span class="label label-default">Clave Presupuestaria</span>
+                                                <p id="lbl-clave-presupuestaria"></p>
                                             </div>
                                             <div class="col-sm-12">
-                                                <b>Programa Presupuestario</b><br>
-                                                <span class="form-control-static" id="lbl-programa-presupuestario"></span>
+                                                <span class="label label-default">Programa Presupuestario</span>
+                                                <p id="lbl-programa-presupuestario"></p>
                                             </div>
                                             <!--div class="col-sm-4">
                                                 <button type="button" class="btn btn-info" id="btn-capturar-proyecto">
@@ -170,15 +170,14 @@
                                                 </button>
                                             </div-->
                                             <div class="col-sm-12">
-                                                <b>Alineación al PED</b><br>
-                                                <span class="form-control-static" id="lbl-alineacion-ped"></span>
+                                                <span class="label label-default">Alineación al PED</span>
+                                                <p id="lbl-alineacion-ped"></p>
                                             </div>
                                             <div class="col-sm-12">
-                                                <b>Cobertura / Municipio</b><br>
-                                                <span class="form-control-static" id="lbl-cobertura-municipio"></span>
+                                                <span class="label label-default">Cobertura / Municipio</span>
+                                                <p id="lbl-cobertura-municipio"></p>
                                             </div>
                                             <div class="col-sm-12">
-                                                <b>Beneficiarios</b>
                                                 <table class="table table-condensed table-bordered">
                                                     <tr>
                                                         <th>Tipo Beneficiario</th>
@@ -200,42 +199,46 @@
                                         <br>
                                         <div class="row">
                                             <div class="col-sm-6">
-                                                <b>Justificación del Proyecto</b><br>
-                                                <span class="form-control-static" id="lbl-justificacion-proyecto"></span>
+                                                <span class="label label-default">Justificación del Proyecto</span>
+                                                <p id="lbl-justificacion-proyecto"></p>
                                             </div>
                                             <div class="col-sm-6">
-                                                <b>Descripción del Proyecto</b><br>
-                                                <span class="form-control-static" id="lbl-descripcion-proyecto"></span>
+                                                <span class="label label-default">Descripción del Proyecto</span>
+                                                <p id="lbl-descripcion-proyecto"></p>
                                             </div>
                                             <div class="col-sm-12">
-                                                <b>Alineación a los Objetivos de Desarrollo del Milenio</b>
+                                                <div class="row panel panel-default">
+                                                    <div class="col-sm-12 panel-heading">
+                                                        <b>Alineación a los Objetivos de Desarrollo del Milenio</b>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <span class="label label-default">Alienación Especifica</span>
+                                                        <p id="lbl-alineacion-especifica"></p>
+                                                    </div>
+                                                    <div class="col-sm-6">
+                                                        <span class="label label-default">Alienación General</span>
+                                                        <p id="lbl-alineacion-general"></p>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div class="col-sm-6">
-                                                <b>Alienación Especifica</b><br>
-                                                <span class="form-control-static" id="lbl-alineacion-especifica"></span>
+                                                <span class="label label-default">Organismo Público</span>
+                                                <p id="lbl-organismo-publico"></p>
                                             </div>
                                             <div class="col-sm-6">
-                                                <b>Alienación General</b><br>
-                                                <span class="form-control-static" id="lbl-alineacion-general"></span>
+                                                <span class="label label-default">Sector</span>
+                                                <p id="lbl-sector"></p>
                                             </div>
                                             <div class="col-sm-6">
-                                                <b>Organismo Público</b><br>
-                                                <span class="form-control-static" id="lbl-organismo-publico"></span>
+                                                <span class="label label-default">Subcomite</span>
+                                                <p id="lbl-subcomite"></p>
                                             </div>
                                             <div class="col-sm-6">
-                                                <b>Sector</b><br>
-                                                <span class="form-control-static" id="lbl-sector"></span>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <b>Subcomite</b><br>
-                                                <span class="form-control-static" id="lbl-subcomite"></span>
-                                            </div>
-                                            <div class="col-sm-6">
-                                                <b>Grupo de Trabajo</b><br>
-                                                <span class="form-control-static" id="lbl-grupo-trabajo"></span>
+                                                <span class="label label-default">Grupo de Trabajo</span>
+                                                <p id="lbl-grupo-trabajo"></p>
                                             </div>
                                             <div class="col-sm-12">
-                                                <b>Documentación de Soporte</b>
+                                                <span class="label label-default">Documentación de Soporte</span>
                                                 <div class="row" id="lbl-lista-documentos"></div>
                                             </div>
                                         </div>
@@ -244,12 +247,12 @@
                                         <br>
                                         <div class="row">
                                             <div class="col-sm-6">
-                                                <b>Resultados Obtenidos</b><br>
-                                                <span class="form-control-static" id="lbl-resultados-obtenidos"></span>
+                                                <span class="label label-default">Resultados Obtenidos</span>
+                                                <p id="lbl-resultados-obtenidos"></p>
                                             </div>
                                             <div class="col-sm-6">
-                                                <b>Resultados Esperados</b><br>
-                                                <span class="form-control-static" id="lbl-resultados-esperados"></span>
+                                                <span class="label label-default">Resultados Esperados</span>
+                                                <p id="lbl-resultados-esperados"></p>
                                             </div>
                                             <div class="col-sm-12">
                                                 <br>
@@ -273,21 +276,21 @@
                                         <br>
                                         <div class="row">
                                             <div class="col-sm-6">
-                                                <b>Periodo de Ejecuación</b><br>
-                                                <span class="form-control-static" id="lbl-periodo-ejecucion"></span>
+                                                <span class="label label-default">Periodo de Ejecuación</span>
+                                                <p id="lbl-periodo-ejecucion"></p>
                                             </div>
                                             <div class="col-sm-6">
-                                                <b>Presupuesto Requerido</b><br>
-                                                <span class="form-control-static" id="lbl-presupuesto-requerido"></span>
+                                                <span class="label label-default">Presupuesto Requerido</span>
+                                                <p id="lbl-presupuesto-requerido"></p>
                                             </div>
                                             <div class="col-sm-12">
-                                                <b>Origen</b>
+                                                <b>Origenes</b>
                                                 <div class="row" id="lbl-origen-financiamiento">
                                                     @foreach ($origenes_financiamiento as $origen)
                                                         <div class="col-sm-3">
                                                             <div class="form-group">
-                                                                <b>{{$origen->descripcion}}</b><br>
-                                                                <span class="valores-origenes" id="lbl-origen-{{$origen->id}}">0</span>
+                                                                <span class="label label-default">{{$origen->descripcion}}</span>
+                                                                <p class="valores-origenes" id="lbl-origen-{{$origen->id}}">0</p>
                                                             </div>
                                                         </div>
                                                     @endforeach

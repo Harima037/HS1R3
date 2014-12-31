@@ -36,6 +36,11 @@ if($('#id').val()){
         _success: function(response){
         	inicializar_comportamiento_caratula();
 
+        	$('#lbl-lider-proyecto').text(response.data.lider_proyecto.nombre);
+			$('#lbl-jefe-inmediato').text(response.data.jefe_inmediato.nombre);
+			$('#lbl-jefe-planeacion').text(response.data.jefe_planeacion.nombre);
+			$('#lbl-coordinador-grupo').text(response.data.coordinador_grupo_estrategico.nombre);
+
             $('#nombretecnico').val(response.data.nombreTecnico);
 
 			$('#unidad_responsable').text(response.data.datos_unidad_responsable.clave);
