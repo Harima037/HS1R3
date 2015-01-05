@@ -94,6 +94,21 @@ function editar (e){
 
             $('#id').val(response.data.id);
 
+            if(response.data.idClasificacionProyecto == 2){
+                $('#tab-link-fibap').parent().removeClass('hidden');
+                if(response.data.fibap){
+                    $('#datos-capturados-fibap').show();
+                    $('#datos-alerta-fibap').empty();
+                    llenar_datos_fibap(response.data.fibap);
+                }else{
+                    $('#datos-capturados-fibap').hide();
+                    $('#datos-alerta-fibap').empty();
+                    $('#datos-alerta-fibap').append('<div class="alert alert-info">No ha sido asignada ningun FIBAP a este proyecto.</div>');
+                }
+            }else{
+                $('#tab-link-fibap').parent().addClass('hidden');
+            }
+
             construir_panel_componentes(response.data.componentes);
             
             $('#datos-formulario').hide();
@@ -102,6 +117,63 @@ function editar (e){
             $(modal_name).modal('show');
         }
     });
+}
+
+function llenar_datos_fibap(fibap){
+    $('#lbl-justificacion-proyecto').text(fibap.justificacionProyecto);
+    $('#lbl-descripcion-proyecto').text(fibap.descripcionProyecto);
+    $('#lbl-alineacion-especifica').html(fibap.alineacionEspecifica);
+    $('#lbl-alineacion-general').html(fibap.alineacionGeneral || '&nbsp;');
+    $('#lbl-organismo-publico').text(fibap.organismoPublico);
+    $('#lbl-sector').text(fibap.sector);
+    $('#lbl-subcomite').text(fibap.subcomite);
+    $('#lbl-grupo-trabajo').text(fibap.grupoTrabajo);
+    $('#lbl-resultados-obtenidos').text(fibap.resultadosObtenidos || '');
+    $('#lbl-resultados-esperados').text(fibap.resultadosEsperados || '');
+    $('#lbl-periodo-ejecucion').text(fibap.periodoEjecucion || '');
+
+    var html_antecedentes = '';
+    for(var i in fibap.antecedentes_financieros){
+        var porcentaje = (fibap.antecedentes_financieros[i].ejercido * 100) / fibap.antecedentes_financieros[i].autorizado;
+        html_antecedentes += '<tr>';
+        html_antecedentes += '<td>' + fibap.antecedentes_financieros[i].anio + '</td>';
+        html_antecedentes += '<td>' + fibap.antecedentes_financieros[i].autorizado.format() + '</td>';
+        html_antecedentes += '<td>' + fibap.antecedentes_financieros[i].ejercido.format() + '</td>';
+        html_antecedentes += '<td>' + parseFloat(porcentaje.toFixed(2)) + '% </td>';
+        html_antecedentes += '<td>' + fibap.antecedentes_financieros[i].fechaCorte + '</td>';
+        html_antecedentes += '</tr>';
+    }
+    $('#tabla-antecedentes > tbody').html(html_antecedentes);
+
+    var presupuesto_requerido = fibap.presupuestoRequerido || 0;
+
+    var html_distribucion = '';
+    for(var i in fibap.distribucion_presupuesto){
+        var presupuesto = fibap.distribucion_presupuesto[i];
+        var porcentaje = (presupuesto.cantidad * 100) / presupuesto_requerido;
+        html_distribucion += '<tr>';
+        html_distribucion += '<td>' + presupuesto.objeto_gasto.clave + '</td>';
+        html_distribucion += '<td>' + presupuesto.objeto_gasto.descripcion + '</td>';
+        html_distribucion += '<td>' + presupuesto.cantidad.format() + '</td>';
+        html_distribucion += '<td>' + parseFloat(porcentaje.toFixed(2)) + '% </td>';
+        html_distribucion += '</tr>';
+    }
+    $('#tabla-distribucion > tbody').html(html_distribucion);
+
+    $('.valores-origenes').text('0');
+
+    for(var i in fibap.propuestas_financiamiento){
+        $('#lbl-origen-'+fibap.propuestas_financiamiento[i].idOrigenFinanciamiento).text(fibap.propuestas_financiamiento[i].cantidad.format());
+    }
+        
+    $('#lbl-presupuesto-requerido').text(presupuesto_requerido.format());
+    var html_list = '';
+    for(var indx in fibap.documentos){
+        html_list += '<div class="col-sm-4"><span class="fa fa-file-o"></span> '+fibap.documentos[indx].descripcion+'</div>';
+    }
+    $('#lbl-lista-documentos').html(html_list);
+
+
 }
 
 $('#clasificacion_proyecto').on('change',function(){

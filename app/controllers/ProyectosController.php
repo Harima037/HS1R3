@@ -11,7 +11,8 @@ class ProyectosController extends \BaseController {
 	{
 		$catalogos = array(
 				'clasificacion_proyectos'=>ClasificacionProyecto::all(),
-				'tipos_proyectos'=>TipoProyecto::all()
+				'tipos_proyectos'=>TipoProyecto::all(),
+				'origenes_financiamiento' => OrigenFinanciamiento::all()
 			);
 		return parent::loadIndex('EXP','PROYECTOS',$catalogos);
 	}
@@ -65,7 +66,7 @@ class ProyectosController extends \BaseController {
 			'clasificacion_proyecto' => $clasificacion[Input::get('clasificacion_proyecto')],
 			'tipo_proyecto' => $tipo[Input::get('tipo_proyecto')],
 			'tipos_acciones' => TipoAccion::all(),
-			'unidades_responsables' => UnidadResponsable::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
+			'unidades_responsables' => UnidadResponsable::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->where('clave','=',Sentry::getUser()->claveUnidad)->get(),
 			'funciones_gasto' => $funciones_gasto,
 			'programas_sectoriales' => ProgramaSectorial::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
 			'programas_presupuestarios' => ProgramaPresupuestario::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),

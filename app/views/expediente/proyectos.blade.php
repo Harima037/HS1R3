@@ -159,6 +159,11 @@
                                         <span class="fa fa-cogs"></span> Componentes
                                     </a>
                                 </li>
+                                <li role="presentation" class="hidden">
+                                    <a id="tab-link-fibap" href="#tab-fibap" aria-controls="tab-fibap" role="tab" data-toggle="tab">
+                                        <span class="fa fa-file-o"></span> FIBAP
+                                    </a>
+                                </li>
                             </ul>
 
                         <!-- Tab panes -->
@@ -387,6 +392,152 @@
                                     </div>
                                 </div>
                                 <div role="tabpanel" class="tab-pane" id="tab-componente"></div>
+                                <div role="tabpanel" class="tab-pane" id="tab-fibap">
+                                    <br>
+                                    <div id="datos-alerta-fibap"></div>
+                                    <div class="row" id="datos-capturados-fibap">
+                                        <div class="col-sm-6">
+                                            <span class="label label-default">Justificación del Proyecto</span>
+                                            <p id="lbl-justificacion-proyecto"></p>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <span class="label label-default">Descripción del Proyecto</span>
+                                            <p id="lbl-descripcion-proyecto"></p>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="row panel panel-default">
+                                                <div class="col-sm-12 panel-heading">
+                                                    <b>Alineación a los Objetivos de Desarrollo del Milenio</b>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <span class="label label-default">Alienación Especifica</span>
+                                                    <p id="lbl-alineacion-especifica"></p>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <span class="label label-default">Alienación General</span>
+                                                    <p id="lbl-alineacion-general"></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <span class="label label-default">Organismo Público</span>
+                                            <p id="lbl-organismo-publico"></p>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <span class="label label-default">Sector</span>
+                                            <p id="lbl-sector"></p>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <span class="label label-default">Subcomite</span>
+                                            <p id="lbl-subcomite"></p>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <span class="label label-default">Grupo de Trabajo</span>
+                                            <p id="lbl-grupo-trabajo"></p>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div role="tabpanel">
+                                            <!-- Nav tabs -->
+                                                <ul class="nav nav-pills" role="tablist">
+                                                    <li role="presentation" class="active">
+                                                        <a href="#fibap-doc-soporte" aria-controls="fibap-doc-soporte" role="tab" data-toggle="tab">
+                                                            Documentos Soporte
+                                                        </a>
+                                                    </li>
+                                                    <li role="presentation">
+                                                        <a href="#fibap-antecedentes" aria-controls="fibap-antecedentes" role="tab" data-toggle="tab">
+                                                            Antecedentes
+                                                        </a>
+                                                    </li>
+                                                    <li role="presentation">
+                                                        <a href="#fibap-presupuesto" aria-controls="fibap-presupuesto" role="tab" data-toggle="tab">
+                                                            Presupuesto
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            <!-- Tab panes -->
+                                                <div class="tab-content bg-info">
+                                                    <div role="tabpanel" class="tab-pane active" id="fibap-doc-soporte">
+                                                        <br>
+                                                        <div class="row" id="lbl-lista-documentos"></div>
+                                                    </div>
+                                                    <div role="tabpanel" class="tab-pane" id="fibap-antecedentes">
+                                                        <br>
+                                                        <div class="row">
+                                                            <div class="col-sm-6">
+                                                                <span class="label label-default">Resultados Obtenidos</span>
+                                                                <p id="lbl-resultados-obtenidos"></p>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <span class="label label-default">Resultados Esperados</span>
+                                                                <p id="lbl-resultados-esperados"></p>
+                                                            </div>
+                                                            <div class="col-sm-12">
+                                                                <br>
+                                                                <b>Antecedentes Financieros</b>
+                                                                <table class="table table-condensed table-bordered" id="tabla-antecedentes">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Año</th>
+                                                                            <th>Autorizado</th>
+                                                                            <th>Ejercido</th>
+                                                                            <th>%</th>
+                                                                            <th>Fecha de Corte</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody></tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div role="tabpanel" class="tab-pane" id="fibap-presupuesto">
+                                                        <br>
+                                                        <div class="row">
+                                                            <div class="col-sm-6">
+                                                                <span class="label label-default">Periodo de Ejecuación</span>
+                                                                <p id="lbl-periodo-ejecucion"></p>
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <span class="label label-default">Presupuesto Requerido</span>
+                                                                <p id="lbl-presupuesto-requerido"></p>
+                                                            </div>
+                                                            <div class="col-sm-12">
+                                                                <b>Origenes</b>
+                                                                <div class="row" id="lbl-origen-financiamiento">
+                                                                    @foreach ($origenes_financiamiento as $origen)
+                                                                        <div class="col-sm-3">
+                                                                            <div class="form-group">
+                                                                                <span class="label label-default">
+                                                                                    {{$origen->descripcion}}
+                                                                                </span>
+                                                                                <p class="valores-origenes" id="lbl-origen-{{$origen->id}}">0</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    @endforeach
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-sm-12">
+                                                                <br>
+                                                                <b>Distribución del Presupuesto Estatal</b>
+                                                                <table class="table table-condensed table-bordered" id="tabla-distribucion">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Partida</th>
+                                                                            <th>Descripcion</th>
+                                                                            <th>Cantidad</th>
+                                                                            <th>%</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody></tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

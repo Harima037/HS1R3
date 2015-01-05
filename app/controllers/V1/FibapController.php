@@ -3,7 +3,7 @@
 namespace V1;
 
 use SSA\Utilerias\Validador;
-use BaseController, Input, Response, DB, Sentry, Exception;
+use BaseController, Input, Response, DB, Sentry, Exception, DateTime;
 use FIBAP, Proyecto, FibapDatosProyecto, PropuestaFinanciamiento, AntecedenteFinanciero, DistribucionPresupuesto, Ministracion, OrigenFinanciamiento;
 
 class FibapController extends BaseController {
@@ -62,6 +62,7 @@ class FibapController extends BaseController {
 		if(isset($parametros['formatogrid'])){
 
 			$rows = FIBAP::getModel();
+			$rows = $rows->where('claveUnidadResponsable','=',Sentry::getUser()->claveUnidad);
 
 			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 			
@@ -109,6 +110,7 @@ class FibapController extends BaseController {
 								->leftjoin('fibapDatosProyecto AS fp','fp.idFibap','=','fibap.id')
 								->leftjoin('catalogoTiposProyectos AS ftp','ftp.id','=','fp.idTipoProyecto')
 								->whereNull('fibap.idProyecto')
+								->where('claveUnidadResponsable','=',Sentry::getUser()->claveUnidad)
 								->orderBy('fibap.id', 'desc')
 								->get();
 
@@ -224,7 +226,7 @@ class FibapController extends BaseController {
 						}
 						$recurso = new FIBAP;
 						$proyecto = FALSE;
-
+						$recurso->claveUnidadResponsable = Sentry::getUser()->claveUnidad;
 						//$recurso->tipo = $parametros['tipo'];
 						$recurso->organismoPublico = $parametros['organismo-publico'];
 						$recurso->sector = $parametros['sector'];
@@ -279,16 +281,26 @@ class FibapController extends BaseController {
 						});
 						
 					}elseif($parametros['formulario'] == 'form-antecedente'){
+						$fecha_corte = DateTime::createFromFormat('d/m/Y',Input::get('fecha-corte-antecedente'));
+
+						if(!$fecha_corte){
+							$fecha_corte = DateTime::createFromFormat('Y-m-d',Input::get('fecha-corte-antecedente'));
+						}
+
+						if(!$fecha_corte){
+							throw new Exception('{"field":"fecha-corte-antecedente","error":"La fecha de corte no tiene el formato correcto."}');
+						}
+
 						$recurso = new AntecedenteFinanciero;
 						$recurso->anio = $parametros['anio-antecedente'];
 						$recurso->autorizado = $parametros['autorizado-antecedente'];
 						$recurso->ejercido = $parametros['ejercido-antecedente'];
-						$recurso->fechaCorte = $parametros['fecha-corte-antecedente'];
+						$recurso->fechaCorte = $fecha_corte;
 						$recurso->porcentaje = ($recurso->ejercido * 100) / $recurso->autorizado;
 
-						$fibap = FIBAP::with('antecedentesFinancieros')->find($parametros['fibap-id']);
+						$fibap = FIBAP::find($parametros['fibap-id']);
 						$fibap->antecedentesFinancieros()->save($recurso);
-
+						$fibap->load('antecedentesFinancieros');
 						$respuesta['data'] = array('data'=>$recurso,'antecedentes' => $fibap->antecedentesFinancieros);
 					}elseif($parametros['formulario'] == 'form-presupuesto'){ //Nuevo Presupuesto
 						$fibap = FIBAP::with('distribucionPresupuesto')->find($parametros['fibap-id']);
@@ -502,11 +514,21 @@ class FibapController extends BaseController {
 							}
 						});
 					}elseif($parametros['formulario'] == 'form-antecedente'){ //Editar antecedente
+						$fecha_corte = DateTime::createFromFormat('d/m/Y',Input::get('fecha-corte-antecedente'));
+
+						if(!$fecha_corte){
+							$fecha_corte = DateTime::createFromFormat('Y-m-d',Input::get('fecha-corte-antecedente'));
+						}
+
+						if(!$fecha_corte){
+							throw new Exception('{"field":"fecha-corte-antecedente","error":"La fecha de corte no tiene el formato correcto."}');
+						}
+
 						$recurso = AntecedenteFinanciero::find($id);
 						$recurso->anio = $parametros['anio-antecedente'];
 						$recurso->autorizado = $parametros['autorizado-antecedente'];
 						$recurso->ejercido = $parametros['ejercido-antecedente'];
-						$recurso->fechaCorte = $parametros['fecha-corte-antecedente'];
+						$recurso->fechaCorte = $fecha_corte;
 						$recurso->porcentaje = ($recurso->ejercido * 100) / $recurso->autorizado;
 
 						if($recurso->save()){

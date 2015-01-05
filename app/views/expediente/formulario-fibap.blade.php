@@ -490,8 +490,11 @@
                         </div>
                         <div class="col-sm-6">
                             <div class="form-group">
-                                <label for="fecha-corte-antecedente" class="control-label">Fecha de Corte</label>
+                                <label for="fecha-corte-antecedente" class="control-label">Fecha de Corte </label>
                                 <input type="date" class="form-control" id="fecha-corte-antecedente" name="fecha-corte-antecedente"/>
+                                <p class="help-block">
+                                    La fecha de corte debe estar en cualquiera de los siguientes formatos: dd/mm/aaaa o aaaa-mm-dd.
+                                </p>
                             </div>
                         </div>
                     </div>

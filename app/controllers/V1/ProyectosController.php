@@ -150,6 +150,7 @@ class ProyectosController extends BaseController {
 								->leftjoin('fibap','proyectos.id','=','fibap.idProyecto')
 								->orderBy('proyectos.id','desc')
 								->where('proyectos.idClasificacionProyecto','=',DB::raw('2'))
+								->where('unidadResponsable','=',Sentry::getUser()->claveUnidad)
 								->whereNull('fibap.id')
 								->get();
 			$data = array('data'=>$rows);
@@ -191,6 +192,13 @@ class ProyectosController extends BaseController {
 			}elseif($parametros['ver'] == 'proyecto'){
 				$recurso = Proyecto::contenidoCompleto()->find($id);
 				if($recurso){
+					if($recurso->idClasificacionProyecto == 2){
+						$recurso->load('fibap');
+						if($recurso->fibap){
+							$recurso->fibap->load('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuesto');
+							$recurso->fibap->distribucionPresupuesto->load('objetoGasto');
+						}
+					}
 					foreach ($recurso->componentes as $key => $componente) {
 						$recurso->componentes[$key]->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable'));
 						foreach ($recurso->componentes[$key]->actividades as $llave => $actividad) {

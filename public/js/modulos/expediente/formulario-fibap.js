@@ -30,6 +30,7 @@ var form_presupuesto = 'form-presupuesto';
 window.onload = function () { 
 	$('#mensaje-espera').addClass('hidden');
 	$('#panel-principal-formulario').removeClass('hidden');
+	$('[data-toggle="popover"]').popover();
 };
 
 deshabilita_paneles('');
@@ -388,7 +389,6 @@ $('#btn-antecedente-guardar').on('click',function(){
 		fibapResource.post(parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Antecedente almacenado con éxito',type:'OK',timer:3});
-	            response.antecedentes.push(response.data);
 	            llenar_datagrid_antecedentes(response.antecedentes);
 	            cambiar_icono_tabs('#tab-link-antecedentes-fibap','fa-check-square-o');
 	            $(modal_antecedente).modal('hide');
