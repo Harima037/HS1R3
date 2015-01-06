@@ -124,7 +124,7 @@
                 <div class="col-sm-12">
                     <div class="form-group">
                         <label for="programa-presupuestal" class="control-label">Programa Presupuestario</label>
-                        <select class="form-control selectpicker" name="programa-presupuestal" id="programa-presupuestal" data-live-search="true">
+                        <select class="form-control selectpicker" name="programa-presupuestal" id="programa-presupuestal" data-live-search="true" data-size="8">
                             <option value=''>Seleccione un elemento</option>
                             @foreach($programa_presupuestario as $item)
                                 <option value="{{ $item->clave }}">{{$item->clave}}{{' '}}{{ $item->descripcion }}</option>
@@ -135,7 +135,7 @@
                 <div class="col-sm-12">
                     <div class="form-group">
                         <label class="control-label" for="vinculacion-ped">Alineación al PED (Plan Estatal de Desarrollo)</label>
-                        <select class="form-control selectpicker" id="vinculacion-ped" name="vinculacion-ped" data-live-search="true">
+                        <select class="form-control selectpicker" id="vinculacion-ped" name="vinculacion-ped" data-live-search="true" data-size="5">
                             <option value="">Seleciona un objetivo</option>
                             <!-- Inicio de ejes -->
                             @foreach ($objetivos_ped as $eje)
@@ -207,7 +207,7 @@
                     </div>
                     <div id="select-municipio-panel" class="form-group">
                         <label class="control-label" for="municipio">Municipio</label>
-                        {{Form::select('municipio',array('' =>'Selecciona un municipio') + $municipios->lists('nombre','clave'),'',array('class'=>'form-control selectpicker','id'=>'municipio','data-live-search'=>'true','data-container'=>'body'))}}
+                        {{Form::select('municipio',array('' =>'Selecciona un municipio') + $municipios->lists('nombre','clave'),'',array('class'=>'form-control selectpicker','id'=>'municipio','data-live-search'=>'true','data-container'=>'body','data-size'=>'8'))}}
                     </div>
                     <div id="select-region-panel" class="form-group">
                         <label class="control-label" for="region">Región</label>
@@ -217,7 +217,7 @@
                 <div class="col-sm-4">
                     <div class="form-group">
                         <label class="control-label" for="tipo-beneficiario">Tipo de Beneficiario</label>
-                        {{Form::select('tipo-beneficiario',array('' =>'Selecciona un beneficiario') + $tipos_beneficiarios->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'tipo-beneficiario','data-live-search'=>'true','data-container'=>'body'))}}
+                        {{Form::select('tipo-beneficiario',array('' =>'Selecciona un beneficiario') + $tipos_beneficiarios->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'tipo-beneficiario','data-live-search'=>'true','data-container'=>'body','data-size'=>'8'))}}
                     </div>
                 </div>
             </div>
@@ -521,7 +521,7 @@
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <label for="objeto-gasto-presupuesto" class="control-label">Capitulo, Concepto, Partida</label>
-                                <select class="form-control selectpicker" id="objeto-gasto-presupuesto" name="objeto-gasto-presupuesto" data-live-search="true">
+                                <select class="form-control selectpicker" id="objeto-gasto-presupuesto" name="objeto-gasto-presupuesto" data-live-search="true" data-size="8">
                                     <option value="">Seleciona una partida</option>
                                     @foreach ($objetos_gasto as $capitulo)
                                         @if(count($capitulo->hijos))

@@ -52,6 +52,10 @@ body                                        {
 .datagrid table td,
 .datagrid table th                          { display:none; }
 
+.dropdown-menu.inner.selectpicker li a{
+  white-space: normal;
+}
+
 .modal-dialog-fullscreen {
   width: auto;
   height: 100%;

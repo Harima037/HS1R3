@@ -19,7 +19,21 @@ class FibapController extends \BaseController {
 
 	public function formulario()
 	{
-		$datos = array(
+		$datos['sys_sistemas'] = SysGrupoModulo::all();
+		$datos['sys_activo'] = SysGrupoModulo::findByKey('EXP');
+		$datos['sys_mod_activo'] = SysModulo::findByKey('FIBAP');
+		$datos['usuario'] = Sentry::getUser();
+
+		if(!$datos['usuario']->claveUnidad){
+			return Response::view('errors.403', array(
+				'usuario'=>$datos['usuario'],
+				'sys_activo'=>null, 
+				'sys_sistemas'=>$datos['sys_sistemas'],
+				'sys_mod_activo'=>null), 403
+			);
+		}
+
+		$datos += array(
 			'tipos_proyectos'=>TipoProyecto::all(),
 			'programa_presupuestario'=>ProgramaPresupuestario::all(),
 			'objetivos_ped'=>ObjetivoPED::whereNull('idPadre')->where('id','=',25)->with('hijos')->get(),
@@ -46,12 +60,8 @@ class FibapController extends \BaseController {
 			$datos['proyecto_id'] = Input::get('proyecto-id');
 		}
 
-		$datos['sys_sistemas'] = SysGrupoModulo::all();
-		$datos['sys_activo'] = SysGrupoModulo::findByKey('EXP');
-		$datos['sys_mod_activo'] = SysModulo::findByKey('FIBAP');
 		$uri = 'expediente.formulario-fibap';
-		$datos['usuario'] = Sentry::getUser();
-
+		
 		if(Sentry::hasAccess('EXP.FIBAP.C')){
 			return View::make($uri)->with($datos);
 		}else{

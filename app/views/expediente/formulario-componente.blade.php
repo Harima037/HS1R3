@@ -32,7 +32,7 @@
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label for="entregable-{{$identificador}}" class="control-label">Entregable</label>
-                            {{Form::select('entregable-'.$identificador,array(''=>'Seleccione una opción') + $entregables->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'entregable-'.$identificador,'data-live-search'=>'true'))}}
+                            {{Form::select('entregable-'.$identificador,array(''=>'Seleccione una opción') + $entregables->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'entregable-'.$identificador,'data-live-search'=>'true','data-size'=>'8'))}}
                         </div>
                     </div>
                     <div class="col-sm-6">
@@ -124,7 +124,7 @@
                                 <label class="control-label" for="unidad-medida-{{$identificador}}">
                                     Unidad de Medida
                                 </label>
-                                {{Form::select('unidad-medida-'.$identificador,array(''=>'Seleccione una unidad') + $unidades_medida->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'unidad-medida-'.$identificador,'data-live-search'=>'true'))}}
+                                {{Form::select('unidad-medida-'.$identificador,array(''=>'Seleccione una unidad') + $unidades_medida->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'unidad-medida-'.$identificador,'data-live-search'=>'true','data-size'=>'8'))}}
                             </div>
                         </div>
                     </div>
@@ -146,7 +146,7 @@
                         <input type="text" class="form-control" id="anio-base-{{$identificador}}" name="anio-base-{{$identificador}}">
                     </div>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-5">
                     <div clasS="form-group">
                         <label class="control-label" for="formula-{{$identificador}}">
                             Formula
@@ -154,7 +154,7 @@
                         {{Form::select('formula-'.$identificador,array(''=>'Seleccione una formula') + $formulas->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'formula-'.$identificador))}}
                     </div>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-3">
                     <div clasS="form-group">
                         <label class="control-label" for="frecuencia-{{$identificador}}">
                             Frecuencia
@@ -192,28 +192,28 @@
                     <div class="row">
                         <div class="col-sm-3">
                             <div class="form-group">
-                                <label class="control-label"><span class="fa fa-link"></span> Trimestre 1</label>
+                                <label class="control-label"><span class="fa fa-link"></span> Trim 1</label>
                                 <span class="form-control control-espejo" data-espejo-id="#trim1-{{$identificador}}"></span>
                                 <input type="hidden" id="trim1-{{$identificador}}" name="trim1-{{$identificador}}">
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
-                                <label class="control-label"><span class="fa fa-link"></span> Trimestre 2</label>
+                                <label class="control-label"><span class="fa fa-link"></span> Trim 2</label>
                                 <span class="form-control control-espejo" data-espejo-id="#trim2-{{$identificador}}"></span>
                                 <input type="hidden" id="trim2-{{$identificador}}" name="trim2-{{$identificador}}">
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
-                                <label class="control-label"><span class="fa fa-link"></span> Trimestre 3</label>
+                                <label class="control-label"><span class="fa fa-link"></span> Trim 3</label>
                                 <span class="form-control control-espejo" data-espejo-id="#trim3-{{$identificador}}"></span>
                                 <input type="hidden" id="trim3-{{$identificador}}" name="trim3-{{$identificador}}">
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
-                                <label class="control-label"><span class="fa fa-link"></span> Trimestre 4</label>
+                                <label class="control-label"><span class="fa fa-link"></span> Trim 4</label>
                                 <span class="form-control control-espejo" data-espejo-id="#trim4-{{$identificador}}"></span>
                                 <input type="hidden" id="trim4-{{$identificador}}" name="trim4-{{$identificador}}">
                             </div>
@@ -235,7 +235,7 @@
                 </div>
                 <div class="col-sm-2">
                     <div class="form-group">
-                        <label class="control-label"><span class="fa fa-link"></span> Meta Indicador</label>
+                        <label class="control-label"><span class="fa fa-link"></span> Meta</label>
                         <span class="form-control control-espejo" data-espejo-id="#meta-{{$identificador}}"></span>
                         <input type="hidden" id="meta-{{$identificador}}" name="meta-{{$identificador}}">
                     </div>

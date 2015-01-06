@@ -41,7 +41,7 @@
         <div class="col-sm-12">
             <div class="form-group">
                 <label class="control-label" for="vinculacionped">Vinculación al PED (Plan Estatal de Desarrollo)</label>
-                <select class="form-control selectpicker" id="vinculacionped" name="vinculacionped" data-live-search="true">
+                <select class="form-control selectpicker" id="vinculacionped" name="vinculacionped" data-live-search="true" data-size="5">
                     <option value="">Seleciona un objetivo</option>
                     <!-- Inicio de ejes -->
                     @foreach ($objetivos_ped as $eje)
@@ -113,7 +113,7 @@
                             <label class="control-label" for="funciongasto">
                                 Funcion del Gasto (Finalidad,Funcion,Sub Funcion,Sub Sub Funcion)
                             </label>
-                            <select class="form-control selectpicker" id="funciongasto" name="funciongasto" data-live-search="true">
+                            <select class="form-control selectpicker" id="funciongasto" name="funciongasto" data-live-search="true"  data-size="8">
                                 <option value="">Seleciona una función</option>
                                 @foreach ($funciones_gasto as $finalidad)
                                     @if(count($finalidad->hijos))
@@ -156,19 +156,19 @@
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label class="control-label" for="programapresupuestario">Programa Presupuestario</label>
-                            {{Form::select('programapresupuestario',array('' =>'Selecciona un programa presupuestario') + $programas_presupuestarios->lists('descripcion','clave'),0,array('class'=>'form-control selectpicker','id'=>'programapresupuestario','data-live-search'=>'true'))}}
+                            {{Form::select('programapresupuestario',array('' =>'Selecciona un programa presupuestario') + $programas_presupuestarios->lists('descripcion','clave'),0,array('class'=>'form-control selectpicker','id'=>'programapresupuestario','data-live-search'=>'true','data-size'=>'8'))}}
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label class="control-label" for="programaespecial">Programa Especial</label>
-                            {{Form::select('programaespecial',array('' =>'Selecciona un programa especial') + $programas_especiales->lists('descripcion','clave'),'',array('class'=>'form-control selectpicker','id'=>'programaespecial','data-live-search'=>'true'))}}
+                            {{Form::select('programaespecial',array('' =>'Selecciona un programa especial') + $programas_especiales->lists('descripcion','clave'),'',array('class'=>'form-control selectpicker','id'=>'programaespecial','data-live-search'=>'true','data-size'=>'8'))}}
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label class="control-label" for="actividadinstitucional">Actividades Institucionales</label>
-                            {{Form::select('actividadinstitucional',array('' =>'Selecciona una actividad institucional') + $actividades_institucionales->lists('descripcion','clave'),'',array('class'=>'form-control selectpicker','id'=>'actividadinstitucional','data-live-search'=>'true'))}}
+                            {{Form::select('actividadinstitucional',array('' =>'Selecciona una actividad institucional') + $actividades_institucionales->lists('descripcion','clave'),'',array('class'=>'form-control selectpicker','id'=>'actividadinstitucional','data-live-search'=>'true','data-size'=>'8'))}}
                         </div>
                     </div>
                     <div class="col-sm-6">
@@ -199,7 +199,7 @@
             </div>
             <div id="select-municipio-panel" class="form-group">
                 <label class="control-label" for="municipio">Municipio</label>
-                {{Form::select('municipio',array('' =>'Selecciona un municipio') + $municipios->lists('nombre','clave'),'',array('class'=>'form-control selectpicker','id'=>'municipio','data-live-search'=>'true','data-container'=>'body'))}}
+                {{Form::select('municipio',array('' =>'Selecciona un municipio') + $municipios->lists('nombre','clave'),'',array('class'=>'form-control selectpicker','id'=>'municipio','data-live-search'=>'true','data-container'=>'body','data-size'=>'8'))}}
             </div>
             <div id="select-region-panel" class="form-group">
                 <label class="control-label" for="region">Región</label>
@@ -209,7 +209,7 @@
         <div class="col-sm-4">
             <div class="form-group">
                 <label class="control-label" for="tipobeneficiario">Tipo de Beneficiario</label>
-                {{Form::select('tipobeneficiario',array('' =>'Selecciona un beneficiario') + $tipos_beneficiarios->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'tipobeneficiario','data-live-search'=>'true','data-container'=>'body'))}}
+                {{Form::select('tipobeneficiario',array('' =>'Selecciona un beneficiario') + $tipos_beneficiarios->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'tipobeneficiario','data-live-search'=>'true','data-container'=>'body','data-size'=>'8'))}}
             </div>
         </div>
 

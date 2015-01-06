@@ -228,6 +228,9 @@ $('#btn-seleccionar-fibap').on('click',function(){
             for(var i in response.data){
                 lista_radios += '<div><label><input type="radio" onChange="cambiar_tipo_proyecto('+response.data[i].idTipoProyecto+')" name="fibap-id" value="'+response.data[i].id+'" > <span class="fa fa-file"></span> ' + response.data[i].nombreTecnico + ' ['+response.data[i].tipoProyecto+'] <br><small>'+response.data[i].descripcionProyecto+'</small></label></div>';
             }
+            if(lista_radios == ''){
+                lista_radios += '<div><label>No se encontraron Fichas capturadas.</label></div>';
+            }
             $('#lista_fibap').html(lista_radios);
             $('#opciones_fibap').addClass('hidden');
             $('#lista_fibap').removeClass('hidden');

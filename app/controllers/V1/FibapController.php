@@ -288,7 +288,8 @@ class FibapController extends BaseController {
 						}
 
 						if(!$fecha_corte){
-							throw new Exception('{"field":"fecha-corte-antecedente","error":"La fecha de corte no tiene el formato correcto."}');
+							$respuesta['data']['data'] = '{"field":"fecha-corte-antecedente","error":"La fecha de corte no tiene el formato correcto."}';
+							throw new Exception('La fecha no tiene un formato valido');
 						}
 
 						$recurso = new AntecedenteFinanciero;
@@ -521,7 +522,8 @@ class FibapController extends BaseController {
 						}
 
 						if(!$fecha_corte){
-							throw new Exception('{"field":"fecha-corte-antecedente","error":"La fecha de corte no tiene el formato correcto."}');
+							$respuesta['data']['data'] = '{"field":"fecha-corte-antecedente","error":"La fecha de corte no tiene el formato correcto."}';
+							throw new Exception('La fecha no tiene un formato valido');
 						}
 
 						$recurso = AntecedenteFinanciero::find($id);
