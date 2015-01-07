@@ -902,7 +902,7 @@ function sumar_totales(tipo,campo_suma,campo_total,mensaje){
 	}
 }
 
-function ejecutar_formula(identificador){
+function ejecutar_formula(identificador){	
 	var numerador = parseInt($('#numerador-'+identificador).val()) || 0;
 	var denominador = parseInt($('#denominador-'+identificador).val()) || 1;
 	var total;
@@ -935,6 +935,7 @@ function ejecutar_formula(identificador){
 		case '7':
 			//Indicador simple
 			total = numerador;
+			break;
 		default:
 			total = '';
 			break;
@@ -1006,10 +1007,10 @@ function actualizar_eventos_metas(){
 		suma = trim1 + trim2 + trim3 + trim4;
 
 		$('#numerador-'+identificador).val(suma).change();
-
-		if($('#denominador-'+identificador).val()){
+		
+		//if($('#denominador-'+identificador).val()){
 			ejecutar_formula(identificador);
-		}
+		//}
 	});
 }
 

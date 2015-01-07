@@ -348,7 +348,7 @@ function constructor_grupo_acordiones(padre,item,tipo,contenido_extra){ //tipo =
     contenido += '<span class="label label-default">Numerador :</span> <br>'+item.valorNumerador;
     contenido += '</div>';
     contenido += '<div class="col-sm-3 col-xs-6">';
-    contenido += '<span class="label label-default">Denominador :</span> <br>'+item.valorDenominador;
+    contenido += '<span class="label label-default">Denominador :</span> <br>'+ (item.valorDenominador || 0);
     contenido += '</div>';
     contenido += '<div class="col-sm-3 col-xs-6">';
     contenido += '<span class="label label-default">Linea Base :</span> <br>' + (item.lineaBase || 0);

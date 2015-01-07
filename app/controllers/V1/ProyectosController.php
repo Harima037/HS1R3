@@ -56,7 +56,7 @@ class ProyectosController extends BaseController {
 		'formula-componente' 			=> 'required',
 		'frecuencia-componente' 		=> 'required',
 		'interpretacion-componente' 	=> 'required',
-		'meta-componente' 				=> 'required|numeric|min:1',
+		'meta-componente' 				=> 'required|numeric|min:0',
 		'numerador-componente' 			=> 'required|numeric|min:1',
 		'numerador-ind-componente' 		=> 'required',
 		'supuestos-componente' 			=> 'required',
@@ -80,7 +80,7 @@ class ProyectosController extends BaseController {
 		'formula-actividad' 			=> 'required',
 		'frecuencia-actividad' 			=> 'required',
 		'interpretacion-actividad' 		=> 'required',
-		'meta-actividad' 				=> 'required|numeric|min:1',
+		'meta-actividad' 				=> 'required|numeric|min:0',
 		'numerador-actividad' 			=> 'required|numeric|min:1',
 		'numerador-ind-actividad' 		=> 'required',
 		'supuestos-actividad' 			=> 'required',
@@ -287,7 +287,11 @@ class ProyectosController extends BaseController {
 					$actividad->numeroTrim3 			= ($parametros['trim3-actividad'])?$parametros['trim3-actividad']:NULL;
 					$actividad->numeroTrim4 			= ($parametros['trim4-actividad'])?$parametros['trim4-actividad']:NULL;
 					$actividad->valorNumerador 			= $parametros['numerador-actividad'];
-					$actividad->valorDenominador 		= $parametros['denominador-actividad'];
+					if($actividad->idFormula == 7){
+						$actividad->valorDenominador 	= NULL;
+					}else{
+						$actividad->valorDenominador 	= $parametros['denominador-actividad'];
+					}
 					$actividad->lineaBase 				= ($parametros['linea-base-actividad'])?$parametros['linea-base-actividad']:NULL;
 					$actividad->anioBase 				= ($parametros['anio-base-actividad'])?$parametros['anio-base-actividad']:NULL;
 					
@@ -382,7 +386,11 @@ class ProyectosController extends BaseController {
 					$componente->numeroTrim3 			= ($parametros['trim3-componente'])?$parametros['trim3-componente']:NULL;
 					$componente->numeroTrim4 			= ($parametros['trim4-componente'])?$parametros['trim4-componente']:NULL;
 					$componente->valorNumerador 		= $parametros['numerador-componente'];
-					$componente->valorDenominador 		= $parametros['denominador-componente'];
+					if($componente->idFormula == 7){
+						$componente->valorDenominador 	= NULL;
+					}else{
+						$componente->valorDenominador 	= $parametros['denominador-componente'];
+					}
 					$componente->lineaBase 				= ($parametros['linea-base-componente'])?$parametros['linea-base-componente']:NULL;
 					$componente->anioBase 				= ($parametros['anio-base-componente'])?$parametros['anio-base-componente']:NULL;
 
@@ -638,7 +646,11 @@ class ProyectosController extends BaseController {
 					$recurso->numeroTrim3 				= 	($parametros['trim3-actividad'])?$parametros['trim3-actividad']:NULL;
 					$recurso->numeroTrim4 				= 	($parametros['trim4-actividad'])?$parametros['trim4-actividad']:NULL;
 					$recurso->valorNumerador 			= 	$parametros['numerador-actividad'];
-					$recurso->valorDenominador 			= 	$parametros['denominador-actividad'];
+					if($recurso->idFormula == 7){
+						$recurso->valorDenominador 		= 	NULL;
+					}else{
+						$recurso->valorDenominador 		= 	$parametros['denominador-actividad'];
+					}
 					$recurso->lineaBase 				= 	($parametros['linea-base-actividad'])?$parametros['linea-base-actividad']:NULL;
 					$recurso->anioBase 					= 	($parametros['anio-base-actividad'])?$parametros['anio-base-actividad']:NULL;
 					
@@ -730,7 +742,11 @@ class ProyectosController extends BaseController {
 					$recurso->numeroTrim3 				= 	($parametros['trim3-componente'])?$parametros['trim3-componente']:NULL;
 					$recurso->numeroTrim4 				= 	($parametros['trim4-componente'])?$parametros['trim4-componente']:NULL;
 					$recurso->valorNumerador 			= 	$parametros['numerador-componente'];
-					$recurso->valorDenominador 			= 	$parametros['denominador-componente'];
+					if($recurso->idFormula == 7){
+						$recurso->valorDenominador 		= 	NULL;
+					}else{
+						$recurso->valorDenominador 		= 	$parametros['denominador-componente'];
+					}
 					$recurso->lineaBase 				= 	($parametros['linea-base-componente'])?$parametros['linea-base-componente']:NULL;
 					$recurso->anioBase 					= 	($parametros['anio-base-componente'])?$parametros['anio-base-componente']:NULL;
 
