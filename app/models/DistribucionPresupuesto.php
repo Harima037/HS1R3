@@ -10,4 +10,8 @@ class DistribucionPresupuesto extends BaseModel
 	public function objetoGasto(){
         return $this->belongsTo('ObjetoGasto','idObjetoGasto');
     }
+
+    public function scopeAgrupar($query){
+    	$query->select('id','idFibap','idObjetoGasto',DB::raw('sum(cantidad) AS cantidad'))->groupBy('idObjetoGasto');
+    }
 }

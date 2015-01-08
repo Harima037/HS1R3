@@ -361,7 +361,16 @@
                 <div class="col-sm-6">
                     <div class="form-group">
                         <label for="periodo-ejecucion" class="control-label">Periodo de Ejecución</label>
-                        <input type="text" class="form-control" id="periodo-ejecucion" name="periodo-ejecucion"/>
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                Del
+                            </span>
+                            <input type="date" placeholder="aaaa-mm-dd" class="form-control" id="periodo-ejecucion-inicio" name="periodo-ejecucion-inicio">
+                            <span class="input-group-addon">
+                                Al
+                            </span>
+                            <input type="date" placeholder="aaaa-mm-dd" class="form-control" id="periodo-ejecucion-final" name="periodo-ejecucion-final">
+                        </div>
                     </div>
                 </div>
                 <div class="col-sm-1"><label class="control-label">Origen</label></div>
@@ -371,14 +380,14 @@
                             <div class="col-sm-3">
                                 <div class="form-group">
                                     <label for="origen_{{$origen->id}}" class="control-label">{{$origen->descripcion}}</label>
-                                    <input type="text" class="form-control origen-financiamiento" id="origen_{{$origen->id}}" name="origen[{{$origen->id}}]" data-origen-id="{{$origen->id}}" data-captura-id="">
+                                    <input type="number" class="form-control origen-financiamiento" id="origen_{{$origen->id}}" name="origen[{{$origen->id}}]" data-origen-id="{{$origen->id}}" data-captura-id="">
                                 </div>
                             </div>
                         @endforeach
                     </div>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" id="grid_distribucion_presupuesto">
                 <div class="col-sm-12">
                     <div class="panel panel-primary datagrid" id="datagridPresupuesto" data-edit-row="editar_presupuesto">
                         <div class="panel-heading">
@@ -386,7 +395,14 @@
                         </div>
                         <div class="panel-body">
                             <div class="row">
-                                <div class="col-lg-12">
+                                <div class="col-sm-9">
+                                    <label class="control-label">Porcentaje total distribuido del Presupuesto</label>
+                                    <div class="progress">
+                                        <div id="porcentaje_completo" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"> 0%
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
                                     <div class="btn-toolbar pull-right" >
                                         <div class="btn-group" style="margin:5px">
                                             <button type="button" class="btn btn-success" id="btn-agregar-presupuesto">
@@ -473,28 +489,25 @@
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label for="anio-antecedente" class="control-label">Año</label>
-                                <input type="text" class="form-control" id="anio-antecedente" name="anio-antecedente"/>
+                                <input type="number" class="form-control" id="anio-antecedente" name="anio-antecedente"/>
                             </div>
                         </div>
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label for="autorizado-antecedente" class="control-label">Autorizado</label>
-                                <input type="text" class="form-control" id="autorizado-antecedente" name="autorizado-antecedente"/>
+                                <input type="number" class="form-control" id="autorizado-antecedente" name="autorizado-antecedente"/>
                             </div>
                         </div>
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label for="ejercido-antecedente" class="control-label">Ejercido</label>
-                                <input type="text" class="form-control" id="ejercido-antecedente" name="ejercido-antecedente"/>
+                                <input type="number" class="form-control" id="ejercido-antecedente" name="ejercido-antecedente"/>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label for="fecha-corte-antecedente" class="control-label">Fecha de Corte </label>
-                                <input type="date" class="form-control" id="fecha-corte-antecedente" name="fecha-corte-antecedente"/>
-                                <p class="help-block">
-                                    La fecha de corte debe estar en cualquiera de los siguientes formatos: dd/mm/aaaa o aaaa-mm-dd.
-                                </p>
+                                <input type="date" placeholder="aaaa-mm-dd"  class="form-control" id="fecha-corte-antecedente" name="fecha-corte-antecedente"/>
                             </div>
                         </div>
                     </div>

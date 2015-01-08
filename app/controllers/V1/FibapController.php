@@ -4,7 +4,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Exception, DateTime;
-use FIBAP, Proyecto, FibapDatosProyecto, PropuestaFinanciamiento, AntecedenteFinanciero, DistribucionPresupuesto, Ministracion, OrigenFinanciamiento;
+use FIBAP, Proyecto, FibapDatosProyecto, PropuestaFinanciamiento, AntecedenteFinanciero, DistribucionPresupuesto, OrigenFinanciamiento;
 
 class FibapController extends BaseController {
 	private $reglasFibap = array(
@@ -34,11 +34,12 @@ class FibapController extends BaseController {
 	
 	private $reglasFibapPresupuesto = array(
 		'presupuesto-requerido'		=> 'required',
-		'periodo-ejecucion'			=> 'required'
+		'periodo-ejecucion-inicio'	=> 'required',
+		'periodo-ejecucion-final'	=> 'required'
 	);
 
 	private $reglasAntecedentes = array(
-		'anio-antecedente'				=> 'required|integer|min:0',
+		'anio-antecedente'				=> 'required|integer|min:1000',
 		'autorizado-antecedente'		=> 'required',
 		'ejercido-antecedente'			=> 'required',
 		'fecha-corte-antecedente'		=> 'required'
@@ -46,7 +47,7 @@ class FibapController extends BaseController {
 
 	private $reglasPresupuesto = array(
 		'objeto-gasto-presupuesto'	=> 'required',
-		'cantidad-presupuesto'		=> 'required'
+		'cantidad-presupuesto'		=> 'required|numeric|min:1'
 	);
 
 	/**
@@ -148,8 +149,9 @@ class FibapController extends BaseController {
 		$clave_presupuestaria = FALSE;
 		if($parametros){
 			if($parametros['ver'] == 'fibap'){
-				$recurso = FIBAP::with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuesto')->find($id);
-				$recurso->distribucionPresupuesto->load('objetoGasto');
+				$recurso = FIBAP::with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado')->find($id);
+				//$recurso->distribucionPresupuesto->load('objetoGasto');
+				$recurso->distribucionPresupuestoAgrupado->load('objetoGasto');
 				if($recurso->idProyecto){
 					$recurso->load('proyecto');
 					$clave_presupuestaria = $recurso->proyecto->clavePresupuestaria;
@@ -161,7 +163,8 @@ class FibapController extends BaseController {
 			}elseif($parametros['ver'] == 'distribucion-presupuesto'){
 				$recurso = DistribucionPresupuesto::find($id);
 				//Actualziar despues
-				$calendarizado = Ministracion::where('idFibap',$recurso->idFibap)->where('idObjetoGasto',$recurso->idObjetoGasto)->get();
+				//$calendarizado = Ministracion::where('idFibap',$recurso->idFibap)->where('idObjetoGasto',$recurso->idObjetoGasto)->get();
+				$calendarizado = DistribucionPresupuesto::where('idFibap',$recurso->idFibap)->where('idObjetoGasto',$recurso->idObjetoGasto)->get();
 			}elseif($parametros['ver'] == 'datos-proyecto'){
 				$recurso = Proyecto::find($id);
 				$clave_presupuestaria = $recurso->clavePresupuestaria;
@@ -288,6 +291,7 @@ class FibapController extends BaseController {
 						}
 
 						if(!$fecha_corte){
+							$respuesta['data']['code'] = 'U00';
 							$respuesta['data']['data'] = '{"field":"fecha-corte-antecedente","error":"La fecha de corte no tiene el formato correcto."}';
 							throw new Exception('La fecha no tiene un formato valido');
 						}
@@ -306,46 +310,49 @@ class FibapController extends BaseController {
 					}elseif($parametros['formulario'] == 'form-presupuesto'){ //Nuevo Presupuesto
 						$fibap = FIBAP::with('distribucionPresupuesto')->find($parametros['fibap-id']);
 
-						$suma_distribucion = $fibap->distribucionPresupuesto->sum('cantidad');
+						$idObjetoGasto = $parametros['objeto-gasto-presupuesto'];
 
-						if(($suma_distribucion + $parametros['cantidad-presupuesto']) > $fibap->presupuestoRequerido){
-							$respuesta['data']['data'] = 'La distribución del presupuesto sobrepasa el presupuesto requerido.';
+						$capturados = $fibap->distribucionPresupuesto->filter(function($item) use ($idObjetoGasto){
+							if($item->idObjetoGasto == $idObjetoGasto){
+								return true;
+							}
+						});
+
+						if(count($capturados)){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"objeto-gasto-presupuesto","error":"Esta partida ya fue capturada para este proyecto."}';
+							throw new Exception('Se encontraron '.count($capturados).' elementos capturados',1);
+						}
+
+						$mes_incial = date("n",strtotime($fibap->periodoEjecucionInicio));
+						$mes_final = date("n",strtotime($fibap->periodoEjecucionFinal));
+
+						$distribucion = array();
+						$suma_presupuesto = 0;
+						foreach ($parametros['mes'] as $mes => $cantidad) {
+							if($cantidad > 0 && $mes >= $mes_incial && $mes <= $mes_final){
+								$recurso = new DistribucionPresupuesto;
+								$recurso->idObjetoGasto = $idObjetoGasto;
+								$recurso->mes = $mes;
+								$recurso->cantidad = $cantidad;
+								$distribucion[] = $recurso;
+								$suma_presupuesto += $cantidad;
+							}
+						}
+
+						$suma_distribucion = $fibap->distribucionPresupuesto->sum('cantidad');
+						//parametros['cantidad-presupuesto']
+						if(($suma_distribucion + $suma_presupuesto) > $fibap->presupuestoRequerido){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"cantidad-presupuesto","error":"La distribución del presupuesto sobrepasa el presupuesto requerido."}';
 							throw new Exception('La distribución del presupuesto sobrepasa el presupuesto requerido.', 1);
 						}
 
-						$recurso = new DistribucionPresupuesto;
-						$recurso->idObjetoGasto = $parametros['objeto-gasto-presupuesto'];
-						$recurso->cantidad = $parametros['cantidad-presupuesto'];
-						//$recurso->porcentaje = ($recurso->cantidad * 100) / $fibap->presupuestoRequerido;
-
-						$calendarizado = array();
-						$suma_ministracion = 0;
-						foreach ($parametros['mes'] as $mes => $cantidad) {
-							if($cantidad > 0){
-								$ministracion = new Ministracion;
-								$ministracion->idObjetoGasto = $parametros['objeto-gasto-presupuesto'];
-								$ministracion->mes = $mes;
-								$ministracion->cantidad = $cantidad;
-								$calendarizado[] = $ministracion;
-								$suma_ministracion += $cantidad;
-							}
-						}
-
-						if($suma_ministracion != $recurso->cantidad){
-							$respuesta['data']['data']='La distribución de las ministraciones no corresponde con el total a repartir.';
-							throw new Exception('La distribución de las ministraciones no corresponde con el total a repartir.', 1);
-						}
-
-						$respuesta['data'] = DB::transaction(function() use ($fibap,$recurso,$calendarizado){
-							if($fibap->distribucionPresupuesto()->save($recurso)){
-								$fibap->calendarizadoMinistraciones()->saveMany($calendarizado);
-								$fibap->load('distribucionPresupuesto');
-								$fibap->distribucionPresupuesto->load('objetoGasto');
-								return array('data'=>$recurso,'distribucion' => $fibap->distribucionPresupuesto);
-							}else{
-								$respuesta['data']['code'] = 'S01';
-								throw new Exception("Error al intentar guardar los datos de la ficha: Error en el guardado de la ficha", 1);
-							}
+						$respuesta['data'] = DB::transaction(function() use ($fibap,$distribucion){
+							$fibap->distribucionPresupuesto()->saveMany($distribucion);
+							$fibap->load('distribucionPresupuestoAgrupado');
+							$fibap->distribucionPresupuestoAgrupado->load('objetoGasto');
+							return array('data'=>'Presupuesto almacenado','distribucion' => $fibap->distribucionPresupuestoAgrupado);
 						});
 					}
 				}catch(\Exception $ex){
@@ -478,10 +485,43 @@ class FibapController extends BaseController {
 							$respuesta['data']['code'] = 'S01';
 							throw new Exception("Error al intentar guardar los datos de la ficha: Error en el guardado de los datos antecedentes", 1);
 						}
-					}elseif($parametros['formulario'] == 'form-fibap-presupuesto'){
+					}elseif($parametros['formulario'] == 'form-fibap-presupuesto'){ //Agregar/Editar datos del presupuesto
+						$fecha_inicio = DateTime::createFromFormat('d/m/Y',Input::get('periodo-ejecucion-inicio'));
+						$fecha_fin = DateTime::createFromFormat('d/m/Y',Input::get('periodo-ejecucion-final'));
+
+						if(!$fecha_inicio){
+							$fecha_inicio = DateTime::createFromFormat('Y-m-d',Input::get('periodo-ejecucion-inicio'));
+						}
+						if(!$fecha_fin){
+							$fecha_fin = DateTime::createFromFormat('Y-m-d',Input::get('periodo-ejecucion-final'));
+						}
+
+						if(!$fecha_inicio){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"periodo-ejecucion-inicio","error":"La fecha de inicio del periodo de ejecución no tiene el formato correcto."}';
+							throw new Exception('La fecha no tiene un formato valido');
+						}
+						if(!$fecha_fin){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"periodo-ejecucion-final","error":"La fecha final del periodo de ejecución no tiene el formato correcto."}';
+							throw new Exception('La fecha no tiene un formato valido');
+						}
+
+						if($fecha_fin < $fecha_inicio){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"periodo-ejecucion-final","error":"La fecha final del periodo de ejecución no puede ser menor que la de inicio."}';
+							throw new Exception('La fecha final es menor a la de inicio');
+						}
+
 						$recurso = FIBAP::with('propuestasFinanciamiento')->find($id);
-						$recurso->presupuestoRequerido = $parametros['presupuesto-requerido'];
-						$recurso->periodoEjecucion = $parametros['periodo-ejecucion'];
+						$meses_borrar = array();
+						if($recurso->periodoEjecucionInicio != $fecha_inicio || $recurso->periodoEjecucionFinal != $fecha_fin){
+							$meses_borrar['inicio'] = $fecha_inicio->format("n");
+							$meses_borrar['fin'] = $fecha_fin->format("n");
+						}
+
+						$recurso->periodoEjecucionInicio = $fecha_inicio;
+						$recurso->periodoEjecucionFinal = $fecha_fin;
 
 						$origenes = $parametros['origen'];
 						$origenes_ids = array();
@@ -490,12 +530,13 @@ class FibapController extends BaseController {
 							$origenes_ids = $parametros['origen-captura-id'];
 						}
 
-						$respuesta['data'] = DB::transaction(function() use ($origenes, $origenes_ids, $recurso){
+						$respuesta['data'] = DB::transaction(function() use ($origenes, $origenes_ids, $recurso, $meses_borrar){
 							$guardar_origenes = array();
+							$presupuesto_suma = 0;
 							foreach ($origenes as $origen => $valor) {
 								if(isset($origenes_ids[$origen])){
 									$origen_finan = $recurso->propuestasFinanciamiento()->find($origenes_ids[$origen]);
-									$origen_finan->cantidad = $valor;
+									$origen_finan->cantidad = ($valor)? $valor:0;
 									$guardar_origenes[] = $origen_finan;
 								}elseif($valor > 0){
 									$origen_finan = new PropuestaFinanciamiento;
@@ -503,15 +544,27 @@ class FibapController extends BaseController {
 									$origen_finan->cantidad = $valor;
 									$guardar_origenes[] = $origen_finan;
 								}
+								$presupuesto_suma += $valor;
+							}
+
+							$recurso->presupuestoRequerido = $presupuesto_suma;
+
+							if(count($meses_borrar)){
+								$recurso->distribucionPresupuesto()
+										->where('mes','<',$meses_borrar['inicio'])
+										->orWhere('mes','>',$meses_borrar['fin'])
+										->delete();
 							}
 
 							$recurso->propuestasFinanciamiento()->saveMany($guardar_origenes);
 
 							if($recurso->save()){
-								return array('data'=>$recurso);
+								$recurso->load('distribucionPresupuestoAgrupado');
+								$recurso->distribucionPresupuestoAgrupado->load('objetoGasto');
+								return array('data'=>$recurso,'distribucion' => $recurso->distribucionPresupuestoAgrupado);
 							}else{
 								//No se pudieron guardar los datos del proyecto
-								throw new Exception("Error al intentar guardar los datos de la ficha: Error en el guardado de los datos antecedentes", 1);
+								throw new Exception("Error al intentar guardar los datos de la ficha: Error en el guardado de los datos del presupuesto", 1);
 							}
 						});
 					}elseif($parametros['formulario'] == 'form-antecedente'){ //Editar antecedente
@@ -522,6 +575,7 @@ class FibapController extends BaseController {
 						}
 
 						if(!$fecha_corte){
+							$respuesta['data']['code'] = 'U00';
 							$respuesta['data']['data'] = '{"field":"fecha-corte-antecedente","error":"La fecha de corte no tiene el formato correcto."}';
 							throw new Exception('La fecha no tiene un formato valido');
 						}
@@ -542,59 +596,83 @@ class FibapController extends BaseController {
 						}
 					}elseif($parametros['formulario'] == 'form-presupuesto'){ //Editar presupuesto
 						$fibap = FIBAP::with('distribucionPresupuesto')->find($parametros['fibap-id']);
+						$presupuesto_base = DistribucionPresupuesto::find($id);
 
-						$suma_distribucion = $fibap->distribucionPresupuesto->sum('cantidad');
+						if(isset($parametros['meses-capturados'])){
+							$recursos_ids = $parametros['meses-capturados'];
+						}else{
+							$recursos_ids = array();
+						}
 
-						if(($suma_distribucion + $parametros['cantidad-presupuesto']) > $fibap->presupuestoRequerido){
-							$respuesta['data']['data'] = 'La distribución del presupuesto sobrepasa el presupuesto requerido.';
+						$idObjetoGasto = $parametros['objeto-gasto-presupuesto'];
+
+						if($idObjetoGasto != $presupuesto_base->idObjetoGasto){
+							$capturados = $fibap->distribucionPresupuesto->filter(function($item) use ($idObjetoGasto, $recursos_ids){
+								$buscar_id = $item->id;
+								$encontrado = array_first($recursos_ids, function($key,$value)use($buscar_id){ 
+										return $value == $buscar_id;
+									});
+								if($item->idObjetoGasto == $idObjetoGasto && !$encontrado ){
+									return true;
+								}
+							});
+
+							if(count($capturados)){
+								$respuesta['data']['code'] = 'U00';
+								$respuesta['data']['data'] = '{"field":"objeto-gasto-presupuesto","error":"Esta partida ya fue capturada para este proyecto."}';
+								throw new Exception('Se encontraron '.count($capturados).' elementos capturados',1);
+							}
+						}
+						
+						$mes_incial = date("n",strtotime($fibap->periodoEjecucionInicio));
+						$mes_final = date("n",strtotime($fibap->periodoEjecucionFinal));
+
+						$calendarizado = array();
+						$suma_presupuesto = 0;
+						foreach ($parametros['mes'] as $mes => $cantidad) {
+							if(isset($recursos_ids[$mes])){
+								$recurso = DistribucionPresupuesto::find($recursos_ids[$mes]);
+								$recurso->idObjetoGasto = $parametros['objeto-gasto-presupuesto'];
+								$recurso->mes = $mes;
+								if($mes >= $mes_incial && $mes <= $mes_final){
+									$recurso->cantidad = $cantidad;
+								}else{
+									$recurso->cantidad = 0;
+								}
+								$calendarizado[] = $recurso;
+							}elseif($cantidad > 0){
+								if($mes >= $mes_incial && $mes <= $mes_final){
+									$recurso = new DistribucionPresupuesto;
+									$recurso->idObjetoGasto = $parametros['objeto-gasto-presupuesto'];
+									$recurso->mes = $mes;
+									$recurso->cantidad = $cantidad;
+									$calendarizado[] = $recurso;
+								}
+							}
+							$suma_presupuesto += $cantidad;
+						}
+
+						//asdfasdfasdf
+						$sumatoria = $fibap->distribucionPresupuesto->filter(function($item) use ($idObjetoGasto){
+							if($item->idObjetoGasto != $idObjetoGasto){
+								return true;
+							}
+						});
+
+						//$suma_distribucion = $fibap->distribucionPresupuesto->sum('cantidad');
+						$suma_distribucion = $sumatoria->sum('cantidad');
+
+						if(($suma_distribucion + $suma_presupuesto) > $fibap->presupuestoRequerido){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"cantidad-presupuesto","error":"La distribución del presupuesto sobrepasa el presupuesto requerido."}';
 							throw new Exception('La distribución del presupuesto sobrepasa el presupuesto requerido.', 1);
 						}
 
-						$recurso = DistribucionPresupuesto::find($id);
-						$recurso->idObjetoGasto = $parametros['objeto-gasto-presupuesto'];
-						$recurso->cantidad = $parametros['cantidad-presupuesto'];
-
-						if(isset($parametros['meses-capturados'])){
-							$ministraciones_ids = $parametros['meses-capturados'];
-						}else{
-							$ministraciones_ids = array();
-						}
-						$calendarizado = array();
-						$suma_ministracion = 0;
-						
-						foreach ($parametros['mes'] as $mes => $cantidad) {
-							if(isset($ministraciones_ids[$mes])){
-								$ministracion = Ministracion::find($ministraciones_ids[$mes]);
-								$ministracion->idObjetoGasto = $parametros['objeto-gasto-presupuesto'];
-								$ministracion->mes = $mes;
-								$ministracion->cantidad = $cantidad ;
-								$calendarizado[] = $ministracion;
-								$suma_ministracion += $cantidad;
-							}elseif($cantidad > 0){
-								$ministracion = new Ministracion;
-								$ministracion->idObjetoGasto = $parametros['objeto-gasto-presupuesto'];
-								$ministracion->mes = $mes;
-								$ministracion->cantidad = $cantidad;
-								$calendarizado[] = $ministracion;
-								$suma_ministracion += $cantidad;
-							}
-						}
-
-						if($suma_ministracion != $recurso->cantidad){
-							$respuesta['data']['data']='La distribución de las ministraciones no corresponde con el total a repartir.';
-							throw new Exception('La distribución de las ministraciones no corresponde con el total a repartir.', 1);
-						}
-
-						$respuesta['data'] = DB::transaction(function() use ($fibap,$recurso,$calendarizado){
-							if($recurso->save()){
-								$fibap->calendarizadoMinistraciones()->saveMany($calendarizado);
-								$fibap->load('distribucionPresupuesto');
-								$fibap->distribucionPresupuesto->load('objetoGasto');
-								return array('data'=>$recurso,'distribucion' => $fibap->distribucionPresupuesto);
-							}else{
-								$respuesta['data']['code'] = 'S01';
-								throw new Exception("Error al intentar guardar los datos de la ficha: Error en el guardado de la ficha", 1);
-							}
+						$respuesta['data'] = DB::transaction(function() use ($fibap,$calendarizado){
+							$fibap->distribucionPresupuesto()->saveMany($calendarizado);
+							$fibap->load('distribucionPresupuestoAgrupado');
+							$fibap->distribucionPresupuestoAgrupado->load('objetoGasto');
+							return array('data'=>'Presupuesto Editado','distribucion' => $fibap->distribucionPresupuestoAgrupado);
 						});
 					}
 				}catch(\Exception $ex){
@@ -634,17 +712,15 @@ class FibapController extends BaseController {
 			$id_padre = 0;
 			
 			if(isset($parametros['eliminar'])){ //Con parametros, el delete viene de dentro de Editar Fibap
-				if($parametros['eliminar'] == 'presupuesto'){ //Eliminar Presupuesto(s) y Ministracion(es)
+				if($parametros['eliminar'] == 'presupuesto'){ //Eliminar Distribucion del Presupuesto
 					$id_padre = $parametros['id-fibap'];
 					$rows = DB::transaction(function() use ($ids,$id_padre){
 						//Obtenemos los ids de las actividades de los componentes seleccionados
 						$objetos_gastos_ids = DistribucionPresupuesto::wherein('id',$ids)->lists('idObjetoGasto');
-						if(count($objetos_gastos_ids) > 0){
-							//Eliminamos las ministraciones por mes
-							Ministracion::where('idFibap',$id_padre)->whereIn('idObjetoGasto',$objetos_gastos_ids)->delete();
-						}
-						//Eliminamos los componenetes
-						return DistribucionPresupuesto::wherein('id',$ids)->delete();
+						//Eliminamos la distribucion del presupuesto
+						return DistribucionPresupuesto::where('idFibap',$id_padre)
+													  ->whereIn('idObjetoGasto',$objetos_gastos_ids)
+													  ->delete();
 					});
 				}
 				if($parametros['eliminar'] == 'antecedente'){ //Eliminar Antecedente(s)
@@ -669,8 +745,6 @@ class FibapController extends BaseController {
 					DistribucionPresupuesto::whereIn('idFibap',$ids)->delete();
 					//Eliminamos la propuesta de financiamiento
 					PropuestaFinanciamiento::whereIn('idFibap',$ids)->delete();
-					//Eliminamos las ministraciones de la fibap
-					Ministracion::whereIn('idFibap',$ids)->delete();
 					//Eliminamos los FIBAPs
 					return FIBAP::whereIn('id',$ids)->delete();
 				});

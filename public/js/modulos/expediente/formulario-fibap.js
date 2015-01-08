@@ -77,7 +77,13 @@ if($('#id').val()){
 			$('#resultados-esperados').val(response.data.resultadosEsperados);
 			$('#presupuesto-requerido').val(response.data.presupuestoRequerido);
 			$('#presupuesto-requerido').change();
-			$('#periodo-ejecucion').val(response.data.periodoEjecucion);
+			//$('#periodo-ejecucion').val(response.data.periodoEjecucion);
+			$('#periodo-ejecucion-inicio').val(response.data.periodoEjecucionInicio);
+			$('#periodo-ejecucion-final').val(response.data.periodoEjecucionFinal);
+
+			if(response.data.periodoEjecucionInicio){
+				habilitar_meses(response.data.periodoEjecucionInicio,response.data.periodoEjecucionFinal);
+			}
 
 			var datosProyecto = null;
 
@@ -145,7 +151,7 @@ if($('#id').val()){
             cambiar_icono_tabs('#tab-link-datos-fibap','fa-check-square-o');
 
             llenar_datagrid_antecedentes(response.data.antecedentes_financieros);
-            llenar_datagrid_presupuestos(response.data.distribucion_presupuesto);
+            llenar_datagrid_presupuestos(response.data.distribucion_presupuesto_agrupado);
 
             if(response.data.resultadosObtenidos || response.data.resultadosEsperados){
             	cambiar_icono_tabs('#tab-link-antecedentes-fibap','fa-check-square-o');
@@ -309,6 +315,7 @@ $("#datagridPresupuesto .btn-delete-rows").on('click',function(e){
 $('#btn-presupuesto-guardar').on('click',function(){
 	var parametros = $('#'+form_presupuesto).serialize();
 	parametros += '&formulario='+form_presupuesto + '&fibap-id=' + $('#id').val();
+	Validation.cleanFormErrors('#'+form_presupuesto);
 	if($('#id-presupuesto').val()){
 		var meses_capturados = '';
 		$('.presupuesto-mes').each(function(){
@@ -364,6 +371,7 @@ $('#btn-presupuesto-guardar').on('click',function(){
 $('#btn-antecedente-guardar').on('click',function(){
 	var parametros = $('#'+form_antecedente).serialize();
 	parametros += '&formulario='+form_antecedente + '&fibap-id=' + $('#id').val();
+	Validation.cleanFormErrors('#'+form_antecedente);
 	if($('#id-antecedente').val()){
 		fibapResource.put($('#id-antecedente').val(),parametros,{
 	        _success: function(response){
@@ -417,7 +425,7 @@ $('#btn-fibap-guardar').on('click',function(){
 		parametros += '&proyecto-id=' + $('#proyecto-id').val();
 	}
 
-	Validation.cleanFormErrors(formulario);
+	Validation.cleanFormErrors('#'+formulario);
 
 	if($('#id').val()){
 		if(formulario == 'form-fibap-presupuesto'){
@@ -436,6 +444,12 @@ $('#btn-fibap-guardar').on('click',function(){
 	            var tab_panel_id = $('#fibap-grupo-formularios > .tab-pane.active').attr('id');
 	            var tab_link_id = $('.nav-tabs a[href="#'+tab_panel_id+'"]').attr('id');
 	            cambiar_icono_tabs('#'+tab_link_id,'fa-check-square-o');
+	            if(response.distribucion){
+	            	llenar_datagrid_presupuestos(response.distribucion);
+	            }
+	            if(response.data.periodoEjecucionInicio){
+	            	habilitar_meses(response.data.periodoEjecucionInicio,response.data.periodoEjecucionFinal);
+	            }
 	        },
 	        _error: function(response){
 	            try{
@@ -503,7 +517,7 @@ $(modal_presupuesto).on('hide.bs.modal',function(e){
 function llenar_datagrid_presupuestos(datos){
 	var distribucion = [];
 	$('#datagridPresupuesto > table > tbody').empty();
-
+	var total_porcentaje = 0;
 	for(var indx in datos){
 		var presupuesto = {};
 
@@ -515,15 +529,35 @@ function llenar_datagrid_presupuestos(datos){
 		presupuesto.cantidad = datos[indx].cantidad;
 		presupuesto.porcentaje = parseFloat(porcentaje.toFixed(2));
 
+		total_porcentaje += parseFloat(porcentaje.toFixed(2));
+
 		distribucion.push(presupuesto);
 	}
 
 	if(distribucion.length == 0){
+		actualiza_porcentaje(0);
 		$('#datagridPresupuesto > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
 	}else{
+		actualiza_porcentaje(total_porcentaje);
 		presupuestoDatagrid.cargarDatos(distribucion);
 	}
 	
+}
+
+function actualiza_porcentaje(porcentaje){
+	$('#porcentaje_completo').text(porcentaje + ' %');
+	$('#porcentaje_completo').attr('aria-valuenow',porcentaje);
+	$('#porcentaje_completo').attr('style','width:'+porcentaje + '%;');
+	if(porcentaje > 100){
+		$('#porcentaje_completo').addClass('progress-bar-danger');
+		MessageManager.show({
+			data:'El porcentaje se exedio, por favor modifique la propuesta de financiamiento o elimine uno o varios elementos en la distribución del presupuesto para corregir esto.',
+			type:'ERR',
+			container: '#grid_distribucion_presupuesto'
+		});
+	}else{
+		$('#porcentaje_completo').removeClass('progress-bar-danger');
+	}
 }
 
 function llenar_datagrid_antecedentes(datos){
@@ -556,8 +590,28 @@ function habilitar_tabs(){
 	$('#tab-link-antecedentes-fibap').parent().removeClass('disabled');
 	$('#tab-link-presupuesto-fibap').attr('data-toggle','tab');
 	$('#tab-link-presupuesto-fibap').parent().removeClass('disabled');
-	//$('#tab-link-info-proyecto').attr('data-toggle','tab');
-	//$('#tab-link-info-proyecto').parent().removeClass('disabled');
+}
+
+function habilitar_meses(fechaInicio,fechaFinal){
+	if(typeof(fechaInicio) == 'string'){
+		var inicio = fechaInicio;
+		var fin = fechaFinal;
+	}else{
+		var inicio = fechaInicio.date;
+		var fin = fechaFinal.date;
+	}
+	
+	var primer_mes = parseInt(inicio.substring(5,7))
+	var ultimo_mes = parseInt(fin.substring(5,7))
+	$('.presupuesto-mes').each(function(){
+		if($(this).attr('data-presupuesto-mes') < primer_mes){
+			$(this).prop('disabled',true);
+		}else if($(this).attr('data-presupuesto-mes') > ultimo_mes){
+			$(this).prop('disabled',true);
+		}else{
+			$(this).prop('disabled',false);
+		}
+	});
 }
 
 function bloquear_controles(){

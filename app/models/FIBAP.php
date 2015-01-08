@@ -39,7 +39,7 @@ class FIBAP extends BaseModel
         return $this->hasMany('DistribucionPresupuesto','idFibap');
     }
 
-    public function calendarizadoMinistraciones(){
-        return $this->hasMany('Ministracion','idFibap');
+    public function distribucionPresupuestoAgrupado(){
+        return $this->hasMany('DistribucionPresupuesto','idFibap')->agrupar();
     }
 }
