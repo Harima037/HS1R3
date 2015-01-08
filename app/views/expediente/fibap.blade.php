@@ -275,11 +275,11 @@
                                     <div role="tabpanel" class="tab-pane" id="presupuesto-fibap">
                                         <br>
                                         <div class="row">
-                                            <div class="col-sm-6">
+                                            <div class="col-sm-7">
                                                 <span class="label label-default">Periodo de Ejecuación</span>
                                                 <p id="lbl-periodo-ejecucion"></p>
                                             </div>
-                                            <div class="col-sm-6">
+                                            <div class="col-sm-5">
                                                 <span class="label label-default">Presupuesto Requerido</span>
                                                 <p id="lbl-presupuesto-requerido"></p>
                                             </div>

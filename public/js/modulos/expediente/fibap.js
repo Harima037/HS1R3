@@ -49,7 +49,11 @@ function editar(e){
             $('#lbl-grupo-trabajo').text(fibap.grupoTrabajo);
             $('#lbl-resultados-obtenidos').text(fibap.resultadosObtenidos || '');
             $('#lbl-resultados-esperados').text(fibap.resultadosEsperados || '');
-            $('#lbl-periodo-ejecucion').text(fibap.periodoEjecucion || '');
+            var periodo_ejecucion = '';
+            if(fibap.periodoEjecucionInicio){
+                periodo_ejecucion = 'Del ' + fibap.periodoEjecucionInicio + ' al ' + fibap.periodoEjecucionFinal;
+            }
+            $('#lbl-periodo-ejecucion').text(periodo_ejecucion);
             var presupuesto_requerido = fibap.presupuestoRequerido || 0;
             $('#lbl-presupuesto-requerido').text(presupuesto_requerido.format());
 
@@ -67,8 +71,8 @@ function editar(e){
             $('#tabla-antecedentes > tbody').html(html_antecedentes);
 
             var html_distribucion = '';
-            for(var i in fibap.distribucion_presupuesto){
-                var presupuesto = fibap.distribucion_presupuesto[i];
+            for(var i in fibap.distribucion_presupuesto_agrupado){
+                var presupuesto = fibap.distribucion_presupuesto_agrupado[i];
                 var porcentaje = (presupuesto.cantidad * 100) / presupuesto_requerido;
                 html_distribucion += '<tr>';
                 html_distribucion += '<td>' + presupuesto.objeto_gasto.clave + '</td>';
