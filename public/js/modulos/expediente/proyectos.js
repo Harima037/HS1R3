@@ -98,12 +98,12 @@ function editar (e){
                 $('#tab-link-fibap').parent().removeClass('hidden');
                 if(response.data.fibap){
                     $('#datos-capturados-fibap').show();
-                    $('#datos-alerta-fibap').empty();
+                    $('#datos-alerta-fibap').hide();
                     llenar_datos_fibap(response.data.fibap);
                 }else{
                     $('#datos-capturados-fibap').hide();
-                    $('#datos-alerta-fibap').empty();
-                    $('#datos-alerta-fibap').append('<div class="alert alert-info">No ha sido asignada ningun FIBAP a este proyecto.</div>');
+                    $('#datos-alerta-fibap').show();
+                    $('#proyecto-id').val(response.data.id);
                 }
             }else{
                 $('#tab-link-fibap').parent().addClass('hidden');
@@ -132,7 +132,11 @@ function llenar_datos_fibap(fibap){
     $('#lbl-grupo-trabajo').text(fibap.grupoTrabajo);
     $('#lbl-resultados-obtenidos').text(fibap.resultadosObtenidos || '');
     $('#lbl-resultados-esperados').text(fibap.resultadosEsperados || '');
-    $('#lbl-periodo-ejecucion').text(fibap.periodoEjecucion || '');
+    var periodo_ejecucion = '';
+    if(fibap.periodoEjecucionInicio){
+        periodo_ejecucion = 'Del ' + fibap.periodoEjecucionInicio + ' al ' + fibap.periodoEjecucionFinal;
+    }
+    $('#lbl-periodo-ejecucion').text(periodo_ejecucion);
 
     var html_antecedentes = '';
     for(var i in fibap.antecedentes_financieros){
@@ -212,13 +216,19 @@ $('.btn-datagrid-agregar').on('click', function () {
     $('#datos-proyecto').hide();
 });
 
-$('#btn-capturar-fibap').on('click',function(){
+$('#btn-capturar-nuevo-fibap').on('click',function(){
     window.location.href = "formulario-fibap";
 });
 
 $(modal_name+' .btn-guardar').on('click', function (e) {
     e.preventDefault();
     submitModulo();
+});
+
+$('#btn-capturar-fibap').on('click',function(){
+    $('#nuevo-fibap-proyecto').attr('action',SERVER_HOST+'/expediente/formulario-fibap');
+    $('#nuevo-fibap-proyecto').attr('method','POST');
+    $('#nuevo-fibap-proyecto').submit();
 });
 
 $('#btn-seleccionar-fibap').on('click',function(){

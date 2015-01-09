@@ -84,12 +84,14 @@ class FibapController extends BaseController {
 			$rows = $rows->select('fibap.id',DB::raw('if(p.id,concat(p.unidadResponsable,p.finalidad,p.funcion,p.subfuncion,p.subsubfuncion,p.programaSectorial,p.programaPresupuestario,p.programaEspecial,p.actividadInstitucional,p.proyectoEstrategico,LPAD(p.numeroProyectoEstrategico,3,"0")),"No asignada") as Proyecto'),
 								DB::raw('if(p.id,p.nombreTecnico,fp.nombreTecnico) AS nombreTecnico'),
 								DB::raw('if(p.idTipoProyecto,tp.descripcion,ftp.descripcion) AS tipoProyecto'),
-								'descripcionProyecto','sentryUsers.username','fibap.modificadoAl')
+								'descripcionProyecto','catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username',
+								'fibap.modificadoAl')
 								->leftjoin('sentryUsers','sentryUsers.id','=','fibap.creadoPor')
 								->leftjoin('proyectos AS p','p.id','=','fibap.idProyecto')
 								->leftjoin('fibapDatosProyecto AS fp','fp.idFibap','=','fibap.id')
 								->leftjoin('catalogoTiposProyectos AS tp','tp.id','=','p.idTipoProyecto')
 								->leftjoin('catalogoTiposProyectos AS ftp','ftp.id','=','fp.idTipoProyecto')
+								->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','fibap.idEstatusProyecto')
 								->orderBy('fibap.id', 'desc')
 								->skip(($parametros['pagina']-1)*10)->take(10)
 								->get();
@@ -228,16 +230,17 @@ class FibapController extends BaseController {
 						}
 						$recurso = new FIBAP;
 						$proyecto = FALSE;
+
 						$recurso->claveUnidadResponsable = Sentry::getUser()->claveUnidad;
-						//$recurso->tipo = $parametros['tipo'];
-						$recurso->organismoPublico = $parametros['organismo-publico'];
-						$recurso->sector = $parametros['sector'];
-						$recurso->subcomite = $parametros['subcomite'];
-						$recurso->grupoTrabajo = $parametros['grupo-trabajo'];
-						$recurso->justificacionProyecto = $parametros['justificacion-proyecto'];
-						$recurso->descripcionProyecto = $parametros['descripcion-proyecto'];
-						$recurso->alineacionEspecifica = $parametros['alineacion-especifica'];
-						$recurso->alineacionGeneral = $parametros['alineacion-general'];
+						$recurso->organismoPublico 		 = $parametros['organismo-publico'];
+						$recurso->sector 				 = $parametros['sector'];
+						$recurso->subcomite 			 = $parametros['subcomite'];
+						$recurso->grupoTrabajo 			 = $parametros['grupo-trabajo'];
+						$recurso->justificacionProyecto  = $parametros['justificacion-proyecto'];
+						$recurso->descripcionProyecto 	 = $parametros['descripcion-proyecto'];
+						$recurso->alineacionEspecifica 	 = $parametros['alineacion-especifica'];
+						$recurso->alineacionGeneral 	 = $parametros['alineacion-general'];
+						$recurso->idEstatusProyecto 	 = 1;
 
 						if(isset($parametros['proyecto-id'])){
 							$recurso->idProyecto = $parametros['proyecto-id'];

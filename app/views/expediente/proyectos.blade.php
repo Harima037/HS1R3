@@ -128,7 +128,7 @@
                                         <br>
                                         Si desea utilizar una nueva FIBAP debe hacer click en el siguiente enlace para iniciar la captura.
                                         <br>
-                                        <button type="button" id="btn-capturar-fibap" class="btn btn-link btn-block">
+                                        <button type="button" id="btn-capturar-nuevo-fibap" class="btn btn-link btn-block">
                                             <span class="fa fa-file"></span> Ir al Formulario de Captura de la FIBAP
                                         </button>
                                         <br>
@@ -394,7 +394,15 @@
                                 <div role="tabpanel" class="tab-pane" id="tab-componente"></div>
                                 <div role="tabpanel" class="tab-pane" id="tab-fibap">
                                     <br>
-                                    <div id="datos-alerta-fibap"></div>
+                                    <div id="datos-alerta-fibap">
+                                        <div class="alert alert-info">No ha sido asignada ningun FIBAP a este proyecto.</div>
+                                        <form id="nuevo-fibap-proyecto">
+                                            <button type="button" class="btn btn-block btn-primary" id="btn-capturar-fibap">
+                                                Capturar FIBAP
+                                            </button>
+                                            <input type="hidden" name="proyecto-id" id="proyecto-id">
+                                        </form>
+                                    </div>
                                     <div class="row" id="datos-capturados-fibap">
                                         <div class="col-sm-6">
                                             <span class="label label-default">Justificación del Proyecto</span>

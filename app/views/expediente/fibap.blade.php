@@ -60,6 +60,7 @@
                         <th>Proyecto</th>
                         <th>Tipo</th>
                         <th>Descripción</th>
+                        <th>Estatus</th>
                         <th style="text-align:center; width:90px;"><span class="glyphicon glyphicon-user"></span></th>
                         <th style="text-align:center; width:120px;"><span class="glyphicon glyphicon-calendar"></span></th>
                     </tr>
