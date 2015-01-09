@@ -306,7 +306,13 @@ class FibapController extends BaseController {
 						$fibap->antecedentesFinancieros()->save($recurso);
 						$fibap->load('antecedentesFinancieros');
 						$respuesta['data'] = array('data'=>$recurso,'antecedentes' => $fibap->antecedentesFinancieros);
+
 					}elseif($parametros['formulario'] == 'form-presupuesto'){ //Nuevo Presupuesto
+
+						/***
+								Nuevo Presupuesto
+						****/
+
 						$fibap = FIBAP::with('distribucionPresupuesto')->find($parametros['fibap-id']);
 
 						$idObjetoGasto = $parametros['objeto-gasto-presupuesto'];
@@ -594,6 +600,11 @@ class FibapController extends BaseController {
 							throw new Exception("Error al intentar guardar los datos del antecedente", 1);
 						}
 					}elseif($parametros['formulario'] == 'form-presupuesto'){ //Editar presupuesto
+
+						/****
+							Editar presupuesto
+						****/
+
 						$fibap = FIBAP::with('distribucionPresupuesto')->find($parametros['fibap-id']);
 						$presupuesto_base = DistribucionPresupuesto::find($id);
 
@@ -651,9 +662,9 @@ class FibapController extends BaseController {
 							$suma_presupuesto += $cantidad;
 						}
 
-						//asdfasdfasdf
-						$sumatoria = $fibap->distribucionPresupuesto->filter(function($item) use ($idObjetoGasto){
-							if($item->idObjetoGasto != $idObjetoGasto){
+						//
+						$sumatoria = $fibap->distribucionPresupuesto->filter(function($item) use ($presupuesto_base){
+							if($item->idObjetoGasto != $presupuesto_base->idObjetoGasto){
 								return true;
 							}
 						});

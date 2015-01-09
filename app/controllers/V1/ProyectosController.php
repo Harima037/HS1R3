@@ -195,16 +195,20 @@ class ProyectosController extends BaseController {
 					if($recurso->idClasificacionProyecto == 2){
 						$recurso->load('fibap');
 						if($recurso->fibap){
-							$recurso->fibap->load('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuesto');
-							$recurso->fibap->distribucionPresupuesto->load('objetoGasto');
+							$recurso->fibap->load('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado');
+							$recurso->fibap->distribucionPresupuestoAgrupado->load('objetoGasto');
 						}
 					}
+					$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable'));
 					foreach ($recurso->componentes as $key => $componente) {
+						$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
+					}
+					/*foreach ($recurso->componentes as $key => $componente) {
 						$recurso->componentes[$key]->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable'));
 						foreach ($recurso->componentes[$key]->actividades as $llave => $actividad) {
 							$recurso->componentes[$key]->actividades[$llave]->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
 						}
-					}
+					}*/
 				}
 			}elseif($parametros['ver'] == 'datos-fibap'){
 				$recurso = FibapDatosProyecto::where('idFibap','=',$id)->get();

@@ -143,7 +143,7 @@
                     <div id="datos-proyecto">
                         <div role="tabpanel">
                         <!-- Nav tabs -->
-                            <ul class="nav nav-tabs" role="tablist">
+                            <ul id="proyecto-tab-panel-list" class="nav nav-tabs" role="tablist">
                                 <li role="presentation" class="active">
                                     <a href="#tab-proyecto" aria-controls="tab-proyecto" role="tab" data-toggle="tab">
                                         <span class="fa fa-file"></span> Proyecto

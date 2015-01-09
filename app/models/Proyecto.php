@@ -12,16 +12,16 @@ class Proyecto extends BaseModel
 
         static::creating(function($item){
         	$count = Proyecto::where('unidadResponsable',$item->unidadResponsable)
-        						->where('finalidad',$item->finalidad)
-        						->where('funcion',$item->funcion)
-        						->where('subFuncion',$item->subFuncion)
-        						->where('subSubFuncion',$item->subSubFuncion)
-        						->where('programaSectorial',$item->programaSectorial)
-        						->where('programaPresupuestario',$item->programaPresupuestario)
-        						->where('programaEspecial',$item->programaEspecial)
-        						->where('actividadInstitucional',$item->actividadInstitucional)
-        						->where('proyectoEstrategico',$item->proyectoEstrategico)
-        						->max('numeroProyectoEstrategico');
+        					 ->where('finalidad',$item->finalidad)
+        					 ->where('funcion',$item->funcion)
+        					 ->where('subFuncion',$item->subFuncion)
+        					 ->where('subSubFuncion',$item->subSubFuncion)
+        					 ->where('programaSectorial',$item->programaSectorial)
+        					 ->where('programaPresupuestario',$item->programaPresupuestario)
+        					 ->where('programaEspecial',$item->programaEspecial)
+        					 ->where('actividadInstitucional',$item->actividadInstitucional)
+        					 ->where('proyectoEstrategico',$item->proyectoEstrategico)
+        					 ->max('numeroProyectoEstrategico');
             $item->numeroProyectoEstrategico = ($count + 1);
         });
     }

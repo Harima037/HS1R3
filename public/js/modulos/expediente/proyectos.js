@@ -114,6 +114,8 @@ function editar (e){
             $('#datos-formulario').hide();
             $('#datos-proyecto').show();
 
+            $('#proyecto-tab-panel-list a:first').tab('show');
+
             $(modal_name).modal('show');
         }
     });
@@ -148,8 +150,8 @@ function llenar_datos_fibap(fibap){
     var presupuesto_requerido = fibap.presupuestoRequerido || 0;
 
     var html_distribucion = '';
-    for(var i in fibap.distribucion_presupuesto){
-        var presupuesto = fibap.distribucion_presupuesto[i];
+    for(var i in fibap.distribucion_presupuesto_agrupado){
+        var presupuesto = fibap.distribucion_presupuesto_agrupado[i];
         var porcentaje = (presupuesto.cantidad * 100) / presupuesto_requerido;
         html_distribucion += '<tr>';
         html_distribucion += '<td>' + presupuesto.objeto_gasto.clave + '</td>';
