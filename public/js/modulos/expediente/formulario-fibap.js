@@ -16,16 +16,21 @@ var fibapResource = new RESTfulRequests(SERVER_HOST+'/v1/fibap');
 //var componenteDatagrid = new Datagrid("#datagridComponentes",proyectoResource);
 var presupuestoDatagrid = new Datagrid("#datagridPresupuesto",fibapResource);
 var antecedenteDatagrid = new Datagrid("#datagridAntecedentes",fibapResource);
+var accionesDatagrid = new Datagrid('#datagridAcciones',fibapResource);
+
 antecedenteDatagrid.init();
 presupuestoDatagrid.init();
+accionesDatagrid;
 
 //Ventanas modales
 var modal_antecedente = '#modal-antecedente';
 var modal_presupuesto = '#modal-presupuesto';
+var modal_accion  = '#modal-accion';
 
 //Formularios de las ventanas modales
 var form_antecedente = 'form-antecedente';
 var form_presupuesto = 'form-presupuesto';
+var form_accion = 'form-accion';
 
 window.onload = function () { 
 	$('#mensaje-espera').addClass('hidden');
@@ -38,6 +43,9 @@ deshabilita_paneles('');
 //*********************************   Funcionalidad al cargar el formulario   *********************************
 $('.origen-financiamiento').on('keyup',function(){
 	sumar_valores('.origen-financiamiento','#presupuesto-requerido');
+});
+$('.accion-origen-financiamiento').on('keyup',function(){
+	sumar_valores('.accion-origen-financiamiento','#accion-presupuesto-requerido');
 });
 $('.presupuesto-mes').on('keyup',function(){
 	sumar_valores('.presupuesto-mes','#cantidad-presupuesto');
@@ -81,6 +89,7 @@ if($('#id').val()){
 			$('#periodo-ejecucion-inicio').val(response.data.periodoEjecucionInicio);
 			$('#periodo-ejecucion-final').val(response.data.periodoEjecucionFinal);
 
+			actualizar_tabla_meses(response.data.jurisdicciones);
 			if(response.data.periodoEjecucionInicio){
 				habilitar_meses(response.data.periodoEjecucionInicio,response.data.periodoEjecucionFinal);
 			}
@@ -151,6 +160,7 @@ if($('#id').val()){
             cambiar_icono_tabs('#tab-link-datos-fibap','fa-check-square-o');
 
             llenar_datagrid_antecedentes(response.data.antecedentes_financieros);
+            llenar_datagrid_acciones(response.data.acciones);
             llenar_datagrid_presupuestos(response.data.distribucion_presupuesto_agrupado);
 
             if(response.data.resultadosObtenidos || response.data.resultadosEsperados){
@@ -447,6 +457,7 @@ $('#btn-fibap-guardar').on('click',function(){
 	            if(response.distribucion){
 	            	llenar_datagrid_presupuestos(response.distribucion);
 	            }
+	            actualizar_tabla_meses(response.data.jurisdicciones);
 	            if(response.data.periodoEjecucionInicio){
 	            	habilitar_meses(response.data.periodoEjecucionInicio,response.data.periodoEjecucionFinal);
 	            }
@@ -470,6 +481,7 @@ $('#btn-fibap-guardar').on('click',function(){
 	        _success: function(response){
 	            MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:3});
 	            habilitar_tabs();
+	            actualizar_tabla_meses(response.data.jurisdicciones);
 	            cambiar_icono_tabs('#tab-link-datos-fibap','fa-check-square-o');
 	            $('#id').val(response.data.id);
 	        },
@@ -505,6 +517,11 @@ $('#btn-agregar-presupuesto').on('click',function(){
 	$(modal_presupuesto).modal('show');
 });
 
+$('#btn-agregar-accion').on('click',function(){
+	$(modal_accion).find(".modal-title").html("Nueva Acción");
+	$(modal_accion).modal('show');
+});
+
 $(modal_antecedente).on('hide.bs.modal',function(e){
 	reset_modal_form(form_antecedente);
 });
@@ -513,7 +530,20 @@ $(modal_presupuesto).on('hide.bs.modal',function(e){
 	reset_modal_form(form_presupuesto);
 });
 
+$(modal_accion).on('hide.bs.modal',function(e){
+	reset_modal_form(form_accion);
+});
+
 //********************************************   Funciones   ********************************************
+function llenar_datagrid_acciones(datos){
+	$('#datagridAcciones > table > tbody').empty();
+
+	if(datos.length == 0){
+		$('#datagridAcciones > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
+	}else{
+		accionesDatagrid.cargarDatos(distribucion);
+	}
+}
 function llenar_datagrid_presupuestos(datos){
 	var distribucion = [];
 	$('#datagridPresupuesto > table > tbody').empty();
@@ -614,6 +644,29 @@ function habilitar_meses(fechaInicio,fechaFinal){
 	});
 }
 
+function actualizar_tabla_meses(jurisdicciones){
+	var tabla_id = '#tabla-distribucion-mes';
+	var meses = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+
+	var html = '';
+	var indx,idx;
+	var llaves = Object.keys(jurisdicciones).sort(); //Se ordenan las llaves
+	for(var index in llaves){
+		indx = llaves[index];
+		html += '<tr>';
+		html += '<th>'+jurisdicciones[indx]+'</th>';
+		for(idx in meses){
+			id_mes = parseInt(idx) + 1;
+			html += '<td><input id="mes-distribucion-'+indx+'-'+id_mes+'" name="mes-distribucion['+indx+']['+id_mes+']" type="number" class="form-control input-sm presupuesto-mes" data-presupuesto-mes="'+id_mes+'" data-presupuesto-jurisdiccion="'+indx+'" data-presupuesto-id=""></td>';
+		}
+		html += '</tr>';
+	}
+
+	$(tabla_id + ' tbody').empty();
+	$(tabla_id + ' tbody').html(html);
+	//actualizar_eventos_metas();
+}
+
 function bloquear_controles(){
 	//$('.control-bloqueado').prop('disabled',true);
 	$('.control-bloqueado').each(function(){
@@ -665,6 +718,11 @@ function reset_modal_form(formulario){
 		});
     	//$('#id-presupuesto').val('');
     	$(modal_presupuesto + ' .alert').remove();
+    }
+    if(formulario == form_accion){
+    	$('#' + formulario + ' .selectpicker').change();
+    	$('#' + formulario + ' input[type="hidden"]').val('');
+    	$('#' + formulario + ' input[type="hidden"]').change();
     }
 }
 

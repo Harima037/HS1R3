@@ -11,6 +11,10 @@ class FIBAP extends BaseModel
         return $this->belongsTo('Proyecto','idProyecto');
     }
 
+    public function acciones(){
+        return $this->hasMany('Accion','idFibap');
+    }
+
     public function proyectoCompleto(){
         return $this->belongsTo('Proyecto','idProyecto')->contenidoCompleto();
     }

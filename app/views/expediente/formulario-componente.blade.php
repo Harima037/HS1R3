@@ -29,19 +29,19 @@
             <br>
             @if (isset($lista_actividades) && $clasificacion_proyecto == 2)
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <div class="form-group">
                             <label for="entregable-{{$identificador}}" class="control-label">Entregable</label>
                             {{Form::select('entregable-'.$identificador,array(''=>'Seleccione una opción') + $entregables->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'entregable-'.$identificador,'data-live-search'=>'true','data-size'=>'8'))}}
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <div class="form-group">
                             <label for="tipo-obj-{{$identificador}}" class="control-label">Tipo</label>
                             <input type="text" class="form-control" id="tipo-obj-{{$identificador}}" name="tipo-obj-{{$identificador}}">
                         </div>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <div class="form-group">
                             <label for="accion-{{$identificador}}" class="control-label">Acción</label>
                             <input type="text" class="form-control" id="accion-{{$identificador}}" name="accion-{{$identificador}}">

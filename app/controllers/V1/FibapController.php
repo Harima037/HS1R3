@@ -5,6 +5,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Exception, DateTime;
 use FIBAP, Proyecto, FibapDatosProyecto, PropuestaFinanciamiento, AntecedenteFinanciero, DistribucionPresupuesto, OrigenFinanciamiento;
+use Jurisdiccion, Municipio, Region;
 
 class FibapController extends BaseController {
 	private $reglasFibap = array(
@@ -149,15 +150,26 @@ class FibapController extends BaseController {
 		$parametros = Input::all();
 		$calendarizado = FALSE;
 		$clave_presupuestaria = FALSE;
+		$jurisdicciones = FALSE;
 		if($parametros){
 			if($parametros['ver'] == 'fibap'){
-				$recurso = FIBAP::with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado')->find($id);
+				$recurso = FIBAP::with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado','acciones')->find($id);
 				$recurso->distribucionPresupuestoAgrupado->load('objetoGasto');
+				$proyecto = NULL;
 				if($recurso->idProyecto){
 					$recurso->load('proyecto');
 					$clave_presupuestaria = $recurso->proyecto->clavePresupuestaria;
+					$proyecto = $recurso->proyecto;
 				}else{
 					$recurso->load('datosProyecto');
+					$proyecto = $recurso->datosProyecto;
+				}
+				if($proyecto->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
+					$jurisdicciones = Jurisdiccion::all();
+				}elseif($proyecto->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
+					$jurisdicciones = Municipio::obtenerJurisdicciones($proyecto->claveMunicipio)->get();
+				}elseif($proyecto->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
+					$jurisdicciones = Region::obtenerJurisdicciones($proyecto->claveRegion)->get();
 				}
 			}elseif($parametros['ver'] == 'antecedente'){
 				$recurso = AntecedenteFinanciero::find($id);
@@ -187,6 +199,9 @@ class FibapController extends BaseController {
 			$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
 		}else{
 			$recurso = $recurso->toArray();
+			if($jurisdicciones){
+				$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
+			}
 			$data = array("data"=>$recurso);
 			if($calendarizado){
 				$data['calendarizado'] = $calendarizado->toArray();

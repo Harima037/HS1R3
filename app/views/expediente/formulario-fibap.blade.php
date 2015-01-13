@@ -47,6 +47,11 @@
                         <span class="fa fa-square-o"></span> Antecedentes
                     </a>
                 </li>
+                <li role="presentation">
+                    <a href="#antes-presupuesto-fibap" aria-controls="antes-presupuesto-fibap" role="tab" data-toggle="tab">
+                        <span class="fa fa-square-o"></span> antes - Presupuesto
+                    </a>
+                </li>
                 <li role="presentation" class="disabled">
                     <a href="#presupuesto-fibap" aria-controls="presupuesto-fibap" role="tab" id="tab-link-presupuesto-fibap">
                         <span class="fa fa-square-o"></span> Presupuesto
@@ -316,7 +321,7 @@
                             <tr>
                                 <th><input type="checkbox" class="check-select-all-rows"></th>
                                 <th>Año</th>
-                                <th>Autorizados</th>
+                                <th>Autorizado</th>
                                 <th>Ejercido</th>
                                 <th>%</th>
                                 <th>Fecha de Corte</th>
@@ -344,9 +349,97 @@
         </div><!-- tab-pane -->
         <!--  End Tab Panel: Antecedentes Financieros  -->
 
-        <!--  Begin Tab Panel: Presupuesto y Propuesta  -->
         <div role="tabpanel" class="tab-pane" id="presupuesto-fibap" data-form-id="form-fibap-presupuesto">
         <form id="form-fibap-presupuesto">
+        </form>
+            <h4>Presupuesto Requerido y Propuesta de Financiamiento</h4>
+            <div class="row">
+                <div class="col-sm-12"><label class="control-label">Origen del Presupuesto</label></div>
+                <div class="col-sm-12">
+                    <div class="row">
+                        @foreach ($origenes_financiamiento as $origen)
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        {{$origen->descripcion}} :
+                                    </label>
+                                    <span class="text-muted" data-total-origen-id="{{$origen->id}}">$ 0.00</span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label">
+                            Total Requerido :
+                        </label>
+                        <span class="text-muted" id="total-presupuesto-requerido">$ 0.00</span>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="periodo-ejecucion" class="control-label">
+                            Periodo de Ejecución
+                        </label>
+                        <label class="control-label">
+                            del 
+                        </label>
+                        <span class="text-muted" id="periodo-ejecucion-inicio-global">Sin asginar</span>
+                        <label class="control-label">
+                             al 
+                        </label>
+                        <span class="text-muted" id="periodo-ejecucion-final-global">Sin asginar</span>
+                    </div>
+                </div>
+            </div>
+            <div class="datagrid" id="datagridAcciones" data-edit-row="editar_accion">
+                <div>
+                    <div class="pull-left">
+                        <h4>Acciones</h4>
+                    </div>
+                    <div class="btn-toolbar pull-right" >
+                        <div class="btn-group" style="margin:5px">
+                            <button type="button" class="btn btn-success" id="btn-agregar-accion">
+                                <span class="glyphicon glyphicon-plus"></span> Agregar Acción
+                            </button>
+                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu pull-right" role="menu">
+                                <li>
+                                    <a href="#" class="btn-edit-rows">
+                                        <span class="glyphicon glyphicon-edit"></span> Editar
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="#" class="btn-delete-rows">
+                                        <span class="glyphicon glyphicon-remove"></span> Eliminar
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" class="check-select-all-rows"></th>
+                            <th>Acción</th>
+                            <th>Objetivo</th>
+                            <th>Modalidad</th>
+                            <th>Presupuesto</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!--  Begin Tab Panel: Presupuesto y Propuesta  -->
+        <div role="tabpanel" class="tab-pane" id="antes-presupuesto-fibap" data-form-id="">
+        <form>
             <h4>Presupuesto Requerido y Propuesta de Financiamiento</h4>
             <div class="row">
                 <div class="col-sm-6">
@@ -565,6 +658,32 @@
                         </div>
                         <div class="col-sm-12">
                             <div class="row">
+                                <table id="tabla-distribucion-mes" class="table table-condensed table-hover table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Mes</th>
+                                            @foreach ($meses as $clave => $mes)
+                                                <th>{{$mes}}</th>
+                                            @endforeach
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($jurisdicciones as $llave => $jurisdiccion)
+                                            <tr>
+                                                <th>{{$jurisdiccion}}</th>
+                                                @foreach ($meses as $clave => $mes)
+                                                    <td>
+                                                        <input id="mes-distribucion-{{$llave}}-{{$clave}}" name="mes-distribucion[{{$llave}}][{{$clave}}]" type="number" class="form-control input-sm presupuesto-mes" data-presupuesto-mes="{{$clave}}" data-presupuesto-jurisdiccion="{{$llave}}" data-presupuesto-id="">
+                                                    </td>
+                                                @endforeach
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="row">
                                 @foreach ($meses as $clave => $mes)
                                     <div class="col-sm-3">
                                         <div class="form-group">
@@ -591,6 +710,90 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary btn-guardar" id="btn-presupuesto-guardar">Guardar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<div class="modal fade" id="modal-accion" tabindex="-1" role="dialog" aria-labelledby="modalAccionLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-85-screen">
+        <div class="modal-content modal-content-85-screen">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="modalAccionLabel">Nuevo</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-accion">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="entregable" class="control-label">Entregable</label>
+                                {{Form::select('entregable',array(''=>'Seleccione una opción') + $entregables->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'entregable','data-live-search'=>'true','data-size'=>'8'))}}
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="tipo-componente" class="control-label">Tipo</label>
+                                <input type="text" class="form-control" id="tipo-componente" name="tipo-componente">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="accion-componente" class="control-label">Acción</label>
+                                <input type="text" class="form-control" id="accion-componente" name="accion-componente">
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="objetivo-componente">Objetivo</label>
+                                <input type="text" class="form-control" id="objetivo-componente" name="objetivo-componente">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <div class="form-group">
+                                <label for="accion-presupuesto-requerido" class="control-label">
+                                    <span class="fa fa-link"></span> Presupuesto Requerido
+                                </label>
+                                <span class="form-control control-espejo" data-espejo-id="#accion-presupuesto-requerido"></span>
+                                <input type="hidden" id="accion-presupuesto-requerido" name="accion-presupuesto-requerido"/>
+                            </div>
+                        </div>
+                        <div class="col-sm-7">
+                            <div class="form-group">
+                                <label class="control-label">Periodo de Ejecución</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        Del
+                                    </span>
+                                    <input type="date" placeholder="aaaa-mm-dd" class="form-control" id="accion-periodo-ejecucion-inicio" name="accion-periodo-ejecucion-inicio">
+                                    <span class="input-group-addon">
+                                        Al
+                                    </span>
+                                    <input type="date" placeholder="aaaa-mm-dd" class="form-control" id="accion-periodo-ejecucion-final" name="accion-periodo-ejecucion-final">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-1"><label class="control-label">Origen</label></div>
+                        <div class="col-sm-11">
+                            <div class="row">
+                                @foreach ($origenes_financiamiento as $origen)
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label for="origen_{{$origen->id}}" class="control-label">{{$origen->descripcion}}</label>
+                                            <input type="number" class="form-control accion-origen-financiamiento" id="accion-origen-{{$origen->id}}" name="accion-origen[{{$origen->id}}]" data-origen-id="{{$origen->id}}" data-captura-id="">
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="id-accion" id="id-accion">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary btn-guardar" id="btn-accion-guardar">Guardar</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

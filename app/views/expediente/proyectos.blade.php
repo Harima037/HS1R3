@@ -59,7 +59,7 @@
                         <th>Clave</th>
                         <th>Nombre Técnico</th>
                         <th>Tipo de Proyecto</th>
-                        <th>Estatus</th>
+                        <th style="width:100px;">Estatus</th>
                         <th style="text-align:center; width:85px;"><span class="glyphicon glyphicon-user"></span></th>
                         <th style="text-align:center; width:120px;"><span class="glyphicon glyphicon-calendar"></span></th>
                     </tr>

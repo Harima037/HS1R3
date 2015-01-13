@@ -34,6 +34,7 @@ class FibapController extends \BaseController {
 		}
 
 		$datos += array(
+			'entregables' => Entregable::all(),
 			'tipos_proyectos'=>TipoProyecto::all(),
 			'programa_presupuestario'=>ProgramaPresupuestario::all(),
 			'objetivos_ped'=>ObjetivoPED::whereNull('idPadre')->where('id','=',25)->with('hijos')->get(),
@@ -46,9 +47,11 @@ class FibapController extends \BaseController {
 			'origenes_financiamiento' => OrigenFinanciamiento::all()
 		);
 
+		$datos['jurisdicciones'] = array('OC'=>'O.C.','I'=>'I','II'=>'II','III'=>'III','IV'=>'IV','V'=>'V','VI'=>'VI','VII'=>'VII','VIII'=>'VIII','IX'=>'IX','X'=>'X');
+
 		$datos['meses'] = array(
-				'1'=>'Enero','2'=>'Febrero','3'=>'Marzo','4'=>'Abril','5'=>'Mayo','6'=>'Junio',
-				'7'=>'Julio','8'=>'Agosto','9'=>'Septiembre','10'=>'Octubre','11'=>'Noviembre','12'=>'Diciembre'
+				'1'=>'ENE','2'=>'FEB','3'=>'MAR','4'=>'ABR','5'=>'MAY','6'=>'JUN',
+				'7'=>'JUL','8'=>'AGO','9'=>'SEP','10'=>'OCT','11'=>'NOV','12'=>'DIC'
 			);
 
 		//Si hay un id etonces es edición

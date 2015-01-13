@@ -48,28 +48,31 @@
                         @if(count($eje->hijos))
                             <optgroup label="{{$eje->clave . ' ' . $eje->descripcion}}">
                                 <!-- Inicio de temas -->
-                                @foreach ($eje->hijos as $tema)
-                                    @if(count($tema->hijos))
-                                        <optgroup label="{{$tema->clave . ' ' . $tema->descripcion}}">
-                                            <!-- Inicio de politicas -->
-                                            @foreach ($tema->hijos as $politica)
-                                                @if(count($politica->hijos))
-                                                    <optgroup label="{{$politica->clave . ' ' . $politica->descripcion}}">
-                                                        <!-- Inicio de objetivos -->    
-                                                        @foreach ($politica->hijos as $objetivo)
-                                                            <option value="{{$objetivo->id}}">
-                                                                {{$objetivo->clave . ' ' . $objetivo->descripcion}}
-                                                            </option>
-                                                        @endforeach
-                                                        <!-- Inicio de objetivos -->
-                                                    </optgroup>
-                                                @endif
+                            @foreach ($eje->hijos as $tema)
+                                @if(count($tema->hijos))
+                                    <option disabled="disabled">
+                                        {{$tema->clave . ' ' . $tema->descripcion}}
+                                    </option>
+                                    <!-- Inicio de politicas -->
+                                    @foreach ($tema->hijos as $politica)
+                                        @if(count($politica->hijos))
+                                            <option disabled="disabled">
+                                                {{$politica->clave . ' ' . $politica->descripcion}}
+                                            </option>
+                                            <!-- Inicio de objetivos -->    
+                                            @foreach ($politica->hijos as $objetivo)
+                                                <option value="{{$objetivo->id}}">
+                                                    {{$objetivo->clave . ' ' . $objetivo->descripcion}}
+                                                </option>
                                             @endforeach
-                                            <!-- Fin de politicas -->
-                                        </optgroup>
-                                    @endif
-                                @endforeach
-                                <!-- Fin de temas -->
+                                            <!-- Inicio de objetivos -->
+                                            <option data-divider="true"></option>
+                                        @endif
+                                    @endforeach
+                                    <!-- Fin de politicas -->
+                                @endif
+                            @endforeach
+                            <!-- Fin de temas -->
                             </optgroup>
                         @endif
                     @endforeach
@@ -121,23 +124,25 @@
 
                                             @foreach ($finalidad->hijos as $funcion)
                                                 @if(count($funcion->hijos))
-                                                    <optgroup label="{{$funcion->clave . ' ' . $funcion->descripcion}}">
+                                                    <option disabled="disabled">
+                                                        {{$funcion->clave . ' ' . $funcion->descripcion}}
+                                                    </option>
 
-                                                        @foreach ($funcion->hijos as $subfuncion)
-                                                            @if(count($subfuncion->hijos))
-                                                                <optgroup label="{{$subfuncion->clave . ' ' . $subfuncion->descripcion}}">
-                                                                    
-                                                                    @foreach ($subfuncion->hijos as $subsubfuncion)
-                                                                        <option value="{{$subsubfuncion->clave}}">
-                                                                            {{$subsubfuncion->clave . ' ' . $subsubfuncion->descripcion}}
-                                                                        </option>
-                                                                    @endforeach
+                                                    @foreach ($funcion->hijos as $subfuncion)
+                                                        @if(count($subfuncion->hijos))
+                                                            <option disabled="disabled">
+                                                                {{$subfuncion->clave . ' ' . $subfuncion->descripcion}}
+                                                            </option>
 
-                                                                </optgroup>
-                                                            @endif
-                                                        @endforeach
-
-                                                    </optgroup>
+                                                            @foreach ($subfuncion->hijos as $subsubfuncion)
+                                                                <option value="{{$subsubfuncion->clave}}">
+                                                                    {{$subsubfuncion->clave . ' ' . $subsubfuncion->descripcion}}
+                                                                </option>
+                                                            @endforeach
+                                                            <!--/optgroup-->
+                                                        @endif
+                                                    @endforeach
+                                                    <!--/optgroup-->
                                                 @endif
                                             @endforeach
 
