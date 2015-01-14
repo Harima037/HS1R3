@@ -363,7 +363,9 @@
                                     <label class="control-label">
                                         {{$origen->descripcion}} :
                                     </label>
-                                    <span class="text-muted" data-total-origen-id="{{$origen->id}}">$ 0.00</span>
+                                    <span class="text-muted totales-financiamiento" data-total-origen-id="{{$origen->id}}">
+                                        $ 0.00
+                                    </span>
                                 </div>
                             </div>
                         @endforeach
@@ -375,21 +377,6 @@
                             Total Requerido :
                         </label>
                         <span class="text-muted" id="total-presupuesto-requerido">$ 0.00</span>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <label for="periodo-ejecucion" class="control-label">
-                            Periodo de Ejecución
-                        </label>
-                        <label class="control-label">
-                            del
-                        </label>
-                        <span class="text-muted" id="periodo-ejecucion-inicio-global">Sin asginar</span>
-                        <label class="control-label">
-                             al
-                        </label>
-                        <span class="text-muted" id="periodo-ejecucion-final-global">Sin asginar</span>
                     </div>
                 </div>
             </div>
@@ -430,10 +417,55 @@
                             <th>Objetivo</th>
                             <th>Modalidad</th>
                             <th>Presupuesto</th>
+                            <th width="70px">Detalle</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
+            </div>
+            <div id="datagrid-contenedor" class="hidden">
+                <div class="datagrid" id="datagridDistribucion" data-edit-row="editar_distrib_presupuesto" data-selected-id="">
+                    <div>
+                        <div class="pull-left">
+                            <h4>Distribución del Presupuesto</h4>
+                        </div>
+                        <div class="btn-toolbar pull-right" >
+                            <div class="btn-group" style="margin:5px">
+                                <button type="button" class="btn btn-info" id="btn-agregar-distribucion">
+                                    <span class="glyphicon glyphicon-plus"></span> Agregar Presupuesto
+                                </button>
+                                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu pull-right" role="menu">
+                                    <li>
+                                        <a href="#" class="btn-edit-rows">
+                                            <span class="glyphicon glyphicon-edit"></span> Editar
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>
+                                    <li>
+                                        <a href="#" class="btn-delete-rows">
+                                            <span class="glyphicon glyphicon-remove"></span> Eliminar
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" class="check-select-all-rows"></th>
+                                <th width="100px">Partida</th>
+                                <th>Descripción</th>
+                                <th width="100px">Cantidad</th>
+                                <th width="90px">%</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 

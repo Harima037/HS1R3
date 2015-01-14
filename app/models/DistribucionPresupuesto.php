@@ -12,6 +12,6 @@ class DistribucionPresupuesto extends BaseModel
     }
 
     public function scopeAgrupar($query){
-    	$query->select('id','idFibap','idObjetoGasto',DB::raw('sum(cantidad) AS cantidad'))->groupBy('idObjetoGasto');
+    	$query->select('id','idFibap','idAccion','idObjetoGasto',DB::raw('sum(cantidad) AS cantidad'))->groupBy('idObjetoGasto');
     }
 }

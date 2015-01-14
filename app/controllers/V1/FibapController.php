@@ -164,7 +164,7 @@ class FibapController extends BaseController {
 		if($parametros){
 			if($parametros['ver'] == 'fibap'){
 				$recurso = FIBAP::with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado','acciones')->find($id);
-				$recurso->acciones->load('datosComponente');
+				$recurso->acciones->load('datosComponente','propuestasFinanciamiento');
 				$recurso->distribucionPresupuestoAgrupado->load('objetoGasto');
 				$proyecto = NULL;
 				if($recurso->idProyecto){
@@ -184,11 +184,18 @@ class FibapController extends BaseController {
 				}
 			}elseif($parametros['ver'] == 'antecedente'){
 				$recurso = AntecedenteFinanciero::find($id);
-			}elseif($parametros['ver'] == 'distribucion-presupuesto'){
+			}elseif($parametros['ver'] == 'old-distribucion-presupuesto'){
 				$recurso = DistribucionPresupuesto::find($id);
 				//Actualziar despues
 				//$calendarizado = Ministracion::where('idFibap',$recurso->idFibap)->where('idObjetoGasto',$recurso->idObjetoGasto)->get();
 				$calendarizado = DistribucionPresupuesto::where('idFibap',$recurso->idFibap)->where('idObjetoGasto',$recurso->idObjetoGasto)->get();
+			}elseif($parametros['ver'] == 'accion'){
+				$recurso = Accion::with('datosComponente','propuestasFinanciamiento')->find($id);
+			}elseif($parametros['ver'] == 'distribucion-presupuesto'){
+				$recurso = Accion::with('distribucionPresupuestoAgrupado')->find($id);
+				if($recurso->distribucionPresupuestoAgrupado){
+					$recurso->distribucionPresupuestoAgrupado->load('objetoGasto');
+				}
 			}elseif($parametros['ver'] == 'datos-proyecto'){
 				$recurso = Proyecto::find($id);
 				$clave_presupuestaria = $recurso->clavePresupuestaria;
@@ -467,7 +474,7 @@ class FibapController extends BaseController {
 								$accion->propuestasFinanciamiento()->saveMany($guardar_origenes);
 
 								$fibap->load('acciones');
-								$fibap->acciones->load('datosComponente');
+								$fibap->acciones->load('datosComponente','propuestasFinanciamiento');
 								return array('data'=>$accion,'acciones' => $fibap->acciones);
 							}else{
 								//No se pudieron guardar los datos del proyecto
@@ -520,6 +527,8 @@ class FibapController extends BaseController {
 				$validacion = Validador::validar(Input::all(), $this->reglasAntecedentes);
 			}elseif($parametros['formulario'] == 'form-presupuesto'){
 				$validacion = Validador::validar(Input::all(), $this->reglasPresupuesto);
+			}elseif($parametros['formulario'] == 'form-accion'){
+				$validacion = Validador::validar(Input::all(), $this->reglasAccion);
 			}
 
 			if($validacion === TRUE){
@@ -798,6 +807,115 @@ class FibapController extends BaseController {
 							$fibap->load('distribucionPresupuestoAgrupado');
 							$fibap->distribucionPresupuestoAgrupado->load('objetoGasto');
 							return array('data'=>'Presupuesto Editado','distribucion' => $fibap->distribucionPresupuestoAgrupado);
+						});
+					}elseif($parametros['formulario'] == 'form-accion'){ //Editar Accion
+
+						/***
+								Editar Acción
+						****/
+
+						$fecha_inicio = DateTime::createFromFormat('d/m/Y',Input::get('accion-periodo-ejecucion-inicio'));
+						$fecha_fin = DateTime::createFromFormat('d/m/Y',Input::get('accion-periodo-ejecucion-final'));
+
+						if(!$fecha_inicio){
+							$fecha_inicio = DateTime::createFromFormat('Y-m-d',Input::get('accion-periodo-ejecucion-inicio'));
+						}
+						if(!$fecha_fin){
+							$fecha_fin = DateTime::createFromFormat('Y-m-d',Input::get('accion-periodo-ejecucion-final'));
+						}
+
+						if(!$fecha_inicio){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"accion-periodo-ejecucion-inicio","error":"La fecha de inicio del periodo de ejecución no tiene el formato correcto."}';
+							throw new Exception('La fecha no tiene un formato valido');
+						}
+						if(!$fecha_fin){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"accion-periodo-ejecucion-final","error":"La fecha final del periodo de ejecución no tiene el formato correcto."}';
+							throw new Exception('La fecha no tiene un formato valido');
+						}
+
+						if($fecha_fin < $fecha_inicio){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"accion-periodo-ejecucion-final","error":"La fecha final del periodo de ejecución no puede ser menor que la de inicio."}';
+							throw new Exception('La fecha final es menor a la de inicio');
+						}
+
+						$fibap = FIBAP::find($parametros['fibap-id']);
+						//with('acciones')->
+						$accion = Accion::with('propuestasFinanciamiento')->find($id);
+						//$accion = $fibap->acciones()->find($id);
+						$accion->periodoEjecucionInicio = $fecha_inicio;
+						$accion->periodoEjecucionFinal = $fecha_fin;
+						/*if(DateTime::createFromFormat('Y-m-d',$recurso->periodoEjecucionInicio) > $fecha_inicio){
+							$recurso->periodoEjecucionInicio = $fecha_inicio;
+						}
+						if(DateTime::createFromFormat('Y-m-d',$recurso->periodoEjecucionFinal) < $fecha_fin){
+							$recurso->periodoEjecucionFinal = $fecha_fin;
+						}*/
+
+						$origenes = $parametros['accion-origen'];
+						$origenes_ids = array();
+						if(isset($parametros['origen-captura-id'])){
+							$origenes_ids = $parametros['origen-captura-id'];
+						}
+						
+						$componente = FibapDatosComponente::where('idFibap','=',$fibap->id)->where('idAccion','=',$id)->get();
+						$componente = $componente[0];
+						//$componente = $accion->datosComponente()->findIdFibap($fibap->id);
+						//$componente = $accion->datosComponente();
+						$componente->objetivo = $parametros['objetivo-componente'];
+						$componente->idEntregable = $parametros['entregable'];
+						$componente->idAccionComponente = 2;
+						$componente->idTipoComponente = 2;
+						
+						/*$respuesta['data']['data'] = '<br> origenes ' . print_r($origenes,true) . '<br> origenes_id ' . print_r($origenes_ids,true) .
+													'<br><br> fibap ' . print_r($fibap->toArray(),true) . ' <br><br> accion ' . print_r($accion->toArray(),true) . '<br>' .
+													'<br> componente ' . print_r($componente->toArray(),true);
+						throw new Exception("Error Processing Request", 1);*/
+						$respuesta['data'] = DB::transaction(function() use ($origenes, $origenes_ids, $fibap, $accion, $componente){
+							$guardar_origenes = array();
+							$presupuesto_suma = 0;
+							
+							/*
+							if(count($meses_borrar)){
+								$recurso->distribucionPresupuesto()
+										->where('mes','<',$meses_borrar['inicio'])
+										->orWhere('mes','>',$meses_borrar['fin'])
+										->delete();
+							}
+							*/
+
+							$presupuesto_suma = 0;
+							foreach ($origenes as $origen => $valor) {
+								if(isset($origenes_ids[$origen])){
+									$respuesta['data']['data'] = 'encontrar origen';
+									$origen_finan = $accion->propuestasFinanciamiento()->find($origenes_ids[$origen]);
+									$origen_finan->cantidad = ($valor)? $valor:0;
+									$guardar_origenes[] = $origen_finan;
+								}elseif($valor > 0){
+									$origen_finan = new PropuestaFinanciamiento;
+									$origen_finan->idOrigenFinanciamiento = $origen;
+									$origen_finan->cantidad = $valor;
+									$origen_finan->idFibap = $fibap->id;
+									$guardar_origenes[] = $origen_finan;
+								}
+								$presupuesto_suma += $valor;
+							}
+							$accion->presupuestoRequerido = $presupuesto_suma;
+
+							if($accion->save()){
+								$componente->save();
+								//$accion->datosComponente()->save($componente);
+								$accion->propuestasFinanciamiento()->saveMany($guardar_origenes);
+
+								$fibap->load('acciones');
+								$fibap->acciones->load('datosComponente','propuestasFinanciamiento');
+								return array('data'=>$accion,'acciones' => $fibap->acciones);
+							}else{
+								//No se pudieron guardar los datos del proyecto
+								throw new Exception("Error al intentar guardar los datos de la acción: Error en el guardado de los datos de la acción", 1);
+							}
 						});
 					}
 				}catch(\Exception $ex){
