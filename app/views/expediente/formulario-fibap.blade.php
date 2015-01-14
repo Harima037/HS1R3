@@ -154,7 +154,7 @@
                                                     @foreach ($tema->hijos as $politica)
                                                         @if(count($politica->hijos))
                                                             <optgroup label="{{$politica->clave . ' ' . $politica->descripcion}}">
-                                                                <!-- Inicio de objetivos -->    
+                                                                <!-- Inicio de objetivos -->
                                                                 @foreach ($politica->hijos as $objetivo)
                                                                     <option value="{{$objetivo->id}}">
                                                                         {{$objetivo->clave . ' ' . $objetivo->descripcion}}
@@ -268,7 +268,7 @@
                                 <div class="col-sm-4">
                                     <div class="checkbox">
                                         <label>
-                                              <input type="checkbox"  id="documento_{{$documento->id}}" name="documento-soporte[]" value="{{$documento->id}}" > 
+                                              <input type="checkbox"  id="documento_{{$documento->id}}" name="documento-soporte[]" value="{{$documento->id}}" >
                                               {{$documento->descripcion}}
                                         </label>
                                     </div>
@@ -383,11 +383,11 @@
                             Periodo de Ejecución
                         </label>
                         <label class="control-label">
-                            del 
+                            del
                         </label>
                         <span class="text-muted" id="periodo-ejecucion-inicio-global">Sin asginar</span>
                         <label class="control-label">
-                             al 
+                             al
                         </label>
                         <span class="text-muted" id="periodo-ejecucion-final-global">Sin asginar</span>
                     </div>
@@ -549,7 +549,7 @@
 
             </div><!-- tab-content -->
         </div><!-- tab-panel -->
-        
+
         <input type="hidden" id="id" name="id" value="{{{ $id or '' }}}">
         <input type="hidden" id="proyecto-id" name="proyecto-id" value="{{{ $proyecto_id or '' }}}">
         <div class="panel-footer">
@@ -744,7 +744,7 @@
                         </div>
                         <div class="col-sm-12">
                             <div class="form-group">
-                                <label for="objetivo-componente">Objetivo</label>
+                                <label for="objetivo-componente" class="control-label">Objetivo</label>
                                 <input type="text" class="form-control" id="objetivo-componente" name="objetivo-componente">
                             </div>
                         </div>
@@ -780,7 +780,7 @@
                                 @foreach ($origenes_financiamiento as $origen)
                                     <div class="col-sm-3">
                                         <div class="form-group">
-                                            <label for="origen_{{$origen->id}}" class="control-label">{{$origen->descripcion}}</label>
+                                            <label for="accion-origen-{{$origen->id}}" class="control-label">{{$origen->descripcion}}</label>
                                             <input type="number" class="form-control accion-origen-financiamiento" id="accion-origen-{{$origen->id}}" name="accion-origen[{{$origen->id}}]" data-origen-id="{{$origen->id}}" data-captura-id="">
                                         </div>
                                     </div>

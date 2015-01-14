@@ -32,7 +32,7 @@ var form_antecedente = 'form-antecedente';
 var form_presupuesto = 'form-presupuesto';
 var form_accion = 'form-accion';
 
-window.onload = function () { 
+window.onload = function () {
 	$('#mensaje-espera').addClass('hidden');
 	$('#panel-principal-formulario').removeClass('hidden');
 	$('[data-toggle="popover"]').popover();
@@ -284,7 +284,7 @@ $("#datagridAntecedentes .btn-delete-rows").on('click',function(e){
 				mensaje: "¿Estás seguro que deseas eliminar los antecedentes seleccionados?",
 				callback: function(){
 					fibapResource.delete(rows,{'rows': rows, 'eliminar': 'antecedente', 'id-fibap': $('#id').val()},{
-                        _success: function(response){ 
+                        _success: function(response){
                         	llenar_datagrid_antecedentes(response.antecedentes);
                         	MessageManager.show({data:'Antecedente eliminado con éxito.',timer:3});
                         },
@@ -310,7 +310,7 @@ $("#datagridPresupuesto .btn-delete-rows").on('click',function(e){
 				mensaje: "¿Estás seguro que deseas eliminar los presupuestos seleccionados?",
 				callback: function(){
 					fibapResource.delete(rows,{'rows': rows, 'eliminar': 'presupuesto', 'id-fibap': $('#id').val()},{
-                        _success: function(response){ 
+                        _success: function(response){
                         	llenar_datagrid_presupuestos(response.presupuesto);
                         	MessageManager.show({data:'Presupuesto eliminado con éxito.',timer:3});
                         },
@@ -322,6 +322,65 @@ $("#datagridPresupuesto .btn-delete-rows").on('click',function(e){
 });
 
 //*********************************   Funcionalidad de Botones principales (Guardar y Cancelar)   *********************************
+$('#btn-accion-guardar').on('click',function(){
+	var parametros = $('#'+form_accion).serialize();
+	parametros += '&formulario='+form_accion + '&fibap-id=' + $('#id').val();
+	Validation.cleanFormErrors('#'+form_accion);
+
+	var lista_origenes_id = '';
+	$('.accion-origen-financiamiento').each(function(){
+		if($(this).data('captura-id')){
+			lista_origenes_id += '&origen-captura-id[' + $(this).data('origen-id') + ']=' + $(this).data('captura-id');
+		}
+	});
+	parametros += lista_origenes_id;
+
+	if($('#id-accion').val()){
+		fibapResource.put($('#id-accion').val(),parametros,{
+			_success: function(response){
+				MessageManager.show({data:'Cambios almacenados con éxito',type:'OK',timer:3});
+				llenar_datagrid_presupuestos(response.distribucion);
+				$(modal_presupuesto).modal('hide');
+			},
+			_error: function(response){
+				try{
+					var json = $.parseJSON(response.responseText);
+					if(!json.code)
+						MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+						else{
+							MessageManager.show(json);
+						}
+						Validation.formValidate(json.data);
+					}catch(e){
+						console.log(e);
+					}
+				}
+			});
+	}else{
+		fibapResource.post(parametros,{
+			_success: function(response){
+				MessageManager.show({data:'Acción almacenada con éxito',type:'OK',timer:3});
+				llenar_datagrid_acciones(response.acciones);
+				cambiar_icono_tabs('#tab-link-presupuesto-fibap','fa-check-square-o');
+				$(modal_accion).modal('hide');
+			},
+			_error: function(response){
+				try{
+					var json = $.parseJSON(response.responseText);
+					if(!json.code)
+						MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+						else{
+							MessageManager.show(json);
+						}
+						Validation.formValidate(json.data);
+					}catch(e){
+						console.log(e);
+					}
+			}
+		});
+	}
+});
+
 $('#btn-presupuesto-guardar').on('click',function(){
 	var parametros = $('#'+form_presupuesto).serialize();
 	parametros += '&formulario='+form_presupuesto + '&fibap-id=' + $('#id').val();
@@ -351,7 +410,7 @@ $('#btn-presupuesto-guardar').on('click',function(){
 	                Validation.formValidate(json.data);
 	            }catch(e){
 	                console.log(e);
-	            }                       
+	            }
 	        }
 	    });
 	}else{
@@ -373,7 +432,7 @@ $('#btn-presupuesto-guardar').on('click',function(){
 	                Validation.formValidate(json.data);
 	            }catch(e){
 	                console.log(e);
-	            }                       
+	            }
 	        }
 	    });
 	}
@@ -400,7 +459,7 @@ $('#btn-antecedente-guardar').on('click',function(){
 	                Validation.formValidate(json.data);
 	            }catch(e){
 	                console.log(e);
-	            }                       
+	            }
 	        }
 	    });
 	}else{
@@ -422,7 +481,7 @@ $('#btn-antecedente-guardar').on('click',function(){
 	                Validation.formValidate(json.data);
 	            }catch(e){
 	                console.log(e);
-	            }                       
+	            }
 	        }
 	    });
 	}
@@ -473,7 +532,7 @@ $('#btn-fibap-guardar').on('click',function(){
 	                Validation.formValidate(json.data);
 	            }catch(e){
 	                console.log(e);
-	            }                       
+	            }
 	        }
 	    });
 	}else{
@@ -496,7 +555,7 @@ $('#btn-fibap-guardar').on('click',function(){
 	                Validation.formValidate(json.data);
 	            }catch(e){
 	                console.log(e);
-	            }                       
+	            }
 	        }
 	    });
 	}
@@ -537,11 +596,25 @@ $(modal_accion).on('hide.bs.modal',function(e){
 //********************************************   Funciones   ********************************************
 function llenar_datagrid_acciones(datos){
 	$('#datagridAcciones > table > tbody').empty();
+	var acciones = [];
+	for(var indx in datos){
+		var accion = {};
+
+		var presupuesto = parseFloat(datos[indx].presupuestoRequerido);
+
+		accion.id = datos[indx].id;
+		accion.accion = datos[indx].datos_componente.idAccion;
+		accion.objetivo = datos[indx].datos_componente.objetivo;
+		accion.modalidad = 'pendiente';//datos[indx].cantidad;
+		accion.presupuesto = parseFloat(presupuesto.toFixed(2));
+
+		acciones.push(accion);
+	}
 
 	if(datos.length == 0){
 		$('#datagridAcciones > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
 	}else{
-		accionesDatagrid.cargarDatos(distribucion);
+		accionesDatagrid.cargarDatos(acciones);
 	}
 }
 function llenar_datagrid_presupuestos(datos){
@@ -571,7 +644,7 @@ function llenar_datagrid_presupuestos(datos){
 		actualiza_porcentaje(total_porcentaje);
 		presupuestoDatagrid.cargarDatos(distribucion);
 	}
-	
+
 }
 
 function actualiza_porcentaje(porcentaje){
@@ -612,7 +685,7 @@ function llenar_datagrid_antecedentes(datos){
 	}else{
 		antecedenteDatagrid.cargarDatos(antecedentes);
 	}
-	
+
 }
 
 function habilitar_tabs(){
@@ -630,7 +703,7 @@ function habilitar_meses(fechaInicio,fechaFinal){
 		var inicio = fechaInicio.date;
 		var fin = fechaFinal.date;
 	}
-	
+
 	var primer_mes = parseInt(inicio.substring(5,7))
 	var ultimo_mes = parseInt(fin.substring(5,7))
 	$('.presupuesto-mes').each(function(){

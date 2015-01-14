@@ -5,7 +5,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Exception, DateTime;
 use FIBAP, Proyecto, FibapDatosProyecto, PropuestaFinanciamiento, AntecedenteFinanciero, DistribucionPresupuesto, OrigenFinanciamiento;
-use Jurisdiccion, Municipio, Region;
+use Jurisdiccion, Municipio, Region, Accion, FibapDatosComponente;
 
 class FibapController extends BaseController {
 	private $reglasFibap = array(
@@ -32,11 +32,21 @@ class FibapController extends BaseController {
 		'resultados-obtenidos'		=> 'required',
 		'resultados-esperados'		=> 'required'
 	);
-	
+
 	private $reglasFibapPresupuesto = array(
-		'presupuesto-requerido'		=> 'required',
+		'presupuesto-requerido'			=> 'required',
 		'periodo-ejecucion-inicio'	=> 'required',
-		'periodo-ejecucion-final'	=> 'required'
+		'periodo-ejecucion-final'		=> 'required'
+	);
+
+	private $reglasAccion = array(
+		'accion-presupuesto-requerido'		=> 'required',
+		'accion-periodo-ejecucion-inicio'	=> 'required',
+		'accion-periodo-ejecucion-final'	=> 'required',
+		'entregable' 											=> 'required',
+		'tipo-componente' 								=> 'required',
+		'accion-componente' 							=> 'required',
+		'objetivo-componente' 						=> 'required'
 	);
 
 	private $reglasAntecedentes = array(
@@ -67,8 +77,8 @@ class FibapController extends BaseController {
 			$rows = $rows->where('claveUnidadResponsable','=',Sentry::getUser()->claveUnidad);
 
 			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
-			
-			if(isset($parametros['buscar'])){				
+
+			if(isset($parametros['buscar'])){
 				$rows = $rows->where('fibap.sector','like','%'.$parametros['buscar'].'%')
 							 ->where('fibap.subcomite','like','%'.$parametros['buscar'].'%')
 							 ->where('fibap.grupoTrabajo','like','%'.$parametros['buscar'].'%')
@@ -78,10 +88,10 @@ class FibapController extends BaseController {
 							 ->where('p.nombreTecnico','like','%'.$parametros['buscar'].'%')
 							 ->where('Proyecto','like','%'.$parametros['buscar'].'%');
 				$total = $rows->count();
-			}else{				
+			}else{
 				$total = $rows->count();
 			}
-			
+
 			$rows = $rows->select('fibap.id',DB::raw('if(p.id,concat(p.unidadResponsable,p.finalidad,p.funcion,p.subfuncion,p.subsubfuncion,p.programaSectorial,p.programaPresupuestario,p.programaEspecial,p.actividadInstitucional,p.proyectoEstrategico,LPAD(p.numeroProyectoEstrategico,3,"0")),"No asignada") as Proyecto'),
 								DB::raw('if(p.id,p.nombreTecnico,fp.nombreTecnico) AS nombreTecnico'),
 								DB::raw('if(p.idTipoProyecto,tp.descripcion,ftp.descripcion) AS tipoProyecto'),
@@ -105,7 +115,7 @@ class FibapController extends BaseController {
 				$http_status = 404;
 				$data = array('resultados'=>$total,"data"=>"No hay datos",'code'=>'W00');
 			}
-			
+
 			return Response::json($data,$http_status);
 		}elseif(isset($parametros['lista_fibap'])){
 			$rows = FIBAP::getModel();
@@ -119,7 +129,7 @@ class FibapController extends BaseController {
 								->get();
 
 			$data = array('data'=>$rows);
-			
+
 			return Response::json($data,$http_status);
 		}
 
@@ -154,6 +164,7 @@ class FibapController extends BaseController {
 		if($parametros){
 			if($parametros['ver'] == 'fibap'){
 				$recurso = FIBAP::with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado','acciones')->find($id);
+				$recurso->acciones->load('datosComponente');
 				$recurso->distribucionPresupuestoAgrupado->load('objetoGasto');
 				$proyecto = NULL;
 				if($recurso->idProyecto){
@@ -234,6 +245,8 @@ class FibapController extends BaseController {
 				$validacion = Validador::validar(Input::all(), $this->reglasAntecedentes);
 			}elseif($parametros['formulario'] == 'form-presupuesto'){
 				$validacion = Validador::validar(Input::all(), $this->reglasPresupuesto);
+			}elseif($parametros['formulario'] == 'form-accion'){
+				$validacion = Validador::validar(Input::all(), $this->reglasAccion);
 			}
 
 			if($validacion === TRUE){
@@ -297,9 +310,9 @@ class FibapController extends BaseController {
 								$respuesta['data']['code'] = 'S01';
 								throw new Exception("Error al intentar guardar los datos de la ficha: Error en el guardado de la ficha", 1);
 							}
-							
+
 						});
-						
+
 					}elseif($parametros['formulario'] == 'form-antecedente'){
 						$fecha_corte = DateTime::createFromFormat('d/m/Y',Input::get('fecha-corte-antecedente'));
 
@@ -377,11 +390,95 @@ class FibapController extends BaseController {
 							$fibap->distribucionPresupuestoAgrupado->load('objetoGasto');
 							return array('data'=>'Presupuesto almacenado','distribucion' => $fibap->distribucionPresupuestoAgrupado);
 						});
+					}elseif($parametros['formulario'] == 'form-accion'){ //Nueva Accion
+						# code...
+
+						/***
+								Nueva Acción
+						****/
+
+						$fecha_inicio = DateTime::createFromFormat('d/m/Y',Input::get('accion-periodo-ejecucion-inicio'));
+						$fecha_fin = DateTime::createFromFormat('d/m/Y',Input::get('accion-periodo-ejecucion-final'));
+
+						if(!$fecha_inicio){
+							$fecha_inicio = DateTime::createFromFormat('Y-m-d',Input::get('accion-periodo-ejecucion-inicio'));
+						}
+						if(!$fecha_fin){
+							$fecha_fin = DateTime::createFromFormat('Y-m-d',Input::get('accion-periodo-ejecucion-final'));
+						}
+
+						if(!$fecha_inicio){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"accion-periodo-ejecucion-inicio","error":"La fecha de inicio del periodo de ejecución no tiene el formato correcto."}';
+							throw new Exception('La fecha no tiene un formato valido');
+						}
+						if(!$fecha_fin){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"accion-periodo-ejecucion-final","error":"La fecha final del periodo de ejecución no tiene el formato correcto."}';
+							throw new Exception('La fecha no tiene un formato valido');
+						}
+
+						if($fecha_fin < $fecha_inicio){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"accion-periodo-ejecucion-final","error":"La fecha final del periodo de ejecución no puede ser menor que la de inicio."}';
+							throw new Exception('La fecha final es menor a la de inicio');
+						}
+
+						$fibap = FIBAP::with('acciones')->find($parametros['fibap-id']);
+						$accion = new Accion;
+						$accion->periodoEjecucionInicio = $fecha_inicio;
+						$accion->periodoEjecucionFinal = $fecha_fin;
+						/*if(DateTime::createFromFormat('Y-m-d',$recurso->periodoEjecucionInicio) > $fecha_inicio){
+							$recurso->periodoEjecucionInicio = $fecha_inicio;
+						}
+						if(DateTime::createFromFormat('Y-m-d',$recurso->periodoEjecucionFinal) < $fecha_fin){
+							$recurso->periodoEjecucionFinal = $fecha_fin;
+						}*/
+
+						$origenes = $parametros['accion-origen'];
+						//$origenes_ids = array();
+						/*if(isset($parametros['origen-captura-id'])){
+							$origenes_ids = $parametros['origen-captura-id'];
+						}*/
+
+						$componente = new FibapDatosComponente;
+						$componente->objetivo = $parametros['objetivo-componente'];
+						$componente->idEntregable = $parametros['entregable'];
+						$componente->idFibap = $fibap->id;
+						$componente->idAccionComponente = 1;
+						$componente->idTipoComponente = 1;
+
+						$respuesta['data'] = DB::transaction(function() use ($origenes, $fibap, $accion, $componente){
+							$presupuesto_suma = 0;
+							foreach ($origenes as $origen => $valor) {
+								if($valor > 0){
+									$origen_finan = new PropuestaFinanciamiento;
+									$origen_finan->idOrigenFinanciamiento = $origen;
+									$origen_finan->cantidad = $valor;
+									$origen_finan->idFibap = $fibap->id;
+									$guardar_origenes[] = $origen_finan;
+									$presupuesto_suma += $valor;
+								}
+							}
+							$accion->presupuestoRequerido = $presupuesto_suma;
+
+							if($fibap->acciones()->save($accion)){
+								$accion->datosComponente()->save($componente);
+								$accion->propuestasFinanciamiento()->saveMany($guardar_origenes);
+
+								$fibap->load('acciones');
+								$fibap->acciones->load('datosComponente');
+								return array('data'=>$accion,'acciones' => $fibap->acciones);
+							}else{
+								//No se pudieron guardar los datos del proyecto
+								throw new Exception("Error al intentar guardar los datos de la acción: Error en el guardado de los datos de la acción", 1);
+							}
+						});
 					}
 				}catch(\Exception $ex){
 					$respuesta['http_status'] = 500;
 					if($respuesta['data']['data'] == ''){
-						$respuesta['data']['data'] = 'Ocurrio un error en el servidor al guardar la actividad.';
+						$respuesta['data']['data'] = 'Ocurrio un error en el servidor al guardar la acción.';
 					}
 					$respuesta['data']['ex'] = $ex->getMessage();
 					if(!isset($respuesta['data']['code'])){
@@ -393,7 +490,7 @@ class FibapController extends BaseController {
 				$respuesta['data'] = $validacion['data'];
 			}
 
-			
+
 		}
 
 		return Response::json($respuesta['data'],$respuesta['http_status']);
@@ -637,7 +734,7 @@ class FibapController extends BaseController {
 						if($idObjetoGasto != $presupuesto_base->idObjetoGasto){
 							$capturados = $fibap->distribucionPresupuesto->filter(function($item) use ($idObjetoGasto, $recursos_ids){
 								$buscar_id = $item->id;
-								$encontrado = array_first($recursos_ids, function($key,$value)use($buscar_id){ 
+								$encontrado = array_first($recursos_ids, function($key,$value)use($buscar_id){
 										return $value == $buscar_id;
 									});
 								if($item->idObjetoGasto == $idObjetoGasto && !$encontrado ){
@@ -651,7 +748,7 @@ class FibapController extends BaseController {
 								throw new Exception('Se encontraron '.count($capturados).' elementos capturados',1);
 							}
 						}
-						
+
 						$mes_incial = date("n",strtotime($fibap->periodoEjecucionInicio));
 						$mes_final = date("n",strtotime($fibap->periodoEjecucionFinal));
 
@@ -716,7 +813,7 @@ class FibapController extends BaseController {
 			}else{
 				$respuesta['http_status'] = $validacion['http_status'];
 				$respuesta['data'] = $validacion['data'];
-			}	
+			}
 		}
 		return Response::json($respuesta['data'],$respuesta['http_status']);
 	}
@@ -738,7 +835,7 @@ class FibapController extends BaseController {
 
 			$ids = $parametros['rows'];
 			$id_padre = 0;
-			
+
 			if(isset($parametros['eliminar'])){ //Con parametros, el delete viene de dentro de Editar Fibap
 				if($parametros['eliminar'] == 'presupuesto'){ //Eliminar Distribucion del Presupuesto
 					$id_padre = $parametros['id-fibap'];
@@ -794,10 +891,10 @@ class FibapController extends BaseController {
 			}else{
 				$http_status = 404;
 				$data = array('data' => "No se pueden eliminar los recursos.",'code'=>'S03');
-			}	
+			}
 		}catch(Exception $ex){
-			$http_status = 500;	
-			$data = array('data' => "No se pueden borrar los registros",'ex'=>$ex->getMessage(),'code'=>'S03');	
+			$http_status = 500;
+			$data = array('data' => "No se pueden borrar los registros",'ex'=>$ex->getMessage(),'code'=>'S03');
 		}
 		return Response::json($data,$http_status);
 	}
