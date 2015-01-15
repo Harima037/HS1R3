@@ -417,7 +417,7 @@
                             <th>Objetivo</th>
                             <th>Modalidad</th>
                             <th>Presupuesto</th>
-                            <th width="70px">Detalle</th>
+                            <th width="50px"></th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -680,6 +680,21 @@
                                             @endforeach
                                         @endif
                                     @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="municipio-accion" class="label-control selectpicker">Municipio</label>
+                                <select id="municipio-accion" name="municipio-accion" class="form-control" data-live-search="true" data-size="8">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="localidad-accion" class="label-control selectpicker">Localidad</label>
+                                <select id="localidad-accion" name="localidad-accion" class="form-control" data-live-search="true" data-size="8">
+                                    <option value="">Selecciona un Municipio</option>
                                 </select>
                             </div>
                         </div>

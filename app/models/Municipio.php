@@ -7,6 +7,10 @@ class Municipio extends BaseModel
 	protected $dates = ['borradoAl'];
 	protected $table = "vistaMunicipios";
 
+	public function localidades(){
+		return $this->hasMany('Localidad','idMunicipio');
+	}
+
 	public function scopeObtenerJurisdicciones($query,$municipio){
 		$query->select('jurisdiccion.*')
 				->leftjoin('vistaJurisdicciones AS jurisdiccion','jurisdiccion.id','=','vistaMunicipios.idJurisdiccion')

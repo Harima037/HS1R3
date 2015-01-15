@@ -161,6 +161,7 @@ class FibapController extends BaseController {
 		$calendarizado = FALSE;
 		$clave_presupuestaria = FALSE;
 		$jurisdicciones = FALSE;
+		$municipios = FALSE;
 		if($parametros){
 			if($parametros['ver'] == 'fibap'){
 				$recurso = FIBAP::with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado','acciones')->find($id);
@@ -177,10 +178,15 @@ class FibapController extends BaseController {
 				}
 				if($proyecto->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
 					$jurisdicciones = Jurisdiccion::all();
+					$municipios = Municipio::with('localidades')->get(); //Todos los municipios
 				}elseif($proyecto->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
 					$jurisdicciones = Municipio::obtenerJurisdicciones($proyecto->claveMunicipio)->get();
+					$municipios = Municipio::with('localidades')->where('clave','=',$proyecto->claveMunicipio)->get(); //Obtenemos el municipio seleccionado
 				}elseif($proyecto->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
 					$jurisdicciones = Region::obtenerJurisdicciones($proyecto->claveRegion)->get();
+					$region = Region::with('municipios')->where('region','=',$proyecto->claveRegion)->get();
+					$region[0]->municipios->load('localidades');
+					$municipios = $region[0]->municipios;
 				}
 			}elseif($parametros['ver'] == 'antecedente'){
 				$recurso = AntecedenteFinanciero::find($id);
@@ -217,6 +223,9 @@ class FibapController extends BaseController {
 			$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
 		}else{
 			$recurso = $recurso->toArray();
+			if($municipios){
+				$recurso['municipios'] = $municipios;
+			}
 			if($jurisdicciones){
 				$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
 			}
@@ -305,13 +314,23 @@ class FibapController extends BaseController {
 						$respuesta['data'] = DB::transaction(function() use ($recurso, $proyecto, $documentos){
 							if($recurso->save()){
 								$recurso->documentos()->attach($documentos);
+								$datos_extra = array();
 								if($proyecto){
 									if(!$recurso->datosProyecto()->save($proyecto)){
 										$respuesta['data']['code'] = 'S01';
 										throw new Exception("Error al intentar guardar los datos de la ficha: Error en el guardado del proyecto", 1);
 									}
+									if($proyecto->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
+										$datos_extra['municipios'] = Municipio::with('localidades')->get(); //Todos los municipios
+									}elseif($proyecto->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
+										$datos_extra['municipios'] = Municipio::with('localidades')->where('clave','=',$proyecto->claveMunicipio)->get(); //Obtenemos el municipio seleccionado
+									}elseif($proyecto->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
+										$region = Region::with('municipios')->where('region','=',$proyecto->claveRegion)->get();
+										$region[0]->municipios->load('localidades');
+										$datos_extra['municipios'] = $region[0]->municipios;
+									}
 								}
-								return array('data'=>$recurso);
+								return array('data'=>$recurso,'extras'=>$datos_extra);
 							}else{
 								//No se pudieron guardar los datos del proyecto
 								$respuesta['data']['code'] = 'S01';
@@ -590,13 +609,23 @@ class FibapController extends BaseController {
 								if(count($docs_nuevos)){
 									$recurso->documentos()->attach($docs_nuevos);
 								}
+								$datos_extra = array();
 								if($proyecto){
 									if(!$proyecto->save()){
 										$respuesta['data']['code'] = 'S01';
 										throw new Exception("Error al intentar guardar los datos de la ficha: Error en el guardado del proyecto", 1);
 									}
+									if($proyecto->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
+										$datos_extra['municipios'] = Municipio::with('localidades')->get(); //Todos los municipios
+									}elseif($proyecto->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
+										$datos_extra['municipios'] = Municipio::with('localidades')->where('clave','=',$proyecto->claveMunicipio)->get(); //Obtenemos el municipio seleccionado
+									}elseif($proyecto->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
+										$region = Region::with('municipios')->where('region','=',$proyecto->claveRegion)->get();
+										$region[0]->municipios->load('localidades');
+										$datos_extra['municipios'] = $region[0]->municipios;
+									}
 								}
-								return array('data'=>$recurso);
+								return array('data'=>$recurso, 'extras'=>$datos_extra);
 							}else{
 								//No se pudieron guardar los datos del proyecto
 								$respuesta['data']['code'] = 'S01';

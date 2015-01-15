@@ -7,6 +7,10 @@ class Region extends BaseModel
 	protected $dates = ['borradoAl'];
 	protected $table = "vistaRegiones";
 
+	public function municipios(){
+		return $this->hasMany('Municipio','idRegion');
+	}
+
 	public function scopeObtenerJurisdicciones($query,$region){
 		$query->select('jurisdiccion.*')
 				->leftjoin('vistaMunicipios AS municipio','municipio.idRegion','=','vistaRegiones.id')
