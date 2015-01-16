@@ -112,16 +112,22 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-12">
                     <div class="form-group">
                         <label for="justificacion-proyecto" class="control-label">Justificación del Proyecto</label>
                         <textarea class="form-control" id="justificacion-proyecto" name="justificacion-proyecto"></textarea>
                     </div>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-12">
                     <div class="form-group">
                         <label for="descripcion-proyecto" class="control-label">Descripción del Proyecto</label>
                         <textarea class="form-control" id="descripcion-proyecto" name="descripcion-proyecto"></textarea>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label for="objetivo-proyecto" class="control-label">Objetivo del Proyecto</label>
+                        <textarea class="form-control" id="objetivo-proyecto" name="objetivo-proyecto"></textarea>
                     </div>
                 </div>
             </div>
@@ -255,6 +261,31 @@
                     <div class="form-group">
                         <label class="control-label"><span class="fa fa-link"></span> Total</label>
                         <span id="total-beneficiarios" class="form-control"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-5">
+                    <div class="form-group">
+                        <label for="presupuesto-requerido" class="control-label">
+                            Presupuesto Requerido
+                        </label>
+                        <input type="number" class="form-control" id="presupuesto-requerido" name="presupuesto-requerido"/>
+                    </div>
+                </div>
+                <div class="col-sm-7">
+                    <div class="form-group">
+                        <label class="control-label">Periodo de Ejecución</label>
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                Del
+                            </span>
+                            <input type="date" placeholder="aaaa-mm-dd" class="form-control" id="periodo-ejecucion-inicio" name="periodo-ejecucion-inicio">
+                            <span class="input-group-addon">
+                                Al
+                            </span>
+                            <input type="date" placeholder="aaaa-mm-dd" class="form-control" id="periodo-ejecucion-final" name="periodo-ejecucion-final">
+                        </div>
                     </div>
                 </div>
             </div>

@@ -272,6 +272,34 @@ class FibapController extends BaseController {
 							$respuesta['data']['data'] = 'Debe seleccionar al menos un documento.';
 							throw new Exception("Error Processing Request", 1);
 						}
+
+						$fecha_inicio = DateTime::createFromFormat('d/m/Y',Input::get('periodo-ejecucion-inicio'));
+						$fecha_fin = DateTime::createFromFormat('d/m/Y',Input::get('periodo-ejecucion-final'));
+
+						if(!$fecha_inicio){
+							$fecha_inicio = DateTime::createFromFormat('Y-m-d',Input::get('periodo-ejecucion-inicio'));
+						}
+						if(!$fecha_fin){
+							$fecha_fin = DateTime::createFromFormat('Y-m-d',Input::get('periodo-ejecucion-final'));
+						}
+
+						if(!$fecha_inicio){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"periodo-ejecucion-inicio","error":"La fecha de inicio del periodo de ejecución no tiene el formato correcto."}';
+							throw new Exception('La fecha no tiene un formato valido');
+						}
+						if(!$fecha_fin){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"periodo-ejecucion-final","error":"La fecha final del periodo de ejecución no tiene el formato correcto."}';
+							throw new Exception('La fecha no tiene un formato valido');
+						}
+
+						if($fecha_fin < $fecha_inicio){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"periodo-ejecucion-final","error":"La fecha final del periodo de ejecución no puede ser menor que la de inicio."}';
+							throw new Exception('La fecha final es menor a la de inicio');
+						}
+
 						$recurso = new FIBAP;
 						$proyecto = FALSE;
 
@@ -282,9 +310,13 @@ class FibapController extends BaseController {
 						$recurso->grupoTrabajo 			 = $parametros['grupo-trabajo'];
 						$recurso->justificacionProyecto  = $parametros['justificacion-proyecto'];
 						$recurso->descripcionProyecto 	 = $parametros['descripcion-proyecto'];
+						$recurso->objetivoProyecto		 = $parametros['objetivo-proyecto'];
 						$recurso->alineacionEspecifica 	 = $parametros['alineacion-especifica'];
 						$recurso->alineacionGeneral 	 = $parametros['alineacion-general'];
 						$recurso->idEstatusProyecto 	 = 1;
+						$recurso->periodoEjecucionInicio = $fecha_inicio;
+						$recurso->periodoEjecucionFinal  = $fecha_fin;
+						$recurso->presupuestoRequerido 	 = $parametros['presupuesto-requerido'];
 
 						if(isset($parametros['proyecto-id'])){
 							$recurso->idProyecto = $parametros['proyecto-id'];
@@ -573,17 +605,49 @@ class FibapController extends BaseController {
 							$respuesta['data']['data'] = 'Debe seleccionar al menos un documento.';
 							throw new Exception("Error Processing Request", 1);
 						}
+
+						$fecha_inicio = DateTime::createFromFormat('d/m/Y',Input::get('periodo-ejecucion-inicio'));
+						$fecha_fin = DateTime::createFromFormat('d/m/Y',Input::get('periodo-ejecucion-final'));
+
+						if(!$fecha_inicio){
+							$fecha_inicio = DateTime::createFromFormat('Y-m-d',Input::get('periodo-ejecucion-inicio'));
+						}
+						if(!$fecha_fin){
+							$fecha_fin = DateTime::createFromFormat('Y-m-d',Input::get('periodo-ejecucion-final'));
+						}
+
+						if(!$fecha_inicio){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"periodo-ejecucion-inicio","error":"La fecha de inicio del periodo de ejecución no tiene el formato correcto."}';
+							throw new Exception('La fecha no tiene un formato valido');
+						}
+						if(!$fecha_fin){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"periodo-ejecucion-final","error":"La fecha final del periodo de ejecución no tiene el formato correcto."}';
+							throw new Exception('La fecha no tiene un formato valido');
+						}
+
+						if($fecha_fin < $fecha_inicio){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"periodo-ejecucion-final","error":"La fecha final del periodo de ejecución no puede ser menor que la de inicio."}';
+							throw new Exception('La fecha final es menor a la de inicio');
+						}
+
 						$recurso = FIBAP::with('documentos')->find($id);
 						$proyecto = FALSE;
 
-						$recurso->organismoPublico = $parametros['organismo-publico'];
-						$recurso->sector = $parametros['sector'];
-						$recurso->subcomite = $parametros['subcomite'];
-						$recurso->grupoTrabajo = $parametros['grupo-trabajo'];
-						$recurso->justificacionProyecto = $parametros['justificacion-proyecto'];
-						$recurso->descripcionProyecto = $parametros['descripcion-proyecto'];
-						$recurso->alineacionEspecifica = $parametros['alineacion-especifica'];
-						$recurso->alineacionGeneral = $parametros['alineacion-general'];
+						$recurso->organismoPublico 			= $parametros['organismo-publico'];
+						$recurso->sector 					= $parametros['sector'];
+						$recurso->subcomite 				= $parametros['subcomite'];
+						$recurso->grupoTrabajo 				= $parametros['grupo-trabajo'];
+						$recurso->justificacionProyecto 	= $parametros['justificacion-proyecto'];
+						$recurso->descripcionProyecto 		= $parametros['descripcion-proyecto'];
+						$recurso->objetivoProyecto			= $parametros['objetivo-proyecto'];
+						$recurso->alineacionEspecifica 		= $parametros['alineacion-especifica'];
+						$recurso->alineacionGeneral 		= $parametros['alineacion-general'];
+						$recurso->periodoEjecucionInicio 	= $fecha_inicio;
+						$recurso->periodoEjecucionFinal  	= $fecha_fin;
+						$recurso->presupuestoRequerido 	 	= $parametros['presupuesto-requerido'];
 
 						if(!isset($parametros['proyecto-id'])){
 							$recurso->load('datosProyecto');

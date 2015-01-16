@@ -98,13 +98,13 @@ if($('#id').val()){
 			$('#grupo-trabajo').val(response.data.grupoTrabajo);
 			$('#justificacion-proyecto').val(response.data.justificacionProyecto);
 			$('#descripcion-proyecto').val(response.data.descripcionProyecto);
+			$('#objetivo-proyecto').val(response.data.objetivoProyecto);
 			$('#alineacion-especifica').val(response.data.alineacionEspecifica);
 			$('#alineacion-general').val(response.data.alineacionGeneral);
 			$('#resultados-obtenidos').val(response.data.resultadosObtenidos);
 			$('#resultados-esperados').val(response.data.resultadosEsperados);
 			$('#presupuesto-requerido').val(response.data.presupuestoRequerido);
 			$('#presupuesto-requerido').change();
-			//$('#periodo-ejecucion').val(response.data.periodoEjecucion);
 			$('#periodo-ejecucion-inicio').val(response.data.periodoEjecucionInicio);
 			$('#periodo-ejecucion-final').val(response.data.periodoEjecucionFinal);
 
