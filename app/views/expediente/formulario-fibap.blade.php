@@ -424,8 +424,8 @@
                 </table>
             </div>
             <div id="datagrid-contenedor" class="hidden">
-                <div class="datagrid" id="datagridDistribucion" data-edit-row="editar_distrib_presupuesto" data-selected-id="">
-                    <div>
+                <div class="datagrid panel panel-primary" id="datagridDistribucion" data-edit-row="editar_distrib_presupuesto" data-selected-id="">
+                    <div class="panel-body">
                         <div class="pull-left">
                             <h4>Distribución del Presupuesto</h4>
                         </div>
@@ -703,7 +703,7 @@
                                 <label class="control-label">Calanderizado de Ministraciones</label>
                             </div>
                         </div>
-                        <div class="col-sm-12">
+                        <div class="col-sm-12 hidden">
                             <div class="row">
                                 <table id="tabla-distribucion-mes" class="table table-condensed table-hover table-striped">
                                     <thead>

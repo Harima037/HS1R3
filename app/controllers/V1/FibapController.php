@@ -369,12 +369,19 @@ class FibapController extends BaseController {
 						/***
 								Nuevo Presupuesto
 						****/
+						$accion_id = $parametros['accion-id'];
+						//$fibap = FIBAP::with('distribucionPresupuesto')->find($parametros['fibap-id']);
+						$accion = Accion::with('distribucionPresupuesto')->find($accion_id);
 
-						$fibap = FIBAP::with('distribucionPresupuesto')->find($parametros['fibap-id']);
+						$clave_municipio = $parametros['municipio-accion'];
+						$clave_localidad = $parametros['localidad-accion'];
+						$municipio = Municipio::with('jurisdiccion')->where('clave','=',$clave_municipio)->get();
+						$clave_jurisdiccion = $municipio[0]->jurisdiccion->clave;
 
 						$idObjetoGasto = $parametros['objeto-gasto-presupuesto'];
 
-						$capturados = $fibap->distribucionPresupuesto->filter(function($item) use ($idObjetoGasto){
+						//$capturados = $fibap->distribucionPresupuesto->filter(function($item) use ($idObjetoGasto){
+						$capturados = $accion->distribucionPresupuesto->filter(function($item) use ($idObjetoGasto){
 							if($item->idObjetoGasto == $idObjetoGasto){
 								return true;
 							}
@@ -386,14 +393,20 @@ class FibapController extends BaseController {
 							throw new Exception('Se encontraron '.count($capturados).' elementos capturados',1);
 						}
 
-						$mes_incial = date("n",strtotime($fibap->periodoEjecucionInicio));
-						$mes_final = date("n",strtotime($fibap->periodoEjecucionFinal));
+						//$mes_incial = date("n",strtotime($fibap->periodoEjecucionInicio));
+						//$mes_final = date("n",strtotime($fibap->periodoEjecucionFinal));
+						$mes_incial = date("n",strtotime($accion->periodoEjecucionInicio));
+						$mes_final = date("n",strtotime($accion->periodoEjecucionFinal));
 
 						$distribucion = array();
 						$suma_presupuesto = 0;
 						foreach ($parametros['mes'] as $mes => $cantidad) {
 							if($cantidad > 0 && $mes >= $mes_incial && $mes <= $mes_final){
 								$recurso = new DistribucionPresupuesto;
+								$recurso->idFibap = $accion->idFibap;
+								$recurso->claveMunicipio = $clave_municipio;
+								$recurso->claveLocalidad = $clave_localidad;
+								$recurso->claveJurisdiccion = $clave_jurisdiccion;
 								$recurso->idObjetoGasto = $idObjetoGasto;
 								$recurso->mes = $mes;
 								$recurso->cantidad = $cantidad;
@@ -402,19 +415,22 @@ class FibapController extends BaseController {
 							}
 						}
 
-						$suma_distribucion = $fibap->distribucionPresupuesto->sum('cantidad');
+						//$suma_distribucion = $fibap->distribucionPresupuesto->sum('cantidad');
+						$suma_distribucion = $accion->distribucionPresupuesto->sum('cantidad');
 						//parametros['cantidad-presupuesto']
-						if(($suma_distribucion + $suma_presupuesto) > $fibap->presupuestoRequerido){
+						if(($suma_distribucion + $suma_presupuesto) > $accion->presupuestoRequerido){
 							$respuesta['data']['code'] = 'U00';
 							$respuesta['data']['data'] = '{"field":"cantidad-presupuesto","error":"La distribución del presupuesto sobrepasa el presupuesto requerido."}';
 							throw new Exception('La distribución del presupuesto sobrepasa el presupuesto requerido.', 1);
 						}
 
-						$respuesta['data'] = DB::transaction(function() use ($fibap,$distribucion){
-							$fibap->distribucionPresupuesto()->saveMany($distribucion);
-							$fibap->load('distribucionPresupuestoAgrupado');
-							$fibap->distribucionPresupuestoAgrupado->load('objetoGasto');
-							return array('data'=>'Presupuesto almacenado','distribucion' => $fibap->distribucionPresupuestoAgrupado);
+						//$accion->presupuestoRequerido = $suma_distribucion + $suma_presupuesto;
+						$respuesta['data'] = DB::transaction(function() use ($accion,$distribucion){
+							//$accion->save();
+							$accion->distribucionPresupuesto()->saveMany($distribucion);
+							$accion->load('distribucionPresupuestoAgrupado');
+							$accion->distribucionPresupuestoAgrupado->load('objetoGasto');
+							return array('data'=>$accion,'distribucion' => $accion->distribucionPresupuestoAgrupado);
 						});
 					}elseif($parametros['formulario'] == 'form-accion'){ //Nueva Accion
 						# code...

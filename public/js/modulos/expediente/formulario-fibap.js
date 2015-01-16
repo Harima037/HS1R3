@@ -57,7 +57,12 @@ $('#cobertura').on('change',function(){
 });
 $('#municipio-accion').on('change',function(){
 	var json = $('#municipio-accion > option:selected').attr('data-localidades');
-	json = json.split('|');
+	if(json){
+		json = json.split('|');
+	}else{
+		json = [];
+	}
+	
 	var localidades = [];
 	var localidad;
 	for(var i in json){
@@ -431,6 +436,8 @@ $('#btn-accion-guardar').on('click',function(){
 $('#btn-presupuesto-guardar').on('click',function(){
 	var parametros = $('#'+form_presupuesto).serialize();
 	parametros += '&formulario='+form_presupuesto + '&fibap-id=' + $('#id').val();
+	var accion_id = $('#datagridDistribucion').attr('data-selected-id');
+	parametros += '&accion-id='+accion_id;
 	Validation.cleanFormErrors('#'+form_presupuesto);
 	if($('#id-presupuesto').val()){
 		var meses_capturados = '';
@@ -443,7 +450,8 @@ $('#btn-presupuesto-guardar').on('click',function(){
 		fibapResource.put($('#id-presupuesto').val(),parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Cambios almacenados con éxito',type:'OK',timer:3});
-	            llenar_datagrid_presupuestos(response.distribucion);
+	            //llenar_datagrid_presupuestos(response.distribucion);
+	            llenar_datagrid_distribucion(response.distribucion,response.data.presupuestoRequerido);
 	            $(modal_presupuesto).modal('hide');
 	        },
 	        _error: function(response){
@@ -464,7 +472,8 @@ $('#btn-presupuesto-guardar').on('click',function(){
 		fibapResource.post(parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Presupuesto almacenado con éxito',type:'OK',timer:3});
-	            llenar_datagrid_presupuestos(response.distribucion);
+	            //llenar_datagrid_presupuestos(response.distribucion);
+	            llenar_datagrid_distribucion(response.distribucion,response.data.presupuestoRequerido);
 	            cambiar_icono_tabs('#tab-link-presupuesto-fibap','fa-check-square-o');
 	            $(modal_presupuesto).modal('hide');
 	        },
@@ -958,6 +967,9 @@ function reset_modal_form(formulario){
     	$('#' + formulario + ' input[type="hidden"]').val('');
     	$('#' + formulario + ' input[type="hidden"]').change();
     	$('#' + formulario + ' .selectpicker').change();
+    	$('#municipio-accion').change();
+    	$('#localidad-accion').change();
+
     	$('.presupuesto-mes').each(function(){
 			$(this).attr('data-presupuesto-id','');
 		});
