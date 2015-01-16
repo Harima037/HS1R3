@@ -556,7 +556,7 @@ class FibapController extends BaseController {
 				$validacion = Validador::validar(Input::all(), $this->reglasFibap);
 			}elseif($parametros['formulario'] == 'form-fibap-antecedentes'){
 				$validacion = Validador::validar(Input::all(), $this->reglasFibapAntecedentes);
-			}elseif($parametros['formulario'] == 'form-fibap-presupuesto'){
+			}elseif($parametros['formulario'] == 'form-fibap-presupuesto'){ //No estoy usando
 				$validacion = Validador::validar(Input::all(), $this->reglasFibapPresupuesto);
 			}elseif($parametros['formulario'] == 'form-antecedente'){
 				$validacion = Validador::validar(Input::all(), $this->reglasAntecedentes);
@@ -659,7 +659,7 @@ class FibapController extends BaseController {
 							$respuesta['data']['code'] = 'S01';
 							throw new Exception("Error al intentar guardar los datos de la ficha: Error en el guardado de los datos antecedentes", 1);
 						}
-					}elseif($parametros['formulario'] == 'form-fibap-presupuesto'){ //Agregar/Editar datos del presupuesto
+					}elseif($parametros['formulario'] == 'form-fibap-presupuesto'){ //No estoy usando //Agregar/Editar datos del presupuesto
 						$fecha_inicio = DateTime::createFromFormat('d/m/Y',Input::get('periodo-ejecucion-inicio'));
 						$fecha_fin = DateTime::createFromFormat('d/m/Y',Input::get('periodo-ejecucion-final'));
 

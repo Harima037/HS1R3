@@ -48,13 +48,13 @@
                     </a>
                 </li>
                 <li role="presentation">
-                    <a href="#antes-presupuesto-fibap" aria-controls="antes-presupuesto-fibap" role="tab" data-toggle="tab">
-                        <span class="fa fa-square-o"></span> antes - Presupuesto
+                    <a href="#presupuesto-fibap" aria-controls="presupuesto-fibap" role="tab" id="tab-link-presupuesto-fibap">
+                        <span class="fa fa-square-o"></span> Presupuesto
                     </a>
                 </li>
                 <li role="presentation" class="disabled">
-                    <a href="#presupuesto-fibap" aria-controls="presupuesto-fibap" role="tab" id="tab-link-presupuesto-fibap">
-                        <span class="fa fa-square-o"></span> Presupuesto
+                    <a href="#acciones-fibap" aria-controls="acciones-fibap" role="tab" id="tab-link-acciones-fibap">
+                        <span class="fa fa-square-o"></span> Acciones
                     </a>
                 </li>
                 <!--li role="presentation" class="disabled">
@@ -349,37 +349,9 @@
         </div><!-- tab-pane -->
         <!--  End Tab Panel: Antecedentes Financieros  -->
 
-        <div role="tabpanel" class="tab-pane" id="presupuesto-fibap" data-form-id="form-fibap-presupuesto">
-        <form id="form-fibap-presupuesto">
-        </form>
-            <h4>Presupuesto Requerido y Propuesta de Financiamiento</h4>
-            <div class="row">
-                <div class="col-sm-12"><label class="control-label">Origen del Presupuesto</label></div>
-                <div class="col-sm-12">
-                    <div class="row">
-                        @foreach ($origenes_financiamiento as $origen)
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <label class="control-label">
-                                        {{$origen->descripcion}} :
-                                    </label>
-                                    <span class="text-muted totales-financiamiento" data-total-origen-id="{{$origen->id}}">
-                                        $ 0.00
-                                    </span>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <label class="control-label">
-                            Total Requerido :
-                        </label>
-                        <span class="text-muted" id="total-presupuesto-requerido">$ 0.00</span>
-                    </div>
-                </div>
-            </div>
+        <div role="tabpanel" class="tab-pane" id="acciones-fibap">
+        <!--form id="form-fibap-presupuesto">
+        </form-->
             <div class="datagrid" id="datagridAcciones" data-edit-row="editar_accion">
                 <div>
                     <div class="pull-left">
@@ -409,7 +381,8 @@
                         </div>
                     </div>
                 </div>
-                <table class="table table-striped table-hover">
+                <div class="clearfix"></div>
+                <table class="table table-condensed">
                     <thead>
                         <tr>
                             <th><input type="checkbox" class="check-select-all-rows"></th>
@@ -427,7 +400,11 @@
                 <div class="datagrid panel panel-primary" id="datagridDistribucion" data-edit-row="editar_distrib_presupuesto" data-selected-id="">
                     <div class="panel-body">
                         <div class="pull-left">
-                            <h4>Distribución del Presupuesto</h4>
+                            <label class="control-label">Distribución del Presupuesto</label>
+                            <div class="progress">
+                                <div id="porcentaje_accion" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"> 0%
+                                </div>
+                            </div>
                         </div>
                         <div class="btn-toolbar pull-right" >
                             <div class="btn-group" style="margin:5px">
@@ -453,14 +430,32 @@
                             </div>
                         </div>
                     </div>
-                    <table class="table table-striped table-hover">
+                    <table class="table table-condensed">
                         <thead>
                             <tr>
                                 <th><input type="checkbox" class="check-select-all-rows"></th>
                                 <th width="100px">Partida</th>
                                 <th>Descripción</th>
-                                <th width="100px">Cantidad</th>
+                                <th width="100px">Monto</th>
                                 <th width="90px">%</th>
+                                <th width="50px"></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="datagrid-contenedor-desgloce" class="hidden">
+                <div class="datagrid panel panel-primary" id="datagridDistribucionMunicipio" data-edit-row="editar_distrib_municipio" data-selected-id="">
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" class="check-select-all-rows"></th>
+                                <th width="100px">Municipio</th>
+                                <th>Localidad</th>
+                                <th width="100px">Monto</th>
+                                <th>Unidad</th>
+                                <th width="90px">Meta</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -470,48 +465,36 @@
         </div>
 
         <!--  Begin Tab Panel: Presupuesto y Propuesta  -->
-        <div role="tabpanel" class="tab-pane" id="antes-presupuesto-fibap" data-form-id="">
-        <form>
+        <div role="tabpanel" class="tab-pane" id="presupuesto-fibap">
             <h4>Presupuesto Requerido y Propuesta de Financiamiento</h4>
             <div class="row">
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <label for="presupuesto-requerido" class="control-label">
-                            <span class="fa fa-link"></span> Presupuesto Requerido
-                        </label>
-                        <span class="form-control control-espejo" data-espejo-id="#presupuesto-requerido"></span>
-                        <input type="hidden" id="presupuesto-requerido" name="presupuesto-requerido"/>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <label for="periodo-ejecucion" class="control-label">Periodo de Ejecución</label>
-                        <div class="input-group">
-                            <span class="input-group-addon">
-                                Del
-                            </span>
-                            <input type="date" placeholder="aaaa-mm-dd" class="form-control" id="periodo-ejecucion-inicio" name="periodo-ejecucion-inicio">
-                            <span class="input-group-addon">
-                                Al
-                            </span>
-                            <input type="date" placeholder="aaaa-mm-dd" class="form-control" id="periodo-ejecucion-final" name="periodo-ejecucion-final">
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-1"><label class="control-label">Origen</label></div>
-                <div class="col-sm-11">
+                <div class="col-sm-12"><label class="control-label">Origen del Presupuesto</label></div>
+                <div class="col-sm-12">
                     <div class="row">
                         @foreach ($origenes_financiamiento as $origen)
                             <div class="col-sm-3">
                                 <div class="form-group">
-                                    <label for="origen_{{$origen->id}}" class="control-label">{{$origen->descripcion}}</label>
-                                    <input type="number" class="form-control origen-financiamiento" id="origen_{{$origen->id}}" name="origen[{{$origen->id}}]" data-origen-id="{{$origen->id}}" data-captura-id="">
+                                    <label class="control-label">
+                                        {{$origen->descripcion}} :
+                                    </label>
+                                    <span class="text-muted totales-financiamiento" data-total-origen-id="{{$origen->id}}">
+                                        $ 0.00
+                                    </span>
                                 </div>
                             </div>
                         @endforeach
                     </div>
                 </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label">
+                            Total Requerido :
+                        </label>
+                        <span class="text-muted" id="total-presupuesto-requerido">$ 0.00</span>
+                    </div>
+                </div>
             </div>
+        
             <div class="row" id="grid_distribucion_presupuesto">
                 <div class="col-sm-12">
                     <div class="panel panel-primary datagrid" id="datagridPresupuesto" data-edit-row="editar_presupuesto">
@@ -527,7 +510,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-3">
+                                <!--div class="col-sm-3">
                                     <div class="btn-toolbar pull-right" >
                                         <div class="btn-group" style="margin:5px">
                                             <button type="button" class="btn btn-success" id="btn-agregar-presupuesto">
@@ -551,7 +534,7 @@
                                             </ul>
                                         </div>
                                     </div>
-                                </div>
+                                </div-->
                             </div>
                         </div>
                         <table class="table table-striped table-hover">
@@ -560,7 +543,7 @@
                                     <th><input type="checkbox" class="check-select-all-rows"></th>
                                     <th width="100px">Partida</th>
                                     <th>Descripción</th>
-                                    <th width="100px">Cantidad</th>
+                                    <th width="100px">Monto</th>
                                     <th width="90px">%</th>
                                 </tr>
                             </thead>
@@ -569,7 +552,6 @@
                     </div>
                 </div>
             </div>
-        </form>
         </div><!-- tab-pane -->
         <!--  End Tab Panel: Presupuesto y Propuesta  -->
 
@@ -698,9 +680,51 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Beneficiarios
+                                </label>
+                                <p class="form-control-static">
+                                    Tipo Beneficiario
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="control-label" for="totalbeneficiariosf">Femenino</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="fa fa-female"></span></span>
+                                    <input type="number" class="form-control benef-totales" name="totalbeneficiariosf" id="totalbeneficiariosf">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="control-label" for="totalbeneficiariosm">Masculino</label>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><span class="fa fa-male"></span></span>
+                                    <input type="number" class="form-control benef-totales" name="totalbeneficiariosm" id="totalbeneficiariosm">
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <label class="control-label">Calanderizado de Ministraciones</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="row">
+                                @foreach ($meses as $clave => $mes)
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <span class="input-group-addon">{{$mes}}</span>
+                                                <input id="mes-{{$clave}}" name="mes[{{$clave}}]" type="number" class="form-control input-sm presupuesto-mes" data-presupuesto-mes="{{$clave}}" data-presupuesto-id="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                         <div class="col-sm-12 hidden">
@@ -729,25 +753,21 @@
                                 </table>
                             </div>
                         </div>
-                        <div class="col-sm-12">
-                            <div class="row">
-                                @foreach ($meses as $clave => $mes)
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <label for="mes-{{$clave}}" class="control-label">{{$mes}}</label>
-                                            <input id="mes-{{$clave}}" name="mes[{{$clave}}]" type="number" class="form-control input-sm presupuesto-mes" data-presupuesto-mes="{{$clave}}" data-presupuesto-id="">
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
                         <div class="col-sm-5">
                             <div class="form-group">
-                                <label for="cantidad-presupuesto" class="control-label">
-                                    <span class="fa fa-link"></span> Cantidad
-                                </label>
-                                <span class="form-control control-espejo" data-espejo-id="#cantidad-presupuesto"></span>
-                                <input type="hidden" id="cantidad-presupuesto" name="cantidad-presupuesto"/>
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        <span class="fa fa-link"></span> Total
+                                    </span>
+                                    <input type="hidden" id="cantidad-presupuesto" name="cantidad-presupuesto"/>
+                                    <span class="form-control control-espejo" data-espejo-id="#cantidad-presupuesto"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label">Metas</label>
                             </div>
                         </div>
                     </div>
