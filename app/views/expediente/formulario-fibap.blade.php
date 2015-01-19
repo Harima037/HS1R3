@@ -418,8 +418,9 @@
                     <thead>
                         <tr>
                             <th><input type="checkbox" class="check-select-all-rows"></th>
+                            <th>Entregable</th>
+                            <th>Tipo</th>
                             <th>Acción</th>
-                            <th>Objetivo</th>
                             <th>Modalidad</th>
                             <th>Presupuesto</th>
                             <th width="50px"></th>
@@ -675,34 +676,7 @@
             <div class="modal-body">
                 <form id="form-presupuesto">
                     <div class="row">
-                        <div class="col-sm-12">
-                            <div class="form-group">
-                                <label for="objeto-gasto-presupuesto" class="control-label">Capitulo, Concepto, Partida</label>
-                                <select class="form-control selectpicker" id="objeto-gasto-presupuesto" name="objeto-gasto-presupuesto" data-live-search="true" data-size="8">
-                                    <option value="">Seleciona una partida</option>
-                                    @foreach ($objetos_gasto as $capitulo)
-                                        @if(count($capitulo->hijos))
-                                            @foreach ($capitulo->hijos as $concepto)
-                                                @if(count($concepto->hijos))
-                                                    @foreach ($concepto->hijos as $generica)
-                                                        @if(count($generica->hijos))
-                                                            <optgroup label="{{$capitulo->clave . ' ' . $capitulo->descripcion . '<br>' . $concepto->clave . ' ' . $concepto->descripcion . '<br>' . $generica->clave . ' ' . $generica->descripcion}}">
-                                                                @foreach ($generica->hijos as $especifica)
-                                                                    <option value="{{$especifica->id}}">
-                                                                        {{$especifica->clave . ' ' . $especifica->descripcion}}
-                                                                    </option>
-                                                                @endforeach
-                                                            </optgroup>
-                                                        @endif
-                                                    @endforeach
-                                                @endif
-                                            @endforeach
-                                        @endif
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-sm-2">
+                        <div class="col-sm-4">
                             <div class="form-group">
                                 <label for="jurisdiccion-accion" class="label-control selectpicker">Jurisdicción</label>
                                 <select id="jurisdiccion-accion" name="jurisdiccion-accion" class="form-control selectpicker" data-live-search="true" data-size="8">
@@ -713,14 +687,14 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-sm-5">
+                        <div class="col-sm-4">
                             <div class="form-group">
                                 <label for="municipio-accion" class="label-control selectpicker">Municipio</label>
                                 <select id="municipio-accion" name="municipio-accion" class="form-control" data-live-search="true" data-size="8">
                                 </select>
                             </div>
                         </div>
-                        <div class="col-sm-5">
+                        <div class="col-sm-4">
                             <div class="form-group">
                                 <label for="localidad-accion" class="label-control selectpicker">Localidad</label>
                                 <select id="localidad-accion" name="localidad-accion" class="form-control" data-live-search="true" data-size="8">
@@ -728,7 +702,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-3">
                             <div class="form-group">
                                 <label class="control-label">
                                     Beneficiarios
@@ -740,93 +714,123 @@
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
-                                <label class="control-label" for="totalbeneficiariosf">Femenino</label>
+                                <label class="control-label" for="beneficiarios-f">Femenino</label>
                                 <div class="input-group">
                                     <span class="input-group-addon"><span class="fa fa-female"></span></span>
-                                    <input type="number" class="form-control benef-totales" name="totalbeneficiariosf" id="totalbeneficiariosf">
+                                    <input type="number" class="form-control benef-totales-accion" name="beneficiarios-f" id="beneficiarios-f">
                                 </div>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
-                                <label class="control-label" for="totalbeneficiariosm">Masculino</label>
+                                <label class="control-label" for="beneficiarios-m">Masculino</label>
                                 <div class="input-group">
                                     <span class="input-group-addon"><span class="fa fa-male"></span></span>
-                                    <input type="number" class="form-control benef-totales" name="totalbeneficiariosm" id="totalbeneficiariosm">
+                                    <input type="number" class="form-control benef-totales-accion" name="beneficiarios-m" id="beneficiarios-m">
                                 </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="control-label"><span class="fa fa-link"></span> Total</label>
+                                <span class="form-control control-espejo" data-espejo-id="#total-beneficiarios-accion"></span>
+                                <input type="hidden" id="total-beneficiarios-accion">
                             </div>
                         </div>
                         <div class="col-sm-12">
                             <div class="form-group">
-                                <label class="control-label">Calenderizado de Ministraciones</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="row">
-                                @foreach ($meses as $clave => $mes)
-                                    <div class="col-sm-3">
-                                        <div class="form-group">
-                                            <div class="input-group">
-                                                <span class="input-group-addon">{{$mes}}</span>
-                                                <input id="mes-{{$clave}}" name="mes[{{$clave}}]" type="number" class="form-control input-sm presupuesto-mes" data-presupuesto-mes="{{$clave}}" data-presupuesto-id="">
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                        <div class="col-sm-5">
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        <span class="fa fa-link"></span> Total
-                                    </span>
-                                    <input type="hidden" id="cantidad-presupuesto" name="cantidad-presupuesto"/>
-                                    <span class="form-control control-espejo" data-espejo-id="#cantidad-presupuesto"></span>
-                                </div>
+                                <label class="control-label">Calenderización</label>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <div class="form-group">
-                                <label class="control-label">Metas</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="indicador" class="control-label">Indicador</label>
-                                <input type="text" class="form-control" name="indicador" id="indicador">
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="unidad-medida" class="control-label">Unidad de Medida</label>
-                                <input type="text" class="form-control" name="unidad-medida" id="unidad-medida">
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="row">
-                                @foreach ($meses as $clave => $mes)
-                                    <div class="col-sm-3">
+                    <div role="tabpanel">
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active">
+                                <a href="#calendarizado-presupuesto" aria-controls="calendarizado-presupuesto" role="tab" data-toggle="tab">
+                                    <span class="fa fa-usd"></span> Presupuesto
+                                </a>
+                            </li>
+                            <li role="presentation">
+                                <a href="#calendarizado-metas" aria-controls="calendarizado-metas" role="tab" data-toggle="tab">
+                                    <span class="fa fa-table"></span> Metas
+                                </a>
+                            </li>
+                        </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane active" id="calendarizado-presupuesto">
+                                <br>
+                                <div class="row">
+                                    @foreach ($meses as $clave => $mes)
+                                        <div class="col-sm-3">
+                                            <div class="form-group" data-grupo-mes="{{$clave}}">
+                                                <label class="control-label">{{$mes}}</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-addon clave-partida-1">000</span>
+                                                    <input id="mes-{{$clave}}-1" name="mes[{{$clave}}][1]" type="number" class="form-control input-sm presupuesto-mes valor-partida-1" data-presupuesto-mes="{{$clave}}" data-presupuesto-id="" data-presupuesto-partida-id="">
+                                                </div>
+                                                <div class="input-group">
+                                                    <span class="input-group-addon clave-partida-2">000</span>
+                                                    <input id="mes-{{$clave}}-2" name="mes[{{$clave}}][2]" type="number" class="form-control input-sm presupuesto-mes valor-partida-2" data-presupuesto-mes="{{$clave}}" data-presupuesto-id="" data-presupuesto-partida-id="">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                    <div class="clearfix"></div>
+                                    <div class="col-sm-5">
                                         <div class="form-group">
                                             <div class="input-group">
-                                                <span class="input-group-addon">{{$mes}}</span>
-                                                <input id="meta-mes-{{$clave}}" name="meta-mes[{{$clave}}]" type="number" class="form-control input-sm meta-mes" data-meta-mes="{{$clave}}" data-meta-id="">
+                                                <span class="input-group-addon">
+                                                    <span class="fa fa-link"></span> Total
+                                                </span>
+                                                <input type="hidden" id="cantidad-presupuesto" name="cantidad-presupuesto"/>
+                                                <span class="form-control control-espejo" data-espejo-id="#cantidad-presupuesto"></span>
                                             </div>
                                         </div>
                                     </div>
-                                @endforeach
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-sm-5">
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        <span class="fa fa-link"></span> Total
-                                    </span>
-                                    <input type="hidden" id="cantidad-meta" name="cantidad-meta"/>
-                                    <span class="form-control control-espejo" data-espejo-id="#cantidad-meta"></span>
+                            <div role="tabpanel" class="tab-pane" id="calendarizado-metas">
+                                <br>
+                                <div class="row">
+                                    <div class="col-sm-8">
+                                        <div class="form-group">
+                                            <label for="indicador" class="control-label">Indicador</label>
+                                            <input type="text" class="form-control" name="indicador" id="indicador">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="unidad-medida" class="control-label">Unidad de Medida</label>
+                                            {{Form::select('unidad-medida',array(''=>'Seleccione una unidad') + $unidades_medida->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'unidad-medida','data-live-search'=>'true','data-size'=>'8'))}}
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="row">
+                                            @foreach ($meses as $clave => $mes)
+                                                <div class="col-sm-3">
+                                                    <div class="form-group">
+                                                        <div class="input-group">
+                                                            <span class="input-group-addon">{{$mes}}</span>
+                                                            <input id="meta-mes-{{$clave}}" name="meta-mes[{{$clave}}]" type="number" class="form-control input-sm meta-mes" data-meta-mes="{{$clave}}" data-meta-id="">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <span class="input-group-addon">
+                                                    <span class="fa fa-link"></span> Total
+                                                </span>
+                                                <input type="hidden" id="cantidad-meta" name="cantidad-meta"/>
+                                                <span class="form-control control-espejo" data-espejo-id="#cantidad-meta"></span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -851,6 +855,55 @@
             <div class="modal-body">
                 <form id="form-accion">
                     <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="objeto-gasto-presupuesto" class="control-label">Capitulo, Concepto, Partida</label>
+                                <select class="form-control selectpicker" id="objeto-gasto-presupuesto_1" name="objeto-gasto-presupuesto[]" data-live-search="true" data-size="8">
+                                    <option value="">Seleciona una partida</option>
+                                    @foreach ($objetos_gasto as $capitulo)
+                                        @if(count($capitulo->hijos))
+                                            @foreach ($capitulo->hijos as $concepto)
+                                                @if(count($concepto->hijos))
+                                                    @foreach ($concepto->hijos as $generica)
+                                                        @if(count($generica->hijos))
+                                                            <optgroup label="{{$capitulo->clave . ' ' . $capitulo->descripcion . '<br>' . $concepto->clave . ' ' . $concepto->descripcion . '<br>' . $generica->clave . ' ' . $generica->descripcion}}">
+                                                                @foreach ($generica->hijos as $especifica)
+                                                                    <option value="{{$especifica->id}}">
+                                                                        {{$especifica->clave}} - {{$especifica->descripcion}}
+                                                                    </option>
+                                                                @endforeach
+                                                            </optgroup>
+                                                        @endif
+                                                    @endforeach
+                                                @endif
+                                            @endforeach
+                                        @endif
+                                    @endforeach
+                                </select>
+                                <select class="form-control selectpicker" id="objeto-gasto-presupuesto_2" name="objeto-gasto-presupuesto[]" data-live-search="true" data-size="8">
+                                    <option value="">Seleciona una partida</option>
+                                    @foreach ($objetos_gasto as $capitulo)
+                                        @if(count($capitulo->hijos))
+                                            @foreach ($capitulo->hijos as $concepto)
+                                                @if(count($concepto->hijos))
+                                                    @foreach ($concepto->hijos as $generica)
+                                                        @if(count($generica->hijos))
+                                                            <optgroup label="{{$capitulo->clave . ' ' . $capitulo->descripcion . '<br>' . $concepto->clave . ' ' . $concepto->descripcion . '<br>' . $generica->clave . ' ' . $generica->descripcion}}">
+                                                                @foreach ($generica->hijos as $especifica)
+                                                                    <option value="{{$especifica->id}}">
+                                                                        {{$especifica->clave}} - {{$especifica->descripcion}}
+                                                                    </option>
+                                                                @endforeach
+                                                            </optgroup>
+                                                        @endif
+                                                    @endforeach
+                                                @endif
+                                            @endforeach
+                                        @endif
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label for="entregable" class="control-label">Entregable</label>
@@ -869,31 +922,10 @@
                                 <input type="text" class="form-control" id="accion-componente" name="accion-componente">
                             </div>
                         </div>
-                        <div class="col-sm-12">
-                            <div class="form-group">
-                                <label for="objetivo-componente" class="control-label">Objetivo</label>
-                                <input type="text" class="form-control" id="objetivo-componente" name="objetivo-componente">
-                            </div>
-                        </div>
                     </div>
                     <div class="row">
-                        <!--div class="col-sm-7">
-                            <div class="form-group">
-                                <label class="control-label">Periodo de Ejecución</label>
-                                <div class="input-group">
-                                    <span class="input-group-addon">
-                                        Del
-                                    </span>
-                                    <input type="date" placeholder="aaaa-mm-dd" class="form-control" id="accion-periodo-ejecucion-inicio" name="accion-periodo-ejecucion-inicio">
-                                    <span class="input-group-addon">
-                                        Al
-                                    </span>
-                                    <input type="date" placeholder="aaaa-mm-dd" class="form-control" id="accion-periodo-ejecucion-final" name="accion-periodo-ejecucion-final">
-                                </div>
-                            </div>
-                        </div-->
-                        <div class="col-sm-1"><label class="control-label">Origen</label></div>
-                        <div class="col-sm-11">
+                        <div class="col-sm-12"><label class="control-label">Origen del Presupuesto</label></div>
+                        <div class="col-sm-12">
                             <div class="row">
                                 @foreach ($origenes_financiamiento as $origen)
                                     <div class="col-sm-3">

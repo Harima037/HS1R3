@@ -35,6 +35,7 @@ class FibapController extends \BaseController {
 
 		$datos += array(
 			'entregables' => Entregable::all(),
+			'unidades_medida' => UnidadMedida::all(),
 			'tipos_proyectos'=>TipoProyecto::all(),
 			'programa_presupuestario'=>ProgramaPresupuestario::all(),
 			'objetivos_ped'=>ObjetivoPED::whereNull('idPadre')->where('id','=',25)->with('hijos')->get(),
