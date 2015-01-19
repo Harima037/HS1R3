@@ -52,6 +52,9 @@ $('.accion-origen-financiamiento').on('keyup',function(){
 $('.presupuesto-mes').on('keyup',function(){
 	sumar_valores('.presupuesto-mes','#cantidad-presupuesto');
 });
+$('.meta-mes').on('keyup',function(){
+	sumar_valores('.meta-mes','#cantidad-meta');
+});
 $('#cobertura').on('change',function(){
 	deshabilita_paneles($(this).val());
 });
@@ -107,6 +110,9 @@ if($('#id').val()){
 			$('#presupuesto-requerido').change();
 			$('#periodo-ejecucion-inicio').val(response.data.periodoEjecucionInicio);
 			$('#periodo-ejecucion-final').val(response.data.periodoEjecucionFinal);
+
+			$('#total-presupuesto-requerido').text('$ ' + response.data.presupuestoRequerido.format());
+			$('#total-presupuesto-requerido').attr('data-valor',response.data.presupuestoRequerido);
 
 			actualizar_tabla_meses(response.data.jurisdicciones);
 			if(response.data.periodoEjecucionInicio){
@@ -292,6 +298,10 @@ function editar_presupuesto(e){
     });
 }
 
+function ver_distribucion_partida(e){
+	console.log(e);
+}
+
 function editar_accion(e){
 	var parametros = {'ver':'accion'};
 	fibapResource.get(e,parametros,{
@@ -300,8 +310,8 @@ function editar_accion(e){
 
             $('#accion-presupuesto-requerido').val(response.data.presupuestoRequerido);
 			$('#accion-presupuesto-requerido').change();
-			$('#accion-periodo-ejecucion-inicio').val(response.data.periodoEjecucionInicio);
-			$('#accion-periodo-ejecucion-final').val(response.data.periodoEjecucionFinal);
+			//$('#accion-periodo-ejecucion-inicio').val(response.data.periodoEjecucionInicio);
+			//$('#accion-periodo-ejecucion-final').val(response.data.periodoEjecucionFinal);
 			for(var indx in response.data.propuestas_financiamiento){
             	var origen = response.data.propuestas_financiamiento[indx];
             	$('#accion-origen-'+origen.idOrigenFinanciamiento).val(origen.cantidad);
@@ -702,8 +712,8 @@ function llenar_datagrid_acciones(datos){
 		}
 	});
 
-	$('#total-presupuesto-requerido').attr('data-valor',suma_total);
-	$('#total-presupuesto-requerido').text('$ ' + suma_total.format());
+	$('#total-presupuesto-distribuido').attr('data-valor',suma_total);
+	$('#total-presupuesto-distribuido').text('$ ' + suma_total.format());
 
 	if(datos.length == 0){
 		$('#datagridAcciones > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
@@ -761,10 +771,10 @@ function llenar_datagrid_presupuestos(datos){
 	}
 
 	if(distribucion.length == 0){
-		actualiza_porcentaje(0);
+		actualiza_porcentaje('#porcentaje_completo',0);
 		$('#datagridPresupuesto > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
 	}else{
-		actualiza_porcentaje(total_porcentaje);
+		actualiza_porcentaje('#porcentaje_completo',total_porcentaje);
 		presupuestoDatagrid.cargarDatos(distribucion);
 	}
 }
@@ -779,10 +789,11 @@ function llenar_datagrid_distribucion(datos,total_presupuesto){
 		var porcentaje = (datos[indx].cantidad * 100) / parseInt(total_presupuesto);
 
 		presupuesto.id = datos[indx].id;
-		presupuesto.partida = datos[indx].objeto_gasto.clave;
-		presupuesto.descripcion = datos[indx].objeto_gasto.descripcion;
-		presupuesto.cantidad = '$ ' + datos[indx].cantidad.format();
-		presupuesto.porcentaje = parseFloat(porcentaje.toFixed(2));
+		presupuesto.municipio = datos[indx].municipio.nombre;
+		presupuesto.localidad = datos[indx].localidad.nombre;
+		presupuesto.monto = '$ ' + datos[indx].cantidad.format();
+		presupuesto.unidad = 'UnidadMedida';
+		presupuesto.Meta = '000';
 
 		total_porcentaje += parseFloat(porcentaje.toFixed(2));
 
@@ -790,10 +801,10 @@ function llenar_datagrid_distribucion(datos,total_presupuesto){
 	}
 
 	if(distribucion.length == 0){
-		//actualiza_porcentaje(0);
+		actualiza_porcentaje('#porcentaje_accion',0);
 		$('#datagridDistribucion > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
 	}else{
-		//actualiza_porcentaje(total_porcentaje);
+		actualiza_porcentaje('#porcentaje_accion',total_porcentaje);
 		distribucionDataGrid.cargarDatos(distribucion);
 	}
 
@@ -832,19 +843,19 @@ function mostrar_detalles(id){
 	}
 }
 
-function actualiza_porcentaje(porcentaje){
-	$('#porcentaje_completo').text(porcentaje + ' %');
-	$('#porcentaje_completo').attr('aria-valuenow',porcentaje);
-	$('#porcentaje_completo').attr('style','width:'+porcentaje + '%;');
+function actualiza_porcentaje(id,porcentaje){
+	$(id).text(porcentaje + ' %');
+	$(id).attr('aria-valuenow',porcentaje);
+	$(id).attr('style','width:'+porcentaje + '%;');
 	if(porcentaje > 100){
-		$('#porcentaje_completo').addClass('progress-bar-danger');
+		$(id).addClass('progress-bar-danger');
 		MessageManager.show({
 			data:'El porcentaje se exedio, por favor modifique la propuesta de financiamiento o elimine uno o varios elementos en la distribución del presupuesto para corregir esto.',
 			type:'ERR',
 			container: '#grid_distribucion_presupuesto'
 		});
 	}else{
-		$('#porcentaje_completo').removeClass('progress-bar-danger');
+		$(id).removeClass('progress-bar-danger');
 	}
 }
 
