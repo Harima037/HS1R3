@@ -22,7 +22,7 @@ var distribucionDataGrid = new Datagrid('#datagridDistribucion',fibapResource); 
 antecedenteDatagrid.init();
 presupuestoDatagrid.init();
 accionesDatagrid.init();
-distribucionDataGrid.init();
+//distribucionDataGrid.init();
 
 //Ventanas modales
 var modal_antecedente = '#modal-antecedente';
@@ -93,6 +93,7 @@ $('.control-espejo').each(function(){
 		$('.control-espejo[data-espejo-id="#'+id+'"]').text($(this).val());
 	});
 });
+//Si hay un id, entonces cargamos los datos para editar
 if($('#id').val()){
 	var parametros = {ver:'fibap'};
 	fibapResource.get($('#id').val(),parametros,{
@@ -307,6 +308,7 @@ function ver_distribucion_partida(e){
 }
 
 function editar_accion(e){
+	ocultar_detalles(true);
 	var parametros = {'ver':'accion'};
 	fibapResource.get(e,parametros,{
         _success: function(response){
@@ -327,6 +329,9 @@ function editar_accion(e){
             	$('#accion-origen-'+origen.idOrigenFinanciamiento).attr('data-captura-id',origen.id);
             }
 
+            $('#indicador').val(response.data.datos_componente.indicador);
+            $('#unidad-medida').val(response.data.datos_componente.idUnidadMedida);
+            $('#unidad-medida').change();
             $('#entregable').val(response.data.datos_componente.idEntregable);
             $('#entregable').change();
             $('#tipo-componente').val(response.data.datos_componente.idTipoComponente);
@@ -392,6 +397,32 @@ $("#datagridPresupuesto .btn-delete-rows").on('click',function(e){
 	}else{ MessageManager.show({data:'No has seleccionado ningún registro.',type:'ADV',timer:3}); }
 });
 
+$("#datagridAcciones .btn-delete-rows").unbind('click');
+$("#datagridAcciones .btn-delete-rows").on('click',function(e){
+	e.preventDefault();
+	var rows = [];
+	var contador= 0;
+    $(this).parents("#datagridAcciones").find("tbody").find("input[type=checkbox]:checked").each(function () {
+		contador++;
+        rows.push($(this).parent().parent().data("id"));
+	});
+	if(contador>0){
+		Confirm.show({
+				titulo:"Eliminar Acción",
+				mensaje: "¿Estás seguro que deseas eliminar la(s) acción(es) seleccionada(s)?",
+				callback: function(){
+					fibapResource.delete(rows,{'rows': rows, 'eliminar': 'accion', 'id-fibap': $('#id').val()},{
+                        _success: function(response){
+                        	llenar_datagrid_acciones(response.acciones);
+                        	MessageManager.show({data:'Acción(es) eliminada(s) con éxito.',timer:3});
+                        },
+                        _error: function(jqXHR){  MessageManager.show(jqXHR.responseJSON); }
+        			});
+				}
+		});
+	}else{ MessageManager.show({data:'No has seleccionado ningún registro.',type:'ADV',timer:3}); }
+});
+
 //*********************************   Funcionalidad de Botones principales (Guardar y Cancelar)   *********************************
 $('#btn-accion-guardar').on('click',function(){
 	var parametros = $('#'+form_accion).serialize();
@@ -411,7 +442,7 @@ $('#btn-accion-guardar').on('click',function(){
 			_success: function(response){
 				MessageManager.show({data:'Cambios almacenados con éxito',type:'OK',timer:3});
 				llenar_datagrid_acciones(response.acciones);
-				$(modal_presupuesto).modal('hide');
+				$(modal_accion).modal('hide');
 			},
 			_error: function(response){
 				try{
@@ -456,14 +487,27 @@ $('#btn-accion-guardar').on('click',function(){
 $('#btn-presupuesto-guardar').on('click',function(){
 	var parametros = $('#'+form_presupuesto).serialize();
 	parametros += '&formulario='+form_presupuesto + '&fibap-id=' + $('#id').val();
+	//Obtenemos el id de la Acción, la cual esta en un atributo en el datagrid
 	var accion_id = $('#datagridDistribucion').attr('data-selected-id');
 	parametros += '&accion-id='+accion_id;
+
+	//Obtenemos los ids de las Partidas capturadas
+	var partida_1_id = $('#datagridDistribucion').attr('data-partida-1-id');
+	var partida_2_id = $('#datagridDistribucion').attr('data-partida-2-id');
+	parametros += '&partidas[1]='+partida_1_id+'&partidas[2]='+partida_2_id;
+
 	Validation.cleanFormErrors('#'+form_presupuesto);
+
 	if($('#id-presupuesto').val()){
 		var meses_capturados = '';
 		$('.presupuesto-mes').each(function(){
 			if($(this).attr('data-presupuesto-id')){
-				meses_capturados += '&meses-capturados['+$(this).attr('data-presupuesto-mes')+']='+$(this).attr('data-presupuesto-id');
+				if($(this).hasClass('valor-partida-1')){
+					meses_capturados += '&meses-capturados[1]['+$(this).attr('data-presupuesto-mes')+']='+$(this).attr('data-presupuesto-id');
+				}else{
+					meses_capturados += '&meses-capturados[2]['+$(this).attr('data-presupuesto-mes')+']='+$(this).attr('data-presupuesto-id');
+				}
+				
 			}
 		});
 		parametros += meses_capturados;
@@ -828,14 +872,21 @@ function llenar_datagrid_distribucion(datos,total_presupuesto){
 
 }
 
-function mostrar_detalles(id){
-	//datagrid-contenedor
-	//datagridDistribucion
+function ocultar_detalles(remover_contendor){
 	$('#datagridAcciones > table > tbody > tr > td > span.boton-detalle > span.fa-minus-square-o').addClass('fa-plus-square-o');
 	$('#datagridAcciones > table > tbody > tr > td > span.boton-detalle > span.fa-minus-square-o').removeClass('fa-minus-square-o');
 	$('#datagridAcciones > table > tbody > tr.bg-info').removeClass('text-primary');
 	$('#datagridAcciones > table > tbody > tr.bg-info').removeClass('bg-info');
 	$('#datagridDistribucion').appendTo('#datagrid-contenedor');
+	if(remover_contendor){
+		$('#datagridAcciones > table > tbody > tr.contendor-desechable').remove();
+	}
+}
+
+function mostrar_detalles(id){
+	//datagrid-contenedor
+	//datagridDistribucion
+	ocultar_detalles(false);
 
 	if($('#datagrid-contenedor-' + id).length){
 		$('#datagridAcciones > table > tbody > tr.contendor-desechable').remove();
@@ -856,7 +907,7 @@ function mostrar_detalles(id){
 				$('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"]').after('<tr class="contendor-desechable"><td colspan="6" id="datagrid-contenedor-' + id + '"></td></tr>');
 				$('#datagridDistribucion').appendTo('#datagrid-contenedor-' + id);
 				$('#datagridDistribucion').attr('data-selected-id',id);
-
+				
 				actualizar_claves_presupuesto(response.data.partidas);
 			}
 		});
@@ -936,12 +987,11 @@ function habilitar_meses(fechaInicio,fechaFinal){
 }
 
 function actualizar_claves_presupuesto(datos){
-	console.log(datos);
 	for(var i in datos){
 		var id = parseInt(i) + 1;
 		$('#calendarizado-presupuesto .clave-partida-'+id).text(datos[i].clave);
 		$('#calendarizado-presupuesto .clave-partida-'+id).attr('title',datos[i].descripcion);
-		$('#calendarizado-presupuesto .valor-partida-'+id).attr('data-presupuesto-partida-id',datos[i].id);
+		$('#datagridDistribucion').attr('data-partida-' + id + '-id',datos[i].id);
 	}
 }
 

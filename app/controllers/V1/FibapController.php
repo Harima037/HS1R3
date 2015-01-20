@@ -44,6 +44,9 @@ class FibapController extends BaseController {
 	);
 
 	private $reglasAccion = array(
+		//'objeto-gasto-presupuesto'		=> 'required',
+		'indicador'						=> 'required',
+		'unidad-medida'					=> 'required',
 		'accion-presupuesto-requerido'	=> 'required|numeric|min:1',
 		'entregable' 					=> 'required',
 		'tipo-componente' 				=> 'required',
@@ -58,7 +61,12 @@ class FibapController extends BaseController {
 	);
 
 	private $reglasPresupuesto = array(
-		'objeto-gasto-presupuesto'	=> 'required',
+		'beneficiarios-f'			=> 'required',
+		'beneficiarios-m'			=> 'required',
+		'jurisdiccion-accion'		=> 'required',
+		'municipio-accion'			=> 'required',
+		'localidad-accion'			=> 'required',
+		'cantidad-meta'				=> 'required|numeric|min:1',
 		'cantidad-presupuesto'		=> 'required|numeric|min:1'
 	);
 
@@ -275,6 +283,11 @@ class FibapController extends BaseController {
 			if($validacion === TRUE){
 				try{
 					if($parametros['formulario'] == 'form-fibap-datos'){
+
+						/**
+						*	Formulario de datos generales del FIBAP (POST)
+						**/
+
 						if(!isset($parametros['documento-soporte'])){
 							$respuesta['data']['data'] = 'Debe seleccionar al menos un documento.';
 							throw new Exception("Error Processing Request", 1);
@@ -379,6 +392,11 @@ class FibapController extends BaseController {
 						});
 
 					}elseif($parametros['formulario'] == 'form-antecedente'){
+
+						/**
+						*	Formulario de datos especificos de Antecedente del FIBAP (POST)
+						**/
+
 						$fecha_corte = DateTime::createFromFormat('d/m/Y',Input::get('fecha-corte-antecedente'));
 
 						if(!$fecha_corte){
@@ -404,12 +422,16 @@ class FibapController extends BaseController {
 						$respuesta['data'] = array('data'=>$recurso,'antecedentes' => $fibap->antecedentesFinancieros);
 
 					}elseif($parametros['formulario'] == 'form-presupuesto'){ //Nuevo Presupuesto
-
+						throw new Exception("Error Processing Request", 1);
 						/***
-								Nuevo Presupuesto
-						****/
+						*	Formulario de datos del desgloce del presupuesto de la Accion (POST)
+						*
+						*	- Guarda una nueva distribución de presupuesto por mes y partida
+						* 	- Guarda datos del desgloce del componete (datos a exportar al proyecto) (Metas,Beneficiarios,Localidad)
+						*	- Guardar el desgloce de metas por mes del componente
+						***/
+
 						$accion_id = $parametros['accion-id'];
-						//$fibap = FIBAP::with('distribucionPresupuesto')->find($parametros['fibap-id']);
 						$accion = Accion::with('distribucionPresupuesto')->find($accion_id);
 
 						$clave_municipio = $parametros['municipio-accion'];
@@ -471,38 +493,74 @@ class FibapController extends BaseController {
 							$accion->distribucionPresupuestoAgrupado->load('municipio','localidad');
 							return array('data'=>$accion,'distribucion' => $accion->distribucionPresupuestoAgrupado);
 						});
+
 					}elseif($parametros['formulario'] == 'form-accion'){ //Nueva Accion
+
 						/***
-								Nueva Acción
-						****/
+						*	Formulario de datos generales de Accion (POST)
+						*
+						*	- Guarda una nueva acción
+						*	- Guarda una relacion de la acción con 2 partidas prespuestarias
+						* 	- Guarda datos del componete (datos a exportar al proyecto)
+						*	- Guarda la propuesta del financiamiento
+						***/
+
+						//Obtenemos las partidas (Deben ser 2 en un arreglo)
+						$partidas = array();
+						foreach ($parametros['objeto-gasto-presupuesto'] as $partida) {
+							if($partida){
+								$partidas[] = $partida;
+							}
+						}
+
+						if(count($partidas) < 2){
+							$index = count($partidas);
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"objeto-gasto-presupuesto_' . ($index + 1) . '","error":"Se deben seleccionar dos Partidas"}';
+							throw new Exception("Se deben seleccionar al menos dos partidas presupuestales", 1);
+						}
 
 						$fibap = FIBAP::with('acciones')->find($parametros['fibap-id']);
 						$accion = new Accion;
 						
-						$origenes = $parametros['accion-origen'];
-						
+						//Datos del componente (Estos datos se eportarán al crear el proyecto, para generar los componentes)
 						$componente = new FibapDatosComponente;
-						$componente->idFibap = $fibap->id;
-						$componente->idEntregable = $parametros['entregable'];
-						$componente->idTipoComponente = $parametros['tipo-componente'];
+						$componente->idFibap 			= $fibap->id;
+						$componente->idEntregable 		= $parametros['entregable'];
+						$componente->idTipoComponente 	= $parametros['tipo-componente'];
 						$componente->idAccionComponente = $parametros['accion-componente'];
+						$componente->idUnidadMedida		= $parametros['unidad-medida'];
+						$componente->indicador			= $parametros['indicador'];
 
-						$partidas = $parametros['objeto-gasto-presupuesto'];
-
-						$respuesta['data'] = DB::transaction(function() use ($origenes, $fibap, $accion, $componente, $partidas){
-							$presupuesto_suma = 0;
-							foreach ($origenes as $origen => $valor) {
-								if($valor > 0){
-									$origen_finan = new PropuestaFinanciamiento;
-									$origen_finan->idOrigenFinanciamiento = $origen;
-									$origen_finan->cantidad = $valor;
-									$origen_finan->idFibap = $fibap->id;
-									$guardar_origenes[] = $origen_finan;
-									$presupuesto_suma += $valor;
-								}
+						//Obtenemos los origenes del presupuesto
+						$origenes = $parametros['accion-origen'];
+						//Arreglo con los objetos a guardar en la base de datos, relacionados a la Accion
+						$guardar_origenes = array();
+						$presupuesto_suma = 0;
+						foreach ($origenes as $origen => $valor) {
+							if($valor > 0){
+								$origen_finan = new PropuestaFinanciamiento;
+								$origen_finan->idOrigenFinanciamiento = $origen;
+								$origen_finan->cantidad = $valor;
+								$origen_finan->idFibap = $fibap->id;
+								$guardar_origenes[] = $origen_finan;
+								$presupuesto_suma += $valor;
 							}
-							$accion->presupuestoRequerido = $presupuesto_suma;
+						}
+						$accion->presupuestoRequerido = $presupuesto_suma;
 
+						//Obtenemos la suma de los presupuestos ya capturados y sumamos el nuevo presupuesto
+						$total_presupuesto = $fibap->acciones->sum('presupuestoRequerido');
+						$total_presupuesto += $presupuesto_suma;
+
+						if($total_presupuesto > $fibap->presupuestoRequerido){
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"accion-presupuesto-requerido","error":"El presupuesto capturado sobrepasa el Presupuesto Requerido asignado al proyecto."}';
+							throw new Exception("El presupuesto sobrepasa el PresupuestoRequerido de la FIBAP", 1);
+						}
+
+						//Se inicia la transacción
+						$respuesta['data'] = DB::transaction(function() use ($guardar_origenes, $fibap, $accion, $componente, $partidas){
 							if($fibap->acciones()->save($accion)){
 								$accion->partidas()->attach($partidas);
 								$accion->datosComponente()->save($componente);
@@ -531,10 +589,7 @@ class FibapController extends BaseController {
 				$respuesta['http_status'] = $validacion['http_status'];
 				$respuesta['data'] = $validacion['data'];
 			}
-
-
 		}
-
 		return Response::json($respuesta['data'],$respuesta['http_status']);
 	}
 
@@ -889,51 +944,76 @@ class FibapController extends BaseController {
 					}elseif($parametros['formulario'] == 'form-accion'){ //Editar Accion
 
 						/***
-								Editar Acción
-						****/
+						*	Formulario de datos generales de Acción (PUT)
+						*
+						*	- Actualiza datoa de una acción
+						*	- Actualiza la relación de la acción con 2 partidas prespuestarias
+						* 	- Actualiza datos del componete (datos a exportar al proyecto)
+						*	- Actualiza la propuesta del financiamiento
+						***/
 
-						$fibap = FIBAP::find($parametros['fibap-id']);
-						$accion = Accion::with('propuestasFinanciamiento','partidas')->find($id);
+						$fibap = FIBAP::with('acciones')->find($parametros['fibap-id']);
+						$accion = Accion::with('propuestasFinanciamiento','partidas','datosComponente')->find($id);
 						
+						//Se obtienen la prupuesta del financiamiento y los ids de los elementos ya capturados
 						$origenes = $parametros['accion-origen'];
 						$origenes_ids = array();
 						if(isset($parametros['origen-captura-id'])){
 							$origenes_ids = $parametros['origen-captura-id'];
 						}
 						
-						$componente = FibapDatosComponente::where('idFibap','=',$fibap->id)->where('idAccion','=',$id)->get();
-						$componente = $componente[0];
-						$componente->idEntregable = $parametros['entregable'];
-						$componente->idAccionComponente = 2;
-						$componente->idTipoComponente = 2;
-						
+						//$componente = FibapDatosComponente::where('idFibap','=',$fibap->id)->where('idAccion','=',$id)->get();
+						//$componente = $componente[0];
+						$componente = $accion->datosComponente;
+						$componente->idEntregable 		= $parametros['entregable'];
+						$componente->idTipoComponente 	= $parametros['tipo-componente'];
+						$componente->idAccionComponente = $parametros['accion-componente'];
+						$componente->idUnidadMedida 	= $parametros['unidad-medida'];
+						$componente->indicador 			= $parametros['indicador'];
+
+						//Obtenemos las partidas seleccionadas en el formulario y las partidas ya capturadas
 						$partidas_formulario = $parametros['objeto-gasto-presupuesto'];
 						$partidas_anteriores = $accion->partidas->lists('id');
 
+						//Sacamos las diferencias de las partidas seleccionadas y las ya capturadas
 						$partidas['nuevas'] = array_diff($partidas_formulario, $partidas_anteriores);
 						$partidas['borrar'] = array_diff($partidas_anteriores, $partidas_formulario);
 
-						$respuesta['data'] = DB::transaction(function() use ($origenes, $origenes_ids, $fibap, $accion, $componente, $partidas){
-							$guardar_origenes = array();
-							$presupuesto_suma = 0;
-							
-							foreach ($origenes as $origen => $valor) {
-								if(isset($origenes_ids[$origen])){
-									$respuesta['data']['data'] = 'encontrar origen';
-									$origen_finan = $accion->propuestasFinanciamiento()->find($origenes_ids[$origen]);
-									$origen_finan->cantidad = ($valor)? $valor:0;
-									$guardar_origenes[] = $origen_finan;
-								}elseif($valor > 0){
-									$origen_finan = new PropuestaFinanciamiento;
-									$origen_finan->idOrigenFinanciamiento = $origen;
-									$origen_finan->cantidad = $valor;
-									$origen_finan->idFibap = $fibap->id;
-									$guardar_origenes[] = $origen_finan;
-								}
-								$presupuesto_suma += $valor;
+						$guardar_origenes = array();
+						$presupuesto_suma = 0;
+						
+						foreach ($origenes as $origen => $valor) {
+							if(isset($origenes_ids[$origen])){
+								$origen_finan = $accion->propuestasFinanciamiento()->find($origenes_ids[$origen]);
+								$origen_finan->cantidad = ($valor)? $valor:0;
+								$guardar_origenes[] = $origen_finan;
+							}elseif($valor > 0){
+								$origen_finan = new PropuestaFinanciamiento;
+								$origen_finan->idOrigenFinanciamiento = $origen;
+								$origen_finan->cantidad = $valor;
+								$origen_finan->idFibap = $fibap->id;
+								$guardar_origenes[] = $origen_finan;
 							}
-							$accion->presupuestoRequerido = $presupuesto_suma;
+							$presupuesto_suma += $valor;
+						}
+						
+						if($presupuesto_suma != $accion->presupuestoRequerido){
+							//Obtenemos la suma de los presupuestos ya capturados y sumamos el nuevo presupuesto
+							$total_presupuesto = $fibap->acciones->sum('presupuestoRequerido');
+							$total_presupuesto += $presupuesto_suma;
+							//Quitamos el presupuesto anterior, de lo contrario sumara un presupuesto de más
+							$total_presupuesto -= $accion->presupuestoRequerido;
 
+							if($total_presupuesto > $fibap->presupuestoRequerido){
+								$respuesta['data']['code'] = 'U00';
+								$respuesta['data']['data'] = '{"field":"accion-presupuesto-requerido","error":"El presupuesto capturado sobrepasa el Presupuesto Requerido asignado al proyecto."}';
+								throw new Exception("El presupuesto sobrepasa el PresupuestoRequerido de la FIBAP", 1);
+							}
+
+							$accion->presupuestoRequerido = $presupuesto_suma;
+						}
+						
+						$respuesta['data'] = DB::transaction(function() use ($guardar_origenes, $fibap, $accion, $componente, $partidas){
 							if($accion->save()){
 								if(count($partidas['borrar'])){
 									$accion->partidas()->detach($partidas['borrar']);
@@ -941,7 +1021,8 @@ class FibapController extends BaseController {
 								if(count($partidas['nuevas'])){
 									$accion->partidas()->attach($partidas['nuevas']);
 								}
-								$componente->save();
+								//$componente->save();
+								$accion->datosComponente()->save($componente);
 								$accion->propuestasFinanciamiento()->saveMany($guardar_origenes);
 
 								$fibap->load('acciones');
@@ -1000,12 +1081,33 @@ class FibapController extends BaseController {
 													  ->whereIn('idObjetoGasto',$objetos_gastos_ids)
 													  ->delete();
 					});
-				}
-				if($parametros['eliminar'] == 'antecedente'){ //Eliminar Antecedente(s)
+				}elseif($parametros['eliminar'] == 'antecedente'){ //Eliminar Antecedente(s)
 					$id_padre = $parametros['id-fibap'];
 					$rows = DB::transaction(function() use ($ids){
 						//Eliminamos las actividades
 						return AntecedenteFinanciero::wherein('id',$ids)->delete();
+					});
+				}elseif($parametros['eliminar'] == 'accion'){
+					/***
+					*	Eliminar Acción (DELETE)
+					*
+					*	- Borrar datos de una acción
+					*	- Borrar la relación de la acción con las partidas prespuestarias
+					* 	- Borrar datos del componete (datos a exportar al proyecto)
+					*	- Borrar la propuesta del financiamiento
+					*	- Borrar la distribución del presupuesto
+					*	- Pendiente...
+					***/
+					$id_padre = $parametros['id-fibap'];
+					$rows = DB::transaction(function() use ($ids){
+						FibapDatosComponente::whereIn('idAccion',$ids)->delete();
+						PropuestaFinanciamiento::whereIn('idAccion',$ids)->delete();
+						DistribucionPresupuesto::whereIn('idAccion',$ids)->delete();
+						$acciones = Accion::whereIn('id',$ids)->get();
+						foreach ($acciones as $accion) {
+							$accion->partidas()->detach();
+						}
+						return Accion::whereIn('id',$ids)->delete();
 					});
 				}
 			}else{ //Sin parametros el delete viene de la lista de fibaps
@@ -1033,12 +1135,16 @@ class FibapController extends BaseController {
 				if(isset($parametros['eliminar'])){
 					if($parametros['eliminar'] == 'antecedente'){
 						$data['antecedentes'] = AntecedenteFinanciero::where('idFibap',$id_padre)->get();
-					}
-					if($parametros['eliminar'] == 'presupuesto'){
+					}elseif($parametros['eliminar'] == 'presupuesto'){
 						$fibap = FIBAP::find($id_padre);
 						$fibap->load('distribucionPresupuesto');
 						$fibap->distribucionPresupuesto->load('objetoGasto');
 						$data['presupuesto'] = $fibap->distribucionPresupuesto;
+					}elseif($parametros['eliminar'] == 'accion'){
+						//mako037
+						$fibap = FIBAP::with('acciones')->find($id_padre);
+						$fibap->acciones->load('datosComponente','propuestasFinanciamiento');
+						$data['acciones'] = $fibap->acciones;
 					}
 				}
 			}else{

@@ -768,11 +768,11 @@
                                                 <label class="control-label">{{$mes}}</label>
                                                 <div class="input-group">
                                                     <span class="input-group-addon clave-partida-1">000</span>
-                                                    <input id="mes-{{$clave}}-1" name="mes[{{$clave}}][1]" type="number" class="form-control input-sm presupuesto-mes valor-partida-1" data-presupuesto-mes="{{$clave}}" data-presupuesto-id="" data-presupuesto-partida-id="">
+                                                    <input id="mes-1-{{$clave}}" name="mes[1][{{$clave}}]" type="number" class="form-control input-sm presupuesto-mes valor-partida-1" data-presupuesto-mes="{{$clave}}" data-presupuesto-id="">
                                                 </div>
                                                 <div class="input-group">
                                                     <span class="input-group-addon clave-partida-2">000</span>
-                                                    <input id="mes-{{$clave}}-2" name="mes[{{$clave}}][2]" type="number" class="form-control input-sm presupuesto-mes valor-partida-2" data-presupuesto-mes="{{$clave}}" data-presupuesto-id="" data-presupuesto-partida-id="">
+                                                    <input id="mes-2-{{$clave}}" name="mes[2][{{$clave}}]" type="number" class="form-control input-sm presupuesto-mes valor-partida-2" data-presupuesto-mes="{{$clave}}" data-presupuesto-id="">
                                                 </div>
                                             </div>
                                         </div>
@@ -794,22 +794,10 @@
                             <div role="tabpanel" class="tab-pane" id="calendarizado-metas">
                                 <br>
                                 <div class="row">
-                                    <div class="col-sm-8">
-                                        <div class="form-group">
-                                            <label for="indicador" class="control-label">Indicador</label>
-                                            <input type="text" class="form-control" name="indicador" id="indicador">
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label for="unidad-medida" class="control-label">Unidad de Medida</label>
-                                            {{Form::select('unidad-medida',array(''=>'Seleccione una unidad') + $unidades_medida->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'unidad-medida','data-live-search'=>'true','data-size'=>'8'))}}
-                                        </div>
-                                    </div>
                                     <div class="col-sm-12">
                                         <div class="row">
                                             @foreach ($meses as $clave => $mes)
-                                                <div class="col-sm-3">
+                                                <div class="col-sm-4">
                                                     <div class="form-group">
                                                         <div class="input-group">
                                                             <span class="input-group-addon">{{$mes}}</span>
@@ -820,15 +808,43 @@
                                             @endforeach
                                         </div>
                                     </div>
-                                    <div class="col-sm-5">
-                                        <div class="form-group">
-                                            <div class="input-group">
-                                                <span class="input-group-addon">
-                                                    <span class="fa fa-link"></span> Total
-                                                </span>
-                                                <input type="hidden" id="cantidad-meta" name="cantidad-meta"/>
-                                                <span class="form-control control-espejo" data-espejo-id="#cantidad-meta"></span>
+                                    <div class="col-sm-9">
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label class="control-label"><span class="fa fa-link"></span> Trim 1</label>
+                                                    <span class="form-control control-espejo" data-espejo-id="#trim1"></span>
+                                                    <input type="hidden" id="trim1" name="trim1">
+                                                </div>
                                             </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label class="control-label"><span class="fa fa-link"></span> Trim 2</label>
+                                                    <span class="form-control control-espejo" data-espejo-id="#trim2"></span>
+                                                    <input type="hidden" id="trim2" name="trim2">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label class="control-label"><span class="fa fa-link"></span> Trim 3</label>
+                                                    <span class="form-control control-espejo" data-espejo-id="#trim3"></span>
+                                                    <input type="hidden" id="trim3" name="trim3">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label class="control-label"><span class="fa fa-link"></span> Trim 4</label>
+                                                    <span class="form-control control-espejo" data-espejo-id="#trim4"></span>
+                                                    <input type="hidden" id="trim4" name="trim4">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label><span class="fa fa-link"></span> Total</label>
+                                            <input type="hidden" id="cantidad-meta" name="cantidad-meta"/>
+                                            <span class="form-control control-espejo" data-espejo-id="#cantidad-meta"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -845,6 +861,11 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<!--
+    Modal para Acción
+-->
+
 <div class="modal fade" id="modal-accion" tabindex="-1" role="dialog" aria-labelledby="modalAccionLabel" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-dialog-85-screen">
         <div class="modal-content modal-content-85-screen">
@@ -904,6 +925,22 @@
                                 </select>
                             </div>
                         </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <div class="form-group">
+                                <label for="indicador" class="control-label">Indicador</label>
+                                <input type="text" class="form-control" name="indicador" id="indicador">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="unidad-medida" class="control-label">Unidad de Medida</label>
+                                {{Form::select('unidad-medida',array(''=>'Seleccione una unidad') + $unidades_medida->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'unidad-medida','data-live-search'=>'true','data-size'=>'8'))}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label for="entregable" class="control-label">Entregable</label>
