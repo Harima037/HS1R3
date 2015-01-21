@@ -11,6 +11,10 @@ class DistribucionPresupuesto extends BaseModel
         return $this->belongsTo('ObjetoGasto','idObjetoGasto');
     }
 
+    public function jurisdiccion(){
+        return $this->belongsTo('Jurisdiccion','claveJurisdiccion','clave');
+    }
+
     public function municipio(){
     	return $this->belongsTo('Municipio','claveMunicipio','clave');
     }

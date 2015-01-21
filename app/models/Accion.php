@@ -7,6 +7,10 @@ class Accion extends BaseModel
 	protected $dates = ['borradoAl'];
 	protected $table = "fibapAcciones";
 
+    public function fibap(){
+        return $this->belongsTo('FIBAP','idFibap');
+    }
+
     public function partidas(){
         return $this->belongsToMany('ObjetoGasto','relAccionesPartidas','idAccion','idObjetoGasto');
     }

@@ -8,7 +8,11 @@ class Componente extends BaseModel
 	protected $table = "proyectoComponentes";
 	
 	public function scopeContenidoCompleto($query){
-		return $query->with('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable');
+		return $query->with('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','desgloce');
+	}
+
+	public function desgloce(){
+		return $this->hasMany('ComponenteDesgloce','idComponente')->with('municipio','localidad');
 	}
 
 	public function actividades(){

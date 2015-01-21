@@ -471,11 +471,10 @@
                         <thead>
                             <tr>
                                 <th><input type="checkbox" class="check-select-all-rows"></th>
-                                <th width="100px">Municipio</th>
+                                <th>Jurisdicción</th>
+                                <th>Municipio</th>
                                 <th>Localidad</th>
                                 <th width="100px">Monto</th>
-                                <th>Unidad</th>
-                                <th width="90px">Meta</th>
                             </tr>
                         </thead>
                         <tbody></tbody>

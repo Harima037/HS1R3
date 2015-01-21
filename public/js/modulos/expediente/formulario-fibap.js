@@ -514,8 +514,7 @@ $('#btn-presupuesto-guardar').on('click',function(){
 		fibapResource.put($('#id-presupuesto').val(),parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Cambios almacenados con éxito',type:'OK',timer:3});
-	            //llenar_datagrid_presupuestos(response.distribucion);
-	            llenar_datagrid_distribucion(response.distribucion,response.data.presupuestoRequerido);
+	            llenar_datagrid_distribucion(response.distribucion_presupuesto_agrupado,response.data.presupuestoRequerido);
 	            $(modal_presupuesto).modal('hide');
 	        },
 	        _error: function(response){
@@ -536,8 +535,7 @@ $('#btn-presupuesto-guardar').on('click',function(){
 		fibapResource.post(parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Presupuesto almacenado con éxito',type:'OK',timer:3});
-	            //llenar_datagrid_presupuestos(response.distribucion);
-	            llenar_datagrid_distribucion(response.distribucion,response.data.presupuestoRequerido);
+	            llenar_datagrid_distribucion(response.data.distribucion_presupuesto_agrupado,response.data.presupuestoRequerido);
 	            cambiar_icono_tabs('#tab-link-presupuesto-fibap','fa-check-square-o');
 	            cambiar_icono_tabs('#tab-link-acciones-fibap','fa-check-square-o');
 	            $(modal_presupuesto).modal('hide');
@@ -851,11 +849,10 @@ function llenar_datagrid_distribucion(datos,total_presupuesto){
 		var porcentaje = (datos[indx].cantidad * 100) / parseInt(total_presupuesto);
 
 		presupuesto.id = datos[indx].id;
+		presupuesto.jurisdiccion = datos[indx].jurisdiccion.nombre;
 		presupuesto.municipio = datos[indx].municipio.nombre;
 		presupuesto.localidad = datos[indx].localidad.nombre;
 		presupuesto.monto = '$ ' + datos[indx].cantidad.format();
-		presupuesto.unidad = 'UnidadMedida';
-		presupuesto.Meta = '000';
 
 		total_porcentaje += parseFloat(porcentaje.toFixed(2));
 

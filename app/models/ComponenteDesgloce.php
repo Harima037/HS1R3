@@ -8,6 +8,14 @@ class ComponenteDesgloce extends BaseModel
 	protected $table = "componenteDesgloce";
 
 	public function metasMes(){
-		$this->hasMany('DesgloceMetasMes','idComponenteDesgloce');
+		return $this->hasMany('DesgloceMetasMes','idComponenteDesgloce');
 	}
+
+	public function municipio(){
+    	return $this->belongsTo('Municipio','claveMunicipio','clave');
+    }
+
+    public function localidad(){
+    	return $this->belongsTo('Localidad','claveLocalidad','clave');
+    }
 }
