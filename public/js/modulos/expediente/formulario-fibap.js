@@ -22,7 +22,7 @@ var distribucionDataGrid = new Datagrid('#datagridDistribucion',fibapResource); 
 antecedenteDatagrid.init();
 presupuestoDatagrid.init();
 accionesDatagrid.init();
-//distribucionDataGrid.init();
+distribucionDataGrid.init();
 
 //Ventanas modales
 var modal_antecedente = '#modal-antecedente';
@@ -281,24 +281,63 @@ function editar_antecedente(e){
 }
 
 function editar_presupuesto(e){
-	console.log('editar presupuesto');
-	return;
-	var parametros = {'ver':'distribucion-presupuesto'};
+	if($(modal_presupuesto).find(".modal-title").html() == "Editar Presupuesto"){
+		return;
+	}
+	$(modal_presupuesto).find(".modal-title").html("Editar Presupuesto");
+	var parametros = {'ver':'distribucion-presupuesto-metas'};
 	fibapResource.get(e,parametros,{
         _success: function(response){
-            $(modal_presupuesto).find(".modal-title").html("Editar Presupuesto");
+            //$(modal_presupuesto).find(".modal-title").html("Editar Presupuesto");
+            console.log(response);
+            $('#jurisdiccion-accion').val(response.calendarizado[0].claveJurisdiccion);
+            $('#jurisdiccion-accion').change();
 
+            var desgloce = response.data.desgloce_componente;
+            console.log(desgloce);
+            $('#municipio-accion').val(desgloce.claveMunicipio);
+            $('#municipio-accion').change();
+
+            //llenar_select_localidades
+            /*$('#localidad-accion').val(desgloce.claveLocalidad);
+            $('#localidad-accion').change();*/
+
+            $('#beneficiarios-f').val(desgloce.beneficiariosF);
+            $('#beneficiarios-m').val(desgloce.beneficiariosM);
+            $('#total-beneficiarios-accion').val(desgloce.beneficiariosF + desgloce.beneficiariosM).change();
+
+            for(var indx in desgloce.metas_mes){
+            	var meta = desgloce.metas_mes[indx];
+            	$('#meta-mes-'+meta.mes).val(meta.meta);
+            	$('#meta-mes-'+meta.mes).attr('data-meta-id',meta.id);
+            }
+            $('#trim1').val(desgloce.trim1).change();
+            $('#trim2').val(desgloce.trim2).change();
+            $('#trim3').val(desgloce.trim3).change();
+            $('#trim4').val(desgloce.trim4).change();
+            $('#cantidad-meta').val(desgloce.meta).change();
+			/*
 			$('#cantidad-presupuesto').val(response.data.cantidad);
 			$('#cantidad-presupuesto').change();
 			$('#id-presupuesto').val(response.data.id);
-
+			*/
+			/*
 			var calendarizacion = response.calendarizado;
 			for(var indx in calendarizacion){
 				$('#mes-'+calendarizacion[indx].mes).val(calendarizacion[indx].cantidad);
 				$('#mes-'+calendarizacion[indx].mes).attr('data-presupuesto-id',calendarizacion[indx].id);
 			}
-
+			*/
             $(modal_presupuesto).modal('show');
+        },
+        _error: function(){
+        	var json = $.parseJSON(jqXHR.responseText);
+			
+			if(!json.code)
+				MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+			else
+				MessageManager.show(json);
+			$(modal_presupuesto).find(".modal-title").html("Error");
         }
     });
 }
@@ -556,6 +595,7 @@ $('#btn-presupuesto-guardar').on('click',function(){
 	    });
 	}
 });
+
 $('#btn-antecedente-guardar').on('click',function(){
 	var parametros = $('#'+form_antecedente).serialize();
 	parametros += '&formulario='+form_antecedente + '&fibap-id=' + $('#id').val();
@@ -605,6 +645,7 @@ $('#btn-antecedente-guardar').on('click',function(){
 	    });
 	}
 });
+
 $('#btn-fibap-guardar').on('click',function(){
 	var formulario = $('#fibap-grupo-formularios > .tab-pane.active').data('form-id');
 	var parametros = $('#'+formulario).serialize() + '&id=' + $('#id').val() + '&formulario=' + formulario;
@@ -616,16 +657,6 @@ $('#btn-fibap-guardar').on('click',function(){
 	Validation.cleanFormErrors('#'+formulario);
 
 	if($('#id').val()){
-		/*if(formulario == 'form-fibap-presupuesto'){
-			var lista_origenes_id = '';
-			$('.origen-financiamiento').each(function(){
-				if($(this).data('captura-id')){
-					lista_origenes_id += '&origen-captura-id[' + $(this).data('origen-id') + ']=' + $(this).data('captura-id');
-				}
-			});
-			parametros += lista_origenes_id;
-		}*/
-
 		fibapResource.put($('#id').val(),parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Datos del proyecto actualizados con éxito',type:'OK',timer:3});
@@ -718,6 +749,7 @@ $(modal_antecedente).on('hide.bs.modal',function(e){
 });
 
 $(modal_presupuesto).on('hide.bs.modal',function(e){
+	$(modal_presupuesto).find(".modal-title").html("Modal");
 	reset_modal_form(form_presupuesto);
 });
 
@@ -850,8 +882,8 @@ function llenar_datagrid_distribucion(datos,total_presupuesto){
 
 		presupuesto.id = datos[indx].id;
 		presupuesto.jurisdiccion = datos[indx].jurisdiccion.nombre;
-		presupuesto.municipio = datos[indx].municipio.nombre;
-		presupuesto.localidad = datos[indx].localidad.nombre;
+		presupuesto.municipio = datos[indx].municipio;
+		presupuesto.localidad = datos[indx].localidad;
 		presupuesto.monto = '$ ' + datos[indx].cantidad.format();
 
 		total_porcentaje += parseFloat(porcentaje.toFixed(2));
@@ -881,8 +913,6 @@ function ocultar_detalles(remover_contendor){
 }
 
 function mostrar_detalles(id){
-	//datagrid-contenedor
-	//datagridDistribucion
 	ocultar_detalles(false);
 
 	if($('#datagrid-contenedor-' + id).length){
@@ -901,7 +931,7 @@ function mostrar_detalles(id){
 				$('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"] > td > span.boton-detalle > span.fa-plus-square-o').addClass('fa-minus-square-o');
 				$('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"] > td > span.boton-detalle > span.fa-plus-square-o').removeClass('fa-plus-square-o');
 				
-				$('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"]').after('<tr class="contendor-desechable"><td colspan="6" id="datagrid-contenedor-' + id + '"></td></tr>');
+				$('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"]').after('<tr class="contendor-desechable disabled"><td class="disabled" colspan="7" id="datagrid-contenedor-' + id + '"></td></tr>');
 				$('#datagridDistribucion').appendTo('#datagrid-contenedor-' + id);
 				$('#datagridDistribucion').attr('data-selected-id',id);
 				

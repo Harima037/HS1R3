@@ -74,9 +74,10 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
 			context.quickSearch($(context.selector + " .txt-quick-search").val());			
 		});
 
-		$(this.selector + " tbody").on('dblclick','tr td', function () {
+		$(this.selector + " tbody").on('dblclick','tr td:not(.disabled)', function (e) {
 	        if ($(this).index() != 0){
-	            var data = $(this).parents(".datagrid").data("edit-row");
+	            //var data = $(this).parents(".datagrid").data("edit-row");
+	            var data = $(this).closest(".datagrid").data("edit-row");
 	            if (data !== null) {
 	                var funcion = window[data];
 	                funcion($(this).parent().data("id"));
@@ -87,11 +88,12 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
 		$(this.selector + " .btn-edit-rows").on('click', function (e) {
 			e.preventDefault();
 	      	
-			var data = $(this).parents(".datagrid").data("edit-row");
-	 
+			var data = $(this).closest(".datagrid").data("edit-row");
+			//var data = $(this.selector).data("edit-row");
 			if (data != null) {
 				var funcion = window[data], contador = 0, row_id = null;
-				$(this).parents(".datagrid").find("tbody").find("input[type=checkbox]:checked").each(function () {
+				$(this).closest(".datagrid").find("tbody").find("input[type=checkbox]:checked").each(function () {
+				//$(this.selector).find("tbody").find("input[type=checkbox]:checked").each(function () {
 					contador++;
 					row_id = $(this).parent().parent().data("id");
 				});
@@ -112,9 +114,11 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
 
 		$(this.selector + " .check-select-all-rows").on('click', function (e) {       
 	        if ($(this).is(':checked')) {
-			  $(this).parents(".datagrid").find("tbody").find("input[type=checkbox]").prop('checked', true);
+			  //$(this).parents(".datagrid").find("tbody").find("input[type=checkbox]").prop('checked', true);
+			  $(this).closest(".datagrid").find("tbody").find("input[type=checkbox]").prop('checked', true);
 	        } else {
-	            $(this).parents(".datagrid").find("tbody").find("input[type=checkbox]").prop('checked', false);
+	            //$(this).parents(".datagrid").find("tbody").find("input[type=checkbox]").prop('checked', false);
+	            $(this).closest(".datagrid").find("tbody").find("input[type=checkbox]").prop('checked', false);
 	        }
 		});
 

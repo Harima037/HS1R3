@@ -20,7 +20,7 @@ class DistribucionPresupuesto extends BaseModel
     }
 
     public function localidad(){
-    	return $this->belongsTo('Localidad','claveLocalidad','clave');
+    	return $this->belongsTo('Localidad','claveLocalidad','clave')->where('idMunicipio',$this->municipio->id);
     }
 
     public function scopeAgrupar($query){
@@ -28,6 +28,13 @@ class DistribucionPresupuesto extends BaseModel
     }
 
     public function scopeAgruparPorLocalidad($query){
-    	$query->select('id','idFibap','idAccion','claveLocalidad','claveMunicipio','claveJurisdiccion',DB::raw('sum(cantidad) AS cantidad'))->groupBy('claveLocalidad');
+    	$query->select('fibapDistribucionPresupuesto.id','idFibap','idAccion','localidad.nombre AS localidad','municipio.nombre AS municipio','claveJurisdiccion',
+                DB::raw('sum(cantidad) AS cantidad'))
+                ->groupBy('claveMunicipio','claveLocalidad')
+                ->leftjoin('vistaMunicipios AS municipio','municipio.clave','=','claveMunicipio')
+                ->leftjoin('vistaLocalidades AS localidad',function($join){
+                    return $join->on('localidad.clave','=','claveLocalidad')
+                         ->on('localidad.idMunicipio','=','municipio.id');
+                });
     }
 }

@@ -80,8 +80,8 @@ class FibapController extends BaseController {
 		$data = array();
 
 		$parametros = Input::all();
+		
 		if(isset($parametros['formatogrid'])){
-
 			$rows = FIBAP::getModel();
 			$rows = $rows->where('claveUnidadResponsable','=',Sentry::getUser()->claveUnidad);
 
@@ -164,13 +164,15 @@ class FibapController extends BaseController {
 	{
 		//
 		$http_status = 200;
-		$data = array();
+		$data = array('data'=>'');
 
 		$parametros = Input::all();
 		$calendarizado = FALSE;
 		$clave_presupuestaria = FALSE;
 		$jurisdicciones = FALSE;
 		$municipios = FALSE;
+		$desgloce = FALSE;
+	try{
 		if($parametros){
 			if($parametros['ver'] == 'fibap'){
 				$recurso = FIBAP::with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado','acciones')->find($id);
@@ -199,27 +201,37 @@ class FibapController extends BaseController {
 				}
 			}elseif($parametros['ver'] == 'antecedente'){
 				$recurso = AntecedenteFinanciero::find($id);
-			}/*elseif($parametros['ver'] == 'old-distribucion-presupuesto'){
-				$recurso = DistribucionPresupuesto::find($id);
-				//Actualziar despues
-				//$calendarizado = Ministracion::where('idFibap',$recurso->idFibap)->where('idObjetoGasto',$recurso->idObjetoGasto)->get();
-				$calendarizado = DistribucionPresupuesto::where('idFibap',$recurso->idFibap)->where('idObjetoGasto',$recurso->idObjetoGasto)->get();
-			}*/
-			elseif($parametros['ver'] == 'accion'){
+			}elseif($parametros['ver'] == 'accion'){
+
 				$recurso = Accion::with('datosComponente','propuestasFinanciamiento','partidas')->find($id);
+
 			}elseif($parametros['ver'] == 'distribucion-presupuesto'){
-				//Lista de presupuesto en un datagrid
-				/*$distribucion_base = DistribucionPresupuesto::find($id);
-				$recurso = DistribucionPresupuesto::where('idFibap','=',$distribucion_base->idFibap)
-													->where('idAccion','=',$distribucion_base->idAccion)
-													->where('idObjetoGasto','=',$distribucion_base->idObjetoGasto)
-													->where('claveLocalidad','=',$distribucion_base->claveLocalidad)->get();*/
+
 				$recurso = Accion::with('distribucionPresupuestoAgrupado','partidas')->find($id);
 				if($recurso->distribucionPresupuestoAgrupado){
-					$recurso->distribucionPresupuestoAgrupado->load('municipio','localidad','jurisdiccion');
+					$recurso->distribucionPresupuestoAgrupado->load('jurisdiccion');
 				}
+
 			}elseif($parametros['ver'] == 'distribucion-presupuesto-metas'){
 				//Obtener los datos del presupuesto a modificar
+				$distribucion_base = DistribucionPresupuesto::find($id);
+
+				$recurso = Accion::with('partidas')->find($distribucion_base->idAccion);
+				/*if($recurso->datosComponente){
+					$recurso->datosComponente->load('desgloceComponente.metasMes');
+				}*/
+				
+				$desgloce = ComponenteDesgloce::with('metasMes')->where('idAccion','=',$distribucion_base->idAccion)
+												->where('claveMunicipio','=',$distribucion_base->claveMunicipio)
+												->where('claveLocalidad','=',$distribucion_base->claveLocalidad)->get();
+				//
+				$calendarizado = DistribucionPresupuesto::where('idFibap','=',$distribucion_base->idFibap)
+													->where('idAccion','=',$distribucion_base->idAccion)
+													->whereIn('idObjetoGasto',$recurso->partidas->lists('id'))
+													->where('claveJurisdiccion','=',$distribucion_base->claveJurisdiccion)
+													->where('claveMunicipio','=',$distribucion_base->claveMunicipio)
+													->where('claveLocalidad','=',$distribucion_base->claveLocalidad)->get();
+				//
 
 			}elseif($parametros['ver'] == 'datos-proyecto'){
 				$recurso = Proyecto::find($id);
@@ -248,6 +260,9 @@ class FibapController extends BaseController {
 			if($jurisdicciones){
 				$recurso['jurisdicciones'] = $jurisdicciones; //array('OC'=>'O.C.') + 
 			}
+			if($desgloce){
+				$recurso['desgloce_componente'] = $desgloce[0];
+			}
 			$data = array("data"=>$recurso);
 			if($calendarizado){
 				$data['calendarizado'] = $calendarizado->toArray();
@@ -256,7 +271,16 @@ class FibapController extends BaseController {
 				$data['clavePresupuestaria'] = $clave_presupuestaria;
 			}
 		}
-
+	}catch(\Exception $ex){
+			$http_status = 500;
+			if($data['data'] == ''){
+				$data['data'] = 'Ocurrio un error en el servidor al guardar la acción.';
+			}
+			$data['ex'] = $ex->getMessage();
+			if(!isset($data['code'])){
+				$data['code'] = 'S03';
+			}
+		}
 		return Response::json($data,$http_status);
 	}
 
@@ -435,7 +459,7 @@ class FibapController extends BaseController {
 						***/
 
 						$accion_id = $parametros['accion-id'];
-						$accion = Accion::with('distribucionPresupuesto','desgloceComponente','partidas')->find($accion_id);
+						$accion = Accion::with('distribucionPresupuesto','datosComponente','partidas')->find($accion_id);
 						$fibap = FIBAP::find($accion->idFibap);
 
 						$clave_municipio = $parametros['municipio-accion'];
@@ -499,17 +523,7 @@ class FibapController extends BaseController {
 													->where('claveLocalidad','!=',$clave_localidad)
 													->groupBy('claveLocalidad')
 													->get();
-						/*
-						throw new Exception(json_encode($beneficiarios_capturados->sum('beneficiariosM')), 1);
-						$suma_benef_f = 0;
-						$suma_benef_m = 0;
-						foreach ($beneficiarios_capturados as $benef) {
-							$suma_benef_f += intval($benef['beneficiariosF']);
-							$suma_benef_m += intval($benef['beneficiariosM']);
-						}
-						throw new Exception(json_encode($suma_benef_f), 1);
-						*/
-
+						
 						if($beneficiarios_capturados){
 							$suma_benef_f = $beneficiarios_capturados->sum('beneficiariosF');
 							$suma_benef_m = $beneficiarios_capturados->sum('beneficiariosM');
@@ -545,6 +559,7 @@ class FibapController extends BaseController {
 						}
 
 						$desgloce = new ComponenteDesgloce;
+						$desgloce->idAccion 		= $accion->id; //Pendiente si es necesario
 						$desgloce->claveMunicipio 	= $clave_municipio;
 						$desgloce->claveLocalidad 	= $clave_localidad;
 						$desgloce->presupuesto 		= $suma_presupuesto;
@@ -558,7 +573,8 @@ class FibapController extends BaseController {
 
 
 						$respuesta['data'] = DB::transaction(function() use ($accion,$distribucion, $desgloce,$metas_mes){
-							$accion->desgloceComponente()->save($desgloce);
+							//$accion->desgloceComponente()->save($desgloce);
+							$accion->datosComponente->desgloceComponente()->save($desgloce);
 							$accion->distribucionPresupuesto()->saveMany($distribucion);
 							$desgloce->metasMes()->saveMany($metas_mes);
 							

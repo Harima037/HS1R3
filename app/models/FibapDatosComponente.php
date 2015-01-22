@@ -6,4 +6,8 @@ class FibapDatosComponente extends BaseModel
 	public function accion(){
         return $this->belongsTo('Accion','idAccion');
     }
+
+    public function desgloceComponente(){
+        return $this->hasMany('ComponenteDesgloce','idComponente');
+    }
 }
