@@ -289,45 +289,48 @@ function editar_presupuesto(e){
 	fibapResource.get(e,parametros,{
         _success: function(response){
             //$(modal_presupuesto).find(".modal-title").html("Editar Presupuesto");
-            console.log(response);
             $('#jurisdiccion-accion').val(response.calendarizado[0].claveJurisdiccion);
             $('#jurisdiccion-accion').change();
 
-            var desgloce = response.data.desgloce_componente;
-            console.log(desgloce);
-            $('#municipio-accion').val(desgloce.claveMunicipio);
+            var desglose = response.data.desglose_componente;
+            $('#municipio-accion').val(desglose.claveMunicipio);
             $('#municipio-accion').change();
 
             //llenar_select_localidades
-            /*$('#localidad-accion').val(desgloce.claveLocalidad);
-            $('#localidad-accion').change();*/
+            $('#localidad-accion').val(desglose.claveLocalidad);
+            $('#localidad-accion').change();
 
-            $('#beneficiarios-f').val(desgloce.beneficiariosF);
-            $('#beneficiarios-m').val(desgloce.beneficiariosM);
-            $('#total-beneficiarios-accion').val(desgloce.beneficiariosF + desgloce.beneficiariosM).change();
+            $('#beneficiarios-f').val(desglose.beneficiariosF);
+            $('#beneficiarios-m').val(desglose.beneficiariosM);
+            $('#total-beneficiarios-accion').val(desglose.beneficiariosF + desglose.beneficiariosM).change();
 
-            for(var indx in desgloce.metas_mes){
-            	var meta = desgloce.metas_mes[indx];
+            for(var indx in desglose.metas_mes){
+            	var meta = desglose.metas_mes[indx];
             	$('#meta-mes-'+meta.mes).val(meta.meta);
             	$('#meta-mes-'+meta.mes).attr('data-meta-id',meta.id);
             }
-            $('#trim1').val(desgloce.trim1).change();
-            $('#trim2').val(desgloce.trim2).change();
-            $('#trim3').val(desgloce.trim3).change();
-            $('#trim4').val(desgloce.trim4).change();
-            $('#cantidad-meta').val(desgloce.meta).change();
-			/*
-			$('#cantidad-presupuesto').val(response.data.cantidad);
+
+            $('#trim1').val(desglose.trim1).change();
+            $('#trim2').val(desglose.trim2).change();
+            $('#trim3').val(desglose.trim3).change();
+            $('#trim4').val(desglose.trim4).change();
+            $('#cantidad-meta').val(desglose.meta).change();
+
+            $('#cantidad-presupuesto').val(desglose.presupuesto);
 			$('#cantidad-presupuesto').change();
-			$('#id-presupuesto').val(response.data.id);
-			*/
-			/*
+			//mario
 			var calendarizacion = response.calendarizado;
+			var partidas = [];
+			partidas[1] = parseInt($('#datagridDistribucion').attr('data-partida-1-id'));
+			partidas[2] = parseInt($('#datagridDistribucion').attr('data-partida-2-id'));
 			for(var indx in calendarizacion){
-				$('#mes-'+calendarizacion[indx].mes).val(calendarizacion[indx].cantidad);
-				$('#mes-'+calendarizacion[indx].mes).attr('data-presupuesto-id',calendarizacion[indx].id);
+				var partida = partidas.indexOf(calendarizacion[indx].idObjetoGasto);
+				$('#mes-'+partida+'-'+calendarizacion[indx].mes).val(calendarizacion[indx].cantidad);
+				$('#mes-'+partida+'-'+calendarizacion[indx].mes).attr('data-presupuesto-id',calendarizacion[indx].id);
 			}
-			*/
+
+			$('#id-desglose').val(desglose.id);
+
             $(modal_presupuesto).modal('show');
         },
         _error: function(){
@@ -537,8 +540,9 @@ $('#btn-presupuesto-guardar').on('click',function(){
 
 	Validation.cleanFormErrors('#'+form_presupuesto);
 
-	if($('#id-presupuesto').val()){
+	if($('#id-desglose').val()){
 		var meses_capturados = '';
+		var metas_capturadas = '';
 		$('.presupuesto-mes').each(function(){
 			if($(this).attr('data-presupuesto-id')){
 				if($(this).hasClass('valor-partida-1')){
@@ -550,7 +554,14 @@ $('#btn-presupuesto-guardar').on('click',function(){
 			}
 		});
 		parametros += meses_capturados;
-		fibapResource.put($('#id-presupuesto').val(),parametros,{
+		$('.meta-mes').each(function(){
+			if($(this).attr('data-meta-id')){
+				metas_capturadas += '&metas-capturadas['+$(this).attr('data-meta-mes')+']='+$(this).attr('data-meta-id');
+			}
+		});
+		parametros += metas_capturadas;
+				
+		fibapResource.put($('#id-desglose').val(),parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Cambios almacenados con éxito',type:'OK',timer:3});
 	            llenar_datagrid_distribucion(response.distribucion_presupuesto_agrupado,response.data.presupuestoRequerido);

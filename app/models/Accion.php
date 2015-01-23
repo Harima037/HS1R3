@@ -19,10 +19,6 @@ class Accion extends BaseModel
         return $this->belongsTo('Componente','idComponente');
     }
 
-    /*public function desgloceComponente(){
-        return $this->hasOne('ComponenteDesgloce','idAccion');
-    }*/
-
     public function datosComponente(){
     	return $this->hasOne('FibapDatosComponente','idAccion');
     }

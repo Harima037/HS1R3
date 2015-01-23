@@ -481,23 +481,6 @@
                     </table>
                 </div>
             </div>
-            <!--div id="datagrid-contenedor-desgloce" class="hidden">
-                <div class="datagrid panel panel-primary" id="datagridDistribucionMunicipio" data-edit-row="editar_distrib_municipio" data-selected-id="">
-                    <table class="table table-condensed">
-                        <thead>
-                            <tr>
-                                <th><input type="checkbox" class="check-select-all-rows"></th>
-                                <th width="100px">Municipio</th>
-                                <th>Localidad</th>
-                                <th width="100px">Monto</th>
-                                <th>Unidad</th>
-                                <th width="90px">Meta</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div-->
         </div>
         <!--  End Tab Panel: Acciones y distribucion de presupuesto  -->
 
@@ -850,7 +833,7 @@
                             </div>
                         </div>
                     </div>
-                    <input type="hidden" name="id-presupuesto" id="id-presupuesto">
+                    <input type="hidden" name="id-desglose" id="id-desglose">
                 </form>
             </div>
             <div class="modal-footer">

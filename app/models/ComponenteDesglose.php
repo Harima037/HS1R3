@@ -1,14 +1,14 @@
 <?php
 use Illuminate\Database\Eloquent\SoftDeletingTrait;
 
-class ComponenteDesgloce extends BaseModel
+class ComponenteDesglose extends BaseModel
 {
 	use SoftDeletingTrait;
 	protected $dates = ['borradoAl'];
-	protected $table = "componenteDesgloce";
+	protected $table = "componenteDesglose";
 
 	public function metasMes(){
-		return $this->hasMany('DesgloceMetasMes','idComponenteDesgloce');
+		return $this->hasMany('DesgloseMetasMes','idComponenteDesglose');
 	}
 
 	public function municipio(){
