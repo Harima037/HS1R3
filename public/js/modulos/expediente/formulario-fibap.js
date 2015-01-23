@@ -318,7 +318,7 @@ function editar_presupuesto(e){
 
             $('#cantidad-presupuesto').val(desglose.presupuesto);
 			$('#cantidad-presupuesto').change();
-			//mario
+			
 			var calendarizacion = response.calendarizado;
 			var partidas = [];
 			partidas[1] = parseInt($('#datagridDistribucion').attr('data-partida-1-id'));
@@ -413,23 +413,24 @@ $("#datagridAntecedentes .btn-delete-rows").on('click',function(e){
 	}else{ MessageManager.show({data:'No has seleccionado ningún registro.',type:'ADV',timer:3}); }
 });
 
-$("#datagridPresupuesto .btn-delete-rows").unbind('click');
-$("#datagridPresupuesto .btn-delete-rows").on('click',function(e){
+$("#datagridDistribucion .btn-delete-rows").unbind('click');
+$("#datagridDistribucion .btn-delete-rows").on('click',function(e){
 	e.preventDefault();
 	var rows = [];
 	var contador= 0;
-    $(this).parents(".datagrid").find("tbody").find("input[type=checkbox]:checked").each(function () {
+    $("#datagridDistribucion").find("tbody").find("input[type=checkbox]:checked").each(function () {
 		contador++;
         rows.push($(this).parent().parent().data("id"));
 	});
 	if(contador>0){
+		var accion_id = $('#datagridDistribucion').attr('data-selected-id');
 		Confirm.show({
 				titulo:"Eliminar presupuesto",
 				mensaje: "¿Estás seguro que deseas eliminar los presupuestos seleccionados?",
 				callback: function(){
-					fibapResource.delete(rows,{'rows': rows, 'eliminar': 'presupuesto', 'id-fibap': $('#id').val()},{
+					fibapResource.delete(rows,{'rows': rows, 'eliminar': 'presupuesto', 'id-accion': accion_id},{
                         _success: function(response){
-                        	llenar_datagrid_presupuestos(response.presupuesto);
+                        	llenar_datagrid_distribucion(response.accion.distribucion_presupuesto_agrupado,response.accion.presupuestoRequerido);
                         	MessageManager.show({data:'Presupuesto eliminado con éxito.',timer:3});
                         },
                         _error: function(jqXHR){  MessageManager.show(jqXHR.responseJSON); }
@@ -539,7 +540,7 @@ $('#btn-presupuesto-guardar').on('click',function(){
 	parametros += '&partidas[1]='+partida_1_id+'&partidas[2]='+partida_2_id;
 
 	Validation.cleanFormErrors('#'+form_presupuesto);
-
+	
 	if($('#id-desglose').val()){
 		var meses_capturados = '';
 		var metas_capturadas = '';
@@ -564,7 +565,7 @@ $('#btn-presupuesto-guardar').on('click',function(){
 		fibapResource.put($('#id-desglose').val(),parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Cambios almacenados con éxito',type:'OK',timer:3});
-	            llenar_datagrid_distribucion(response.distribucion_presupuesto_agrupado,response.data.presupuestoRequerido);
+	            llenar_datagrid_distribucion(response.data.distribucion_presupuesto_agrupado,response.data.presupuestoRequerido);
 	            $(modal_presupuesto).modal('hide');
 	        },
 	        _error: function(response){
@@ -1108,6 +1109,10 @@ function reset_modal_form(formulario){
     	$('.presupuesto-mes').each(function(){
 			$(this).attr('data-presupuesto-id','');
 		});
+		$('.meta-mes').each(function(){
+			$(this).attr('data-meta-id','');
+		});
+
     	//$('#id-presupuesto').val('');
     	$(modal_presupuesto + ' .alert').remove();
     }

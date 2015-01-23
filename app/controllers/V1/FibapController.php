@@ -175,7 +175,7 @@ class FibapController extends BaseController {
 	try{
 		if($parametros){
 			if($parametros['ver'] == 'fibap'){
-				$recurso = FIBAP::with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado','acciones')->find($id);
+				$recurso = FIBAP::with('documentos','antecedentesFinancieros','distribucionPresupuestoAgrupado','acciones')->find($id);
 				$recurso->acciones->load('datosComponente','propuestasFinanciamiento');
 				$recurso->distribucionPresupuestoAgrupado->load('objetoGasto');
 				$proyecto = NULL;
@@ -202,18 +202,37 @@ class FibapController extends BaseController {
 			}elseif($parametros['ver'] == 'antecedente'){
 				$recurso = AntecedenteFinanciero::find($id);
 			}elseif($parametros['ver'] == 'accion'){
-
+				/***
+				*	Obtiene los datos de una Acción (GET)
+				*
+				*	- Obtiene los datos del componente la Acción
+				*	- Obtiene la propuesta de financiamiento
+				*	- Obtiene las partidas seleccionadas para la Acción
+				* 	
+				***/
 				$recurso = Accion::with('datosComponente','propuestasFinanciamiento','partidas')->find($id);
-
 			}elseif($parametros['ver'] == 'distribucion-presupuesto'){
-
+				/***
+				*	Obtiene la distribución del presupuesto de una Acción (GET)
+				*
+				*	- Obtiene la distribución de presupuesto concentrado por Localidad
+				* 	
+				***/
 				$recurso = Accion::with('distribucionPresupuestoAgrupado','partidas')->find($id);
 				if($recurso->distribucionPresupuestoAgrupado){
 					$recurso->distribucionPresupuestoAgrupado->load('jurisdiccion');
 				}
 
 			}elseif($parametros['ver'] == 'distribucion-presupuesto-metas'){
-				//Obtener los datos del presupuesto a modificar
+				/***
+				*	Obtiene los datos del desglose del presupuesto de la Accion (GET)
+				*
+				*	- Obtiene la distribución de presupuesto concentrado por mes y partida
+				* 	- Obtiene los datos del desglose del componete (datos a exportar al proyecto) (Metas,Beneficiarios,Localidad)
+				*	- Obtiene el desglose de metas por mes del componente
+				*	- Obtiene datos generales de la accion
+				*
+				***/
 				$distribucion_base = DistribucionPresupuesto::find($id);
 
 				$recurso = Accion::with('partidas')->find($distribucion_base->idAccion);
@@ -828,89 +847,6 @@ class FibapController extends BaseController {
 							$respuesta['data']['code'] = 'S01';
 							throw new Exception("Error al intentar guardar los datos de la ficha: Error en el guardado de los datos antecedentes", 1);
 						}
-					}elseif($parametros['formulario'] == 'form-fibap-presupuesto'){ //No estoy usando //Agregar/Editar datos del presupuesto
-						/*
-						$fecha_inicio = DateTime::createFromFormat('d/m/Y',Input::get('periodo-ejecucion-inicio'));
-						$fecha_fin = DateTime::createFromFormat('d/m/Y',Input::get('periodo-ejecucion-final'));
-
-						if(!$fecha_inicio){
-							$fecha_inicio = DateTime::createFromFormat('Y-m-d',Input::get('periodo-ejecucion-inicio'));
-						}
-						if(!$fecha_fin){
-							$fecha_fin = DateTime::createFromFormat('Y-m-d',Input::get('periodo-ejecucion-final'));
-						}
-
-						if(!$fecha_inicio){
-							$respuesta['data']['code'] = 'U00';
-							$respuesta['data']['data'] = '{"field":"periodo-ejecucion-inicio","error":"La fecha de inicio del periodo de ejecución no tiene el formato correcto."}';
-							throw new Exception('La fecha no tiene un formato valido');
-						}
-						if(!$fecha_fin){
-							$respuesta['data']['code'] = 'U00';
-							$respuesta['data']['data'] = '{"field":"periodo-ejecucion-final","error":"La fecha final del periodo de ejecución no tiene el formato correcto."}';
-							throw new Exception('La fecha no tiene un formato valido');
-						}
-
-						if($fecha_fin < $fecha_inicio){
-							$respuesta['data']['code'] = 'U00';
-							$respuesta['data']['data'] = '{"field":"periodo-ejecucion-final","error":"La fecha final del periodo de ejecución no puede ser menor que la de inicio."}';
-							throw new Exception('La fecha final es menor a la de inicio');
-						}
-
-						$recurso = FIBAP::with('propuestasFinanciamiento')->find($id);
-						$meses_borrar = array();
-						if($recurso->periodoEjecucionInicio != $fecha_inicio || $recurso->periodoEjecucionFinal != $fecha_fin){
-							$meses_borrar['inicio'] = $fecha_inicio->format("n");
-							$meses_borrar['fin'] = $fecha_fin->format("n");
-						}
-
-						$recurso->periodoEjecucionInicio = $fecha_inicio;
-						$recurso->periodoEjecucionFinal = $fecha_fin;
-
-						$origenes = $parametros['origen'];
-						$origenes_ids = array();
-
-						if(isset($parametros['origen-captura-id'])){
-							$origenes_ids = $parametros['origen-captura-id'];
-						}
-
-						$respuesta['data'] = DB::transaction(function() use ($origenes, $origenes_ids, $recurso, $meses_borrar){
-							$guardar_origenes = array();
-							$presupuesto_suma = 0;
-							foreach ($origenes as $origen => $valor) {
-								if(isset($origenes_ids[$origen])){
-									$origen_finan = $recurso->propuestasFinanciamiento()->find($origenes_ids[$origen]);
-									$origen_finan->cantidad = ($valor)? $valor:0;
-									$guardar_origenes[] = $origen_finan;
-								}elseif($valor > 0){
-									$origen_finan = new PropuestaFinanciamiento;
-									$origen_finan->idOrigenFinanciamiento = $origen;
-									$origen_finan->cantidad = $valor;
-									$guardar_origenes[] = $origen_finan;
-								}
-								$presupuesto_suma += $valor;
-							}
-
-							$recurso->presupuestoRequerido = $presupuesto_suma;
-
-							if(count($meses_borrar)){
-								$recurso->distribucionPresupuesto()
-										->where('mes','<',$meses_borrar['inicio'])
-										->orWhere('mes','>',$meses_borrar['fin'])
-										->delete();
-							}
-
-							$recurso->propuestasFinanciamiento()->saveMany($guardar_origenes);
-
-							if($recurso->save()){
-								$recurso->load('distribucionPresupuestoAgrupado');
-								$recurso->distribucionPresupuestoAgrupado->load('objetoGasto');
-								return array('data'=>$recurso,'distribucion' => $recurso->distribucionPresupuestoAgrupado);
-							}else{
-								//No se pudieron guardar los datos del proyecto
-								throw new Exception("Error al intentar guardar los datos de la ficha: Error en el guardado de los datos del presupuesto", 1);
-							}
-						});*/
 					}elseif($parametros['formulario'] == 'form-antecedente'){ //Editar antecedente
 						$fecha_corte = DateTime::createFromFormat('d/m/Y',Input::get('fecha-corte-antecedente'));
 
@@ -942,32 +878,27 @@ class FibapController extends BaseController {
 						/***
 						*	Formulario de datos del desglose del presupuesto de la Accion (PUT)
 						*
-						*	- Actualiza una nueva distribución de presupuesto por mes y partida
+						*	- Actualiza la distribución de presupuesto por mes y partida
 						* 	- Actualiza datos del desglose del componete (datos a exportar al proyecto) (Metas,Beneficiarios,Localidad)
 						*	- Actualiza el desglose de metas por mes del componente
 						***/
-						throw new Exception("Error Processing Request", 1);
 						
 						$desglose = ComponenteDesglose::with('metasMes')->find($parametros['id-desglose']);
 
-						//$accion_id = $parametros['accion-id'];
 						$accion_id = $desglose->idAccion;
 						$clave_municipio = $desglose->claveMunicipio;
 						$clave_localidad = $desglose->claveLocalidad;
 						$clave_jurisdiccion = FALSE;
 
-						$accion = Accion::with('distribucionPresupuesto.jurisdiccion','datosComponente','partidas')->find($accion_id);
+						$accion = Accion::with('distribucionPresupuesto','datosComponente','partidas')->find($accion_id);
 						$fibap = FIBAP::find($accion->idFibap);
 
-						$nueva_clave_municipio = intval($parametros['municipio-accion']);
-						$nueva_clave_localidad = intval($parametros['localidad-accion']);
+						$nueva_clave_municipio = $parametros['municipio-accion'];
+						$nueva_clave_localidad = $parametros['localidad-accion'];
 
-						if($nueva_clave_municipio != $clave_municipio){
-							$municipio = Municipio::with('jurisdiccion')->where('clave','=',$clave_municipio)->get();
-							$clave_jurisdiccion = $municipio[0]->jurisdiccion->clave;
-						}else{
-							$clave_jurisdiccion = $accion->distribucionPresupuesto[0]->jurisdiccion->clave;
-						}
+						//Obtenemos la clave de la jurisdiccion para los nuevos elementos a capturar
+						$municipio = Municipio::with('jurisdiccion')->where('clave','=',$nueva_clave_municipio)->get();
+						$clave_jurisdiccion = $municipio[0]->jurisdiccion->clave;
 
 						//SI cambio la localidad hay que buscar si la nueva localidad ya fue capturada
 						if($nueva_clave_localidad != $clave_localidad){
@@ -1003,8 +934,13 @@ class FibapController extends BaseController {
 							foreach ($meses_capturados[$indx] as $mes => $cantidad) {
 								if(isset($meses_ids[$indx][$mes])){
 									$recurso = $accion->distribucionPresupuesto->find($meses_ids[$indx][$mes]);
+									$recurso->claveMunicipio = $nueva_clave_municipio;
+									$recurso->claveLocalidad = $nueva_clave_localidad;
+									$recurso->claveJurisdiccion = $clave_jurisdiccion;
+									$recurso->cantidad = $cantidad;
+									$distribucion[] = $recurso;
 									//Aqui me quede llenando la edicion de la distribucion del presupuesto
-								}else($cantidad > 0 && $mes >= $mes_incial && $mes <= $mes_final){
+								}elseif($cantidad > 0 && $mes >= $mes_incial && $mes <= $mes_final){
 									$recurso = new DistribucionPresupuesto;
 									$recurso->idFibap = $accion->idFibap;
 									$recurso->claveMunicipio = $nueva_clave_municipio;
@@ -1014,12 +950,18 @@ class FibapController extends BaseController {
 									$recurso->mes = $mes;
 									$recurso->cantidad = $cantidad;
 									$distribucion[] = $recurso;
-									$suma_presupuesto += $cantidad;
 								}
+								$suma_presupuesto += $cantidad;
 							}
 						}
 						
-						$suma_distribucion = $accion->distribucionPresupuesto->sum('cantidad');
+						$sumatoria = $accion->distribucionPresupuesto->filter(function($item) use ($clave_municipio,$clave_localidad){
+							if($item->claveLocalidad != $clave_localidad && $item->claveMunicipio != $clave_municipio){
+								return true;
+							}
+						});
+
+						$suma_distribucion = $sumatoria->sum('cantidad');
 
 						if(($suma_distribucion + $suma_presupuesto) > $accion->presupuestoRequerido){
 							$respuesta['data']['code'] = 'U00';
@@ -1027,51 +969,58 @@ class FibapController extends BaseController {
 							throw new Exception('La distribución del presupuesto sobrepasa el presupuesto requerido.', 1);
 						}
 
-						$fibap->load('acciones','datosProyecto');
-						$beneficiarios_capturados = ComponenteDesglose::whereIn('idAccion',$fibap->acciones->lists('id'))
-													->select(DB::raw('(sum(beneficiariosF)/count(claveLocalidad)) AS beneficiariosF'),
-														DB::raw('(sum(beneficiariosM)/count(claveLocalidad)) AS beneficiariosM'))
-													->where('claveLocalidad','!=',$clave_localidad)
-													->groupBy('claveLocalidad')
-													->get();
-						
-						if($beneficiarios_capturados){
-							$suma_benef_f = $beneficiarios_capturados->sum('beneficiariosF');
-							$suma_benef_m = $beneficiarios_capturados->sum('beneficiariosM');
-						}else{
-							$suma_benef_f = 0;
-							$suma_benef_m = 0;
-						}
-						
-						if(($suma_benef_f + $parametros['beneficiarios-f']) > $fibap->datosProyecto->totalBeneficiariosF){
-							$respuesta['data']['code'] = 'U00';
-							$respuesta['data']['data'] = '{"field":"beneficiarios-f","error":"La suma de los beneficiarios sobrepasa la cantidad especificada al capturar la FIBAP."}';
-							throw new Exception('La suma de beneficiarios sobrepasa los beneficiarios capturados al inicio.', 1);
-						}
+						//Si el numero de beneficiarios cambia, hay que checar si el nuevo numero no sobrepasa al anterior
+						if ($desglose->beneficiariosF != $parametros['beneficiarios-f'] || $desglose->beneficiariosM != $parametros['beneficiarios-m']) {
+							$fibap->load('acciones','datosProyecto');
+							$beneficiarios_capturados = ComponenteDesglose::whereIn('idAccion',$fibap->acciones->lists('id'))
+														->select(DB::raw('(sum(beneficiariosF)/count(claveLocalidad)) AS beneficiariosF'),
+															DB::raw('(sum(beneficiariosM)/count(claveLocalidad)) AS beneficiariosM'))
+														->where('claveLocalidad','!=',$clave_localidad)
+														->groupBy('claveLocalidad')
+														->get();
+							
+							if($beneficiarios_capturados){
+								$suma_benef_f = $beneficiarios_capturados->sum('beneficiariosF');
+								$suma_benef_m = $beneficiarios_capturados->sum('beneficiariosM');
+							}else{
+								$suma_benef_f = 0;
+								$suma_benef_m = 0;
+							}
+							
+							if(($suma_benef_f + $parametros['beneficiarios-f']) > $fibap->datosProyecto->totalBeneficiariosF){
+								$respuesta['data']['code'] = 'U00';
+								$respuesta['data']['data'] = '{"field":"beneficiarios-f","error":"La suma de los beneficiarios sobrepasa la cantidad especificada al capturar la FIBAP."}';
+								throw new Exception('La suma de beneficiarios sobrepasa los beneficiarios capturados al inicio.', 1);
+							}
 
-						if(($suma_benef_m + $parametros['beneficiarios-m']) > $fibap->datosProyecto->totalBeneficiariosM){
-							$respuesta['data']['code'] = 'U00';
-							$respuesta['data']['data'] = '{"field":"beneficiarios-m","error":"La suma de los beneficiarios sobrepasa la cantidad especificada al capturar la FIBAP."}';
-							throw new Exception('La suma de beneficiarios sobrepasa los beneficiarios capturados al inicio.', 1);
+							if(($suma_benef_m + $parametros['beneficiarios-m']) > $fibap->datosProyecto->totalBeneficiariosM){
+								$respuesta['data']['code'] = 'U00';
+								$respuesta['data']['data'] = '{"field":"beneficiarios-m","error":"La suma de los beneficiarios sobrepasa la cantidad especificada al capturar la FIBAP."}';
+								throw new Exception('La suma de beneficiarios sobrepasa los beneficiarios capturados al inicio.', 1);
+							}
 						}
-
+						
 						$suma_metas = 0;
 						$trimestres = array( 1=>0 , 2=>0 , 3=>0 , 4=>0);
 						$metas_mes = array();
+						$metas_ids = $parametros['metas-capturadas']; //Elementos ya capturados por tanto se actualizaran
 						foreach ($parametros['meta-mes'] as $mes => $meta) {
-							if($meta > 0 ){
+							if(isset($metas_ids[$mes])){
+								$recurso = $desglose->metasMes->find($metas_ids[$mes]);
+								$recurso->meta = $meta;
+								$metas_mes[] = $recurso;
+							}elseif($meta > 0 ){
 								$recurso = new DesgloseMetasMes;
 								$recurso->mes = $mes;
 								$recurso->meta = $meta;
 								$metas_mes[] = $recurso;
-								$suma_metas += $meta;
-								$trimestres[ceil(($mes/3))] += $meta;
 							}
+							$trimestres[ceil(($mes/3))] += $meta;
+							$suma_metas += $meta;
 						}
 						
-						$desglose = new ComponenteDesglose;
-						$desglose->claveMunicipio 	= $clave_municipio;
-						$desglose->claveLocalidad 	= $clave_localidad;
+						$desglose->claveMunicipio 	= $nueva_clave_municipio;
+						$desglose->claveLocalidad 	= $nueva_clave_localidad;
 						$desglose->presupuesto 		= $suma_presupuesto;
 						$desglose->meta 			= $suma_metas;
 						$desglose->trim1 			= $trimestres[1];
@@ -1080,6 +1029,8 @@ class FibapController extends BaseController {
 						$desglose->trim4 			= $trimestres[4];
 						$desglose->beneficiariosF 	= $parametros['beneficiarios-f'];
 						$desglose->beneficiariosM 	= $parametros['beneficiarios-m'];
+
+						//throw new Exception(json_encode(print_r($desglose->toArray(),true)), 1);
 
 						$respuesta['data'] = DB::transaction(function() use ($accion,$distribucion, $desglose,$metas_mes){
 							$accion->datosComponente->desgloseComponente()->save($desglose);
@@ -1090,90 +1041,6 @@ class FibapController extends BaseController {
 							return array('data'=>$accion);
 						});
 
-
-						/****
-							Editar presupuesto
-						****/
-
-						$fibap = FIBAP::with('distribucionPresupuesto')->find($parametros['fibap-id']);
-						$presupuesto_base = DistribucionPresupuesto::find($id);
-
-						if(isset($parametros['meses-capturados'])){
-							$recursos_ids = $parametros['meses-capturados'];
-						}else{
-							$recursos_ids = array();
-						}
-
-						$idObjetoGasto = $parametros['objeto-gasto-presupuesto'];
-
-						if($idObjetoGasto != $presupuesto_base->idObjetoGasto){
-							$capturados = $fibap->distribucionPresupuesto->filter(function($item) use ($idObjetoGasto, $recursos_ids){
-								$buscar_id = $item->id;
-								$encontrado = array_first($recursos_ids, function($key,$value)use($buscar_id){
-										return $value == $buscar_id;
-									});
-								if($item->idObjetoGasto == $idObjetoGasto && !$encontrado ){
-									return true;
-								}
-							});
-
-							if(count($capturados)){
-								$respuesta['data']['code'] = 'U00';
-								$respuesta['data']['data'] = '{"field":"objeto-gasto-presupuesto","error":"Esta partida ya fue capturada para este proyecto."}';
-								throw new Exception('Se encontraron '.count($capturados).' elementos capturados',1);
-							}
-						}
-
-						$mes_incial = date("n",strtotime($fibap->periodoEjecucionInicio));
-						$mes_final = date("n",strtotime($fibap->periodoEjecucionFinal));
-
-						$calendarizado = array();
-						$suma_presupuesto = 0;
-						foreach ($parametros['mes'] as $mes => $cantidad) {
-							if(isset($recursos_ids[$mes])){
-								$recurso = DistribucionPresupuesto::find($recursos_ids[$mes]);
-								$recurso->idObjetoGasto = $parametros['objeto-gasto-presupuesto'];
-								$recurso->mes = $mes;
-								if($mes >= $mes_incial && $mes <= $mes_final){
-									$recurso->cantidad = $cantidad;
-								}else{
-									$recurso->cantidad = 0;
-								}
-								$calendarizado[] = $recurso;
-							}elseif($cantidad > 0){
-								if($mes >= $mes_incial && $mes <= $mes_final){
-									$recurso = new DistribucionPresupuesto;
-									$recurso->idObjetoGasto = $parametros['objeto-gasto-presupuesto'];
-									$recurso->mes = $mes;
-									$recurso->cantidad = $cantidad;
-									$calendarizado[] = $recurso;
-								}
-							}
-							$suma_presupuesto += $cantidad;
-						}
-
-						//
-						$sumatoria = $fibap->distribucionPresupuesto->filter(function($item) use ($presupuesto_base){
-							if($item->idObjetoGasto != $presupuesto_base->idObjetoGasto){
-								return true;
-							}
-						});
-
-						//$suma_distribucion = $fibap->distribucionPresupuesto->sum('cantidad');
-						$suma_distribucion = $sumatoria->sum('cantidad');
-
-						if(($suma_distribucion + $suma_presupuesto) > $fibap->presupuestoRequerido){
-							$respuesta['data']['code'] = 'U00';
-							$respuesta['data']['data'] = '{"field":"cantidad-presupuesto","error":"La distribución del presupuesto sobrepasa el presupuesto requerido."}';
-							throw new Exception('La distribución del presupuesto sobrepasa el presupuesto requerido.', 1);
-						}
-
-						$respuesta['data'] = DB::transaction(function() use ($fibap,$calendarizado){
-							$fibap->distribucionPresupuesto()->saveMany($calendarizado);
-							$fibap->load('distribucionPresupuestoAgrupado');
-							$fibap->distribucionPresupuestoAgrupado->load('objetoGasto');
-							return array('data'=>'Presupuesto Editado','distribucion' => $fibap->distribucionPresupuestoAgrupado);
-						});
 					}elseif($parametros['formulario'] == 'form-accion'){ //Editar Accion
 
 						/***
@@ -1195,8 +1062,6 @@ class FibapController extends BaseController {
 							$origenes_ids = $parametros['origen-captura-id'];
 						}
 						
-						//$componente = FibapDatosComponente::where('idFibap','=',$fibap->id)->where('idAccion','=',$id)->get();
-						//$componente = $componente[0];
 						$componente = $accion->datosComponente;
 						$componente->idEntregable 		= $parametros['entregable'];
 						$componente->idTipoComponente 	= $parametros['tipo-componente'];
@@ -1254,7 +1119,6 @@ class FibapController extends BaseController {
 								if(count($partidas['nuevas'])){
 									$accion->partidas()->attach($partidas['nuevas']);
 								}
-								//$componente->save();
 								$accion->datosComponente()->save($componente);
 								$accion->propuestasFinanciamiento()->saveMany($guardar_origenes);
 
@@ -1305,14 +1169,40 @@ class FibapController extends BaseController {
 
 			if(isset($parametros['eliminar'])){ //Con parametros, el delete viene de dentro de Editar Fibap
 				if($parametros['eliminar'] == 'presupuesto'){ //Eliminar Distribucion del Presupuesto
-					$id_padre = $parametros['id-fibap'];
-					$rows = DB::transaction(function() use ($ids,$id_padre){
+					/***
+					*	Eliminar desglose del presupuesto de la Accion (DELETE)
+					*
+					* 	- Borrar datos del desglose del componete (Metas,Beneficiarios,Localidad)
+					*	- Borrar la distribución de presupuesto por mes y partida
+					*	- Borrar el desglose de metas por mes del componente
+					***/
+					$id_padre = $parametros['id-accion'];
+					$rows = DB::transaction(function() use ($ids){
 						//Obtenemos los ids de las actividades de los componentes seleccionados
-						$objetos_gastos_ids = DistribucionPresupuesto::wherein('id',$ids)->lists('idObjetoGasto');
+						$distribuciones = DistribucionPresupuesto::whereIn('id',$ids)
+																	->select('idAccion','claveMunicipio','claveLocalidad')
+																	//->groupBy('idAccion','claveMunicipio','claveLocalidad')
+																	->get();
 						//Eliminamos la distribucion del presupuesto
-						return DistribucionPresupuesto::where('idFibap',$id_padre)
-													  ->whereIn('idObjetoGasto',$objetos_gastos_ids)
-													  ->delete();
+						$distribucion_eliminar = DistribucionPresupuesto::getModel();
+						$desgloses_eliminar = ComponenteDesglose::getModel();
+						foreach ($distribuciones as $distribucion) {
+							$distribucion_eliminar = $distribucion_eliminar->orWhere(function($query) use ($distribucion){
+								$query->where('idAccion','=',$distribucion->idAccion)
+										->where('claveMunicipio','=',$distribucion->claveMunicipio)
+										->where('claveLocalidad','=',$distribucion->claveLocalidad);
+							});
+							$desgloses_eliminar = $desgloses_eliminar->orWhere(function($query) use ($distribucion){
+								$query->where('idAccion','=',$distribucion->idAccion)
+										->where('claveMunicipio','=',$distribucion->claveMunicipio)
+										->where('claveLocalidad','=',$distribucion->claveLocalidad);
+							});
+						}
+
+						$distribucion_eliminar->delete();
+						$desgloses_ids = $desgloses_eliminar->get();
+						DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses_ids->lists('id'))->delete();
+						return $desgloses_eliminar->delete();
 					});
 				}elseif($parametros['eliminar'] == 'antecedente'){ //Eliminar Antecedente(s)
 					$id_padre = $parametros['id-fibap'];
@@ -1327,15 +1217,20 @@ class FibapController extends BaseController {
 					*	- Borrar datos de una acción
 					*	- Borrar la relación de la acción con las partidas prespuestarias
 					* 	- Borrar datos del componete (datos a exportar al proyecto)
-					*	- Borrar la propuesta del financiamiento
+					*	- Borrar la propuesta de financiamiento
 					*	- Borrar la distribución del presupuesto
-					*	- Pendiente...
+					* 	- Borrar datos del desglose del componete (Metas,Beneficiarios,Localidad)
+					*	- Borrar el desglose de metas por mes del componente
+					*
 					***/
 					$id_padre = $parametros['id-fibap'];
 					$rows = DB::transaction(function() use ($ids){
 						FibapDatosComponente::whereIn('idAccion',$ids)->delete();
 						PropuestaFinanciamiento::whereIn('idAccion',$ids)->delete();
 						DistribucionPresupuesto::whereIn('idAccion',$ids)->delete();
+						$desgloses = ComponenteDesglose::whereIn('idAccion',$ids)->get();
+						$desgloses->metasMes()->delete();
+						$desgloses->delete();
 						$acciones = Accion::whereIn('id',$ids)->get();
 						foreach ($acciones as $accion) {
 							$accion->partidas()->detach();
@@ -1369,10 +1264,7 @@ class FibapController extends BaseController {
 					if($parametros['eliminar'] == 'antecedente'){
 						$data['antecedentes'] = AntecedenteFinanciero::where('idFibap',$id_padre)->get();
 					}elseif($parametros['eliminar'] == 'presupuesto'){
-						$fibap = FIBAP::find($id_padre);
-						$fibap->load('distribucionPresupuesto');
-						$fibap->distribucionPresupuesto->load('objetoGasto');
-						$data['presupuesto'] = $fibap->distribucionPresupuesto;
+						$data['accion'] = Accion::with('distribucionPresupuestoAgrupado.jurisdiccion')->find($id_padre);
 					}elseif($parametros['eliminar'] == 'accion'){
 						//mako037
 						$fibap = FIBAP::with('acciones')->find($id_padre);

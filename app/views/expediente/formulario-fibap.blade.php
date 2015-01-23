@@ -382,8 +382,34 @@
 
         <!--  Begin Tab Panel: Acciones y distribucion de presupuesto  -->
         <div role="tabpanel" class="tab-pane" id="acciones-fibap">
-        <!--form id="form-fibap-presupuesto">
-        </form-->
+            <h4>Presupuesto Requerido y Propuesta de Financiamiento</h4>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label">
+                            Total Requerido / Total Distribuido :
+                        </label>
+                        <span class="text-muted" id="total-presupuesto-distribuido">$ 0.00</span> / <span class="text-muted" id="total-presupuesto-requerido">$ 0.00</span>
+                    </div>
+                </div>
+                <div class="col-sm-12"><label class="control-label">Origen del Presupuesto</label></div>
+                <div class="col-sm-12">
+                    <div class="row">
+                        @foreach ($origenes_financiamiento as $origen)
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        {{$origen->descripcion}} :
+                                    </label>
+                                    <span class="text-muted totales-financiamiento" data-total-origen-id="{{$origen->id}}">
+                                        $ 0.00
+                                    </span>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
             <div class="datagrid" id="datagridAcciones" data-edit-row="editar_accion">
                 <div>
                     <div class="pull-left">
@@ -429,6 +455,7 @@
                     <tbody></tbody>
                 </table>
             </div>
+            
             <div id="datagrid-contenedor" class="hidden">
                 <div class="datagrid panel panel-primary" id="datagridDistribucion" data-edit-row="editar_presupuesto" data-selected-id="">
                     <div class="panel-body">
@@ -486,35 +513,6 @@
 
         <!--  Begin Tab Panel: Presupuesto y Propuesta  -->
         <div role="tabpanel" class="tab-pane" id="presupuesto-fibap">
-            <h4>Presupuesto Requerido y Propuesta de Financiamiento</h4>
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <label class="control-label">
-                            Total Requerido / Total Distribuido :
-                        </label>
-                        <span class="text-muted" id="total-presupuesto-requerido">$ 0.00</span> / <span class="text-muted" id="total-presupuesto-distribuido">$ 0.00</span>
-                    </div>
-                </div>
-                <div class="col-sm-12"><label class="control-label">Origen del Presupuesto</label></div>
-                <div class="col-sm-12">
-                    <div class="row">
-                        @foreach ($origenes_financiamiento as $origen)
-                            <div class="col-sm-3">
-                                <div class="form-group">
-                                    <label class="control-label">
-                                        {{$origen->descripcion}} :
-                                    </label>
-                                    <span class="text-muted totales-financiamiento" data-total-origen-id="{{$origen->id}}">
-                                        $ 0.00
-                                    </span>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        
             <div class="row" id="grid_distribucion_presupuesto">
                 <div class="col-sm-12">
                     <div class="panel panel-primary datagrid" id="datagridPresupuesto" data-edit-row="ver_distribucion_partida">
@@ -530,31 +528,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!--div class="col-sm-3">
-                                    <div class="btn-toolbar pull-right" >
-                                        <div class="btn-group" style="margin:5px">
-                                            <button type="button" class="btn btn-success" id="btn-agregar-presupuesto">
-                                                <span class="glyphicon glyphicon-plus"></span> Agregar
-                                            </button>
-                                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                                                <span class="caret"></span>
-                                            </button>
-                                            <ul class="dropdown-menu pull-right" role="menu">
-                                                <li>
-                                                    <a href="#" class="btn-edit-rows">
-                                                        <span class="glyphicon glyphicon-edit"></span> Editar
-                                                    </a>
-                                                </li>
-                                                <li class="divider"></li>
-                                                <li>
-                                                    <a href="#" class="btn-delete-rows">
-                                                        <span class="glyphicon glyphicon-remove"></span> Eliminar
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div-->
                             </div>
                         </div>
                         <table class="table table-striped table-hover">
