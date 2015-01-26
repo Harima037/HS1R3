@@ -1163,7 +1163,6 @@ class FibapController extends BaseController {
 
 		try{
 			$parametros = Input::all();
-
 			$ids = $parametros['rows'];
 			$id_padre = 0;
 
@@ -1176,35 +1175,56 @@ class FibapController extends BaseController {
 					*	- Borrar la distribución de presupuesto por mes y partida
 					*	- Borrar el desglose de metas por mes del componente
 					***/
+
 					$id_padre = $parametros['id-accion'];
 					$rows = DB::transaction(function() use ($ids){
 						//Obtenemos los ids de las actividades de los componentes seleccionados
 						$distribuciones = DistribucionPresupuesto::whereIn('id',$ids)
 																	->select('idAccion','claveMunicipio','claveLocalidad')
-																	//->groupBy('idAccion','claveMunicipio','claveLocalidad')
 																	->get();
-						//Eliminamos la distribucion del presupuesto
+						
 						$distribucion_eliminar = DistribucionPresupuesto::getModel();
 						$desgloses_eliminar = ComponenteDesglose::getModel();
-						foreach ($distribuciones as $distribucion) {
-							$distribucion_eliminar = $distribucion_eliminar->orWhere(function($query) use ($distribucion){
-								$query->where('idAccion','=',$distribucion->idAccion)
-										->where('claveMunicipio','=',$distribucion->claveMunicipio)
-										->where('claveLocalidad','=',$distribucion->claveLocalidad);
-							});
-							$desgloses_eliminar = $desgloses_eliminar->orWhere(function($query) use ($distribucion){
-								$query->where('idAccion','=',$distribucion->idAccion)
-										->where('claveMunicipio','=',$distribucion->claveMunicipio)
-										->where('claveLocalidad','=',$distribucion->claveLocalidad);
-							});
+
+						foreach ($distribuciones as $key => $distribucion) {
+							if($key == 0){
+								$distribucion_eliminar = $distribucion_eliminar->where(function($query) use ($distribucion){
+									$query->where('idAccion','=',$distribucion->idAccion)
+											->where('claveMunicipio','=',$distribucion->claveMunicipio)
+											->where('claveLocalidad','=',$distribucion->claveLocalidad);
+								});
+								$desgloses_eliminar = $desgloses_eliminar->where(function($query) use ($distribucion){
+									$query->where('idAccion','=',$distribucion->idAccion)
+											->where('claveMunicipio','=',$distribucion->claveMunicipio)
+											->where('claveLocalidad','=',$distribucion->claveLocalidad);
+								});
+							}else{
+								$distribucion_eliminar = $distribucion_eliminar->orWhere(function($query) use ($distribucion){
+									$query->where('idAccion','=',$distribucion->idAccion)
+											->where('claveMunicipio','=',$distribucion->claveMunicipio)
+											->where('claveLocalidad','=',$distribucion->claveLocalidad);
+								});
+								$desgloses_eliminar = $desgloses_eliminar->orWhere(function($query) use ($distribucion){
+									$query->where('idAccion','=',$distribucion->idAccion)
+											->where('claveMunicipio','=',$distribucion->claveMunicipio)
+											->where('claveLocalidad','=',$distribucion->claveLocalidad);
+								});
+							}
 						}
 
 						$distribucion_eliminar->delete();
 						$desgloses_ids = $desgloses_eliminar->get();
+
 						DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses_ids->lists('id'))->delete();
 						return $desgloses_eliminar->delete();
 					});
 				}elseif($parametros['eliminar'] == 'antecedente'){ //Eliminar Antecedente(s)
+					/***
+					*	Eliminar Antecedente Financiero (DELETE)
+					*
+					* 	- Borrar antecedentes finanacieros de una FIBAP
+					*
+					***/
 					$id_padre = $parametros['id-fibap'];
 					$rows = DB::transaction(function() use ($ids){
 						//Eliminamos las actividades
@@ -1229,9 +1249,11 @@ class FibapController extends BaseController {
 						PropuestaFinanciamiento::whereIn('idAccion',$ids)->delete();
 						DistribucionPresupuesto::whereIn('idAccion',$ids)->delete();
 						$desgloses = ComponenteDesglose::whereIn('idAccion',$ids)->get();
-						$desgloses->metasMes()->delete();
-						$desgloses->delete();
+						//$desgloses->metasMes()->delete();
+						DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses->lists('id'))->delete();
+						ComponenteDesglose::whereIn('idAccion',$ids)->delete();
 						$acciones = Accion::whereIn('id',$ids)->get();
+						//$acciones->partidas->detach();
 						foreach ($acciones as $accion) {
 							$accion->partidas()->detach();
 						}
@@ -1239,6 +1261,12 @@ class FibapController extends BaseController {
 					});
 				}
 			}else{ //Sin parametros el delete viene de la lista de fibaps
+				/***
+				*	Eliminar FIBAP (DELETE)
+				*
+				* 	- Borrar antecedentes finanacieros de una FIBAP
+				*
+				***/
 				$rows = DB::transaction(function() use ($ids){
 					//Eliminamos los datos del proyecto, en caso de que el FIBAP no haya sido asignado a ningun proyecto
 					FibapDatosProyecto::whereIn('idFibap',$ids)->delete();
