@@ -13,14 +13,12 @@
 =====================================*/
 // Declaracion de variables
 var fibapResource = new RESTfulRequests(SERVER_HOST+'/v1/fibap');
-//var componenteDatagrid = new Datagrid("#datagridComponentes",proyectoResource);
-var presupuestoDatagrid = new Datagrid("#datagridPresupuesto",fibapResource);
+
 var antecedenteDatagrid = new Datagrid("#datagridAntecedentes",fibapResource);
 var accionesDatagrid = new Datagrid('#datagridAcciones',fibapResource);
 var distribucionDataGrid = new Datagrid('#datagridDistribucion',fibapResource); //Este datagrid se ira moviendo por todas las acciones
 
 antecedenteDatagrid.init();
-presupuestoDatagrid.init();
 accionesDatagrid.init();
 distribucionDataGrid.init();
 
@@ -42,7 +40,16 @@ window.onload = function () {
 
 deshabilita_paneles('');
 
+$('.chosen-one').chosen({width:'100%'});
+
 //*********************************   Funcionalidad al cargar el formulario   *********************************
+$('#jurisdiccion-accion').on('change',function(){
+	habilita_opciones('#municipio-accion',$('#jurisdiccion-accion option:selected').attr('data-jurisdiccion-id'));
+});
+$('#municipio-accion').on('change',function(){
+	habilita_opciones('#localidad-accion',$('#municipio-accion option:selected').attr('data-municipio-id'));
+});
+
 $('.origen-financiamiento').on('keyup',function(){
 	sumar_valores('.origen-financiamiento','#presupuesto-requerido');
 });
@@ -52,33 +59,47 @@ $('.accion-origen-financiamiento').on('keyup',function(){
 $('.presupuesto-mes').on('keyup',function(){
 	sumar_valores('.presupuesto-mes','#cantidad-presupuesto');
 });
-$('.meta-mes').on('keyup',function(){
-	sumar_valores('.meta-mes','#cantidad-meta');
-});
 $('.benef-totales-accion').on('keyup',function(){
 	sumar_valores('.benef-totales-accion','#total-beneficiarios-accion');
 });
 $('#cobertura').on('change',function(){
 	deshabilita_paneles($(this).val());
 });
-$('#municipio-accion').on('change',function(){
-	var json = $('#municipio-accion > option:selected').attr('data-localidades');
-	if(json){
-		json = json.split('|');
-	}else{
-		json = [];
-	}
-	
-	var localidades = [];
-	var localidad;
-	for(var i in json){
-		localidad = jQuery.parseJSON(json[i]);
-		if(localidad){
-			localidades.push(localidad);
-		}
-	}
-	llenar_select_localidades(localidades);
+$('#entregable').on('change',function(){
+	habilita_opciones('#tipo-componente',$(this).val(),'NA');
+	habilita_opciones('#accion-componente',$(this).val());
 });
+
+$('.meta-mes').on('change',function(){
+	var mes = $(this).data('meta-mes');
+	var trimestre = Math.ceil(mes/3);
+
+	var suma = 0;
+
+	if(trimestre == 1){
+		var i = 1;
+		var j = 3;
+	}else if(trimestre == 2){
+		var i = 4;
+		var j = 6;
+	}else if(trimestre == 3){
+		var i = 7;
+		var j = 9;
+	}else{
+		var i = 10;
+		var j = 12;
+	}
+	for(i; i <= j ; i++){
+		suma += parseInt($('.meta-mes[data-meta-mes="' + i + '"]').val()) || 0;
+	}
+	$('#trim'+trimestre).val(suma);
+	$('#trim'+trimestre).change();
+	sumar_valores('.meta-mes','#cantidad-meta');
+});
+$('.meta-mes').on('keyup',function(){
+	$(this).change();
+});
+
 $('.benef-totales').on('keyup',function(){
 	var total = 0;
 	$('.benef-totales').each(function(){
@@ -174,6 +195,8 @@ if($('#id').val()){
             $('#total-beneficiarios-f').val(datosProyecto.totalBeneficiariosF);
             $('#total-beneficiarios-m').val(datosProyecto.totalBeneficiariosM);
 
+            $('#tipo_beneficiario_texto').text($('#tipo-beneficiario option:selected').text());
+
             for(var indx in response.data.documentos){
             	$('#documento_'+response.data.documentos[indx].id).prop('checked',true);
             }
@@ -194,14 +217,13 @@ if($('#id').val()){
 
             llenar_select_jurisdicciones(response.data.jurisdicciones);
             llenar_select_municipios(response.data.municipios);
-            llenar_select_localidades([]);
+            //llenar_select_localidades([]);
 
             if(response.data.resultadosObtenidos || response.data.resultadosEsperados){
             	cambiar_icono_tabs('#tab-link-antecedentes-fibap','fa-check-square-o');
             }
 
             if(response.data.presupuestoRequerido || response.data.periodoEjecucion){
-            	cambiar_icono_tabs('#tab-link-presupuesto-fibap','fa-check-square-o');
             	cambiar_icono_tabs('#tab-link-acciones-fibap','fa-check-square-o');
             }
 		}
@@ -290,15 +312,17 @@ function editar_presupuesto(e){
         _success: function(response){
             //$(modal_presupuesto).find(".modal-title").html("Editar Presupuesto");
             $('#jurisdiccion-accion').val(response.calendarizado[0].claveJurisdiccion);
-            $('#jurisdiccion-accion').change();
+            $('#jurisdiccion-accion').trigger('chosen:updated');
+            $('#jurisdiccion-accion').chosen().change();
 
             var desglose = response.data.desglose_componente;
             $('#municipio-accion').val(desglose.claveMunicipio);
-            $('#municipio-accion').change();
+            $('#municipio-accion').trigger('chosen:updated');
+            $('#municipio-accion').chosen().change();
 
             //llenar_select_localidades
-            $('#localidad-accion').val(desglose.claveLocalidad);
-            $('#localidad-accion').change();
+            $('#localidad-accion').val(desglose.claveMunicipio + '|' + desglose.claveLocalidad);
+            $('#localidad-accion').trigger('chosen:updated');
 
             $('#beneficiarios-f').val(desglose.beneficiariosF);
             $('#beneficiarios-m').val(desglose.beneficiariosM);
@@ -345,10 +369,6 @@ function editar_presupuesto(e){
     });
 }
 
-function ver_distribucion_partida(e){
-	console.log(e);
-}
-
 function editar_accion(e){
 	ocultar_detalles(true);
 	var parametros = {'ver':'accion'};
@@ -374,10 +394,16 @@ function editar_accion(e){
             $('#indicador').val(response.data.datos_componente.indicador);
             $('#unidad-medida').val(response.data.datos_componente.idUnidadMedida);
             $('#unidad-medida').change();
+
             $('#entregable').val(response.data.datos_componente.idEntregable);
-            $('#entregable').change();
-            $('#tipo-componente').val(response.data.datos_componente.idTipoComponente);
-            $('#accion-componente').val(response.data.datos_componente.idAccionComponente);
+            $('#entregable').chosen().change();
+            $('#entregable').trigger('chosen:updated');
+
+            $('#tipo-componente').val(response.data.datos_componente.idEntregableTipo || 'NA');
+			$('#tipo-componente').trigger('chosen:updated');            
+
+            $('#accion-componente').val(response.data.datos_componente.idEntregableAccion);
+            $('#accion-componente').trigger('chosen:updated');
 
             $('#id-accion').val(response.data.id);
             
@@ -566,6 +592,7 @@ $('#btn-presupuesto-guardar').on('click',function(){
 	        _success: function(response){
 	            MessageManager.show({data:'Cambios almacenados con éxito',type:'OK',timer:3});
 	            llenar_datagrid_distribucion(response.data.distribucion_presupuesto_agrupado,response.data.presupuestoRequerido);
+	            llenar_datagrid_presupuestos(response.distribucion_total);
 	            $(modal_presupuesto).modal('hide');
 	        },
 	        _error: function(response){
@@ -587,7 +614,7 @@ $('#btn-presupuesto-guardar').on('click',function(){
 	        _success: function(response){
 	            MessageManager.show({data:'Presupuesto almacenado con éxito',type:'OK',timer:3});
 	            llenar_datagrid_distribucion(response.data.distribucion_presupuesto_agrupado,response.data.presupuestoRequerido);
-	            cambiar_icono_tabs('#tab-link-presupuesto-fibap','fa-check-square-o');
+	            llenar_datagrid_presupuestos(response.distribucion_total);
 	            cambiar_icono_tabs('#tab-link-acciones-fibap','fa-check-square-o');
 	            $(modal_presupuesto).modal('hide');
 	        },
@@ -684,7 +711,7 @@ $('#btn-fibap-guardar').on('click',function(){
 	            }
 	            if(response.extras){
 	            	llenar_select_municipios(response.extras.municipios);
-            		llenar_select_localidades([]);
+            		//llenar_select_localidades([]);
 	            }
 	        },
 	        _error: function(response){
@@ -711,7 +738,7 @@ $('#btn-fibap-guardar').on('click',function(){
 	            $('#id').val(response.data.id);
 	            if(response.extras){
 		            llenar_select_municipios(response.extras.municipios);
-	            	llenar_select_localidades([]);
+	            	//llenar_select_localidades([]);
 	            }
 	        },
 	        _error: function(response){
@@ -774,16 +801,16 @@ function llenar_datagrid_acciones(datos){
 	$('#datagridAcciones > table > tbody').empty();
 	var acciones = [];
 	var sumas_origenes = [];
-	var suma_total = 0;
+	//var suma_total = 0;
 	for(var indx in datos){
 		var accion = {};
 
 		var presupuesto = parseFloat(datos[indx].presupuestoRequerido);
 
 		accion.id = datos[indx].id;
-		accion.entregable = datos[indx].datos_componente.idEntregable;
-		accion.tipo = datos[indx].datos_componente.idTipoComponente;
-		accion.accion = datos[indx].datos_componente.idAccionComponente;
+		accion.entregable = datos[indx].datos_componente_listado.entregable;
+		accion.tipo = datos[indx].datos_componente_listado.entregableTipo || 'N / A';
+		accion.accion = datos[indx].datos_componente_listado.entregableAccion;
 		accion.modalidad = 'pendiente';//datos[indx].cantidad;
 		accion.presupuesto = '$ ' + parseFloat(presupuesto.toFixed(2)).format();
 		accion.boton = '<span class="btn-link text-info boton-detalle" onClick="mostrar_detalles(' + datos[indx].id + ')"><span class="fa fa-plus-square-o"></span></span>'
@@ -796,7 +823,7 @@ function llenar_datagrid_acciones(datos){
 				sumas_origenes[origen.idOrigenFinanciamiento] = 0;
 			}
 			sumas_origenes[origen.idOrigenFinanciamiento] += origen.cantidad;
-			suma_total += origen.cantidad;
+			//suma_total += origen.cantidad;
 		}
 	}
 	
@@ -807,8 +834,8 @@ function llenar_datagrid_acciones(datos){
 		}
 	});
 
-	$('#total-presupuesto-distribuido').attr('data-valor',suma_total);
-	$('#total-presupuesto-distribuido').text('$ ' + suma_total.format());
+	//$('#total-presupuesto-distribuido').attr('data-valor',suma_total);
+	//$('#total-presupuesto-distribuido').text('$ ' + suma_total.format());
 
 	if(datos.length == 0){
 		$('#datagridAcciones > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
@@ -823,63 +850,62 @@ function llenar_select_jurisdicciones(datos){
 	$.each(datos, function() {
 		options.append($("<option />").attr('data-jurisdiccion-id',this.id).val(this.clave).text(this.nombre));
 	});
-	options.selectpicker('refresh');
+	options.val('');
+	$(options).trigger('chosen:updated');
 }
 
 function llenar_select_municipios(datos){
-	var options = $("#municipio-accion");
-	options.html('<option value="">Selecciona un Municipio</option>')
-	$.each(datos, function() {
-		var localidades = '';
-		for(var i in this.localidades){
-			localidades += '{"clave":"' + this.localidades[i].clave + '","nombre":"' + this.localidades[i].nombre + '"}|';
-		}
-		localidades += '{}';
-		options.append($("<option />").attr('data-localidades',localidades).val(this.clave).text(this.nombre));
-	});
-	options.selectpicker('refresh');
-}
+	var municipios = $("#municipio-accion");
+	var localidades = $("#localidad-accion");
 
-function llenar_select_localidades(datos){
-	var options = $("#localidad-accion");
-	if(datos.length){
-		options.html('<option value="">Selecciona una Localidad</option>')
-	}else{
-		options.html('<option value="">Selecciona un Municipio</option>')
-	}
-	
+	localidades.html('<option value="">Selecciona una Localidad</option>')
+	municipios.html('<option value="">Selecciona un Municipio</option>')
+
 	$.each(datos, function() {
-		options.append($("<option />").val(this.clave).text(this.nombre));
+		for(var i in this.localidades){
+			localidades.append($("<option />").attr('data-habilita-id',this.localidades[i].idMunicipio)
+											.attr('data-clave-municipio',this.clave)
+											.attr('disabled',true)
+									  		.addClass('hidden')
+											.val(this.clave + '|' + this.localidades[i].clave).text(this.localidades[i].nombre));
+		}
+		municipios.append($("<option />").attr('data-habilita-id',this.idJurisdiccion)
+										.attr('data-municipio-id',this.id)
+									  	.attr('disabled',true)
+									  	.addClass('hidden')
+									  	.val(this.clave).text(this.nombre));
 	});
-	options.selectpicker('refresh');
 }
 
 function llenar_datagrid_presupuestos(datos){
-	var distribucion = [];
-	$('#datagridPresupuesto > table > tbody').empty();
+	var distribucion = '';
+	$('#tabla_presupuesto_partida > table > tbody').empty();
 	var total_porcentaje = 0;
+	var suma_distribuido = 0;
 	var total_presup = $('#total-presupuesto-requerido').attr('data-valor');
 	for(var indx in datos){
-		var presupuesto = {};
 		var porcentaje = (datos[indx].cantidad * 100) / parseFloat(total_presup);
 
-		presupuesto.id = datos[indx].id;
-		presupuesto.partida = datos[indx].objeto_gasto.clave;
-		presupuesto.descripcion = datos[indx].objeto_gasto.descripcion;
-		presupuesto.cantidad = '$ ' + datos[indx].cantidad.format();
-		presupuesto.porcentaje = parseFloat(porcentaje.toFixed(2));
+		distribucion += '<tr>';
+		distribucion += '<td>' + datos[indx].objeto_gasto.clave + '</td>';
+		distribucion += '<td>' + datos[indx].objeto_gasto.descripcion + '</td>';
+		distribucion += '<td>$ ' + datos[indx].cantidad.format() + '</td>';
+		distribucion += '<td>' + parseFloat(porcentaje.toFixed(2)) + ' %</td>';
+		distribucion += '</tr>';
 
+		suma_distribuido += datos[indx].cantidad;
 		total_porcentaje += parseFloat(porcentaje.toFixed(2));
-
-		distribucion.push(presupuesto);
 	}
 
-	if(distribucion.length == 0){
+	$('#total-presupuesto-distribuido').attr('data-valor',suma_distribuido);
+	$('#total-presupuesto-distribuido').text('$ ' + suma_distribuido.format());
+
+	if(distribucion == ''){
 		actualiza_porcentaje('#porcentaje_completo',0);
-		$('#datagridPresupuesto > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
+		$('#tabla_presupuesto_partida > table > tbody').html('<tr><td colspan="4" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
 	}else{
 		actualiza_porcentaje('#porcentaje_completo',total_porcentaje);
-		presupuestoDatagrid.cargarDatos(distribucion);
+		$('#tabla_presupuesto_partida > table > tbody').html(distribucion);
 	}
 }
 
@@ -893,9 +919,9 @@ function llenar_datagrid_distribucion(datos,total_presupuesto){
 		var porcentaje = (datos[indx].cantidad * 100) / parseInt(total_presupuesto);
 
 		presupuesto.id = datos[indx].id;
-		presupuesto.jurisdiccion = datos[indx].jurisdiccion.nombre;
-		presupuesto.municipio = datos[indx].municipio;
 		presupuesto.localidad = datos[indx].localidad;
+		presupuesto.municipio = datos[indx].municipio;
+		presupuesto.jurisdiccion = datos[indx].jurisdiccion.nombre;
 		presupuesto.monto = '$ ' + datos[indx].cantidad.format();
 
 		total_porcentaje += parseFloat(porcentaje.toFixed(2));
@@ -911,6 +937,23 @@ function llenar_datagrid_distribucion(datos,total_presupuesto){
 		distribucionDataGrid.cargarDatos(distribucion);
 	}
 
+}
+
+function habilita_opciones(selector,habilitar_id,default_id){
+	var suma = $(selector + ' option[data-habilita-id="' + habilitar_id + '"]').length;
+	$(selector + ' option[data-habilita-id]').attr('disabled',true).addClass('hidden');
+	$(selector + ' option[data-habilita-id="' + habilitar_id + '"]').attr('disabled',false).removeClass('hidden');
+	if(suma == 0 && default_id){
+		$(selector + ' option[data-habilita-id="' + default_id + '"]').attr('disabled',false).removeClass('hidden');
+	}
+	$(selector).val('');
+	$(selector).change();
+	if($(selector).hasClass('selectpicker')){
+		$(selector).selectpicker('refresh');
+	}
+	if($(selector).hasClass('chosen-one')){
+		$(selector).trigger("chosen:updated");
+	}
 }
 
 function ocultar_detalles(remover_contendor){
@@ -943,10 +986,13 @@ function mostrar_detalles(id){
 				$('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"] > td > span.boton-detalle > span.fa-plus-square-o').addClass('fa-minus-square-o');
 				$('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"] > td > span.boton-detalle > span.fa-plus-square-o').removeClass('fa-plus-square-o');
 				
-				$('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"]').after('<tr class="contendor-desechable disabled"><td class="disabled" colspan="7" id="datagrid-contenedor-' + id + '"></td></tr>');
+				$('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"]').after('<tr class="contendor-desechable disabled"><td class="disabled bg-info" colspan="7" id="datagrid-contenedor-' + id + '"></td></tr>');
 				$('#datagridDistribucion').appendTo('#datagrid-contenedor-' + id);
 				$('#datagridDistribucion').attr('data-selected-id',id);
-				
+
+				$('#indicador_texto').text(response.data.datos_componente_listado.indicador);
+				$('#unidad_medida_texto').text(response.data.datos_componente_listado.unidadMedida);
+
 				actualizar_claves_presupuesto(response.data.partidas);
 			}
 		});
@@ -997,8 +1043,6 @@ function llenar_datagrid_antecedentes(datos){
 function habilitar_tabs(){
 	$('#tab-link-antecedentes-fibap').attr('data-toggle','tab');
 	$('#tab-link-antecedentes-fibap').parent().removeClass('disabled');
-	$('#tab-link-presupuesto-fibap').attr('data-toggle','tab');
-	$('#tab-link-presupuesto-fibap').parent().removeClass('disabled');
 	$('#tab-link-acciones-fibap').attr('data-toggle','tab');
 	$('#tab-link-acciones-fibap').parent().removeClass('disabled');
 }
@@ -1103,8 +1147,10 @@ function reset_modal_form(formulario){
     	$('#' + formulario + ' input[type="hidden"]').val('');
     	$('#' + formulario + ' input[type="hidden"]').change();
     	$('#' + formulario + ' .selectpicker').change();
-    	$('#municipio-accion').change();
-    	$('#localidad-accion').change();
+    	//change para actualizar municipios y localidades
+    	$('#jurisdiccion-accion').chosen().change();
+    	//update para actualizar el control con el valor seleccionado
+    	$('#jurisdiccion-accion').trigger('chosen:updated');
 
     	$('.presupuesto-mes').each(function(){
 			$(this).attr('data-presupuesto-id','');
@@ -1123,6 +1169,8 @@ function reset_modal_form(formulario){
     	$('.accion-origen-financiamiento').each(function(){
     		$(this).attr('data-captura-id','');
     	});
+    	$('#entregable').chosen().change();
+		$('#entregable').trigger('chosen:updated');
     	//$('#objeto-gasto-presupuesto').selectpicker('refresh');
     }
 }

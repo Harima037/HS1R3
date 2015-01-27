@@ -23,6 +23,10 @@ class Accion extends BaseModel
     	return $this->hasOne('FibapDatosComponente','idAccion');
     }
 
+    public function datosComponenteListado(){
+        return $this->hasOne('FibapDatosComponente','idAccion')->mostrarDatos();
+    }
+
 	public function propuestasFinanciamiento(){
 		return $this->hasMany('PropuestaFinanciamiento','idAccion');
 	}

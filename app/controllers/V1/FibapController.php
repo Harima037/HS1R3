@@ -37,12 +37,6 @@ class FibapController extends BaseController {
 		'resultados-esperados'		=> 'required'
 	);
 
-	private $reglasFibapPresupuesto = array(
-		'presupuesto-requerido'		=> 'required',
-		'periodo-ejecucion-inicio'	=> 'required',
-		'periodo-ejecucion-final'	=> 'required'
-	);
-
 	private $reglasAccion = array(
 		//'objeto-gasto-presupuesto'		=> 'required',
 		'indicador'						=> 'required',
@@ -176,7 +170,7 @@ class FibapController extends BaseController {
 		if($parametros){
 			if($parametros['ver'] == 'fibap'){
 				$recurso = FIBAP::with('documentos','antecedentesFinancieros','distribucionPresupuestoAgrupado','acciones')->find($id);
-				$recurso->acciones->load('datosComponente','propuestasFinanciamiento');
+				$recurso->acciones->load('datosComponenteListado','propuestasFinanciamiento');
 				$recurso->distribucionPresupuestoAgrupado->load('objetoGasto');
 				$proyecto = NULL;
 				if($recurso->idProyecto){
@@ -200,6 +194,12 @@ class FibapController extends BaseController {
 					$municipios = $region[0]->municipios;
 				}
 			}elseif($parametros['ver'] == 'antecedente'){
+				/***
+				*	Obtiene los datos de un Antecedente (GET)
+				*
+				*	- Obtiene los datos del antecedente
+				* 	
+				***/
 				$recurso = AntecedenteFinanciero::find($id);
 			}elseif($parametros['ver'] == 'accion'){
 				/***
@@ -218,7 +218,7 @@ class FibapController extends BaseController {
 				*	- Obtiene la distribución de presupuesto concentrado por Localidad
 				* 	
 				***/
-				$recurso = Accion::with('distribucionPresupuestoAgrupado','partidas')->find($id);
+				$recurso = Accion::with('distribucionPresupuestoAgrupado','datosComponenteListado','partidas')->find($id);
 				if($recurso->distribucionPresupuestoAgrupado){
 					$recurso->distribucionPresupuestoAgrupado->load('jurisdiccion');
 				}
@@ -479,7 +479,9 @@ class FibapController extends BaseController {
 						$fibap = FIBAP::find($accion->idFibap);
 
 						$clave_municipio = $parametros['municipio-accion'];
-						$clave_localidad = $parametros['localidad-accion'];
+						$clave_localidad = explode('|',$parametros['localidad-accion']);
+						$clave_localidad = $clave_localidad[1];
+
 						$municipio = Municipio::with('jurisdiccion')->where('clave','=',$clave_municipio)->get();
 						$clave_jurisdiccion = $municipio[0]->jurisdiccion->clave;
 
@@ -595,6 +597,8 @@ class FibapController extends BaseController {
 							return array('data'=>$accion);
 						});
 
+						$fibap->load('distribucionPresupuestoAgrupado.objetoGasto');
+						$respuesta['data']['distribucion_total'] = $fibap->distribucionPresupuestoAgrupado;
 					}elseif($parametros['formulario'] == 'form-accion'){ //Nueva Accion
 
 						/***
@@ -628,10 +632,13 @@ class FibapController extends BaseController {
 						$componente = new FibapDatosComponente;
 						$componente->idFibap 			= $fibap->id;
 						$componente->idEntregable 		= $parametros['entregable'];
-						$componente->idTipoComponente 	= $parametros['tipo-componente'];
-						$componente->idAccionComponente = $parametros['accion-componente'];
+						$componente->idEntregableAccion = $parametros['accion-componente'];
 						$componente->idUnidadMedida		= $parametros['unidad-medida'];
 						$componente->indicador			= $parametros['indicador'];
+
+						if($parametros['tipo-componente'] != 'NA'){
+							$componente->idEntregableTipo 	= $parametros['tipo-componente'];
+						}
 
 						//Obtenemos los origenes del presupuesto
 						$origenes = $parametros['accion-origen'];
@@ -668,7 +675,7 @@ class FibapController extends BaseController {
 								$accion->propuestasFinanciamiento()->saveMany($guardar_origenes);
 
 								$fibap->load('acciones');
-								$fibap->acciones->load('datosComponente','propuestasFinanciamiento');
+								$fibap->acciones->load('datosComponenteListado','propuestasFinanciamiento');
 								return array('data'=>$accion,'acciones' => $fibap->acciones);
 							}else{
 								//No se pudieron guardar los datos del proyecto
@@ -712,8 +719,6 @@ class FibapController extends BaseController {
 				$validacion = Validador::validar(Input::all(), $this->reglasFibap);
 			}elseif($parametros['formulario'] == 'form-fibap-antecedentes'){
 				$validacion = Validador::validar(Input::all(), $this->reglasFibapAntecedentes);
-			}elseif($parametros['formulario'] == 'form-fibap-presupuesto'){ //No estoy usando
-				$validacion = Validador::validar(Input::all(), $this->reglasFibapPresupuesto);
 			}elseif($parametros['formulario'] == 'form-antecedente'){
 				$validacion = Validador::validar(Input::all(), $this->reglasAntecedentes);
 			}elseif($parametros['formulario'] == 'form-presupuesto'){
@@ -894,8 +899,9 @@ class FibapController extends BaseController {
 						$fibap = FIBAP::find($accion->idFibap);
 
 						$nueva_clave_municipio = $parametros['municipio-accion'];
-						$nueva_clave_localidad = $parametros['localidad-accion'];
-
+						$nueva_clave_localidad = explode('|',$parametros['localidad-accion']);
+						$nueva_clave_localidad = $nueva_clave_localidad[1];
+						
 						//Obtenemos la clave de la jurisdiccion para los nuevos elementos a capturar
 						$municipio = Municipio::with('jurisdiccion')->where('clave','=',$nueva_clave_municipio)->get();
 						$clave_jurisdiccion = $municipio[0]->jurisdiccion->clave;
@@ -1040,7 +1046,8 @@ class FibapController extends BaseController {
 							$accion->load('distribucionPresupuestoAgrupado.jurisdiccion');
 							return array('data'=>$accion);
 						});
-
+						$fibap->load('distribucionPresupuestoAgrupado.objetoGasto');
+						$respuesta['data']['distribucion_total'] = $fibap->distribucionPresupuestoAgrupado;
 					}elseif($parametros['formulario'] == 'form-accion'){ //Editar Accion
 
 						/***
@@ -1064,15 +1071,25 @@ class FibapController extends BaseController {
 						
 						$componente = $accion->datosComponente;
 						$componente->idEntregable 		= $parametros['entregable'];
-						$componente->idTipoComponente 	= $parametros['tipo-componente'];
-						$componente->idAccionComponente = $parametros['accion-componente'];
+						$componente->idEntregableAccion = $parametros['accion-componente'];
 						$componente->idUnidadMedida 	= $parametros['unidad-medida'];
 						$componente->indicador 			= $parametros['indicador'];
+
+						if($parametros['tipo-componente'] != 'NA'){
+							$componente->idEntregableTipo 	= $parametros['tipo-componente'];
+						}
 
 						//Obtenemos las partidas seleccionadas en el formulario y las partidas ya capturadas
 						$partidas_formulario = $parametros['objeto-gasto-presupuesto'];
 						$partidas_anteriores = $accion->partidas->lists('id');
 
+						if(count($partidas_formulario) < 2){
+							$index = count($partidas);
+							$respuesta['data']['code'] = 'U00';
+							$respuesta['data']['data'] = '{"field":"objeto-gasto-presupuesto_' . ($index + 1) . '","error":"Se deben seleccionar dos Partidas"}';
+							throw new Exception("Se deben seleccionar al menos dos partidas presupuestales", 1);
+						}
+						
 						//Sacamos las diferencias de las partidas seleccionadas y las ya capturadas
 						$partidas['nuevas'] = array_diff($partidas_formulario, $partidas_anteriores);
 						$partidas['borrar'] = array_diff($partidas_anteriores, $partidas_formulario);
@@ -1123,7 +1140,7 @@ class FibapController extends BaseController {
 								$accion->propuestasFinanciamiento()->saveMany($guardar_origenes);
 
 								$fibap->load('acciones');
-								$fibap->acciones->load('datosComponente','propuestasFinanciamiento');
+								$fibap->acciones->load('datosComponenteListado','propuestasFinanciamiento');
 								return array('data'=>$accion,'acciones' => $fibap->acciones);
 							}else{
 								//No se pudieron guardar los datos del proyecto
@@ -1296,7 +1313,7 @@ class FibapController extends BaseController {
 					}elseif($parametros['eliminar'] == 'accion'){
 						//mako037
 						$fibap = FIBAP::with('acciones')->find($id_padre);
-						$fibap->acciones->load('datosComponente','propuestasFinanciamiento');
+						$fibap->acciones->load('datosComponenteListado','propuestasFinanciamiento');
 						$data['acciones'] = $fibap->acciones;
 					}
 				}

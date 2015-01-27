@@ -6,11 +6,13 @@
 @section('css')
 @parent
 <link href="{{ URL::to('bootstrap/css/bootstrap-select.min.css') }}" rel="stylesheet" media="screen">
+<link href="{{ URL::to('css/chosen.bootstrap.min.css') }}" rel="stylesheet" type="text/css" media="screen">
 @stop
 
 @section('js')
 @parent
 <script src="{{ URL::to('bootstrap/js/bootstrap-select.min.js') }}"></script>
+<script src="{{ URL::to('js/dependencias/chosen.jquery.min.js') }}"></script>
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
 <script src="{{ URL::to('js/modulos/expediente/formulario-fibap.js')}}"></script>
@@ -47,14 +49,9 @@
                         <span class="fa fa-square-o"></span> Antecedentes
                     </a>
                 </li>
-                <li role="presentation">
-                    <a href="#presupuesto-fibap" aria-controls="presupuesto-fibap" role="tab" id="tab-link-presupuesto-fibap">
-                        <span class="fa fa-square-o"></span> Presupuesto
-                    </a>
-                </li>
                 <li role="presentation" class="disabled">
                     <a href="#acciones-fibap" aria-controls="acciones-fibap" role="tab" id="tab-link-acciones-fibap">
-                        <span class="fa fa-square-o"></span> Acciones
+                        <span class="fa fa-square-o"></span> Acciones / Presupuesto
                     </a>
                 </li>
                 <!--li role="presentation" class="disabled">
@@ -208,7 +205,7 @@
                 <div class="col-sm-4">
                     <div class="form-group">
                         <label class="control-label" for="cobertura">Cobertura</label>
-                        {{Form::select('cobertura',array('' =>'Selecciona una cobertura') + $coberturas->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'cobertura'))}}
+                        {{Form::select('cobertura',array('' =>'Selecciona una cobertura') + $coberturas->lists('descripcion','id'),'',array('class'=>'form-control','id'=>'cobertura'))}}
                     </div>
                 </div>
                 <div class="col-sm-4">
@@ -222,7 +219,7 @@
                     </div>
                     <div id="select-region-panel" class="form-group">
                         <label class="control-label" for="region">Región</label>
-                        {{Form::select('region',array('' =>'Selecciona una región') + $regiones->lists('nombre','region'),'',array('class'=>'form-control selectpicker','id'=>'region','data-container'=>'body'))}}
+                        {{Form::select('region',array('' =>'Selecciona una región') + $regiones->lists('nombre','region'),'',array('class'=>'form-control','id'=>'region'))}}
                     </div>
                 </div>
                 <div class="col-sm-4">
@@ -384,12 +381,31 @@
         <div role="tabpanel" class="tab-pane" id="acciones-fibap">
             <h4>Presupuesto Requerido y Propuesta de Financiamiento</h4>
             <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-12">
                     <div class="form-group">
                         <label class="control-label">
-                            Total Requerido / Total Distribuido :
+                            Total Distribuido / Total Requerido :
                         </label>
                         <span class="text-muted" id="total-presupuesto-distribuido">$ 0.00</span> / <span class="text-muted" id="total-presupuesto-requerido">$ 0.00</span>
+                        <div class="progress">
+                            <div id="porcentaje_completo" class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"> 0%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="panel panel-success" id="tabla_presupuesto_partida">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr class="bg-success">
+                                    <th width="100px">Partida</th>
+                                    <th>Descripción</th>
+                                    <th width="100px">Monto</th>
+                                    <th width="90px">Porcentaje</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </div>
                 <div class="col-sm-12"><label class="control-label">Origen del Presupuesto</label></div>
@@ -410,36 +426,39 @@
                     </div>
                 </div>
             </div>
-            <div class="datagrid" id="datagridAcciones" data-edit-row="editar_accion">
-                <div>
-                    <div class="pull-left">
-                        <h4>Acciones</h4>
-                    </div>
-                    <div class="btn-toolbar pull-right" >
-                        <div class="btn-group" style="margin:5px">
-                            <button type="button" class="btn btn-success" id="btn-agregar-accion">
-                                <span class="glyphicon glyphicon-plus"></span> Agregar Acción
-                            </button>
-                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu pull-right" role="menu">
-                                <li>
-                                    <a href="#" class="btn-edit-rows">
-                                        <span class="glyphicon glyphicon-edit"></span> Editar
-                                    </a>
-                                </li>
-                                <li class="divider"></li>
-                                <li>
-                                    <a href="#" class="btn-delete-rows">
-                                        <span class="glyphicon glyphicon-remove"></span> Eliminar
-                                    </a>
-                                </li>
-                            </ul>
+            <div class="datagrid panel panel-primary" id="datagridAcciones" data-edit-row="editar_accion">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h4>Acciones</h4>
                         </div>
-                    </div>
+                        <div class="col-sm-6">
+                            <div class="btn-toolbar pull-right" >
+                                <div class="btn-group" style="margin:5px">
+                                    <button type="button" class="btn btn-primary" id="btn-agregar-accion">
+                                        <span class="glyphicon glyphicon-plus"></span> Agregar Acción
+                                    </button>
+                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right" role="menu">
+                                        <li>
+                                            <a href="#" class="btn-edit-rows">
+                                                <span class="glyphicon glyphicon-edit"></span> Editar
+                                            </a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li>
+                                            <a href="#" class="btn-delete-rows">
+                                                <span class="glyphicon glyphicon-remove"></span> Eliminar
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>    
                 </div>
-                <div class="clearfix"></div>
                 <table class="table table-condensed">
                     <thead>
                         <tr>
@@ -463,7 +482,7 @@
                             <div class="col-sm-8">
                                 <label class="control-label">Distribución del Presupuesto</label>
                                 <div class="progress">
-                                    <div id="porcentaje_accion" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"> 0%
+                                    <div id="porcentaje_accion" class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"> 0%
                                     </div>
                                 </div>
                             </div>
@@ -498,9 +517,9 @@
                         <thead>
                             <tr>
                                 <th><input type="checkbox" class="check-select-all-rows"></th>
-                                <th>Jurisdicción</th>
-                                <th>Municipio</th>
                                 <th>Localidad</th>
+                                <th>Municipio</th>
+                                <th>Jurisdicción</th>
                                 <th width="100px">Monto</th>
                             </tr>
                         </thead>
@@ -511,46 +530,9 @@
         </div>
         <!--  End Tab Panel: Acciones y distribucion de presupuesto  -->
 
-        <!--  Begin Tab Panel: Presupuesto y Propuesta  -->
-        <div role="tabpanel" class="tab-pane" id="presupuesto-fibap">
-            <div class="row" id="grid_distribucion_presupuesto">
-                <div class="col-sm-12">
-                    <div class="panel panel-primary datagrid" id="datagridPresupuesto" data-edit-row="ver_distribucion_partida">
-                        <div class="panel-heading">
-                            <b>Distribución del Presupuesto Estatal</b>
-                        </div>
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-sm-9">
-                                    <label class="control-label">Porcentaje total distribuido del Presupuesto</label>
-                                    <div class="progress">
-                                        <div id="porcentaje_completo" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"> 0%
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th><input type="checkbox" class="check-select-all-rows"></th>
-                                    <th width="100px">Partida</th>
-                                    <th>Descripción</th>
-                                    <th width="100px">Monto</th>
-                                    <th width="90px">%</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div><!-- tab-pane -->
-        <!--  End Tab Panel: Presupuesto y Propuesta  -->
-
         <!--  Begin Tab Panel: Información del Proyecto  -->
         <!--div role="tabpanel" class="tab-pane" id="info-proyecto" data-from-id="form-info-proyecto">
-
+        
         </div-->
         <!--  End Tab Panel: Información del Proyecto  -->
 
@@ -633,9 +615,9 @@
                     <div class="row">
                         <div class="col-sm-4">
                             <div class="form-group">
-                                <label for="jurisdiccion-accion" class="label-control selectpicker">Jurisdicción</label>
-                                <select id="jurisdiccion-accion" name="jurisdiccion-accion" class="form-control selectpicker" data-live-search="true" data-size="8">
-                                    <option value="">Selecciona una jurisdicción</option>
+                                <label for="jurisdiccion-accion" class="label-control">Jurisdicción</label>
+                                <select id="jurisdiccion-accion" name="jurisdiccion-accion" class="form-control chosen-one">
+                                    <option value="">Selecciona una Jurisdicción</option>
                                     @foreach($jurisdicciones as $llave => $valor)
                                         <option value="{{$llave}}">{{$valor}}</option>
                                     @endforeach
@@ -644,16 +626,17 @@
                         </div>
                         <div class="col-sm-4">
                             <div class="form-group">
-                                <label for="municipio-accion" class="label-control selectpicker">Municipio</label>
-                                <select id="municipio-accion" name="municipio-accion" class="form-control" data-live-search="true" data-size="8">
+                                <label for="municipio-accion" class="label-control">Municipio</label>
+                                <select id="municipio-accion" name="municipio-accion" class="form-control chosen-one" >
+                                    <option value="">Selecciona un Municipio</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-sm-4">
                             <div class="form-group">
-                                <label for="localidad-accion" class="label-control selectpicker">Localidad</label>
-                                <select id="localidad-accion" name="localidad-accion" class="form-control" data-live-search="true" data-size="8">
-                                    <option value="">Selecciona un Municipio</option>
+                                <label for="localidad-accion" class="label-control">Localidad</label>
+                                <select id="localidad-accion" name="localidad-accion" class="form-control chosen-one">
+                                    <option value="">Selecciona una Localidad</option>
                                 </select>
                             </div>
                         </div>
@@ -662,7 +645,7 @@
                                 <label class="control-label">
                                     Beneficiarios
                                 </label>
-                                <p class="form-control-static">
+                                <p class="form-control-static" id="tipo_beneficiario_texto">
                                     Tipo Beneficiario
                                 </p>
                             </div>
@@ -749,6 +732,26 @@
                             <div role="tabpanel" class="tab-pane" id="calendarizado-metas">
                                 <br>
                                 <div class="row">
+                                    <div class="col-sm-8">
+                                        <div class="form-group">
+                                            <label class="control-label">
+                                                Indicador
+                                            </label>
+                                            <p class="form-control-static" id="indicador_texto">
+                                                Descripción del Indicador
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label class="control-label">
+                                                Unidad de Medida
+                                            </label>
+                                            <p class="form-control-static" id="unidad_medida_texto">
+                                                Descripción de la unidad de medida
+                                            </p>
+                                        </div>
+                                    </div>
                                     <div class="col-sm-12">
                                         <div class="row">
                                             @foreach ($meses as $clave => $mes)
@@ -856,6 +859,8 @@
                                         @endif
                                     @endforeach
                                 </select>
+                            </div>
+                            <div class="form-group">
                                 <select class="form-control selectpicker" id="objeto-gasto-presupuesto_2" name="objeto-gasto-presupuesto[]" data-live-search="true" data-size="8">
                                     <option value="">Seleciona una partida</option>
                                     @foreach ($objetos_gasto as $capitulo)
@@ -899,19 +904,34 @@
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label for="entregable" class="control-label">Entregable</label>
-                                {{Form::select('entregable',array(''=>'Seleccione una opción') + $entregables->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'entregable','data-live-search'=>'true','data-size'=>'8'))}}
+                                {{Form::select('entregable',array(''=>'Seleccione una opción') + $entregables->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'entregable'))}}
                             </div>
                         </div>
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label for="tipo-componente" class="control-label">Tipo</label>
-                                <input type="text" class="form-control" id="tipo-componente" name="tipo-componente">
+                                <select id="tipo-componente" name="tipo-componente" class="form-control chosen-one">
+                                    <option value="">Seleccione un tipo</option>
+                                    <option value="NA" data-habilita-id="NA"> N / A </option>
+                                @foreach ($entregables_tipos as $tipo)
+                                    <option value="{{$tipo->id}}" data-habilita-id="{{$tipo->idEntregable}}" class="hidden" disabled>
+                                        {{$tipo->descripcion}}
+                                    </option>
+                                @endforeach
+                                </select>
                             </div>
                         </div>
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label for="accion-componente" class="control-label">Acción</label>
-                                <input type="text" class="form-control" id="accion-componente" name="accion-componente">
+                                <select id="accion-componente" name="accion-componente" class="form-control chosen-one">
+                                    <option value="">Seleccione una acción</option>
+                                @foreach ($entregables_acciones as $accion)
+                                    <option value="{{$accion->id}}" data-habilita-id="{{$accion->idEntregable}}" class="hidden" disabled>
+                                        {{$accion->descripcion}}
+                                    </option>
+                                @endforeach
+                                </select>
                             </div>
                         </div>
                     </div>

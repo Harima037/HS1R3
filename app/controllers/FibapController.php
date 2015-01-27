@@ -35,6 +35,8 @@ class FibapController extends \BaseController {
 
 		$datos += array(
 			'entregables' => Entregable::all(),
+			'entregables_tipos' => EntregableTipo::all(),
+			'entregables_acciones' => EntregableAccion::all(),
 			'unidades_medida' => UnidadMedida::all(),
 			'tipos_proyectos'=>TipoProyecto::all(),
 			'programa_presupuestario'=>ProgramaPresupuestario::all(),
