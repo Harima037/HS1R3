@@ -5,13 +5,11 @@
 
 @section('css')
 @parent
-<link href="{{ URL::to('bootstrap/css/bootstrap-select.min.css') }}" rel="stylesheet" media="screen">
 <link href="{{ URL::to('css/chosen.bootstrap.min.css') }}" rel="stylesheet" type="text/css" media="screen">
 @stop
 
 @section('js')
 @parent
-<script src="{{ URL::to('bootstrap/js/bootstrap-select.min.js') }}"></script>
 <script src="{{ URL::to('js/dependencias/chosen.jquery.min.js') }}"></script>
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
@@ -132,7 +130,7 @@
                 <div class="col-sm-12">
                     <div class="form-group">
                         <label for="programa-presupuestal" class="control-label">Programa Presupuestario</label>
-                        <select class="form-control selectpicker" name="programa-presupuestal" id="programa-presupuestal" data-live-search="true" data-size="8">
+                        <select class="form-control chosen-one" name="programa-presupuestal" id="programa-presupuestal">
                             <option value=''>Seleccione un elemento</option>
                             @foreach($programa_presupuestario as $item)
                                 <option value="{{ $item->clave }}">{{$item->clave}}{{' '}}{{ $item->descripcion }}</option>
@@ -143,7 +141,7 @@
                 <div class="col-sm-12">
                     <div class="form-group">
                         <label class="control-label" for="vinculacion-ped">Alineación al PED (Plan Estatal de Desarrollo)</label>
-                        <select class="form-control selectpicker" id="vinculacion-ped" name="vinculacion-ped" data-live-search="true" data-size="5">
+                        <select class="form-control chosen-one" id="vinculacion-ped" name="vinculacion-ped" data-live-search="true" data-size="5">
                             <option value="">Seleciona un objetivo</option>
                             <!-- Inicio de ejes -->
                             @foreach ($objetivos_ped as $eje)
@@ -215,7 +213,7 @@
                     </div>
                     <div id="select-municipio-panel" class="form-group">
                         <label class="control-label" for="municipio">Municipio</label>
-                        {{Form::select('municipio',array('' =>'Selecciona un municipio') + $municipios->lists('nombre','clave'),'',array('class'=>'form-control selectpicker','id'=>'municipio','data-live-search'=>'true','data-container'=>'body','data-size'=>'8'))}}
+                        {{Form::select('municipio',array('' =>'Selecciona un municipio') + $municipios->lists('nombre','clave'),'',array('class'=>'form-control chosen-one','id'=>'municipio'))}}
                     </div>
                     <div id="select-region-panel" class="form-group">
                         <label class="control-label" for="region">Región</label>
@@ -225,7 +223,7 @@
                 <div class="col-sm-4">
                     <div class="form-group">
                         <label class="control-label" for="tipo-beneficiario">Tipo de Beneficiario</label>
-                        {{Form::select('tipo-beneficiario',array('' =>'Selecciona un beneficiario') + $tipos_beneficiarios->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'tipo-beneficiario','data-live-search'=>'true','data-container'=>'body','data-size'=>'8'))}}
+                        {{Form::select('tipo-beneficiario',array('' =>'Selecciona un beneficiario') + $tipos_beneficiarios->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'tipo-beneficiario'))}}
                     </div>
                 </div>
             </div>
@@ -837,7 +835,7 @@
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <label for="objeto-gasto-presupuesto" class="control-label">Capitulo, Concepto, Partida</label>
-                                <select class="form-control selectpicker" id="objeto-gasto-presupuesto_1" name="objeto-gasto-presupuesto[]" data-live-search="true" data-size="8">
+                                <select class="form-control chosen-one" id="objeto-gasto-presupuesto_1" name="objeto-gasto-presupuesto[]" data-live-search="true" data-size="8">
                                     <option value="">Seleciona una partida</option>
                                     @foreach ($objetos_gasto as $capitulo)
                                         @if(count($capitulo->hijos))
@@ -845,7 +843,7 @@
                                                 @if(count($concepto->hijos))
                                                     @foreach ($concepto->hijos as $generica)
                                                         @if(count($generica->hijos))
-                                                            <optgroup label="{{$capitulo->clave . ' ' . $capitulo->descripcion . '<br>' . $concepto->clave . ' ' . $concepto->descripcion . '<br>' . $generica->clave . ' ' . $generica->descripcion}}">
+                                                            <optgroup label="{{$capitulo->clave . ' ' . $capitulo->descripcion . ' &#13; ' . $concepto->clave . ' ' . $concepto->descripcion . ' &#13; ' . $generica->clave . ' ' . $generica->descripcion}}">
                                                                 @foreach ($generica->hijos as $especifica)
                                                                     <option value="{{$especifica->id}}">
                                                                         {{$especifica->clave}} - {{$especifica->descripcion}}
@@ -861,7 +859,7 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <select class="form-control selectpicker" id="objeto-gasto-presupuesto_2" name="objeto-gasto-presupuesto[]" data-live-search="true" data-size="8">
+                                <select class="form-control chosen-one" id="objeto-gasto-presupuesto_2" name="objeto-gasto-presupuesto[]" data-live-search="true" data-size="8">
                                     <option value="">Seleciona una partida</option>
                                     @foreach ($objetos_gasto as $capitulo)
                                         @if(count($capitulo->hijos))
@@ -896,7 +894,7 @@
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label for="unidad-medida" class="control-label">Unidad de Medida</label>
-                                {{Form::select('unidad-medida',array(''=>'Seleccione una unidad') + $unidades_medida->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'unidad-medida','data-live-search'=>'true','data-size'=>'8'))}}
+                                {{Form::select('unidad-medida',array(''=>'Seleccione una unidad') + $unidades_medida->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'unidad-medida'))}}
                             </div>
                         </div>
                     </div>

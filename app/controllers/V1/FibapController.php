@@ -254,7 +254,8 @@ class FibapController extends BaseController {
 				$clave_presupuestaria = $recurso->clavePresupuestaria;
 			}
 		}else{
-			$recurso = FIBAP::with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado')->find($id);
+			//$recurso = FIBAP::with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado')->find($id);
+			$recurso = FIBAP::contenidoCompleto()->find($id);
 			$recurso->distribucionPresupuestoAgrupado->load('objetoGasto');
 			$recurso->propuestasFinanciamiento->load('origen');
 			if($recurso->idProyecto){

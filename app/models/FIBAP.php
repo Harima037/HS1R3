@@ -7,6 +7,10 @@ class FIBAP extends BaseModel
 	protected $dates = ['borradoAl'];
 	protected $table = "fibap";
 
+    public function scopeContenidoCompleto($query){
+        return $query->with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado');
+    }
+
 	public function proyecto(){
         return $this->belongsTo('Proyecto','idProyecto');
     }
@@ -32,7 +36,7 @@ class FIBAP extends BaseModel
     }
 
     public function propuestasFinanciamiento(){
-        return $this->hasMany('PropuestaFinanciamiento','idFibap');
+        return $this->hasMany('PropuestaFinanciamiento','idFibap')->agrupadoPorFibap();
     }
 
     public function antecedentesFinancieros(){

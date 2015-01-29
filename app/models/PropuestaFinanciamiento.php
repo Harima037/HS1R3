@@ -10,4 +10,9 @@ class PropuestaFinanciamiento extends BaseModel
 	public function origen(){
 		return $this->belongsTo('OrigenFinanciamiento','idOrigenFinanciamiento');
 	}
+
+	public function scopeAgrupadoPorFibap($query){
+		return $query->select('id','idFibap','idAccion','idOrigenFinanciamiento',DB::raw('sum(cantidad) AS cantidad'))
+					->groupBy('idOrigenFinanciamiento');
+	}
 }

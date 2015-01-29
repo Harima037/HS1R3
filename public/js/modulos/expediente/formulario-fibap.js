@@ -170,16 +170,17 @@ if($('#id').val()){
 			$('#tipo-proyecto').change();
 
 			$('#programa-presupuestal').val(datosProyecto.programaPresupuestario);
-            $('#programa-presupuestal').change();
+			$('#programa-presupuestal').trigger('chosen:updated');
 
 			$('#vinculacion-ped').val(datosProyecto.idObjetivoPED);
-            $('#vinculacion-ped').change();
+            $('#vinculacion-ped').trigger('chosen:updated');
+
 			$('#cobertura').val(datosProyecto.idCobertura);
             $('#cobertura').change();
 
 			if(datosProyecto.claveMunicipio){
 				$('#municipio').val(datosProyecto.claveMunicipio);
-            	$('#municipio').change();
+            	$('#municipio').trigger('chosen:updated');
             }
 
             if(datosProyecto.claveRegion){
@@ -190,7 +191,8 @@ if($('#id').val()){
 			$('#proyecto').val(datosProyecto.nombreTecnico);
 
 			$('#tipo-beneficiario').val(datosProyecto.idTipoBeneficiario);
-            $('#tipo-beneficiario').change();
+            $('#tipo-beneficiario').trigger('chosen:updated');
+
             $('#total-beneficiarios').text(datosProyecto.totalBeneficiarios);
             $('#total-beneficiarios-f').val(datosProyecto.totalBeneficiariosF);
             $('#total-beneficiarios-m').val(datosProyecto.totalBeneficiariosM);
@@ -252,16 +254,17 @@ if($('#id').val()){
 			$('#tipo-proyecto').change();
 
 			$('#programa-presupuestal').val(datosProyecto.programaPresupuestario);
-            $('#programa-presupuestal').change();
+            $('#programa-presupuestal').trigger('chosen:updated');
 
 			$('#vinculacion-ped').val(datosProyecto.idObjetivoPED);
-            $('#vinculacion-ped').change();
+            $('#vinculacion-ped').trigger('chosen:updated');
+
 			$('#cobertura').val(datosProyecto.idCobertura);
             $('#cobertura').change();
 
 			if(datosProyecto.claveMunicipio){
 				$('#municipio').val(datosProyecto.claveMunicipio);
-            	$('#municipio').change();
+            	$('#municipio').trigger('chosen:updated');
             }
 
             if(datosProyecto.claveRegion){
@@ -272,7 +275,8 @@ if($('#id').val()){
 			$('#proyecto').val(datosProyecto.nombreTecnico);
 
 			$('#tipo-beneficiario').val(datosProyecto.idTipoBeneficiario);
-            $('#tipo-beneficiario').change();
+            $('#tipo-beneficiario').trigger('chosen:updated');
+
             $('#total-beneficiarios').text(datosProyecto.totalBeneficiarios);
             $('#total-beneficiarios-f').val(datosProyecto.totalBeneficiariosF);
             $('#total-beneficiarios-m').val(datosProyecto.totalBeneficiariosM);
@@ -379,7 +383,7 @@ function editar_accion(e){
             for(var i in response.data.partidas){
             	var id = parseInt(i) + 1;
             	$('#objeto-gasto-presupuesto_' + id).val(response.data.partidas[i].id);
-                $('#objeto-gasto-presupuesto_' + id).change();
+                $('#objeto-gasto-presupuesto_' + id).trigger('chosen:updated');
             }
             //$('#objeto-gasto-presupuesto').selectpicker('refresh');
 
@@ -393,7 +397,7 @@ function editar_accion(e){
 
             $('#indicador').val(response.data.datos_componente.indicador);
             $('#unidad-medida').val(response.data.datos_componente.idUnidadMedida);
-            $('#unidad-medida').change();
+            $('#unidad-medida').trigger('chosen:updated');
 
             $('#entregable').val(response.data.datos_componente.idEntregable);
             $('#entregable').chosen().change();
@@ -948,9 +952,9 @@ function habilita_opciones(selector,habilitar_id,default_id){
 	}
 	$(selector).val('');
 	$(selector).change();
-	if($(selector).hasClass('selectpicker')){
+	/*if($(selector).hasClass('selectpicker')){
 		$(selector).selectpicker('refresh');
-	}
+	}*/
 	if($(selector).hasClass('chosen-one')){
 		$(selector).trigger("chosen:updated");
 	}
@@ -1146,11 +1150,12 @@ function reset_modal_form(formulario){
     if(formulario == form_presupuesto){
     	$('#' + formulario + ' input[type="hidden"]').val('');
     	$('#' + formulario + ' input[type="hidden"]').change();
-    	$('#' + formulario + ' .selectpicker').change();
-    	//change para actualizar municipios y localidades
+    	//$('#' + formulario + ' .selectpicker').change();
     	$('#jurisdiccion-accion').chosen().change();
+    	$('#' + formulario + ' .chosen-one').trigger('chosen:updated');
+    	//change para actualizar municipios y localidades
     	//update para actualizar el control con el valor seleccionado
-    	$('#jurisdiccion-accion').trigger('chosen:updated');
+    	//$('#jurisdiccion-accion').trigger('chosen:updated');
 
     	$('.presupuesto-mes').each(function(){
 			$(this).attr('data-presupuesto-id','');
@@ -1163,14 +1168,18 @@ function reset_modal_form(formulario){
     	$(modal_presupuesto + ' .alert').remove();
     }
     if(formulario == form_accion){
-    	$('#' + formulario + ' .selectpicker').change();
+    	//$('#' + formulario + ' .selectpicker').change();
     	$('#' + formulario + ' input[type="hidden"]').val('');
     	$('#' + formulario + ' input[type="hidden"]').change();
+    	$('#entregable').chosen().change();
+    	$('#' + formulario + ' .chosen-one').trigger('chosen:updated');
+
     	$('.accion-origen-financiamiento').each(function(){
     		$(this).attr('data-captura-id','');
     	});
-    	$('#entregable').chosen().change();
-		$('#entregable').trigger('chosen:updated');
+
+    	
+		//$('#entregable').trigger('chosen:updated');
     	//$('#objeto-gasto-presupuesto').selectpicker('refresh');
     }
 }
