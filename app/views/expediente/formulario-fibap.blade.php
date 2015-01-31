@@ -47,7 +47,7 @@
                         <span class="fa fa-square-o"></span> Antecedentes
                     </a>
                 </li>
-                <li role="presentation" class="disabled">
+                <li role="presentation" class="pull-right disabled">
                     <a href="#acciones-fibap" aria-controls="acciones-fibap" role="tab" id="tab-link-acciones-fibap">
                         <span class="fa fa-square-o"></span> Acciones / Presupuesto
                     </a>
@@ -148,28 +148,31 @@
                                 @if(count($eje->hijos))
                                     <optgroup label="{{$eje->clave . ' ' . $eje->descripcion}}">
                                         <!-- Inicio de temas -->
-                                        @foreach ($eje->hijos as $tema)
-                                            @if(count($tema->hijos))
-                                                <optgroup label="{{$tema->clave . ' ' . $tema->descripcion}}">
-                                                    <!-- Inicio de politicas -->
-                                                    @foreach ($tema->hijos as $politica)
-                                                        @if(count($politica->hijos))
-                                                            <optgroup label="{{$politica->clave . ' ' . $politica->descripcion}}">
-                                                                <!-- Inicio de objetivos -->
-                                                                @foreach ($politica->hijos as $objetivo)
-                                                                    <option value="{{$objetivo->id}}">
-                                                                        {{$objetivo->clave . ' ' . $objetivo->descripcion}}
-                                                                    </option>
-                                                                @endforeach
-                                                                <!-- Inicio de objetivos -->
-                                                            </optgroup>
-                                                        @endif
+                                    @foreach ($eje->hijos as $tema)
+                                        @if(count($tema->hijos))
+                                            <option disabled="disabled">
+                                                {{$tema->clave . ' ' . $tema->descripcion}}
+                                            </option>
+                                            <!-- Inicio de politicas -->
+                                            @foreach ($tema->hijos as $politica)
+                                                @if(count($politica->hijos))
+                                                    <option disabled="disabled">
+                                                        {{$politica->clave . ' ' . $politica->descripcion}}
+                                                    </option>
+                                                    <!-- Inicio de objetivos -->    
+                                                    @foreach ($politica->hijos as $objetivo)
+                                                        <option value="{{$objetivo->id}}">
+                                                            {{$objetivo->clave . ' ' . $objetivo->descripcion}}
+                                                        </option>
                                                     @endforeach
-                                                    <!-- Fin de politicas -->
-                                                </optgroup>
-                                            @endif
-                                        @endforeach
-                                        <!-- Fin de temas -->
+                                                    <!-- Inicio de objetivos -->
+                                                    <option data-divider="true"></option>
+                                                @endif
+                                            @endforeach
+                                            <!-- Fin de politicas -->
+                                        @endif
+                                    @endforeach
+                                    <!-- Fin de temas -->
                                     </optgroup>
                                 @endif
                             @endforeach
@@ -306,6 +309,11 @@
                 </div>
             </div>
         </form>
+        <div class="pull-right">
+            <button type="button" class="btn btn-primary btn-fibap-guardar">
+                <span class="fa fa-save"></span> Guardar cambios
+            </button>
+        </div>
         </div><!-- tab-pane -->
         <!--  End Tab Panel: Datos del proyecto  -->
 
@@ -372,6 +380,11 @@
                 </div>
             </div>
         </form>
+        <div class="pull-right">
+            <button type="button" class="btn btn-primary btn-fibap-guardar">
+                <span class="fa fa-save"></span> Guardar cambios
+            </button>
+        </div>
         </div><!-- tab-pane -->
         <!--  End Tab Panel: Antecedentes Financieros  -->
 
@@ -477,12 +490,19 @@
                 <div class="datagrid panel panel-primary" id="datagridDistribucion" data-edit-row="editar_presupuesto" data-selected-id="">
                     <div class="panel-body">
                         <div class="row">
+                            <div class="col-sm-4">
+                                <label class="control-label">Porcentaje Distribuido del Presupuesto</label>
+                            </div>
                             <div class="col-sm-8">
-                                <label class="control-label">Distribución del Presupuesto</label>
                                 <div class="progress">
                                     <div id="porcentaje_accion" class="progress-bar progress-bar-info progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"> 0%
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                
                             </div>
                             <div class="col-sm-4">
                                 <div class="btn-toolbar pull-right" >
@@ -539,16 +559,13 @@
 
         <input type="hidden" id="id" name="id" value="{{{ $id or '' }}}">
         <input type="hidden" id="proyecto-id" name="proyecto-id" value="{{{ $proyecto_id or '' }}}">
-        <div class="panel-footer">
-            <div class="row">
-                <div class="col-sm-12">
-                    <button type="button" class="btn btn-primary" id="btn-fibap-guardar">
-                        <span class="fa fa-save"></span> Guardar cambios
-                    </button>
-                    <button type="button" class="btn btn-default" id="btn-fibap-cancelar">
-                        <span class="fa fa-chevron-left"></span> Cancelar
-                    </button>
-                </div>
+    </div>
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-sm-12">
+                <button type="button" class="btn btn-default" id="btn-fibap-cancelar">
+                    <span class="fa fa-chevron-left"></span> Regresar a la lista de FIBAPs
+                </button>
             </div>
         </div>
     </div>
@@ -835,53 +852,39 @@
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <label for="objeto-gasto-presupuesto" class="control-label">Capitulo, Concepto, Partida</label>
-                                <select class="form-control chosen-one" id="objeto-gasto-presupuesto_1" name="objeto-gasto-presupuesto[]" data-live-search="true" data-size="8">
-                                    <option value="">Seleciona una partida</option>
-                                    @foreach ($objetos_gasto as $capitulo)
-                                        @if(count($capitulo->hijos))
-                                            @foreach ($capitulo->hijos as $concepto)
-                                                @if(count($concepto->hijos))
-                                                    @foreach ($concepto->hijos as $generica)
-                                                        @if(count($generica->hijos))
-                                                            <optgroup label="{{$capitulo->clave . ' ' . $capitulo->descripcion . ' &#13; ' . $concepto->clave . ' ' . $concepto->descripcion . ' &#13; ' . $generica->clave . ' ' . $generica->descripcion}}">
-                                                                @foreach ($generica->hijos as $especifica)
-                                                                    <option value="{{$especifica->id}}">
-                                                                        {{$especifica->clave}} - {{$especifica->descripcion}}
-                                                                    </option>
-                                                                @endforeach
-                                                            </optgroup>
-                                                        @endif
-                                                    @endforeach
-                                                @endif
-                                            @endforeach
-                                        @endif
-                                    @endforeach
-                                </select>
                             </div>
+                            @for ($i = 0; $i < 2; $i++)
                             <div class="form-group">
-                                <select class="form-control chosen-one" id="objeto-gasto-presupuesto_2" name="objeto-gasto-presupuesto[]" data-live-search="true" data-size="8">
+                                <select class="form-control chosen-one" id="objeto-gasto-presupuesto_{{($i+1)}}" name="objeto-gasto-presupuesto[]">
                                     <option value="">Seleciona una partida</option>
                                     @foreach ($objetos_gasto as $capitulo)
                                         @if(count($capitulo->hijos))
+                                        <optgroup label="{{$capitulo->clave . ' ' . $capitulo->descripcion}}">
                                             @foreach ($capitulo->hijos as $concepto)
                                                 @if(count($concepto->hijos))
+                                                <option disabled="disabled">
+                                                    {{$concepto->clave . ' ' . $concepto->descripcion}}
+                                                </option>
                                                     @foreach ($concepto->hijos as $generica)
                                                         @if(count($generica->hijos))
-                                                            <optgroup label="{{$capitulo->clave . ' ' . $capitulo->descripcion . '<br>' . $concepto->clave . ' ' . $concepto->descripcion . '<br>' . $generica->clave . ' ' . $generica->descripcion}}">
-                                                                @foreach ($generica->hijos as $especifica)
-                                                                    <option value="{{$especifica->id}}">
-                                                                        {{$especifica->clave}} - {{$especifica->descripcion}}
-                                                                    </option>
-                                                                @endforeach
-                                                            </optgroup>
+                                                            <option disabled="disabled">
+                                                                &nbsp;&nbsp; {{str_pad($generica->clave,5,'0') . ' ' . $generica->descripcion}}
+                                                            </option>
+                                                            @foreach ($generica->hijos as $especifica)
+                                                                <option value="{{$especifica->id}}">
+                                                                    &nbsp;&nbsp;&nbsp;&nbsp; {{$especifica->clave}} - {{$especifica->descripcion}}
+                                                                </option>
+                                                            @endforeach
                                                         @endif
                                                     @endforeach
                                                 @endif
                                             @endforeach
+                                        </optgroup>
                                         @endif
                                     @endforeach
                                 </select>
                             </div>
+                            @endfor
                         </div>
                     </div>
                     <div class="row">

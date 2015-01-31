@@ -25,6 +25,8 @@ var form_caratula = '#form_caratula';
 var form_componente = '#form_componente';
 var form_actividad = '#form_actividad';
 
+$('.chosen-one').chosen({width:'100%'});
+
 window.onload = function () { 
 	$('#mensaje-espera').addClass('hidden');
 	$('#panel-principal-formulario').removeClass('hidden');
@@ -56,44 +58,45 @@ if($('#id').val()){
             $('#no_proyecto_estrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
 
             $('#unidadresponsable').val(response.data.datos_unidad_responsable.clave);
-            $('#unidadresponsable').change();
+            $('#unidadresponsable').trigger('chosen:updated');
             $('#funciongasto').val(response.data.datos_sub_sub_funcion.clave);
-            $('#funciongasto').change();
+            $('#funciongasto').trigger('chosen:updated');
             $('#programasectorial').val(response.data.datos_programa_sectorial.clave);
-            $('#programasectorial').change();
+            $('#programasectorial').trigger('chosen:updated');
             $('#programapresupuestario').val(response.data.datos_programa_presupuestario.clave);
-            $('#programapresupuestario').change();
+            $('#programapresupuestario').trigger('chosen:updated');
             $('#programaespecial').val(response.data.datos_programa_especial.clave);
-            $('#programaespecial').change();
+            $('#programaespecial').trigger('chosen:updated');
             $('#actividadinstitucional').val(response.data.datos_actividad_institucional.clave);
-            $('#actividadinstitucional').change();
+            $('#actividadinstitucional').trigger('chosen:updated');
             $('#proyectoestrategico').val(response.data.datos_proyecto_estrategico.clave);
-            $('#proyectoestrategico').change();
+            $('#proyectoestrategico').trigger('chosen:updated');
             $('#numeroproyectoestrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
 
             $('#cobertura').val(response.data.cobertura.id);
-            $('#cobertura').change();
+            $('#cobertura').trigger('chosen:updated');
+            $('#cobertura').chosen().change();
 
             deshabilita_paneles($('#cobertura').val());
 
             if(response.data.claveMunicipio){
 				$('#municipio').val(response.data.claveMunicipio);
-            	$('#municipio').change();
+            	$('#municipio').trigger('chosen:updated');
             }
 
             if(response.data.claveRegion){
             	$('#region').val(response.data.claveRegion);
-            	$('#region').change();
+            	$('#region').trigger('chosen:updated');
             }
 
             $('#tipoaccion').val(response.data.tipo_accion.id);
-            $('#tipoaccion').change();
+            $('#tipoaccion').trigger('chosen:updated');
 
             $('#vinculacionped').val(response.data.objetivo_ped.id);
-            $('#vinculacionped').change();
+            $('#vinculacionped').trigger('chosen:updated');
 
             $('#tipobeneficiario').val(response.data.tipo_beneficiario.id);
-            $('#tipobeneficiario').change();
+            $('#tipobeneficiario').trigger('chosen:updated');
             $('#totalbeneficiarios').text(response.data.totalBeneficiarios);
             $('#totalbeneficiariosf').val(response.data.totalBeneficiariosF);
             $('#totalbeneficiariosm').val(response.data.totalBeneficiariosM);
@@ -134,23 +137,24 @@ if($('#id').val()){
 			
 			$('#nombretecnico').val(response.data.nombreTecnico);
 			$('#vinculacionped').val(response.data.idObjetivoPED);
-			$('#vinculacionped').change();
+			$('#vinculacionped').trigger('chosen:updated');
 			$('#programa_presupuestario').text(response.data.programaPresupuestario);
 			$('#programapresupuestario').val(response.data.programaPresupuestario);
-            $('#programapresupuestario').change();
+            $('#programapresupuestario').trigger('chosen:updated');
 			$('#cobertura').val(response.data.idCobertura);
-			$('#cobertura').change();
+			$('#cobertura').trigger('chosen:updated');
+			$('#cobertura').chosen().change();
 			deshabilita_paneles($('#cobertura').val());
 			if(response.data.claveMunicipio){
 				$('#municipio').val(response.data.claveMunicipio);
-				$('#municipio').change();
+				$('#municipio').trigger('chosen:updated');
 			}
 			if(response.data.claveRegion){
 				$('#region').val(response.data.claveRegion);
-				$('#region').change();
+				$('#region').trigger('chosen:updated');
 			}
 			$('#tipobeneficiario').val(response.data.idTipoBeneficiario);
-			$('#tipobeneficiario').change();
+			$('#tipobeneficiario').trigger('chosen:updated');
 			$('#totalbeneficiarios').text(response.data.totalBeneficiarios);
 			$('#totalbeneficiariosf').val(response.data.totalBeneficiariosF);
 			$('#totalbeneficiariosm').val(response.data.totalBeneficiariosM);
@@ -238,12 +242,12 @@ function editar_componente(e){
 			$('#unidad-medida-componente').val(response.data.idUnidadMedida);
 			$('#entregable-componente').val(response.data.idEntregable);
 
-			$('#formula-componente').change();
-			$('#dimension-componente').change();
-			$('#frecuencia-componente').change();
-			$('#tipo-ind-componente').change();
-			$('#unidad-medida-componente').change();
-			$('#entregable-componente').change();
+			$('#formula-componente').trigger('chosen:updated');
+			$('#dimension-componente').trigger('chosen:updated');
+			$('#frecuencia-componente').trigger('chosen:updated');
+			$('#tipo-ind-componente').trigger('chosen:updated');
+			$('#unidad-medida-componente').trigger('chosen:updated');
+			$('#entregable-componente').trigger('chosen:updated');
 
             $('#id-componente').val(response.data.id);
     		$('#tablink-componente-actividades').attr('data-toggle','tab');
@@ -336,11 +340,11 @@ function editar_actividad(e){
 			$('#tipo-ind-actividad').val(response.data.idTipoIndicador);
 			$('#unidad-medida-actividad').val(response.data.idUnidadMedida);
 
-			$('#formula-actividad').change();
-			$('#dimension-actividad').change();
-			$('#frecuencia-actividad').change();
-			$('#tipo-ind-actividad').change();
-			$('#unidad-medida-actividad').change();
+			$('#formula-actividad').trigger('chosen:updated');
+			$('#dimension-actividad').trigger('chosen:updated');
+			$('#frecuencia-actividad').trigger('chosen:updated');
+			$('#tipo-ind-actividad').trigger('chosen:updated');
+			$('#unidad-medida-actividad').trigger('chosen:updated');
 
 			$(form_actividad + ' .metas-mes').attr('data-meta-id','');
 
@@ -842,7 +846,8 @@ function reset_modal_form(formulario){
     $(formulario).get(0).reset();
     $(formulario + ' input[type="hidden"]').val('');
     $(formulario + ' input[type="hidden"]').change();
-    $(formulario + ' .selectpicker').change();
+    //$(formulario + ' .selectpicker').change();
+    $(formulario + ' .chosen-one').trigger('chosen:updated');
     Validation.cleanFormErrors(formulario);
     if(formulario == form_componente){
     	$(modal_componente + ' .alert').remove();

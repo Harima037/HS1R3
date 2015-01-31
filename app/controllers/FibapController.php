@@ -40,7 +40,7 @@ class FibapController extends \BaseController {
 			'unidades_medida' => UnidadMedida::all(),
 			'tipos_proyectos'=>TipoProyecto::all(),
 			'programa_presupuestario'=>ProgramaPresupuestario::all(),
-			'objetivos_ped'=>ObjetivoPED::whereNull('idPadre')->where('id','=',25)->with('hijos')->get(),
+			'objetivos_ped'=>ObjetivoPED::whereNull('idPadre')->with('hijos')->get(),
 			'objetos_gasto'=>ObjetoGasto::whereNull('idPadre')->with('hijos')->get(),
 			'coberturas' => Cobertura::all(),
 			'tipos_beneficiarios' => TipoBeneficiario::all(),

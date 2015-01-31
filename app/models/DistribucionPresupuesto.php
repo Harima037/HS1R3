@@ -30,7 +30,7 @@ class DistribucionPresupuesto extends BaseModel
     public function scopeAgruparPorLocalidad($query){
     	$query->select('fibapDistribucionPresupuesto.id','idFibap','idAccion','localidad.nombre AS localidad','municipio.nombre AS municipio','claveJurisdiccion',
                 DB::raw('sum(cantidad) AS cantidad'))
-                ->groupBy('claveMunicipio','claveLocalidad')
+                ->groupBy('claveJurisdiccion','claveMunicipio','claveLocalidad')
                 ->leftjoin('vistaMunicipios AS municipio','municipio.clave','=','claveMunicipio')
                 ->leftjoin('vistaLocalidades AS localidad',function($join){
                     return $join->on('localidad.clave','=','claveLocalidad')

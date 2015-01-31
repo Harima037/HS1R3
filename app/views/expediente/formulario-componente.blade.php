@@ -32,7 +32,7 @@
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label for="entregable-{{$identificador}}" class="control-label">Entregable</label>
-                            {{Form::select('entregable-'.$identificador,array(''=>'Seleccione una opción') + $entregables->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'entregable-'.$identificador,'data-live-search'=>'true','data-size'=>'8'))}}
+                            {{Form::select('entregable-'.$identificador,array(''=>'Seleccione una opción') + $entregables->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'entregable-'.$identificador))}}
                         </div>
                     </div>
                     <div class="col-sm-4">
@@ -108,7 +108,7 @@
                                 <label class="control-label" for="dimension-{{$identificador}}">
                                     Dimensión
                                 </label>
-                                {{Form::select('dimension-'.$identificador,array(''=>'Seleccione una dimensión') + $dimensiones->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'dimension-'.$identificador))}}
+                                {{Form::select('dimension-'.$identificador,array(''=>'Seleccione una dimensión') + $dimensiones->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'dimension-'.$identificador))}}
                             </div>
                         </div>
                         <div class="col-sm-3">
@@ -116,7 +116,7 @@
                                 <label class="control-label" for="tipo-ind-{{$identificador}}">
                                     Tipo
                                 </label>
-                                {{Form::select('tipo-ind-'.$identificador,array(''=>'Seleccione un tipo') + $tipos_indicador->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'tipo-ind-'.$identificador))}}
+                                {{Form::select('tipo-ind-'.$identificador,array(''=>'Seleccione un tipo') + $tipos_indicador->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'tipo-ind-'.$identificador))}}
                             </div>
                         </div>
                         <div class="col-sm-5">
@@ -124,7 +124,7 @@
                                 <label class="control-label" for="unidad-medida-{{$identificador}}">
                                     Unidad de Medida
                                 </label>
-                                {{Form::select('unidad-medida-'.$identificador,array(''=>'Seleccione una unidad') + $unidades_medida->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'unidad-medida-'.$identificador,'data-live-search'=>'true','data-size'=>'8'))}}
+                                {{Form::select('unidad-medida-'.$identificador,array(''=>'Seleccione una unidad') + $unidades_medida->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'unidad-medida-'.$identificador))}}
                             </div>
                         </div>
                     </div>
@@ -146,20 +146,20 @@
                         <input type="text" class="form-control" id="anio-base-{{$identificador}}" name="anio-base-{{$identificador}}">
                     </div>
                 </div>
-                <div class="col-sm-5">
+                <div class="col-sm-4">
                     <div clasS="form-group">
                         <label class="control-label" for="formula-{{$identificador}}">
                             Formula
                         </label>
-                        {{Form::select('formula-'.$identificador,array(''=>'Seleccione una formula') + $formulas->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'formula-'.$identificador))}}
+                        {{Form::select('formula-'.$identificador,array(''=>'Seleccione una formula') + $formulas->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'formula-'.$identificador))}}
                     </div>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                     <div clasS="form-group">
                         <label class="control-label" for="frecuencia-{{$identificador}}">
                             Frecuencia
                         </label>
-                        {{Form::select('frecuencia-'.$identificador,array(''=>'Seleccione una frecuencia') + $frecuencias->lists('descripcion','id'),'',array('class'=>'form-control selectpicker','id'=>'frecuencia-'.$identificador))}}
+                        {{Form::select('frecuencia-'.$identificador,array(''=>'Seleccione una frecuencia') + $frecuencias->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'frecuencia-'.$identificador))}}
                     </div>
                 </div>
             </div>

@@ -5,12 +5,12 @@
 
 @section('css')
 @parent
-<link href="{{ URL::to('bootstrap/css/bootstrap-select.min.css') }}" rel="stylesheet" media="screen">
+<link href="{{ URL::to('css/chosen.bootstrap.min.css') }}" rel="stylesheet" type="text/css" media="screen">
 @stop
 
 @section('js')
 @parent
-<script src="{{ URL::to('bootstrap/js/bootstrap-select.min.js') }}"></script>
+<script src="{{ URL::to('js/dependencias/chosen.jquery.min.js') }}"></script>
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
 <script src="{{ URL::to('js/modulos/expediente/caratula.js')}}"></script>

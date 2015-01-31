@@ -45,9 +45,9 @@ class ProyectosController extends \BaseController {
 		$clasificacion = ClasificacionProyecto::all()->lists('descripcion','id');
 		$tipo = TipoProyecto::all()->lists('descripcion','id');
 
-		$funciones_gasto = FuncionGasto::whereNull('idPadre')->where('id','=',61)->with('hijos')->get();
+		$funciones_gasto = FuncionGasto::whereNull('idPadre')->with('hijos')->get();
 
-		$objetivos_ped = ObjetivoPED::whereNull('idPadre')->where('id','=',25)->with('hijos')->get();
+		$objetivos_ped = ObjetivoPED::whereNull('idPadre')->with('hijos')->get();
 
 		$datos_componentes = array(
 			'clasificacion_proyecto' => Input::get('clasificacion_proyecto'),

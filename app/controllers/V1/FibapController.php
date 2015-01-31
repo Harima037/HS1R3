@@ -38,7 +38,6 @@ class FibapController extends BaseController {
 	);
 
 	private $reglasAccion = array(
-		//'objeto-gasto-presupuesto'		=> 'required',
 		'indicador'						=> 'required',
 		'unidad-medida'					=> 'required',
 		'accion-presupuesto-requerido'	=> 'required|numeric|min:1',
@@ -58,8 +57,8 @@ class FibapController extends BaseController {
 		'beneficiarios-f'			=> 'required',
 		'beneficiarios-m'			=> 'required',
 		'jurisdiccion-accion'		=> 'required',
-		'municipio-accion'			=> 'required',
-		'localidad-accion'			=> 'required',
+		'municipio-accion'			=> 'required_if:jurisdiccion-accion,01,02,03,04,05,06,07,08,09,10',
+		'localidad-accion'			=> 'required_if:jurisdiccion-accion,01,02,03,04,05,06,07,08,09,10',
 		'cantidad-meta'				=> 'required|numeric|min:1',
 		'cantidad-presupuesto'		=> 'required|numeric|min:1'
 	);
@@ -189,8 +188,8 @@ class FibapController extends BaseController {
 					$municipios = Municipio::with('localidades')->where('clave','=',$proyecto->claveMunicipio)->get(); //Obtenemos el municipio seleccionado
 				}elseif($proyecto->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
 					$jurisdicciones = Region::obtenerJurisdicciones($proyecto->claveRegion)->get();
-					$region = Region::with('municipios')->where('region','=',$proyecto->claveRegion)->get();
-					$region[0]->municipios->load('localidades');
+					$region = Region::with('municipios.localidades')->where('region','=',$proyecto->claveRegion)->get();
+					//$region[0]->municipios->load('localidades');
 					$municipios = $region[0]->municipios;
 				}
 			}elseif($parametros['ver'] == 'antecedente'){
@@ -418,10 +417,13 @@ class FibapController extends BaseController {
 										throw new Exception("Error al intentar guardar los datos de la ficha: Error en el guardado del proyecto", 1);
 									}
 									if($proyecto->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
+										$datos_extra['jurisdicciones'] = Jurisdiccion::all();
 										$datos_extra['municipios'] = Municipio::with('localidades')->get(); //Todos los municipios
 									}elseif($proyecto->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
+										$datos_extra['jurisdicciones'] = Municipio::obtenerJurisdicciones($proyecto->claveMunicipio)->get();
 										$datos_extra['municipios'] = Municipio::with('localidades')->where('clave','=',$proyecto->claveMunicipio)->get(); //Obtenemos el municipio seleccionado
 									}elseif($proyecto->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
+										$datos_extra['jurisdicciones'] = Region::obtenerJurisdicciones($proyecto->claveRegion)->get();
 										$region = Region::with('municipios')->where('region','=',$proyecto->claveRegion)->get();
 										$region[0]->municipios->load('localidades');
 										$datos_extra['municipios'] = $region[0]->municipios;
@@ -479,23 +481,41 @@ class FibapController extends BaseController {
 						$accion = Accion::with('distribucionPresupuesto','datosComponente','partidas')->find($accion_id);
 						$fibap = FIBAP::find($accion->idFibap);
 
-						$clave_municipio = $parametros['municipio-accion'];
-						$clave_localidad = explode('|',$parametros['localidad-accion']);
-						$clave_localidad = $clave_localidad[1];
-
-						$municipio = Municipio::with('jurisdiccion')->where('clave','=',$clave_municipio)->get();
-						$clave_jurisdiccion = $municipio[0]->jurisdiccion->clave;
+						$clave_jurisdiccion = $parametros['jurisdiccion-accion'];
+						if($clave_jurisdiccion != 'OC'){
+							$clave_municipio = $parametros['municipio-accion'];
+							$clave_localidad = explode('|',$parametros['localidad-accion']);
+							$clave_localidad = $clave_localidad[1];
+						}else{
+							$clave_municipio = NULL;
+							$clave_localidad = NULL;
+						}
+						
 
 						//Se buscan si la Localidad ya fue capturada
-						$capturados = $accion->distribucionPresupuesto->filter(function($item) use ($clave_localidad){
-							if($item->claveLocalidad == $clave_localidad){
-								return true;
-							}
-						});
+						if($clave_jurisdiccion != 'OC'){
+							$capturados = $accion->distribucionPresupuesto->filter(function($item) use ($clave_localidad){
+								if($item->claveLocalidad == $clave_localidad){
+									return true;
+								}
+							});
+						}else{
+							$capturados = $accion->distribucionPresupuesto->filter(function($item) use ($clave_jurisdiccion){
+								if($item->claveJurisdiccion == $clave_jurisdiccion){
+									return true;
+								}
+							});
+						}
+						
 
 						if(count($capturados)){
 							$respuesta['data']['code'] = 'U00';
-							$respuesta['data']['data'] = '{"field":"localidad-accion","error":"Esta localidad ya fue capturada para esta acción."}';
+							if($clave_municipio){
+								$respuesta['data']['data'] = '{"field":"localidad-accion","error":"Esta localidad ya fue capturada para esta acción."}';
+							}else{
+								$respuesta['data']['data'] = '{"field":"jurisdiccion-accion","error":"Esta jurisdicción ya fue capturada para esta acción."}';
+							}
+							
 							throw new Exception('Se encontraron '.count($capturados).' elementos capturados',1);
 						}
 
@@ -515,9 +535,11 @@ class FibapController extends BaseController {
 								if($cantidad > 0 && $mes >= $mes_incial && $mes <= $mes_final){
 									$recurso = new DistribucionPresupuesto;
 									$recurso->idFibap = $accion->idFibap;
-									$recurso->claveMunicipio = $clave_municipio;
-									$recurso->claveLocalidad = $clave_localidad;
 									$recurso->claveJurisdiccion = $clave_jurisdiccion;
+									if($clave_jurisdiccion != 'OC'){
+										$recurso->claveMunicipio = $clave_municipio;
+										$recurso->claveLocalidad = $clave_localidad;
+									}
 									$recurso->idObjetoGasto = $partida_id;
 									$recurso->mes = $mes;
 									$recurso->cantidad = $cantidad;
@@ -539,9 +561,14 @@ class FibapController extends BaseController {
 						$beneficiarios_capturados = ComponenteDesglose::whereIn('idAccion',$fibap->acciones->lists('id'))
 													->select(DB::raw('(sum(beneficiariosF)/count(claveLocalidad)) AS beneficiariosF'),
 														DB::raw('(sum(beneficiariosM)/count(claveLocalidad)) AS beneficiariosM'))
-													->where('claveLocalidad','!=',$clave_localidad)
-													->groupBy('claveLocalidad')
-													->get();
+													->groupBy('claveLocalidad');
+
+						if($clave_jurisdiccion != 'OC'){
+							$beneficiarios_capturados = $beneficiarios_capturados->where('claveLocalidad','!=',$clave_localidad);
+						}else{
+							$beneficiarios_capturados = $beneficiarios_capturados->where('claveJurisdiccion','!=',$clave_jurisdiccion);
+						}
+						$beneficiarios_capturados = $beneficiarios_capturados->get();
 						
 						if($beneficiarios_capturados){
 							$suma_benef_f = $beneficiarios_capturados->sum('beneficiariosF');
@@ -578,8 +605,11 @@ class FibapController extends BaseController {
 						}
 						
 						$desglose = new ComponenteDesglose;
-						$desglose->claveMunicipio 	= $clave_municipio;
-						$desglose->claveLocalidad 	= $clave_localidad;
+						$desglose->claveJurisdiccion = $clave_jurisdiccion;
+						if($clave_jurisdiccion != 'OC'){
+							$desglose->claveMunicipio 	= $clave_municipio;
+							$desglose->claveLocalidad 	= $clave_localidad;
+						}
 						$desglose->presupuesto 		= $suma_presupuesto;
 						$desglose->meta 			= $suma_metas;
 						$desglose->trim1 			= $trimestres[1];
@@ -766,6 +796,9 @@ class FibapController extends BaseController {
 						$recurso = FIBAP::with('documentos')->find($id);
 						$proyecto = FALSE;
 
+						$periodo_anterior['inicio'] = $recurso->periodoEjecucionInicio;
+						$periodo_anterior['fin'] = $recurso->periodoEjecucionFinal;
+
 						$recurso->organismoPublico 			= $parametros['organismo-publico'];
 						$recurso->sector 					= $parametros['sector'];
 						$recurso->subcomite 				= $parametros['subcomite'];
@@ -779,13 +812,19 @@ class FibapController extends BaseController {
 						$recurso->periodoEjecucionFinal  	= $fecha_fin;
 						$recurso->presupuestoRequerido 	 	= $parametros['presupuesto-requerido'];
 
+						$cobertura_anterior = array();
 						if(!isset($parametros['proyecto-id'])){
+
 							$recurso->load('datosProyecto');
 							$proyecto = $recurso->datosProyecto;
+
 							$proyecto->nombreTecnico = $parametros['proyecto'];
 							$proyecto->idTipoProyecto = $parametros['tipo-proyecto'];
 							$proyecto->programaPresupuestario = $parametros['programa-presupuestal'];
 							$proyecto->idCobertura = $parametros['cobertura'];
+
+							$cobertura_anterior['municipio'] = $proyecto->claveMunicipio;
+							$cobertura_anterior['region'] = $proyecto->claveRegion;
 
 							if($parametros['cobertura'] == 2){
 								$proyecto->claveRegion = NULL;
@@ -803,38 +842,112 @@ class FibapController extends BaseController {
 							$proyecto->totalBeneficiarios = $parametros['total-beneficiarios-f']+$parametros['total-beneficiarios-m'];
 							$proyecto->totalBeneficiariosF = $parametros['total-beneficiarios-f'];
 							$proyecto->totalBeneficiariosM = $parametros['total-beneficiarios-m'];
+
 						}
 
 						$documentos = $parametros['documento-soporte'];
 						$documentos_anteriores = $recurso->documentos->lists('id');
 
-						$docs_nuevos = array_diff($documentos, $documentos_anteriores);
-						$docs_borrar = array_diff($documentos_anteriores, $documentos);
+						$docs['nuevos'] = array_diff($documentos, $documentos_anteriores);
+						$docs['borrar'] = array_diff($documentos_anteriores, $documentos);
 
-						$respuesta['data'] = DB::transaction(function() use ($recurso, $proyecto, $docs_nuevos, $docs_borrar){
+						$respuesta['data'] = DB::transaction(function() use ($recurso, $proyecto, $docs, $cobertura_anterior, $periodo_anterior){
 							if($recurso->save()){
-								if(count($docs_borrar)){
+								if(count($docs['borrar'])){
 									$recurso->documentos()->detach($docs_borrar);
 								}
-								if(count($docs_nuevos)){
+								if(count($docs['nuevos'])){
 									$recurso->documentos()->attach($docs_nuevos);
 								}
+
+								$distribucion_borrada = 0;
+
+								//Si se cambiaron las fechas del periodo de ejecucion hay que eliminar las metas y presupuestos que no entren en el periodo
+								if($recurso->periodoEjecucionInicio != $periodo_anterior['inicio'] || $recurso->periodoEjecucionFinal != $periodo_anterior['fin']){
+
+									$mes['inicio'] = date_format($recurso->periodoEjecucionInicio,"n");
+									$mes['fin'] = date_format($recurso->periodoEjecucionFinal,"n");
+
+									//Obtenemos los desgloses
+									$desgloses_completo = ComponenteDesglose::whereIn('idAccion',$recurso->acciones->lists('id'))
+																			->get();
+									//Eliminamos las metas por mes
+									DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses_completo->lists('id'))
+													->where(function($query) use ($mes){
+														$query->where('mes','<',$mes['inicio'])
+															->orWhere('mes','>',$mes['fin']);
+													})->delete();
+									//Eliminamos la distribucion del presupuesto
+									$distribucion_borrada = DistribucionPresupuesto::where('idFibap','=',$recurso->id)
+															->where(function($query) use ($mes){
+																$query->where('mes','<',$mes['inicio'])
+																	->orWhere('mes','>',$mes['fin']);
+															})->delete();
+									//
+								}
+
 								$datos_extra = array();
 								if($proyecto){
+
 									if(!$proyecto->save()){
 										$respuesta['data']['code'] = 'S01';
 										throw new Exception("Error al intentar guardar los datos de la ficha: Error en el guardado del proyecto", 1);
 									}
+									
+									$desgloses = FALSE;
 									if($proyecto->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
-										$datos_extra['municipios'] = Municipio::with('localidades')->get(); //Todos los municipios
+
+										if($cobertura_anterior['municipio'] || $cobertura_anterior['region']){
+											$datos_extra['municipios'] = Municipio::with('localidades')->get(); //Todos los municipios
+											$datos_extra['jurisdicciones'] = Jurisdiccion::all();
+										}
+
 									}elseif($proyecto->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
-										$datos_extra['municipios'] = Municipio::with('localidades')->where('clave','=',$proyecto->claveMunicipio)->get(); //Obtenemos el municipio seleccionado
+
+										if($proyecto->claveMunicipio != $cobertura_anterior['municipio']){
+											//Obtenemos el municipio seleccionado
+											$datos_extra['municipios'] = Municipio::with('localidades')->where('clave','=',$proyecto->claveMunicipio)->get();
+											$recurso->load('acciones');
+
+											//Borrar todo lo que no sea de este municipio por municipio
+											$distribucion_borrada = DistribucionPresupuesto::where('idFibap','=',$recurso->id)
+																	->where('claveMunicipio','!=',$proyecto->claveMunicipio)
+																	->delete();
+											$desgloses = ComponenteDesglose::whereIn('idAccion',$recurso->acciones->lists('id'))
+																->where('claveMunicipio','!=',$proyecto->claveMunicipio);
+
+											$datos_extra['jurisdicciones'] = Municipio::obtenerJurisdicciones($proyecto->claveMunicipio)->get();
+										}
+
 									}elseif($proyecto->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
-										$region = Region::with('municipios')->where('region','=',$proyecto->claveRegion)->get();
-										$region[0]->municipios->load('localidades');
-										$datos_extra['municipios'] = $region[0]->municipios;
+
+										if($proyecto->claveRegion != $cobertura_anterior['region']){
+											$region = Region::with('municipios.localidades')->where('region','=',$proyecto->claveRegion)->get();
+											$datos_extra['municipios'] = $region[0]->municipios;
+											$recurso->load('acciones');
+
+											$distribucion_borrada = DistribucionPresupuesto::where('idFibap','=',$recurso->id)
+																	->whereNotIn('claveMunicipio',$region[0]->municipios->lists('clave'))
+																	->delete();
+											$desgloses = ComponenteDesglose::whereIn('idAccion',$recurso->acciones->lists('id'))
+																->whereNotIn('claveMunicipio',$region[0]->municipios->lists('clave'));
+
+											$datos_extra['jurisdicciones'] = Region::obtenerJurisdicciones($proyecto->claveRegion)->get();
+										}
+
+									}
+									
+									if($desgloses){
+										$metas_mes = DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses->get()->lists('id'));
+										$metas_mes->delete();
+										$desgloses->delete();
 									}
 								}
+
+								if($distribucion_borrada > 0){
+									$recurso->load('distribucionPresupuestoAgrupado.objetoGasto');
+								}
+
 								return array('data'=>$recurso, 'extras'=>$datos_extra);
 							}else{
 								//No se pudieron guardar los datos del proyecto
@@ -894,31 +1007,46 @@ class FibapController extends BaseController {
 						$accion_id = $desglose->idAccion;
 						$clave_municipio = $desglose->claveMunicipio;
 						$clave_localidad = $desglose->claveLocalidad;
-						$clave_jurisdiccion = FALSE;
+						$clave_jurisdiccion = $desglose->claveJurisdiccion;
 
 						$accion = Accion::with('distribucionPresupuesto','datosComponente','partidas')->find($accion_id);
 						$fibap = FIBAP::find($accion->idFibap);
 
-						$nueva_clave_municipio = $parametros['municipio-accion'];
-						$nueva_clave_localidad = explode('|',$parametros['localidad-accion']);
-						$nueva_clave_localidad = $nueva_clave_localidad[1];
-						
-						//Obtenemos la clave de la jurisdiccion para los nuevos elementos a capturar
-						$municipio = Municipio::with('jurisdiccion')->where('clave','=',$nueva_clave_municipio)->get();
-						$clave_jurisdiccion = $municipio[0]->jurisdiccion->clave;
+						$nueva_clave_jurisdiccion = $parametros['jurisdiccion-accion'];
 
+						if($nueva_clave_jurisdiccion != 'OC'){
+							$nueva_clave_municipio = $parametros['municipio-accion'];
+							$nueva_clave_localidad = explode('|',$parametros['localidad-accion']);
+							$nueva_clave_localidad = $nueva_clave_localidad[1];
+						}else{
+							$nueva_clave_municipio = NULL;
+							$nueva_clave_localidad = NULL;
+						}
+						
 						//SI cambio la localidad hay que buscar si la nueva localidad ya fue capturada
 						if($nueva_clave_localidad != $clave_localidad){
 							//Se buscan si la Localidad ya fue capturada
-							$capturados = $accion->distribucionPresupuesto->filter(function($item) use ($nueva_clave_localidad){
-								if($item->claveLocalidad == $nueva_clave_localidad){
-									return true;
-								}
-							});
+							if($nueva_clave_jurisdiccion != 'OC'){
+								$capturados = $accion->distribucionPresupuesto->filter(function($item) use ($nueva_clave_localidad){
+									if($item->claveLocalidad == $nueva_clave_localidad){
+										return true;
+									}
+								});
+							}else{
+								$capturados = $accion->distribucionPresupuesto->filter(function($item) use ($nueva_clave_jurisdiccion){
+									if($item->claveJurisdiccion == $nueva_clave_jurisdiccion){
+										return true;
+									}
+								});
+							}
 
 							if(count($capturados)){
 								$respuesta['data']['code'] = 'U00';
-								$respuesta['data']['data'] = '{"field":"localidad-accion","error":"Esta localidad ya fue capturada para esta acción."}';
+								if($nueva_clave_jurisdiccion != 'OC'){
+									$respuesta['data']['data'] = '{"field":"localidad-accion","error":"Esta localidad ya fue capturada para esta acción."}';
+								}else{
+									$respuesta['data']['data'] = '{"field":"jurisdiccion-accion","error":"Esta jurisdiccion ya fue capturada para esta acción."}';
+								}
 								throw new Exception('Se encontraron '.count($capturados).' elementos capturados',1);
 							}
 						}
@@ -941,18 +1069,25 @@ class FibapController extends BaseController {
 							foreach ($meses_capturados[$indx] as $mes => $cantidad) {
 								if(isset($meses_ids[$indx][$mes])){
 									$recurso = $accion->distribucionPresupuesto->find($meses_ids[$indx][$mes]);
-									$recurso->claveMunicipio = $nueva_clave_municipio;
-									$recurso->claveLocalidad = $nueva_clave_localidad;
 									$recurso->claveJurisdiccion = $clave_jurisdiccion;
+									if($nueva_clave_jurisdiccion != 'OC'){
+										$recurso->claveMunicipio = $nueva_clave_municipio;
+										$recurso->claveLocalidad = $nueva_clave_localidad;
+									}else{
+										$recurso->claveMunicipio = NULL;
+										$recurso->claveLocalidad = NULL;
+									}
 									$recurso->cantidad = $cantidad;
 									$distribucion[] = $recurso;
 									//Aqui me quede llenando la edicion de la distribucion del presupuesto
 								}elseif($cantidad > 0 && $mes >= $mes_incial && $mes <= $mes_final){
 									$recurso = new DistribucionPresupuesto;
 									$recurso->idFibap = $accion->idFibap;
-									$recurso->claveMunicipio = $nueva_clave_municipio;
-									$recurso->claveLocalidad = $nueva_clave_localidad;
 									$recurso->claveJurisdiccion = $clave_jurisdiccion;
+									if($nueva_clave_jurisdiccion != 'OC'){
+										$recurso->claveMunicipio = $nueva_clave_municipio;
+										$recurso->claveLocalidad = $nueva_clave_localidad;
+									}
 									$recurso->idObjetoGasto = $partida_id;
 									$recurso->mes = $mes;
 									$recurso->cantidad = $cantidad;
@@ -963,7 +1098,7 @@ class FibapController extends BaseController {
 						}
 						
 						$sumatoria = $accion->distribucionPresupuesto->filter(function($item) use ($clave_municipio,$clave_localidad){
-							if($item->claveLocalidad != $clave_localidad && $item->claveMunicipio != $clave_municipio){
+							if($item->claveLocalidad != $clave_localidad || $item->claveMunicipio != $clave_municipio){
 								return true;
 							}
 						});
@@ -982,9 +1117,14 @@ class FibapController extends BaseController {
 							$beneficiarios_capturados = ComponenteDesglose::whereIn('idAccion',$fibap->acciones->lists('id'))
 														->select(DB::raw('(sum(beneficiariosF)/count(claveLocalidad)) AS beneficiariosF'),
 															DB::raw('(sum(beneficiariosM)/count(claveLocalidad)) AS beneficiariosM'))
-														->where('claveLocalidad','!=',$clave_localidad)
-														->groupBy('claveLocalidad')
-														->get();
+														->groupBy('claveLocalidad');
+							//
+							if($clave_jurisdiccion != 'OC'){
+								$beneficiarios_capturados = $beneficiarios_capturados->where('claveLocalidad','!=',$clave_localidad);
+							}else{
+								$beneficiarios_capturados = $beneficiarios_capturados->where('claveJurisdiccion','!=',$clave_jurisdiccion);
+							}
+							$beneficiarios_capturados = $beneficiarios_capturados->get();
 							
 							if($beneficiarios_capturados){
 								$suma_benef_f = $beneficiarios_capturados->sum('beneficiariosF');
@@ -1026,8 +1166,14 @@ class FibapController extends BaseController {
 							$suma_metas += $meta;
 						}
 						
-						$desglose->claveMunicipio 	= $nueva_clave_municipio;
-						$desglose->claveLocalidad 	= $nueva_clave_localidad;
+						$desglose->claveJurisdiccion = $clave_jurisdiccion;
+						if($nueva_clave_jurisdiccion != 'OC'){
+							$desglose->claveMunicipio 	= $nueva_clave_municipio;
+							$desglose->claveLocalidad 	= $nueva_clave_localidad;
+						}else{
+							$desglose->claveMunicipio 	= NULL;
+							$desglose->claveLocalidad 	= NULL;
+						}
 						$desglose->presupuesto 		= $suma_presupuesto;
 						$desglose->meta 			= $suma_metas;
 						$desglose->trim1 			= $trimestres[1];
@@ -1036,8 +1182,6 @@ class FibapController extends BaseController {
 						$desglose->trim4 			= $trimestres[4];
 						$desglose->beneficiariosF 	= $parametros['beneficiarios-f'];
 						$desglose->beneficiariosM 	= $parametros['beneficiarios-m'];
-
-						//throw new Exception(json_encode(print_r($desglose->toArray(),true)), 1);
 
 						$respuesta['data'] = DB::transaction(function() use ($accion,$distribucion, $desglose,$metas_mes){
 							$accion->datosComponente->desgloseComponente()->save($desglose);
@@ -1282,23 +1426,47 @@ class FibapController extends BaseController {
 				/***
 				*	Eliminar FIBAP (DELETE)
 				*
-				* 	- Borrar antecedentes finanacieros de una FIBAP
+				*	- Borrar Datos del Proyecto (Información de Exportación al proyecto)
+				*	- Borrar Datos del Componente  (Información de Exportación al proyecto)
+				*	- Borrar la relacion de de documentos de soporte con las FIBAPs
+				* 	- Borrar antecedentes finanacieros de las FIBAPs
+				*	- Borrar la distribución del presupuesto
+				*	- Borrar las propuestas de financiamiento
+				*	- Borrar las acciones de las FIBAPs -
+				*	- Borrar la relación de la acción con las partidas prespuestarias
+				* 	- Borrar datos del desglose del componete (Metas,Beneficiarios,Localidad)
+				*	- Borrar el desglose de metas por mes del componente
 				*
 				***/
 				$rows = DB::transaction(function() use ($ids){
-					//Eliminamos los datos del proyecto, en caso de que el FIBAP no haya sido asignado a ningun proyecto
+					//Eliminamos los datos del proyecto y los componentes, en caso de que el FIBAP no haya sido asignado a ningun proyecto
 					FibapDatosProyecto::whereIn('idFibap',$ids)->delete();
+					FibapDatosComponente::whereIn('idFibap',$ids)->delete();
 					//Eliminamos los documentos de soporte asignados al fibap
 					$fibaps = FIBAP::whereIn('id',$ids)->with('documentos')->get();
 					foreach ($fibaps as $fibap) {
 						$fibap->documentos()->detach();
 					}
+
 					//Eliminamos los antecedentes financieros
 					AntecedenteFinanciero::whereIn('idFibap',$ids)->delete();
 					//Eliminamos la distribución del presupuesto
 					DistribucionPresupuesto::whereIn('idFibap',$ids)->delete();
 					//Eliminamos la propuesta de financiamiento
 					PropuestaFinanciamiento::whereIn('idFibap',$ids)->delete();
+
+					$acciones = Accion::whereIn('idFibap',$ids)->get();
+					$desgloses = ComponenteDesglose::whereIn('idAccion',$acciones->lists('id'))->get();
+
+					DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses->lists('id'))->delete();
+					ComponenteDesglose::whereIn('idAccion',$acciones->lists('id'))->delete();
+					
+					foreach ($acciones as $accion) {
+						$accion->partidas()->detach();
+					}
+
+					Accion::whereIn('idFibap',$ids)->delete();
+
 					//Eliminamos los FIBAPs
 					return FIBAP::whereIn('id',$ids)->delete();
 				});
