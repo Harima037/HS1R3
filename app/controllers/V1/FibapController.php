@@ -221,7 +221,6 @@ class FibapController extends BaseController {
 				if($recurso->distribucionPresupuestoAgrupado){
 					$recurso->distribucionPresupuestoAgrupado->load('jurisdiccion');
 				}
-
 			}elseif($parametros['ver'] == 'distribucion-presupuesto-metas'){
 				/***
 				*	Obtiene los datos del desglose del presupuesto de la Accion (GET)
@@ -868,15 +867,20 @@ class FibapController extends BaseController {
 									$mes['inicio'] = date_format($recurso->periodoEjecucionInicio,"n");
 									$mes['fin'] = date_format($recurso->periodoEjecucionFinal,"n");
 
-									//Obtenemos los desgloses
-									$desgloses_completo = ComponenteDesglose::whereIn('idAccion',$recurso->acciones->lists('id'))
-																			->get();
-									//Eliminamos las metas por mes
-									DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses_completo->lists('id'))
-													->where(function($query) use ($mes){
-														$query->where('mes','<',$mes['inicio'])
-															->orWhere('mes','>',$mes['fin']);
-													})->delete();
+									if(count($recurso->acciones)){
+										//Obtenemos los desgloses
+										$desgloses_completo = ComponenteDesglose::whereIn('idAccion',$recurso->acciones->lists('id'))->get();
+										
+										if(count($desgloses_completo)){
+											//Eliminamos las metas por mes
+											DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses_completo->lists('id'))
+															->where(function($query) use ($mes){
+																$query->where('mes','<',$mes['inicio'])
+																	->orWhere('mes','>',$mes['fin']);
+															})->delete();
+										}
+									}
+									
 									//Eliminamos la distribucion del presupuesto
 									$distribucion_borrada = DistribucionPresupuesto::where('idFibap','=',$recurso->id)
 															->where(function($query) use ($mes){
@@ -1233,7 +1237,14 @@ class FibapController extends BaseController {
 							$respuesta['data']['code'] = 'U00';
 							$respuesta['data']['data'] = '{"field":"objeto-gasto-presupuesto_' . ($index + 1) . '","error":"Se deben seleccionar dos Partidas"}';
 							throw new Exception("Se deben seleccionar al menos dos partidas presupuestales", 1);
+						}else{
+							if($partidas_formulario[0] == $partidas_formulario[1]){
+								$respuesta['data']['code'] = 'U00';
+								$respuesta['data']['data'] = '{"field":"objeto-gasto-presupuesto_2","error":"Las partidas no deben ser iguales"}';
+								throw new Exception("Se selecciono la misma partida dos veces", 1);
+							}
 						}
+
 						
 						//Sacamos las diferencias de las partidas seleccionadas y las ya capturadas
 						$partidas['nuevas'] = array_diff($partidas_formulario, $partidas_anteriores);
@@ -1275,7 +1286,33 @@ class FibapController extends BaseController {
 						
 						$respuesta['data'] = DB::transaction(function() use ($guardar_origenes, $fibap, $accion, $componente, $partidas){
 							if($accion->save()){
+								$distribucion_total = NULL;
 								if(count($partidas['borrar'])){
+									$restar_de_distribucion = array();
+									$distribuciones = $accion->distribucionPresupuesto()
+															 ->whereIn('idObjetoGasto',$partidas['borrar'])->get();
+									if(count($distribuciones) > 0){
+										foreach ($distribuciones as $distribucion) {
+											if(isset($restar_de_distribucion[$distribucion->claveMunicipio][$distribucion->claveLocalidad])){
+												$restar_de_distribucion[$distribucion->claveMunicipio][$distribucion->claveLocalidad] += $distribucion->cantidad;
+											}else{
+												$restar_de_distribucion[$distribucion->claveMunicipio][$distribucion->claveLocalidad] = $distribucion->cantidad;
+											}
+										}
+										$desgloses = ComponenteDesglose::where('idAccion','=',$accion->id)->get();
+										$desgloses_editar = array();
+										foreach ($desgloses as $desglose) {
+											if(isset($restar_de_distribucion[$desglose->claveMunicipio][$desglose->claveLocalidad])){
+												$desglose->presupuesto -= $restar_de_distribucion[$desglose->claveMunicipio][$desglose->claveLocalidad];
+												$desgloses_editar[] = $desglose;
+											}
+										}
+
+										$accion->datosComponente->desgloseComponente()->saveMany($desgloses_editar);
+										$accion->distribucionPresupuesto()->whereIn('idObjetoGasto',$partidas['borrar'])->delete();
+										$fibap->load('distribucionPresupuestoAgrupado.objetoGasto');
+										$distribucion_total = $fibap->distribucionPresupuestoAgrupado;
+									}
 									$accion->partidas()->detach($partidas['borrar']);
 								}
 								if(count($partidas['nuevas'])){
@@ -1286,7 +1323,7 @@ class FibapController extends BaseController {
 
 								$fibap->load('acciones');
 								$fibap->acciones->load('datosComponenteListado','propuestasFinanciamiento');
-								return array('data'=>$accion,'acciones' => $fibap->acciones);
+								return array('data'=>$accion,'acciones' => $fibap->acciones, 'distribucion_total'=>$distribucion_total);
 							}else{
 								//No se pudieron guardar los datos del proyecto
 								throw new Exception("Error al intentar guardar los datos de la acción: Error en el guardado de los datos de la acción", 1);
@@ -1407,12 +1444,17 @@ class FibapController extends BaseController {
 					***/
 					$id_padre = $parametros['id-fibap'];
 					$rows = DB::transaction(function() use ($ids){
+
 						FibapDatosComponente::whereIn('idAccion',$ids)->delete();
 						PropuestaFinanciamiento::whereIn('idAccion',$ids)->delete();
 						DistribucionPresupuesto::whereIn('idAccion',$ids)->delete();
+
 						$desgloses = ComponenteDesglose::whereIn('idAccion',$ids)->get();
-						//$desgloses->metasMes()->delete();
-						DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses->lists('id'))->delete();
+
+						if(count($desgloses) > 0){
+							DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses->lists('id'))->delete();
+						}
+						
 						ComponenteDesglose::whereIn('idAccion',$ids)->delete();
 						$acciones = Accion::whereIn('id',$ids)->get();
 						//$acciones->partidas->detach();
@@ -1458,8 +1500,12 @@ class FibapController extends BaseController {
 					$acciones = Accion::whereIn('idFibap',$ids)->get();
 					$desgloses = ComponenteDesglose::whereIn('idAccion',$acciones->lists('id'))->get();
 
-					DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses->lists('id'))->delete();
-					ComponenteDesglose::whereIn('idAccion',$acciones->lists('id'))->delete();
+					if(count($desgloses) > 0){
+						DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses->lists('id'))->delete();
+					}
+					if(count($acciones) > 0){
+						ComponenteDesglose::whereIn('idAccion',$acciones->lists('id'))->delete();
+					}
 					
 					foreach ($acciones as $accion) {
 						$accion->partidas()->detach();
@@ -1478,12 +1524,18 @@ class FibapController extends BaseController {
 					if($parametros['eliminar'] == 'antecedente'){
 						$data['antecedentes'] = AntecedenteFinanciero::where('idFibap',$id_padre)->get();
 					}elseif($parametros['eliminar'] == 'presupuesto'){
-						$data['accion'] = Accion::with('distribucionPresupuestoAgrupado.jurisdiccion')->find($id_padre);
+						$accion = Accion::with('fibap.distribucionPresupuestoAgrupado','distribucionPresupuestoAgrupado.jurisdiccion')
+										->find($id_padre);
+						$accion->fibap->distribucionPresupuestoAgrupado->load('objetoGasto');
+						$data['distribucion_presupuesto'] = $accion->distribucionPresupuestoAgrupado;
+						$data['presupuesto_requerido'] = $accion->presupuestoRequerido;
+						$data['distribucion_total'] = $accion->fibap->distribucionPresupuestoAgrupado;
 					}elseif($parametros['eliminar'] == 'accion'){
 						//mako037
-						$fibap = FIBAP::with('acciones')->find($id_padre);
+						$fibap = FIBAP::with('acciones','distribucionPresupuestoAgrupado.objetoGasto')->find($id_padre);
 						$fibap->acciones->load('datosComponenteListado','propuestasFinanciamiento');
 						$data['acciones'] = $fibap->acciones;
+						$data['distribucion_total'] = $fibap->distribucionPresupuestoAgrupado;
 					}
 				}
 			}else{

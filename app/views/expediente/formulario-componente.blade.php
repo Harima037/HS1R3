@@ -31,20 +31,35 @@
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="form-group">
-                            <label for="entregable-{{$identificador}}" class="control-label">Entregable</label>
-                            {{Form::select('entregable-'.$identificador,array(''=>'Seleccione una opción') + $entregables->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'entregable-'.$identificador))}}
+                            <label for="entregable" class="control-label">Entregable</label>
+                            {{Form::select('entregable',array(''=>'Seleccione una opción') + $entregables->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'entregable'))}}
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-group">
-                            <label for="tipo-obj-{{$identificador}}" class="control-label">Tipo</label>
-                            <input type="text" class="form-control" id="tipo-obj-{{$identificador}}" name="tipo-obj-{{$identificador}}">
+                            <label for="tipo-entregable" class="control-label">Tipo</label>
+                            <select id="tipo-entregable" name="tipo-entregable" class="form-control chosen-one">
+                                <option value="">Seleccione un tipo</option>
+                                <option value="NA" data-habilita-id="NA"> N / A </option>
+                            @foreach ($entregables_tipos as $tipo)
+                                <option value="{{$tipo->id}}" data-habilita-id="{{$tipo->idEntregable}}" class="hidden" disabled>
+                                    {{$tipo->descripcion}}
+                                </option>
+                            @endforeach
+                            </select>
                         </div>
                     </div>
                     <div class="col-sm-4">
                         <div class="form-group">
-                            <label for="accion-{{$identificador}}" class="control-label">Acción</label>
-                            <input type="text" class="form-control" id="accion-{{$identificador}}" name="accion-{{$identificador}}">
+                            <label for="accion-entregable" class="control-label">Acción</label>
+                            <select id="accion-entregable" name="accion-entregable" class="form-control chosen-one">
+                                <option value="">Seleccione una acción</option>
+                            @foreach ($entregables_acciones as $accion)
+                                <option value="{{$accion->id}}" data-habilita-id="{{$accion->idEntregable}}" class="hidden" disabled>
+                                    {{$accion->descripcion}}
+                                </option>
+                            @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>

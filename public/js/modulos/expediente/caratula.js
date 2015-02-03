@@ -166,6 +166,10 @@ if($('#id').val()){
 }
 
 function inicializar_comportamiento_caratula(){
+	$('#entregable').on('change',function(){
+		habilita_opciones('#tipo-entregable',$(this).val(),'NA');
+		habilita_opciones('#accion-entregable',$(this).val());
+	});
 	$('.control-espejo').each(function(){
 		var control_id = $(this).data('espejo-id');
 		$(control_id).on('change',function(){
@@ -846,7 +850,7 @@ function reset_modal_form(formulario){
     $(formulario).get(0).reset();
     $(formulario + ' input[type="hidden"]').val('');
     $(formulario + ' input[type="hidden"]').change();
-    //$(formulario + ' .selectpicker').change();
+    
     $(formulario + ' .chosen-one').trigger('chosen:updated');
     Validation.cleanFormErrors(formulario);
     if(formulario == form_componente){
@@ -1026,4 +1030,22 @@ function cargar_totales(){
 	sumar_totales('.sub-total-poblacion.masc','total-poblacion-m','totalbeneficiariosm','Los subtotales de Población no concuerdan.');
 	sumar_totales('.sub-total-marginacion.fem','total-marginacion-f','totalbeneficiariosf','Los subtotales de Marginación no concuerdan.');
 	sumar_totales('.sub-total-marginacion.masc','total-marginacion-m','totalbeneficiariosm','Los subtotales de Marginación no concuerdan.');
+}
+
+function habilita_opciones(selector,habilitar_id,default_id){
+	var suma = $(selector + ' option[data-habilita-id="' + habilitar_id + '"]').length;
+
+	$(selector + ' option[data-habilita-id]').attr('disabled',true).addClass('hidden');
+	$(selector + ' option[data-habilita-id="' + habilitar_id + '"]').attr('disabled',false).removeClass('hidden');
+
+	if(suma == 0 && default_id){
+		$(selector + ' option[data-habilita-id="' + default_id + '"]').attr('disabled',false).removeClass('hidden');
+	}
+
+	$(selector).val('');
+	$(selector).change();
+
+	if($(selector).hasClass('chosen-one')){
+		$(selector).trigger("chosen:updated");
+	}
 }

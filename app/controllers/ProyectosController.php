@@ -52,6 +52,8 @@ class ProyectosController extends \BaseController {
 		$datos_componentes = array(
 			'clasificacion_proyecto' => Input::get('clasificacion_proyecto'),
 			'entregables' => Entregable::all(),
+			'entregables_tipos' => EntregableTipo::all(),
+			'entregables_acciones' => EntregableAccion::all(),
 			'formulas' => Formula::all(),
 			'dimensiones' => Dimension::all(),
 			'frecuencias' => Frecuencia::all(),

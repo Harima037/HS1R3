@@ -219,7 +219,6 @@ if($('#id').val()){
 
             llenar_select_jurisdicciones(response.data.jurisdicciones);
             llenar_select_municipios(response.data.municipios);
-            //llenar_select_localidades([]);
 
             if(response.data.resultadosObtenidos || response.data.resultadosEsperados){
             	cambiar_icono_tabs('#tab-link-antecedentes-fibap','fa-check-square-o');
@@ -458,8 +457,9 @@ $("#datagridDistribucion .btn-delete-rows").on('click',function(e){
 				callback: function(){
 					fibapResource.delete(rows,{'rows': rows, 'eliminar': 'presupuesto', 'id-accion': accion_id},{
                         _success: function(response){
-                        	llenar_datagrid_distribucion(response.accion.distribucion_presupuesto_agrupado,response.accion.presupuestoRequerido);
-                        	MessageManager.show({data:'Presupuesto eliminado con éxito.',timer:3});
+                        	llenar_datagrid_distribucion(response.distribucion_presupuesto,response.presupuesto_requerido);
+                        	llenar_datagrid_presupuestos(response.distribucion_total);
+                        	MessageManager.show({data:'Presupuesto(s) eliminado(s) con éxito.',timer:3});
                         },
                         _error: function(jqXHR){  MessageManager.show(jqXHR.responseJSON); }
         			});
@@ -473,11 +473,12 @@ $("#datagridAcciones .btn-delete-rows").on('click',function(e){
 	e.preventDefault();
 	var rows = [];
 	var contador= 0;
-    $(this).parents("#datagridAcciones").find("tbody").find("input[type=checkbox]:checked").each(function () {
+    $("#datagridAcciones").find("tbody").find("input[type=checkbox]:checked").each(function () {
 		contador++;
         rows.push($(this).parent().parent().data("id"));
 	});
 	if(contador>0){
+		ocultar_detalles(true);
 		Confirm.show({
 				titulo:"Eliminar Acción",
 				mensaje: "¿Estás seguro que deseas eliminar la(s) acción(es) seleccionada(s)?",
@@ -485,6 +486,7 @@ $("#datagridAcciones .btn-delete-rows").on('click',function(e){
 					fibapResource.delete(rows,{'rows': rows, 'eliminar': 'accion', 'id-fibap': $('#id').val()},{
                         _success: function(response){
                         	llenar_datagrid_acciones(response.acciones);
+                        	llenar_datagrid_presupuestos(response.distribucion_total);
                         	MessageManager.show({data:'Acción(es) eliminada(s) con éxito.',timer:3});
                         },
                         _error: function(jqXHR){  MessageManager.show(jqXHR.responseJSON); }
@@ -513,6 +515,7 @@ $('#btn-accion-guardar').on('click',function(){
 			_success: function(response){
 				MessageManager.show({data:'Cambios almacenados con éxito',type:'OK',timer:3});
 				llenar_datagrid_acciones(response.acciones);
+				llenar_datagrid_presupuestos(response.distribucion_total);
 				$(modal_accion).modal('hide');
 			},
 			_error: function(response){
@@ -741,6 +744,11 @@ $('.btn-fibap-guardar').on('click',function(){
 	            habilitar_tabs();
 	            //actualizar_tabla_meses(response.data.jurisdicciones);
 	            cambiar_icono_tabs('#tab-link-datos-fibap','fa-check-square-o');
+	            $('#total-presupuesto-requerido').text('$ ' + parseFloat(response.data.presupuestoRequerido).format());
+				$('#total-presupuesto-requerido').attr('data-valor',response.data.presupuestoRequerido);
+				if(response.data.periodoEjecucionInicio){
+	            	habilitar_meses(response.data.periodoEjecucionInicio,response.data.periodoEjecucionFinal);
+	            }
 	            $('#id').val(response.data.id);
 	            if(response.extras){
 	            	if(response.extras.municipios){
@@ -840,6 +848,8 @@ function llenar_datagrid_acciones(datos){
 		var id_origen = $(this).data('total-origen-id');
 		if(sumas_origenes[id_origen]){
 			$(this).text('$ ' + sumas_origenes[id_origen].format());
+		}else{
+			$(this).text('$ 0.00');
 		}
 	});
 

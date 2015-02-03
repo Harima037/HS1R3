@@ -361,9 +361,9 @@ class ProyectosController extends BaseController {
 				}
 
 				if($parametros['clasificacion'] == 2){
-					$this->reglasComponente['entregable-componente'] = 'required';
-					$this->reglasComponente['tipo-obj-componente'] = 'required';
-					$this->reglasComponente['accion-componente'] = 'required';
+					$this->reglasComponente['entregable'] = 'required';
+					$this->reglasComponente['tipo-entregable'] = 'required';
+					$this->reglasComponente['accion-entregable'] = 'required';
 				}
 
 				$validacion = Validador::validar(Input::all(), $this->reglasComponente);
@@ -399,9 +399,9 @@ class ProyectosController extends BaseController {
 					$componente->anioBase 				= ($parametros['anio-base-componente'])?$parametros['anio-base-componente']:NULL;
 
 					if($parametros['clasificacion'] == 2){
-						$componente->idEntregable = $parametros['entregable-componente'];
-						$componente->tipo = $parametros['tipo-obj-componente'];
-						$componente->accion = $parametros['accion-componente'];
+						$componente->idEntregable 		= $parametros['entregable'];
+						$componente->idEntregableTipo	= $parametros['tipo-entregable'];
+						$componente->idEntregableAccion	= $parametros['accion-entregable'];
 					}
 
 					$respuesta['data'] = DB::transaction(function() use ($parametros, $proyecto, $componente){
@@ -712,9 +712,9 @@ class ProyectosController extends BaseController {
 			try{
 				
 				if($parametros['clasificacion'] == 2){
-					$this->reglasComponente['entregable-componente'] = 'required';
-					$this->reglasComponente['tipo-obj-componente'] = 'required';
-					$this->reglasComponente['accion-componente'] = 'required';
+					$this->reglasComponente['entregable'] = 'required';
+					$this->reglasComponente['tipo-entregable'] = 'required';
+					$this->reglasComponente['accion-entregable'] = 'required';
 				}
 
 				$validacion = Validador::validar(Input::all(), $this->reglasComponente);
@@ -755,9 +755,9 @@ class ProyectosController extends BaseController {
 					$recurso->anioBase 					= 	($parametros['anio-base-componente'])?$parametros['anio-base-componente']:NULL;
 
 					if($parametros['clasificacion'] == 2){
-						$recurso->idEntregable 	= 	$parametros['entregable-componente'];
-						$recurso->tipo 			= 	$parametros['tipo-obj-componente'];
-						$recurso->accion 		= 	$parametros['accion-componente'];
+						$recurso->idEntregable 			= $parametros['entregable'];
+						$recurso->idEntregableTipo		= $parametros['tipo-entregable'];
+						$recurso->idEntregableAccion	= $parametros['accion-entregable'];
 					}
 
 					$respuesta['data'] = DB::transaction(function() use ($parametros, $recurso){
