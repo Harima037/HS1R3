@@ -10,20 +10,22 @@ class ProyectosController extends BaseController {
 	private $reglasProyecto = array(
 		'funciongasto'				=> 'required',
 		'clasificacionproyecto'		=> 'required',
-		'nombretecnico'				=> 'required',
+		'nombretecnico'				=> 'sometimes|required',
 		'tipoproyecto'				=> 'required',
-		'cobertura'					=> 'required',
+		'cobertura'					=> 'sometimes|required',
+		'municipio'					=> 'sometimes|required_if:cobertura,2|digits_between:1,3',
+		'region'					=> 'sometimes|required_if:cobertura,3|alpha',
 		'tipoaccion'				=> 'required',
 		'unidadresponsable'			=> 'required|digits:2',
 		'programasectorial'			=> 'required|alpha_num|size:1',
-		'programapresupuestario'	=> 'required|alpha_num|size:3',
+		'programapresupuestario'	=> 'sometimes|required|alpha_num|size:3',
 		'programaespecial'			=> 'required|alpha_num|size:3',
 		'actividadinstitucional'	=> 'required|alpha_num|size:3',
 		'proyectoestrategico'		=> 'required|alpha_num|size:1',
-		'vinculacionped'			=> 'required',
-		'tipobeneficiario'			=> 'required',
-		'totalbeneficiariosf'		=> 'required|integer|min:0',
-		'totalbeneficiariosm'		=> 'required|integer|min:0',
+		'vinculacionped'			=> 'sometimes|required',
+		'tipobeneficiario'			=> 'sometimes|required',
+		'totalbeneficiariosf'		=> 'sometimes|required|integer|min:0',
+		'totalbeneficiariosm'		=> 'sometimes|required|integer|min:0',
 		'altaf' 					=> 'required|integer|min:0',
 		'altam' 					=> 'required|integer|min:0',
 		'bajaf' 					=> 'required|integer|min:0',
@@ -199,7 +201,7 @@ class ProyectosController extends BaseController {
 							$recurso->fibap->distribucionPresupuestoAgrupado->load('objetoGasto');
 						}
 					}
-					$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable'));
+					$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion'));
 					foreach ($recurso->componentes as $key => $componente) {
 						$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
 					}
@@ -452,12 +454,12 @@ class ProyectosController extends BaseController {
 
 		if($parametros['guardar'] == 'proyecto'){
 
-			if($parametros['cobertura'] == 2){
+			/*if($parametros['cobertura'] == 2){
 				//Si la cobertura es diferente a estatal, checamos que haya seleccionado un municipio
 				$this->reglasProyecto['municipio'] = 'required|digits_between:1,3';
 			}elseif($parametros['cobertura'] == 3){
 				$this->reglasProyecto['region'] = 'required|alpha';
-			}
+			}*/
 
 			$validacion = Validador::validar(Input::all(), $this->reglasProyecto);
 
@@ -817,12 +819,12 @@ class ProyectosController extends BaseController {
 
 		if($parametros['guardar'] == 'proyecto'){
 
-			if($parametros['cobertura'] == 2){
+			/*if($parametros['cobertura'] == 2){
 				//Si la cobertura es diferente a estatal, checamos que haya seleccionado un municipio
 				$this->reglasProyecto['municipio'] = 'required|digits_between:1,3';
 			}elseif($parametros['cobertura'] == 3){
 				$this->reglasProyecto['region'] = 'required|alpha';
-			}
+			}*/
 
 			$validacion = Validador::validar(Input::all(), $this->reglasProyecto);
 

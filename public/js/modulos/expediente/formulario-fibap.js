@@ -253,10 +253,8 @@ if($('#id').val()){
 			$('#tipo-proyecto').change();
 
 			$('#programa-presupuestal').val(datosProyecto.programaPresupuestario);
-            $('#programa-presupuestal').trigger('chosen:updated');
-
+           	
 			$('#vinculacion-ped').val(datosProyecto.idObjetivoPED);
-            $('#vinculacion-ped').trigger('chosen:updated');
 
 			$('#cobertura').val(datosProyecto.idCobertura);
             $('#cobertura').change();
@@ -274,7 +272,6 @@ if($('#id').val()){
 			$('#proyecto').val(datosProyecto.nombreTecnico);
 
 			$('#tipo-beneficiario').val(datosProyecto.idTipoBeneficiario);
-            $('#tipo-beneficiario').trigger('chosen:updated');
 
             $('#total-beneficiarios').text(datosProyecto.totalBeneficiarios);
             $('#total-beneficiarios-f').val(datosProyecto.totalBeneficiariosF);
@@ -283,6 +280,10 @@ if($('#id').val()){
             $('#clave-presupuestaria').text('[ '+response.clavePresupuestaria+' ]');
 
             bloquear_controles();
+
+            $('#tipo-beneficiario').trigger('chosen:updated');
+            $('#programa-presupuestal').trigger('chosen:updated');
+            $('#vinculacion-ped').trigger('chosen:updated');
 		}
 	});
 }

@@ -310,13 +310,21 @@ function constructor_grupo_acordiones(padre,item,tipo,contenido_extra){ //tipo =
     contenido += '<span class="label label-default">Medios de Verificación :</span> '+item.mediosVerificacion+'<br>';
     contenido += '<span class="label label-default">Supuestos :</span> '+item.supuestos;
     contenido += '</div>';
-    if(item.accion){
+
+    if(item.entregable){
         contenido += '<div class="col-sm-5">';
         contenido += '<span class="label label-default">Entregable :</span> '+item.entregable.descripcion+'<br>';
-        contenido += '<span class="label label-default">Tipo :</span> '+item.tipo+'<br>';
-        contenido += '<span class="label label-default">Accion :</span> '+item.accion;
+        
+        if(item.entregable_tipo){
+            contenido += '<span class="label label-default">Tipo :</span> '+item.entregable_tipo.descripcion+'<br>';
+        }else{
+            contenido += '<span class="label label-default">Tipo :</span> N / A <br>';
+        }
+        
+        contenido += '<span class="label label-default">Acción :</span> '+item.entregable_accion.descripcion;
         contenido += '</div>';
     }
+
     contenido += '</div>';
 
     contenido += '<hr style="margin-bottom:5px; margin-top:5px;">';
