@@ -8,7 +8,8 @@ class Componente extends BaseModel
 	protected $table = "proyectoComponentes";
 	
 	public function scopeContenidoCompleto($query){
-		return $query->with('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','desgloce');
+		return $query->with('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable',
+							'entregableTipo','entregableAccion','desgloce');
 	}
 
 	public function desgloce(){
@@ -49,5 +50,13 @@ class Componente extends BaseModel
 
 	public function entregable(){
 		return $this->belongsTo('Entregable','idEntregable');
+	}
+
+	public function entregableTipo(){
+		return $this->belongsTo('EntregableTipo','idEntregableTipo');
+	}
+
+	public function entregableAccion(){
+		return $this->belongsTo('EntregableAccion','idEntregableAccion');
 	}
 }
