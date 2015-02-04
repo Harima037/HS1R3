@@ -61,7 +61,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('cuenta',			'V1\CuentaController');
 		
 		Route::resource('proyectos',		'V1\ProyectosController');
-		Route::resource('fibap',		'V1\FibapController');
+		Route::resource('reporteProyecto',	'V1\ReporteProyectoController', array('only' => array('show')));
+		Route::resource('fibap',			'V1\FibapController');
 	});
 });
 

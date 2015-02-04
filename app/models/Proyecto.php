@@ -6,6 +6,7 @@ class Proyecto extends BaseModel
 	use SoftDeletingTrait;
 	protected $dates = ['borradoAl'];
 	protected $table = "proyectos";
+	protected $appends = array('ClavePresupuestaria');
 
 	public static function boot(){
         parent::boot();
