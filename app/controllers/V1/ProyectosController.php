@@ -402,7 +402,9 @@ class ProyectosController extends BaseController {
 
 					if($parametros['clasificacion'] == 2){
 						$componente->idEntregable 		= $parametros['entregable'];
-						$componente->idEntregableTipo	= $parametros['tipo-entregable'];
+						if($parametros['tipo-entregable'] != 'NA'){
+							$componente->idEntregableTipo	= $parametros['tipo-entregable'] ;
+						}
 						$componente->idEntregableAccion	= $parametros['accion-entregable'];
 					}
 
@@ -758,7 +760,11 @@ class ProyectosController extends BaseController {
 
 					if($parametros['clasificacion'] == 2){
 						$recurso->idEntregable 			= $parametros['entregable'];
-						$recurso->idEntregableTipo		= $parametros['tipo-entregable'];
+						if($parametros['tipo-entregable'] != 'NA'){
+							$componente->idEntregableTipo	= $parametros['tipo-entregable'] ;
+						}else{
+							$componente->idEntregableTipo	= NULL;
+						}
 						$recurso->idEntregableAccion	= $parametros['accion-entregable'];
 					}
 
