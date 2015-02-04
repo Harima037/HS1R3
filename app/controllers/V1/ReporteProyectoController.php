@@ -23,7 +23,7 @@ class ReporteProyectoController extends BaseController {
 		$recurso = Proyecto::contenidoCompleto()->find($idProyecto);
 		
 		//Datos para la hoja Programa Inversion
-		$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable'));
+		$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion'));
 					foreach ($recurso->componentes as $key => $componente) {
 						$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
 					}

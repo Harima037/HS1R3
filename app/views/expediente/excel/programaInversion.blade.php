@@ -187,9 +187,9 @@
 			<td colspan="2" style="background-color: #CCCCCC;">ENTREGABLE:</td>
 			<td colspan="2">{{ $componente->entregable->descripcion }}</td>
 			<td colspan="3" style="background-color: #CCCCCC;">TIPO</td>
-			<td colspan="2">{{ $componente->tipo }}</td>
+			<td colspan="2">{{ ($componente->entregableTipo) ? $componente->entregableTipo->descripcion : 'N / A' }}</td>
 			<td colspan="3" style="background-color: #CCCCCC;">ACCIÓN</td>
-			<td colspan="2">{{ $componente->accion }}</td>
+			<td colspan="2">{{ $componente->entregableAccion->descripcion }}</td>
 		</tr>
 		@else
 		<tr><td colspan="15"></td></tr>
@@ -357,7 +357,7 @@
 		</tr>
 		<tr>
 			<td style="background-color: #CCCCCC;border:1px solid #000">MUNICIPIO:</td>
-			<td colspan="3">{{ $data['municipio']->nombre }}</td>
+			<td colspan="3"></td>
 			<td colspan="2" style="background-color: #CCCCCC;">LOCALIDAD:</td>
 			<td colspan="8"></td>
 		</tr>

@@ -116,6 +116,11 @@ function editar (e){
 
             $('#proyecto-tab-panel-list a:first').tab('show');
 
+            $('#btn-exportar-excel').off('click');
+            $('#btn-exportar-excel').on('click',function(){
+                window.open(SERVER_HOST+'/v1/reporteProyecto/'+response.data.id);
+            });
+
             $(modal_name).modal('show');
         }
     });
