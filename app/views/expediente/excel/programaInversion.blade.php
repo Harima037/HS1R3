@@ -33,7 +33,10 @@
 		</tr>
 		<tr><td colspan="15"></td></tr>
 		<tr>
-			<td colspan="15" align="center" style="background-color:#CCCCCC;">PROYECTO DE INVERSIÓN</td>
+			<?php
+				$tipoProyecto = ($data['idClasificacionProyecto'] == 2) ? 'DE INVERSIÓN':'INSTITUCIONAL';
+			?>
+			<td colspan="15" align="center" style="background-color:#CCCCCC;">PROYECTO {{ $tipoProyecto }}</td>
 		</tr>
 		<tr><td colspan="15"></td></tr>
 		<tr>
