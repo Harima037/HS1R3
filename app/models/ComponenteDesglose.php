@@ -11,11 +11,20 @@ class ComponenteDesglose extends BaseModel
 		return $this->hasMany('DesgloseMetasMes','idComponenteDesglose');
 	}
 
+	public function scopeListarDatos(){
+		$query->select('componenteDesglose.*','localidad.nombre AS localidad','municipio.nombre AS municipio')
+                ->leftjoin('vistaMunicipios AS municipio','municipio.clave','=','claveMunicipio')
+                ->leftjoin('vistaLocalidades AS localidad',function($join){
+                    return $join->on('localidad.clave','=','claveLocalidad')
+                         ->on('localidad.idMunicipio','=','municipio.id');
+                });
+	}
+
 	public function municipio(){
     	return $this->belongsTo('Municipio','claveMunicipio','clave');
     }
 
     public function localidad(){
-    	return $this->belongsTo('Localidad','claveLocalidad','clave');
+    	return $this->belongsTo('Localidad','claveLocalidad','clave')->where('idMunicipio',$this->municipio->id);
     }
 }

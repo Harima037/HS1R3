@@ -44,6 +44,7 @@ if($('#id').val()){
 			$('#lbl-coordinador-grupo').text(response.data.coordinador_grupo_estrategico.nombre);
 
             $('#nombretecnico').val(response.data.nombreTecnico);
+            $('#ejercicio').val(response.data.ejercicio);
 
 			$('#unidad_responsable').text(response.data.datos_unidad_responsable.clave);
             $('#finalidad').text(response.data.datos_finalidad.clave.slice(-1));
@@ -311,11 +312,11 @@ function cargar_formulario_componente_actividad(identificador,datos){
 		Validation.printFieldsErrors('trim4-'+identificador,'Valor anterior de '+datos.numeroTrim4+'.');
 		errores_metas = true;
 	}
-	if($('#numerador-'+identificador).val() != datos.valorNumerador){
+	if($('#numerador-'+identificador).val() != datos.valorNumerador && datos.valorNumerador != null){
 		Validation.printFieldsErrors('numerador-'+identificador,'Valor anterior de '+datos.valorNumerador+'.');
 		errores_metas = true;
 	}
-	if($('#meta-'+identificador).val() != datos.metaIndicador){
+	if($('#meta-'+identificador).val() != datos.metaIndicador && datos.metaIndicador != null){
 		Validation.printFieldsErrors('meta-'+identificador,'Valor anterior de '+datos.metaIndicador+'.');
 		errores_metas = true;
 	}
@@ -495,6 +496,10 @@ $('#btn-proyecto-guardar').on('click',function(){
 	            $(form_caratula + ' #id').val(response.data.id);
 	            $(form_caratula + ' #no_proyecto_estrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
 	            $(form_caratula + ' #numeroproyectoestrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
+
+	            if(response.data.componentes){
+	            	actualizar_grid_componentes(response.data.componentes);
+	            }
 
 	            actualizar_tabla_metas('actividad',response.data.jurisdicciones);
             	actualizar_tabla_metas('componente',response.data.jurisdicciones);
@@ -793,12 +798,14 @@ function actualizar_tabla_metas(identificador,jurisdicciones){
 	var html = '';
 	var indx,idx;
 	var llaves = Object.keys(jurisdicciones).sort(); //Se ordenan las llaves
+
 	for(var index in llaves){
 		indx = llaves[index];
 		html += '<tr>';
 		html += '<th>'+jurisdicciones[indx]+'</th>';
 		for(idx in meses){
-			html += '<td><input id="mes-'+identificador+'-'+indx+'-'+meses[idx]+'" name="mes-'+identificador+'['+indx+']['+meses[idx]+']" type="number" class="form-control input-sm metas-mes" data-meta-mes="'+meses[idx]+'" data-meta-jurisdiccion="'+indx+'" data-meta-identificador="'+identificador+'" data-meta-id=""></td>';
+			id_mes = parseInt(idx) + 1;
+			html += '<td><input id="mes-'+identificador+'-'+indx+'-'+id_mes+'" name="mes-'+identificador+'['+indx+']['+id_mes+']" type="number" class="form-control input-sm metas-mes" data-meta-mes="'+id_mes+'" data-meta-jurisdiccion="'+indx+'" data-meta-identificador="'+identificador+'" data-meta-id=""></td>';
 		}
 		html += '</tr>';
 	}
@@ -975,58 +982,34 @@ function ejecutar_formula(identificador){
 
 function actualizar_eventos_metas(){
 	$('.metas-mes').on('change',function(){
-		var meses = {'ENE':1,'FEB':2,'MAR':3,'ABR':4,'MAY':5,'JUN':6,'JUL':7,'AGO':8,'SEP':9,'OCT':10,'NOV':11,'DIC':12};
 		var mes = $(this).data('meta-mes');
-		var trimestre = Math.ceil(meses[mes]/3);
+		var trimestre = Math.ceil(mes/3);
 		var identificador = $(this).data('meta-identificador');
-
-		var valor_1 = 0;
-		var valor_2 = 0;
-		var valor_3 = 0;
+		
+		var suma = 0;
+		var mes_inicio = 0;
+		var mes_fin = 0;
 
 		if(trimestre == 1){
-			$('.metas-mes[data-meta-mes="ENE"][data-meta-identificador="'+identificador+'"]').each(function(){
-				valor_1 += parseInt($(this).val()) || 0;
-			});
-			$('.metas-mes[data-meta-mes="FEB"][data-meta-identificador="'+identificador+'"]').each(function(){
-				valor_2 += parseInt($(this).val()) || 0;
-			});
-			$('.metas-mes[data-meta-mes="MAR"][data-meta-identificador="'+identificador+'"]').each(function(){
-				valor_3 += parseInt($(this).val()) || 0;
-			});
+			mes_inicio = 1;
+			mes_fin = 3;
 		}else if(trimestre == 2){
-			$('.metas-mes[data-meta-mes="ABR"][data-meta-identificador="'+identificador+'"]').each(function(){
-				valor_1 += parseInt($(this).val()) || 0;
-			});
-			$('.metas-mes[data-meta-mes="MAY"][data-meta-identificador="'+identificador+'"]').each(function(){
-				valor_2 += parseInt($(this).val()) || 0;
-			});
-			$('.metas-mes[data-meta-mes="JUN"][data-meta-identificador="'+identificador+'"]').each(function(){
-				valor_3 += parseInt($(this).val()) || 0;
-			});
+			mes_inicio = 4;
+			mes_fin = 6;
 		}else if(trimestre == 3){
-			$('.metas-mes[data-meta-mes="JUL"][data-meta-identificador="'+identificador+'"]').each(function(){
-				valor_1 += parseInt($(this).val()) || 0;
-			});
-			$('.metas-mes[data-meta-mes="AGO"][data-meta-identificador="'+identificador+'"]').each(function(){
-				valor_2 += parseInt($(this).val()) || 0;
-			});
-			$('.metas-mes[data-meta-mes="SEP"][data-meta-identificador="'+identificador+'"]').each(function(){
-				valor_3 += parseInt($(this).val()) || 0;
-			});
+			mes_inicio = 7;
+			mes_fin = 9;
 		}else if(trimestre == 4){
-			$('.metas-mes[data-meta-mes="OCT"][data-meta-identificador="'+identificador+'"]').each(function(){
-				valor_1 += parseInt($(this).val()) || 0;
-			});
-			$('.metas-mes[data-meta-mes="NOV"][data-meta-identificador="'+identificador+'"]').each(function(){
-				valor_2 += parseInt($(this).val()) || 0;
-			});
-			$('.metas-mes[data-meta-mes="DIC"][data-meta-identificador="'+identificador+'"]').each(function(){
-				valor_3 += parseInt($(this).val()) || 0;
-			});
+			mes_inicio = 10;
+			mes_fin = 12;
 		}
 
-		var suma = valor_1 + valor_2 + valor_3;
+		for(var i = mes_inicio; i <= mes_fin; i++) {
+			$('.metas-mes[data-meta-mes="' + i + '"][data-meta-identificador="' + identificador + '"]').each(function(){
+				suma += parseInt($(this).val()) || 0;
+			});
+		}
+		
 		$('#trim'+trimestre+'-'+identificador).val(suma).change();
 
 		var trim1 = parseInt($('#trim1-'+identificador).val()) || 0;
@@ -1037,10 +1020,7 @@ function actualizar_eventos_metas(){
 		suma = trim1 + trim2 + trim3 + trim4;
 
 		$('#numerador-'+identificador).val(suma).change();
-		
-		//if($('#denominador-'+identificador).val()){
-			ejecutar_formula(identificador);
-		//}
+		ejecutar_formula(identificador);
 	});
 }
 

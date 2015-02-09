@@ -343,11 +343,11 @@ function constructor_grupo_acordiones(padre,item,tipo,contenido_extra){ //tipo =
     contenido += '<span class="label label-default">Meta Indicador :</span> '+item.metaIndicador+'<br>';
     contenido += '</div>';
     contenido += '<div class="col-sm-6">';
-    contenido += '<span class="label label-default">Formula :</span> '+item.formula.descripcion+'<br>';
-    contenido += '<span class="label label-default">Dimensión :</span> '+item.dimension.descripcion+'<br>';
-    contenido += '<span class="label label-default">Frecuencia :</span> '+item.frecuencia.descripcion+'<br>';
-    contenido += '<span class="label label-default">Tipo :</span> '+item.tipo_indicador.descripcion+'<br>';
-    contenido += '<span class="label label-default">Unidad de Medida :</span> '+item.unidad_medida.descripcion+'<br>';    
+    contenido += '<span class="label label-default">Formula :</span> '+ ((item.formula)?item.formula.descripcion:'') +'<br>';
+    contenido += '<span class="label label-default">Dimensión :</span> '+((item.dimension)?item.dimension.descripcion:'')+'<br>';
+    contenido += '<span class="label label-default">Frecuencia :</span> '+((item.frecuencia)?item.frecuencia.descripcion:'')+'<br>';
+    contenido += '<span class="label label-default">Tipo :</span> '+((item.tipo_indicador)?item.tipo_indicador.descripcion:'')+'<br>';
+    contenido += '<span class="label label-default">Unidad de Medida :</span> '+((item.unidad_medida)?item.unidad_medida.descripcion:'')+'<br>';    
     contenido += '</div>';
     contenido += '</div>';
 

@@ -610,11 +610,11 @@ class FibapController extends BaseController {
 							$desglose->claveLocalidad 	= $clave_localidad;
 						}
 						$desglose->presupuesto 		= $suma_presupuesto;
-						$desglose->meta 			= $suma_metas;
-						$desglose->trim1 			= $trimestres[1];
-						$desglose->trim2 			= $trimestres[2];
-						$desglose->trim3 			= $trimestres[3];
-						$desglose->trim4 			= $trimestres[4];
+						//$desglose->meta 			= $suma_metas;
+						//$desglose->trim1 			= $trimestres[1];
+						//$desglose->trim2 			= $trimestres[2];
+						//$desglose->trim3 			= $trimestres[3];
+						//$desglose->trim4 			= $trimestres[4];
 						$desglose->beneficiariosF 	= $parametros['beneficiarios-f'];
 						$desglose->beneficiariosM 	= $parametros['beneficiarios-m'];
 
@@ -942,8 +942,9 @@ class FibapController extends BaseController {
 									}
 									
 									if($desgloses){
-										$metas_mes = DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses->get()->lists('id'));
-										$metas_mes->delete();
+										DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses->get()->lists('id'))->delete();
+										//$metas_mes = 
+										//$metas_mes->delete();
 										$desgloses->delete();
 									}
 								}
@@ -1179,11 +1180,11 @@ class FibapController extends BaseController {
 							$desglose->claveLocalidad 	= NULL;
 						}
 						$desglose->presupuesto 		= $suma_presupuesto;
-						$desglose->meta 			= $suma_metas;
-						$desglose->trim1 			= $trimestres[1];
-						$desglose->trim2 			= $trimestres[2];
-						$desglose->trim3 			= $trimestres[3];
-						$desglose->trim4 			= $trimestres[4];
+						//$desglose->meta 			= $suma_metas;
+						//$desglose->trim1 			= $trimestres[1];
+						//$desglose->trim2 			= $trimestres[2];
+						//$desglose->trim3 			= $trimestres[3];
+						//$desglose->trim4 			= $trimestres[4];
 						$desglose->beneficiariosF 	= $parametros['beneficiarios-f'];
 						$desglose->beneficiariosM 	= $parametros['beneficiarios-m'];
 

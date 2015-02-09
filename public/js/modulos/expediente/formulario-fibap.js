@@ -210,7 +210,7 @@ if($('#id').val()){
             }
 
             habilitar_tabs();
-            bloquear_controles();
+            
             cambiar_icono_tabs('#tab-link-datos-fibap','fa-check-square-o');
 
             llenar_datagrid_antecedentes(response.data.antecedentes_financieros);
@@ -227,6 +227,8 @@ if($('#id').val()){
             if(response.data.presupuestoRequerido || response.data.periodoEjecucion){
             	cambiar_icono_tabs('#tab-link-acciones-fibap','fa-check-square-o');
             }
+            bloquear_controles();
+			$('.chosen-one.control-bloqueado').trigger('chosen:updated');
 		}
 	});
 }else if($('#proyecto-id').val()){
@@ -335,13 +337,14 @@ function editar_presupuesto(e){
             	var meta = desglose.metas_mes[indx];
             	$('#meta-mes-'+meta.mes).val(meta.meta);
             	$('#meta-mes-'+meta.mes).attr('data-meta-id',meta.id);
+            	$('#meta-mes-'+meta.mes).change();
             }
 
-            $('#trim1').val(desglose.trim1).change();
-            $('#trim2').val(desglose.trim2).change();
-            $('#trim3').val(desglose.trim3).change();
-            $('#trim4').val(desglose.trim4).change();
-            $('#cantidad-meta').val(desglose.meta).change();
+            //$('#trim1').val(desglose.trim1).change();
+            //$('#trim2').val(desglose.trim2).change();
+            //$('#trim3').val(desglose.trim3).change();
+            //$('#trim4').val(desglose.trim4).change();
+            //$('#cantidad-meta').val(desglose.meta).change();
 
             $('#cantidad-presupuesto').val(desglose.presupuesto);
 			$('#cantidad-presupuesto').change();
@@ -516,7 +519,7 @@ $('#btn-accion-guardar').on('click',function(){
 			_success: function(response){
 				MessageManager.show({data:'Cambios almacenados con éxito',type:'OK',timer:3});
 				llenar_datagrid_acciones(response.acciones);
-				llenar_datagrid_presupuestos(response.distribucion_total);
+				//llenar_datagrid_presupuestos(response.distribucion_total);
 				$(modal_accion).modal('hide');
 			},
 			_error: function(response){

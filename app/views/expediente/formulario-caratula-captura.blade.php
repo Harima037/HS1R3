@@ -26,7 +26,7 @@
         </div>
     </div>
 	<div class="row">
-		<div class="col-sm-8">
+		<div class="col-sm-6">
 			<div class="form-group">
 				<label class="control-label" for="nombretecnico">Nombre Técnico</label>
 				<input type="text" class="form-control" name="nombretecnico" id="nombretecnico"/>
@@ -35,9 +35,15 @@
 		<div class="col-sm-4">
 			<div class="form-group">
 				<label class="control-label" for="tipoaccion">Tipo de Acción</label>
-				{{Form::select('tipoaccion',array('' =>'Selecciona un tipo de acción') + $tipos_acciones->lists('descripcion','id'),0,array('class'=>'form-control chosen-one','id'=>'tipoaccion'))}}
+				{{Form::select('tipoaccion',array('' =>'Selecciona una acción') + $tipos_acciones->lists('descripcion','id'),0,array('class'=>'form-control chosen-one','id'=>'tipoaccion'))}}
 			</div>
 		</div>
+        <div class="col-sm-2">
+            <div class="form-group">
+                <label class="control-label" for="ejercicio">Ejercicio</label>
+                <input type="text" class="form-control" name="ejercicio" id="ejercicio"/>
+            </div>
+        </div>
         <div class="col-sm-12">
             <div class="form-group">
                 <label class="control-label" for="vinculacionped">Vinculación al PED (Plan Estatal de Desarrollo)</label>

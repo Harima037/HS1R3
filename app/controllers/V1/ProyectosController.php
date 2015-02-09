@@ -11,6 +11,7 @@ class ProyectosController extends BaseController {
 		'funciongasto'				=> 'required',
 		'clasificacionproyecto'		=> 'required',
 		'nombretecnico'				=> 'sometimes|required',
+		'ejercicio'					=> 'required',
 		'tipoproyecto'				=> 'required',
 		'cobertura'					=> 'sometimes|required',
 		'municipio'					=> 'sometimes|required_if:cobertura,2|digits_between:1,3',
@@ -132,8 +133,21 @@ class ProyectosController extends BaseController {
 								->orderBy('id', 'desc')
 								->skip(($parametros['pagina']-1)*10)->take(10)
 								->get();
+			$proyectos = array();
+			foreach ($rows as $row) {
+				# code...
+				$proyectos[] = array(
+						'id' 					=> $row->id,
+						'clavePresup' 			=> $row->clavePresup,
+						'nombreTecnico' 		=> $row->nombreTecnico,
+						'clasificacionProyecto'	=> $row->clasificacionProyecto,
+						'estatusProyecto'		=> $row->estatusProyecto,
+						'username'				=> $row->username,
+						'modificadoAl'			=> date_format($row->modificadoAl,'d/m/Y')
+					);
+			}
 			
-			$data = array('resultados'=>$total,'data'=>$rows);
+			$data = array('resultados'=>$total,'data'=>$proyectos);
 
 			if($total<=0){
 				$http_status = 404;
@@ -205,12 +219,6 @@ class ProyectosController extends BaseController {
 					foreach ($recurso->componentes as $key => $componente) {
 						$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
 					}
-					/*foreach ($recurso->componentes as $key => $componente) {
-						$recurso->componentes[$key]->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable'));
-						foreach ($recurso->componentes[$key]->actividades as $llave => $actividad) {
-							$recurso->componentes[$key]->actividades[$llave]->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
-						}
-					}*/
 				}
 			}elseif($parametros['ver'] == 'datos-fibap'){
 				$recurso = FibapDatosProyecto::where('idFibap','=',$id)->get();
@@ -454,14 +462,7 @@ class ProyectosController extends BaseController {
 			}
 		} //Guardar datos del componente
 
-		if($parametros['guardar'] == 'proyecto'){
-
-			/*if($parametros['cobertura'] == 2){
-				//Si la cobertura es diferente a estatal, checamos que haya seleccionado un municipio
-				$this->reglasProyecto['municipio'] = 'required|digits_between:1,3';
-			}elseif($parametros['cobertura'] == 3){
-				$this->reglasProyecto['region'] = 'required|alpha';
-			}*/
+		if($parametros['guardar'] == 'proyecto'){ //Nuevo Proyecto
 
 			$validacion = Validador::validar(Input::all(), $this->reglasProyecto);
 
@@ -473,9 +474,7 @@ class ProyectosController extends BaseController {
 					$funcion_gasto = explode('.',$parametros['funciongasto']);
 
 					$recurso->idClasificacionProyecto 		= $parametros['clasificacionproyecto'];
-					$recurso->nombreTecnico 				= $parametros['nombretecnico'];
-					$recurso->idTipoProyecto 				= $parametros['tipoproyecto'];
-					$recurso->idCobertura 					= $parametros['cobertura'];
+					$recurso->ejercicio						= $parametros['ejercicio'];
 					$recurso->idTipoAccion 					= $parametros['tipoaccion'];
 					$recurso->unidadResponsable 			= $parametros['unidadresponsable'];
 					$recurso->finalidad 					= $funcion_gasto[0];
@@ -483,21 +482,112 @@ class ProyectosController extends BaseController {
 					$recurso->subFuncion 					= $funcion_gasto[2];
 					$recurso->subSubFuncion 				= $funcion_gasto[3];
 					$recurso->programaSectorial 			= $parametros['programasectorial'];
-					$recurso->programaPresupuestario 		= $parametros['programapresupuestario'];
 					$recurso->programaEspecial 				= $parametros['programaespecial'];
 					$recurso->actividadInstitucional 		= $parametros['actividadinstitucional'];
 					$recurso->proyectoEstrategico 			= $parametros['proyectoestrategico'];
-					$recurso->idObjetivoPED 				= $parametros['vinculacionped'];
-					$recurso->idTipoBeneficiario 			= $parametros['tipobeneficiario'];
-					$recurso->totalBeneficiarios 			= $parametros['totalbeneficiariosf'] + $parametros['totalbeneficiariosm'];
-					$recurso->totalBeneficiariosF 			= $parametros['totalbeneficiariosf'];
-					$recurso->totalBeneficiariosM 			= $parametros['totalbeneficiariosm'];
 					$recurso->idEstatusProyecto 			= 1;
 
-					if($parametros['cobertura'] == 2){
-						$recurso->claveMunicipio = $parametros['municipio'];
-					}elseif($parametros['cobertura'] == 3){
-						$recurso->claveRegion = $parametros['region'];
+					$componentes = array();
+					$fibap = FALSE;
+					if($parametros['id-fibap']){
+						//Si se esta importando una FIBAP, obtener los datos del proyecto y 
+						$fibap = FIBAP::with('datosProyecto','acciones.datosComponente.desgloseComponente.metasMes')
+										->find($parametros['id-fibap']);
+						//
+						if(!$fibap){
+							$respuesta['data']['data'] = 'La Fibap seleccionada no se encuentra, es posible que haya sido eliminada.';
+							throw new Exception("La FIBAP no existe, o fue eliminada.", 1);
+						}
+
+						$recurso->idTipoProyecto 				= $fibap->datosProyecto->idTipoProyecto;
+						$recurso->nombreTecnico 				= $fibap->datosProyecto->nombreTecnico;
+						$recurso->idObjetivoPED 				= $fibap->datosProyecto->idObjetivoPED;
+						$recurso->programaPresupuestario 		= $fibap->datosProyecto->programaPresupuestario;
+						$recurso->idCobertura 					= $fibap->datosProyecto->idCobertura;
+						if($fibap->datosProyecto->idCobertura == 2){
+							$recurso->claveMunicipio = $fibap->datosProyecto->claveMunicipio;
+						}elseif($fibap->datosProyecto->idCobertura == 3){
+							$recurso->claveRegion = $fibap->datosProyecto->claveRegion;
+						}
+						$recurso->idTipoBeneficiario 			= $fibap->datosProyecto->idTipoBeneficiario;
+						$recurso->totalBeneficiarios 			= $fibap->datosProyecto->totalBeneficiarios;
+						$recurso->totalBeneficiariosF 			= $fibap->datosProyecto->totalBeneficiariosF;
+						$recurso->totalBeneficiariosM 			= $fibap->datosProyecto->totalBeneficiariosM;
+
+						foreach ($fibap->acciones as $accion) {
+							$componente = new Componente;
+
+							$componente->idEntregable 		= $accion->datosComponente->idEntregable;
+							$componente->idEntregableTipo 	= $accion->datosComponente->idEntregableTipo;
+							$componente->idEntregableAccion	= $accion->datosComponente->idEntregableAccion;
+							$componente->idUnidadMedida		= $accion->datosComponente->idUnidadMedida;
+							$componente->indicador 			= $accion->datosComponente->indicador;
+							$componente->numeroTrim1 		= 0;
+							$componente->numeroTrim2 		= 0;
+							$componente->numeroTrim3 		= 0;
+							$componente->numeroTrim4 		= 0;
+
+							$metas_mes = array();
+							$componente_desglose = array();
+							foreach ($accion->datosComponente->desgloseComponente as $desglose) {
+								$desglose->trim1 = 0;
+								$desglose->trim2 = 0;
+								$desglose->trim3 = 0;
+								$desglose->trim4 = 0;
+								$desglose->meta = 0;
+
+								if(!isset($metas_mes[$desglose->claveJurisdiccion])){
+									$metas_mes[$desglose->claveJurisdiccion] = array(
+											1 => 0, 2 => 0, 3 => 0,  4 => 0,  5 => 0,  6 => 0,
+											7 => 0, 8 => 0, 9 => 0, 10 => 0, 11 => 0, 12 => 0
+										);
+								}
+
+								foreach ($desglose->metasMes as $meta) {
+									if($meta->meta > 0){
+										$metas_mes[$desglose->claveJurisdiccion][$meta->mes] += $meta->meta;
+										//Se divide la meta por trimestre
+										if($meta->mes >= 1 && $meta->mes <= 3){
+											$componente->numeroTrim1 += $meta->meta;
+											$desglose->trim1 += $meta->meta;
+										}elseif ($meta->mes >= 4 && $meta->mes <= 6) {
+											$componente->numeroTrim2 += $meta->meta;
+											$desglose->trim2 += $meta->meta;
+										}elseif ($meta->mes >= 7 && $meta->mes <= 9) {
+											$componente->numeroTrim3 += $meta->meta;
+											$desglose->trim3 += $meta->meta;
+										}elseif ($meta->mes >= 10 && $meta->mes <= 12) {
+											$componente->numeroTrim4 += $meta->meta;
+											$desglose->trim4 += $meta->meta;
+										}
+										$componente->valorNumerador += $meta->meta;
+										$desglose->meta += $meta->meta;
+									}
+								}
+								$componente_desglose[] = $desglose;
+							}
+
+							$componentes[] = array(
+									'componente' 	=> $componente,
+									'metas_mes'		=> $metas_mes,
+									'desglose'		=> $componente_desglose
+								);
+						}
+					}else{
+						$recurso->idTipoProyecto 				= $parametros['tipoproyecto'];
+						$recurso->nombreTecnico 				= $parametros['nombretecnico'];
+						$recurso->idObjetivoPED 				= $parametros['vinculacionped'];
+						$recurso->programaPresupuestario 		= $parametros['programapresupuestario'];
+						$recurso->idCobertura 					= $parametros['cobertura'];
+						if($parametros['cobertura'] == 2){
+							$recurso->claveMunicipio = $parametros['municipio'];
+						}elseif($parametros['cobertura'] == 3){
+							$recurso->claveRegion = $parametros['region'];
+						}
+						$recurso->idTipoBeneficiario 			= $parametros['tipobeneficiario'];
+						$recurso->totalBeneficiarios 			= $parametros['totalbeneficiariosf'] + $parametros['totalbeneficiariosm'];
+						$recurso->totalBeneficiariosF 			= $parametros['totalbeneficiariosf'];
+						$recurso->totalBeneficiariosM 			= $parametros['totalbeneficiariosm'];
 					}
 
 					$titulares = Titular::whereIn('claveUnidad',array('00','01', Sentry::getUser()->claveUnidad))->get();
@@ -515,61 +605,74 @@ class ProyectosController extends BaseController {
 							$recurso->idLiderProyecto = $titular->id;
 						}
 					}
+					
+					$beneficiarioF = new Beneficiario;
+					$beneficiarioF->sexo 		= 	'f';
+					$beneficiarioF->urbana 		= 	$parametros['urbanaf'];
+					$beneficiarioF->rural 		= 	$parametros['ruralf'];
+					$beneficiarioF->mestiza 	= 	$parametros['mestizaf'];
+					$beneficiarioF->indigena 	= 	$parametros['indigenaf'];
+					$beneficiarioF->inmigrante 	= 	$parametros['inmigrantef'];
+					$beneficiarioF->otros 		= 	$parametros['otrosf'];
+					$beneficiarioF->muyAlta 	= 	$parametros['muyaltaf'];
+					$beneficiarioF->alta 		= 	$parametros['altaf'];
+					$beneficiarioF->media 		= 	$parametros['mediaf'];
+					$beneficiarioF->baja 		= 	$parametros['bajaf'];
+					$beneficiarioF->muyBaja 	= 	$parametros['muybajaf'];
 
-				  //$recurso->idLiderProyecto 				= $parametros[''];
-				  //$recurso->idJefeInmediato 				= $parametros[''];
-				  //$recurso->idJefePlaneacion 				= $parametros[''];
-				  //$recurso->idCoordinadorGrupoEstrategico = $parametros[''];
 
-					DB::transaction(function() use ($parametros, $recurso, $respuesta){
+					$beneficiarioM = new Beneficiario;
+					$beneficiarioM->sexo 		= 	'm';
+					$beneficiarioM->urbana 		= 	$parametros['urbanam'];
+					$beneficiarioM->rural 		= 	$parametros['ruralm'];
+					$beneficiarioM->mestiza 	= 	$parametros['mestizam'];
+					$beneficiarioM->indigena 	= 	$parametros['indigenam'];
+					$beneficiarioM->inmigrante 	= 	$parametros['inmigrantem'];
+					$beneficiarioM->otros 		= 	$parametros['otrosm'];
+					$beneficiarioM->muyAlta 	= 	$parametros['muyaltam'];
+					$beneficiarioM->alta 		= 	$parametros['altam'];
+					$beneficiarioM->media 		= 	$parametros['mediam'];
+					$beneficiarioM->baja 		= 	$parametros['bajam'];
+					$beneficiarioM->muyBaja 	= 	$parametros['muybajam'];
+
+					$beneficiarios = array($beneficiarioF,$beneficiarioM);
+
+					DB::transaction(function() use ($beneficiarios, $recurso, $respuesta, $componentes, $fibap){
 						if($recurso->save()){
-
-							$beneficiarioF = new Beneficiario;
-							$beneficiarioF->sexo 		= 	'f';
-							$beneficiarioF->urbana 		= 	$parametros['urbanaf'];
-							$beneficiarioF->rural 		= 	$parametros['ruralf'];
-							$beneficiarioF->mestiza 	= 	$parametros['mestizaf'];
-							$beneficiarioF->indigena 	= 	$parametros['indigenaf'];
-							$beneficiarioF->inmigrante 	= 	$parametros['inmigrantef'];
-							$beneficiarioF->otros 		= 	$parametros['otrosf'];
-							$beneficiarioF->muyAlta 	= 	$parametros['muyaltaf'];
-							$beneficiarioF->alta 		= 	$parametros['altaf'];
-							$beneficiarioF->media 		= 	$parametros['mediaf'];
-							$beneficiarioF->baja 		= 	$parametros['bajaf'];
-							$beneficiarioF->muyBaja 	= 	$parametros['muybajaf'];
-
-
-							$beneficiarioM = new Beneficiario;
-							$beneficiarioM->sexo 		= 	'm';
-							$beneficiarioM->urbana 		= 	$parametros['urbanam'];
-							$beneficiarioM->rural 		= 	$parametros['ruralm'];
-							$beneficiarioM->mestiza 	= 	$parametros['mestizam'];
-							$beneficiarioM->indigena 	= 	$parametros['indigenam'];
-							$beneficiarioM->inmigrante 	= 	$parametros['inmigrantem'];
-							$beneficiarioM->otros 		= 	$parametros['otrosm'];
-							$beneficiarioM->muyAlta 	= 	$parametros['muyaltam'];
-							$beneficiarioM->alta 		= 	$parametros['altam'];
-							$beneficiarioM->media 		= 	$parametros['mediam'];
-							$beneficiarioM->baja 		= 	$parametros['bajam'];
-							$beneficiarioM->muyBaja 	= 	$parametros['muybajam'];
-
-							$beneficiarios = array($beneficiarioF,$beneficiarioM);
 
 							if(!$recurso->beneficiarios()->saveMany($beneficiarios)){
 								$respuesta['data']['code'] = 'S01';
 								throw new Exception("Error al intentar guardar los beneficiarios del proyecto", 1);
 							}
 
-							if($parametros['id-fibap']){
-								$fibap = FIBAP::find($parametros['id-fibap']);
-								if($fibap){
-									$fibap->idProyecto = $recurso->id;
-									$fibap->save();
-									FibapDatosProyecto::where('idFibap','=',$fibap->id)->delete();
-								}else{
-									$respuesta['data']['data'] = 'La Fibap seleccionada no se encuentra, es posible que haya sido eliminada.';
-									throw new Exception("La FIBAP no existe, o fue eliminada.", 1);
+							if($fibap){
+								foreach ($componentes as $datos) {
+									$componente = $datos['componente'];
+									$metas_mes = $datos['metas_mes'];
+									$desglose = $datos['desglose'];
+
+									$recurso->componentes()->save($componente);
+									
+									$metas = array();
+									foreach ($metas_mes as $jurisdiccion => $meses) {
+										foreach ($meses as $mes => $meta) {
+											if($meta > 0){
+												$meta_mes = new ComponenteMetaMes;
+												$meta_mes->claveJurisdiccion = $jurisdiccion;
+												$meta_mes->mes = $mes;
+												$meta_mes->meta = $meta;
+												$meta_mes->idProyecto = $componente->idProyecto;
+												$metas[] = $meta_mes;
+											}
+										}
+									}
+									$componente->metasMes()->saveMany($metas);
+									$componente->desglose()->saveMany($desglose);
 								}
+
+								$fibap->idProyecto = $recurso->id;
+								$fibap->save();
+								FibapDatosProyecto::where('idFibap','=',$fibap->id)->delete();
 							}
 						}else{
 							//No se pudieron guardar los datos del proyecto
@@ -586,6 +689,9 @@ class ProyectosController extends BaseController {
 						$jurisdicciones = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
 					}
 					//Proyecto guardado con éxito
+					if($fibap){
+						$recurso->load('componentes.usuario');
+					}
 					$recurso = $recurso->toArray();
 					$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
 					$respuesta['data'] = array('data'=>$recurso);
@@ -712,7 +818,7 @@ class ProyectosController extends BaseController {
 			}
 		} //Guardar datos de la actividad
 
-		if($parametros['guardar'] == 'componente'){
+		if($parametros['guardar'] == 'componente'){  //Editar componente
 			try{
 				
 				if($parametros['clasificacion'] == 2){
@@ -761,9 +867,9 @@ class ProyectosController extends BaseController {
 					if($parametros['clasificacion'] == 2){
 						$recurso->idEntregable 			= $parametros['entregable'];
 						if($parametros['tipo-entregable'] != 'NA'){
-							$componente->idEntregableTipo	= $parametros['tipo-entregable'] ;
+							$recurso->idEntregableTipo	= $parametros['tipo-entregable'] ;
 						}else{
-							$componente->idEntregableTipo	= NULL;
+							$recurso->idEntregableTipo	= NULL;
 						}
 						$recurso->idEntregableAccion	= $parametros['accion-entregable'];
 					}

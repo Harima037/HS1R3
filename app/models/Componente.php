@@ -12,8 +12,8 @@ class Componente extends BaseModel
 							'entregableTipo','entregableAccion','desgloce');
 	}
 
-	public function desgloce(){
-		return $this->hasMany('ComponenteDesgloce','idComponente')->with('municipio','localidad');
+	public function desglose(){
+		return $this->hasMany('ComponenteDesglose','idComponente');
 	}
 
 	public function actividades(){
