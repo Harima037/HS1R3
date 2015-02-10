@@ -33,11 +33,11 @@
                 <thead>
                     <tr>
                         <th><input type="checkbox" class="check-select-all-rows"></th>
-                        <th>Descripción</th>
-                        <th>Medios de Verificación</th>
-                        <th>Supuestos</th>
-                        <th style="text-align:center; width:150px;"><span class="glyphicon glyphicon-user"></span></th>
-                        <th style="text-align:center; width:150px;"><span class="glyphicon glyphicon-calendar"></span></th>
+                        <th>Indicador</th>
+                        <th>Interpretación</th>
+                        <th>Unidad de Medida</th>
+                        <th style="text-align:center; width:100px;"><span class="glyphicon glyphicon-user"></span></th>
+                        <th style="text-align:center; width:100px;"><span class="glyphicon glyphicon-calendar"></span></th>
                     </tr>
                 </thead>
                 <tbody>

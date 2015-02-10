@@ -483,16 +483,11 @@
     <input type="hidden" id="id-fibap" name="id-fibap" value="{{{ $fibap_id or '' }}}">
     <input type="hidden" id="clasificacionproyecto" name="clasificacionproyecto" value="{{$clasificacion_proyecto_id}}">
     <input type="hidden" id="tipoproyecto" name="tipoproyecto" value="{{$tipo_proyecto_id}}">
-    <div class="panel-footer">
-        <div class="row">
-            <div class="col-sm-12">
-                <button type="button" class="btn btn-primary" id="btn-proyecto-guardar">
-                    <span class="fa fa-save"></span> Guardar cambios
-                </button>
-                <button type="button" class="btn btn-default" id="btn-proyecto-cancelar">
-                    <span class="fa fa-chevron-left"></span> Regresar a la lista de Proyectos
-                </button>
-            </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <button type="button" class="btn btn-primary pull-right" id="btn-proyecto-guardar">
+                <span class="fa fa-save"></span> Guardar cambios
+            </button>
         </div>
     </div>
 </form>

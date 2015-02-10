@@ -9,11 +9,16 @@ class Componente extends BaseModel
 	
 	public function scopeContenidoCompleto($query){
 		return $query->with('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable',
-							'entregableTipo','entregableAccion','desgloce');
+							'entregableTipo','entregableAccion','desgloseCompleto');
 	}
 
 	public function desglose(){
 		return $this->hasMany('ComponenteDesglose','idComponente');
+	}
+
+	public function desgloseCompleto(){
+		return $this->hasMany('ComponenteDesglose','idComponente')->listarDatos();
+		//->with('metasMes');
 	}
 
 	public function actividades(){

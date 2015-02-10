@@ -13,14 +13,22 @@
 =====================================*/
 // Declaracion de variables
 var proyectoResource = new RESTfulRequests(SERVER_HOST+'/v1/proyectos');
+
 var componenteDatagrid = new Datagrid("#datagridComponentes",proyectoResource);
 var actividadDatagrid = new Datagrid('#datagridActividades',proyectoResource);
+var desgloseComponenteDatagrid = new Datagrid('#datagridDesgloseComponente',proyectoResource);
+
 componenteDatagrid.init();
 actividadDatagrid.init();
+desgloseComponenteDatagrid.init();
+
 var modal_componente = '#modalComponente';
 var modal_actividad = '#modalActividad';
+
 var grid_componentes = '#datagridComponentes';
 var grid_actividades = '#datagridActividades';
+var grid_desglose = '#datagridDesgloseComponente';
+
 var form_caratula = '#form_caratula';
 var form_componente = '#form_componente';
 var form_actividad = '#form_actividad';
@@ -260,6 +268,7 @@ function editar_componente(e){
 			$('#frecuencia-componente').val(response.data.idFrecuenciaIndicador);
 			$('#tipo-ind-componente').val(response.data.idTipoIndicador);
 			$('#unidad-medida-componente').val(response.data.idUnidadMedida);
+
 			$('#formula-componente').trigger('chosen:updated');
 			$('#dimension-componente').trigger('chosen:updated');
 			$('#frecuencia-componente').trigger('chosen:updated');
@@ -289,10 +298,87 @@ function editar_componente(e){
 
 			actualizar_grid_actividades(response.data.actividades);
 
-            $(modal_componente).modal('show');
+			if(response.data.idEntregable){
+				busqueda_rapida_desglose(e,{});
+			}else{
+				actualizar_grid_desglose([]);
+				$(modal_componente).modal('show');
+			}
         }
-    });
+    },'Cargando los datos del componente');
 }
+
+///*****  Comportamiento_del_grid_de_Desglose
+$(grid_desglose + " .btn-next-rows").off('click');
+$(grid_desglose + " .btn-next-rows").on('click', function(e) {           
+	e.preventDefault();	
+	var pagina  = parseInt(desgloseComponenteDatagrid.getPagina())+1;
+
+    if(desgloseComponenteDatagrid.getMaxPagina()>=pagina){
+    	buscar_pagina_desglose(pagina);
+    }
+});
+$(grid_desglose + " .btn-back-rows").off('click');
+$(grid_desglose + " .btn-back-rows").on('click',function(e){
+	e.preventDefault();	
+	var pagina  = parseInt(desgloseComponenteDatagrid.getPagina())-1;
+    if(pagina<1)
+      pagina = 1;
+  	
+	buscar_pagina_desglose(pagina);
+});
+$(grid_desglose + " .btn-go-first-rows").off('click');
+$(grid_desglose + " .btn-go-first-rows").on('click',function(e){           
+	e.preventDefault();
+	buscar_pagina_desglose(1);
+});
+$(grid_desglose + " .btn-go-last-rows").off('click');
+$(grid_desglose + " .btn-go-last-rows").on('click',function(e){
+	e.preventDefault();
+	buscar_pagina_desglose(desgloseComponenteDatagrid.getMaxPagina() || 1);
+});
+$(grid_desglose + " .txt-go-page").off('keydown');
+$(grid_desglose + " .txt-go-page").on('keydown', function(event){
+	if (event.which == 13) {
+		buscar_pagina_desglose($(this.selector + " .txt-go-page").val());
+   	}
+});
+$(grid_desglose + " .txt-quick-search").off('keydown');
+$(grid_desglose + " .txt-quick-search").on('keydown', function(event){
+	if (event.which == 13) {
+		busqueda_rapida_desglose($('#id-componente').val(),{buscar:$(this).val()});
+   	}
+});
+$(grid_desglose + " .btn-quick-search").off('click');
+$(grid_desglose + " .btn-quick-search").on('click',function(e){
+	e.preventDefault();		
+	busqueda_rapida_desglose($('#id-componente').val(),{buscar:$(grid_desglose + " .txt-quick-search").val()});
+});
+function buscar_pagina_desglose(pagina){
+	var max_pagina = desgloseComponenteDatagrid.getMaxPagina() || 1;
+	if(pagina > max_pagina){
+		pagina = max_pagina;
+	}else if(pagina <= 0){
+		pagina = 1;
+	}
+	busqueda_rapida_desglose($('#id-componente').val(),{pagina:pagina})
+}
+function busqueda_rapida_desglose(id_componente,parametros){
+	var param_buscar = {ver:'lista-desglose',pagina:1};
+	if(parametros.buscar){
+		param_buscar.buscar = parametros.buscar;
+	}
+	if(parametros.pagina){
+		param_buscar.pagina = parametros.pagina;
+	}
+	proyectoResource.get(id_componente,param_buscar,{
+		_success: function(response){
+			actualizar_grid_desglose(response.data, response.total, param_buscar.pagina);
+			$(modal_componente).modal('show');
+		}
+	},'Cargando el desglose del componente...');
+}
+///***** Termina Comportamiento_del_grid_de_Desglose
 
 function cargar_formulario_componente_actividad(identificador,datos){
 	var errores_metas = false;
@@ -824,6 +910,36 @@ function actualizar_metas(identificador,metas){
 	$('.metas-mes[data-meta-jurisdiccion="OC"][data-meta-identificador="'+identificador+'"]').change();
 }
 
+function actualizar_grid_desglose(datos,total_resultados,pagina){
+	$(grid_desglose + ' > table > tbody').empty();
+	var desglose_componente = [];
+	for(indx in datos){
+		var desglose = {};
+
+		desglose.id = datos[indx].id;
+		desglose.localidad = datos[indx].localidad || 'OFICINA CENTRAL';
+		desglose.municipio = datos[indx].municipio || 'OFICINA CENTRAL';
+		desglose.jurisdiccion = datos[indx].jurisdiccion || 'OFICINA CENTRAL';
+		desglose.meta = datos[indx].meta;
+
+		desglose_componente.push(desglose);
+	}
+
+	$('#conteo-desglose').text(desglose_componente.length);
+
+	if(desglose_componente.length == 0){
+		$(grid_desglose + ' > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
+		desgloseComponenteDatagrid.paginacion(1);
+	}else{
+		desgloseComponenteDatagrid.cargarDatos(desglose_componente);
+		var total = parseInt(total_resultados/10); 
+        if((parseInt(total_resultados)%10) > 0) 
+        	total++;
+        desgloseComponenteDatagrid.paginacion(total);
+        desgloseComponenteDatagrid.setPagina(pagina);
+	}
+}
+
 function actualizar_grid_actividades(datos){
 	$(grid_actividades + ' > table > tbody').empty();
 	var actividades = [];
@@ -831,11 +947,11 @@ function actualizar_grid_actividades(datos){
 		var actividad = {};
 
 		actividad.id = datos[indx].id;
-		actividad.descripcion = datos[indx].objetivo;
-		actividad.mediosVerificacion = datos[indx].mediosVerificacion;
-		actividad.supuestos = datos[indx].supuestos;
+		actividad.indicador = datos[indx].indicador;
+		actividad.interpretacion = datos[indx].interpretacion;
+		actividad.unidad_medida = datos[indx].unidad_medida.descripcion;
 		actividad.creadoPor = datos[indx].usuario.username;
-		actividad.creadoAl = datos[indx].creadoAl;
+		actividad.creadoAl = datos[indx].creadoAl.substring(0,11);
 
 		actividades.push(actividad);
 	}
@@ -856,11 +972,11 @@ function actualizar_grid_componentes(datos){
 		var componente = {};
 
 		componente.id = datos[indx].id;
-		componente.descripcion = datos[indx].objetivo;
-		componente.mediosVerificacion = datos[indx].mediosVerificacion;
-		componente.supuestos = datos[indx].supuestos;
+		componente.indicador = datos[indx].indicador;
+		componente.interpretacion = datos[indx].interpretacion || '---';
+		componente.unidad_medida = datos[indx].unidad_medida.descripcion;
 		componente.creadoPor = datos[indx].usuario.username;
-		componente.creadoAl = datos[indx].creadoAl;
+		componente.creadoAl = datos[indx].creadoAl.substring(0,11);
 
 		componentes.push(componente);
 	}
@@ -869,9 +985,9 @@ function actualizar_grid_componentes(datos){
 
 	if(componentes.length == 0){
 		$(grid_componentes + ' > table > tbody').append('<tr><td colspan="6" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
+	}else{
+		componenteDatagrid.cargarDatos(componentes);
 	}
-
-	componenteDatagrid.cargarDatos(componentes);
 }
 
 function reset_modal_form(formulario){

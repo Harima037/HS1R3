@@ -4,7 +4,8 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception;
-use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, FibapDatosProyecto, Titular;
+use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
+	FibapDatosProyecto, Titular, ComponenteDesglose;
 
 class ProyectosController extends BaseController {
 	private $reglasProyecto = array(
@@ -146,7 +147,6 @@ class ProyectosController extends BaseController {
 						'modificadoAl'			=> date_format($row->modificadoAl,'d/m/Y')
 					);
 			}
-			
 			$data = array('resultados'=>$total,'data'=>$proyectos);
 
 			if($total<=0){
@@ -202,10 +202,37 @@ class ProyectosController extends BaseController {
 
 		if($parametros){
 			if($parametros['ver'] == 'componente'){
-				$recurso = Componente::with('actividades','metasMes')->find($id);
+				$recurso = Componente::with('actividades.unidadMedida','metasMes')->find($id);
+			}elseif ($parametros['ver'] == 'lista-desglose') {
+
+				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
+				$pagina = $parametros['pagina'];
+				$rows = ComponenteDesglose::listarDatos()->where('idComponente','=',$id);
+
+				if(isset($parametros['buscar'])){				
+					$rows = $rows->where(function($query) use ($parametros){
+									$query->where('jurisdiccion.nombre','like','%'.$parametros['buscar'].'%')
+										->orWhere('municipio.nombre','like','%'.$parametros['buscar'].'%')
+										->orWhere('localidad.nombre','like','%'.$parametros['buscar'].'%');
+								});
+					$total = $rows->count();
+
+					$queries = DB::getQueryLog();
+					$data['query'] = print_r(end($queries),true);
+				}else{				
+					$total = $rows->count();						
+				}
+				$data['total'] = $total;
+				$recurso = $rows->orderBy('id', 'desc')
+							->skip(($parametros['pagina']-1)*10)->take(10)
+							->get();
+
 			}elseif($parametros['ver'] == 'actividad'){
+
 				$recurso = Actividad::with('metasMes')->find($id);
+
 			}elseif($parametros['ver'] == 'proyecto'){
+
 				$recurso = Proyecto::contenidoCompleto()->find($id);
 				if($recurso){
 					if($recurso->idClasificacionProyecto == 2){
@@ -215,17 +242,19 @@ class ProyectosController extends BaseController {
 							$recurso->fibap->distribucionPresupuestoAgrupado->load('objetoGasto');
 						}
 					}
-					$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion'));
+					$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion','desgloseCompleto'));
 					foreach ($recurso->componentes as $key => $componente) {
 						$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
 					}
 				}
+
 			}elseif($parametros['ver'] == 'datos-fibap'){
 				$recurso = FibapDatosProyecto::where('idFibap','=',$id)->get();
 				$recurso = $recurso[0];
 			}
 		}else{
 			$recurso = Proyecto::contenidoCompleto()->find($id);
+			$recurso->componentes->load('unidadMedida');
 			if($recurso->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
 				$jurisdicciones = Jurisdiccion::all();
 			}elseif($recurso->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
@@ -243,7 +272,7 @@ class ProyectosController extends BaseController {
 			if(!$parametros){
 				$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
 			}
-			$data = array("data"=>$recurso);
+			$data["data"] = $recurso;
 		}
 
 		return Response::json($data,$http_status);
@@ -332,7 +361,7 @@ class ProyectosController extends BaseController {
 							}
 							
 							$actividad->metasMes()->saveMany($metasMes);
-
+							$componente->actividades->load('unidadMedida');
 							return array('data'=>$actividad,'actividades'=>$componente->actividades,'metas'=>$metasMes);
 						}else{
 							throw new Exception("Ocurrió un error al guardar la actividad.", 1);
@@ -439,7 +468,7 @@ class ProyectosController extends BaseController {
 							}
 							
 							$componente->metasMes()->saveMany($metasMes);
-
+							$proyecto->componentes->load('unidadMedida');
 							return array('data'=>$componente,'componentes'=>$proyecto->componentes,'metas'=>$metasMes);
 						}else{
 							throw new Exception("Ocurrió un error al guardar el componente.", 1);
@@ -770,7 +799,7 @@ class ProyectosController extends BaseController {
 					
 					$respuesta['data'] = DB::transaction(function() use ($parametros, $recurso){
 						if($recurso->save()){
-							$componente = Componente::with('actividades')->find($recurso->idComponente);
+							$componente = Componente::with('actividades.unidadMedida')->find($recurso->idComponente);
 
 							$jurisdicciones = $parametros['mes-actividad'];
 							$ides = $parametros['mes-actividad-id'];
@@ -905,7 +934,7 @@ class ProyectosController extends BaseController {
 							$recurso->metasMes()->saveMany($metasMes);
 							//$recurso->load('metasMes');
 
-							$proyecto = Proyecto::with('componentes')->find($recurso->idProyecto);
+							$proyecto = Proyecto::with('componentes.unidadMedida')->find($recurso->idProyecto);
 
 							return array('data'=>$recurso,'componentes'=>$proyecto->componentes,'metas'=>$metasMes);
 						}else{

@@ -56,6 +56,15 @@
                     </div>
                 </div>
             </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-default" id="btn-proyecto-cancelar">
+                            <span class="fa fa-chevron-left"></span> Regresar a la lista de Proyectos
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 	</div>
 </div>
