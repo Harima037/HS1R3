@@ -17,8 +17,7 @@ class Componente extends BaseModel
 	}
 
 	public function desgloseCompleto(){
-		return $this->hasMany('ComponenteDesglose','idComponente')->listarDatos();
-		//->with('metasMes');
+		return $this->hasMany('ComponenteDesglose','idComponente')->listarDatos()->with('metasMes');
 	}
 
 	public function actividades(){

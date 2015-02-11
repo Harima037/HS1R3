@@ -559,11 +559,11 @@ class ProyectosController extends BaseController {
 							$metas_mes = array();
 							$componente_desglose = array();
 							foreach ($accion->datosComponente->desgloseComponente as $desglose) {
-								$desglose->trim1 = 0;
+								/*$desglose->trim1 = 0;
 								$desglose->trim2 = 0;
 								$desglose->trim3 = 0;
 								$desglose->trim4 = 0;
-								$desglose->meta = 0;
+								$desglose->meta = 0;*/
 
 								if(!isset($metas_mes[$desglose->claveJurisdiccion])){
 									$metas_mes[$desglose->claveJurisdiccion] = array(
@@ -578,19 +578,19 @@ class ProyectosController extends BaseController {
 										//Se divide la meta por trimestre
 										if($meta->mes >= 1 && $meta->mes <= 3){
 											$componente->numeroTrim1 += $meta->meta;
-											$desglose->trim1 += $meta->meta;
+											//$desglose->trim1 += $meta->meta;
 										}elseif ($meta->mes >= 4 && $meta->mes <= 6) {
 											$componente->numeroTrim2 += $meta->meta;
-											$desglose->trim2 += $meta->meta;
+											//$desglose->trim2 += $meta->meta;
 										}elseif ($meta->mes >= 7 && $meta->mes <= 9) {
 											$componente->numeroTrim3 += $meta->meta;
-											$desglose->trim3 += $meta->meta;
+											//$desglose->trim3 += $meta->meta;
 										}elseif ($meta->mes >= 10 && $meta->mes <= 12) {
 											$componente->numeroTrim4 += $meta->meta;
-											$desglose->trim4 += $meta->meta;
+											//$desglose->trim4 += $meta->meta;
 										}
 										$componente->valorNumerador += $meta->meta;
-										$desglose->meta += $meta->meta;
+										//$desglose->meta += $meta->meta;
 									}
 								}
 								$componente_desglose[] = $desglose;
