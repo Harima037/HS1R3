@@ -58,7 +58,6 @@ class ReporteProyectoController extends BaseController {
 
 		Excel::create($nombreArchivo, function($excel) use ($data){
 
-
 			if($data['data']->idClasificacionProyecto == 1){
 				$excel->sheet('Programa presupuestario', function($sheet)  use ($data){
 
@@ -70,7 +69,6 @@ class ReporteProyectoController extends BaseController {
 			        $sheet->setWidth('E', 19);
 			        $sheet->setWidth('F', 16);
 			        $sheet->setWidth('G', 13);
-
 			        $sheet->cell('A10', function($cells) {
 			        	$cells->setBorder('thin', 'thin', 'none', 'thin');
 					});
@@ -81,8 +79,6 @@ class ReporteProyectoController extends BaseController {
 			        	$cells->setBorder('none', 'none', 'thin', 'none');
 					});
 					$sheet->setBorder('B11:G11', 'thin');
-					//$sheet->setBorder('B12:B15', 'thin');
-					//$sheet->setBorder('D12:D15', 'thin');
 					$sheet->cell('A16:D16', function($cells) {
 			        	$cells->setBorder('thin', 'thin', 'none', 'thin');
 					});
@@ -169,7 +165,7 @@ class ReporteProyectoController extends BaseController {
 
 			$excel->sheet($nombreHoja, function($sheet)  use ($data){
 
-		        $sheet->loadView('expediente.excel.programaInversion', $data);
+		        $sheet->loadView('expediente.excel.programa', $data);
 		        $sheet->setWidth('A', 30);
 		        $sheet->setSize('A2', 30, 20);
 		        $sheet->cell('E31', function($cell) {
@@ -236,16 +232,14 @@ class ReporteProyectoController extends BaseController {
 		        $sheet->setWidth('A', 30);
 
 		    });
-
-			//if($data['data']->idClasificacionProyecto == 2){
-				$excel->sheet('Metas x mes', function($sheet)  use ($data){
-
-			        $sheet->loadView('expediente.excel.anexoMetasMes', $data);
-			        $sheet->setWidth('A', 30);
-
-			    });
-			//}
 			
+			$excel->sheet('Metas x mes', function($sheet)  use ($data){
+
+		        $sheet->loadView('expediente.excel.anexoMetasMes', $data);
+		        $sheet->setWidth('A', 30);
+
+		    });
+
 		})->export('xls');
 
 	}

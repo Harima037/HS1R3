@@ -21,7 +21,7 @@
 		<tr>
 			<td colspan="15" align="center">DEPARTAMENTO DE INTEGRACION PROGRAMATICA PRESUPUESTAL</td>
 		</tr>
-		<tr><td colspan="15" align="center">DISTRIBUCIÓN DE METAS POR JURISDICCIÓN 2013</td></tr>
+		<tr><td colspan="15" align="center">DISTRIBUCIÓN DE METAS POR JURISDICCIÓN {{$data['ejercicio']}}</td></tr>
 		<tr>
 			<td colspan="15">NOMBRE DEL PROYECTO: {{ $data['nombreTecnico'] }}</td>
 		</tr>
