@@ -352,25 +352,25 @@
 		
 		@endforeach
 
-        @endforeach
-        @if($data['idClasificacionProyecto']== 2)
+		@if($data['idClasificacionProyecto']== 2)
+		@foreach($componente->desglose_completo as $desglose)
         <tr><td colspan="15"></td></tr>
 		<tr>
 			<td colspan="15" align="center" style="background-color: #CCCCCC;">DESGLOSE DEL COMPONENTE</td>
 		</tr>
 		<tr>
 			<td style="background-color: #CCCCCC;border:1px solid #000">MUNICIPIO:</td>
-			<td colspan="3"></td>
+			<td colspan="3">{{$desglose->municipio}}</td>
 			<td colspan="2" style="background-color: #CCCCCC;">LOCALIDAD:</td>
-			<td colspan="8"></td>
+			<td colspan="8">{{$desglose->localidad}}</td>
 		</tr>
 		<tr>
 			<td style="background-color: #CCCCCC;border:1px solid #000">BENEFICIARIO:</td>
-			<td colspan="3"></td>
+			<td colspan="3">{{ $data['tipoBeneficiario']->descripcion }}</td>
 			<td colspan="2" style="background-color: #CCCCCC;">CANTIDAD:</td>
-			<td colspan="2"></td>
+			<td colspan="2">{{$desglose->beneficiariosF + $desglose->beneficiariosM}}</td>
 			<td colspan="3" style="background-color: #CCCCCC;">PRESUPUESTO:</td>
-			<td colspan="3"></td>
+			<td colspan="3">{{$desglose->presupuesto}}</td>
 		</tr>
 		<tr><td colspan="15"></td></tr>
 
@@ -379,15 +379,67 @@
 		</tr>
 		<tr>
 			<td style="background-color: #CCCCCC;">TRIMESTRE 1:</td>
-			<td colspan="2"></td>
+			<td colspan="2">
+				<?php
+					$trim = 0;
+				?>
+				@foreach($desglose->metas_mes as $meta)
+					@if($meta->mes < 4)
+						<?php 
+						$trim += $meta->meta;
+						?>
+					@endif
+				@endforeach
+				{{$trim}}
+			</td>
 			<td colspan="2" style="background-color: #CCCCCC;">TRIMESTRE 2:</td>
-			<td colspan="2"></td>
+			<td colspan="2">
+				<?php
+					$trim = 0;
+				?>
+				@foreach($desglose->metas_mes as $meta)
+					@if($meta->mes > 3 && $meta->mes < 7)
+						<?php 
+						$trim += $meta->meta;
+						?>
+					@endif
+				@endforeach
+				{{$trim}}
+			</td>
 			<td colspan="2" style="background-color: #CCCCCC;">TRIMESTRE 3:</td>
-			<td colspan="2"></td>
+			<td colspan="2">
+				<?php
+					$trim = 0;
+				?>
+				@foreach($desglose->metas_mes as $meta)
+					@if($meta->mes > 6 && $meta->mes < 10)
+						<?php 
+						$trim += $meta->meta;
+						?>
+					@endif
+				@endforeach
+				{{$trim}}
+			</td>
 			<td colspan="2" style="background-color: #CCCCCC;">TRIMESTRE 4:</td>
-			<td colspan="2"></td>
+			<td colspan="2">
+				<?php
+					$trim = 0;
+				?>
+				@foreach($desglose->metas_mes as $meta)
+					@if($meta->mes > 9 && $meta->mes < 13)
+						<?php 
+						$trim += $meta->meta;
+						?>
+					@endif
+				@endforeach
+				{{$trim}}
+			</td>
 		</tr>
+		@endforeach
 		@endif
+
+        @endforeach
+        
 		<tr><td colspan="15"></td></tr>
 
 		<tr>

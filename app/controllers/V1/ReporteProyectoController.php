@@ -4,7 +4,7 @@ namespace V1;
 
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
-use BaseController, Input, Response, DB, Sentry;
+use BaseController, Input, Response, DB, Sentry, View;
 use Excel, Proyecto, ComponenteMetaMes, ActividadMetaMes;
 
 class ReporteProyectoController extends BaseController {
@@ -19,13 +19,11 @@ class ReporteProyectoController extends BaseController {
 	{
 		
 		$idProyecto = $id;
-
-		//return Response::view('expediente.excel.programaPresupuestario');die();
 		
 		$recurso = Proyecto::contenidoCompleto()->find($idProyecto);
 		
 		//Datos para la hoja Programa Inversion
-		$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion'));
+		$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion','desgloseCompleto'));
 					foreach ($recurso->componentes as $key => $componente) {
 						$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
 					}
@@ -53,13 +51,16 @@ class ReporteProyectoController extends BaseController {
 
 		$data = array("data"=> $recurso);
 
+		//var_dump($recurso->toArray());die();
+		//return View::make('expediente.excel.programa')->with($data);die();
+
 		$nombreArchivo = ($recurso->idClasificacionProyecto== 2) ? 'Carátula Proyecto Inversión' : 'Carátula Proyecto Institucional';
 		$nombreArchivo.=' - '.$recurso->ClavePresupuestaria;
 
 		Excel::create($nombreArchivo, function($excel) use ($data){
 
 			if($data['data']->idClasificacionProyecto == 1){
-				$excel->sheet('Programa presupuestario', function($sheet)  use ($data){
+				$excel->sheet('Programa Presupuestario', function($sheet)  use ($data){
 
 			        $sheet->loadView('expediente.excel.programaPresupuestario', $data);
 			        $sheet->setWidth('A', 26);
@@ -222,6 +223,16 @@ class ReporteProyectoController extends BaseController {
 						$sheet->setBorder('A'.($fila+10).':O'.($fila+13), 'thin');
 						$fila+=15;
 					}
+					//Bordes para el desglose del componente
+					if($data['data']->idClasificacionProyecto == 2){
+						foreach ($componente->desglose_completo as $desglose) {
+							$sheet->setBorder('A'.($fila).':O'.($fila), 'thin');
+							$sheet->setBorder('B'.($fila+1).':N'.($fila+2), 'thin');
+							$sheet->setBorder('A'.($fila+4).':C'.($fila+4), 'thin');
+							$sheet->setBorder('A'.($fila+5).':O'.($fila+5), 'thin');
+							$fila+=7;
+						}
+					}
 				}
 
 		    });
@@ -230,6 +241,7 @@ class ReporteProyectoController extends BaseController {
 
 		        $sheet->loadView('expediente.excel.anexoPorJurisdiccion', $data);
 		        $sheet->setWidth('A', 30);
+		        $sheet->setWidth('B', 17);
 
 		    });
 			
@@ -237,6 +249,7 @@ class ReporteProyectoController extends BaseController {
 
 		        $sheet->loadView('expediente.excel.anexoMetasMes', $data);
 		        $sheet->setWidth('A', 30);
+		        $sheet->setWidth('B', 25);
 
 		    });
 

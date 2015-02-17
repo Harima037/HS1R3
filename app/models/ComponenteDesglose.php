@@ -19,7 +19,7 @@ class ComponenteDesglose extends BaseModel
                 ->leftjoin('vistaLocalidades AS localidad',function($join){
                     return $join->on('localidad.clave','=','claveLocalidad')
                          ->on('localidad.idMunicipio','=','municipio.id');
-                });
+                })->orderBy('municipio.nombre','ASC')->orderBy('localidad.nombre','ASC');
 	}
 
 	public function municipio(){
