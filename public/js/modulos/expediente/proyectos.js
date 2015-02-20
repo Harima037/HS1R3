@@ -69,7 +69,7 @@ function editar (e){
             $('#lbl_jefe_ṕlaneacion').text((response.data.jefe_planeacion)?response.data.jefe_planeacion.nombre:'No asignado');
             $('#lbl_coordinador_grupo').text((response.data.coordinador_grupo_estrategico)?response.data.coordinador_grupo_estrategico.nombre:'No asignado');
 
-
+            /*
             $('#lbl_tipo_beneficiario').text(response.data.tipo_beneficiario.descripcion);
             $('#lbl_total_beneficiarios').text(response.data.totalBeneficiarios.format());
             $('#lbl_beneficiarios_f').text(response.data.totalBeneficiariosF.format());
@@ -90,7 +90,8 @@ function editar (e){
                 $('#lbl_benef_media_'+sexo).text(response.data.beneficiarios[indx].media.format());
                 $('#lbl_benef_baja_'+sexo).text(response.data.beneficiarios[indx].baja.format());
                 $('#lbl_benef_muy_baja_'+sexo).text(response.data.beneficiarios[indx].muyBaja.format());
-            }
+            }*/
+            llenar_tabla_beneficiarios(response.data.beneficiarios);
 
             $('#id').val(response.data.id);
 
@@ -124,6 +125,74 @@ function editar (e){
             $(modal_name).modal('show');
         }
     });
+}
+
+function llenar_tabla_beneficiarios(datos){
+    $('#tabla_beneficiarios tbody').empty();
+    var beneficiarios = {};
+    for(var i in datos){
+        if(!beneficiarios[datos[i].idTipoBeneficiario]){
+            beneficiarios[datos[i].idTipoBeneficiario] = {
+                id: datos[i].idTipoBeneficiario,
+                tipo: datos[i].tipo_beneficiario.descripcion,
+                total: 0,
+                desglose: {}
+            };
+        }
+        beneficiarios[datos[i].idTipoBeneficiario].total += datos[i].total;
+        beneficiarios[datos[i].idTipoBeneficiario].desglose[datos[i].sexo] = {
+            sexo: datos[i].sexo,
+            total: datos[i].total,
+            urbana: datos[i].urbana,
+            rural: datos[i].rural,
+            mestiza: datos[i].mestiza,
+            indigena: datos[i].indigena,
+            inmigrante: datos[i].inmigrante,
+            otros: datos[i].otros,
+            muyAlta: datos[i].muyAlta,
+            alta: datos[i].alta,
+            media: datos[i].media,
+            baja: datos[i].baja,
+            muyBaja: datos[i].muyBaja
+        }
+    }
+    var rows = '';
+    for(var i in beneficiarios){
+        console.log(beneficiarios[i]);
+        rows += '<tr>';
+        rows += '<td rowspan="2">' + beneficiarios[i].tipo + '</td>';
+        rows += '<td rowspan="2">' + beneficiarios[i].total + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['f'].total + '</td>';
+        rows += '<th>Femenino</th>';
+        rows += '<td>' + beneficiarios[i].desglose['f'].urbana + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['f'].rural + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['f'].mestiza + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['f'].indigena + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['f'].inmigrante + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['f'].otros + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['f'].muyAlta + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['f'].alta + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['f'].media + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['f'].baja + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['f'].muyBaja + '</td>';
+        rows += '</tr>';
+        rows += '<tr>';
+        rows += '<td>' + beneficiarios[i].desglose['m'].total + '</td>';
+        rows += '<th>Masculino</th>';
+        rows += '<td>' + beneficiarios[i].desglose['m'].urbana + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['m'].rural + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['m'].mestiza + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['m'].indigena + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['m'].inmigrante + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['m'].otros + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['m'].muyAlta + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['m'].alta + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['m'].media + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['m'].baja + '</td>';
+        rows += '<td>' + beneficiarios[i].desglose['m'].muyBaja + '</td>';
+        rows += '</tr>';
+    }
+    $('#tabla_beneficiarios tbody').html(rows);
 }
 
 function llenar_datos_fibap(fibap){

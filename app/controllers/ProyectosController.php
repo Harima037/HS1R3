@@ -17,7 +17,7 @@ class ProyectosController extends \BaseController {
 		return parent::loadIndex('EXP','PROYECTOS',$catalogos);
 	}
 
-	public function caratula()
+	public function caratula($id = NULL)
 	{
 		//Obtener los titulares para firmas: de las unidades de Planeacion y Desarrollo, Direccion General y Director de la Unidad Responsable
 		$titulares = Titular::whereIn('claveUnidad',array('00','01', Sentry::getUser()->claveUnidad))->get();
@@ -67,7 +67,7 @@ class ProyectosController extends \BaseController {
 			'tipo_proyecto_id' => Input::get('tipo_proyecto'),
 			'clasificacion_proyecto' => $clasificacion[Input::get('clasificacion_proyecto')],
 			'tipo_proyecto' => $tipo[Input::get('tipo_proyecto')],
-			'tipos_acciones' => TipoAccion::all(),
+			'tipos_acciones' => TipoAccion::where('id','=',7)->get(),
 			'unidades_responsables' => UnidadResponsable::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->where('clave','=',Sentry::getUser()->claveUnidad)->get(),
 			'funciones_gasto' => $funciones_gasto,
 			'programas_sectoriales' => ProgramaSectorial::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
@@ -77,7 +77,6 @@ class ProyectosController extends \BaseController {
 			'proyectos_estrategicos' => ProyectoEstrategico::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
 			'objetivos_ped' => $objetivos_ped,
 			'coberturas' => Cobertura::all(),
-			'tipos_beneficiarios' => TipoBeneficiario::all(),
 			'municipios' => Municipio::all(),
 			'regiones' => Region::all()
 		);
@@ -95,6 +94,8 @@ class ProyectosController extends \BaseController {
 		$datos['formulario'] = View::make('expediente.formulario-caratula-captura',$datos);
 		//Se Pre-carga el datagrid de los componentes
 		$datos['grid_componentes'] = View::make('expediente.listado-componentes');
+
+		$datos['grid_beneficiarios'] = View::make('expediente.formulario-caratula-beneficiarios');
 
 		//Cargar el formulario para dar de alta actividades
 		$datos_componentes['identificador'] = 'actividad'; //El identificador se agrega al id de los elementos del formulario
@@ -120,6 +121,11 @@ class ProyectosController extends \BaseController {
 		$datos_componentes['identificador'] = 'componente';
 		$datos['formulario_componente'] = View::make('expediente.formulario-componente',$datos_componentes);
 
+		$datos_beneficiarios = array(
+			'tipos_beneficiarios' => TipoBeneficiario::all()
+		);
+		$datos['formulario_beneficiario'] = View::make('expediente.formulario-beneficiario',$datos_beneficiarios);
+
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
 		$datos['sys_activo'] = SysGrupoModulo::findByKey('EXP');
 		$datos['sys_mod_activo'] = SysModulo::findByKey('PROYECTOS');
@@ -137,5 +143,82 @@ class ProyectosController extends \BaseController {
 				'sys_mod_activo'=>null), 403
 			);
 		}
+	}
+
+	public function loadIndex($sys_sis_llave,$sys_mod_llave = NULL,$datos_extra = array()){
+		return parent::loadIndex($sys_sis_llave, $sys_mod_llave, $datos_extra);
+	}
+	
+	public function catalogos_caratula($parametros){
+		//
+		//Obtener los titulares para firmas: de las unidades de Planeacion y Desarrollo, Direccion General y Director de la Unidad Responsable
+		$titulares = Titular::whereIn('claveUnidad',array('00','01', Sentry::getUser()->claveUnidad))->get();
+		$firmas = array(
+				'LiderProyecto' 	=> NULL,
+				'JefeInmediato' 	=> NULL,
+				'JefePlaneacion'	=> NULL,
+				'CoordinadorGrupo' 	=> NULL
+			);
+
+		foreach ($titulares as $titular) {
+			if($titular->claveUnidad == '00'){ //Dirección General
+				$firmas['JefeInmediato'] = $titular;
+			}elseif ($titular->claveUnidad == '01') { //Dirección de Planeación y Desarrollo
+				$firmas['JefePlaneacion'] = $titular;
+				$firmas['CoordinadorGrupo'] = $titular;
+				if($firmas['LiderProyecto'] == NULL){
+					$firmas['LiderProyecto'] = $titular;
+				}
+			}else{
+				$firmas['LiderProyecto'] = $titular;
+			}
+		}
+		
+		$clasificacion = ClasificacionProyecto::all()->lists('descripcion','id');
+		$tipo = TipoProyecto::all()->lists('descripcion','id');
+
+		$funciones_gasto = FuncionGasto::whereNull('idPadre')->with('hijos')->get();
+
+		$objetivos_ped = ObjetivoPED::whereNull('idPadre')->with('hijos')->get();
+
+		$datos = array(
+			'firmas' => $firmas,
+			'clasificacion_proyecto_id' => $parametros['clasificacion-proyecto'],
+			'tipo_proyecto_id' => $parametros['tipo-proyecto'],
+			'clasificacion_proyecto' => $clasificacion[$parametros['clasificacion-proyecto']],
+			'tipo_proyecto' => $tipo[$parametros['tipo-proyecto']],
+			'tipos_acciones' => TipoAccion::where('id','=',7)->get(),
+			'unidades_responsables' => UnidadResponsable::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->where('clave','=',Sentry::getUser()->claveUnidad)->get(),
+			'funciones_gasto' => $funciones_gasto,
+			'programas_sectoriales' => ProgramaSectorial::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
+			'programas_presupuestarios' => ProgramaPresupuestario::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
+			'programas_especiales' => ProgramaEspecial::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
+			'actividades_institucionales' => ActividadInstitucional::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
+			'proyectos_estrategicos' => ProyectoEstrategico::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
+			'objetivos_ped' => $objetivos_ped,
+			'coberturas' => Cobertura::all(),
+			//'tipos_beneficiarios' => TipoBeneficiario::all(),
+			'municipios' => Municipio::all(),
+			'regiones' => Region::all()
+		);
+
+		/*$datos['clasificacion_proyecto_id'] = $parametros['clasificacion-proyecto'];
+		$datos['clasificacion_proyecto'] = $clasificacion[$parametros['clasificacion-proyecto']];
+		$datos['tipo_proyecto'] = $tipo[$parametros['tipo-proyecto']];*/
+		
+		if(isset($parametros['id'])){
+			$datos['id'] = $parametros['id'];
+		}
+
+		$datos_beneficiarios = array(
+			'tipos_beneficiarios' => TipoBeneficiario::all()
+		);
+		$datos_benef['formulario_beneficiarios'] = View::make('expediente.formulario-beneficiario',$datos_beneficiarios);
+		$datos['grid_beneficiarios'] = View::make('expediente.formulario-caratula-beneficiarios',$datos_benef);
+
+		//Se Pre-carga formulario general de la caratula
+		$datos['formulario'] = View::make('expediente.formulario-caratula-captura',$datos);
+
+		return $datos;
 	}
 }

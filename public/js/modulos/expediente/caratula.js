@@ -17,21 +17,26 @@ var proyectoResource = new RESTfulRequests(SERVER_HOST+'/v1/proyectos');
 var componenteDatagrid = new Datagrid("#datagridComponentes",proyectoResource);
 var actividadDatagrid = new Datagrid('#datagridActividades',proyectoResource);
 var desgloseComponenteDatagrid = new Datagrid('#datagridDesgloseComponente',proyectoResource);
+var beneficiarioDatagrid = new Datagrid("#datagridBeneficiarios",proyectoResource);
 
 componenteDatagrid.init();
 actividadDatagrid.init();
 desgloseComponenteDatagrid.init();
+beneficiarioDatagrid.init();
 
 var modal_componente = '#modalComponente';
 var modal_actividad = '#modalActividad';
+var modal_beneficiario = '#modalBeneficiario';
 
 var grid_componentes = '#datagridComponentes';
 var grid_actividades = '#datagridActividades';
 var grid_desglose = '#datagridDesgloseComponente';
+var grid_beneficiarios = '#datagridBeneficiarios';
 
 var form_caratula = '#form_caratula';
 var form_componente = '#form_componente';
 var form_actividad = '#form_actividad';
+var form_beneficiario = '#form_beneficiario';
 
 $('.chosen-one').chosen({width:'100%'});
 
@@ -104,36 +109,15 @@ if($('#id').val()){
             $('#vinculacionped').val(response.data.objetivo_ped.id);
             $('#vinculacionped').trigger('chosen:updated');
 
-            $('#tipobeneficiario').val(response.data.tipo_beneficiario.id);
-            $('#tipobeneficiario').trigger('chosen:updated');
-            $('#totalbeneficiarios').text(response.data.totalBeneficiarios);
-            $('#totalbeneficiariosf').val(response.data.totalBeneficiariosF);
-            $('#totalbeneficiariosm').val(response.data.totalBeneficiariosM);
-
-            var indx;
-            var sexo;
-            for( indx in response.data.beneficiarios ){
-                sexo = response.data.beneficiarios[indx].sexo;
-                $('#urbana'+sexo).val(response.data.beneficiarios[indx].urbana);
-                $('#rural'+sexo).val(response.data.beneficiarios[indx].rural);
-                $('#mestiza'+sexo).val(response.data.beneficiarios[indx].mestiza);
-                $('#indigena'+sexo).val(response.data.beneficiarios[indx].indigena);
-                $('#inmigrante'+sexo).val(response.data.beneficiarios[indx].inmigrante);
-                $('#otros'+sexo).val(response.data.beneficiarios[indx].otros);
-                $('#muyalta'+sexo).val(response.data.beneficiarios[indx].muyAlta);
-                $('#alta'+sexo).val(response.data.beneficiarios[indx].alta);
-                $('#media'+sexo).val(response.data.beneficiarios[indx].media);
-                $('#baja'+sexo).val(response.data.beneficiarios[indx].baja);
-                $('#muybaja'+sexo).val(response.data.beneficiarios[indx].muyBaja);
-            }
-
-            cargar_totales();
+            actualizar_grid_beneficiarios(response.data.beneficiarios);
 
             actualizar_tabla_metas('actividad',response.data.jurisdicciones);
             actualizar_tabla_metas('componente',response.data.jurisdicciones);
 
             $('#tablink-componentes').attr('data-toggle','tab');
 			$('#tablink-componentes').parent().removeClass('disabled');
+			$('#tablink-beneficiarios').attr('data-toggle','tab');
+			$('#tablink-beneficiarios').parent().removeClass('disabled');
 
 			actualizar_grid_componentes(response.data.componentes);
         }
@@ -420,6 +404,43 @@ function cargar_formulario_componente_actividad(identificador,datos){
 	}
 }
 
+function editar_beneficiario(e){
+	var parametros = {ver:'beneficiario','id-proyecto':$('#id').val()}
+	proyectoResource.get(e,parametros,{
+		_success: function(response){
+			$(modal_beneficiario).find('.modal-title').html('Editar Beneficiario');
+
+			$('#tipobeneficiario').val(response.data[0].idTipoBeneficiario);
+            $('#tipobeneficiario').trigger('chosen:updated');
+
+            $('#id-beneficiario').val(response.data[0].idTipoBeneficiario);
+
+            var indx;
+            var sexo;
+            var total = 0;
+            for( indx in response.data ){
+                sexo = response.data[indx].sexo;
+                total += response.data[indx].total;
+                $('#totalbeneficiarios'+sexo).val(response.data[indx].total);
+                $('#urbana'+sexo).val(response.data[indx].urbana);
+                $('#rural'+sexo).val(response.data[indx].rural);
+                $('#mestiza'+sexo).val(response.data[indx].mestiza);
+                $('#indigena'+sexo).val(response.data[indx].indigena);
+                $('#inmigrante'+sexo).val(response.data[indx].inmigrante);
+                $('#otros'+sexo).val(response.data[indx].otros);
+                $('#muyalta'+sexo).val(response.data[indx].muyAlta);
+                $('#alta'+sexo).val(response.data[indx].alta);
+                $('#media'+sexo).val(response.data[indx].media);
+                $('#baja'+sexo).val(response.data[indx].baja);
+                $('#muybaja'+sexo).val(response.data[indx].muyBaja);
+            }
+            $('#totalbeneficiarios').text(total);
+            cargar_totales();
+			$(modal_beneficiario).modal('show');
+		}
+	});
+}
+
 function editar_actividad(e){
 	var parametros = {'ver':'actividad'};
 	proyectoResource.get(e,parametros,{
@@ -479,7 +500,57 @@ $('#btn-componente-guardar-salir').on('click',function(){
 $('#btn-componente-guardar').on('click',function(){
 	guardar_datos_componente(false);
 });
+$('#btn-beneficiario-guardar').on('click',function(){
+	Validation.cleanFormErrors(form_beneficiario);
+	var parametros = $(form_beneficiario).serialize();
+	parametros = parametros + '&guardar=beneficiario&id-proyecto=' + $('#id').val();
 
+	if($(form_beneficiario + ' #id-beneficiario').val()){
+		proyectoResource.put($(form_beneficiario + ' #id-beneficiario').val(),parametros,{
+			_success: function(response){
+				MessageManager.show({data:'Datos de los beneficiarios almacenados con éxito',type:'OK',timer:3});
+	            $(modal_beneficiario).modal('hide');
+				actualizar_grid_beneficiarios(response.data);
+			},
+			_error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                	json.container = modal_actividad + ' .modal-body';
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
+		});
+	}else{
+		proyectoResource.post(parametros,{
+			_success: function(response){
+				MessageManager.show({data:'Datos de los beneficiarios almacenados con éxito',type:'OK',timer:3});
+	            $(modal_beneficiario).modal('hide');
+				actualizar_grid_beneficiarios(response.data);
+			},
+			_error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                	json.container = modal_actividad + ' .modal-body';
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
+		});
+	}
+});
 $('#btn-actividad-guardar').on('click',function(){
 	Validation.cleanFormErrors(form_actividad);
 	var parametros = $(form_actividad).serialize();
@@ -627,6 +698,11 @@ $('#formula-actividad').on('change',function(){
 });
 
 /** Botones para mostrar los modales de Componente y Actividad **/
+$('.btn-agregar-beneficiario').on('click',function(){
+	$(modal_beneficiario).find(".modal-title").html("Nuevo Beneficiario");
+	$(modal_beneficiario).modal('show');
+});
+
 $('.btn-agregar-actividad').on('click',function(){
 	var actividades = $('#conteo-actividades').text().split('/');
 
@@ -701,6 +777,10 @@ $(modal_componente).on('hide.bs.modal',function(e){
 
 $(modal_actividad).on('hide.bs.modal',function(e){
 	reset_modal_form(form_actividad);
+});
+
+$(modal_beneficiario).on('hide.bs.modal',function(e){
+	reset_modal_form(form_beneficiario);
 });
 
 //***********************     Funciones             +++++++++++++++++++++++++++++++++
@@ -836,6 +916,42 @@ $(grid_actividades + " .btn-delete-rows").on('click',function(e){
                         _success: function(response){ 
                         	actualizar_grid_actividades(response.actividades);
                         	MessageManager.show({data:'Actividad eliminada con éxito.',timer:3});
+                        },
+                        _error: function(jqXHR){ 
+                        	MessageManager.show(jqXHR.responseJSON);
+                        }
+        			});
+				}
+		});
+	}else{
+		MessageManager.show({data:'No has seleccionado ningún registro.',type:'ADV',timer:3});
+	}
+});
+
+
+$(grid_beneficiarios + " .btn-delete-rows").unbind('click');
+$(grid_beneficiarios + " .btn-delete-rows").on('click',function(e){
+	e.preventDefault();
+	var rows = [];
+	var contador= 0;
+    
+    $(this).parents(".datagrid").find("tbody").find("input[type=checkbox]:checked").each(function () {
+		contador++;
+        rows.push($(this).parent().parent().data("id"));
+	});
+
+	if(contador>0){
+		Confirm.show({
+				titulo:"Eliminar beneficiario",
+				//botones:[], 
+				mensaje: "¿Estás seguro que deseas eliminar el(los) beneficiario(s) seleccionado(s)?",
+				//si: 'Actualizar',
+				//no: 'No, gracias',
+				callback: function(){
+					proyectoResource.delete(rows,{'rows': rows, 'eliminar': 'beneficiario', 'id-proyecto': $('#id').val()},{
+                        _success: function(response){ 
+                        	actualizar_grid_beneficiarios(response.beneficiarios);
+                        	MessageManager.show({data:'Beneficiario(s) eliminado(s) con éxito.',timer:3});
                         },
                         _error: function(jqXHR){ 
                         	MessageManager.show(jqXHR.responseJSON);
@@ -990,6 +1106,47 @@ function actualizar_grid_componentes(datos){
 	}
 }
 
+function actualizar_grid_beneficiarios(datos){
+	$(grid_beneficiarios + ' > table > tbody').empty();
+	var beneficiarios_grid = [];
+	var beneficiarios = [];
+	var beneficiario;
+	for(var indx in datos){
+		if(beneficiarios[datos[indx].idTipoBeneficiario]){
+			beneficiario = beneficiarios[datos[indx].idTipoBeneficiario];
+		}else{
+			beneficiario = {};
+			beneficiario.id = datos[indx].idTipoBeneficiario;
+			beneficiario.tipoBeneficiario = datos[indx].tipo_beneficiario.descripcion;
+			beneficiario.totalF = 0;
+			beneficiario.totalM = 0;
+			beneficiario.total = 0;
+		}
+
+		if(datos[indx].sexo == 'f'){
+			beneficiario.totalF = datos[indx].total;
+			beneficiario.total += datos[indx].total;
+		}else{
+			beneficiario.totalM = datos[indx].total;
+			beneficiario.total += datos[indx].total;
+		}
+		
+		//beneficiarios.push(beneficiario);
+		beneficiarios[datos[indx].idTipoBeneficiario] = beneficiario;
+	}
+	for(var i in beneficiarios){
+		beneficiarios_grid.push(beneficiarios[i]);
+	}
+	
+	$('#tablink-beneficiarios > span').text(beneficiarios_grid.length);
+
+	if(beneficiarios_grid.length == 0){
+		$(grid_beneficiarios + ' > table > tbody').append('<tr><td></td><td colspan="4" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
+	}else{
+		beneficiarioDatagrid.cargarDatos(beneficiarios_grid);
+	}
+}
+
 function reset_modal_form(formulario){
     $(formulario).get(0).reset();
     $(formulario + ' input[type="hidden"]').val('');
@@ -1003,11 +1160,12 @@ function reset_modal_form(formulario){
     	//$(grid_actividades + ' > table > tbody').empty();
     	$('#conteo-actividades').text(' 0 / 5 ');
     	$(grid_actividades + ' > table > tbody').html('<tr><td colspan="6" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
-    }
-    if(formulario == form_actividad){
+    }else if(formulario == form_actividad){
     	$('#id-actividad').val('');
     	$('#lista-tabs-actividad a:first').tab('show');
     	$(modal_actividad + ' .alert').remove();
+    }else if(formulario == form_beneficiario){
+    	$(form_beneficiario + ' span.form-control').text('');
     }
 }
 

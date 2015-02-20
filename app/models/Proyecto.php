@@ -51,7 +51,7 @@ class Proyecto extends BaseModel
 		return $query->with('componentes','beneficiarios','municipio','region','clasificacionProyecto','tipoProyecto','cobertura','tipoAccion',
 			'datosUnidadResponsable','datosFinalidad','datosFuncion','datosSubFuncion','datosSubSubFuncion','datosProgramaSectorial',
 			'datosProgramaPresupuestario','datosProgramaEspecial','datosActividadInstitucional','datosProyectoEstrategico',
-			'objetivoPed','tipoBeneficiario','estatusProyecto','jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico');
+			'objetivoPed','estatusProyecto','jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico');
 	}
 
 	public function jefeInmediato(){
@@ -75,7 +75,7 @@ class Proyecto extends BaseModel
 	}
 
 	public function beneficiarios(){
-		return $this->hasMany('Beneficiario','idProyecto');
+		return $this->hasMany('Beneficiario','idProyecto')->with('tipoBeneficiario');
 	}
 
 	public function municipio(){
@@ -146,9 +146,9 @@ class Proyecto extends BaseModel
 		return $this->belongsTo('ObjetivoPED','idObjetivoPED');
 	}
 
-	public function tipoBeneficiario(){
+	/*public function tipoBeneficiario(){
 		return $this->belongsTo('TipoBeneficiario','idTipoBeneficiario');
-	}
+	}*/
 
 	public function estatusProyecto(){
 		return $this->belongsTo('EstatusProyecto','idEstatusProyecto');

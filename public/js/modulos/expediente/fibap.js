@@ -109,10 +109,11 @@ function editar(e){
                 cobertura_detalle = 'Chiapas';
             }
             $('#lbl-cobertura-municipio').text(proyecto.cobertura.descripcion + ' / ' + cobertura_detalle);
-            $('#lbl-tipo-beneficiario').text(proyecto.tipo_beneficiario.descripcion);
+            
             $('#lbl-beneficiario-f').text(proyecto.totalBeneficiariosF.format());
             $('#lbl-beneficiario-m').text(proyecto.totalBeneficiariosM.format());
-            $('#lbl-total-beneficiario').text(proyecto.totalBeneficiarios.format());
+            /*$('#lbl-tipo-beneficiario').text(proyecto.tipo_beneficiario.descripcion);
+            $('#lbl-total-beneficiario').text(proyecto.totalBeneficiarios.format());*/
 
             var html_list = '';
             for(var indx in fibap.documentos){
