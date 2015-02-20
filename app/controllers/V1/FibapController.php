@@ -648,10 +648,10 @@ class FibapController extends BaseController {
 							}
 						}
 
-						if(count($partidas) < 2){
+						if(count($partidas) < 1){
 							$index = count($partidas);
 							$respuesta['data']['code'] = 'U00';
-							$respuesta['data']['data'] = '{"field":"objeto-gasto-presupuesto_' . ($index + 1) . '","error":"Se deben seleccionar dos Partidas"}';
+							$respuesta['data']['data'] = '{"field":"objeto-gasto-presupuesto_1","error":"Se deben seleccionar al menos una Partida"}';
 							throw new Exception("Se deben seleccionar al menos dos partidas presupuestales", 1);
 						}
 
@@ -914,7 +914,7 @@ class FibapController extends BaseController {
 											$recurso->load('acciones');
 
 											//Borrar todo lo que no sea de este municipio por municipio
-											$distribucion_borrada = DistribucionPresupuesto::where('idFibap','=',$recurso->id)
+											$distribucion_borrada += DistribucionPresupuesto::where('idFibap','=',$recurso->id)
 																	->where('claveMunicipio','!=',$proyecto->claveMunicipio)
 																	->delete();
 											$desgloses = ComponenteDesglose::whereIn('idAccion',$recurso->acciones->lists('id'))
@@ -930,7 +930,7 @@ class FibapController extends BaseController {
 											$datos_extra['municipios'] = $region[0]->municipios;
 											$recurso->load('acciones');
 
-											$distribucion_borrada = DistribucionPresupuesto::where('idFibap','=',$recurso->id)
+											$distribucion_borrada += DistribucionPresupuesto::where('idFibap','=',$recurso->id)
 																	->whereNotIn('claveMunicipio',$region[0]->municipios->lists('clave'))
 																	->delete();
 											$desgloses = ComponenteDesglose::whereIn('idAccion',$recurso->acciones->lists('id'))

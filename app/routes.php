@@ -45,6 +45,10 @@ Route::group(array('before'=>'auth.sentry'), function(){
 	Route::group(array('prefix'=>'expediente'), function(){
 		Route::get('proyectos',array('uses'=>'ProyectosController@index'));
 		Route::any('caratula',array('uses'=>'ProyectosController@caratula'));
+		
+		Route::get('inversion',array('uses'=>'InversionController@index'));
+		Route::any('caratula-inversion/{id?}',array('uses'=>'InversionController@caratula'));
+		
 		Route::get('fibap',array('uses'=>'FibapController@index'));
 		Route::any('formulario-fibap',array('uses'=>'FibapController@formulario'));
 	});
@@ -61,6 +65,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('cuenta',			'V1\CuentaController');
 		
 		Route::resource('proyectos',		'V1\ProyectosController');
+		Route::resource('inversion',		'V1\InversionController');
 		Route::resource('reporteProyecto',	'V1\ReporteProyectoController', array('only' => array('show')));
 		Route::resource('fibap',			'V1\FibapController');
 	});

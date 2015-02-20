@@ -39,6 +39,11 @@
                         </a>
                     </li>
                     <li role="presentation" class="disabled">
+                        <a id="tablink-beneficiarios" href="#caratula-beneficiarios" role="tab">
+                            Beneficiarios <span class="badge">0</span>
+                        </a>
+                    </li>
+                    <li role="presentation" class="disabled">
                         <a id="tablink-componentes" href="#componentes" role="tab">
                             Componentes <span class="badge">0 / 2</span>
                         </a>
@@ -49,6 +54,10 @@
                     <div role="tabpanel" class="tab-pane active" id="caratula-captura">
                         <br>
                         {{$formulario}}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="caratula-beneficiarios">
+                        <br>
+                        {{$grid_beneficiarios}}
                     </div>
                     <div role="tabpanel" class="tab-pane" id="componentes">
                         <br>
@@ -103,6 +112,24 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary btn-guardar" id="btn-actividad-guardar">Guardar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="modalBeneficiario" tabindex="-1" role="dialog" aria-labelledby="modalBenefLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-85-screen">
+        <div class="modal-content modal-content-85-screen">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="modalBenefLabel">Nuevo</h4>
+            </div>
+            <div class="modal-body">
+                {{$formulario_beneficiario}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary btn-guardar" id="btn-beneficiario-guardar">Guardar</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
