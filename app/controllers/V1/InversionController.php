@@ -5,7 +5,8 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
 use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
-	FibapDatosProyecto, Titular, ComponenteDesglose, AntecedenteFinanciero, DesgloseMetasMes, DistribucionPresupuesto;
+	FibapDatosProyecto, Titular, ComponenteDesglose, AntecedenteFinanciero, DesgloseMetasMes, DistribucionPresupuesto,Accion,
+	PropuestaFinanciamiento;
 
 class InversionController extends ProyectosController {
 	private $reglasFibap = array(
@@ -124,7 +125,8 @@ class InversionController extends ProyectosController {
 									'fibap.documentos','beneficiarios.tipoBeneficiario')
 									->find($id);
 				if($recurso->fibap){
-					$recurso->fibap->load('antecedentesFinancieros');
+					$recurso->fibap->load('antecedentesFinancieros','acciones.datosComponenteDetalle');
+					$recurso->fibap->acciones->load('propuestasFinanciamiento');
 				}
 				if(!is_null($recurso)){
 					$extras = array();
@@ -149,6 +151,15 @@ class InversionController extends ProyectosController {
 										->where('idTipoBeneficiario','=',$id)->get();
 			}elseif ($parametros['mostrar'] == 'editar-antecedente') {
 				$recurso = AntecedenteFinanciero::find($id);
+			}elseif ($parametros['mostrar'] == 'editar-componente') {
+				# code...
+				$recurso = Accion::with('componente.actividades','partidas','propuestasFinanciamiento')->find($id);
+			}elseif ($parametros['mostrar'] == 'desglose-componente') {
+				# code...
+				$recurso = Accion::with('distribucionPresupuestoAgrupado','datosComponenteDetalle','partidas')->find($id);
+				if($recurso->distribucionPresupuestoAgrupado){
+					$recurso->distribucionPresupuestoAgrupado->load('jurisdiccion');
+				}
 			}
 		}
 
@@ -202,8 +213,13 @@ class InversionController extends ProyectosController {
 				}
 			}elseif($parametros['guardar'] == 'componente'){
 				$parametros['clasificacion'] = 2;
+				$parametros['datos_presupuesto'] = TRUE;
 				$respuesta = parent::guardar_datos_componente('componente',$parametros);
-				//Llenar datos adicionales
+				//
+				if($respuesta['data']['data']){
+					$componente = $respuesta['data']['data'];
+					$respuesta['data'] = $this->guardar_datos_accion_presupuesto($parametros,$componente);
+				}
 			}elseif($parametros['guardar'] == 'proyecto-beneficiario'){
 				$respuesta = parent::guardar_datos_beneficiario($parametros);
 			}elseif ($parametros['guardar'] == 'datos-fibap') {
@@ -300,6 +316,136 @@ class InversionController extends ProyectosController {
 		return Response::json($respuesta['data'],$respuesta['http_status']);
 	}
 
+	public function guardar_datos_accion_presupuesto($parametros,$componente,$id = NULL){
+		$es_editar = FALSE;
+		$respuesta = DB::transaction(function() use ($parametros,$componente,$id){
+			$fibap = FIBAP::find($parametros['id-fibap']);
+			if($fibap){
+				if($id){
+					$accion = Accion::with('propuestasFinanciamiento','partidas','componente')->find($id);
+					$es_editar = TRUE;
+				}else{
+					$accion = new Accion;
+				}
+				
+				$accion->idComponente = $componente->id;
+
+/**********************************************       Partidas Presupuestarias       **********************************************/
+				
+				$partidas_formulario = $parametros['objeto-gasto-presupuesto'];
+				if($es_editar){
+					$partidas_anteriores = $accion->partidas->lists('id');
+				}else{
+					$partidas_anteriores = array();
+				}
+
+				if($partidas_formulario[0] == $partidas_formulario[1]){
+					throw new Exception('{"field":"objeto-gasto-presupuesto","error":"Las partidas no deben ser iguales"}', 1);
+				}
+
+				//Sacamos las diferencias de las partidas seleccionadas y las ya capturadas
+				$partidas['nuevas'] = array_diff($partidas_formulario, $partidas_anteriores);
+				$partidas['borrar'] = array_diff($partidas_anteriores, $partidas_formulario);
+
+/***********************************       Origenes del presupuesto y presupuesto Requerido      ************************************/
+				//Obtenemos los origenes del presupuesto
+				$origenes = $parametros['accion-origen'];
+				$origenes_ids = array();
+				if(isset($parametros['origen-captura-id'])){
+					$origenes_ids = $parametros['origen-captura-id'];
+				}
+
+				//Arreglo con los objetos a guardar en la base de datos, relacionados a la Accion
+				$guardar_origenes = array();
+				$presupuesto_suma = 0;
+				foreach ($origenes as $origen => $valor) {
+					if(isset($origenes_ids[$origen])){
+						$origen_finan = $accion->propuestasFinanciamiento()->find($origenes_ids[$origen]);
+						$origen_finan->cantidad = ($valor)? $valor:0;
+						$guardar_origenes[] = $origen_finan;
+					}elseif($valor > 0){
+						$origen_finan = new PropuestaFinanciamiento;
+						$origen_finan->idOrigenFinanciamiento = $origen;
+						$origen_finan->cantidad = $valor;
+						$origen_finan->idFibap = $fibap->id;
+						$guardar_origenes[] = $origen_finan;
+					}
+					$presupuesto_suma += $valor;
+				}
+
+				if($es_editar){
+					if($presupuesto_suma != $accion->presupuestoRequerido){
+						//Obtenemos la suma de los presupuestos ya capturados y sumamos el nuevo presupuesto
+						$total_presupuesto = $fibap->acciones->sum('presupuestoRequerido');
+						$total_presupuesto += $presupuesto_suma;
+						//Quitamos el presupuesto anterior, de lo contrario sumara un presupuesto de más
+						$total_presupuesto -= $accion->presupuestoRequerido;
+
+						if($total_presupuesto > $fibap->presupuestoRequerido){
+							throw new Exception('{"field":"accion-presupuesto-requerido","error":"El presupuesto capturado sobrepasa el Presupuesto Requerido asignado al proyecto."}', 1);
+						}
+
+						$accion->presupuestoRequerido = $presupuesto_suma;
+					}
+				}else{
+					//Obtenemos la suma de los presupuestos ya capturados y sumamos el nuevo presupuesto
+					$total_presupuesto = $fibap->acciones->sum('presupuestoRequerido');
+					$total_presupuesto += $presupuesto_suma;
+
+					if($total_presupuesto > $fibap->presupuestoRequerido){
+						throw new Exception('{"field":"accion-presupuesto-requerido","error":"El presupuesto capturado sobrepasa el Presupuesto Requerido asignado al proyecto."}', 1);
+					}
+
+					$accion->presupuestoRequerido = $presupuesto_suma;
+				}
+				
+				if($fibap->acciones()->save($accion)){
+					$distribucion_total = NULL;
+					if(count($partidas['borrar'])){
+						$restar_de_distribucion = array();
+						$distribuciones = $accion->distribucionPresupuesto()
+												 ->whereIn('idObjetoGasto',$partidas['borrar'])->get();
+						if(count($distribuciones) > 0){
+							foreach ($distribuciones as $distribucion) {
+								if(isset($restar_de_distribucion[$distribucion->claveMunicipio][$distribucion->claveLocalidad])){
+									$restar_de_distribucion[$distribucion->claveMunicipio][$distribucion->claveLocalidad] += $distribucion->cantidad;
+								}else{
+									$restar_de_distribucion[$distribucion->claveMunicipio][$distribucion->claveLocalidad] = $distribucion->cantidad;
+								}
+							}
+							$desgloses = ComponenteDesglose::where('idAccion','=',$accion->id)->get();
+							$desgloses_editar = array();
+							foreach ($desgloses as $desglose) {
+								if(isset($restar_de_distribucion[$desglose->claveMunicipio][$desglose->claveLocalidad])){
+									$desglose->presupuesto -= $restar_de_distribucion[$desglose->claveMunicipio][$desglose->claveLocalidad];
+									$desgloses_editar[] = $desglose;
+								}
+							}
+
+							$accion->componente->desglose()->saveMany($desgloses_editar);
+							$accion->distribucionPresupuesto()->whereIn('idObjetoGasto',$partidas['borrar'])->delete();
+
+							$fibap->load('distribucionPresupuestoAgrupado.objetoGasto');
+							$distribucion_total = $fibap->distribucionPresupuestoAgrupado;
+						}
+						$accion->partidas()->detach($partidas['borrar']);
+					}
+					if(count($partidas['nuevas'])){
+						$accion->partidas()->attach($partidas['nuevas']);
+					}
+					
+					$accion->propuestasFinanciamiento()->saveMany($guardar_origenes);
+				}
+			}else{
+				throw new Exception("No se pudo encontrar la FIBAP", 1);
+			}
+			$fibap->load('acciones.datosComponenteDetalle');
+			$fibap->acciones->load('propuestasFinanciamiento');
+			return array('data'=>$accion,'acciones' => $fibap->acciones);
+		});
+		return $respuesta;
+	}
+
 	/**
 	 * Update the specified resource in storage.
 	 *
@@ -373,6 +519,15 @@ class InversionController extends ProyectosController {
 				}
 			}elseif($parametros['guardar'] == 'proyecto-beneficiario'){
 				$respuesta = parent::guardar_datos_beneficiario($parametros,$id);
+			}elseif($parametros['guardar'] == 'componente'){
+				$parametros['clasificacion'] = 2;
+				$parametros['datos_presupuesto'] = TRUE;
+				$respuesta = parent::guardar_datos_componente('componente',$parametros,$parametros['id-componente']);
+				//Llenar datos adicionales
+				if($respuesta['data']['data']){
+					$componente = $respuesta['data']['data'];
+					$respuesta['data'] = $this->guardar_datos_accion_presupuesto($parametros,$componente,$id);
+				}
 			}elseif($parametros['guardar'] == 'datos-fibap'){
 				/***
 				*	Editar datos generales de la FIBAP (PUT)

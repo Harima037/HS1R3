@@ -214,6 +214,7 @@ function llenar_datagrid_beneficiarios(datos){
 		//beneficiarios.push(beneficiario);
 		beneficiarios[datos[indx].idTipoBeneficiario] = beneficiario;
 	}
+	
 	for(var i in beneficiarios){
 		beneficiarios_grid.push(beneficiarios[i]);
 	}

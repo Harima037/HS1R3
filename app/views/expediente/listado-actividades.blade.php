@@ -9,7 +9,7 @@
                     <div class="col-lg-6">
                         <div class="btn-toolbar pull-right" >
                             <div class="btn-group" style="margin:5px">
-                                <button type="button" class="btn btn-primary btn-agregar-actividad">
+                                <button type="button" class="btn btn-primary btn-agregar-actividad" id="btn-agregar-actividad">
                                     <span class="glyphicon glyphicon-plus-sign"></span> Agregar Actividad
                                 </button>
                                 <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
