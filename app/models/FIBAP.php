@@ -8,7 +8,7 @@ class FIBAP extends BaseModel
 	protected $table = "fibap";
 
     public function scopeContenidoCompleto($query){
-        return $query->with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado');
+        return $query->with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado','acciones');
     }
 
 	public function proyecto(){

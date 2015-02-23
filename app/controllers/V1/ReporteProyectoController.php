@@ -1,11 +1,25 @@
 <?php
+/* 
+*	POA
+*	Programa Operativo Anual
+*
+*	PHP version 5.5.3
+*
+* 	Área de Informática, Dirección de Planeación y Desarrollo.
+*
+*	@copyright			Copyright 2015, Instituto de Salud.
+*	@author 			Donaldo Ríos
+*	@package 			poa
+*	@version 			1.0
+*	@comment 			
+*/
 
 namespace V1;
 
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, View;
-use Excel, Proyecto, ComponenteMetaMes, ActividadMetaMes;
+use Excel, Proyecto, FIBAP, ComponenteMetaMes, ActividadMetaMes;
 
 class ReporteProyectoController extends BaseController {
 
@@ -24,9 +38,9 @@ class ReporteProyectoController extends BaseController {
 		
 		//Datos para la hoja Programa Inversion
 		$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion','desgloseCompleto'));
-					foreach ($recurso->componentes as $key => $componente) {
-						$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
-					}
+		foreach ($recurso->componentes as $key => $componente) {
+			$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
+		}
 		//Datos para la hoja Metas por Jurisdicción
 		$componentesMetasJuris = ComponenteMetaMes::select('idComponente', 'claveJurisdiccion', DB::raw('sum(meta) as sumeta'))
 												->where('idProyecto',$idProyecto)->groupBy('claveJurisdiccion','idComponente')->get();
@@ -36,23 +50,32 @@ class ReporteProyectoController extends BaseController {
 
 	 	$recurso['componentesMetasJuris'] = $componentesMetasJuris;
 	 	$recurso['actividadesMetasJuris'] = $actividadesMetasJuris;
-	 	
-	 	//if($recurso->idClasificacionProyecto == 2){
-		 	//Datos para la hoja Metas Por Mes
-		 	$componentesMetasMes = ComponenteMetaMes::select('idComponente', 'mes', DB::raw('sum(meta) as sumeta'))
-													->where('idProyecto',$idProyecto)->groupBy('mes','idComponente')->get();
 
-			$actividadesMetasMes = ActividadMetaMes::select('idActividad', 'mes', DB::raw('sum(meta) as sumeta'))
-													->where('idProyecto',$idProyecto)->groupBy('mes','idActividad')->get();
+	 	//Datos para la hoja Metas Por Mes
+	 	$componentesMetasMes = ComponenteMetaMes::select('idComponente', 'mes', DB::raw('sum(meta) as sumeta'))
+												->where('idProyecto',$idProyecto)->groupBy('mes','idComponente')->get();
 
-			$recurso['componentesMetasMes'] = $componentesMetasMes;
-		 	$recurso['actividadesMetasMes'] = $actividadesMetasMes;
-		//}
+		$actividadesMetasMes = ActividadMetaMes::select('idActividad', 'mes', DB::raw('sum(meta) as sumeta'))
+												->where('idProyecto',$idProyecto)->groupBy('mes','idActividad')->get();
+
+		$recurso['componentesMetasMes'] = $componentesMetasMes;
+	 	$recurso['actividadesMetasMes'] = $actividadesMetasMes;
+
+	 	//Si es proyecto de inversión se obtiene el FIBAP relacionado
+	 	$fibap = null;
+	 	if($recurso->idClasificacionProyecto == 2){
+
+	 		$fibap = FIBAP::contenidoCompleto()->where('idProyecto',$idProyecto)->first();
+	 		$fibap->distribucion_presupuesto_agrupado->load(array('ObjetoGasto'));
+	 	}
+
+	 	$recurso['fibap'] = $fibap->toArray();
 
 		$data = array("data"=> $recurso);
 
 		//var_dump($recurso->toArray());die();
-		//return View::make('expediente.excel.programa')->with($data);die();
+
+		//return View::make('expediente.excel.fibap')->with($data);
 
 		$nombreArchivo = ($recurso->idClasificacionProyecto== 2) ? 'Carátula Proyecto Inversión' : 'Carátula Proyecto Institucional';
 		$nombreArchivo.=' - '.$recurso->ClavePresupuestaria;
@@ -237,7 +260,7 @@ class ReporteProyectoController extends BaseController {
 
 		    });
 
-			$excel->sheet('Anexo por Jurisdicción', function($sheet)  use ($data){
+				$excel->sheet('Anexo por Jurisdicción', function($sheet)  use ($data){
 
 		        $sheet->loadView('expediente.excel.anexoPorJurisdiccion', $data);
 		        $sheet->setWidth('A', 30);
@@ -252,6 +275,77 @@ class ReporteProyectoController extends BaseController {
 		        $sheet->setWidth('B', 25);
 
 		    });
+
+		    if($data['data']->idClasificacionProyecto == 2){
+		    	$excel->sheet('FIBAP', function($sheet)  use ($data){
+
+			        $sheet->setStyle(array(
+					    'font' => array(
+					        'name'      =>  'Calibri',
+					        'size'      =>  9
+					    )
+					));
+			        $sheet->loadView('expediente.excel.fibap', $data);
+			        $sheet->setWidth('A', 13);
+			        $sheet->setWidth('B', 17);
+			        $sheet->setWidth('C', 5);
+			        $sheet->setWidth('D', 5);
+			        $sheet->setWidth('E', 10);
+			        $sheet->setWidth('F', 6);
+			        $sheet->setWidth('G', 11);
+			        $sheet->setWidth('H', 5);
+			        $sheet->setWidth('I', 5);
+			        $sheet->setWidth('J', 7);
+			        $sheet->setWidth('K', 9);
+			        $sheet->setWidth('L', 10);
+			        $sheet->setWidth('M', 5);
+			        $sheet->setWidth('N', 3);
+			        $sheet->setWidth('O', 10);
+			        $sheet->setWidth('P', 10);
+			        $sheet->setWidth('Q', 10);
+			        $sheet->setWidth('R', 10);
+
+			        $sheet->setBorder('A6:R6', 'thin');
+			        $sheet->setBorder('A8:R11', 'thin');
+			        $sheet->setBorder('A15:R17', 'thin');
+			        $sheet->setBorder('A21:E21', 'thin');
+			        $sheet->setBorder('K21:R21', 'thin');
+			        $sheet->setBorder('C24:C27', 'thin');
+			        $sheet->setBorder('H24:H27', 'thin');
+			        $sheet->setBorder('M25:M27', 'thin');
+			        $sheet->setBorder('O24:R26', 'thin');
+
+			        $fila = 32;
+
+			        foreach($data['data']['fibap']['antecedentes_financieros'] as $antecedente){
+				        $sheet->setBorder('A'.($fila), 'thin');
+				        $sheet->setBorder('C'.($fila).':E'.($fila), 'thin');
+				        $sheet->setBorder('G'.($fila), 'thin');
+				        $sheet->setBorder('I'.($fila), 'thin');
+				        $sheet->setBorder('L'.($fila).':R'.($fila), 'thin');
+				        $fila++;
+			    	}
+			    	$fila+=2;
+			    	$sheet->setBorder('A'.($fila).':I'.($fila+1), 'thin');
+			    	$sheet->setBorder('L'.($fila).':R'.($fila+1), 'thin');
+			    	$fila+=3;
+			    	$sheet->setBorder('A'.($fila).':R'.($fila+1), 'thin');
+			    	$fila+=3;
+			    	$sheet->setBorder('A'.($fila).':R'.($fila), 'thin');
+			    	$fila+=3;
+			    	$sheet->setBorder('C'.($fila).':E'.($fila+1), 'thin');
+			    	$sheet->setBorder('H'.($fila).':K'.($fila+2), 'thin');
+			    	$sheet->setBorder('O'.($fila).':Q'.($fila+2), 'thin');
+			    	$fila+=7;
+			    	foreach($data['data']['fibap']['distribucion_presupuesto_agrupado'] as $distribucion){
+			    		$sheet->setBorder('A'.($fila).':E'.($fila), 'thin');
+			    		$sheet->setBorder('G'.($fila).':O'.($fila), 'thin');
+			    		$sheet->setBorder('Q'.($fila), 'thin');
+			    		$fila++;
+			    	}
+			    });
+
+		    }
 
 		})->export('xls');
 

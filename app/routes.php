@@ -1,27 +1,17 @@
 <?php
 /* 
-*	CIUM
-*	Captura de Indicadores de Unidades Médicas
+*	POA
+*	Programa Operativo Anual
 *
 *	PHP version 5.5.3
 *
 * 	Área de Informática, Dirección de Planeación y Desarrollo.
 *
-*	@copyright			Copyright 2014, Instituto de Salud.
-*	@author 			Mario Cabrera, Donaldo Rios
-*	@package 			cium
+*	@copyright			Copyright 2015, Instituto de Salud.
+*	@author 			Mario Cabrera, Donaldo Ríos
+*	@package 			poa
 *	@version 			1.0 
 *	@comment 			
-*/
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It's a breeze. Simply tell Laravel the URIs it should respond to
-| and give it the Closure to execute when that URI is requested.
-|
 */
 
 //Procesa el formulario e identifica al usuario
