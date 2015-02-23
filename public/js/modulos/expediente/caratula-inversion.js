@@ -53,8 +53,17 @@ if($('#id').val()){
 			$('#tab-link-caratula-beneficiarios').attr('data-toggle','tab');
 			$('#tab-link-caratula-beneficiarios').parent().removeClass('disabled');
 
+			if(response.extras.municipios){
+        		fibapAcciones.cargar_municipios(response.extras.municipios);
+        	}
+        	
+        	if(response.extras.jurisdicciones){
+        		fibapAcciones.cargar_jurisdicciones(response.extras.jurisdicciones);
+        	}
+
 			if(response.data.beneficiarios){
 				caratulaBeneficiario.llenar_datagrid(response.data.beneficiarios);
+				fibapAcciones.actualizar_lista_beneficiarios(response.data.beneficiarios);
 				cambiar_icono_tabs('#tab-link-caratula-beneficiarios','fa-check-square-o');
 			}
 
@@ -69,14 +78,15 @@ if($('#id').val()){
 				fibapAntecedentes.init(response.data.fibap.id,proyectoResource);
 				fibapAcciones.init(response.data.fibap.id,proyectoResource);
 				fibapAcciones.actualizar_total_presupuesto(response.data.fibap.presupuestoRequerido);
-				fibapAcciones.actualizar_metas_mes('componente',response.extras.jurisdicciones);
+				fibapAcciones.actualizar_metas_mes(response.extras.jurisdicciones);
 
 				if(response.data.fibap.antecedentes_financieros){
 					fibapAntecedentes.llenar_datagrid(response.data.fibap.antecedentes_financieros);
 				}
 
 				if(response.data.fibap.acciones){
-
+					cambiar_icono_tabs('#tab-link-acciones-fibap','fa-check-square-o');
+					fibapAcciones.llenar_datagrid(response.data.fibap.acciones);
 				}
 
 				$('#tab-link-antecedentes-fibap').attr('data-toggle','tab');
@@ -115,10 +125,19 @@ function editar_antecedente(e){
 }
 
 function editar_beneficiario(e){
-	var parametros = {'mostrar':'editar-beneficiario','id-proyecto':$('#id').val()}
+	var parametros = {'mostrar':'editar-beneficiario','id-proyecto':$('#id').val()};
 	proyectoResource.get(e,parametros,{
 		_success: function(response){
 			caratulaBeneficiario.mostrar_datos(response.data);
+		}
+	});
+}
+
+function editar_accion(e){
+	var parametros = {'mostrar':'editar-componente'};
+	proyectoResource.get(e,parametros,{
+		_success: function(response){
+			fibapAcciones.mostrar_datos(response.data);
 		}
 	});
 }
@@ -137,28 +156,41 @@ $('#btn-componente-guardar').on('click',function(){
 function guardar_datos_componente(cerrar){
 	Validation.cleanFormErrors(form_componente);
 	var parametros = $(form_componente).serialize();
-	parametros = parametros + '&guardar=componente';
-	parametros = parametros + '&id-proyecto='+$('#id').val();
+	parametros += '&guardar=componente';
+	parametros += '&id-proyecto=' + $('#id').val();
+	parametros += '&id-fibap=' + $('#id-fibap').val();
 	//parametros = parametros + '&clasificacion='+$('#clasificacionproyecto').val();
 
-	if($('#id-componente').val()){
-		/*var cadena_metas = '';
+	if($('#id-accion').val()){
+		var cadena_metas = '';
 		$(form_componente + ' .metas-mes').each(function(){
 			if($(this).data('meta-id')){
 				cadena_metas = cadena_metas + '&mes-componente-id['+$(this).data('meta-jurisdiccion')+']['+$(this).data('meta-mes')+']='+$(this).data('meta-id');
 			}
 		});
 		parametros = parametros + cadena_metas;
-		proyectoResource.put($('#id-componente').val(),parametros,{
+
+		var lista_origenes_id = '';
+		$('.accion-origen-financiamiento').each(function(){
+			if($(this).attr('data-captura-id')){
+				lista_origenes_id += '&origen-captura-id[' + $(this).data('origen-id') + ']=' + $(this).attr('data-captura-id');
+			}
+		});
+		parametros += lista_origenes_id;
+
+		proyectoResource.put($('#id-accion').val(),parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Datos del componente almacenados con éxito',type:'OK',timer:3});
+	            fibapAcciones.llenar_datagrid(response.acciones);
+
 	            if(cerrar){
 					$(modal_componente).modal('hide');
 				}else{
 					$('#tablink-componente-actividades').tab('show');
+					if(response.metas){
+						fibapAcciones.actualizar_metas_ids('componente',response.metas);
+					}
 				}
-				actualizar_grid_componentes(response.componentes);
-				actualizar_metas('componente',response.metas);
 	        },
 	        _error: function(response){
 	            try{
@@ -173,22 +205,25 @@ function guardar_datos_componente(cerrar){
 	                console.log(e);
 	            }                       
 	        }
-	    });*/
+	    });
 	}else{
 		proyectoResource.post(parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Datos del componente almacenados con éxito',type:'OK',timer:3});
-	            $(form_componente + ' #id-componente').val(response.data.id);
-	            
+	            fibapAcciones.llenar_datagrid(response.acciones);
+
 	            if(cerrar){
 					$(modal_componente).modal('hide');
 				}else{
+					$(form_componente + ' #id-componente').val(response.data.idComponente);
+					$(form_componente + ' #id-accion').val(response.data.id);
 					$('#tablink-componente-actividades').attr('data-toggle','tab');
 					$('#tablink-componente-actividades').parent().removeClass('disabled');
 					$('#tablink-componente-actividades').tab('show');
+					if(response.metas){
+						fibapAcciones.actualizar_metas_ids('componente',response.metas);
+					}
 				}
-				actualizar_grid_componentes(response.componentes);
-				actualizar_metas('componente',response.metas);
 	        },
 	        _error: function(response){
 	            try{
@@ -210,10 +245,6 @@ function guardar_datos_componente(cerrar){
 $('#btn-proyecto-guardar').on('click',function(){
 	caratulaProyecto.limpiar_errores();
 
-	/*if(caratulaProyecto.checar_errores()){
-		return false;
-	}*/
-
 	var parametros = $(form_caratula).serialize();
 	parametros = parametros + '&guardar=proyecto';
 	
@@ -226,6 +257,7 @@ $('#btn-proyecto-guardar').on('click',function(){
 	            		fibapAcciones.cargar_municipios(response.extras.municipios);
 	            	}
 	            	if(response.extras.jurisdicciones){
+	            		fibapAcciones.actualizar_metas_mes(response.extras.jurisdicciones);
 	            		fibapAcciones.cargar_jurisdicciones(response.extras.jurisdicciones);
 	            	}
 	            }
@@ -255,6 +287,15 @@ $('#btn-proyecto-guardar').on('click',function(){
 				$('#tab-link-datos-fibap').parent().removeClass('disabled');
 				$('#tab-link-caratula-beneficiarios').attr('data-toggle','tab');
 				$('#tab-link-caratula-beneficiarios').parent().removeClass('disabled');
+				if(response.extras){
+					if(response.extras.municipios){
+	            		fibapAcciones.cargar_municipios(response.extras.municipios);
+	            	}
+					if(response.extras.jurisdicciones){
+						fibapAcciones.actualizar_metas_mes(response.extras.jurisdicciones);
+						fibapAcciones.cargar_jurisdicciones(response.extras.jurisdicciones);
+					}
+				}
 	        },
 	        _error: function(response){
 	            try{

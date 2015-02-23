@@ -188,40 +188,27 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label class="control-label">
-                                    Beneficiarios
-                                </label>
-                                <p class="form-control-static" id="tipo_beneficiario_texto">
-                                    Tipo Beneficiario
-                                </p>
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label class="control-label" for="beneficiarios-f">Femenino</label>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><span class="fa fa-female"></span></span>
-                                    <input type="number" class="form-control benef-totales-accion" name="beneficiarios-f" id="beneficiarios-f">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label class="control-label" for="beneficiarios-m">Masculino</label>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><span class="fa fa-male"></span></span>
-                                    <input type="number" class="form-control benef-totales-accion" name="beneficiarios-m" id="beneficiarios-m">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="form-group">
-                                <label class="control-label"><span class="fa fa-link"></span> Total</label>
-                                <span class="form-control control-espejo" data-espejo-id="#total-beneficiarios-accion"></span>
-                                <input type="hidden" id="total-beneficiarios-accion">
-                            </div>
+                        <div class="col-sm-12">
+                            <table id="tabla_beneficiarios" class="table table-condensed table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo Beneficiario</th>
+                                        <th width="20%"><span class="fa fa-female"></span> Femenino</th>
+                                        <th width="20%"><span class="fa fa-male"></span> Masculino</th>
+                                        <th width="20%">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3"></td>
+                                        <td>
+                                            <span class="form-control" id="total-beneficiarios-lbl"></span>
+                                            <input type="hidden" id="total-beneficiarios" name="total-beneficiarios">
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
                         <div class="col-sm-12">
                             <div class="form-group">
@@ -250,16 +237,8 @@
                                 <div class="row">
                                     @foreach ($meses as $clave => $mes)
                                         <div class="col-sm-3">
-                                            <div class="form-group" data-grupo-mes="{{$clave}}">
+                                            <div class="form-group grupo-partidas" data-grupo-mes="{{$clave}}">
                                                 <label class="control-label">{{$mes}}</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-addon clave-partida-1">000</span>
-                                                    <input id="mes-1-{{$clave}}" name="mes[1][{{$clave}}]" type="number" class="form-control input-sm presupuesto-mes valor-partida-1" data-presupuesto-mes="{{$clave}}" data-presupuesto-id="">
-                                                </div>
-                                                <div class="input-group">
-                                                    <span class="input-group-addon clave-partida-2">000</span>
-                                                    <input id="mes-2-{{$clave}}" name="mes[2][{{$clave}}]" type="number" class="form-control input-sm presupuesto-mes valor-partida-2" data-presupuesto-mes="{{$clave}}" data-presupuesto-id="">
-                                                </div>
                                             </div>
                                         </div>
                                     @endforeach
@@ -271,7 +250,7 @@
                                                     <span class="fa fa-link"></span> Total
                                                 </span>
                                                 <input type="hidden" id="cantidad-presupuesto" name="cantidad-presupuesto"/>
-                                                <span class="form-control control-espejo" data-espejo-id="#cantidad-presupuesto"></span>
+                                                <span class="form-control" id="cantidad-presupuesto-lbl"></span>
                                             </div>
                                         </div>
                                     </div>
@@ -319,28 +298,28 @@
                                             <div class="col-sm-3">
                                                 <div class="form-group">
                                                     <label class="control-label"><span class="fa fa-link"></span> Trim 1</label>
-                                                    <span class="form-control control-espejo" data-espejo-id="#trim1"></span>
+                                                    <span class="form-control" id="trim1-lbl"></span>
                                                     <input type="hidden" id="trim1" name="trim1">
                                                 </div>
                                             </div>
                                             <div class="col-sm-3">
                                                 <div class="form-group">
                                                     <label class="control-label"><span class="fa fa-link"></span> Trim 2</label>
-                                                    <span class="form-control control-espejo" data-espejo-id="#trim2"></span>
+                                                    <span class="form-control" id="trim2-lbl"></span>
                                                     <input type="hidden" id="trim2" name="trim2">
                                                 </div>
                                             </div>
                                             <div class="col-sm-3">
                                                 <div class="form-group">
                                                     <label class="control-label"><span class="fa fa-link"></span> Trim 3</label>
-                                                    <span class="form-control control-espejo" data-espejo-id="#trim3"></span>
+                                                    <span class="form-control" id="trim3-lbl"></span>
                                                     <input type="hidden" id="trim3" name="trim3">
                                                 </div>
                                             </div>
                                             <div class="col-sm-3">
                                                 <div class="form-group">
                                                     <label class="control-label"><span class="fa fa-link"></span> Trim 4</label>
-                                                    <span class="form-control control-espejo" data-espejo-id="#trim4"></span>
+                                                    <span class="form-control" id="trim4-lbl"></span>
                                                     <input type="hidden" id="trim4" name="trim4">
                                                 </div>
                                             </div>
@@ -350,7 +329,7 @@
                                         <div class="form-group">
                                             <label><span class="fa fa-link"></span> Total</label>
                                             <input type="hidden" id="cantidad-meta" name="cantidad-meta"/>
-                                            <span class="form-control control-espejo" data-espejo-id="#cantidad-meta"></span>
+                                            <span class="form-control" id="cantidad-meta-lbl"></span>
                                         </div>
                                     </div>
                                 </div>

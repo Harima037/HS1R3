@@ -266,6 +266,7 @@
                 </div>
             </div>
         </div>
+        <input type="hidden" id="id-accion" name="id-accion">
         <input type="hidden" id="id-{{$identificador}}" name="id-{{$identificador}}">
         @if(isset($lista_actividades))
         <div role="tabpanel" class="tab-pane" id="actividades_{{$identificador}}">
@@ -280,7 +281,7 @@
             <div class="row">
                 <div class="col-sm-9">
                     <div class="form-group">
-                        <select class="form-control chosen-one" id="objeto-gasto">
+                        <select class="form-control chosen-one" id="objeto-gasto-presupuesto">
                             <option value="">Seleciona una partida</option>
                             @foreach ($objetos_gasto as $capitulo)
                                 @if(count($capitulo->hijos))
@@ -358,7 +359,7 @@
                         <label for="accion-presupuesto-requerido" class="control-label">
                             <span class="fa fa-link"></span> Presupuesto Requerido
                         </label>
-                        <span class="form-control control-espejo" data-espejo-id="#accion-presupuesto-requerido"></span>
+                        <span class="form-control" id="accion-presupuesto-requerido-lbl"></span>
                         <input type="hidden" id="accion-presupuesto-requerido" name="accion-presupuesto-requerido"/>
                     </div>
                 </div>

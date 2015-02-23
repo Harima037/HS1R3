@@ -5,7 +5,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception;
 use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
-	FibapDatosProyecto, Titular, ComponenteDesglose;
+	FibapDatosProyecto, Titular, ComponenteDesglose, Accion, PropuestaFinanciamiento, DistribucionPresupuesto;
 
 class ProyectosController extends BaseController {
 	private $reglasProyecto = array(
@@ -546,25 +546,35 @@ class ProyectosController extends BaseController {
 
 		$proyecto = Proyecto::find($parametros['id-proyecto']);
 		
+		if($id){
+			$es_editar = TRUE;
+			$componente = Componente::find($id);
+		}else{
+			$componente = new Componente;
+		}
+
 		if(!$proyecto){
 			throw new Exception("No se pudo encontrar el proyecto al que pertenece este componente", 1);
 		}
+		if(!$es_editar){
+			if($selector == 'componente'){
+				$proyecto->load('componentes');
 
-		if($selector == 'componente'){
-			$proyecto->load('componentes');
+				if(count($proyecto->componentes) == 2){
+					$respuesta['data']['data'] = 'El proyecto no puede tener mas de 2 componentes.';
+					throw new Exception("No esta permitido guardar mas de 2 componentes por cada proyecto", 1);
+				}
+			}else{
+				/*$proyecto->load('acciones');
 
-			if(count($proyecto->componentes) == 2){
-				$respuesta['data']['data'] = 'El proyecto no puede tener mas de 2 componentes.';
-				throw new Exception("No esta permitido guardar mas de 2 componentes por cada proyecto", 1);
-			}
-		}else{
-			$proyecto->load('acciones');
-
-			if(count($proyecto->acciones) == 5){
-				$respuesta['data']['data'] = 'El componente no puede tener mas de 5 acciones.';
-				throw new Exception("No esta permitido guardar mas de 5 acciones por cada componente", 1);
+				if(count($proyecto->acciones) == 5){
+					$respuesta['data']['data'] = 'El componente no puede tener mas de 5 acciones.';
+					throw new Exception("No esta permitido guardar mas de 5 acciones por cada componente", 1);
+				}*/
 			}
 		}
+		
+
 		if($selector == 'componente'){
 			if($parametros['clasificacion'] == 2){
 				$this->reglasComponente['entregable'] = 'required';
@@ -573,12 +583,15 @@ class ProyectosController extends BaseController {
 			}
 		}
 
+		/*if(isset($parametros['datos_presupuesto'])){
+			$this->reglasComponente['accion-presupuesto-requerido']	= 'required|numeric|min:1';
+			$this->reglasComponente['objeto-gasto-presupuesto']		= 'required|array|min:1';
+		}*/
+
 		$validacion = Validador::validar(Input::all(), $this->reglasComponente);
 
 		if($validacion === TRUE){
-			$componente = new Componente;
 
-			//$componente->idProyecto = $parametros['id-proyecto'];
 			$componente->objetivo 				= $parametros['descripcion-obj-componente'];
 			$componente->mediosVerificacion 	= $parametros['verificacion-componente'];
 			$componente->supuestos 				= $parametros['supuestos-componente'];
@@ -591,17 +604,14 @@ class ProyectosController extends BaseController {
 			$componente->idFrecuenciaIndicador 	= $parametros['frecuencia-componente'];
 			$componente->idTipoIndicador 		= $parametros['tipo-ind-componente'];
 			$componente->idUnidadMedida 		= $parametros['unidad-medida-componente'];
-			$componente->metaIndicador 			= $parametros['meta-componente'];
+			$componente->metaIndicador 			= ($parametros['meta-componente'])?$parametros['meta-componente']:NULL;
 			$componente->numeroTrim1 			= ($parametros['trim1-componente'])?$parametros['trim1-componente']:NULL;
 			$componente->numeroTrim2 			= ($parametros['trim2-componente'])?$parametros['trim2-componente']:NULL;
 			$componente->numeroTrim3 			= ($parametros['trim3-componente'])?$parametros['trim3-componente']:NULL;
 			$componente->numeroTrim4 			= ($parametros['trim4-componente'])?$parametros['trim4-componente']:NULL;
-			$componente->valorNumerador 		= $parametros['numerador-componente'];
-			if($componente->idFormula == 7){
-				$componente->valorDenominador 	= NULL;
-			}else{
-				$componente->valorDenominador 	= $parametros['denominador-componente'];
-			}
+			$componente->valorNumerador 		= ($parametros['numerador-componente'])?$parametros['numerador-componente']:NULL;
+			$componente->valorDenominador 		= ($parametros['denominador-componente'])?$parametros['denominador-componente']:NULL;
+			
 			$componente->lineaBase 				= ($parametros['linea-base-componente'])?$parametros['linea-base-componente']:NULL;
 			$componente->anioBase 				= ($parametros['anio-base-componente'])?$parametros['anio-base-componente']:NULL;
 
@@ -615,29 +625,39 @@ class ProyectosController extends BaseController {
 
 			$respuesta['data'] = DB::transaction(function() use ($parametros, $proyecto, $componente){
 				if($proyecto->componentes()->save($componente)){
-					$componente->load('usuario');
-					$proyecto->componentes[] = $componente;
+					//$componente->load('usuario');
+					//$proyecto->componentes[] = $componente;
 
 					$jurisdicciones = $parametros['mes-componente']; //Arreglo que contiene los datos [jurisdiccion][mes] = valor
+
+					if(isset($parametros['mes-componente-id'])){
+						$ides = $parametros['mes-componente-id'];
+					}else{
+						$ides = array();
+					}
 
 					$metasMes = array();
 
 					foreach ($jurisdicciones as $clave => $meses) {
 						foreach ($meses as $mes => $valor) {
-							if($valor > 0){
+							if(isset($ides[$clave][$mes])){
+								$meta = ComponenteMetaMes::find($ides[$clave][$mes]);
+								$meta->meta = $valor;
+								$metasMes[] = $meta;
+							}elseif($valor > 0){
 								$meta = new ComponenteMetaMes;
 								$meta->claveJurisdiccion = $clave;
 								$meta->mes = $mes;
 								$meta->meta = $valor;
-								$meta->idProyecto = $componente->idProyecto;
+								$meta->idProyecto = $recurso->idProyecto;
 								$metasMes[] = $meta;
 							}
 						}
 					}
-					
+
 					$componente->metasMes()->saveMany($metasMes);
-					$proyecto->componentes->load('unidadMedida');
-					return array('data'=>$componente,'componentes'=>$proyecto->componentes,'metas'=>$metasMes);
+					return array('data'=>$componente);	
+					//return array('data'=>$componente,'componentes'=>$proyecto->componentes,'metas'=>$metasMes);
 				}else{
 					throw new Exception("Ocurrió un error al guardar el componente.", 1);
 				}
@@ -949,7 +969,7 @@ class ProyectosController extends BaseController {
 			}
 			
 			//, $componentes, $fibap, $beneficiarios,  
-			DB::transaction(function() use ($recurso, $respuesta, $nuevas_jurisdicciones){
+			DB::transaction(function() use ($recurso, $respuesta, $nuevas_jurisdicciones, $es_editar){
 				if($recurso->save()){
 					
 					if($nuevas_jurisdicciones){
@@ -958,6 +978,45 @@ class ProyectosController extends BaseController {
 							$claves[] = 'OC';
 							ComponenteMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
 							ActividadMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
+						}
+					}
+
+					//Si el proyecto es de Inversión checas si hay fibap, para actualizar la cobertura
+					if($es_editar && $recurso->idClasificacionProyecto == 2){
+						$recurso->load('fibap');
+						if($recurso->fibap){
+							//Nos servira para borrar las metas por mes de los desgloses
+							$desgloses = FALSE;
+							if($recurso->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
+								if($recurso->claveMunicipio != $respuesta['data']['datos-anteriores']['claveMunicipio']){
+									//Obtenemos el municipio seleccionado
+									$recurso->fibap->load('acciones');
+
+									//Borrar todo lo que no sea de este municipio por municipio
+									DistribucionPresupuesto::where('idFibap','=',$recurso->fibap->id)
+															->where('claveMunicipio','!=',$recurso->claveMunicipio)
+															->delete();
+									$desgloses = ComponenteDesglose::whereIn('idAccion',$recurso->fibap->acciones->lists('id'))
+														->where('claveMunicipio','!=',$recurso->claveMunicipio);
+								}
+							}elseif($recurso->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
+								if($recurso->claveRegion != $respuesta['data']['datos-anteriores']['claveRegion']){
+									$region = Region::with('municipios.localidades')->where('region','=',$recurso->claveRegion)->get();
+									$recurso->fibap->load('acciones');
+
+									DistribucionPresupuesto::where('idFibap','=',$recurso->fibap->id)
+															->whereNotIn('claveMunicipio',$region[0]->municipios->lists('clave'))
+															->delete();
+									$desgloses = ComponenteDesglose::whereIn('idAccion',$recurso->fibap->acciones->lists('id'))
+														->whereNotIn('claveMunicipio',$region[0]->municipios->lists('clave'));
+								}
+							}
+							
+							if($desgloses){
+								DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses->get()->lists('id'))->delete();
+								//Actualizar desglose del componente
+								$desgloses->delete();
+							}
 						}
 					}
 				}else{

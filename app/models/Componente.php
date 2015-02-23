@@ -12,10 +12,25 @@ class Componente extends BaseModel
 							'entregableTipo','entregableAccion','desgloseCompleto');
 	}
 
+	public function scopeMostrarDatos($query){
+    	$query->select('proyectoComponentes.id','proyectoComponentes.idEntregable','idEntregableTipo', 
+    					'idEntregableAccion','idUnidadMedida','indicador','entregable.descripcion AS entregable',
+						'entregableTipo.descripcion AS entregableTipo','entregableAccion.descripcion AS entregableAccion',
+						'unidadMedida.descripcion AS unidadMedida')
+    			->leftjoin('catalogoEntregables AS entregable','entregable.id','=','idEntregable')
+    			->leftjoin('catalogoEntregablesTipos AS entregableTipo','entregableTipo.id','=','idEntregableTipo')
+    			->leftjoin('catalogoEntregablesAcciones AS entregableAccion','entregableAccion.id','=','idEntregableAccion')
+    			->leftjoin('catalogoUnidadesMedida AS unidadMedida','unidadMedida.id','=','idUnidadMedida');
+    }
+
+    public function accion(){
+    	return $this->hasOne('Accion','idComponente');
+    }
+	
 	public function desglose(){
 		return $this->hasMany('ComponenteDesglose','idComponente');
 	}
-
+	
 	public function desgloseCompleto(){
 		return $this->hasMany('ComponenteDesglose','idComponente')->listarDatos()->with('metasMes');
 	}
