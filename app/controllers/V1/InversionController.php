@@ -200,6 +200,10 @@ class InversionController extends ProyectosController {
 					
 					$respuesta['data']['extras'] = $extras;
 				}
+			}elseif($parametros['guardar'] == 'componente'){
+				$parametros['clasificacion'] = 2;
+				$respuesta = parent::guardar_datos_componente('componente',$parametros);
+				//Llenar datos adicionales
 			}elseif($parametros['guardar'] == 'proyecto-beneficiario'){
 				$respuesta = parent::guardar_datos_beneficiario($parametros);
 			}elseif ($parametros['guardar'] == 'datos-fibap') {

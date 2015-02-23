@@ -163,6 +163,10 @@ context.quitar_partida_componente = function(id){
     $('#objeto-gasto-' + id).remove();
 };
 
+context.actualizar_metas_mes = function(identificador,jurisdicciones){
+    actualizar_tabla_metas_mes(identificador,jurisdicciones);
+};
+
 /***********************************************************************************************
                     Funciones Privadas
 ************************************************************************************************/
@@ -311,6 +315,84 @@ function llenar_select_municipios(datos){
                                         .attr('disabled',true)
                                         .addClass('hidden')
                                         .val(this.clave).text(this.nombre));
+    });
+}
+
+function actualizar_tabla_metas_mes(identificador,jurisdicciones){
+    var tabla_id = '#tabla-'+identificador+'-metas-mes';
+    var meses = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+
+    var html = '';
+    var indx,idx;
+    //var llaves = Object.keys(jurisdicciones).sort(); //Se ordenan las llaves
+
+    //for(var index in llaves){
+    for(var i in jurisdicciones){
+        //indx = llaves[index];
+        html += '<tr>';
+        //html += '<th>'+jurisdicciones[indx]+'</th>';
+        html += '<th>'+jurisdicciones[i].clave+'</th>';
+        for(idx in meses){
+            id_mes = parseInt(idx) + 1;
+            html += '<td><input id="mes-'+identificador+'-'+jurisdicciones[i].clave+'-'+id_mes+'" name="mes-'+identificador+'['+jurisdicciones[i].clave+']['+id_mes+']" type="number" class="form-control input-sm metas-mes" data-meta-mes="'+id_mes+'" data-meta-jurisdiccion="'+jurisdicciones[i].clave+'" data-meta-identificador="'+identificador+'" data-meta-id=""></td>';
+        }
+        html += '</tr>';
+    }
+
+    html += '<tr><th>O.C.</th>';
+    for(idx in meses){
+        id_mes = parseInt(idx) + 1;
+        html += '<td><input id="mes-'+identificador+'-OC-'+id_mes+'" name="mes-'+identificador+'[OC]['+id_mes+']" type="number" class="form-control input-sm metas-mes" data-meta-mes="'+id_mes+'" data-meta-jurisdiccion="OC" data-meta-identificador="'+identificador+'" data-meta-id=""></td>';
+    }
+    html += '</tr>';
+
+    $(tabla_id + ' tbody').empty();
+    $(tabla_id + ' tbody').html(html);
+    actualizar_eventos_metas();
+}
+
+function actualizar_eventos_metas(){
+    $('.metas-mes').off('change');
+    $('.metas-mes').on('change',function(){
+        var mes = $(this).data('meta-mes');
+        var trimestre = Math.ceil(mes/3);
+        var identificador = $(this).data('meta-identificador');
+        
+        var suma = 0;
+        var mes_inicio = 0;
+        var mes_fin = 0;
+
+        if(trimestre == 1){
+            mes_inicio = 1;
+            mes_fin = 3;
+        }else if(trimestre == 2){
+            mes_inicio = 4;
+            mes_fin = 6;
+        }else if(trimestre == 3){
+            mes_inicio = 7;
+            mes_fin = 9;
+        }else if(trimestre == 4){
+            mes_inicio = 10;
+            mes_fin = 12;
+        }
+
+        for(var i = mes_inicio; i <= mes_fin; i++) {
+            $('.metas-mes[data-meta-mes="' + i + '"][data-meta-identificador="' + identificador + '"]').each(function(){
+                suma += parseInt($(this).val()) || 0;
+            });
+        }
+        
+        $('#trim'+trimestre+'-'+identificador).val(suma).change();
+
+        var trim1 = parseInt($('#trim1-'+identificador).val()) || 0;
+        var trim2 = parseInt($('#trim2-'+identificador).val()) || 0;
+        var trim3 = parseInt($('#trim3-'+identificador).val()) || 0;
+        var trim4 = parseInt($('#trim4-'+identificador).val()) || 0;
+
+        suma = trim1 + trim2 + trim3 + trim4;
+
+        $('#numerador-'+identificador).val(suma).change();
+        ejecutar_formula(identificador);
     });
 }
 

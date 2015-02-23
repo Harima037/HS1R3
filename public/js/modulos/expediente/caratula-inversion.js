@@ -18,11 +18,15 @@ var form_fibap = '#form-fibap-datos';
 var form_fibap_antecentes = '#form-fibap-antecedentes';
 var form_antecedente = '#form-antecedente';
 var form_beneficiario = '#form_beneficiario';
+var form_componente = '#form_componente';
+var form_actividad = '#form_actividad';
 
 var modal_antecedente = '#modal-antecedente';
 var modal_presupuesto = '#modal-presupuesto';
 var modal_accion  = '#modal-accion';
 var modal_beneficiario = '#modalBeneficiario';
+var modal_componente = '#modalComponente';
+var modal_actividad = '#modalActividad';
 
 $('.chosen-one').chosen({width:'100%'});
 
@@ -65,6 +69,7 @@ if($('#id').val()){
 				fibapAntecedentes.init(response.data.fibap.id,proyectoResource);
 				fibapAcciones.init(response.data.fibap.id,proyectoResource);
 				fibapAcciones.actualizar_total_presupuesto(response.data.fibap.presupuestoRequerido);
+				fibapAcciones.actualizar_metas_mes('componente',response.extras.jurisdicciones);
 
 				if(response.data.fibap.antecedentes_financieros){
 					fibapAntecedentes.llenar_datagrid(response.data.fibap.antecedentes_financieros);
@@ -121,6 +126,87 @@ function editar_beneficiario(e){
 /***********************************************************************************************
 								Acciones de Guardado
 ************************************************************************************************/
+$('#btn-componente-guardar-salir').on('click',function(){
+	guardar_datos_componente(true);
+});
+
+$('#btn-componente-guardar').on('click',function(){
+	guardar_datos_componente(false);
+});
+
+function guardar_datos_componente(cerrar){
+	Validation.cleanFormErrors(form_componente);
+	var parametros = $(form_componente).serialize();
+	parametros = parametros + '&guardar=componente';
+	parametros = parametros + '&id-proyecto='+$('#id').val();
+	//parametros = parametros + '&clasificacion='+$('#clasificacionproyecto').val();
+
+	if($('#id-componente').val()){
+		/*var cadena_metas = '';
+		$(form_componente + ' .metas-mes').each(function(){
+			if($(this).data('meta-id')){
+				cadena_metas = cadena_metas + '&mes-componente-id['+$(this).data('meta-jurisdiccion')+']['+$(this).data('meta-mes')+']='+$(this).data('meta-id');
+			}
+		});
+		parametros = parametros + cadena_metas;
+		proyectoResource.put($('#id-componente').val(),parametros,{
+	        _success: function(response){
+	            MessageManager.show({data:'Datos del componente almacenados con éxito',type:'OK',timer:3});
+	            if(cerrar){
+					$(modal_componente).modal('hide');
+				}else{
+					$('#tablink-componente-actividades').tab('show');
+				}
+				actualizar_grid_componentes(response.componentes);
+				actualizar_metas('componente',response.metas);
+	        },
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
+	    });*/
+	}else{
+		proyectoResource.post(parametros,{
+	        _success: function(response){
+	            MessageManager.show({data:'Datos del componente almacenados con éxito',type:'OK',timer:3});
+	            $(form_componente + ' #id-componente').val(response.data.id);
+	            
+	            if(cerrar){
+					$(modal_componente).modal('hide');
+				}else{
+					$('#tablink-componente-actividades').attr('data-toggle','tab');
+					$('#tablink-componente-actividades').parent().removeClass('disabled');
+					$('#tablink-componente-actividades').tab('show');
+				}
+				actualizar_grid_componentes(response.componentes);
+				actualizar_metas('componente',response.metas);
+	        },
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
+	    });
+	}
+}
+
 $('#btn-proyecto-guardar').on('click',function(){
 	caratulaProyecto.limpiar_errores();
 
