@@ -139,46 +139,34 @@
 			<td align="center" style="background-color:#CCCCCC;">BAJA</td>
 			<td align="center" style="background-color:#CCCCCC;">MUY BAJA</td>
 		</tr>
+		@foreach ($data['beneficiarios'] as $key => $beneficiario)
 		<tr>
-			<td rowspan="2" valign="middle">{{ $data['tipoBeneficiario']->descripcion }}</td>
-			<td rowspan="2" valign="middle">{{ $data['totalBeneficiarios'] }}</td>
-			<td>{{ $data['totalBeneficiariosF'] }}</td>
-			<td>FEMENINO</td>
-			@foreach($data['beneficiarios'] as $beneficiario)
-			 @if($beneficiario->sexo=='f')
-			<td>{{ $beneficiario->urbana }}</td>
-			<td>{{ $beneficiario->rural }}</td>
-			<td>{{ $beneficiario->mestiza }}</td>
-			<td>{{ $beneficiario->indigena }}</td>
-			<td>{{ $beneficiario->inmigrante }}</td>
-			<td>{{ $beneficiario->otros }}</td>
-			<td>{{ $beneficiario->muyAlta }}</td>
-			<td>{{ $beneficiario->alta }}</td>
-			<td>{{ $beneficiario->media }}</td>
-			<td>{{ $beneficiario->baja }}</td>
-			<td>{{ $beneficiario->muyBaja }}</td>
-			 @endif
+			<td rowspan="2" valign="middle">{{ $beneficiario['tipo'] }}</td>
+			<td rowspan="2" valign="middle">{{ $beneficiario['total'] }}</td>
+			@foreach ($beneficiario['desglose'] as $key => $desglose)
+				@if($key == 'm')
+					</tr><tr>
+				@endif
+					<td>{{ (isset($desglose['total']))? $desglose['total'] : 0 }}</td>
+				@if($key == 'f')
+					<td>FEMENINO</td>
+				@else
+					<td>MASCULINO</td>
+				@endif
+				<td>{{ (isset($desglose['urbana']))? $desglose['urbana'] : 0 }}</td>
+				<td>{{ (isset($desglose['rural']))? $desglose['rural'] : 0 }}</td>
+				<td>{{ (isset($desglose['mestiza']))? $desglose['mestiza'] : 0 }}</td>
+				<td>{{ (isset($desglose['indigena']))? $desglose['indigena'] : 0 }}</td>
+				<td>{{ (isset($desglose['inmigrante']))? $desglose['inmigrante'] : 0 }}</td>
+				<td>{{ (isset($desglose['otros']))? $desglose['otros'] : 0 }}</td>
+				<td>{{ (isset($desglose['muyAlta']))? $desglose['muyAlta'] : 0 }}</td>
+				<td>{{ (isset($desglose['alta']))? $desglose['alta'] : 0 }}</td>
+				<td>{{ (isset($desglose['media']))? $desglose['media'] : 0 }}</td>
+				<td>{{ (isset($desglose['baja']))? $desglose['baja'] : 0 }}</td>
+				<td>{{ (isset($desglose['muyBaja']))? $desglose['muyBaja'] : 0 }}</td>
 			@endforeach
-		</tr>
-		<tr>
-			<td>{{ $data['totalBeneficiariosM'] }}</td>
-			<td>MASCULINO</td>
-			@foreach($data['beneficiarios'] as $beneficiario)
-			 @if($beneficiario->sexo=='m')
-			<td>{{ $beneficiario->urbana }}</td>
-			<td>{{ $beneficiario->rural }}</td>
-			<td>{{ $beneficiario->mestiza }}</td>
-			<td>{{ $beneficiario->indigena }}</td>
-			<td>{{ $beneficiario->inmigrante }}</td>
-			<td>{{ $beneficiario->otros }}</td>
-			<td>{{ $beneficiario->muyAlta }}</td>
-			<td>{{ $beneficiario->alta }}</td>
-			<td>{{ $beneficiario->media }}</td>
-			<td>{{ $beneficiario->baja }}</td>
-			<td>{{ $beneficiario->muyBaja }}</td>
-			 @endif
-			@endforeach
-		</tr>
+		</tr>	
+		@endforeach
 		
 		@foreach($data['componentes'] as $componente)
 		<tr><td colspan="15"></td></tr>

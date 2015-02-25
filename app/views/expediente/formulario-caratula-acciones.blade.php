@@ -110,7 +110,14 @@
             </div>
             <div class="row">
                 <div class="col-sm-8">
-                    
+                    <div class="input-group" style="margin:5px">                            
+                        <input type="text" class="form-control txt-quick-search" placeholder="Buscar">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default btn-quick-search" type="button">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </span>
+                    </div>
                 </div>
                 <div class="col-sm-4">
                     <div class="btn-toolbar pull-right" >
@@ -151,6 +158,28 @@
             </thead>
             <tbody></tbody>
         </table>
+        <div class="panel-footer">
+            <div class="btn-toolbar ">
+                <div class="btn-group pull-right" style="margin-left:5px; margin-bottom:5px;">
+                    <button class="btn btn-default btn-back-rows"><i class="glyphicon glyphicon-arrow-left"></i></button>
+                    <button class="btn btn-default btn-next-rows"><i class="glyphicon glyphicon-arrow-right"></i></button>
+                </div>
+                <div class="btn-group pull-right " style="width:200px; ">   
+                    <div class="input-group" > 
+                        <span class="input-group-addon">Pág.</span> 
+                        <input type="text" class="txt-go-page form-control" style="text-align:center" value="1" >     
+                        <span class="input-group-addon btn-total-paginas" data-pages="0">de 0</span> 
+                        <div class="input-group-btn dropup">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                            <ul class="dropdown-menu pull-right">
+                                <li><a class="btn-go-first-rows" href="#">Primera Página</a></li>
+                                <li><a class="btn-go-last-rows" href="#">Última Página</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -189,26 +218,28 @@
                             </div>
                         </div>
                         <div class="col-sm-12">
-                            <table id="tabla_beneficiarios" class="table table-condensed table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Tipo Beneficiario</th>
-                                        <th width="20%"><span class="fa fa-female"></span> Femenino</th>
-                                        <th width="20%"><span class="fa fa-male"></span> Masculino</th>
-                                        <th width="20%">Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="3"></td>
-                                        <td>
-                                            <span class="form-control" id="total-beneficiarios-lbl"></span>
-                                            <input type="hidden" id="total-beneficiarios" name="total-beneficiarios">
-                                        </td>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                            <div class="form-group">
+                                <table id="tabla_beneficiarios" class="table table-condensed table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Tipo Beneficiario</th>
+                                            <th width="20%"><span class="fa fa-female"></span> Femenino</th>
+                                            <th width="20%"><span class="fa fa-male"></span> Masculino</th>
+                                            <th width="20%">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="3"></td>
+                                            <td>
+                                                <span class="form-control" id="total-beneficiarios-lbl">0</span>
+                                                <input type="hidden" id="total-beneficiarios" name="total-beneficiarios">
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
                         </div>
                         <div class="col-sm-12">
                             <div class="form-group">
@@ -250,7 +281,7 @@
                                                     <span class="fa fa-link"></span> Total
                                                 </span>
                                                 <input type="hidden" id="cantidad-presupuesto" name="cantidad-presupuesto"/>
-                                                <span class="form-control" id="cantidad-presupuesto-lbl"></span>
+                                                <span class="form-control" id="cantidad-presupuesto-lbl">0</span>
                                             </div>
                                         </div>
                                     </div>
@@ -298,28 +329,28 @@
                                             <div class="col-sm-3">
                                                 <div class="form-group">
                                                     <label class="control-label"><span class="fa fa-link"></span> Trim 1</label>
-                                                    <span class="form-control" id="trim1-lbl"></span>
+                                                    <span class="form-control" id="trim1-lbl">0</span>
                                                     <input type="hidden" id="trim1" name="trim1">
                                                 </div>
                                             </div>
                                             <div class="col-sm-3">
                                                 <div class="form-group">
                                                     <label class="control-label"><span class="fa fa-link"></span> Trim 2</label>
-                                                    <span class="form-control" id="trim2-lbl"></span>
+                                                    <span class="form-control" id="trim2-lbl">0</span>
                                                     <input type="hidden" id="trim2" name="trim2">
                                                 </div>
                                             </div>
                                             <div class="col-sm-3">
                                                 <div class="form-group">
                                                     <label class="control-label"><span class="fa fa-link"></span> Trim 3</label>
-                                                    <span class="form-control" id="trim3-lbl"></span>
+                                                    <span class="form-control" id="trim3-lbl">0</span>
                                                     <input type="hidden" id="trim3" name="trim3">
                                                 </div>
                                             </div>
                                             <div class="col-sm-3">
                                                 <div class="form-group">
                                                     <label class="control-label"><span class="fa fa-link"></span> Trim 4</label>
-                                                    <span class="form-control" id="trim4-lbl"></span>
+                                                    <span class="form-control" id="trim4-lbl">0</span>
                                                     <input type="hidden" id="trim4" name="trim4">
                                                 </div>
                                             </div>
@@ -329,7 +360,7 @@
                                         <div class="form-group">
                                             <label><span class="fa fa-link"></span> Total</label>
                                             <input type="hidden" id="cantidad-meta" name="cantidad-meta"/>
-                                            <span class="form-control" id="cantidad-meta-lbl"></span>
+                                            <span class="form-control" id="cantidad-meta-lbl">0</span>
                                         </div>
                                     </div>
                                 </div>

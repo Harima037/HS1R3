@@ -20,6 +20,7 @@ var form_antecedente = '#form-antecedente';
 var form_beneficiario = '#form_beneficiario';
 var form_componente = '#form_componente';
 var form_actividad = '#form_actividad';
+var form_presupuesto = '#form-presupuesto';
 
 var modal_antecedente = '#modal-antecedente';
 var modal_presupuesto = '#modal-presupuesto';
@@ -84,6 +85,10 @@ if($('#id').val()){
 					fibapAntecedentes.llenar_datagrid(response.data.fibap.antecedentes_financieros);
 				}
 
+				if(response.data.fibap.distribucion_presupuesto_agrupado){
+					fibapAcciones.llenar_tabla_distribucion_general(response.data.fibap.distribucion_presupuesto_agrupado);
+				}
+
 				if(response.data.fibap.acciones){
 					cambiar_icono_tabs('#tab-link-acciones-fibap','fa-check-square-o');
 					fibapAcciones.llenar_datagrid(response.data.fibap.acciones);
@@ -107,10 +112,6 @@ if($('#id').val()){
 $('#btn-proyecto-cancelar').on('click',function(){
 	window.location.href = SERVER_HOST+'/expediente/inversion';
 });
-
-/***********************************************************************************************
-							Funcionamiento de Modales
-************************************************************************************************/
 
 /***********************************************************************************************
 							Funciones de Edición de datos de DataGrid
@@ -142,6 +143,19 @@ function editar_accion(e){
 	});
 }
 
+function editar_presupuesto(e){
+	if($(modal_presupuesto).find(".modal-title").html() == "Editar Presupuesto"){
+		return;
+	}
+	$(modal_presupuesto).find(".modal-title").html("Editar Presupuesto");
+	
+	var parametros = {'mostrar':'editar-presupuesto'};
+	proyectoResource.get(e,parametros,{
+		_success: function(response){
+			fibapAcciones.mostrar_datos_presupuesto(response.data);
+		}
+	});
+}
 /***********************************************************************************************
 								Acciones de Guardado
 ************************************************************************************************/
@@ -370,6 +384,94 @@ $('#btn-fibap-guardar').on('click',function(){
 	            	habilitar_meses(response.data.periodoEjecucionInicio,response.data.periodoEjecucionFinal);
 	            }
 	            */
+	        },
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }
+	        }
+	    });
+	}
+});
+
+$('#btn-presupuesto-guardar').on('click',function(){
+	var parametros = $(form_presupuesto).serialize();
+	parametros += '&guardar=desglose-presupuesto&id-fibap=' + $('#id-fibap').val();
+	//Obtenemos el id de la Acción, la cual esta en un atributo en el datagrid
+	var accion_id = $('#datagridDistribucion').attr('data-selected-id');
+	parametros += '&id-accion='+accion_id;
+
+	//Obtenemos los ids de las Partidas capturadas
+	/*
+	var partida_1_id = $('#datagridDistribucion').attr('data-partida-1-id');
+	var partida_2_id = $('#datagridDistribucion').attr('data-partida-2-id');
+	parametros += '&partidas[1]='+partida_1_id+'&partidas[2]='+partida_2_id;
+	*/
+
+	Validation.cleanFormErrors(form_presupuesto);
+	
+	if($('#id-desglose').val()){
+		/*
+		var meses_capturados = '';
+		var metas_capturadas = '';
+		$('.presupuesto-mes').each(function(){
+			if($(this).attr('data-presupuesto-id')){
+				if($(this).hasClass('valor-partida-1')){
+					meses_capturados += '&meses-capturados[1]['+$(this).attr('data-presupuesto-mes')+']='+$(this).attr('data-presupuesto-id');
+				}else{
+					meses_capturados += '&meses-capturados[2]['+$(this).attr('data-presupuesto-mes')+']='+$(this).attr('data-presupuesto-id');
+				}
+				
+			}
+		});
+		parametros += meses_capturados;
+		$('.meta-mes').each(function(){
+			if($(this).attr('data-meta-id')){
+				metas_capturadas += '&metas-capturadas['+$(this).attr('data-meta-mes')+']='+$(this).attr('data-meta-id');
+			}
+		});
+		parametros += metas_capturadas;
+				
+		proyectoResource.put($('#id-desglose').val(),parametros,{
+	        _success: function(response){
+	            MessageManager.show({data:'Cambios almacenados con éxito',type:'OK',timer:3});
+	            llenar_datagrid_distribucion(response.data.distribucion_presupuesto_agrupado,response.data.presupuestoRequerido);
+	            llenar_datagrid_presupuestos(response.distribucion_total);
+	            $(modal_presupuesto).modal('hide');
+	        },
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }
+	        }
+	    });
+		*/
+	}else{
+		proyectoResource.post(parametros,{
+	        _success: function(response){
+	            MessageManager.show({data:'Presupuesto almacenado con éxito',type:'OK',timer:3});
+	            fibapAcciones.llenar_datagrid_distribucion(response.data.distribucion_presupuesto_agrupado,response.data.presupuestoRequerido);
+	            fibapAcciones.llenar_tabla_distribucion_general(response.extras.distribucion_total);
+	            //llenar_datagrid_distribucion(response.data.distribucion_presupuesto_agrupado,response.data.presupuestoRequerido);
+	            //llenar_datagrid_presupuestos(response.distribucion_total);
+	            //cambiar_icono_tabs('#tab-link-acciones-fibap','fa-check-square-o');
+	            //$(modal_presupuesto).modal('hide');
 	        },
 	        _error: function(response){
 	            try{

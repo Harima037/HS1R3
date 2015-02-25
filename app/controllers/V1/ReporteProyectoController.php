@@ -61,6 +61,36 @@ class ReporteProyectoController extends BaseController {
 		$recurso['componentesMetasMes'] = $componentesMetasMes;
 	 	$recurso['actividadesMetasMes'] = $actividadesMetasMes;
 
+	 	//Arreglamos el arreglo de beneficiarios
+	 	$beneficiarios = array();
+	 	foreach ($recurso['beneficiarios'] as $key => $beneficiario) {
+	 		if(!isset($beneficiarios[$beneficiario->idTipoBeneficiario])){
+				$beneficiarios[$beneficiario->idTipoBeneficiario] = array(
+						'tipo' => $beneficiario->tipo_beneficiario->descripcion,
+						'total' => $beneficiario->total,
+						'desglose' => array('f'=>array(),'m'=>array())
+					);
+	 		}else{
+	 			$beneficiarios[$beneficiario->idTipoBeneficiario]['total'] += $beneficiario->total;
+	 		}
+
+	 		$beneficiarios[$beneficiario->idTipoBeneficiario]['desglose'][$beneficiario->sexo] = array(
+				'total' 	 => $beneficiario->total,
+				'urbana'	 => $beneficiario->urbana,
+				'rural'		 => $beneficiario->rural,
+				'mestiza' 	 => $beneficiario->mestiza,
+				'indigena' 	 => $beneficiario->indigena,
+				'inmigrante' => $beneficiario->inmigrante,
+				'otros'		 => $beneficiario->otros,
+				'muyAlta'	 => $beneficiario->muyAlta,
+				'alta'		 => $beneficiario->alta,
+				'media'		 => $beneficiario->media,
+				'baja'		 => $beneficiario->baja,
+				'muyBaja'	 => $beneficiario->muyBaja,
+			);
+	 	}
+	 	$recurso['beneficiarios'] = $beneficiarios;
+
 	 	//Si es proyecto de inversión se obtiene el FIBAP relacionado
 	 	$fibap = null;
 	 	if($recurso->idClasificacionProyecto == 2){
@@ -225,8 +255,9 @@ class ReporteProyectoController extends BaseController {
 				$sheet->setBorder('B21:K21', 'thin');
 				$sheet->setBorder('B22:H22', 'thin');
 				$sheet->setBorder('C24:K27', 'thin');
-				$sheet->setBorder('A29:O33', 'thin');
-				$fila=35;
+				$sheet->setBorder('A29:O31', 'thin');
+				$sheet->setBorder('A32:O'.(31+(count($data['data']['beneficiarios'])*2)), 'thin');
+				$fila=33 + (count($data['data']['beneficiarios'])*2);
 				//Bordes para componentes
 				foreach ($data['data']->componentes as $componente) {
 					$sheet->setBorder('A'.$fila.':O'.$fila, 'thin');

@@ -217,28 +217,28 @@
                         <div class="col-sm-3">
                             <div class="form-group">
                                 <label class="control-label"><span class="fa fa-link"></span> Trim 1</label>
-                                <span class="form-control control-espejo" data-espejo-id="#trim1-{{$identificador}}"></span>
+                                <span class="form-control control-espejo" id="trim1-{{$identificador}}-lbl"></span>
                                 <input type="hidden" id="trim1-{{$identificador}}" name="trim1-{{$identificador}}">
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
                                 <label class="control-label"><span class="fa fa-link"></span> Trim 2</label>
-                                <span class="form-control control-espejo" data-espejo-id="#trim2-{{$identificador}}"></span>
+                                <span class="form-control control-espejo" id="trim2-{{$identificador}}-lbl"></span>
                                 <input type="hidden" id="trim2-{{$identificador}}" name="trim2-{{$identificador}}">
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
                                 <label class="control-label"><span class="fa fa-link"></span> Trim 3</label>
-                                <span class="form-control control-espejo" data-espejo-id="#trim3-{{$identificador}}"></span>
+                                <span class="form-control control-espejo" id="trim3-{{$identificador}}-lbl"></span>
                                 <input type="hidden" id="trim3-{{$identificador}}" name="trim3-{{$identificador}}">
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
                                 <label class="control-label"><span class="fa fa-link"></span> Trim 4</label>
-                                <span class="form-control control-espejo" data-espejo-id="#trim4-{{$identificador}}"></span>
+                                <span class="form-control control-espejo" id="trim4-{{$identificador}}-lbl"></span>
                                 <input type="hidden" id="trim4-{{$identificador}}" name="trim4-{{$identificador}}">
                             </div>
                         </div>
@@ -247,7 +247,7 @@
                 <div class="col-sm-2">
                     <div class="form-group">
                         <label class="control-label"><span class="fa fa-link"></span> Numerador</label>
-                        <span class="form-control control-espejo" data-espejo-id="#numerador-{{$identificador}}"></span>
+                        <span class="form-control control-espejo" id="numerador-{{$identificador}}-lbl"></span>
                         <input type="hidden" id="numerador-{{$identificador}}" name="numerador-{{$identificador}}">
                     </div>
                 </div>

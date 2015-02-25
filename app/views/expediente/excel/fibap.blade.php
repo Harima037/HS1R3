@@ -129,7 +129,7 @@
 				@endif
 			</td>
 			<td></td>
-			<td>{{ $data['tipoBeneficiario']->descripcion }}</td>
+			<td>$data['tipoBeneficiario']->descripcion</td>
 			<td>{{ $data['totalBeneficiarios'] }}</td>
 			<td>{{ $data['totalBeneficiariosF'] }}</td>
 			<td>{{ $data['totalBeneficiariosM'] }}</td>
