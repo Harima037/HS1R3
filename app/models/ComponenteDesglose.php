@@ -11,6 +11,10 @@ class ComponenteDesglose extends BaseModel
 		return $this->hasMany('DesgloseMetasMes','idComponenteDesglose');
 	}
 
+	public function beneficiarios(){
+		return $this->hasMany('DesgloseBeneficiario','idComponenteDesglose');
+	}
+
 	public function scopeListarDatos($query){
 		$query->select('componenteDesglose.*','localidad.nombre AS localidad','municipio.nombre AS municipio',
 				'jurisdiccion.nombre AS jurisdiccion')
