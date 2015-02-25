@@ -48,6 +48,11 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('fibap',array('uses'=>'FibapController@index'));
 		Route::any('formulario-fibap',array('uses'=>'FibapController@formulario'));
 	});
+	
+	Route::group(array('prefix'=>'revision'), function(){
+		Route::get('revision-proyectos',array('uses'=>'RevisionController@index'));
+		Route::any('revision-caratula',array('uses'=>'RevisionController@caratula'));		
+	});
 
 	Route::group(array('prefix'=>"v1"),function(){
 		Route::get('/', function()
@@ -63,6 +68,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('proyectos',		'V1\ProyectosController');
 		Route::resource('reporteProyecto',	'V1\ReporteProyectoController', array('only' => array('show')));
 		Route::resource('fibap',			'V1\FibapController');
+		
+		Route::resource('revision-proyectos',	'V1\RevisionController');
 	});
 });
 

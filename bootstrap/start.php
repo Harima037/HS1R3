@@ -26,7 +26,7 @@ $app = new Illuminate\Foundation\Application;
 
 $env = $app->detectEnvironment(array(
 
-	'local' => array('ENVY-HP','SaludHP-PC','DebianISECH'),
+	'local' => array('ENVY-HP','SaludHP-PC','DebianISECH','informatica'),
 	'production' => array('production-server-ip'),
 
 ));
