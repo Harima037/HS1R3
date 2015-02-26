@@ -834,7 +834,7 @@ function reset_modal_form(form){
         $(modal_accion + ' .metas-mes').attr('data-meta-id','');
     }else if(form == form_presupuesto){
         $(modal_presupuesto + ' .alert').remove();
-        $('#id-presupuesto').val('');
+        $('#id-desglose').val('');
         $('#jurisdiccion-accion').chosen().change();
         $('.benef-totales-accion').change();
         $('#trim1-lbl').text(0);
