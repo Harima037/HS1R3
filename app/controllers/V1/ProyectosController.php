@@ -54,6 +54,30 @@ class ProyectosController extends BaseController {
 		'urbanaf' 					=> 'required|integer|min:0',
 		'urbanam' 					=> 'required|integer|min:0'
 	);
+	
+	private $reglasAccionBase = array(
+		'denominador-ind-' 	=> 'required',
+		'descripcion-ind-' 	=> 'required',
+		'descripcion-obj-' 	=> 'required',
+		'dimension-' 		=> 'required',
+		'formula-' 			=> 'required',
+		'frecuencia-' 		=> 'required',
+		'interpretacion-' 	=> 'required',
+		'numerador-ind-' 	=> 'required',
+		'supuestos-' 		=> 'required',
+		'tipo-ind-' 		=> 'required',
+		'anio-base-' 		=> 'integer|min:0',
+		'linea-base-' 		=> 'numeric|min:0',
+		'unidad-medida-' 	=> 'required',
+		'verificacion-' 	=> 'required'
+		//'trim1-componente' 				=> 'numeric',
+		//'trim2-componente' 				=> 'numeric',
+		//'trim3-componente' 				=> 'numeric',
+		//'trim4-componente' 				=> 'numeric',
+		//'denominador-componente' 		=> 'required_if:formula-componente,1,2,3,4,5,6|numeric|min:0',
+		//'numerador-componente' 			=> 'required|numeric|min:1',
+		//'meta-componente' 				=> 'required|numeric|min:0',
+	);
 
 	private $reglasComponente = array(
 		'denominador-ind-componente' 	=> 'required',
@@ -543,19 +567,60 @@ class ProyectosController extends BaseController {
 		$respuesta['http_status'] = 200;
 		$respuesta['data'] = array();
 		$es_editar = FALSE;
+		$proyecto = NULL;
+		$componente = NULL;
+		$reglasAccion = array(
+			'denominador-ind-' . $selector 	=> 'required',
+			'descripcion-ind-' . $selector 	=> 'required',
+			'descripcion-obj-' . $selector 	=> 'required',
+			'dimension-' . $selector 		=> 'required',
+			'formula-' . $selector 			=> 'required',
+			'frecuencia-' . $selector 		=> 'required',
+			'interpretacion-' . $selector 	=> 'required',
+			'numerador-ind-' . $selector 	=> 'required',
+			'supuestos-' . $selector 		=> 'required',
+			'tipo-ind-' . $selector 		=> 'required',
+			'anio-base-' . $selector 		=> 'integer|min:0',
+			'linea-base-' . $selector 		=> 'numeric|min:0',
+			'unidad-medida-' . $selector 	=> 'required',
+			'verificacion-' . $selector 	=> 'required'
+			//'trim1-componente' 				=> 'numeric',
+			//'trim2-componente' 				=> 'numeric',
+			//'trim3-componente' 				=> 'numeric',
+			//'trim4-componente' 				=> 'numeric',
+			//'denominador-componente' 		=> 'required_if:formula-componente,1,2,3,4,5,6|numeric|min:0',
+			//'numerador-componente' 			=> 'required|numeric|min:1',
+			//'meta-componente' 				=> 'required|numeric|min:0',
+		);
 
-		$proyecto = Proyecto::find($parametros['id-proyecto']);
+		if($selector == 'componente'){
+			$proyecto = Proyecto::find($parametros['id-proyecto']);
+			if(!$proyecto){
+				throw new Exception("No se pudo encontrar el proyecto al que pertenece este componente", 1);
+			}
+		}else{
+			$componente = Componente::find($parametros['id-componente']);
+			if(!$componente){
+				throw new Exception("No se pudo encontrar el componente al que pertenece esta actividad", 1);
+			}
+		}
 		
 		if($id){
 			$es_editar = TRUE;
-			$componente = Componente::find($id);
+			if($selector == 'componente'){
+				$recurso = Componente::find($id);
+			}else{
+				$recurso = Actividad::find($id);
+			}
 		}else{
-			$componente = new Componente;
+			if($selector == 'componente'){
+				$recurso = new Componente;
+			}else{
+				$recurso = new Actividad;
+			}
+			
 		}
-
-		if(!$proyecto){
-			throw new Exception("No se pudo encontrar el proyecto al que pertenece este componente", 1);
-		}
+		
 		if(!$es_editar){
 			if($selector == 'componente'){
 				$proyecto->load('componentes');
@@ -565,98 +630,107 @@ class ProyectosController extends BaseController {
 					throw new Exception("No esta permitido guardar mas de 2 componentes por cada proyecto", 1);
 				}
 			}else{
-				/*$proyecto->load('acciones');
+				$componente->load('actividades');
 
-				if(count($proyecto->acciones) == 5){
+				if(count($componente->actividades) == 5){
 					$respuesta['data']['data'] = 'El componente no puede tener mas de 5 acciones.';
 					throw new Exception("No esta permitido guardar mas de 5 acciones por cada componente", 1);
-				}*/
+				}
 			}
 		}
 		
-
-		if($selector == 'componente'){
-			if($parametros['clasificacion'] == 2){
-				$this->reglasComponente['entregable'] = 'required';
-				$this->reglasComponente['tipo-entregable'] = 'required';
-				$this->reglasComponente['accion-entregable'] = 'required';
-			}
+		if($parametros['clasificacion'] == 2 && $selector == 'componente'){
+			$reglasAccion['entregable'] 			= 'required';
+			$reglasAccion['tipo-entregable'] 		= 'required';
+			$reglasAccion['accion-entregable'] 	= 'required';
 		}
-
+		
 		/*if(isset($parametros['datos_presupuesto'])){
 			$this->reglasComponente['accion-presupuesto-requerido']	= 'required|numeric|min:1';
 			$this->reglasComponente['objeto-gasto-presupuesto']		= 'required|array|min:1';
 		}*/
 
-		$validacion = Validador::validar(Input::all(), $this->reglasComponente);
+		$validacion = Validador::validar(Input::all(), $reglasAccion);
 
 		if($validacion === TRUE){
 
-			$componente->objetivo 				= $parametros['descripcion-obj-componente'];
-			$componente->mediosVerificacion 	= $parametros['verificacion-componente'];
-			$componente->supuestos 				= $parametros['supuestos-componente'];
-			$componente->indicador 				= $parametros['descripcion-ind-componente'];
-			$componente->numerador 				= $parametros['numerador-ind-componente'];
-			$componente->denominador 			= $parametros['denominador-ind-componente'];
-			$componente->interpretacion 		= $parametros['interpretacion-componente'];
-			$componente->idFormula 				= $parametros['formula-componente'];
-			$componente->idDimensionIndicador 	= $parametros['dimension-componente'];
-			$componente->idFrecuenciaIndicador 	= $parametros['frecuencia-componente'];
-			$componente->idTipoIndicador 		= $parametros['tipo-ind-componente'];
-			$componente->idUnidadMedida 		= $parametros['unidad-medida-componente'];
-			$componente->metaIndicador 			= ($parametros['meta-componente'])?$parametros['meta-componente']:NULL;
-			$componente->numeroTrim1 			= ($parametros['trim1-componente'])?$parametros['trim1-componente']:NULL;
-			$componente->numeroTrim2 			= ($parametros['trim2-componente'])?$parametros['trim2-componente']:NULL;
-			$componente->numeroTrim3 			= ($parametros['trim3-componente'])?$parametros['trim3-componente']:NULL;
-			$componente->numeroTrim4 			= ($parametros['trim4-componente'])?$parametros['trim4-componente']:NULL;
-			$componente->valorNumerador 		= ($parametros['numerador-componente'])?$parametros['numerador-componente']:NULL;
-			$componente->valorDenominador 		= ($parametros['denominador-componente'])?$parametros['denominador-componente']:NULL;
+			$recurso->objetivo 				= $parametros['descripcion-obj-'.$selector];
+			$recurso->mediosVerificacion 	= $parametros['verificacion-'.$selector];
+			$recurso->supuestos 			= $parametros['supuestos-'.$selector];
+			$recurso->indicador 			= $parametros['descripcion-ind-'.$selector];
+			$recurso->numerador 			= $parametros['numerador-ind-'.$selector];
+			$recurso->denominador 			= $parametros['denominador-ind-'.$selector];
+			$recurso->interpretacion 		= $parametros['interpretacion-'.$selector];
+			$recurso->idFormula 			= $parametros['formula-'.$selector];
+			$recurso->idDimensionIndicador 	= $parametros['dimension-'.$selector];
+			$recurso->idFrecuenciaIndicador = $parametros['frecuencia-'.$selector];
+			$recurso->idTipoIndicador 		= $parametros['tipo-ind-'.$selector];
+			$recurso->idUnidadMedida 		= $parametros['unidad-medida-'.$selector];
+			$recurso->metaIndicador 		= ($parametros['meta-'.$selector])?$parametros['meta-'.$selector]:NULL;
+			$recurso->numeroTrim1 			= ($parametros['trim1-'.$selector])?$parametros['trim1-'.$selector]:NULL;
+			$recurso->numeroTrim2 			= ($parametros['trim2-'.$selector])?$parametros['trim2-'.$selector]:NULL;
+			$recurso->numeroTrim3 			= ($parametros['trim3-'.$selector])?$parametros['trim3-'.$selector]:NULL;
+			$recurso->numeroTrim4 			= ($parametros['trim4-'.$selector])?$parametros['trim4-'.$selector]:NULL;
+			$recurso->valorNumerador 		= ($parametros['numerador-'.$selector])?$parametros['numerador-'.$selector]:NULL;
+			$recurso->valorDenominador 		= ($parametros['denominador-'.$selector])?$parametros['denominador-'.$selector]:NULL;
 			
-			$componente->lineaBase 				= ($parametros['linea-base-componente'])?$parametros['linea-base-componente']:NULL;
-			$componente->anioBase 				= ($parametros['anio-base-componente'])?$parametros['anio-base-componente']:NULL;
+			$recurso->lineaBase 			= ($parametros['linea-base-'.$selector])?$parametros['linea-base-'.$selector]:NULL;
+			$recurso->anioBase 				= ($parametros['anio-base-'.$selector])?$parametros['anio-base-'.$selector]:NULL;
 
-			if($parametros['clasificacion'] == 2){
-				$componente->idEntregable 		= $parametros['entregable'];
+			if($parametros['clasificacion'] == 2 && $selector == 'componente'){
+				$recurso->idEntregable 		= $parametros['entregable'];
 				if($parametros['tipo-entregable'] != 'NA'){
-					$componente->idEntregableTipo	= $parametros['tipo-entregable'] ;
+					$recurso->idEntregableTipo	= $parametros['tipo-entregable'] ;
 				}
-				$componente->idEntregableAccion	= $parametros['accion-entregable'];
+				$recurso->idEntregableAccion	= $parametros['accion-entregable'];
 			}
 
-			$respuesta['data'] = DB::transaction(function() use ($parametros, $proyecto, $componente){
-				if($proyecto->componentes()->save($componente)){
-					//$componente->load('usuario');
-					//$proyecto->componentes[] = $componente;
+			$respuesta['data'] = DB::transaction(function() use ($parametros, $proyecto, $componente, $recurso, $selector, $es_editar){
+				if($selector == 'componente'){
+					$guardado = $proyecto->componentes()->save($recurso);
+				}else{
+					$guardado = $componente->actividades()->save($recurso);
+				}
 
-					$jurisdicciones = $parametros['mes-componente']; //Arreglo que contiene los datos [jurisdiccion][mes] = valor
+				if($guardado){
+					$jurisdicciones = $parametros['mes-'.$selector]; //Arreglo que contiene los datos [jurisdiccion][mes] = valor
 
-					if(isset($parametros['mes-componente-id'])){
-						$ides = $parametros['mes-componente-id'];
+					if(isset($parametros['mes-' . $selector . '-id'])){
+						$ides = $parametros['mes-' . $selector . '-id'];
 					}else{
 						$ides = array();
 					}
 
 					$metasMes = array();
 
+					if($es_editar){
+						$recurso->load('metasMes');
+					}
+
 					foreach ($jurisdicciones as $clave => $meses) {
 						foreach ($meses as $mes => $valor) {
 							if(isset($ides[$clave][$mes])){
-								$meta = ComponenteMetaMes::find($ides[$clave][$mes]);
+								$meta = $recurso->metasMes()->find($ides[$clave][$mes]);
 								$meta->meta = $valor;
 								$metasMes[] = $meta;
 							}elseif($valor > 0){
-								$meta = new ComponenteMetaMes;
+								if($selector == 'componente'){
+									$meta = new ComponenteMetaMes;
+									$meta->idProyecto = $recurso->idProyecto;
+								}else{
+									$meta = new ActividadMetaMes;
+									$meta->idProyecto = $componente->idProyecto;
+								}
 								$meta->claveJurisdiccion = $clave;
 								$meta->mes = $mes;
 								$meta->meta = $valor;
-								$meta->idProyecto = $recurso->idProyecto;
 								$metasMes[] = $meta;
 							}
 						}
 					}
 
-					$componente->metasMes()->saveMany($metasMes);
-					return array('data'=>$componente);	
+					$recurso->metasMes()->saveMany($metasMes);
+					return array('data'=>$recurso);	
 					//return array('data'=>$componente,'componentes'=>$proyecto->componentes,'metas'=>$metasMes);
 				}else{
 					throw new Exception("Ocurrió un error al guardar el componente.", 1);

@@ -165,7 +165,10 @@ class InversionController extends ProyectosController {
 				$recurso = AntecedenteFinanciero::find($id);
 			}elseif ($parametros['mostrar'] == 'editar-componente') {
 				# code...
-				$recurso = Accion::with('componente.actividades','componente.metasMes','partidas','propuestasFinanciamiento')->find($id);
+				$recurso = Accion::with('componente.actividades.unidadMedida','componente.metasMes','partidas','propuestasFinanciamiento')->find($id);
+			}elseif ($parametros['mostrar'] == 'editar-actividad') {
+				# code...
+				$recurso = Actividad::with('metasMes')->find($id);
 			}elseif ($parametros['mostrar'] == 'desglose-componente') {
 				# code...
 				$recurso = Accion::with('distribucionPresupuestoAgrupado','datosComponenteDetalle','partidas')->find($id);
@@ -252,12 +255,18 @@ class InversionController extends ProyectosController {
 				}
 			}elseif($parametros['guardar'] == 'componente'){
 				$parametros['clasificacion'] = 2;
-				$parametros['datos_presupuesto'] = TRUE;
 				$respuesta = parent::guardar_datos_componente('componente',$parametros);
 				//
 				if($respuesta['data']['data']){
 					$componente = $respuesta['data']['data'];
 					$respuesta['data'] = $this->guardar_datos_accion_presupuesto($parametros,$componente);
+				}
+			}elseif($parametros['guardar'] == 'actividad'){
+				$parametros['clasificacion'] = 2;
+				$respuesta = parent::guardar_datos_componente('actividad',$parametros);
+				if($respuesta['http_status'] == 200){
+					$componente = Componente::with('actividades.unidadMedida')->find($parametros['id-componente']);
+					$respuesta['data']['extras']['actividades'] = $componente->actividades;
 				}
 			}elseif($parametros['guardar'] == 'proyecto-beneficiario'){
 				$respuesta = parent::guardar_datos_beneficiario($parametros);
@@ -357,404 +366,12 @@ class InversionController extends ProyectosController {
 			}else{
 				$respuesta['data']['ex'] = $ex->getMessage();
 			}
+			$respuesta['data']['line'] = $ex->getLine();
 			if(!isset($respuesta['data']['code'])){
 				$respuesta['data']['code'] = 'S03';
 			}
 		}
 		return Response::json($respuesta['data'],$respuesta['http_status']);
-	}
-
-	public function guardar_datos_desglose_presupuesto($parametros,$id = NULL){
-		$respuesta['http_status'] = 200;
-		$respuesta['data'] = array("data"=>'');
-		$es_editar = FALSE;
-
-		$validacion = Validador::validar(Input::all(), $this->reglasPresupuesto);
-
-		if($validacion === TRUE){
-			
-			$clave_jurisdiccion = $parametros['jurisdiccion-accion'];
-			if($clave_jurisdiccion != 'OC'){
-				$clave_municipio = $parametros['municipio-accion'];
-				//La clave de la localidad se envia concatenada con la clave del municipio municipio|localidad
-				$clave_localidad = explode('|',$parametros['localidad-accion']);
-				$clave_localidad = $clave_localidad[1];
-			}else{
-				$clave_municipio = NULL;
-				$clave_localidad = NULL;
-			}
-
-			if($id){
-				$es_editar = TRUE;
-				$desglose = ComponenteDesglose::with('metasMes')->find($id);
-				$accion_id = $desglose->idAccion;
-				$vieja_clave_municipio = $desglose->claveMunicipio;
-				$vieja_clave_localidad = $desglose->claveLocalidad;
-				$vieja_clave_jurisdiccion = $desglose->claveJurisdiccion;
-			}else{
-				$desglose = new ComponenteDesglose;
-				$accion_id = $parametros['id-accion'];
-				$vieja_clave_municipio = NULL;
-				$vieja_clave_localidad = NULL;
-				$vieja_clave_jurisdiccion = NULL;
-			}
-			
-			$accion = Accion::with('distribucionPresupuesto','partidas')->find($accion_id);
-			$fibap = FIBAP::find($accion->idFibap);
-
-			if($vieja_clave_localidad != $clave_localidad){
-			//Se buscan si la Localidad ya fue capturada
-				if($clave_jurisdiccion != 'OC'){
-					$capturados = $accion->distribucionPresupuesto->filter(function($item) use ($clave_localidad, $clave_municipio){
-						if($item->claveLocalidad == $clave_localidad && $item->claveMunicipio == $clave_municipio){
-							return true;
-						}
-					});
-				}else{
-					//Si la jurisdiccion es Oficina Central se busca por jurisdicción
-					$capturados = $accion->distribucionPresupuesto->filter(function($item) use ($clave_jurisdiccion){
-						if($item->claveJurisdiccion == $clave_jurisdiccion){
-							return true;
-						}
-					});
-				}
-				
-				if(count($capturados)){
-					$respuesta['data']['code'] = 'U00';
-					if($clave_municipio){
-						throw new Exception('{"field":"localidad-accion","error":"Esta localidad ya fue capturada para esta acción."}', 1);
-					}else{
-						throw new Exception('{"field":"jurisdiccion-accion","error":"Esta jurisdicción ya fue capturada para esta acción."}', 1);
-					}
-				}
-			}
-
-			$mes_incial = date("n",strtotime($fibap->periodoEjecucionInicio));
-			$mes_final = date("n",strtotime($fibap->periodoEjecucionFinal));
-
-			//$formul_partidas = $parametros['partidas'];
-			$accion_partidas = $accion->partidas->lists('id','id');
-			$meses_capturados = $parametros['mes'];
-
-			if($es_editar){
-				$meses_ids = $parametros['meses-capturados']; //Elementos ya capturados por tanto se actualizaran
-			}else{
-				$meses_ids = array();
-			}
-
-			//Se calcula la suma total de la distribucion del presupeusto y se crea un arreglo con los elementos a almacenar
-			$distribucion = array();
-			$suma_presupuesto = 0;
-			
-			foreach ($meses_capturados as $mes => $partidas) {
-				//$indx = array_search($partida_id, $partidas);
-				foreach ($partidas as $partida => $cantidad) {
-					//Si la partida enviada desde el formulario se encuantra entre las partidas seleccionadas para el proyecto
-					if(isset($accion_partidas[$partida])){
-						if(isset($meses_ids[$mes][$partida])){
-							$recurso = $accion->distribucionPresupuesto->find($meses_ids[$mes][$partida]);
-							//Aqui me quede llenando la edicion de la distribucion del presupuesto
-						}elseif($cantidad > 0 && $mes >= $mes_incial && $mes <= $mes_final){
-							$recurso = new DistribucionPresupuesto;
-							$recurso->idFibap = $accion->idFibap;
-							$recurso->idObjetoGasto = $partida;
-							$recurso->mes = $mes;
-						}else{
-							$recurso = FALSE;
-						}
-
-						if($recurso){
-							$recurso->claveJurisdiccion = $clave_jurisdiccion;
-							if($clave_jurisdiccion != 'OC'){
-								$recurso->claveMunicipio = $clave_municipio;
-								$recurso->claveLocalidad = $clave_localidad;
-							}else{
-								$recurso->claveMunicipio = NULL;
-								$recurso->claveLocalidad = NULL;
-							}
-							$recurso->cantidad = $cantidad;
-							$distribucion[] = $recurso;
-							$suma_presupuesto += $cantidad;
-						}
-					}
-				}
-			}
-			
-			$suma_distribucion = $accion->distribucionPresupuesto->sum('cantidad');
-
-			if(($suma_distribucion + $suma_presupuesto) > $accion->presupuestoRequerido){
-				throw new Exception('{"field":"cantidad-presupuesto","error":"La distribución del presupuesto sobrepasa el presupuesto requerido."}', 1);
-			}
-
-			//Para calcular total de beneficiarios y validar si no sobrepasa
-			$fibap->load('acciones','proyecto.beneficiarios');
-
-			$beneficiarios_capturados = ComponenteDesglose::whereIn('idAccion',$fibap->acciones->lists('id'))
-										/*->select(DB::raw('(sum(beneficiariosF)/count(claveLocalidad)) AS beneficiariosF'),
-											DB::raw('(sum(beneficiariosM)/count(claveLocalidad)) AS beneficiariosM'))
-										->leftjoin('')*/
-										->groupBy('claveLocalidad','claveMunicipio');
-			//
-			if($clave_jurisdiccion != 'OC'){
-				$beneficiarios_capturados = $beneficiarios_capturados->where('claveLocalidad','!=',$clave_localidad)
-																	->where('claveMunicipio','!=',$clave_municipio);
-			}else{
-				$beneficiarios_capturados = $beneficiarios_capturados->where('claveJurisdiccion','!=',$clave_jurisdiccion);
-			}
-			$beneficiarios_capturados = $beneficiarios_capturados->get();
-			$suma_benef = array();
-			$suma_total = array('f'=>0,'m'=>0);
-			if(count($beneficiarios_capturados)){
-				$beneficiarios_raw = DesgloseBeneficiario::whereIn('idComponenteDesglose',$beneficiarios_capturados->lists('id'))
-														->select('idTipoBeneficiario',DB::raw('sum(totalF) AS totalF'),DB::raw('sum(totalM) AS totalM'))
-														->groupBy('idTipoBeneficiario')
-														->get();
-				foreach ($beneficiarios_raw as $beneficiario) {
-					$suma_benef[$beneficiario->idTipoBeneficiario]['f'] = $beneficiario->totalF;
-					$suma_benef[$beneficiario->idTipoBeneficiario]['m'] = $beneficiario->totalM;
-					//$suma_total['f'] += $beneficiario->totalF;
-					//$suma_total['m'] += $beneficiario->totalM;
-				}
-			}else{
-				$beneficiarios_ids = $fibap->proyecto->beneficiarios->lists('idTipoBeneficiario');
-				foreach ($beneficiarios_ids as $value) {
-					$suma_benef[$value] = array('f'=>0,'m'=>0);
-				}
-			}
-			
-			foreach ($parametros['beneficiarios'] as $tipo_beneficiario => $desglose_sexo) {
-				if(isset($suma_benef[$tipo_beneficiario])){
-					$suma_benef[$tipo_beneficiario]['f'] += $desglose_sexo['f'];
-					$suma_benef[$tipo_beneficiario]['m'] += $desglose_sexo['m'];
-					$suma_total['f'] += $desglose_sexo['f'];
-					$suma_total['m'] += $desglose_sexo['m'];
-				}
-			}
-
-			foreach ($fibap->proyecto->beneficiarios as $beneficiario) {
-				if($suma_benef[$beneficiario->idTipoBeneficiario][$beneficiario->sexo] > $beneficiario->total){
-					throw new Exception('{"field":"beneficiarios-'.$beneficiario->idTipoBeneficiario.'-'.$beneficiario->sexo.'","error":"La cantidad especificada sobrepasa al limite de beneficiarios especificados para el proyecto."}', 1);
-				}
-			}
-
-			$beneficiarios_desglose = array();
-			foreach ($parametros['beneficiarios'] as $tipo_beneficiario => $desglose_sexo) {
-				if(isset($suma_benef[$tipo_beneficiario])){
-					$desglose_benef = new DesgloseBeneficiario;
-					$desglose_benef->idTipoBeneficiario = $tipo_beneficiario;
-					$desglose_benef->totalF = $desglose_sexo['f'];
-					$desglose_benef->totalM = $desglose_sexo['m'];
-
-					$beneficiarios_desglose[] = $desglose_benef;
-				}
-			}
-
-			$suma_metas = 0;
-			$trimestres = array( 1=>0 , 2=>0 , 3=>0 , 4=>0);
-			$metas_mes = array();
-			foreach ($parametros['meta-mes'] as $mes => $meta) {
-				if($meta > 0 ){
-					$recurso = new DesgloseMetasMes;
-					$recurso->mes = $mes;
-					$recurso->meta = $meta;
-					$metas_mes[] = $recurso;
-					$suma_metas += $meta;
-					$trimestres[ceil(($mes/3))] += $meta;
-				}
-			}
-
-			$componente_metas_mes_capturados = ComponenteMetaMes::where('idComponente','=',$accion->idComponente)
-																->where('claveJurisdiccion','=',$clave_jurisdiccion)
-																->get();
-			$componente_metas_mes = array();
-			if(count($componente_metas_mes_capturados)){
-				//Con las metas por mes ya capturadas, buscamos las que vienen del formulario para actualizar
-				foreach ($componente_metas_mes_capturados as $meta_mes) {
-					if(isset($parametros['meta-mes'][$meta_mes->mes])){
-						if($parametros['meta-mes'][$meta_mes->mes] > 0){
-							$meta_mes->meta += $parametros['meta-mes'][$meta_mes->mes];
-
-							$componente_metas_mes[$meta_mes->mes] = $meta_mes;
-						}
-					}
-				}
-			}
-
-			foreach ($metas_mes as $meta) {
-				//las que no se hayan actualizado se crean
-				if(!isset($componente_metas_mes[$meta->mes])){
-					$meta_mes = new ComponenteMetaMes;
-					$meta_mes->idProyecto = $fibap->proyecto->id;
-					$meta_mes->mes = $meta->mes;
-					$meta_mes->meta = $meta->meta;
-					$meta_mes->claveJurisdiccion = $clave_jurisdiccion;
-
-					$componente_metas_mes[$meta->mes] = $meta_mes;
-				}
-				
-			}
-			//$respuesta['data']['data'] = json_encode($componente_metas_mes);
-			//throw new Exception(json_encode($componente_metas_mes_capturados), 1);
-			
-			//$desglose = new ComponenteDesglose;
-			$desglose->idAccion = $accion->id;
-			$desglose->claveJurisdiccion = $clave_jurisdiccion;
-			if($clave_jurisdiccion != 'OC'){
-				$desglose->claveMunicipio 	= $clave_municipio;
-				$desglose->claveLocalidad 	= $clave_localidad;
-			}
-			$desglose->presupuesto 		= $suma_presupuesto;
-			$desglose->beneficiariosF 	= $suma_total['f'];
-			$desglose->beneficiariosM 	= $suma_total['m'];
-
-			$respuesta['data'] = DB::transaction(function() use ($accion,$distribucion,$desglose,$metas_mes,$beneficiarios_desglose,$componente_metas_mes){
-				$accion->componente->desglose()->save($desglose);
-				$accion->componente->metasMes()->saveMany($componente_metas_mes);
-				$accion->distribucionPresupuesto()->saveMany($distribucion);
-				$desglose->metasMes()->saveMany($metas_mes);
-				$desglose->beneficiarios()->saveMany($beneficiarios_desglose);
-				
-				$accion->load('distribucionPresupuestoAgrupado.jurisdiccion');
-				return array('data'=>$accion);
-			});
-
-			$fibap->load('distribucionPresupuestoAgrupado.objetoGasto');
-			$respuesta['data']['extras']['distribucion_total'] = $fibap->distribucionPresupuestoAgrupado;
-		}else{
-			$respuesta['http_status'] 	= $validacion['http_status'];
-			$respuesta['data'] 			= $validacion['data'];
-		}
-		return $respuesta;
-	}
-
-	public function guardar_datos_accion_presupuesto($parametros,$componente,$id = NULL){
-		$es_editar = FALSE;
-		$respuesta = DB::transaction(function() use ($parametros,$componente,$id,$es_editar){
-			$fibap = FIBAP::find($parametros['id-fibap']);
-			if($fibap){
-				if($id){
-					$accion = Accion::with('propuestasFinanciamiento','partidas','componente')->find($id);
-					$es_editar = TRUE;
-				}else{
-					$accion = new Accion;
-				}
-				
-				$accion->idComponente = $componente->id;
-
-/**********************************************       Partidas Presupuestarias       **********************************************/
-				
-				$partidas_formulario = $parametros['objeto-gasto-presupuesto'];
-				if($es_editar){
-					$partidas_anteriores = $accion->partidas->lists('id');
-				}else{
-					$partidas_anteriores = array();
-				}
-
-				if($partidas_formulario[0] == $partidas_formulario[1]){
-					throw new Exception('{"field":"objeto-gasto-presupuesto","error":"Las partidas no deben ser iguales"}', 1);
-				}
-
-				//Sacamos las diferencias de las partidas seleccionadas y las ya capturadas
-				$partidas['nuevas'] = array_diff($partidas_formulario, $partidas_anteriores);
-				$partidas['borrar'] = array_diff($partidas_anteriores, $partidas_formulario);
-
-/***********************************       Origenes del presupuesto y presupuesto Requerido      ************************************/
-				//Obtenemos los origenes del presupuesto
-				$origenes = $parametros['accion-origen'];
-				$origenes_ids = array();
-				if(isset($parametros['origen-captura-id'])){
-					$origenes_ids = $parametros['origen-captura-id'];
-				}
-
-				//Arreglo con los objetos a guardar en la base de datos, relacionados a la Accion
-				$guardar_origenes = array();
-				$presupuesto_suma = 0;
-				foreach ($origenes as $origen => $valor) {
-					if(isset($origenes_ids[$origen])){
-						$origen_finan = $accion->propuestasFinanciamiento()->find($origenes_ids[$origen]);
-						$origen_finan->cantidad = ($valor)? $valor:0;
-						$guardar_origenes[] = $origen_finan;
-					}elseif($valor > 0){
-						$origen_finan = new PropuestaFinanciamiento;
-						$origen_finan->idOrigenFinanciamiento = $origen;
-						$origen_finan->cantidad = $valor;
-						$origen_finan->idFibap = $fibap->id;
-						$guardar_origenes[] = $origen_finan;
-					}
-					$presupuesto_suma += $valor;
-				}
-
-				if($es_editar){
-					if($presupuesto_suma != $accion->presupuestoRequerido){
-						//Obtenemos la suma de los presupuestos ya capturados y sumamos el nuevo presupuesto
-						$total_presupuesto = $fibap->acciones->sum('presupuestoRequerido');
-						$total_presupuesto += $presupuesto_suma;
-						//Quitamos el presupuesto anterior, de lo contrario sumara un presupuesto de más
-						$total_presupuesto -= $accion->presupuestoRequerido;
-
-						if($total_presupuesto > $fibap->presupuestoRequerido){
-							throw new Exception('{"field":"accion-presupuesto-requerido","error":"El presupuesto capturado sobrepasa el Presupuesto Requerido asignado al proyecto."}', 1);
-						}
-
-						$accion->presupuestoRequerido = $presupuesto_suma;
-					}
-				}else{
-					//Obtenemos la suma de los presupuestos ya capturados y sumamos el nuevo presupuesto
-					$total_presupuesto = $fibap->acciones->sum('presupuestoRequerido');
-					$total_presupuesto += $presupuesto_suma;
-
-					if($total_presupuesto > $fibap->presupuestoRequerido){
-						throw new Exception('{"field":"accion-presupuesto-requerido","error":"El presupuesto capturado sobrepasa el Presupuesto Requerido asignado al proyecto."}', 1);
-					}
-
-					$accion->presupuestoRequerido = $presupuesto_suma;
-				}
-				
-				if($fibap->acciones()->save($accion)){
-					$distribucion_total = NULL;
-					if(count($partidas['borrar'])){
-						$restar_de_distribucion = array();
-						$distribuciones = $accion->distribucionPresupuesto()
-												 ->whereIn('idObjetoGasto',$partidas['borrar'])->get();
-						if(count($distribuciones) > 0){
-							foreach ($distribuciones as $distribucion) {
-								if(isset($restar_de_distribucion[$distribucion->claveMunicipio][$distribucion->claveLocalidad])){
-									$restar_de_distribucion[$distribucion->claveMunicipio][$distribucion->claveLocalidad] += $distribucion->cantidad;
-								}else{
-									$restar_de_distribucion[$distribucion->claveMunicipio][$distribucion->claveLocalidad] = $distribucion->cantidad;
-								}
-							}
-							$desgloses = ComponenteDesglose::where('idAccion','=',$accion->id)->get();
-							$desgloses_editar = array();
-							foreach ($desgloses as $desglose) {
-								if(isset($restar_de_distribucion[$desglose->claveMunicipio][$desglose->claveLocalidad])){
-									$desglose->presupuesto -= $restar_de_distribucion[$desglose->claveMunicipio][$desglose->claveLocalidad];
-									$desgloses_editar[] = $desglose;
-								}
-							}
-
-							$accion->componente->desglose()->saveMany($desgloses_editar);
-							$accion->distribucionPresupuesto()->whereIn('idObjetoGasto',$partidas['borrar'])->delete();
-
-							$fibap->load('distribucionPresupuestoAgrupado.objetoGasto');
-							$distribucion_total = $fibap->distribucionPresupuestoAgrupado;
-						}
-						$accion->partidas()->detach($partidas['borrar']);
-					}
-					if(count($partidas['nuevas'])){
-						$accion->partidas()->attach($partidas['nuevas']);
-					}
-					
-					$accion->propuestasFinanciamiento()->saveMany($guardar_origenes);
-				}
-			}else{
-				throw new Exception("No se pudo encontrar la FIBAP", 1);
-			}
-			$fibap->load('acciones.datosComponenteDetalle');
-			$fibap->acciones->load('propuestasFinanciamiento');
-			return array('data'=>$accion,'acciones' => $fibap->acciones);
-		});
-		return $respuesta;
 	}
 
 	/**
@@ -832,12 +449,19 @@ class InversionController extends ProyectosController {
 				$respuesta = parent::guardar_datos_beneficiario($parametros,$id);
 			}elseif($parametros['guardar'] == 'componente'){
 				$parametros['clasificacion'] = 2;
-				$parametros['datos_presupuesto'] = TRUE;
 				$respuesta = parent::guardar_datos_componente('componente',$parametros,$parametros['id-componente']);
 				//Llenar datos adicionales
 				if($respuesta['data']['data']){
 					$componente = $respuesta['data']['data'];
 					$respuesta['data'] = $this->guardar_datos_accion_presupuesto($parametros,$componente,$id);
+				}
+			}elseif($parametros['guardar'] == 'actividad'){
+				$parametros['clasificacion'] = 2;
+				$respuesta = parent::guardar_datos_componente('actividad',$parametros,$parametros['id-actividad']);
+				//Llenar datos adicionales
+				if($respuesta['http_status'] == 200){
+					$componente = Componente::with('actividades.unidadMedida')->find($parametros['id-componente']);
+					$respuesta['data']['extras']['actividades'] = $componente->actividades;
 				}
 			}elseif($parametros['guardar'] == 'datos-fibap'){
 				/***
@@ -970,6 +594,15 @@ class InversionController extends ProyectosController {
 					$respuesta['http_status'] 	= $validacion['http_status'];
 					$respuesta['data'] 			= $validacion['data'];
 				}
+			}elseif ($parametros['guardar'] == 'desglose-presupuesto') {
+				/***
+				*	Formulario de datos del desglose del presupuesto de la Accion (POST)
+				*
+				*	- Guarda una nueva distribución de presupuesto por mes y partida
+				* 	- Guarda datos del desglose del componete (datos a exportar al proyecto) (Metas,Beneficiarios,Localidad)
+				*	- Guardar el desglose de metas por mes del componente
+				***/
+				$respuesta = $this->guardar_datos_desglose_presupuesto($parametros,$id);
 			}
 		}catch(\Exception $ex){
 			$respuesta['http_status'] = 500;	
@@ -1050,6 +683,465 @@ class InversionController extends ProyectosController {
 		}
 
 		return Response::json($data,$http_status);
+	}
+
+	public function guardar_datos_desglose_presupuesto($parametros,$id = NULL){
+		$respuesta['http_status'] = 200;
+		$respuesta['data'] = array("data"=>'');
+		$es_editar = FALSE;
+
+		$validacion = Validador::validar(Input::all(), $this->reglasPresupuesto);
+
+		if($validacion === TRUE){
+			
+			$clave_jurisdiccion = $parametros['jurisdiccion-accion'];
+			if($clave_jurisdiccion != 'OC'){
+				$clave_municipio = $parametros['municipio-accion'];
+				//La clave de la localidad se envia concatenada con la clave del municipio municipio|localidad
+				$clave_localidad = explode('|',$parametros['localidad-accion']);
+				$clave_localidad = $clave_localidad[1];
+			}else{
+				$clave_municipio = NULL;
+				$clave_localidad = NULL;
+			}
+
+			if($id){
+				$es_editar = TRUE;
+				$desglose = ComponenteDesglose::with('metasMes','beneficiarios')->find($id);
+				$accion_id = $desglose->idAccion;
+			}else{
+				$desglose = new ComponenteDesglose;
+				$accion_id = $parametros['id-accion'];
+				$desglose->claveMunicipio = '0';
+				$desglose->claveLocalidad = '0';
+				$desglose->claveJurisdiccion = '0';
+			}
+			
+			$accion = Accion::with('distribucionPresupuesto','partidas')->find($accion_id);
+			$fibap = FIBAP::find($accion->idFibap);
+
+			if( $clave_localidad != $desglose->claveLocalidad || $clave_municipio != $desglose->claveMunicipio){
+			//Se buscan si la Localidad ya fue capturada
+				if($clave_jurisdiccion != 'OC'){
+					$capturados = $accion->distribucionPresupuesto->filter(function($item) use ($clave_localidad, $clave_municipio){
+						if($item->claveLocalidad == $clave_localidad && $item->claveMunicipio == $clave_municipio){
+							return true;
+						}
+					});
+				}else{
+					//Si la jurisdiccion es Oficina Central se busca por jurisdicción
+					$capturados = $accion->distribucionPresupuesto->filter(function($item) use ($clave_jurisdiccion){
+						if($item->claveJurisdiccion == $clave_jurisdiccion){
+							return true;
+						}
+					});
+				}
+				
+				if(count($capturados)){
+					$respuesta['data']['code'] = 'U00';
+					if($clave_municipio){
+						throw new Exception('{"field":"localidad-accion","error":"Esta localidad ya fue capturada para esta acción."}', 1);
+					}else{
+						throw new Exception('{"field":"jurisdiccion-accion","error":"Esta jurisdicción ya fue capturada para esta acción."}', 1);
+					}
+				}
+			}
+
+			$mes_incial = date("n",strtotime($fibap->periodoEjecucionInicio));
+			$mes_final = date("n",strtotime($fibap->periodoEjecucionFinal));
+
+			/******************************      Creación/Edición de elementos del desglose        *******************************/
+			$accion_partidas = $accion->partidas->lists('id','id');
+			$meses_capturados = $parametros['mes'];
+
+			if($es_editar){
+				$meses_ids = $parametros['meses-capturados']; //Elementos ya capturados por tanto se actualizaran
+			}else{
+				$meses_ids = array();
+			}
+
+			//Se calcula la suma total de la distribucion del presupeusto y se crea un arreglo con los elementos a almacenar
+			$distribucion = array();
+			$suma_presupuesto = 0;
+			
+			foreach ($meses_capturados as $mes => $partidas) {
+				foreach ($partidas as $partida => $cantidad) {
+					//Si la partida enviada desde el formulario se encuantra entre las partidas seleccionadas para el proyecto
+					if(isset($accion_partidas[$partida])){
+						if(isset($meses_ids[$mes][$partida])){
+							$recurso = $accion->distribucionPresupuesto->find($meses_ids[$mes][$partida]);
+							//Aqui me quede llenando la edicion de la distribucion del presupuesto
+						}elseif($cantidad > 0 && $mes >= $mes_incial && $mes <= $mes_final){
+							$recurso = new DistribucionPresupuesto;
+							$recurso->idFibap = $accion->idFibap;
+							$recurso->idObjetoGasto = $partida;
+							$recurso->mes = $mes;
+						}else{
+							$recurso = FALSE;
+						}
+
+						if($recurso){
+							$recurso->claveJurisdiccion = $clave_jurisdiccion;
+							if($clave_jurisdiccion != 'OC'){
+								$recurso->claveMunicipio = $clave_municipio;
+								$recurso->claveLocalidad = $clave_localidad;
+							}else{
+								$recurso->claveMunicipio = NULL;
+								$recurso->claveLocalidad = NULL;
+							}
+							$recurso->cantidad = $cantidad;
+							$distribucion[] = $recurso;
+							$suma_presupuesto += $cantidad;
+						}
+					}
+				}
+			}
+			
+			/******************************      Validación de presupuesto        *******************************/
+			if($es_editar){
+				$sumatoria = $accion->distribucionPresupuesto->filter(function($item) use ($clave_municipio,$clave_localidad){
+					if($item->claveLocalidad != $clave_localidad || $item->claveMunicipio != $clave_municipio){
+						return true;
+					}
+				});
+				$suma_distribucion = $sumatoria->sum('cantidad');
+			}else{
+				$suma_distribucion = $accion->distribucionPresupuesto->sum('cantidad');
+			}
+
+			if(($suma_distribucion + $suma_presupuesto) > $accion->presupuestoRequerido){
+				throw new Exception('{"field":"cantidad-presupuesto","error":"La distribución del presupuesto sobrepasa el presupuesto requerido."}', 1);
+			}
+			/******************************      Fin validación de presupuesto        *******************************/
+
+			/******************************      Validación de beneficiarios        *******************************/
+			$fibap->load('acciones','proyecto.beneficiarios');
+
+			if($es_editar){
+				$editar_beneficiarios = FALSE;
+				$beneficiarios_f = $desglose->beneficiarios->lists('totalF','idTipoBeneficiario');
+				$beneficiarios_m = $desglose->beneficiarios->lists('totalM','idTipoBeneficiario');
+				
+				foreach ($parametros['beneficiarios'] as $tipo_beneficiario => $desglose_sexo) {
+					if($beneficiarios_f[$tipo_beneficiario] != $desglose_sexo['f'] || $beneficiarios_m[$tipo_beneficiario] != $desglose_sexo['m']){
+						$editar_beneficiarios = TRUE;
+					}
+				}
+			}else{
+				$editar_beneficiarios = TRUE;
+			}
+
+			$beneficiarios_desglose = array();
+			if($editar_beneficiarios){
+				//Se obtienen todos los beneficiarios capturados para el proyecto
+				$beneficiarios_capturados = ComponenteDesglose::whereIn('idAccion',$fibap->acciones->lists('id'))
+											->groupBy('claveLocalidad','claveMunicipio');
+				//Se filtran por localidad o jurisdicción, para obtener los beneficiarios de las diferentes localidades capturadas
+				if($clave_jurisdiccion != 'OC'){
+					$beneficiarios_capturados = $beneficiarios_capturados->where('claveLocalidad','!=',$clave_localidad)
+																		->where('claveMunicipio','!=',$clave_municipio);
+				}else{
+					$beneficiarios_capturados = $beneficiarios_capturados->where('claveJurisdiccion','!=',$clave_jurisdiccion);
+				}
+				$beneficiarios_capturados = $beneficiarios_capturados->get();
+
+				$suma_benef = array();
+				$suma_total = array('f'=>0,'m'=>0);
+				if(count($beneficiarios_capturados)){
+					$beneficiarios_raw = DesgloseBeneficiario::whereIn('idComponenteDesglose',$beneficiarios_capturados->lists('id'))
+															->select('idTipoBeneficiario',DB::raw('sum(totalF) AS totalF'),DB::raw('sum(totalM) AS totalM'))
+															->groupBy('idTipoBeneficiario')
+															->get();
+					foreach ($beneficiarios_raw as $beneficiario) {
+						$suma_benef[$beneficiario->idTipoBeneficiario]['f'] = $beneficiario->totalF;
+						$suma_benef[$beneficiario->idTipoBeneficiario]['m'] = $beneficiario->totalM;
+					}
+				}else{
+					$beneficiarios_ids = $fibap->proyecto->beneficiarios->lists('idTipoBeneficiario');
+					foreach ($beneficiarios_ids as $value) {
+						$suma_benef[$value] = array('f'=>0,'m'=>0);
+					}
+				}
+				
+				foreach ($parametros['beneficiarios'] as $tipo_beneficiario => $desglose_sexo) {
+					if(isset($suma_benef[$tipo_beneficiario])){
+						$suma_benef[$tipo_beneficiario]['f'] += $desglose_sexo['f'];
+						$suma_benef[$tipo_beneficiario]['m'] += $desglose_sexo['m'];
+						$suma_total['f'] += $desglose_sexo['f'];
+						$suma_total['m'] += $desglose_sexo['m'];
+					}
+				}
+
+				foreach ($fibap->proyecto->beneficiarios as $beneficiario) {
+					if($suma_benef[$beneficiario->idTipoBeneficiario][$beneficiario->sexo] > $beneficiario->total){
+						throw new Exception('{"field":"beneficiarios-'.$beneficiario->idTipoBeneficiario.'-'.$beneficiario->sexo.'","error":"La cantidad especificada sobrepasa al limite de beneficiarios especificados para el proyecto."}', 1);
+					}
+				}
+
+				/******************************      Fin validación de beneficiarios        *******************************/
+
+				foreach ($parametros['beneficiarios'] as $tipo_beneficiario => $desglose_sexo) {
+					if($es_editar){
+						$desglose_benef = $desglose->beneficiarios->filter(function($item) use ($tipo_beneficiario){
+							if($item->idTipoBeneficiario == $tipo_beneficiario){ return true; }
+						})->first();
+						//$desglose_benef = $desglose_benef[0];
+					}else{
+						$desglose_benef = FALSE;
+					}
+					if(!$desglose_benef){
+						$desglose_benef = new DesgloseBeneficiario;
+						$desglose_benef->idTipoBeneficiario = $tipo_beneficiario;
+					}
+					$desglose_benef->totalF = $desglose_sexo['f'];
+					$desglose_benef->totalM = $desglose_sexo['m'];
+
+					$beneficiarios_desglose[] = $desglose_benef;
+				}
+			}
+
+			$suma_metas = 0;
+			$trimestres = array( 1=>0 , 2=>0 , 3=>0 , 4=>0);
+			$metas_mes = array();
+			$metas_anteriores = array(1=>0,2=>0,3=>0,4=>0,5=>0,6=>0,7=>0,8=>0,9=>0,10=>0,11=>0,12=>0); //Para obtener la diferencia
+
+			if($es_editar){
+				$metas_ids = $parametros['metas-capturadas']; //Elementos ya capturados por tanto se actualizaran
+			}else{
+				$metas_ids = array();
+			}
+
+			foreach ($parametros['meta-mes'] as $mes => $meta) {
+				if(isset($metas_ids[$mes])){
+					$recurso = $desglose->metasMes->find($metas_ids[$mes]);
+					
+					$metas_anteriores[$mes] = $recurso->meta;
+					$recurso->meta = $meta;
+
+					$metas_mes[$mes] = $recurso;
+					$trimestres[ceil(($mes/3))] += $meta;
+					$suma_metas += $meta;
+				}elseif($meta > 0 ){
+					$recurso = new DesgloseMetasMes;
+					$recurso->mes = $mes;
+					$recurso->meta = $meta;
+
+					$metas_mes[$mes] = $recurso;
+					$trimestres[ceil(($mes/3))] += $meta;
+					$suma_metas += $meta;
+				}
+			}
+
+			$componente = $accion->componente;
+			$componente->valorNumerador = $suma_metas;
+			$componente->numeroTrim1 = $trimestres[1];
+			$componente->numeroTrim2 = $trimestres[2];
+			$componente->numeroTrim3 = $trimestres[3];
+			$componente->numeroTrim4 = $trimestres[4];
+
+			//Obtenemos las metas por mes del componente de la jurisdicción a capturar, estos serían el concentrado de mestas del desglose
+			$componente_metas_mes_capturados = ComponenteMetaMes::where('idComponente','=',$accion->idComponente)
+																->where('claveJurisdiccion','=',$clave_jurisdiccion)
+																->get();
+			$componente_metas_mes = array();
+			if(count($componente_metas_mes_capturados)){
+				//Con las metas por mes ya capturadas, buscamos las que vienen del formulario para actualizar
+				foreach ($componente_metas_mes_capturados as $mes_capturado) {
+					if(isset($metas_mes[$mes_capturado->mes])){
+						$mes_capturado->meta += ($metas_mes[$mes_capturado->mes]->meta - $metas_anteriores[$mes_capturado->mes]);
+						$componente_metas_mes[$mes_capturado->mes] = $mes_capturado;
+					}
+				}
+			}
+
+			foreach ($metas_mes as $meta) {
+				//las que no se hayan actualizado se crean
+				if(!isset($componente_metas_mes[$meta->mes])){
+					$meta_mes = new ComponenteMetaMes;
+					$meta_mes->idProyecto = $fibap->proyecto->id;
+					$meta_mes->mes = $meta->mes;
+					$meta_mes->meta = $meta->meta;
+					$meta_mes->claveJurisdiccion = $clave_jurisdiccion;
+
+					$componente_metas_mes[$meta->mes] = $meta_mes;
+				}
+				
+			}
+			//$respuesta['data']['data'] = json_encode($componente_metas_mes);
+			//throw new Exception(json_encode($componente_metas_mes_capturados), 1);
+			
+			$desglose->idAccion = $accion->id;
+			$desglose->claveJurisdiccion = $clave_jurisdiccion;
+			if($clave_jurisdiccion != 'OC'){
+				$desglose->claveMunicipio 	= $clave_municipio;
+				$desglose->claveLocalidad 	= $clave_localidad;
+			}
+			$desglose->presupuesto 		= $suma_presupuesto;
+			if($editar_beneficiarios){
+				$desglose->beneficiariosF 	= $suma_total['f'];
+				$desglose->beneficiariosM 	= $suma_total['m'];
+			}
+			
+			$respuesta['data'] = DB::transaction(function() use ($accion,$distribucion,$desglose,$metas_mes,$beneficiarios_desglose,$componente_metas_mes,$componente){
+				$componente->save();
+
+				$accion->componente->desglose()->save($desglose);
+
+				$accion->componente->metasMes()->saveMany($componente_metas_mes);
+
+				if(count($distribucion)){
+					$accion->distribucionPresupuesto()->saveMany($distribucion);
+				}
+
+				if(count($metas_mes)){
+					$desglose->metasMes()->saveMany($metas_mes);
+				}
+
+				if(count($beneficiarios_desglose)){
+					$desglose->beneficiarios()->saveMany($beneficiarios_desglose);
+				}
+				
+				$accion->load('distribucionPresupuestoAgrupado.jurisdiccion');
+				return array('data'=>$accion);
+			});
+
+			$fibap->load('distribucionPresupuestoAgrupado.objetoGasto');
+			$respuesta['data']['extras']['distribucion_total'] = $fibap->distribucionPresupuestoAgrupado;
+		}else{
+			$respuesta['http_status'] 	= $validacion['http_status'];
+			$respuesta['data'] 			= $validacion['data'];
+		}
+		return $respuesta;
+	}
+
+	public function guardar_datos_accion_presupuesto($parametros,$componente,$id = NULL){
+		$es_editar = FALSE;
+		$respuesta = DB::transaction(function() use ($parametros,$componente,$id,$es_editar){
+			$fibap = FIBAP::find($parametros['id-fibap']);
+			if($fibap){
+				if($id){
+					$accion = Accion::with('propuestasFinanciamiento','partidas','componente')
+								->where('idComponente','=',$id)->first();
+					$es_editar = TRUE;
+				}else{
+					$accion = new Accion;
+					$accion->idComponente = $componente->id;
+				}
+				
+				/********************************       Partidas Presupuestarias       *********************************/
+				
+				$partidas_formulario = $parametros['objeto-gasto-presupuesto'];
+				if($es_editar){
+					$partidas_anteriores = $accion->partidas->lists('id');
+				}else{
+					$partidas_anteriores = array();
+				}
+
+				if($partidas_formulario[0] == $partidas_formulario[1]){
+					throw new Exception('{"field":"objeto-gasto-presupuesto","error":"Las partidas no deben ser iguales"}', 1);
+				}
+
+				//Sacamos las diferencias de las partidas seleccionadas y las ya capturadas
+				$partidas['nuevas'] = array_diff($partidas_formulario, $partidas_anteriores);
+				$partidas['borrar'] = array_diff($partidas_anteriores, $partidas_formulario);
+
+				/********************       Origenes del presupuesto y presupuesto Requerido      ************************/
+				//Obtenemos los origenes del presupuesto
+				$origenes = $parametros['accion-origen'];
+				$origenes_ids = array();
+				if(isset($parametros['origen-captura-id'])){
+					$origenes_ids = $parametros['origen-captura-id'];
+				}
+
+				//Arreglo con los objetos a guardar en la base de datos, relacionados a la Accion
+				$guardar_origenes = array();
+				$presupuesto_suma = 0;
+				foreach ($origenes as $origen => $valor) {
+					if(isset($origenes_ids[$origen])){
+						$origen_finan = $accion->propuestasFinanciamiento()->find($origenes_ids[$origen]);
+						$origen_finan->cantidad = ($valor)? $valor:0;
+						$guardar_origenes[] = $origen_finan;
+					}elseif($valor > 0){
+						$origen_finan = new PropuestaFinanciamiento;
+						$origen_finan->idOrigenFinanciamiento = $origen;
+						$origen_finan->cantidad = $valor;
+						$origen_finan->idFibap = $fibap->id;
+						$guardar_origenes[] = $origen_finan;
+					}
+					$presupuesto_suma += $valor;
+				}
+
+				if($es_editar){
+					if($presupuesto_suma != $accion->presupuestoRequerido){
+						//Obtenemos la suma de los presupuestos ya capturados y sumamos el nuevo presupuesto
+						$total_presupuesto = $fibap->acciones->sum('presupuestoRequerido');
+						$total_presupuesto += $presupuesto_suma;
+						//Quitamos el presupuesto anterior, de lo contrario sumara un presupuesto de más
+						$total_presupuesto -= $accion->presupuestoRequerido;
+
+						if($total_presupuesto > $fibap->presupuestoRequerido){
+							throw new Exception('{"field":"accion-presupuesto-requerido","error":"El presupuesto capturado sobrepasa el Presupuesto Requerido asignado al proyecto."}', 1);
+						}
+
+						$accion->presupuestoRequerido = $presupuesto_suma;
+					}
+				}else{
+					//Obtenemos la suma de los presupuestos ya capturados y sumamos el nuevo presupuesto
+					$total_presupuesto = $fibap->acciones->sum('presupuestoRequerido');
+					$total_presupuesto += $presupuesto_suma;
+
+					if($total_presupuesto > $fibap->presupuestoRequerido){
+						throw new Exception('{"field":"accion-presupuesto-requerido","error":"El presupuesto capturado sobrepasa el Presupuesto Requerido asignado al proyecto."}', 1);
+					}
+
+					$accion->presupuestoRequerido = $presupuesto_suma;
+				}
+				
+				if($fibap->acciones()->save($accion)){
+					$distribucion_total = NULL;
+					if(count($partidas['borrar'])){
+						$restar_de_distribucion = array();
+						$distribuciones = $accion->distribucionPresupuesto()
+												 ->whereIn('idObjetoGasto',$partidas['borrar'])->get();
+						if(count($distribuciones) > 0){
+							foreach ($distribuciones as $distribucion) {
+								if(isset($restar_de_distribucion[$distribucion->claveMunicipio][$distribucion->claveLocalidad])){
+									$restar_de_distribucion[$distribucion->claveMunicipio][$distribucion->claveLocalidad] += $distribucion->cantidad;
+								}else{
+									$restar_de_distribucion[$distribucion->claveMunicipio][$distribucion->claveLocalidad] = $distribucion->cantidad;
+								}
+							}
+							$desgloses = ComponenteDesglose::where('idAccion','=',$accion->id)->get();
+							$desgloses_editar = array();
+							foreach ($desgloses as $desglose) {
+								if(isset($restar_de_distribucion[$desglose->claveMunicipio][$desglose->claveLocalidad])){
+									$desglose->presupuesto -= $restar_de_distribucion[$desglose->claveMunicipio][$desglose->claveLocalidad];
+									$desgloses_editar[] = $desglose;
+								}
+							}
+
+							$accion->componente->desglose()->saveMany($desgloses_editar);
+							$accion->distribucionPresupuesto()->whereIn('idObjetoGasto',$partidas['borrar'])->delete();
+
+							$fibap->load('distribucionPresupuestoAgrupado.objetoGasto');
+							$distribucion_total = $fibap->distribucionPresupuestoAgrupado;
+						}
+						$accion->partidas()->detach($partidas['borrar']);
+					}
+					if(count($partidas['nuevas'])){
+						$accion->partidas()->attach($partidas['nuevas']);
+					}
+					
+					$accion->propuestasFinanciamiento()->saveMany($guardar_origenes);
+				}
+			}else{
+				throw new Exception("No se pudo encontrar la FIBAP", 1);
+			}
+			$fibap->load('acciones.datosComponenteDetalle');
+			$fibap->acciones->load('propuestasFinanciamiento');
+			return array('data'=>$accion,'acciones' => $fibap->acciones);
+		});
+		return $respuesta;
 	}
 
 	private function validar_fechas($fecha_inicial, $fecha_final){

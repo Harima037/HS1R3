@@ -260,7 +260,7 @@
                 <div class="col-sm-2">
                     <div class="form-group">
                         <label class="control-label"><span class="fa fa-link"></span> Meta</label>
-                        <span class="form-control control-espejo" data-espejo-id="#meta-{{$identificador}}"></span>
+                        <span class="form-control" id="meta-{{$identificador}}-lbl"></span>
                         <input type="hidden" id="meta-{{$identificador}}" name="meta-{{$identificador}}">
                     </div>
                 </div>

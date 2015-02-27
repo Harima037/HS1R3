@@ -26,8 +26,8 @@ var modal_antecedente = '#modal-antecedente';
 var modal_presupuesto = '#modal-presupuesto';
 var modal_accion  = '#modal-accion';
 var modal_beneficiario = '#modalBeneficiario';
-var modal_componente = '#modalComponente';
-var modal_actividad = '#modalActividad';
+var modal_componente = '#modal-componente';
+var modal_actividad = '#modal-actividad';
 
 $('.chosen-one').chosen({width:'100%'});
 
@@ -54,6 +54,8 @@ if($('#id').val()){
 			$('#tab-link-caratula-beneficiarios').attr('data-toggle','tab');
 			$('#tab-link-caratula-beneficiarios').parent().removeClass('disabled');
 
+			fibapAcciones.init(response.data.fibap.id,proyectoResource);
+
 			if(response.extras.municipios){
         		fibapAcciones.cargar_municipios(response.extras.municipios);
         	}
@@ -72,16 +74,15 @@ if($('#id').val()){
 				caratulaFibap.llenar_datos(response.data.fibap);
 				cambiar_icono_tabs('#tab-link-datos-fibap','fa-check-square-o');
 
-				if(response.data.fibap.resultadosObtenidos || response.data.fibap.antecedentes_financieros){
+				if(response.data.fibap.resultadosObtenidos || response.data.fibap.antecedentes_financieros.length){
 					cambiar_icono_tabs('#tab-link-antecedentes-fibap','fa-check-square-o');
 				}
 
 				fibapAntecedentes.init(response.data.fibap.id,proyectoResource);
-				fibapAcciones.init(response.data.fibap.id,proyectoResource);
 				fibapAcciones.actualizar_total_presupuesto(response.data.fibap.presupuestoRequerido);
 				fibapAcciones.actualizar_metas_mes(response.extras.jurisdicciones);
 
-				if(response.data.fibap.antecedentes_financieros){
+				if(response.data.fibap.antecedentes_financieros.length){
 					fibapAntecedentes.llenar_datagrid(response.data.fibap.antecedentes_financieros);
 				}
 
@@ -139,6 +140,16 @@ function editar_accion(e){
 	proyectoResource.get(e,parametros,{
 		_success: function(response){
 			fibapAcciones.mostrar_datos(response.data);
+			//fibapAcciones.actualizar_metas_ids('componente',response.data.componente.metas_mes);
+		}
+	});
+}
+
+function editar_actividad(e){
+	var parametros = {'mostrar':'editar-actividad'};
+	proyectoResource.get(e,parametros,{
+		_success: function(response){
+			fibapAcciones.mostrar_datos_actividad(response.data);
 		}
 	});
 }
@@ -160,49 +171,74 @@ function editar_presupuesto(e){
 								Acciones de Guardado
 ************************************************************************************************/
 $('#btn-componente-guardar-salir').on('click',function(){
-	guardar_datos_componente(true);
+	guardar_datos_componente(true,'componente');
 });
 
 $('#btn-componente-guardar').on('click',function(){
-	guardar_datos_componente(false);
+	guardar_datos_componente(false,'componente');
 });
 
-function guardar_datos_componente(cerrar){
-	Validation.cleanFormErrors(form_componente);
-	var parametros = $(form_componente).serialize();
-	parametros += '&guardar=componente';
-	parametros += '&id-proyecto=' + $('#id').val();
+$('#btn-actividad-guardar').on('click',function(){
+	guardar_datos_componente(true,'actividad');
+});
+
+function guardar_datos_componente(cerrar,selector){
+	if(selector == 'actividad'){
+		var formulario = form_actividad;
+		var modal = modal_actividad;
+	}else{
+		var formulario = form_componente;
+		var modal = modal_componente;
+	}
+	
+	Validation.cleanFormErrors(formulario);
+	var parametros = $(formulario).serialize();
+	parametros += '&guardar='+selector;
 	parametros += '&id-fibap=' + $('#id-fibap').val();
+	if(selector == 'actividad'){
+		parametros += '&id-componente=' + $('#id-componente').val();
+	}else{
+		parametros += '&id-proyecto=' + $('#id').val();
+	}
 	//parametros = parametros + '&clasificacion='+$('#clasificacionproyecto').val();
 
-	if($('#id-accion').val()){
+	if($('#id-'+selector).val()){
 		var cadena_metas = '';
-		$(form_componente + ' .metas-mes').each(function(){
-			if($(this).data('meta-id')){
-				cadena_metas = cadena_metas + '&mes-componente-id['+$(this).data('meta-jurisdiccion')+']['+$(this).data('meta-mes')+']='+$(this).data('meta-id');
+		$(formulario + ' .metas-mes').each(function(){
+			if($(this).attr('data-meta-id')){
+				cadena_metas = cadena_metas + '&mes-'+selector+'-id['+$(this).attr('data-meta-jurisdiccion')+']['+$(this).attr('data-meta-mes')+']='+$(this).attr('data-meta-id');
 			}
 		});
-		parametros = parametros + cadena_metas;
+		parametros += cadena_metas;
 
-		var lista_origenes_id = '';
-		$('.accion-origen-financiamiento').each(function(){
-			if($(this).attr('data-captura-id')){
-				lista_origenes_id += '&origen-captura-id[' + $(this).data('origen-id') + ']=' + $(this).attr('data-captura-id');
-			}
-		});
-		parametros += lista_origenes_id;
+		if(selector == 'componente'){
+			var lista_origenes_id = '';
+			$('.accion-origen-financiamiento').each(function(){
+				if($(this).attr('data-captura-id')){
+					lista_origenes_id += '&origen-captura-id[' + $(this).attr('data-origen-id') + ']=' + $(this).attr('data-captura-id');
+				}
+			});
+			parametros += lista_origenes_id;
+		}
 
-		proyectoResource.put($('#id-accion').val(),parametros,{
+		proyectoResource.put($('#id-'+selector).val(),parametros,{
 	        _success: function(response){
-	            MessageManager.show({data:'Datos del componente almacenados con éxito',type:'OK',timer:3});
-	            fibapAcciones.llenar_datagrid(response.acciones);
+	            MessageManager.show({data:'Datos de la acción almacenados con éxito',type:'OK',timer:3});
+	            if(selector == 'actividad'){
+	            	fibapAcciones.llenar_datagrid_actividades(response.extras.actividades);
+	            }else{
+	            	fibapAcciones.llenar_datagrid(response.acciones);
+	            }
 
 	            if(cerrar){
-					$(modal_componente).modal('hide');
+					$(modal).modal('hide');
 				}else{
-					$('#tablink-componente-actividades').tab('show');
+					if(selector == 'componente'){
+						$('#tablink-componente-actividades').tab('show');
+					}
+					
 					if(response.metas){
-						fibapAcciones.actualizar_metas_ids('componente',response.metas);
+						fibapAcciones.actualizar_metas_ids(selector,response.metas);
 					}
 				}
 	        },
@@ -223,21 +259,31 @@ function guardar_datos_componente(cerrar){
 	}else{
 		proyectoResource.post(parametros,{
 	        _success: function(response){
-	            MessageManager.show({data:'Datos del componente almacenados con éxito',type:'OK',timer:3});
-	            fibapAcciones.llenar_datagrid(response.acciones);
+	            MessageManager.show({data:'Datos de la acción almacenados con éxito',type:'OK',timer:3});
+	            if(selector == 'actividad'){
+	            	fibapAcciones.llenar_datagrid_actividades(response.extras.actividades);
+	            }else{
+	            	fibapAcciones.llenar_datagrid(response.acciones);
+	            }
 
 	            if(cerrar){
-					$(modal_componente).modal('hide');
+					$(modal).modal('hide');
 				}else{
-					$(form_componente + ' #id-componente').val(response.data.idComponente);
-					$(form_componente + ' #id-accion').val(response.data.id);
-					$('#tablink-componente-actividades').attr('data-toggle','tab');
-					$('#tablink-componente-actividades').parent().removeClass('disabled');
-					$('#tablink-componente-actividades').tab('show');
+					if(selector == 'actividad'){
+						$(formulario + ' #id-actividad').val(response.data.id);
+					}else{
+						$(formulario + ' #id-componente').val(response.data.idComponente);
+						$(formulario + ' #id-accion').val(response.data.id);
+						$('#tablink-componente-actividades').attr('data-toggle','tab');
+						$('#tablink-componente-actividades').parent().removeClass('disabled');
+						$('#tablink-componente-actividades').tab('show');
+					}
+
 					if(response.metas){
-						fibapAcciones.actualizar_metas_ids('componente',response.metas);
+						fibapAcciones.actualizar_metas_ids(selector,response.metas);
 					}
 				}
+				cambiar_icono_tabs('#tab-link-acciones-fibap','fa-check-square-o');
 	        },
 	        _error: function(response){
 	            try{
@@ -379,6 +425,7 @@ $('#btn-fibap-guardar').on('click',function(){
 
 				fibapAntecedentes.init(response.data.id,proyectoResource);
 				fibapAcciones.init(response.data.id,proyectoResource);
+				fibapAcciones.actualizar_total_presupuesto(parseFloat(response.data.presupuestoRequerido));
 	            /*
 				if(response.data.periodoEjecucionInicio){
 	            	habilitar_meses(response.data.periodoEjecucionInicio,response.data.periodoEjecucionFinal);
@@ -409,42 +456,32 @@ $('#btn-presupuesto-guardar').on('click',function(){
 	var accion_id = $('#datagridDistribucion').attr('data-selected-id');
 	parametros += '&id-accion='+accion_id;
 
-	//Obtenemos los ids de las Partidas capturadas
-	/*
-	var partida_1_id = $('#datagridDistribucion').attr('data-partida-1-id');
-	var partida_2_id = $('#datagridDistribucion').attr('data-partida-2-id');
-	parametros += '&partidas[1]='+partida_1_id+'&partidas[2]='+partida_2_id;
-	*/
-
 	Validation.cleanFormErrors(form_presupuesto);
 	
 	if($('#id-desglose').val()){
-		/*
 		var meses_capturados = '';
-		var metas_capturadas = '';
 		$('.presupuesto-mes').each(function(){
 			if($(this).attr('data-presupuesto-id')){
-				if($(this).hasClass('valor-partida-1')){
-					meses_capturados += '&meses-capturados[1]['+$(this).attr('data-presupuesto-mes')+']='+$(this).attr('data-presupuesto-id');
-				}else{
-					meses_capturados += '&meses-capturados[2]['+$(this).attr('data-presupuesto-mes')+']='+$(this).attr('data-presupuesto-id');
-				}
-				
+				var partida = $(this).attr('data-presupuesto-partida');
+				var mes = $(this).attr('data-presupuesto-mes');
+				meses_capturados += '&meses-capturados['+mes+']['+partida+']='+$(this).attr('data-presupuesto-id');
 			}
 		});
 		parametros += meses_capturados;
+
+		var metas_capturadas = '';
 		$('.meta-mes').each(function(){
 			if($(this).attr('data-meta-id')){
 				metas_capturadas += '&metas-capturadas['+$(this).attr('data-meta-mes')+']='+$(this).attr('data-meta-id');
 			}
 		});
 		parametros += metas_capturadas;
-				
+
 		proyectoResource.put($('#id-desglose').val(),parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Cambios almacenados con éxito',type:'OK',timer:3});
-	            llenar_datagrid_distribucion(response.data.distribucion_presupuesto_agrupado,response.data.presupuestoRequerido);
-	            llenar_datagrid_presupuestos(response.distribucion_total);
+	            fibapAcciones.llenar_datagrid_distribucion(response.data.distribucion_presupuesto_agrupado,response.data.presupuestoRequerido);
+	            fibapAcciones.llenar_tabla_distribucion_general(response.extras.distribucion_total);
 	            $(modal_presupuesto).modal('hide');
 	        },
 	        _error: function(response){
@@ -461,17 +498,13 @@ $('#btn-presupuesto-guardar').on('click',function(){
 	            }
 	        }
 	    });
-		*/
 	}else{
 		proyectoResource.post(parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Presupuesto almacenado con éxito',type:'OK',timer:3});
 	            fibapAcciones.llenar_datagrid_distribucion(response.data.distribucion_presupuesto_agrupado,response.data.presupuestoRequerido);
 	            fibapAcciones.llenar_tabla_distribucion_general(response.extras.distribucion_total);
-	            //llenar_datagrid_distribucion(response.data.distribucion_presupuesto_agrupado,response.data.presupuestoRequerido);
-	            //llenar_datagrid_presupuestos(response.distribucion_total);
-	            //cambiar_icono_tabs('#tab-link-acciones-fibap','fa-check-square-o');
-	            //$(modal_presupuesto).modal('hide');
+	            $(modal_presupuesto).modal('hide');
 	        },
 	        _error: function(response){
 	            try{
@@ -584,6 +617,7 @@ $('#btn-beneficiario-guardar').on('click',function(){
 				MessageManager.show({data:'Datos de los beneficiarios almacenados con éxito',type:'OK',timer:3});
 	            $(modal_beneficiario).modal('hide');
 				caratulaBeneficiario.llenar_datagrid(response.data);
+				fibapAcciones.actualizar_lista_beneficiarios(response.data);
 			},
 			_error: function(response){
 	            try{
@@ -605,6 +639,8 @@ $('#btn-beneficiario-guardar').on('click',function(){
 				MessageManager.show({data:'Datos de los beneficiarios almacenados con éxito',type:'OK',timer:3});
 	            $(modal_beneficiario).modal('hide');
 	            caratulaBeneficiario.llenar_datagrid(response.data);
+	            fibapAcciones.actualizar_lista_beneficiarios(response.data);
+	            cambiar_icono_tabs('#tab-link-caratula-beneficiarios','fa-check-square-o');
 			},
 			_error: function(response){
 	            try{

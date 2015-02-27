@@ -136,7 +136,7 @@ function llenar_tabla_beneficiarios(datos){
                 id: datos[i].idTipoBeneficiario,
                 tipo: datos[i].tipo_beneficiario.descripcion,
                 total: 0,
-                desglose: {}
+                desglose: {'f':{},'m':{}}
             };
         }
         beneficiarios[datos[i].idTipoBeneficiario].total += datos[i].total;
@@ -158,38 +158,37 @@ function llenar_tabla_beneficiarios(datos){
     }
     var rows = '';
     for(var i in beneficiarios){
-        console.log(beneficiarios[i]);
         rows += '<tr>';
         rows += '<td rowspan="2">' + beneficiarios[i].tipo + '</td>';
         rows += '<td rowspan="2">' + beneficiarios[i].total + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['f'].total + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['f'].total || 0 ) + '</td>';
         rows += '<th>Femenino</th>';
-        rows += '<td>' + beneficiarios[i].desglose['f'].urbana + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['f'].rural + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['f'].mestiza + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['f'].indigena + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['f'].inmigrante + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['f'].otros + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['f'].muyAlta + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['f'].alta + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['f'].media + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['f'].baja + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['f'].muyBaja + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['f'].urbana || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['f'].rural || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['f'].mestiza || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['f'].indigena || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['f'].inmigrante || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['f'].otros || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['f'].muyAlta || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['f'].alta || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['f'].media || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['f'].baja || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['f'].muyBaja || 0 ) + '</td>';
         rows += '</tr>';
         rows += '<tr>';
-        rows += '<td>' + beneficiarios[i].desglose['m'].total + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['m'].total || 0 ) + '</td>';
         rows += '<th>Masculino</th>';
-        rows += '<td>' + beneficiarios[i].desglose['m'].urbana + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['m'].rural + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['m'].mestiza + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['m'].indigena + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['m'].inmigrante + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['m'].otros + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['m'].muyAlta + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['m'].alta + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['m'].media + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['m'].baja + '</td>';
-        rows += '<td>' + beneficiarios[i].desglose['m'].muyBaja + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['m'].urbana || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['m'].rural || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['m'].mestiza || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['m'].indigena || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['m'].inmigrante || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['m'].otros || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['m'].muyAlta || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['m'].alta || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['m'].media || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['m'].baja || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose['m'].muyBaja || 0 ) + '</td>';
         rows += '</tr>';
     }
     $('#tabla_beneficiarios tbody').html(rows);
