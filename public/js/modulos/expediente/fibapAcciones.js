@@ -114,7 +114,7 @@ context.init = function(id,resource){
             if($(tabla_componente_partidas + ' > table > tbody > tr[data-partida-id="'+datos_partida.id+'"]').length == 0){
                 var linea = linea_tabla_partidas(datos_partida);
                 $(tabla_componente_partidas + ' > table > tbody').append(linea);
-                $(tabla_componente_partidas).append('<input type="hidden" value="'+datos_partida.id+'" name="objeto-gasto-presupuesto[]" id="objeto-gasto-'+datos_partida.id+'">');
+                $(tabla_componente_partidas).append('<input type="hidden" class="ocultos-partidas-componente" value="'+datos_partida.id+'" name="objeto-gasto-presupuesto[]" id="objeto-gasto-'+datos_partida.id+'">');
             }
         }
     });
@@ -943,9 +943,16 @@ function reset_modal_form(form){
         $('#entregable').chosen().change();
         $('#id-componente').val('');
         $('#id-accion').val('');
-        $('#tabla_componente_partidas' + ' > table > tbody').empty();
+        $('#tabla_componente_partidas > table > tbody').empty();
         $('.ocultos-partidas-componente').remove();
         $('#accion-presupuesto-requerido-lbl').text('');
+        $('#trim1-componente-lbl').text('');
+        $('#trim2-componente-lbl').text('');
+        $('#trim3-componente-lbl').text('');
+        $('#trim4-componente-lbl').text('');
+        $('#numerador-componente-lbl').text('');
+        $('#meta-componente-lbl').text('');
+        $(form_accion + ' input[type="hidden"]').val('');
         $(modal_accion + ' .accion-origen-financiamiento').attr('data-captura-id','');
         $(modal_accion + ' .metas-mes').attr('data-meta-id','');
     }else if(form == form_presupuesto){
@@ -963,6 +970,13 @@ function reset_modal_form(form){
         $(modal_actividad + ' .alert').remove();
         $('#id-actividad').val('');
         $(modal_actividad + ' .metas-mes').attr('data-meta-id','');
+        $('#trim1-actividad-lbl').text('');
+        $('#trim2-actividad-lbl').text('');
+        $('#trim3-actividad-lbl').text('');
+        $('#trim4-actividad-lbl').text('');
+        $('#numerador-actividad-lbl').text('');
+        $('#meta-actividad-lbl').text('');
+        $(form_actividad + ' input[type="hidden"]').val('');
     }
 }
 

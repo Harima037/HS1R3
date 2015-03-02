@@ -5,7 +5,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception;
 use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
-	FibapDatosProyecto, Titular, ComponenteDesglose, Accion, PropuestaFinanciamiento, DistribucionPresupuesto;
+	FibapDatosProyecto, Titular, ComponenteDesglose, Accion, PropuestaFinanciamiento, DistribucionPresupuesto, DesgloseMetasMes;
 
 class ProyectosController extends BaseController {
 	private $reglasProyecto = array(

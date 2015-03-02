@@ -1037,7 +1037,7 @@ class InversionController extends ProyectosController {
 					$partidas_anteriores = array();
 				}
 
-				if($partidas_formulario[0] == $partidas_formulario[1]){
+				if($partidas_formulario[0] == $partidas_formulario[1]){ //ciclo
 					throw new Exception('{"field":"objeto-gasto-presupuesto","error":"Las partidas no deben ser iguales"}', 1);
 				}
 
