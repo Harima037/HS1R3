@@ -94,6 +94,33 @@
 @stop
 
 @section('modals')
+    <div class="modal fade" id="modalNuevoProyecto" tabindex="-1" role="dialog" aria-labelledby="modalProyectoLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="modalProyectoLabel">Nuevo</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <form action="" id="form_proyecto">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="tipo-proyecto" class="control-label">Tipo de proyecto</label>
+                                    {{Form::select('tipo-proyecto',$tipos_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'tipo-proyecto'))}}
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary btn-guardar">Ir a la caratula de captura</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
     <div class="modal fade" id="modalCaratulas" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" data-backdrop="static">
         <div class="modal-dialog modal-dialog-85-screen">
             <div class="modal-content modal-content-85-screen">
@@ -104,18 +131,18 @@
                 <div class="modal-body">
                     <div class="row" id="datos-formulario">
                         <form action="" id="form_caratula">
-                            <div class="col-sm-6">
+                            <!--div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="tipo_proyecto" class="control-label">Tipo de proyecto</label>
-                                    {{Form::select('tipo_proyecto',$tipos_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'tipo_proyecto'))}}
+                                    {d{Form::select('tipo_proyecto',$tipos_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'tipo_proyecto'))}d}
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="clasificacion_proyecto" class="control-label">Clase de proyecto a capturar</label>
-                                    {{Form::select('clasificacion_proyecto',$clasificacion_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'clasificacion_proyecto'))}}
+                                    {d{Form::select('clasificacion_proyecto',$clasificacion_proyectos->lists('descripcion','id'),0,array('class'=>'form-control','id'=>'clasificacion_proyecto'))}d}
                                 </div>
-                            </div>
+                            </div-->
                             
                             <div class="col-sm-12">
                                 <div class="form-group hidden" id="opciones_fibap">
@@ -471,7 +498,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary btn-guardar">Ir a la caratula de captura</button>
+                    <button type="button" class="btn btn-primary" id="btn-editar-proyecto">Editar Proyecto</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->

@@ -34,7 +34,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 
 	Route::group(array('prefix'=>'expediente'), function(){
 		Route::get('proyectos',array('uses'=>'ProyectosController@index'));
-		Route::any('caratula',array('uses'=>'ProyectosController@caratula'));
+		Route::any('caratula/{id?}',array('uses'=>'ProyectosController@caratula'));
 		
 		Route::get('inversion',array('uses'=>'InversionController@index'));
 		Route::any('caratula-inversion/{id?}',array('uses'=>'InversionController@caratula'));

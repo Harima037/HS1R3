@@ -610,11 +610,6 @@ class FibapController extends BaseController {
 							$desglose->claveLocalidad 	= $clave_localidad;
 						}
 						$desglose->presupuesto 		= $suma_presupuesto;
-						//$desglose->meta 			= $suma_metas;
-						//$desglose->trim1 			= $trimestres[1];
-						//$desglose->trim2 			= $trimestres[2];
-						//$desglose->trim3 			= $trimestres[3];
-						//$desglose->trim4 			= $trimestres[4];
 						$desglose->beneficiariosF 	= $parametros['beneficiarios-f'];
 						$desglose->beneficiariosM 	= $parametros['beneficiarios-m'];
 

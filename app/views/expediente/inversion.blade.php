@@ -122,8 +122,8 @@
     </div><!-- /.modal -->
 
     <div class="modal fade" id="modalEditarProyecto" tabindex="-1" role="dialog" aria-labelledby="modalEditarLabel" aria-hidden="true" data-backdrop="static">
-        <div class="modal-dialog">
-            <div class="modal-content">
+        <div class="modal-dialog modal-dialog-85-screen">
+            <div class="modal-content modal-content-85-screen">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 class="modal-title" id="modalEditarLabel">Proyecto de Inversión</h4>

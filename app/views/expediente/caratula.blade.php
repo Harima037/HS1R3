@@ -71,6 +71,9 @@
                         <button type="button" class="btn btn-default" id="btn-proyecto-cancelar">
                             <span class="fa fa-chevron-left"></span> Regresar a la lista de Proyectos
                         </button>
+                        <button type="button" class="btn btn-success" id="btn-enviar-proyecto">
+                            <span class="fa fa-send-o"></span> Enviar Proyecto a Revisión
+                        </button>
                     </div>
                 </div>
             </div>
@@ -117,7 +120,7 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<div class="modal fade" id="modalBeneficiario" tabindex="-1" role="dialog" aria-labelledby="modalBenefLabel" aria-hidden="true" data-backdrop="static">
+<!--div class="modal fade" id="modalBeneficiario" tabindex="-1" role="dialog" aria-labelledby="modalBenefLabel" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-dialog-85-screen">
         <div class="modal-content modal-content-85-screen">
             <div class="modal-header">
@@ -125,14 +128,14 @@
                 <h4 class="modal-title" id="modalBenefLabel">Nuevo</h4>
             </div>
             <div class="modal-body">
-                {{$formulario_beneficiario}}
+                {d{$formulario_beneficiario}d}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary btn-guardar" id="btn-beneficiario-guardar">Guardar</button>
             </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+        </div><-f- /.modal-content -f-d>
+    </div><-f- /.modal-dialog -f-d>
+</div--><!-- /.modal -->
 @parent
 @stop

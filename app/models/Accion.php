@@ -42,4 +42,8 @@ class Accion extends BaseModel
     public function distribucionPresupuestoAgrupado(){
         return $this->hasMany('DistribucionPresupuesto','idAccion')->agruparPorLocalidad();
     }
+
+    public function desglosePresupuesto(){
+        return $this->hasMany('ComponenteDesglose','idComponente','idComponente')->listarDatos();
+    }
 }

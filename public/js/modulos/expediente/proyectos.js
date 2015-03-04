@@ -69,28 +69,6 @@ function editar (e){
             $('#lbl_jefe_ṕlaneacion').text((response.data.jefe_planeacion)?response.data.jefe_planeacion.nombre:'No asignado');
             $('#lbl_coordinador_grupo').text((response.data.coordinador_grupo_estrategico)?response.data.coordinador_grupo_estrategico.nombre:'No asignado');
 
-            /*
-            $('#lbl_tipo_beneficiario').text(response.data.tipo_beneficiario.descripcion);
-            $('#lbl_total_beneficiarios').text(response.data.totalBeneficiarios.format());
-            $('#lbl_beneficiarios_f').text(response.data.totalBeneficiariosF.format());
-            $('#lbl_beneficiarios_m').text(response.data.totalBeneficiariosM.format());
-
-            var indx;
-            var sexo;
-            for( indx in response.data.beneficiarios ){
-                sexo = response.data.beneficiarios[indx].sexo;
-                $('#lbl_benef_urbana_'+sexo).text(response.data.beneficiarios[indx].urbana.format());
-                $('#lbl_benef_rural_'+sexo).text(response.data.beneficiarios[indx].rural.format());
-                $('#lbl_benef_mestiza_'+sexo).text(response.data.beneficiarios[indx].mestiza.format());
-                $('#lbl_benef_indigena_'+sexo).text(response.data.beneficiarios[indx].indigena.format());
-                $('#lbl_benef_inmigrante_'+sexo).text(response.data.beneficiarios[indx].inmigrante.format());
-                $('#lbl_benef_otros_'+sexo).text(response.data.beneficiarios[indx].otros.format());
-                $('#lbl_benef_muy_alta_'+sexo).text(response.data.beneficiarios[indx].muyAlta.format());
-                $('#lbl_benef_alta_'+sexo).text(response.data.beneficiarios[indx].alta.format());
-                $('#lbl_benef_media_'+sexo).text(response.data.beneficiarios[indx].media.format());
-                $('#lbl_benef_baja_'+sexo).text(response.data.beneficiarios[indx].baja.format());
-                $('#lbl_benef_muy_baja_'+sexo).text(response.data.beneficiarios[indx].muyBaja.format());
-            }*/
             llenar_tabla_beneficiarios(response.data.beneficiarios);
 
             $('#id').val(response.data.id);
@@ -121,6 +99,8 @@ function editar (e){
             $('#btn-exportar-excel').on('click',function(){
                 window.open(SERVER_HOST+'/v1/reporteProyecto/'+response.data.id);
             });
+
+            $('#btn-editar-proyecto').attr('data-id-proyecto',response.data.id);
 
             $(modal_name).modal('show');
         }
@@ -283,28 +263,37 @@ $(modal_name).on('hide.bs.modal',function(e){
 });
 
 $('.btn-datagrid-agregar').on('click', function () {
-    $(modal_name).find(".modal-title").html("Nuevo Proyecto");
-    $(modal_name).modal('show');
-    $('#datos-formulario').show();
-    $('#datos-proyecto').hide();
+    $('#modalNuevoProyecto').find(".modal-title").html("Nuevo Proyecto Institucional");
+    $('#modalNuevoProyecto').modal('show');
 });
 
-$('#btn-capturar-nuevo-fibap').on('click',function(){
+$('#modalNuevoProyecto .btn-guardar').on('click', function (e) {
+    e.preventDefault();
+    $('#form_proyecto').attr('action',SERVER_HOST+'/expediente/caratula');
+    $('#form_proyecto').attr('method','POST');
+    $('#form_proyecto').submit();
+});
+
+$('#btn-editar-proyecto').on('click',function(){
+    window.location.href = SERVER_HOST+'/expediente/caratula/' + $('#btn-editar-proyecto').attr('data-id-proyecto');
+});
+
+/*$('#btn-capturar-nuevo-fibap').on('click',function(){
     window.location.href = "formulario-fibap";
-});
+});*/
 
-$(modal_name+' .btn-guardar').on('click', function (e) {
+/*$(modal_name+' .btn-guardar').on('click', function (e) {
     e.preventDefault();
     submitModulo();
-});
+});*/
 
-$('#btn-capturar-fibap').on('click',function(){
+/*$('#btn-capturar-fibap').on('click',function(){
     $('#nuevo-fibap-proyecto').attr('action',SERVER_HOST+'/expediente/formulario-fibap');
     $('#nuevo-fibap-proyecto').attr('method','POST');
     $('#nuevo-fibap-proyecto').submit();
-});
+});*/
 
-$('#btn-seleccionar-fibap').on('click',function(){
+/*$('#btn-seleccionar-fibap').on('click',function(){
     var parametros = {lista_fibap:1};
     fibapResource.get(null,parametros,{
         _success: function(response){
@@ -321,7 +310,7 @@ $('#btn-seleccionar-fibap').on('click',function(){
             $('#lista_fibap').removeClass('hidden');
         }
     })
-});
+});*/
 
 function cambiar_tipo_proyecto(tipo_proyecto){
     $('#tipo_proyecto').val(tipo_proyecto);

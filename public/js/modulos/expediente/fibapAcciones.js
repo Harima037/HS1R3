@@ -36,6 +36,9 @@ var form_presupuesto = '#form-presupuesto';
 var presupuesto_total = 0;
 var presupuesto_origenes = [];
 
+var ejecucion_fecha_inicio;
+var ejecucion_fecha_fin;
+
 context.cargar_jurisdicciones = function(datos){
     llenar_select_jurisdicciones(datos);
 };
@@ -263,6 +266,97 @@ context.init = function(id,resource){
     });
 
     $(modal_actividad).on('hide.bs.modal',function(e){ reset_modal_form(form_actividad); });
+
+    $("#datagridDistribucion .btn-delete-rows").unbind('click');
+    $("#datagridDistribucion .btn-delete-rows").on('click',function(e){
+        e.preventDefault();
+        var rows = [];
+        var contador= 0;
+        $("#datagridDistribucion").find("tbody").find("input[type=checkbox]:checked").each(function () {
+            contador++;
+            rows.push($(this).parent().parent().data("id"));
+        });
+        if(contador>0){
+            var id_accion = $('#datagridDistribucion').attr('data-selected-id');
+            Confirm.show({
+                    titulo:"Eliminar presupuesto",
+                    mensaje: "¿Estás seguro que deseas eliminar los presupuestos seleccionados?",
+                    callback: function(){
+                        fibap_resource.delete(rows,{'rows': rows, 'eliminar': 'desglose-presupuesto', 'id-accion': id_accion, 'id-proyecto': $('#id').val()},{
+                            _success: function(response){
+                                llenar_datagrid_distribucion(response.desglose_presupuesto,response.presupuesto_requerido);
+                                llenar_tabla_distribucion(response.distribucion_total);
+                                MessageManager.show({data:'Presupuesto(s) eliminado(s) con éxito.',timer:3});
+                            },
+                            _error: function(jqXHR){  MessageManager.show(jqXHR.responseJSON); }
+                        });
+                    }
+            });
+        }else{ MessageManager.show({data:'No has seleccionado ningún registro.',type:'ADV',timer:3}); }
+    });
+
+    $("#datagridActividades .btn-delete-rows").unbind('click');
+    $("#datagridActividades .btn-delete-rows").on('click',function(e){
+        e.preventDefault();
+        var rows = [];
+        var contador= 0;
+        
+        $("#datagridActividades").find("tbody").find("input[type=checkbox]:checked").each(function () {
+            contador++;
+            rows.push($(this).parent().parent().data("id"));
+        });
+
+        if(contador>0){
+            Confirm.show({
+                    titulo:"Eliminar actividad",
+                    //botones:[], 
+                    mensaje: "¿Estás seguro que deseas eliminar la(s) actividad(es) seleccionadas?",
+                    //si: 'Actualizar',
+                    //no: 'No, gracias',
+                    callback: function(){
+                        proyectoResource.delete(rows,{'rows': rows, 'eliminar': 'actividad', 'id-componente': $('#id-componente').val(), 'id-proyecto': $('#id').val()},{
+                            _success: function(response){ 
+                                llenar_datagrid_actividades(response.actividades);
+                                MessageManager.show({data:'Actividad eliminada con éxito.',timer:3});
+                            },
+                            _error: function(jqXHR){ 
+                                MessageManager.show(jqXHR.responseJSON);
+                            }
+                        });
+                    }
+            });
+        }else{
+            MessageManager.show({data:'No has seleccionado ningún registro.',type:'ADV',timer:3});
+        }
+    });
+
+    $("#datagridAcciones .btn-delete-rows").unbind('click');
+    $("#datagridAcciones .btn-delete-rows").on('click',function(e){
+        e.preventDefault();
+        var rows = [];
+        var contador= 0;
+        $("#datagridAcciones").find("tbody").find("input[type=checkbox]:checked").each(function () {
+            contador++;
+            rows.push($(this).parent().parent().data("id"));
+        });
+        if(contador>0){
+            ocultar_detalles(true);
+            Confirm.show({
+                    titulo:"Eliminar Acción",
+                    mensaje: "¿Estás seguro que deseas eliminar la(s) acción(es) seleccionada(s)?",
+                    callback: function(){
+                        fibap_resource.delete(rows,{'rows': rows, 'eliminar': 'accion', 'id-fibap': $('#id-fibap').val(), 'id-proyecto': $('#id').val()},{
+                            _success: function(response){
+                                llenar_datagrid_acciones(response.acciones);
+                                llenar_tabla_distribucion(response.distribucion_total);
+                                MessageManager.show({data:'Acción(es) eliminada(s) con éxito.',timer:3});
+                            },
+                            _error: function(jqXHR){  MessageManager.show(jqXHR.responseJSON); }
+                        });
+                    }
+            });
+        }else{ MessageManager.show({data:'No has seleccionado ningún registro.',type:'ADV',timer:3}); }
+    });
 };
 
 context.mostrar_datos_presupuesto = function(datos){
@@ -273,13 +367,15 @@ context.mostrar_datos_presupuesto = function(datos){
     $('#jurisdiccion-accion').chosen().change();
 
     var desglose = datos.desglose;
-    $('#municipio-accion').val(desglose.claveMunicipio);
-    $('#municipio-accion').trigger('chosen:updated');
-    $('#municipio-accion').chosen().change();
+    if(desglose.claveMunicipio){
+        $('#municipio-accion').val(desglose.claveMunicipio);
+        $('#municipio-accion').trigger('chosen:updated');
+        $('#municipio-accion').chosen().change();
 
-    $('#localidad-accion').val(desglose.claveMunicipio + '|' + desglose.claveLocalidad);
-    $('#localidad-accion').trigger('chosen:updated');
-
+        $('#localidad-accion').val(desglose.claveMunicipio + '|' + desglose.claveLocalidad);
+        $('#localidad-accion').trigger('chosen:updated');
+    }
+    
     for(var indx in desglose.metas_mes){
         var meta = desglose.metas_mes[indx];
         $('#meta-mes-'+meta.mes).val(meta.meta);
@@ -443,6 +539,10 @@ context.quitar_partida_componente = function(id){
 context.actualizar_metas_mes = function(jurisdicciones){
     actualizar_tabla_metas_mes('componente',jurisdicciones);
     actualizar_tabla_metas_mes('actividad',jurisdicciones);
+    if(ejecucion_fecha_inicio){
+        habilitar_meses_metas('actividad', ejecucion_fecha_inicio, ejecucion_fecha_fin);
+        $(form_accion + ' .metas-mes').prop('disabled',true);
+    }
 };
 
 context.llenar_datagrid = function(datos){
@@ -474,7 +574,7 @@ context.mostrar_detalles = function(id){
             _success:function(response){
                 //
                 $('#datagridAcciones > table > tbody > tr.contendor-desechable').remove();
-                llenar_datagrid_distribucion(response.data.distribucion_presupuesto_agrupado,response.data.presupuestoRequerido);
+                llenar_datagrid_distribucion(response.data.desglose_presupuesto,response.data.presupuestoRequerido);
 
                 $('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"]').addClass('bg-info');
                 $('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"]').addClass('text-primary');
@@ -556,6 +656,11 @@ context.actualizar_lista_beneficiarios = function(datos){
         $('#total-beneficiarios-lbl').text(suma_general.format());
     });    
 };
+
+context.habilitar_meses = function(fechaInicio,fechaFinal){
+    habilitar_meses_captura(fechaInicio, fechaFinal);
+};
+
 /***********************************************************************************************
                     Funciones Privadas
 ************************************************************************************************/
@@ -566,21 +671,21 @@ function llenar_datagrid_distribucion(datos,total_presupuesto){
     for(var indx in datos){
         var presupuesto = {};
 
-        var porcentaje = (datos[indx].cantidad * 100) / parseInt(total_presupuesto);
+        var porcentaje = (datos[indx].presupuesto * 100) / parseInt(total_presupuesto);
 
         presupuesto.id = datos[indx].id;
 
         if(datos[indx].claveJurisdiccion != 'OC'){
             presupuesto.localidad = datos[indx].localidad;
             presupuesto.municipio = datos[indx].municipio;
-            presupuesto.jurisdiccion = datos[indx].jurisdiccion.nombre;
+            presupuesto.jurisdiccion = datos[indx].jurisdiccion;
         }else{
             presupuesto.localidad = 'OFICINA CENTRAL';
             presupuesto.municipio = 'OFICINA CENTRAL';
             presupuesto.jurisdiccion = 'OFICINA CENTRAL';
         }
         
-        presupuesto.monto = '$ ' + datos[indx].cantidad.format();
+        presupuesto.monto = '$ ' + datos[indx].presupuesto.format();
 
         total_porcentaje += parseFloat(porcentaje.toFixed(2));
 
@@ -783,6 +888,81 @@ function ocultar_detalles(remover_contendor){
     }
 }
 
+function habilitar_meses_presupuesto(fechaInicio, fechaFinal){
+    if(typeof(fechaInicio) == 'string'){
+        var inicio = fechaInicio;
+        var fin = fechaFinal;
+    }else{
+        var inicio = fechaInicio.date;
+        var fin = fechaFinal.date;
+    }
+
+    var primer_mes = parseInt(inicio.substring(5,7));
+    var ultimo_mes = parseInt(fin.substring(5,7));
+    $('.presupuesto-mes').each(function(){
+        if($(this).attr('data-presupuesto-mes') < primer_mes){
+            $(this).prop('disabled',true);
+        }else if($(this).attr('data-presupuesto-mes') > ultimo_mes){
+            $(this).prop('disabled',true);
+        }else{
+            $(this).prop('disabled',false);
+        }
+    });
+}
+
+function habilitar_meses_metas(selector, fechaInicio, fechaFinal){
+    if(typeof(fechaInicio) == 'string'){
+        var inicio = fechaInicio;
+        var fin = fechaFinal;
+    }else{
+        var inicio = fechaInicio.date;
+        var fin = fechaFinal.date;
+    }
+
+    if(selector == 'componente'){
+        var formulario = form_accion;
+    }else{
+        var formulario = form_actividad;
+    }
+    
+    var primer_mes = parseInt(inicio.substring(5,7));
+    var ultimo_mes = parseInt(fin.substring(5,7));
+    $(formulario + ' .metas-mes').each(function(){
+        if($(this).attr('data-meta-mes') < primer_mes){
+            $(this).prop('disabled',true);
+        }else if($(this).attr('data-meta-mes') > ultimo_mes){
+            $(this).prop('disabled',true);
+        }else{
+            $(this).prop('disabled',false);
+        }
+    });
+}
+
+function habilitar_meses_captura(fechaInicio, fechaFinal){
+    if(typeof(fechaInicio) == 'string'){
+        var inicio = fechaInicio;
+        var fin = fechaFinal;
+    }else{
+        var inicio = fechaInicio.date;
+        var fin = fechaFinal.date;
+    }
+
+    ejecucion_fecha_inicio = inicio;
+    ejecucion_fecha_fin = fin;
+
+    var primer_mes = parseInt(inicio.substring(5,7));
+    var ultimo_mes = parseInt(fin.substring(5,7));
+    $('.meta-mes').each(function(){
+        if($(this).attr('data-meta-mes') < primer_mes){
+            $(this).prop('disabled',true);
+        }else if($(this).attr('data-meta-mes') > ultimo_mes){
+            $(this).prop('disabled',true);
+        }else{
+            $(this).prop('disabled',false);
+        }
+    });
+}
+
 function actualizar_claves_presupuesto(datos){
     $('.grupo-partidas > .grupo-partida-presupuestal').remove();
     $('.grupo-partidas').each(function(){
@@ -807,6 +987,7 @@ function actualizar_claves_presupuesto(datos){
         $('#cantidad-presupuesto').val(sumatoria);
         $('#cantidad-presupuesto-lbl').text(sumatoria.format());
     });
+    habilitar_meses_presupuesto(ejecucion_fecha_inicio, ejecucion_fecha_fin);
 }
 
 function actualizar_tabla_metas_mes(identificador,jurisdicciones){
@@ -953,8 +1134,8 @@ function reset_modal_form(form){
         $('#numerador-componente-lbl').text('');
         $('#meta-componente-lbl').text('');
         $(form_accion + ' input[type="hidden"]').val('');
-        $(modal_accion + ' .accion-origen-financiamiento').attr('data-captura-id','');
-        $(modal_accion + ' .metas-mes').attr('data-meta-id','');
+        $(form_accion + ' .accion-origen-financiamiento').attr('data-captura-id','');
+        $(form_accion + ' .metas-mes').attr('data-meta-id','');
     }else if(form == form_presupuesto){
         $(modal_presupuesto + ' .alert').remove();
         $('#id-desglose').val('');
@@ -966,6 +1147,8 @@ function reset_modal_form(form){
         $('#trim4-lbl').text(0);
         $('#cantidad-meta-lbl').text(0);
         $('#cantidad-presupuesto-lbl').text(0);
+        $(form_presupuesto + ' .meta-mes').attr('data-meta-id','');
+        $(form_presupuesto + ' .presupuesto-mes').attr('data-presupuesto-id','');
     }else if(form == form_actividad){
         $(modal_actividad + ' .alert').remove();
         $('#id-actividad').val('');

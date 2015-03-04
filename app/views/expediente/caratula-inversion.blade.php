@@ -94,6 +94,9 @@
                         <button type="button" class="btn btn-default" id="btn-proyecto-cancelar">
                             <span class="fa fa-chevron-left"></span> Regresar a la lista de Proyectos
                         </button>
+                        <button type="button" class="btn btn-success" id="btn-enviar-proyecto">
+                            <span class="fa fa-send-o"></span> Enviar Proyecto a Revisión
+                        </button>
                     </div>
                 </div>
             </div>

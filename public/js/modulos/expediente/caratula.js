@@ -554,7 +554,8 @@ $('#btn-beneficiario-guardar').on('click',function(){
 $('#btn-actividad-guardar').on('click',function(){
 	Validation.cleanFormErrors(form_actividad);
 	var parametros = $(form_actividad).serialize();
-	parametros = parametros + '&guardar=actividad&id-componente=' + $('#id-componente').val();
+	parametros += '&guardar=actividad&id-componente=' + $('#id-componente').val();
+	parametros += '&id-proyecto='+$('#id').val();
 
 	if($('#id-actividad').val()){
 		var cadena_metas = '';
@@ -613,12 +614,39 @@ $('#btn-actividad-guardar').on('click',function(){
 	}
 });
 
+$('#btn-enviar-proyecto').on('click',function(){
+	Validation.cleanFormErrors(form_caratula);
+	//var parametros = $(form_caratula).serialize();
+	parametros = 'guardar=validar-proyecto';
+
+	if($('#id').val()){
+		proyectoResource.put($('#id').val(),parametros,{
+	        _success: function(response){
+	            MessageManager.show({data:response.data,type:'OK',timer:6});
+	        },
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
+	    });
+	}
+});
+
 $('#btn-proyecto-guardar').on('click',function(){
 	Validation.cleanFormErrors(form_caratula);
 
-	if(checar_error_totales()){
+	/*if(checar_error_totales()){
 		return false;
-	}
+	}*/
 
 	var parametros = $(form_caratula).serialize();
 	parametros = parametros + '&guardar=proyecto';
@@ -682,7 +710,7 @@ $('#btn-proyecto-guardar').on('click',function(){
 });
 
 $('#btn-proyecto-cancelar').on('click',function(){
-	window.location.href = "proyectos";
+	window.location.href = SERVER_HOST+'/expediente/proyectos';
 });
 
 $('#cobertura').on('change',function(){
@@ -912,7 +940,7 @@ $(grid_actividades + " .btn-delete-rows").on('click',function(e){
 				//si: 'Actualizar',
 				//no: 'No, gracias',
 				callback: function(){
-					proyectoResource.delete(rows,{'rows': rows, 'eliminar': 'actividad', 'id-componente': $('#id-componente').val()},{
+					proyectoResource.delete(rows,{'rows': rows, 'eliminar': 'actividad', 'id-componente': $('#id-componente').val(), 'id-proyecto': $('#id').val()},{
                         _success: function(response){ 
                         	actualizar_grid_actividades(response.actividades);
                         	MessageManager.show({data:'Actividad eliminada con éxito.',timer:3});
@@ -1169,7 +1197,7 @@ function reset_modal_form(formulario){
     }
 }
 
-//
+/*
 function checar_error_totales(){
 	var errores = false;
 	if(parseInt($('#totalbeneficiariosf').val()) != parseInt($('#total-zona-f').text())){
@@ -1198,6 +1226,7 @@ function checar_error_totales(){
 	}
 	return errores;
 }
+*/
 
 //
 function sumar_totales(tipo,campo_suma,campo_total,mensaje){

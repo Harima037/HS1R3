@@ -54,7 +54,7 @@ context.init = function(id,resource){
 					titulo:"Eliminar antecedente",
 					mensaje: "¿Estás seguro que deseas eliminar los antecedentes seleccionados?",
 					callback: function(){
-						fibapResource.delete(rows,{'rows': rows, 'eliminar': 'antecedente', 'id-fibap': $('#id-fibap').val()},{
+						fibap_resource.delete(rows,{'rows': rows, 'eliminar': 'antecedente', 'id-fibap': $('#id-fibap').val(), 'id-proyecto': $('#id').val()},{
 	                        _success: function(response){
 	                        	llenar_datagrid_antecedentes(response.antecedentes);
 	                        	MessageManager.show({data:'Antecedente eliminado con éxito.',timer:3});

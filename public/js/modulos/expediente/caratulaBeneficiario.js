@@ -89,6 +89,9 @@ context.init = function(id,resource){
 						proyectoResource.delete(rows,{'rows': rows, 'eliminar': 'proyecto-beneficiario', 'id-proyecto': $('#id').val()},{
 	                        _success: function(response){ 
 	                        	llenar_datagrid_beneficiarios(response.beneficiarios);
+	                        	if(fibapAcciones){
+	                        		fibapAcciones.actualizar_lista_beneficiarios(response.beneficiarios);
+	                        	}
 	                        	MessageManager.show({data:'Beneficiario(s) eliminado(s) con éxito.',timer:3});
 	                        },
 	                        _error: function(jqXHR){ 

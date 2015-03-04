@@ -5,7 +5,8 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception;
 use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
-	FibapDatosProyecto, Titular, ComponenteDesglose, Accion, PropuestaFinanciamiento, DistribucionPresupuesto, DesgloseMetasMes;
+	FibapDatosProyecto, Titular, ComponenteDesglose, Accion, PropuestaFinanciamiento, DistribucionPresupuesto, DesgloseMetasMes, 
+	DesgloseBeneficiario;
 
 class ProyectosController extends BaseController {
 	private $reglasProyecto = array(
@@ -141,7 +142,9 @@ class ProyectosController extends BaseController {
 		if(isset($parametros['formatogrid'])){
 
 			$rows = Proyecto::getModel();
-			$rows = $rows->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
+			$rows = $rows->where('unidadResponsable','=',Sentry::getUser()->claveUnidad)
+						->where('idClasificacionProyecto','=',1)
+						->whereIn('idEstatusProyecto',[1,2,3]);
 			
 			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 			
@@ -321,8 +324,30 @@ class ProyectosController extends BaseController {
 
 		$parametros = Input::all();
 
-		if($parametros['guardar'] == 'actividad'){
-			try{
+		try{
+
+			if($parametros['guardar'] != 'proyecto'){
+				$proyecto = Proyecto::find($parametros['id-proyecto']);
+				if($proyecto->idEstatusProyecto != 1 && $proyecto->idEstatusProyecto != 3){
+					switch ($proyecto->idEstatusProyecto) {
+						case 2:
+							$respuesta['data']['data'] = 'El proyecto se encuentra en proceso de revisión, por tanto no es posible editarlo';
+							break;
+						case 4:
+							$respuesta['data']['data'] = 'El proyecto se encuentra registrado, por tanto no es posible editarlo';
+							break;
+						case 5:
+							$respuesta['data']['data'] = 'El proyecto ya fue firmado, por tanto no es posible editarlo';
+							break;
+						default:
+							$respuesta['data']['data'] = 'El estatus del proyecto es desconocido';
+							break;
+					}
+					throw new Exception("El proyecto se encuentra en un estatus en el que no esta disponible para edición", 1);
+				}
+			}
+
+			if($parametros['guardar'] == 'actividad'){
 				$componente = Componente::find(Input::get('id-componente'));
 				$componente->load('actividades');
 
@@ -403,20 +428,8 @@ class ProyectosController extends BaseController {
 					$respuesta['http_status'] = $validacion['http_status'];
 					$respuesta['data'] = $validacion['data'];
 				}
-			}catch(\Exception $ex){
-				$respuesta['http_status'] = 500;
-				if($respuesta['data']['data'] == ''){
-					$respuesta['data']['data'] = 'Ocurrio un error en el servidor al guardar la actividad.';
-				}
-				$respuesta['data']['ex'] = $ex->getMessage();
-				if(!isset($respuesta['data']['code'])){
-					$respuesta['data']['code'] = 'S03';
-				}
-			}
-		} //Guardar datos de la actividad
-
-		if($parametros['guardar'] == 'componente'){
-			try{
+			//Guardar datos de la actividad
+			}elseif($parametros['guardar'] == 'componente'){
 				$proyecto = Proyecto::find(Input::get('id-proyecto'));
 				$proyecto->load('componentes');
 
@@ -509,33 +522,10 @@ class ProyectosController extends BaseController {
 					$respuesta['http_status'] = $validacion['http_status'];
 					$respuesta['data'] = $validacion['data'];
 				}
-			}catch(\Exception $ex){
-				$respuesta['http_status'] = 500;
-				if($respuesta['data']['data'] == ''){
-					$respuesta['data']['data'] = 'Ocurrio un error en el servidor, al guardar el componente.';
-				}
-				$respuesta['data']['ex'] = $ex->getMessage();
-				if(!isset($respuesta['data']['code'])){
-					$respuesta['data']['code'] = 'S03';
-				}
-			}
-		} //Guardar datos del componente
-
-		if($parametros['guardar'] == 'beneficiario'){
-			try {
-				$respuesta = $this->guardar_datos_beneficiario($parametros);
-			} catch (\Exception $ex) {
-				$respuesta['http_status'] = 500;	
-				$respuesta['data']['data'] = 'Ocurrio un error al intentar almacenar los datos';
-				$respuesta['data']['ex'] = $ex->getMessage();
-				if(!isset($respuesta['data']['code'])){
-					$respuesta['data']['code'] = 'S03';
-				}
-			}
-		}
-
-		if($parametros['guardar'] == 'proyecto'){ //Nuevo Proyecto
-			try{
+			//Guardar datos del componente
+			}elseif($parametros['guardar'] == 'beneficiario'){
+				$respuesta = $this->guardar_datos_beneficiario($parametros);	
+			}elseif($parametros['guardar'] == 'proyecto'){ //Nuevo Proyecto
 				$respuesta = $this->guardar_datos_proyecto($parametros);
 				if($respuesta['http_status'] == 200){
 					$recurso = $respuesta['data']['data'];
@@ -550,17 +540,780 @@ class ProyectosController extends BaseController {
 					$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
 					$respuesta['data']['data'] = $recurso;
 				}
-			}catch(\Exception $ex){
-				$respuesta['http_status'] = 500;	
-				$respuesta['data']['data'] = 'Ocurrio un error al intentar almacenar los datos';
-				$respuesta['data']['ex'] = $ex->getMessage();
-				if(!isset($respuesta['data']['code'])){
-					$respuesta['data']['code'] = 'S03';
+			} //Guardar Datos del Proyecto
+		
+
+		}catch(\Exception $ex){
+			$respuesta['http_status'] = 500;
+			if($respuesta['data']['data'] == ''){
+				$respuesta['data']['data'] = 'Ocurrio un error al intentar almacenar los datos.';
+			}
+			$respuesta['data']['ex'] = $ex->getMessage();
+			if(!isset($respuesta['data']['code'])){
+				$respuesta['data']['code'] = 'S03';
+			}
+		}
+
+		return Response::json($respuesta['data'],$respuesta['http_status']);
+	}
+
+	/**
+	 * Update the specified resource in storage.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function update($id)
+	{
+		//
+		$respuesta['http_status'] = 200;
+		$respuesta['data'] = array("data"=>'');
+		
+		$parametros = Input::all();
+		try{
+			if($parametros['guardar'] == 'validar-proyecto'){
+				$proyecto = Proyecto::find($id);
+				if($proyecto->idEstatusProyecto == 1 || $proyecto->idEstatusProyecto == 3){
+					$proyecto->idEstatusProyecto = 2;
+					$proyecto->save();
+					$respuesta['data'] = array('data'=>'El Proyecto fue enviado a Revisión');
+				}else{
+					$respuesta['data'] = array('data'=>'El Proyecto ya se encuentra en proceso de Revisión');
+				}
+			}else{
+				if($parametros['guardar'] != 'proyecto'){
+					$proyecto = Proyecto::find($parametros['id-proyecto']);
+				}else{
+					$proyecto = Proyecto::find($id);
+				}
+	
+				if($proyecto->idEstatusProyecto != 1 && $proyecto->idEstatusProyecto != 3){
+					switch ($proyecto->idEstatusProyecto) {
+						case 2:
+							$respuesta['data']['data'] = 'El proyecto se encuentra en proceso de revisión, por tanto no es posible editarlo';
+							break;
+						case 4:
+							$respuesta['data']['data'] = 'El proyecto se encuentra registrado, por tanto no es posible editarlo';
+							break;
+						case 5:
+							$respuesta['data']['data'] = 'El proyecto ya fue firmado, por tanto no es posible editarlo';
+							break;
+						default:
+							$respuesta['data']['data'] = 'El estatus del proyecto es desconocido';
+							break;
+					}
+					throw new Exception("El proyecto se encuentra en un estatus en el que no esta disponible para edición", 1);
 				}
 			}
-		} //Guardar Datos del Proyecto
-		
+
+			if($parametros['guardar'] == 'actividad'){
+				$validacion = Validador::validar(Input::all(), $this->reglasActividad);
+
+				if($validacion === TRUE){
+
+					$recurso = Actividad::find($id);
+
+					if(is_null($recurso)){
+						$respuesta['data']['data'] = 'No se ha podido encontrar la actividad, por favor verifique que no haya sido eliminada.';
+						throw new Exception("No se pudo encontrar la actividad que se intenta editar", 1);
+					}
+
+					//$componente->idProyecto = $parametros['id-proyecto'];
+					$recurso->objetivo 					= 	$parametros['descripcion-obj-actividad'];
+					$recurso->mediosVerificacion 		= 	$parametros['verificacion-actividad'];
+					$recurso->supuestos 				= 	$parametros['supuestos-actividad'];
+					$recurso->indicador 				= 	$parametros['descripcion-ind-actividad'];
+					$recurso->numerador 				= 	$parametros['numerador-ind-actividad'];
+					$recurso->denominador 				= 	$parametros['denominador-ind-actividad'];
+					$recurso->interpretacion 			= 	$parametros['interpretacion-actividad'];
+					$recurso->idFormula 				= 	$parametros['formula-actividad'];
+					$recurso->idDimensionIndicador 		= 	$parametros['dimension-actividad'];
+					$recurso->idFrecuenciaIndicador 	= 	$parametros['frecuencia-actividad'];
+					$recurso->idTipoIndicador 			= 	$parametros['tipo-ind-actividad'];
+					$recurso->idUnidadMedida 			= 	$parametros['unidad-medida-actividad'];
+					$recurso->metaIndicador 			= 	$parametros['meta-actividad'];
+					$recurso->numeroTrim1 				= 	($parametros['trim1-actividad'])?$parametros['trim1-actividad']:NULL;
+					$recurso->numeroTrim2 				= 	($parametros['trim2-actividad'])?$parametros['trim2-actividad']:NULL;
+					$recurso->numeroTrim3 				= 	($parametros['trim3-actividad'])?$parametros['trim3-actividad']:NULL;
+					$recurso->numeroTrim4 				= 	($parametros['trim4-actividad'])?$parametros['trim4-actividad']:NULL;
+					$recurso->valorNumerador 			= 	$parametros['numerador-actividad'];
+					if($recurso->idFormula == 7){
+						$recurso->valorDenominador 		= 	NULL;
+					}else{
+						$recurso->valorDenominador 		= 	$parametros['denominador-actividad'];
+					}
+					$recurso->lineaBase 				= 	($parametros['linea-base-actividad'])?$parametros['linea-base-actividad']:NULL;
+					$recurso->anioBase 					= 	($parametros['anio-base-actividad'])?$parametros['anio-base-actividad']:NULL;
+					
+					$respuesta['data'] = DB::transaction(function() use ($parametros, $recurso){
+						if($recurso->save()){
+							$componente = Componente::with('actividades.unidadMedida')->find($recurso->idComponente);
+
+							$jurisdicciones = $parametros['mes-actividad'];
+							$ides = $parametros['mes-actividad-id'];
+
+							$metasMes = array();
+
+							foreach ($jurisdicciones as $clave => $meses) {
+								foreach ($meses as $mes => $valor) {
+									if(isset($ides[$clave][$mes])){
+										$meta = ActividadMetaMes::find($ides[$clave][$mes]);
+										$meta->meta = $valor;
+										$metasMes[] = $meta;
+									}elseif($valor > 0){
+										$meta = new ActividadMetaMes;
+										$meta->claveJurisdiccion = $clave;
+										$meta->mes = $mes;
+										$meta->meta = $valor;
+										$meta->idProyecto = $componente->idProyecto;
+										$metasMes[] = $meta;
+									}
+								}
+							}
+
+							$recurso->metasMes()->saveMany($metasMes);
+
+							return array('data'=>$recurso,'actividades'=>$componente->actividades,'metas'=>$metasMes);
+						}else{
+							throw new Exception("Ocurrió un error al guardar la actividad.", 1);
+						}
+					});
+				}else{
+					//La Validación del Formulario encontro errores
+					$respuesta['http_status'] = $validacion['http_status'];
+					$respuesta['data'] = $validacion['data'];
+				}
+			//Guardar datos de la actividad
+			}elseif($parametros['guardar'] == 'componente'){  //Editar componente
+				if($parametros['clasificacion'] == 2){
+					$this->reglasComponente['entregable'] = 'required';
+					$this->reglasComponente['tipo-entregable'] = 'required';
+					$this->reglasComponente['accion-entregable'] = 'required';
+				}
+
+				$validacion = Validador::validar(Input::all(), $this->reglasComponente);
+
+				if($validacion === TRUE){
+					$recurso = Componente::find($id);
+
+					if(is_null($recurso)){
+						$respuesta['data']['data'] = 'No se ha podido encontrar el componente, por favor verifique que no haya sido eliminado.';
+						throw new Exception("No se pudo encontrar el componente que se intenta editar", 1);
+					}
+
+					//$componente->idProyecto = $parametros['id-proyecto'];
+					$recurso->objetivo 					= 	$parametros['descripcion-obj-componente'];
+					$recurso->mediosVerificacion 		= 	$parametros['verificacion-componente'];
+					$recurso->supuestos 				= 	$parametros['supuestos-componente'];
+					$recurso->indicador 				= 	$parametros['descripcion-ind-componente'];
+					$recurso->numerador 				= 	$parametros['numerador-ind-componente'];
+					$recurso->denominador 				= 	$parametros['denominador-ind-componente'];
+					$recurso->interpretacion 			= 	$parametros['interpretacion-componente'];
+					$recurso->idFormula 				= 	$parametros['formula-componente'];
+					$recurso->idDimensionIndicador 		= 	$parametros['dimension-componente'];
+					$recurso->idFrecuenciaIndicador 	= 	$parametros['frecuencia-componente'];
+					$recurso->idTipoIndicador 			= 	$parametros['tipo-ind-componente'];
+					$recurso->idUnidadMedida 			= 	$parametros['unidad-medida-componente'];
+					$recurso->metaIndicador 			= 	$parametros['meta-componente'];
+					$recurso->numeroTrim1 				= 	($parametros['trim1-componente'])?$parametros['trim1-componente']:NULL;
+					$recurso->numeroTrim2 				= 	($parametros['trim2-componente'])?$parametros['trim2-componente']:NULL;
+					$recurso->numeroTrim3 				= 	($parametros['trim3-componente'])?$parametros['trim3-componente']:NULL;
+					$recurso->numeroTrim4 				= 	($parametros['trim4-componente'])?$parametros['trim4-componente']:NULL;
+					$recurso->valorNumerador 			= 	$parametros['numerador-componente'];
+					if($recurso->idFormula == 7){
+						$recurso->valorDenominador 		= 	NULL;
+					}else{
+						$recurso->valorDenominador 		= 	$parametros['denominador-componente'];
+					}
+					$recurso->lineaBase 				= 	($parametros['linea-base-componente'])?$parametros['linea-base-componente']:NULL;
+					$recurso->anioBase 					= 	($parametros['anio-base-componente'])?$parametros['anio-base-componente']:NULL;
+
+					if($parametros['clasificacion'] == 2){
+						$recurso->idEntregable 			= $parametros['entregable'];
+						if($parametros['tipo-entregable'] != 'NA'){
+							$recurso->idEntregableTipo	= $parametros['tipo-entregable'] ;
+						}else{
+							$recurso->idEntregableTipo	= NULL;
+						}
+						$recurso->idEntregableAccion	= $parametros['accion-entregable'];
+					}
+
+					$respuesta['data'] = DB::transaction(function() use ($parametros, $recurso){
+						if($recurso->save()){
+							$jurisdicciones = $parametros['mes-componente'];
+							if(isset($parametros['mes-componente-id'])){
+								$ides = $parametros['mes-componente-id'];
+							}else{
+								$ides = array();
+							}
+
+							$metasMes = array();
+
+							foreach ($jurisdicciones as $clave => $meses) {
+								foreach ($meses as $mes => $valor) {
+									if(isset($ides[$clave][$mes])){
+										$meta = ComponenteMetaMes::find($ides[$clave][$mes]);
+										$meta->meta = $valor;
+										$metasMes[] = $meta;
+									}elseif($valor > 0){
+										$meta = new ComponenteMetaMes;
+										$meta->claveJurisdiccion = $clave;
+										$meta->mes = $mes;
+										$meta->meta = $valor;
+										$meta->idProyecto = $recurso->idProyecto;
+										$metasMes[] = $meta;
+									}
+								}	
+							}
+
+							$recurso->metasMes()->saveMany($metasMes);
+							//$recurso->load('metasMes');
+
+							$proyecto = Proyecto::with('componentes.unidadMedida')->find($recurso->idProyecto);
+
+							return array('data'=>$recurso,'componentes'=>$proyecto->componentes,'metas'=>$metasMes);
+						}else{
+							throw new Exception("Ocurrió un error al guardar el componente.", 1);
+						}
+					});
+				}else{
+					//La Validación del Formulario encontro errores
+					$respuesta['http_status'] = $validacion['http_status'];
+					$respuesta['data'] = $validacion['data'];
+				}
+			//Guardar datos del componente
+			}elseif($parametros['guardar'] == 'beneficiario'){ 
+				$respuesta = $this->guardar_datos_beneficiario($parametros,$id);
+			}elseif($parametros['guardar'] == 'proyecto'){
+				$validacion = Validador::validar(Input::all(), $this->reglasProyecto);
+				if($validacion === TRUE){
+
+					$recurso = Proyecto::find($id);
+
+					if(is_null($recurso)){
+						$respuesta['data']['data'] = 'No se ha podido encontrar el proyecto, por favor verifique que no haya sido eliminado.';
+						throw new Exception("No se pudo encontrar el proyecto que se intenta editar", 1);
+					}
+
+					$funcion_gasto = explode('.',$parametros['funciongasto']);
+
+					$recurso->idClasificacionProyecto 		= $parametros['clasificacionproyecto'];
+					$recurso->nombreTecnico 				= $parametros['nombretecnico'];
+					$recurso->idTipoProyecto 				= $parametros['tipoproyecto'];
+					$recurso->idTipoAccion 					= $parametros['tipoaccion'];
+					$recurso->unidadResponsable 			= $parametros['unidadresponsable'];
+					$recurso->finalidad 					= $funcion_gasto[0];
+					$recurso->funcion 						= $funcion_gasto[1];
+					$recurso->subFuncion 					= $funcion_gasto[2];
+					$recurso->subSubFuncion 				= $funcion_gasto[3];
+					$recurso->programaSectorial 			= $parametros['programasectorial'];
+					$recurso->programaPresupuestario 		= $parametros['programapresupuestario'];
+					$recurso->programaEspecial 				= $parametros['programaespecial'];
+					$recurso->actividadInstitucional 		= $parametros['actividadinstitucional'];
+					$recurso->proyectoEstrategico 			= $parametros['proyectoestrategico'];
+					$recurso->idObjetivoPED 				= $parametros['vinculacionped'];
+					
+					//$recurso->totalBeneficiarios 			= $parametros['totalbeneficiariosf'] + $parametros['totalbeneficiariosm'];
+					//$recurso->totalBeneficiariosF 			= $parametros['totalbeneficiariosf'];
+					//$recurso->totalBeneficiariosM 			= $parametros['totalbeneficiariosm'];
+					//$recurso->idEstatusProyecto 			= 1;
+					$recurso->idCobertura 					= $parametros['cobertura'];
+
+					if($recurso->idCobertura != $parametros['cobertura']){
+						$recurso->idCobertura 				= $parametros['cobertura'];
+					}
+					$jurisdicciones = NULL;
+					if($parametros['cobertura'] == 2){
+						if($recurso->claveMunicipio != $parametros['municipio']){
+							$recurso->claveRegion = NULL;
+							$recurso->claveMunicipio = $parametros['municipio'];
+							$jurisdicciones = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
+						}
+					}elseif($parametros['cobertura'] == 3){
+						if($recurso->claveRegion != $parametros['region']){
+							$recurso->claveMunicipio = NULL;
+							$recurso->claveRegion = $parametros['region'];
+							$jurisdicciones = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
+						}
+					}else{
+						if(!is_null($recurso->claveRegion) || !is_null($recurso->claveMunicipio)){
+							$recurso->claveMunicipio = NULL;
+							$recurso->claveRegion = NULL;
+							$jurisdicciones = Jurisdiccion::all();
+						}
+					}
+
+					DB::transaction(function() use ($parametros, $recurso, $respuesta, $jurisdicciones){
+						if($recurso->save()){
+							if($jurisdicciones){
+								$claves = $jurisdicciones->lists('clave');
+								//throw new Exception(print_r($claves,false), 1);
+								if(count($claves) > 0){
+									$claves[] = 'OC';
+									//throw new Exception(print_r($claves,false), 1);
+									ComponenteMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
+									ActividadMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
+									//$queries = DB::getQueryLog();
+									//$last_query = end($queries);
+									//throw new Exception(print_r($last_query,false), 1);
+								}
+							}
+						}else{
+							//No se pudieron guardar los datos del proyecto
+							$respuesta['data']['code'] = 'S01';
+							throw new Exception("Error al intentar guardar los datos del proyecto", 1);
+						}
+					});
+					
+					$recurso = $recurso->toArray();
+					if($jurisdicciones){
+						$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
+					}
+					//Proyecto guardado con éxito
+					$respuesta['data'] = array('data'=>$recurso);
+				}else{
+					//La Validación del Formulario encontro errores
+					$respuesta['http_status'] = $validacion['http_status'];
+					$respuesta['data'] = $validacion['data'];
+				}
+			//Guardar Datos del Proyecto
+			}
+		}catch(\Exception $ex){
+			$respuesta['http_status'] = 500;
+			if($respuesta['data']['data'] == ''){
+				$respuesta['data']['data'] = 'Ocurrio un error al intentar almacenar los datos.';
+			}
+			$respuesta['data']['ex'] = $ex->getMessage();
+			if(!isset($respuesta['data']['code'])){
+				$respuesta['data']['code'] = 'S03';
+			}
+		}
+
 		return Response::json($respuesta['data'],$respuesta['http_status']);
+	}
+
+	/**
+	 * Remove the specified resource from storage.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function destroy($id)
+	{
+		//
+		$http_status = 200;
+		$data = array('data'=>'');
+
+		try{
+
+			$parametros = Input::all();
+
+			$ids = $parametros['rows'];
+			$id_padre = 0;
+			
+			if(isset($parametros['eliminar'])){
+				$proyectos = Proyecto::where('id','=',$parametros['id-proyecto'])->get();
+			}else{
+				$proyectos = Proyecto::whereIn('id',$ids)->get();
+			}
+			
+			foreach ($proyectos as $proyecto) {
+				if($proyecto->idEstatusProyecto != 1 && $proyecto->idEstatusProyecto != 3){
+					switch ($proyecto->idEstatusProyecto) {
+						case 2:
+							$data['data'] = 'El proyecto se encuentra en proceso de revisión, por tanto no es posible editarlo';
+							break;
+						case 4:
+							$data['data'] = 'El proyecto se encuentra registrado, por tanto no es posible editarlo';
+							break;
+						case 5:
+							$data['data'] = 'El proyecto ya fue firmado, por tanto no es posible editarlo';
+							break;
+						default:
+							$data['data'] = 'El estatus del proyecto es desconocido';
+							break;
+					}
+					throw new Exception("El proyecto se encuentra en un estatus en el que no esta disponible para edición", 1);
+				}
+			}
+			
+			if(isset($parametros['eliminar'])){
+				if($parametros['eliminar'] == 'componente'){
+					$id_padre = $parametros['id-proyecto'];
+					$rows = DB::transaction(function() use ($ids){
+						//Obtenemos los ids de las actividades de los componentes seleccionados
+						$actividades = Actividad::wherein('idComponente',$ids)->lists('id');
+						if(count($actividades) > 0){
+							//Eliminamos las metas de dichas actividades
+							ActividadMetaMes::wherein('idActividad',$actividades)->delete();
+							//Eliminamos las actividades de los componentes
+							Actividad::wherein('idComponente',$ids)->delete();
+						}
+						//Eliminamos las metas de los componentes
+						ComponenteMetaMes::wherein('idComponente',$ids)->delete();
+						//Eliminamos los componenetes
+						return Componente::wherein('id',$ids)->delete();
+					});
+				}elseif($parametros['eliminar'] == 'actividad'){
+					$id_padre = $parametros['id-componente'];
+					$rows = DB::transaction(function() use ($ids){
+						//Eliminamos las metas de las actividades seleccionadas
+						ActividadMetaMes::wherein('idActividad',$ids)->delete();
+						//Eliminamos las actividades
+						return Actividad::wherein('id',$ids)->delete();
+					});
+				}elseif($parametros['eliminar'] == 'beneficiario'){
+					$id_padre = $parametros['id-proyecto'];
+					$rows = DB::transaction(function() use ($ids,$id_padre){
+						return Beneficiario::whereIn('idTipoBeneficiario',$ids)
+									->where('idProyecto','=',$id_padre)
+									->delete();
+					});
+				}
+			}else{
+				$rows = DB::transaction(function() use ($ids){
+					//Eliminamos las metas de los componentes de los proyectos
+					ComponenteMetaMes::wherein('idProyecto',$ids)->delete();
+					//Eliminamos las metas de las actividades de los proyectos
+					ActividadMetaMes::wherein('idProyecto',$ids)->delete();
+					//Obtenemos los ids de los componentes de los proyectos
+					$componentes = Componente::wherein('idProyecto',$ids)->lists('id');
+					if(count($componentes) > 0){
+						//Eliminamos las actividades de los componentes
+						Actividad::wherein('idComponente',$componentes)->delete();
+					}
+					//Eliminamos los componentes de los proyectos
+					Componente::wherein('idProyecto',$ids)->delete();
+					//Eliminamos los beneficiarios de los proyectos
+					Beneficiario::wherein('idProyecto',$ids)->delete();
+					//Eliminamos los proyectos
+					return Proyecto::wherein('id',$ids)->delete();
+				});
+			}
+
+			if($rows>0){
+				$data = array("data"=>"Se han eliminado los recursos.");
+				if(isset($parametros['eliminar'])){
+					if($parametros['eliminar'] == 'actividad'){
+						$data['actividades'] = Actividad::with('usuario','unidadMedida')->where('idComponente',$id_padre)->get();
+					}elseif($parametros['eliminar'] == 'componente'){
+						$data['componentes'] = Componente::with('usuario','unidadMedida')->where('idProyecto',$id_padre)->get();
+					}elseif($parametros['eliminar'] == 'beneficiario'){
+						$data['beneficiarios'] = Beneficiario::with('tipoBeneficiario')->where('idProyecto',$id_padre)->get();
+					}
+				}
+			}else{
+				$http_status = 404;
+				$data = array('data' => "No se pueden eliminar los recursos.",'code'=>'S03');
+			}	
+		}catch(Exception $ex){
+			$http_status = 500;	
+			$data['code'] = 'S03';
+			$data['ex'] = $ex->getMessage();
+			if($data['data'] == ''){
+				$data['data'] = "No se pueden borrar los registros";
+			}
+		}
+
+		return Response::json($data,$http_status);
+	}
+
+	public function guardar_datos_proyecto($parametros,$id = NULL){
+		$respuesta['http_status'] = 200;
+		$respuesta['data'] = array();
+		$es_editar = FALSE;
+
+		$validacion = Validador::validar(Input::all(), $this->reglasProyecto);
+		
+		if($validacion === TRUE){
+
+			if($id){
+				$recurso = Proyecto::find($id);
+				$es_editar = TRUE;
+
+				$respuesta['data']['datos-anteriores'] = array(
+						'claveMunicipio' => $recurso->claveMunicipio,
+						'claveRegion'	=> $recurso->claveRegion
+					);
+			}else{
+				$recurso = new Proyecto;
+			}
+			
+			$funcion_gasto = explode('.',$parametros['funciongasto']);
+
+			$recurso->idClasificacionProyecto 		= $parametros['clasificacionproyecto'];
+			$recurso->ejercicio						= $parametros['ejercicio'];
+			$recurso->idTipoAccion 					= $parametros['tipoaccion'];
+			$recurso->unidadResponsable 			= $parametros['unidadresponsable'];
+			$recurso->finalidad 					= $funcion_gasto[0];
+			$recurso->funcion 						= $funcion_gasto[1];
+			$recurso->subFuncion 					= $funcion_gasto[2];
+			$recurso->subSubFuncion 				= $funcion_gasto[3];
+			$recurso->programaSectorial 			= $parametros['programasectorial'];
+			$recurso->programaEspecial 				= $parametros['programaespecial'];
+			$recurso->actividadInstitucional 		= $parametros['actividadinstitucional'];
+			$recurso->proyectoEstrategico 			= $parametros['proyectoestrategico'];
+			$recurso->idEstatusProyecto 			= 1;
+			$recurso->idTipoProyecto 				= $parametros['tipoproyecto'];
+			$recurso->nombreTecnico 				= $parametros['nombretecnico'];
+			$recurso->idObjetivoPED 				= $parametros['vinculacionped'];
+			$recurso->programaPresupuestario 		= $parametros['programapresupuestario'];
+			
+			$nuevas_jurisdicciones = NULL;
+
+			if($es_editar){
+				if($recurso->idCobertura != $parametros['cobertura']){
+					$recurso->idCobertura 			= $parametros['cobertura'];
+				}
+				if($parametros['cobertura'] == 2){
+					if($recurso->claveMunicipio != $parametros['municipio']){
+						$recurso->claveRegion = NULL;
+						$recurso->claveMunicipio = $parametros['municipio'];
+						$nuevas_jurisdicciones = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
+					}
+				}elseif($parametros['cobertura'] == 3){
+					if($recurso->claveRegion != $parametros['region']){
+						$recurso->claveMunicipio = NULL;
+						$recurso->claveRegion = $parametros['region'];
+						$nuevas_jurisdicciones = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
+					}
+				}else{
+					if(!is_null($recurso->claveRegion) || !is_null($recurso->claveMunicipio)){
+						$recurso->claveMunicipio = NULL;
+						$recurso->claveRegion = NULL;
+						$nuevas_jurisdicciones = Jurisdiccion::all();
+					}
+				}
+			}else{
+				$recurso->idCobertura 				= $parametros['cobertura'];
+				if($parametros['cobertura'] == 2){
+					$recurso->claveMunicipio = $parametros['municipio'];
+				}elseif($parametros['cobertura'] == 3){
+					$recurso->claveRegion = $parametros['region'];
+				}
+			}
+
+			if(!$es_editar){
+				$titulares = Titular::whereIn('claveUnidad',array('00','01', Sentry::getUser()->claveUnidad))->get();
+				foreach ($titulares as $titular) {
+					if($titular->claveUnidad == '00'){ //Dirección General
+						$recurso->idJefeInmediato 				= $titular->id;
+					}elseif ($titular->claveUnidad == '01') { //Dirección de Planeación y Desarrollo
+						$recurso->idJefePlaneacion 				= $titular->id;
+			  			$recurso->idCoordinadorGrupoEstrategico = $titular->id;
+						if($recurso->idLiderProyecto == NULL){
+							$recurso->idLiderProyecto = $titular->id;
+						}
+					}else{
+						$recurso->idLiderProyecto = $titular->id;
+					}
+				}
+				$recurso->totalBeneficiarios = 0;
+				$recurso->totalBeneficiariosF = 0;
+				$recurso->totalBeneficiariosM = 0;
+			}
+			
+			//, $componentes, $fibap, $beneficiarios,  
+			DB::transaction(function() use ($recurso, $respuesta, $nuevas_jurisdicciones, $es_editar){
+				if($recurso->save()){
+					
+					if($nuevas_jurisdicciones){
+						$claves = $nuevas_jurisdicciones->lists('clave');
+						if(count($claves) > 0){
+							$claves[] = 'OC';
+							ComponenteMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
+							ActividadMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
+						}
+					}
+
+					//Si el proyecto es de Inversión checas si hay fibap, para actualizar la cobertura
+					if($es_editar && $recurso->idClasificacionProyecto == 2){
+						$recurso->load('fibap');
+						if($recurso->fibap){
+							//Nos servira para borrar las metas por mes de los desgloses
+							$desgloses = FALSE;
+							if($recurso->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
+								if($recurso->claveMunicipio != $respuesta['data']['datos-anteriores']['claveMunicipio']){
+									//Obtenemos el municipio seleccionado
+									$recurso->fibap->load('acciones');
+
+									//Borrar todo lo que no sea de este municipio por municipio
+									DistribucionPresupuesto::where('idFibap','=',$recurso->fibap->id)
+															->where('claveMunicipio','!=',$recurso->claveMunicipio)
+															->delete();
+									$desgloses = ComponenteDesglose::whereIn('idAccion',$recurso->fibap->acciones->lists('id'))
+														->where('claveMunicipio','!=',$recurso->claveMunicipio);
+								}
+							}elseif($recurso->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
+								if($recurso->claveRegion != $respuesta['data']['datos-anteriores']['claveRegion']){
+									$region = Region::with('municipios.localidades')->where('region','=',$recurso->claveRegion)->get();
+									$recurso->fibap->load('acciones');
+
+									DistribucionPresupuesto::where('idFibap','=',$recurso->fibap->id)
+															->whereNotIn('claveMunicipio',$region[0]->municipios->lists('clave'))
+															->delete();
+									$desgloses = ComponenteDesglose::whereIn('idAccion',$recurso->fibap->acciones->lists('id'))
+														->whereNotIn('claveMunicipio',$region[0]->municipios->lists('clave'));
+								}
+							}
+							
+							if($desgloses){
+								$lista_ids = $desgloses->get()->lists('id');
+								DesgloseMetasMes::whereIn('idComponenteDesglose',$lista_ids)->delete();
+								DesgloseBeneficiario::whereIn('idComponenteDesglose',$lista_ids)->delete();
+								//Actualizar desglose del componente
+								$desgloses->delete();
+							}
+						}
+					}
+				}else{
+					//No se pudieron guardar los datos del proyecto
+					throw new Exception("Error al intentar guardar los datos del proyecto", 1);
+				}
+			});
+			$respuesta['data']['data'] = $recurso;
+		}else{
+			//La Validación del Formulario encontro errores
+			$respuesta['http_status'] = $validacion['http_status'];
+			$respuesta['data'] = $validacion['data'];
+		}
+		
+		return $respuesta;
+	}
+
+	public function guardar_datos_beneficiario($parametros, $id = NULL){
+		$respuesta['http_status'] = 200;
+		$respuesta['data'] = array();
+		$es_editar = FALSE;
+
+		$validacion = Validador::validar(Input::all(), $this->reglasBeneficiarios);
+
+		if($validacion === TRUE){
+			$recurso = array();
+			$nuevo_beneficiario = 0;
+			$viejo_beneficiario = 0;
+
+			if($id){
+				$es_editar = TRUE;
+				$proyecto = Proyecto::with('beneficiarios')->find($parametros['id-proyecto']);
+				$beneficiarios = Beneficiario::where('idProyecto','=',$parametros['id-proyecto'])->
+								where('idTipoBeneficiario','=',$id)->get();
+				if($parametros['tipobeneficiario'] != $id){
+					$nuevo_beneficiario = $parametros['tipobeneficiario'];
+					$viejo_beneficiario = $beneficiarios[0]->idTipoBeneficiario;
+				}
+			}else{
+				$proyecto = Proyecto::find($parametros['id-proyecto']);
+				$nuevo_beneficiario = $parametros['tipobeneficiario'];
+			}
+
+			if($nuevo_beneficiario > 0){
+				$beneficiarios_capturados = $proyecto->beneficiarios->lists('idTipoBeneficiario','idTipoBeneficiario');
+				if(isset($beneficiarios_capturados[$nuevo_beneficiario])){
+					throw new Exception('{"field":"tipobeneficiario","error":"Este tipo de beneficiario ya fue capturado."}', 1);
+				}
+			}
+
+			if($es_editar){
+				foreach ($beneficiarios as $key => $item) {
+					$beneficiarios[$key]->idTipoBeneficiario	= 	$parametros['tipobeneficiario'];
+					$beneficiarios[$key]->total 				= 	$parametros['totalbeneficiarios'.$item->sexo];
+					$beneficiarios[$key]->urbana 				= 	$parametros['urbana'.$item->sexo];
+					$beneficiarios[$key]->rural 				= 	$parametros['rural'.$item->sexo];
+					$beneficiarios[$key]->mestiza 				= 	$parametros['mestiza'.$item->sexo];
+					$beneficiarios[$key]->indigena 				= 	$parametros['indigena'.$item->sexo];
+					$beneficiarios[$key]->inmigrante 			=	$parametros['inmigrante'.$item->sexo];
+					$beneficiarios[$key]->otros 				= 	$parametros['otros'.$item->sexo];
+					$beneficiarios[$key]->muyAlta 				= 	$parametros['muyalta'.$item->sexo];
+					$beneficiarios[$key]->alta 					= 	$parametros['alta'.$item->sexo];
+					$beneficiarios[$key]->media 				= 	$parametros['media'.$item->sexo];
+					$beneficiarios[$key]->baja 					= 	$parametros['baja'.$item->sexo];
+					$beneficiarios[$key]->muyBaja 				= 	$parametros['muybaja'.$item->sexo];
+					$recurso[] = $beneficiarios[$key];
+				}
+			}else{
+				if($parametros['totalbeneficiariosf'] > 0){
+					$beneficiarioF = new Beneficiario;
+					$beneficiarioF->idTipoBeneficiario	= $parametros['tipobeneficiario'];
+					$beneficiarioF->total 				= $parametros['totalbeneficiariosf'];
+					$beneficiarioF->sexo 				= 'f';
+					$beneficiarioF->urbana 				= $parametros['urbanaf'];
+					$beneficiarioF->rural 				= $parametros['ruralf'];
+					$beneficiarioF->mestiza 			= $parametros['mestizaf'];
+					$beneficiarioF->indigena 			= $parametros['indigenaf'];
+					$beneficiarioF->inmigrante 			= $parametros['inmigrantef'];
+					$beneficiarioF->otros 				= $parametros['otrosf'];
+					$beneficiarioF->muyAlta 			= $parametros['muyaltaf'];
+					$beneficiarioF->alta 				= $parametros['altaf'];
+					$beneficiarioF->media 				= $parametros['mediaf'];
+					$beneficiarioF->baja 				= $parametros['bajaf'];
+					$beneficiarioF->muyBaja 			= $parametros['muybajaf'];
+
+					$recurso[] = $beneficiarioF;
+				}
+				if($parametros['totalbeneficiariosm'] > 0){
+					$beneficiarioM = new Beneficiario;
+					$beneficiarioM->idTipoBeneficiario	= $parametros['tipobeneficiario'];
+					$beneficiarioM->total 				= $parametros['totalbeneficiariosm'];
+					$beneficiarioM->sexo 				= 'm';
+					$beneficiarioM->urbana 				= $parametros['urbanam'];
+					$beneficiarioM->rural 				= $parametros['ruralm'];
+					$beneficiarioM->mestiza 			= $parametros['mestizam'];
+					$beneficiarioM->indigena 			= $parametros['indigenam'];
+					$beneficiarioM->inmigrante 			= $parametros['inmigrantem'];
+					$beneficiarioM->otros 				= $parametros['otrosm'];
+					$beneficiarioM->muyAlta 			= $parametros['muyaltam'];
+					$beneficiarioM->alta 				= $parametros['altam'];
+					$beneficiarioM->media 				= $parametros['mediam'];
+					$beneficiarioM->baja 				= $parametros['bajam'];
+					$beneficiarioM->muyBaja 			= $parametros['muybajam'];
+
+					$recurso[] = $beneficiarioM;
+				}
+			}
+
+			$respuesta['data']['data'] = DB::transaction(function() use ($recurso, $proyecto, $es_editar, $viejo_beneficiario){
+				if(!$proyecto->beneficiarios()->saveMany($recurso)){
+					throw new Exception("Error al intentar guardar los beneficiarios del proyecto", 1);
+				}
+				$suma = 0;
+				$suma_f = 0;
+				$suma_m = 0;
+				foreach ($proyecto->beneficiarios as $beneficiario) {
+					$suma += $beneficiario->total;
+					if($beneficiario->sexo == 'f'){
+						$suma_f += $beneficiario->total;
+					}else{
+						$suma_m += $beneficiario->total;
+					}
+				}
+				$proyecto->totalBeneficiarios = $suma;
+				$proyecto->totalBeneficiariosF = $suma_f;
+				$proyecto->totalBeneficiariosM = $suma_m;
+
+				if(!$proyecto->save()){
+					throw new Exception("Error al intentar actualizar los totales de los beneficiarios del proyecto", 1);
+				}
+				$proyecto->load('beneficiarios');
+				
+				if($proyecto->idClasificacionProyecto == 2 && $es_editar){
+					$componentes_ids = $proyecto->componentes->lists('id');
+					$desgloses_componente = ComponenteDesglose::whereIn('idcomponente',$componentes_ids)->get()->lists('id');
+					
+					if(count($desgloses_componente)){
+						DesgloseBeneficiario::whereIn('idComponenteDesglose',$desgloses_componente)
+											->where('idTipoBeneficiario','=',$viejo_beneficiario)
+											->update(['idTipoBeneficiario'=>$recurso[0]->idTipoBeneficiario]);
+					}
+				}
+
+				return $proyecto->beneficiarios;
+			});
+		}else{
+			$respuesta['http_status'] = $validacion['http_status'];
+			$respuesta['data'] = $validacion['data'];
+		}
+		return $respuesta;
 	}
 
 	public function guardar_datos_componente($selector,$parametros,$id = NULL){
@@ -693,43 +1446,45 @@ class ProyectosController extends BaseController {
 				}
 
 				if($guardado){
-					$jurisdicciones = $parametros['mes-'.$selector]; //Arreglo que contiene los datos [jurisdiccion][mes] = valor
+					if(isset($parametros['mes-'.$selector])){
+						$jurisdicciones = $parametros['mes-'.$selector]; //Arreglo que contiene los datos [jurisdiccion][mes] = valor
 
-					if(isset($parametros['mes-' . $selector . '-id'])){
-						$ides = $parametros['mes-' . $selector . '-id'];
-					}else{
-						$ides = array();
-					}
+						if(isset($parametros['mes-' . $selector . '-id'])){
+							$ides = $parametros['mes-' . $selector . '-id'];
+						}else{
+							$ides = array();
+						}
 
-					$metasMes = array();
+						$metasMes = array();
 
-					if($es_editar){
-						$recurso->load('metasMes');
-					}
+						if($es_editar){
+							$recurso->load('metasMes');
+						}
 
-					foreach ($jurisdicciones as $clave => $meses) {
-						foreach ($meses as $mes => $valor) {
-							if(isset($ides[$clave][$mes])){
-								$meta = $recurso->metasMes()->find($ides[$clave][$mes]);
-								$meta->meta = $valor;
-								$metasMes[] = $meta;
-							}elseif($valor > 0){
-								if($selector == 'componente'){
-									$meta = new ComponenteMetaMes;
-									$meta->idProyecto = $recurso->idProyecto;
-								}else{
-									$meta = new ActividadMetaMes;
-									$meta->idProyecto = $componente->idProyecto;
+						foreach ($jurisdicciones as $clave => $meses) {
+							foreach ($meses as $mes => $valor) {
+								if(isset($ides[$clave][$mes])){
+									$meta = $recurso->metasMes()->find($ides[$clave][$mes]);
+									$meta->meta = $valor;
+									$metasMes[] = $meta;
+								}elseif($valor > 0){
+									if($selector == 'componente'){
+										$meta = new ComponenteMetaMes;
+										$meta->idProyecto = $recurso->idProyecto;
+									}else{
+										$meta = new ActividadMetaMes;
+										$meta->idProyecto = $componente->idProyecto;
+									}
+									$meta->claveJurisdiccion = $clave;
+									$meta->mes = $mes;
+									$meta->meta = $valor;
+									$metasMes[] = $meta;
 								}
-								$meta->claveJurisdiccion = $clave;
-								$meta->mes = $mes;
-								$meta->meta = $valor;
-								$metasMes[] = $meta;
 							}
 						}
-					}
 
-					$recurso->metasMes()->saveMany($metasMes);
+						$recurso->metasMes()->saveMany($metasMes);
+					}
 					return array('data'=>$recurso);	
 					//return array('data'=>$componente,'componentes'=>$proyecto->componentes,'metas'=>$metasMes);
 				}else{
@@ -744,849 +1499,5 @@ class ProyectosController extends BaseController {
 		return $respuesta;
 	}
 
-	public function guardar_datos_beneficiario($parametros, $id = NULL){
-		$respuesta['http_status'] = 200;
-		$respuesta['data'] = array();
-		$es_editar = FALSE;
-
-		$validacion = Validador::validar(Input::all(), $this->reglasBeneficiarios);
-
-		if($validacion === TRUE){
-			$recurso = array();
-			$nuevo_beneficiario = 0;
-
-			if($id){
-				$es_editar = TRUE;
-				$proyecto = Proyecto::with('beneficiarios')->find($parametros['id-proyecto']);
-				$beneficiarios = Beneficiario::where('idProyecto','=',$parametros['id-proyecto'])->
-								where('idTipoBeneficiario','=',$id)->get();
-				if($parametros['tipobeneficiario'] != $id){
-					$nuevo_beneficiario = $parametros['tipobeneficiario'];
-				}
-			}else{
-				$proyecto = Proyecto::find($parametros['id-proyecto']);
-				$nuevo_beneficiario = $parametros['tipobeneficiario'];
-			}
-
-			if($nuevo_beneficiario > 0){
-				$beneficiarios_capturados = $proyecto->beneficiarios->lists('idTipoBeneficiario');
-				if(array_search($nuevo_beneficiario,$beneficiarios_capturados)){
-					throw new Exception('{"field":"tipobeneficiario","error":"Este tipo de beneficiario ya fue capturado."}', 1);
-				}
-			}
-
-			if($es_editar){
-				foreach ($beneficiarios as $key => $item) {
-					$beneficiarios[$key]->idTipoBeneficiario	= 	$parametros['tipobeneficiario'];
-					$beneficiarios[$key]->total 				= 	$parametros['totalbeneficiarios'.$item->sexo];
-					$beneficiarios[$key]->urbana 				= 	$parametros['urbana'.$item->sexo];
-					$beneficiarios[$key]->rural 				= 	$parametros['rural'.$item->sexo];
-					$beneficiarios[$key]->mestiza 				= 	$parametros['mestiza'.$item->sexo];
-					$beneficiarios[$key]->indigena 				= 	$parametros['indigena'.$item->sexo];
-					$beneficiarios[$key]->inmigrante 			=	$parametros['inmigrante'.$item->sexo];
-					$beneficiarios[$key]->otros 				= 	$parametros['otros'.$item->sexo];
-					$beneficiarios[$key]->muyAlta 				= 	$parametros['muyalta'.$item->sexo];
-					$beneficiarios[$key]->alta 					= 	$parametros['alta'.$item->sexo];
-					$beneficiarios[$key]->media 				= 	$parametros['media'.$item->sexo];
-					$beneficiarios[$key]->baja 					= 	$parametros['baja'.$item->sexo];
-					$beneficiarios[$key]->muyBaja 				= 	$parametros['muybaja'.$item->sexo];
-					$recurso[] = $beneficiarios[$key];
-				}
-			}else{
-				if($parametros['totalbeneficiariosf'] > 0){
-					$beneficiarioF = new Beneficiario;
-					$beneficiarioF->idTipoBeneficiario	= $parametros['tipobeneficiario'];
-					$beneficiarioF->total 				= $parametros['totalbeneficiariosf'];
-					$beneficiarioF->sexo 				= 'f';
-					$beneficiarioF->urbana 				= $parametros['urbanaf'];
-					$beneficiarioF->rural 				= $parametros['ruralf'];
-					$beneficiarioF->mestiza 			= $parametros['mestizaf'];
-					$beneficiarioF->indigena 			= $parametros['indigenaf'];
-					$beneficiarioF->inmigrante 			= $parametros['inmigrantef'];
-					$beneficiarioF->otros 				= $parametros['otrosf'];
-					$beneficiarioF->muyAlta 			= $parametros['muyaltaf'];
-					$beneficiarioF->alta 				= $parametros['altaf'];
-					$beneficiarioF->media 				= $parametros['mediaf'];
-					$beneficiarioF->baja 				= $parametros['bajaf'];
-					$beneficiarioF->muyBaja 			= $parametros['muybajaf'];
-
-					$recurso[] = $beneficiarioF;
-				}
-
-				if($parametros['totalbeneficiariosm'] > 0){
-					$beneficiarioM = new Beneficiario;
-					$beneficiarioM->idTipoBeneficiario	= $parametros['tipobeneficiario'];
-					$beneficiarioM->total 				= $parametros['totalbeneficiariosm'];
-					$beneficiarioM->sexo 				= 'm';
-					$beneficiarioM->urbana 				= $parametros['urbanam'];
-					$beneficiarioM->rural 				= $parametros['ruralm'];
-					$beneficiarioM->mestiza 			= $parametros['mestizam'];
-					$beneficiarioM->indigena 			= $parametros['indigenam'];
-					$beneficiarioM->inmigrante 			= $parametros['inmigrantem'];
-					$beneficiarioM->otros 				= $parametros['otrosm'];
-					$beneficiarioM->muyAlta 			= $parametros['muyaltam'];
-					$beneficiarioM->alta 				= $parametros['altam'];
-					$beneficiarioM->media 				= $parametros['mediam'];
-					$beneficiarioM->baja 				= $parametros['bajam'];
-					$beneficiarioM->muyBaja 			= $parametros['muybajam'];
-
-					$recurso[] = $beneficiarioM;
-				}
-			}
-
-			$respuesta['data']['data'] = DB::transaction(function() use ($recurso, $proyecto){
-				if(!$proyecto->beneficiarios()->saveMany($recurso)){
-					throw new Exception("Error al intentar guardar los beneficiarios del proyecto", 1);
-				}
-				$suma = 0;
-				$suma_f = 0;
-				$suma_m = 0;
-				foreach ($proyecto->beneficiarios as $beneficiario) {
-					$suma += $beneficiario->total;
-					if($beneficiario->sexo == 'f'){
-						$suma_f += $beneficiario->total;
-					}else{
-						$suma_m += $beneficiario->total;
-					}
-				}
-				$proyecto->totalBeneficiarios = $suma;
-				$proyecto->totalBeneficiariosF = $suma_f;
-				$proyecto->totalBeneficiariosM = $suma_m;
-
-				if(!$proyecto->save()){
-					throw new Exception("Error al intentar actualizar los totales de los beneficiarios del proyecto", 1);
-				}
-				$proyecto->load('beneficiarios');
-				return $proyecto->beneficiarios;
-			});
-		}else{
-			$respuesta['http_status'] = $validacion['http_status'];
-			$respuesta['data'] = $validacion['data'];
-		}
-		return $respuesta;
-	}
-
-	public function guardar_datos_proyecto($parametros,$id = NULL){
-		$respuesta['http_status'] = 200;
-		$respuesta['data'] = array();
-		$es_editar = FALSE;
-
-		$validacion = Validador::validar(Input::all(), $this->reglasProyecto);
-		
-		if($validacion === TRUE){
-
-			if($id){
-				$recurso = Proyecto::find($id);
-				$es_editar = TRUE;
-
-				$respuesta['data']['datos-anteriores'] = array(
-						'claveMunicipio' => $recurso->claveMunicipio,
-						'claveRegion'	=> $recurso->claveRegion
-					);
-			}else{
-				$recurso = new Proyecto;
-			}
-			
-			$funcion_gasto = explode('.',$parametros['funciongasto']);
-
-			$recurso->idClasificacionProyecto 		= $parametros['clasificacionproyecto'];
-			$recurso->ejercicio						= $parametros['ejercicio'];
-			$recurso->idTipoAccion 					= $parametros['tipoaccion'];
-			$recurso->unidadResponsable 			= $parametros['unidadresponsable'];
-			$recurso->finalidad 					= $funcion_gasto[0];
-			$recurso->funcion 						= $funcion_gasto[1];
-			$recurso->subFuncion 					= $funcion_gasto[2];
-			$recurso->subSubFuncion 				= $funcion_gasto[3];
-			$recurso->programaSectorial 			= $parametros['programasectorial'];
-			$recurso->programaEspecial 				= $parametros['programaespecial'];
-			$recurso->actividadInstitucional 		= $parametros['actividadinstitucional'];
-			$recurso->proyectoEstrategico 			= $parametros['proyectoestrategico'];
-			$recurso->idEstatusProyecto 			= 1;
-			$recurso->idTipoProyecto 				= $parametros['tipoproyecto'];
-			$recurso->nombreTecnico 				= $parametros['nombretecnico'];
-			$recurso->idObjetivoPED 				= $parametros['vinculacionped'];
-			$recurso->programaPresupuestario 		= $parametros['programapresupuestario'];
-			
-			$nuevas_jurisdicciones = NULL;
-
-			if($es_editar){
-				if($recurso->idCobertura != $parametros['cobertura']){
-					$recurso->idCobertura 			= $parametros['cobertura'];
-				}
-				if($parametros['cobertura'] == 2){
-					if($recurso->claveMunicipio != $parametros['municipio']){
-						$recurso->claveRegion = NULL;
-						$recurso->claveMunicipio = $parametros['municipio'];
-						$nuevas_jurisdicciones = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
-					}
-				}elseif($parametros['cobertura'] == 3){
-					if($recurso->claveRegion != $parametros['region']){
-						$recurso->claveMunicipio = NULL;
-						$recurso->claveRegion = $parametros['region'];
-						$nuevas_jurisdicciones = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
-					}
-				}else{
-					if(!is_null($recurso->claveRegion) || !is_null($recurso->claveMunicipio)){
-						$recurso->claveMunicipio = NULL;
-						$recurso->claveRegion = NULL;
-						$nuevas_jurisdicciones = Jurisdiccion::all();
-					}
-				}
-			}else{
-				$recurso->idCobertura 				= $parametros['cobertura'];
-				if($parametros['cobertura'] == 2){
-					$recurso->claveMunicipio = $parametros['municipio'];
-				}elseif($parametros['cobertura'] == 3){
-					$recurso->claveRegion = $parametros['region'];
-				}
-			}
-				//$componentes = array();
-				//$fibap = FALSE;
-				/*if($parametros['id-fibap']){
-					$fibap = FIBAP::with('datosProyecto','acciones.datosComponente.desgloseComponente.metasMes')
-									->find($parametros['id-fibap']);
-
-					if(!$fibap){
-						$respuesta['data']['data'] = 'La Fibap seleccionada no se encuentra, es posible que haya sido eliminada.';
-						throw new Exception("La FIBAP no existe, o fue eliminada.", 1);
-					}
-
-					$recurso->idTipoProyecto 				= $fibap->datosProyecto->idTipoProyecto;
-					$recurso->nombreTecnico 				= $fibap->datosProyecto->nombreTecnico;
-					$recurso->idObjetivoPED 				= $fibap->datosProyecto->idObjetivoPED;
-					$recurso->programaPresupuestario 		= $fibap->datosProyecto->programaPresupuestario;
-					$recurso->idCobertura 					= $fibap->datosProyecto->idCobertura;
-					if($fibap->datosProyecto->idCobertura == 2){
-						$recurso->claveMunicipio = $fibap->datosProyecto->claveMunicipio;
-					}elseif($fibap->datosProyecto->idCobertura == 3){
-						$recurso->claveRegion = $fibap->datosProyecto->claveRegion;
-					}
-					$recurso->idTipoBeneficiario 			= $fibap->datosProyecto->idTipoBeneficiario;
-					$recurso->totalBeneficiarios 			= $fibap->datosProyecto->totalBeneficiarios;
-					$recurso->totalBeneficiariosF 			= $fibap->datosProyecto->totalBeneficiariosF;
-					$recurso->totalBeneficiariosM 			= $fibap->datosProyecto->totalBeneficiariosM;
-
-					foreach ($fibap->acciones as $accion) {
-						$componente = new Componente;
-
-						$componente->idEntregable 		= $accion->datosComponente->idEntregable;
-						$componente->idEntregableTipo 	= $accion->datosComponente->idEntregableTipo;
-						$componente->idEntregableAccion	= $accion->datosComponente->idEntregableAccion;
-						$componente->idUnidadMedida		= $accion->datosComponente->idUnidadMedida;
-						$componente->indicador 			= $accion->datosComponente->indicador;
-						$componente->numeroTrim1 		= 0;
-						$componente->numeroTrim2 		= 0;
-						$componente->numeroTrim3 		= 0;
-						$componente->numeroTrim4 		= 0;
-
-						$metas_mes = array();
-						$componente_desglose = array();
-						foreach ($accion->datosComponente->desgloseComponente as $desglose) {
-							if(!isset($metas_mes[$desglose->claveJurisdiccion])){
-								$metas_mes[$desglose->claveJurisdiccion] = array(
-										1 => 0, 2 => 0, 3 => 0,  4 => 0,  5 => 0,  6 => 0,
-										7 => 0, 8 => 0, 9 => 0, 10 => 0, 11 => 0, 12 => 0
-									);
-							}
-
-							foreach ($desglose->metasMes as $meta) {
-								if($meta->meta > 0){
-									$metas_mes[$desglose->claveJurisdiccion][$meta->mes] += $meta->meta;
-									//Se divide la meta por trimestre
-									if($meta->mes >= 1 && $meta->mes <= 3){
-										$componente->numeroTrim1 += $meta->meta;
-										//$desglose->trim1 += $meta->meta;
-									}elseif ($meta->mes >= 4 && $meta->mes <= 6) {
-										$componente->numeroTrim2 += $meta->meta;
-										//$desglose->trim2 += $meta->meta;
-									}elseif ($meta->mes >= 7 && $meta->mes <= 9) {
-										$componente->numeroTrim3 += $meta->meta;
-										//$desglose->trim3 += $meta->meta;
-									}elseif ($meta->mes >= 10 && $meta->mes <= 12) {
-										$componente->numeroTrim4 += $meta->meta;
-										//$desglose->trim4 += $meta->meta;
-									}
-									$componente->valorNumerador += $meta->meta;
-									//$desglose->meta += $meta->meta;
-								}
-							}
-							$componente_desglose[] = $desglose;
-						}
-
-						$componentes[] = array(
-								'componente' 	=> $componente,
-								'metas_mes'		=> $metas_mes,
-								'desglose'		=> $componente_desglose
-							);
-					}
-				}else{*/
-			//}
-			//$beneficiarios = array();
-			if(!$es_editar){
-				$titulares = Titular::whereIn('claveUnidad',array('00','01', Sentry::getUser()->claveUnidad))->get();
-				foreach ($titulares as $titular) {
-					if($titular->claveUnidad == '00'){ //Dirección General
-						$recurso->idJefeInmediato 				= $titular->id;
-					}elseif ($titular->claveUnidad == '01') { //Dirección de Planeación y Desarrollo
-						$recurso->idJefePlaneacion 				= $titular->id;
-			  			$recurso->idCoordinadorGrupoEstrategico = $titular->id;
-						if($recurso->idLiderProyecto == NULL){
-							$recurso->idLiderProyecto = $titular->id;
-						}
-					}else{
-						$recurso->idLiderProyecto = $titular->id;
-					}
-				}
-				$recurso->totalBeneficiarios = 0;
-				$recurso->totalBeneficiariosF = 0;
-				$recurso->totalBeneficiariosM = 0;
-			}
-			
-			//, $componentes, $fibap, $beneficiarios,  
-			DB::transaction(function() use ($recurso, $respuesta, $nuevas_jurisdicciones, $es_editar){
-				if($recurso->save()){
-					
-					if($nuevas_jurisdicciones){
-						$claves = $nuevas_jurisdicciones->lists('clave');
-						if(count($claves) > 0){
-							$claves[] = 'OC';
-							ComponenteMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
-							ActividadMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
-						}
-					}
-
-					//Si el proyecto es de Inversión checas si hay fibap, para actualizar la cobertura
-					if($es_editar && $recurso->idClasificacionProyecto == 2){
-						$recurso->load('fibap');
-						if($recurso->fibap){
-							//Nos servira para borrar las metas por mes de los desgloses
-							$desgloses = FALSE;
-							if($recurso->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
-								if($recurso->claveMunicipio != $respuesta['data']['datos-anteriores']['claveMunicipio']){
-									//Obtenemos el municipio seleccionado
-									$recurso->fibap->load('acciones');
-
-									//Borrar todo lo que no sea de este municipio por municipio
-									DistribucionPresupuesto::where('idFibap','=',$recurso->fibap->id)
-															->where('claveMunicipio','!=',$recurso->claveMunicipio)
-															->delete();
-									$desgloses = ComponenteDesglose::whereIn('idAccion',$recurso->fibap->acciones->lists('id'))
-														->where('claveMunicipio','!=',$recurso->claveMunicipio);
-								}
-							}elseif($recurso->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
-								if($recurso->claveRegion != $respuesta['data']['datos-anteriores']['claveRegion']){
-									$region = Region::with('municipios.localidades')->where('region','=',$recurso->claveRegion)->get();
-									$recurso->fibap->load('acciones');
-
-									DistribucionPresupuesto::where('idFibap','=',$recurso->fibap->id)
-															->whereNotIn('claveMunicipio',$region[0]->municipios->lists('clave'))
-															->delete();
-									$desgloses = ComponenteDesglose::whereIn('idAccion',$recurso->fibap->acciones->lists('id'))
-														->whereNotIn('claveMunicipio',$region[0]->municipios->lists('clave'));
-								}
-							}
-							
-							if($desgloses){
-								DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses->get()->lists('id'))->delete();
-								//Actualizar desglose del componente
-								$desgloses->delete();
-							}
-						}
-					}
-				}else{
-					//No se pudieron guardar los datos del proyecto
-					throw new Exception("Error al intentar guardar los datos del proyecto", 1);
-				}
-				/*if($fibap){
-					foreach ($componentes as $datos) {
-						$componente = $datos['componente'];
-						$metas_mes = $datos['metas_mes'];
-						$desglose = $datos['desglose'];
-
-						$recurso->componentes()->save($componente);
-						
-						$metas = array();
-						foreach ($metas_mes as $jurisdiccion => $meses) {
-							foreach ($meses as $mes => $meta) {
-								if($meta > 0){
-									$meta_mes = new ComponenteMetaMes;
-									$meta_mes->claveJurisdiccion = $jurisdiccion;
-									$meta_mes->mes = $mes;
-									$meta_mes->meta = $meta;
-									$meta_mes->idProyecto = $componente->idProyecto;
-									$metas[] = $meta_mes;
-								}
-							}
-						}
-						$componente->metasMes()->saveMany($metas);
-						$componente->desglose()->saveMany($desglose);
-					}
-					$fibap->idProyecto = $recurso->id;
-					$fibap->save();
-					FibapDatosProyecto::where('idFibap','=',$fibap->id)->delete();
-				}*/
-			});
-				
-			/*if($recurso->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
-				$jurisdicciones = Jurisdiccion::all();
-			}elseif($recurso->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
-				$jurisdicciones = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
-			}elseif($recurso->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
-				$jurisdicciones = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
-			}*/
-			//Proyecto guardado con éxito
-			/*if($fibap){
-				$recurso->load('componentes.usuario');
-			}*/
-			//$recurso = $recurso->toArray();
-			//$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
-			$respuesta['data']['data'] = $recurso;
-		}else{
-			//La Validación del Formulario encontro errores
-			$respuesta['http_status'] = $validacion['http_status'];
-			$respuesta['data'] = $validacion['data'];
-		}
-		
-		return $respuesta;
-	}
-
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update($id)
-	{
-		//
-		$respuesta['http_status'] = 200;
-		$respuesta['data'] = array("data"=>'');
-		
-		$parametros = Input::all();
-
-		if($parametros['guardar'] == 'actividad'){
-			try{
-				
-				$validacion = Validador::validar(Input::all(), $this->reglasActividad);
-
-				if($validacion === TRUE){
-
-					$recurso = Actividad::find($id);
-
-					if(is_null($recurso)){
-						$respuesta['data']['data'] = 'No se ha podido encontrar la actividad, por favor verifique que no haya sido eliminada.';
-						throw new Exception("No se pudo encontrar la actividad que se intenta editar", 1);
-					}
-
-					//$componente->idProyecto = $parametros['id-proyecto'];
-					$recurso->objetivo 					= 	$parametros['descripcion-obj-actividad'];
-					$recurso->mediosVerificacion 		= 	$parametros['verificacion-actividad'];
-					$recurso->supuestos 				= 	$parametros['supuestos-actividad'];
-					$recurso->indicador 				= 	$parametros['descripcion-ind-actividad'];
-					$recurso->numerador 				= 	$parametros['numerador-ind-actividad'];
-					$recurso->denominador 				= 	$parametros['denominador-ind-actividad'];
-					$recurso->interpretacion 			= 	$parametros['interpretacion-actividad'];
-					$recurso->idFormula 				= 	$parametros['formula-actividad'];
-					$recurso->idDimensionIndicador 		= 	$parametros['dimension-actividad'];
-					$recurso->idFrecuenciaIndicador 	= 	$parametros['frecuencia-actividad'];
-					$recurso->idTipoIndicador 			= 	$parametros['tipo-ind-actividad'];
-					$recurso->idUnidadMedida 			= 	$parametros['unidad-medida-actividad'];
-					$recurso->metaIndicador 			= 	$parametros['meta-actividad'];
-					$recurso->numeroTrim1 				= 	($parametros['trim1-actividad'])?$parametros['trim1-actividad']:NULL;
-					$recurso->numeroTrim2 				= 	($parametros['trim2-actividad'])?$parametros['trim2-actividad']:NULL;
-					$recurso->numeroTrim3 				= 	($parametros['trim3-actividad'])?$parametros['trim3-actividad']:NULL;
-					$recurso->numeroTrim4 				= 	($parametros['trim4-actividad'])?$parametros['trim4-actividad']:NULL;
-					$recurso->valorNumerador 			= 	$parametros['numerador-actividad'];
-					if($recurso->idFormula == 7){
-						$recurso->valorDenominador 		= 	NULL;
-					}else{
-						$recurso->valorDenominador 		= 	$parametros['denominador-actividad'];
-					}
-					$recurso->lineaBase 				= 	($parametros['linea-base-actividad'])?$parametros['linea-base-actividad']:NULL;
-					$recurso->anioBase 					= 	($parametros['anio-base-actividad'])?$parametros['anio-base-actividad']:NULL;
-					
-					$respuesta['data'] = DB::transaction(function() use ($parametros, $recurso){
-						if($recurso->save()){
-							$componente = Componente::with('actividades.unidadMedida')->find($recurso->idComponente);
-
-							$jurisdicciones = $parametros['mes-actividad'];
-							$ides = $parametros['mes-actividad-id'];
-
-							$metasMes = array();
-
-							foreach ($jurisdicciones as $clave => $meses) {
-								foreach ($meses as $mes => $valor) {
-									if(isset($ides[$clave][$mes])){
-										$meta = ActividadMetaMes::find($ides[$clave][$mes]);
-										$meta->meta = $valor;
-										$metasMes[] = $meta;
-									}elseif($valor > 0){
-										$meta = new ActividadMetaMes;
-										$meta->claveJurisdiccion = $clave;
-										$meta->mes = $mes;
-										$meta->meta = $valor;
-										$meta->idProyecto = $componente->idProyecto;
-										$metasMes[] = $meta;
-									}
-								}
-							}
-
-							$recurso->metasMes()->saveMany($metasMes);
-
-							return array('data'=>$recurso,'actividades'=>$componente->actividades,'metas'=>$metasMes);
-						}else{
-							throw new Exception("Ocurrió un error al guardar la actividad.", 1);
-						}
-					});
-				}else{
-					//La Validación del Formulario encontro errores
-					$respuesta['http_status'] = $validacion['http_status'];
-					$respuesta['data'] = $validacion['data'];
-				}
-			}catch(\Exception $ex){
-				$respuesta['http_status'] = 500;
-				if($respuesta['data']['data'] == ''){
-					$respuesta['data']['data'] = 'Ocurrio un error en el servidor al guardar la actividad.';
-				}
-				$respuesta['data']['ex'] = $ex->getMessage();
-				if(!isset($respuesta['data']['code'])){
-					$respuesta['data']['code'] = 'S03';
-				}
-			}
-		} //Guardar datos de la actividad
-
-		if($parametros['guardar'] == 'componente'){  //Editar componente
-			try{
-				
-				if($parametros['clasificacion'] == 2){
-					$this->reglasComponente['entregable'] = 'required';
-					$this->reglasComponente['tipo-entregable'] = 'required';
-					$this->reglasComponente['accion-entregable'] = 'required';
-				}
-
-				$validacion = Validador::validar(Input::all(), $this->reglasComponente);
-
-				if($validacion === TRUE){
-					$recurso = Componente::find($id);
-
-					if(is_null($recurso)){
-						$respuesta['data']['data'] = 'No se ha podido encontrar el componente, por favor verifique que no haya sido eliminado.';
-						throw new Exception("No se pudo encontrar el componente que se intenta editar", 1);
-					}
-
-					//$componente->idProyecto = $parametros['id-proyecto'];
-					$recurso->objetivo 					= 	$parametros['descripcion-obj-componente'];
-					$recurso->mediosVerificacion 		= 	$parametros['verificacion-componente'];
-					$recurso->supuestos 				= 	$parametros['supuestos-componente'];
-					$recurso->indicador 				= 	$parametros['descripcion-ind-componente'];
-					$recurso->numerador 				= 	$parametros['numerador-ind-componente'];
-					$recurso->denominador 				= 	$parametros['denominador-ind-componente'];
-					$recurso->interpretacion 			= 	$parametros['interpretacion-componente'];
-					$recurso->idFormula 				= 	$parametros['formula-componente'];
-					$recurso->idDimensionIndicador 		= 	$parametros['dimension-componente'];
-					$recurso->idFrecuenciaIndicador 	= 	$parametros['frecuencia-componente'];
-					$recurso->idTipoIndicador 			= 	$parametros['tipo-ind-componente'];
-					$recurso->idUnidadMedida 			= 	$parametros['unidad-medida-componente'];
-					$recurso->metaIndicador 			= 	$parametros['meta-componente'];
-					$recurso->numeroTrim1 				= 	($parametros['trim1-componente'])?$parametros['trim1-componente']:NULL;
-					$recurso->numeroTrim2 				= 	($parametros['trim2-componente'])?$parametros['trim2-componente']:NULL;
-					$recurso->numeroTrim3 				= 	($parametros['trim3-componente'])?$parametros['trim3-componente']:NULL;
-					$recurso->numeroTrim4 				= 	($parametros['trim4-componente'])?$parametros['trim4-componente']:NULL;
-					$recurso->valorNumerador 			= 	$parametros['numerador-componente'];
-					if($recurso->idFormula == 7){
-						$recurso->valorDenominador 		= 	NULL;
-					}else{
-						$recurso->valorDenominador 		= 	$parametros['denominador-componente'];
-					}
-					$recurso->lineaBase 				= 	($parametros['linea-base-componente'])?$parametros['linea-base-componente']:NULL;
-					$recurso->anioBase 					= 	($parametros['anio-base-componente'])?$parametros['anio-base-componente']:NULL;
-
-					if($parametros['clasificacion'] == 2){
-						$recurso->idEntregable 			= $parametros['entregable'];
-						if($parametros['tipo-entregable'] != 'NA'){
-							$recurso->idEntregableTipo	= $parametros['tipo-entregable'] ;
-						}else{
-							$recurso->idEntregableTipo	= NULL;
-						}
-						$recurso->idEntregableAccion	= $parametros['accion-entregable'];
-					}
-
-					$respuesta['data'] = DB::transaction(function() use ($parametros, $recurso){
-						if($recurso->save()){
-							$jurisdicciones = $parametros['mes-componente'];
-							if(isset($parametros['mes-componente-id'])){
-								$ides = $parametros['mes-componente-id'];
-							}else{
-								$ides = array();
-							}
-
-							$metasMes = array();
-
-							foreach ($jurisdicciones as $clave => $meses) {
-								foreach ($meses as $mes => $valor) {
-									if(isset($ides[$clave][$mes])){
-										$meta = ComponenteMetaMes::find($ides[$clave][$mes]);
-										$meta->meta = $valor;
-										$metasMes[] = $meta;
-									}elseif($valor > 0){
-										$meta = new ComponenteMetaMes;
-										$meta->claveJurisdiccion = $clave;
-										$meta->mes = $mes;
-										$meta->meta = $valor;
-										$meta->idProyecto = $recurso->idProyecto;
-										$metasMes[] = $meta;
-									}
-								}	
-							}
-
-							$recurso->metasMes()->saveMany($metasMes);
-							//$recurso->load('metasMes');
-
-							$proyecto = Proyecto::with('componentes.unidadMedida')->find($recurso->idProyecto);
-
-							return array('data'=>$recurso,'componentes'=>$proyecto->componentes,'metas'=>$metasMes);
-						}else{
-							throw new Exception("Ocurrió un error al guardar el componente.", 1);
-						}
-					});
-				}else{
-					//La Validación del Formulario encontro errores
-					$respuesta['http_status'] = $validacion['http_status'];
-					$respuesta['data'] = $validacion['data'];
-				}
-			}catch(\Exception $ex){
-				$respuesta['http_status'] = 500;	
-				if($respuesta['data']['data'] == ''){
-					$respuesta['data']['data'] = 'Ocurrio un error al intentar almacenar los datos';
-				}
-				$respuesta['data']['ex'] = $ex->getMessage();
-				if(!isset($respuesta['data']['code'])){
-					$respuesta['data']['code'] = 'S03';
-				}
-			}
-		} //Guardar datos del componente
-
-		if($parametros['guardar'] == 'beneficiario'){
-			try {
-				$respuesta = $this->guardar_datos_beneficiario($parametros,$id);
-			} catch (\Exception $ex) {
-				$respuesta['http_status'] = 500;	
-				$respuesta['data']['data'] = 'Ocurrio un error al intentar almacenar los datos';
-				$respuesta['data']['ex'] = $ex->getMessage();
-				if(!isset($respuesta['data']['code'])){
-					$respuesta['data']['code'] = 'S03';
-				}
-			}
-		}
-
-		if($parametros['guardar'] == 'proyecto'){
-
-			$validacion = Validador::validar(Input::all(), $this->reglasProyecto);
-
-			try{
-				if($validacion === TRUE){
-
-					$recurso = Proyecto::find($id);
-
-					if(is_null($recurso)){
-						$respuesta['data']['data'] = 'No se ha podido encontrar el proyecto, por favor verifique que no haya sido eliminado.';
-						throw new Exception("No se pudo encontrar el proyecto que se intenta editar", 1);
-					}
-
-					$funcion_gasto = explode('.',$parametros['funciongasto']);
-
-					$recurso->idClasificacionProyecto 		= $parametros['clasificacionproyecto'];
-					$recurso->nombreTecnico 				= $parametros['nombretecnico'];
-					$recurso->idTipoProyecto 				= $parametros['tipoproyecto'];
-					$recurso->idTipoAccion 					= $parametros['tipoaccion'];
-					$recurso->unidadResponsable 			= $parametros['unidadresponsable'];
-					$recurso->finalidad 					= $funcion_gasto[0];
-					$recurso->funcion 						= $funcion_gasto[1];
-					$recurso->subFuncion 					= $funcion_gasto[2];
-					$recurso->subSubFuncion 				= $funcion_gasto[3];
-					$recurso->programaSectorial 			= $parametros['programasectorial'];
-					$recurso->programaPresupuestario 		= $parametros['programapresupuestario'];
-					$recurso->programaEspecial 				= $parametros['programaespecial'];
-					$recurso->actividadInstitucional 		= $parametros['actividadinstitucional'];
-					$recurso->proyectoEstrategico 			= $parametros['proyectoestrategico'];
-					$recurso->idObjetivoPED 				= $parametros['vinculacionped'];
-					$recurso->idTipoBeneficiario 			= $parametros['tipobeneficiario'];
-					$recurso->totalBeneficiarios 			= $parametros['totalbeneficiariosf'] + $parametros['totalbeneficiariosm'];
-					$recurso->totalBeneficiariosF 			= $parametros['totalbeneficiariosf'];
-					$recurso->totalBeneficiariosM 			= $parametros['totalbeneficiariosm'];
-					$recurso->idEstatusProyecto 			= 1;
-					$recurso->idCobertura 					= $parametros['cobertura'];
-
-					if($recurso->idCobertura != $parametros['cobertura']){
-						$recurso->idCobertura 				= $parametros['cobertura'];
-					}
-					$jurisdicciones = NULL;
-					if($parametros['cobertura'] == 2){
-						if($recurso->claveMunicipio != $parametros['municipio']){
-							$recurso->claveRegion = NULL;
-							$recurso->claveMunicipio = $parametros['municipio'];
-							$jurisdicciones = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
-						}
-					}elseif($parametros['cobertura'] == 3){
-						if($recurso->claveRegion != $parametros['region']){
-							$recurso->claveMunicipio = NULL;
-							$recurso->claveRegion = $parametros['region'];
-							$jurisdicciones = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
-						}
-					}else{
-						if(!is_null($recurso->claveRegion) || !is_null($recurso->claveMunicipio)){
-							$recurso->claveMunicipio = NULL;
-							$recurso->claveRegion = NULL;
-							$jurisdicciones = Jurisdiccion::all();
-						}
-					}
-
-					DB::transaction(function() use ($parametros, $recurso, $respuesta, $jurisdicciones){
-						if($recurso->save()){
-							if($jurisdicciones){
-								$claves = $jurisdicciones->lists('clave');
-								//throw new Exception(print_r($claves,false), 1);
-								if(count($claves) > 0){
-									$claves[] = 'OC';
-									//throw new Exception(print_r($claves,false), 1);
-									ComponenteMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
-									ActividadMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
-									//$queries = DB::getQueryLog();
-									//$last_query = end($queries);
-									//throw new Exception(print_r($last_query,false), 1);
-									
-								}
-							}
-						}else{
-							//No se pudieron guardar los datos del proyecto
-							$respuesta['data']['code'] = 'S01';
-							throw new Exception("Error al intentar guardar los datos del proyecto", 1);
-						}
-					});
-					
-					$recurso = $recurso->toArray();
-					if($jurisdicciones){
-						$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
-					}
-					//Proyecto guardado con éxito
-					$respuesta['data'] = array('data'=>$recurso);
-				}else{
-					//La Validación del Formulario encontro errores
-					$respuesta['http_status'] = $validacion['http_status'];
-					$respuesta['data'] = $validacion['data'];
-				}
-			}catch(\Exception $ex){
-				$respuesta['http_status'] = 500;	
-				if($respuesta['data']['data'] == ''){
-					$respuesta['data']['data'] = 'Ocurrio un error al intentar almacenar los datos';
-				}
-				$respuesta['data']['ex'] = $ex->getMessage();
-				if(!isset($respuesta['data']['code'])){
-					$respuesta['data']['code'] = 'S03';
-				}
-			}
-		} //Guardar Datos del Proyecto
-		return Response::json($respuesta['data'],$respuesta['http_status']);
-	}
-
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function destroy($id)
-	{
-		//
-		$http_status = 200;
-		$data = array();
-
-		try{
-
-			$parametros = Input::all();
-
-			$ids = $parametros['rows'];
-			$id_padre = 0;
-			
-			if(isset($parametros['eliminar'])){
-				if($parametros['eliminar'] == 'componente'){
-					$id_padre = $parametros['id-proyecto'];
-					$rows = DB::transaction(function() use ($ids){
-						//Obtenemos los ids de las actividades de los componentes seleccionados
-						$actividades = Actividad::wherein('idComponente',$ids)->lists('id');
-						if(count($actividades) > 0){
-							//Eliminamos las metas de dichas actividades
-							ActividadMetaMes::wherein('idActividad',$actividades)->delete();
-							//Eliminamos las actividades de los componentes
-							Actividad::wherein('idComponente',$ids)->delete();
-						}
-						//Eliminamos las metas de los componentes
-						ComponenteMetaMes::wherein('idComponente',$ids)->delete();
-						//Eliminamos los componenetes
-						return Componente::wherein('id',$ids)->delete();
-					});
-				}
-				if($parametros['eliminar'] == 'actividad'){
-					$id_padre = $parametros['id-componente'];
-					$rows = DB::transaction(function() use ($ids){
-						//Eliminamos las metas de las actividades seleccionadas
-						ActividadMetaMes::wherein('idActividad',$ids)->delete();
-						//Eliminamos las actividades
-						return Actividad::wherein('id',$ids)->delete();
-					});
-				}
-				if($parametros['eliminar'] == 'beneficiario'){
-					$id_padre = $parametros['id-proyecto'];
-					$rows = DB::transaction(function() use ($ids,$id_padre){
-						return Beneficiario::whereIn('idTipoBeneficiario',$ids)
-									->where('idProyecto','=',$id_padre)
-									->delete();
-					});
-				}
-			}else{
-				$rows = DB::transaction(function() use ($ids){
-					//Eliminamos las metas de los componentes de los proyectos
-					ComponenteMetaMes::wherein('idProyecto',$ids)->delete();
-					//Eliminamos las metas de las actividades de los proyectos
-					ActividadMetaMes::wherein('idProyecto',$ids)->delete();
-					//Obtenemos los ids de los componentes de los proyectos
-					$componentes = Componente::wherein('idProyecto',$ids)->lists('id');
-					if(count($componentes) > 0){
-						//Eliminamos las actividades de los componentes
-						Actividad::wherein('idComponente',$componentes)->delete();
-					}
-					//Eliminamos los componentes de los proyectos
-					Componente::wherein('idProyecto',$ids)->delete();
-					//Eliminamos los beneficiarios de los proyectos
-					Beneficiario::wherein('idProyecto',$ids)->delete();
-					//Eliminamos los proyectos
-					return Proyecto::wherein('id',$ids)->delete();
-				});
-			}
-
-			if($rows>0){
-				$data = array("data"=>"Se han eliminado los recursos.");
-				if(isset($parametros['eliminar'])){
-					if($parametros['eliminar'] == 'actividad'){
-						$data['actividades'] = Actividad::with('usuario')->where('idComponente',$id_padre)->get();
-					}
-					if($parametros['eliminar'] == 'componente'){
-						$data['componentes'] = Componente::with('usuario')->where('idProyecto',$id_padre)->get();
-					}
-					if($parametros['eliminar'] == 'beneficiario'){
-						$data['beneficiarios'] = Beneficiario::with('tipoBeneficiario')->where('idProyecto',$id_padre)->get();
-					}
-				}
-			}else{
-				$http_status = 404;
-				$data = array('data' => "No se pueden eliminar los recursos.",'code'=>'S03');
-			}	
-		}catch(Exception $ex){
-			$http_status = 500;	
-			$data = array('data' => "No se pueden borrar los registros",'ex'=>$ex->getMessage(),'code'=>'S03');	
-		}
-
-		return Response::json($data,$http_status);
-	}
-
 }
+
