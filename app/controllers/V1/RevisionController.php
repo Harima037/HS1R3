@@ -263,8 +263,14 @@ class RevisionController extends BaseController {
 			}
 		}else{
 			$recurso = Proyecto::contenidoCompleto()->find($id);
-			$recurso->componentes->load('unidadMedida');
+			$recurso->componentes->load('unidadMedida','dimension','tipoIndicador','metasMes','formula','frecuencia','actividades');
 			$recurso->load('comentarios');
+			
+			/*$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion','desgloseCompleto'));*/
+			foreach ($recurso->componentes as $key => $componente) {
+				$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
+			}
+			
 			if($recurso->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
 				$jurisdicciones = Jurisdiccion::all();
 			}elseif($recurso->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio

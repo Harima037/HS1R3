@@ -70,7 +70,7 @@ function editar (e){
             $('#lbl_coordinador_grupo').text((response.data.coordinador_grupo_estrategico)?response.data.coordinador_grupo_estrategico.nombre:'No asignado');
 
 
-            $('#lbl_tipo_beneficiario').text(response.data.tipo_beneficiario.descripcion);
+            /*$('#lbl_tipo_beneficiario').text(response.data.tipo_beneficiario.descripcion);
             $('#lbl_total_beneficiarios').text(response.data.totalBeneficiarios.format());
             $('#lbl_beneficiarios_f').text(response.data.totalBeneficiariosF.format());
             $('#lbl_beneficiarios_m').text(response.data.totalBeneficiariosM.format());
@@ -90,7 +90,7 @@ function editar (e){
                 $('#lbl_benef_media_'+sexo).text(response.data.beneficiarios[indx].media.format());
                 $('#lbl_benef_baja_'+sexo).text(response.data.beneficiarios[indx].baja.format());
                 $('#lbl_benef_muy_baja_'+sexo).text(response.data.beneficiarios[indx].muyBaja.format());
-            }
+            }*/
 
             $('#id').val(response.data.id);
 

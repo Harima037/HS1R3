@@ -180,28 +180,237 @@ if($('#id').val()){
 				}
 				
 				cadenaHTML = cadenaHTML + '</tr>';
-				
-				
 			}
 			cadenaHTML = cadenaHTML + '</table>';		
 			
 			$('#tabla-beneficiarios').html(cadenaHTML);		
 			
-			for(var contador in response.data.comentarios)
+			var TabComponente = [];
+			var contadorDeTabs = 1;
+			
+			for(var cuentaComponentes in response.data.componentes)
 			{
-				var idCampo = response.data.comentarios[contador]['idCampo'];
-				if(idCampo.substr(0,12)=='beneficiario')
+				var idComponente = response.data.componentes[cuentaComponentes].id;
+				
+				TabComponente[contadorDeTabs] = '<div class="col-sm-12">';
+				
+				/*COMIENZA SECCIÓN DE OBJETIVOS*/
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<br><div class="col-sm-12 bg-info"><span class="fa fa-crosshairs"></span> <strong>Objetivo</strong></div>';										
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-descripcion'+idComponente+'">Descripción</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'descripcion'+idComponente+'\',\'Descripción\',\'lbl-descripcion'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-descripcion'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].objetivo+'</p></div></div></div>';
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-mediosverificacion'+idComponente+'">Medios de verificación</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'mediosverificacion'+idComponente+'\',\'Medios de verificación\',\'lbl-mediosverificacion'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-mediosverificacion'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].mediosVerificacion+'</p></div></div></div>';
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-supuestos'+idComponente+'">Supuestos</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'supuestos'+idComponente+'\',\'Supuestos\',\'lbl-supuestos'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-supuestos'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].supuestos+'</p></div></div></div>';
+				/*TERMINA SECCIÓN DE OBJETIVOS*/
+
+				/*COMIENZA SECCIÓN DE INDICADOR*/				
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12 bg-info"><span class="fa fa-line-chart"></span> <strong>Indicador</strong></div>';	
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-indicador'+idComponente+'">Descripción</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'indicador'+idComponente+'\',\'Descripción\',\'lbl-indicador'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-indicador'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].indicador+'</p></div></div></div>';				
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-interpretacion'+idComponente+'">Interpretación</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'interpretacion'+idComponente+'\',\'Interpretación\',\'lbl-interpretacion'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-interpretacion'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].interpretacion+'</p></div></div></div>';				
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-numerador'+idComponente+'">Numerador</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'numerador'+idComponente+'\',\'Numerador\',\'lbl-numerador'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-numerador'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].numerador+'</p></div></div></div>';
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-denominador'+idComponente+'">Denominador</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'denominador'+idComponente+'\',\'Denominador\',\'lbl-denominador'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-denominador'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].denominador+'</p></div></div></div>';
+				
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-dimension'+idComponente+'">Dimensión</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'dimension'+idComponente+'\',\'Dimensión\',\'lbl-dimension'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-dimension'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].dimension.descripcion+'</p></div></div></div>';				
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-tipo'+idComponente+'">Tipo</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'tipo'+idComponente+'\',\'Tipo\',\'lbl-tipo'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-tipo'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].tipo_indicador.descripcion+'</p></div></div></div>';
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-5"><div class="form-group"><label class="control-label" for="lbl-unidadmedida'+idComponente+'">Unidad de medida</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'unidadmedida'+idComponente+'\',\'Unidad de medida\',\'lbl-unidadmedida'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-unidadmedida'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].unidad_medida.descripcion+'</p></div></div></div>';
+				/*TERMINA SECCIÓN DE INDICADOR*/
+				
+				/*COMIENZA SECCIÓN DE METAS*/				
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12 bg-info"><span class="fa fa-table"></span> <strong> Metas</strong></div>';	
+			
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-2"><div class="form-group"><label class="control-label" for="lbl-lineabase'+idComponente+'">Línea base</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'lineabase'+idComponente+'\',\'Línea base\',\'lbl-lineabase'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-lineabase'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].lineaBase+'</p></div></div></div>';				
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-2"><div class="form-group"><label class="control-label" for="lbl-aniobase'+idComponente+'">Año base</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'aniobase'+idComponente+'\',\'Año base\',\'lbl-aniobase'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-aniobase'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].anioBase+'</p></div></div></div>';
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-formula'+idComponente+'">Fórmula</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'formula'+idComponente+'\',\'Fórmula\',\'lbl-formula'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-formula'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].formula.descripcion+'</p></div></div></div>';
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-frecuencia'+idComponente+'">Frecuencia</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'frecuencia'+idComponente+'\',\'Frecuencia\',\'lbl-frecuencia'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-frecuencia'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].frecuencia.descripcion+'</p></div></div></div>';
+				
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12">';
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<table width=100% class="table table-bordered table-condensed"><tr>';
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<th>Mes</th><th>ENE</th><th>FEB</th><th>MAR</th><th>ABR</th><th>MAY</th><th>JUN</th><th>JUL</th><th>AGO</th><th>SEP</th><th>OCT</th><th>NOV</th><th>DIC</th></tr>';
+				
+				var trim = {};
+				trim[1] = 0.0; trim[2] = 0.0; trim[3] = 0.0; trim[4] = 0.0;
+				
+				for(var cuentaJuris in response.data.jurisdicciones)
+				{					
+					var mes = {};
+					var juris = response.data.jurisdicciones[cuentaJuris];					
+					mes['1'] = '<td>0</td>';mes['2'] = '<td>0</td>';mes['3'] = '<td>0</td>';
+					mes['4'] = '<td>0</td>';mes['5'] = '<td>0</td>';mes['6'] = '<td>0</td>';
+					mes['7'] = '<td>0</td>';mes['8'] = '<td>0</td>';mes['9'] = '<td>0</td>';
+					mes['10'] = '<td>0</td>';mes['11'] = '<td>0</td>';mes['12'] = '<td>0</td>';
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<tr>';
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<td><strong>' + juris + '</strong></td>';
+					for(var cuentaMeses in response.data.componentes[cuentaComponentes].metas_mes)										
+					{
+						if(juris == response.data.componentes[cuentaComponentes].metas_mes[cuentaMeses].claveJurisdiccion)
+						{
+							var valorTrim = Math.ceil(parseFloat(response.data.componentes[cuentaComponentes].metas_mes[cuentaMeses].mes)/3) ;
+							trim[valorTrim] = trim[valorTrim] + parseFloat(response.data.componentes[cuentaComponentes].metas_mes[cuentaMeses].meta);								
+							mes[response.data.componentes[cuentaComponentes].metas_mes[cuentaMeses].mes] = '<td>'+response.data.componentes[cuentaComponentes].metas_mes[cuentaMeses].meta+'</td>';
+						}
+					}
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + mes['1'] + mes['2'] + mes['3'] + mes['4'] + mes['5'] + mes['6'] + mes['7'] + mes['8'] + mes['9'] + mes['10'] + mes['11'] + mes['12']; 
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '</tr>';
+				}
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '</table></div>';
+				
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-6 bg-success">';
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-trim1'+idComponente+'"><span class="fa fa-link"></span> Trim 1</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'trim1'+idComponente+'\',\'Trim 1\',\'lbl-trim1'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-trim1'+idComponente+'" class="form-control" style="height:auto">'+trim[1]+'</p></div></div></div>';
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-trim2'+idComponente+'"><span class="fa fa-link"></span> Trim 2</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'trim2'+idComponente+'\',\'Trim 2\',\'lbl-trim2'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-trim2'+idComponente+'" class="form-control" style="height:auto">'+trim[2]+'</p></div></div></div>';				
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-trim3'+idComponente+'"><span class="fa fa-link"></span> Trim 3</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'trim3'+idComponente+'\',\'Trim 3\',\'lbl-trim3'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-trim3'+idComponente+'" class="form-control" style="height:auto">'+trim[3]+'</p></div></div></div>';
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-trim4'+idComponente+'"><span class="fa fa-link"></span> Trim 4</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'trim4'+idComponente+'\',\'Trim 4\',\'lbl-trim4'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-trim4'+idComponente+'" class="form-control" style="height:auto">'+trim[4]+'</p></div></div></div>';
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '</div>';
+				
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-6">';
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-valornumerador'+idComponente+'"><span class="fa fa-link"></span> Numerador</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'valornumerador'+idComponente+'\',\'Numerador\',\'lbl-valornumerador'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-valornumerador'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].valorNumerador+'</p></div></div></div>';
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-valordenominador'+idComponente+'"><span class="fa fa-link"></span> Denominador</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'valordenominador'+idComponente+'\',\'Denominador\',\'lbl-valordenominador'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-valordenominador'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].valorDenominador+'</p></div></div></div>';
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-metaindicador'+idComponente+'"><span class="fa fa-link"></span> Meta</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'metaindicador'+idComponente+'\',\'Meta\',\'lbl-metaindicador'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-metaindicador'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].metaIndicador+'</p></div></div></div>';
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '</div>';
+				
+				/*TERMINA SECCIÓN DE METAS*/				
+				
+				/*COMIENZA SECCIÓN DE ACTIVIDADES*/				
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12 bg-info"><span class="fa fa-thumb-tack"></span> <strong> Actividades</strong></div><br>';	
+				
+				
+				var PanelDeActividades = [];
+				var cuantasActividades = response.data.componentes[cuentaComponentes].actividades.length;
+				var contadorDeActividades = 1;
+				var actividades = '<br>';
+				
+				
+				if(cuantasActividades > 0)
 				{
-					var objetoAColorear = '#'+idCampo;
-					$(objetoAColorear).removeClass('btn-default');
-					$(objetoAColorear).addClass('btn-warning');					
+					for(var indiceActividad in response.data.componentes[cuentaComponentes].actividades)
+					{
+						var idActividad = response.data.componentes[cuentaComponentes].actividades[indiceActividad].id;
+						
+						PanelDeActividades[contadorDeActividades] = '<div class="col-sm-12">';
+						/*COMIENZA SECCIÓN DE OBJETIVOS*/
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<br><div class="col-sm-12 bg-info"><span class="fa fa-crosshairs"></span> <strong>Objetivo</strong></div>';
+						
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-descripcionactividad'+idActividad+'">Descripción</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'descripcionactividad'+idActividad+'\',\'Descripción\',\'lbl-descripcionactividad'+idActividad+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-descripcionactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].objetivo+'</p></div></div></div>';		
+						
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-mediosverificacionactividad'+idActividad+'">Medios de verificación</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'mediosverificacionactividad'+idActividad+'\',\'Medios de Verificación\',\'lbl-mediosverificacionactividad'+idActividad+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-mediosverificacionactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].mediosVerificacion+'</p></div></div></div>';				
+						
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-supuestosactividad'+idActividad+'">Supuestos</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'supuestosactividad'+idActividad+'\',\'Supuestos\',\'lbl-supuestosactividad'+idActividad+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-supuestosactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].supuestos+'</p></div></div></div>';
+						/*TERMINA SECCIÓN DE OBJETIVOS*/
+						/*COMIENZA SECCIÓN DE INDICADOR*/						
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-12 bg-info"><span class="fa fa-line-chart"></span> <strong>Indicador</strong></div>';	
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-indicadoractividad'+idActividad+'">Descripción</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'indicadoractividad'+idActividad+'\',\'Descripción\',\'lbl-indicadoractividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-indicadoractividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].indicador+'</p></div></div></div>';	
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-interpretacionactividad'+idActividad+'">Interpretación</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'interpretacionactividad'+idActividad+'\',\'Interpretación\',\'lbl-interpretacionactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-interpretacionactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].interpretacion+'</p></div></div></div>';						
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-numeradoractividad'+idActividad+'">Numerador</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'numeradoractividad'+idActividad+'\',\'Numerador\',\'lbl-numeradoractividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-numeradoractividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].numerador+'</p></div></div></div>';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-denominadoractividad'+idActividad+'">Denominador</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'denominadoractividad'+idActividad+'\',\'Denominador\',\'lbl-denominadoractividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-denominadoractividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].denominador+'</p></div></div></div>';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-dimensionactividad'+idActividad+'">Dimensión</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'dimensionactividad'+idActividad+'\',\'Dimensión\',\'lbl-dimensionactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-dimensionactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].dimension.descripcion+'</p></div></div></div>';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-tipoactividad'+idActividad+'">Tipo</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'tipoactividad'+idActividad+'\',\'Tipo\',\'lbl-tipoactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-tipoactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].tipo_indicador.descripcion+'</p></div></div></div>';	
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-5"><div class="form-group"><label class="control-label" for="lbl-unidadmedidaactividad'+idActividad+'">Unidad de medida</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'unidadmedidaactividad'+idActividad+'\',\'Unidad de medida\',\'lbl-unidadmedidaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-unidadmedidaactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].unidad_medida.descripcion+'</p></div></div></div>';
+						/*TERMINA SECCIÓN DE INDICADOR*/
+							
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '</div>';
+						contadorDeActividades++;
+					}
+					
+					actividades = '<br><div role="tabpanel">';
+					actividades = actividades + '<ul class="nav nav-tabs" role="tablist">';		
+					var numeroDeActividad = 1;			
+					
+					for(var i=0; i<cuantasActividades;i++)
+					{
+						actividades = actividades + '<li role="presentation" ';
+						if(i===0)
+							actividades = actividades + 'class="active"';
+						actividades = actividades + '><a href="#TabDeActividad'+numeroDeActividad+'" aria-controls="home" role="tab" data-toggle="tab">Actividad '+numeroDeActividad+'</a></li>';
+						numeroDeActividad++;
+					}
+					actividades = actividades + '</ul>';
+					numeroDeActividad = 1;
+					actividades = actividades + '<div class="tab-content">';
+					
+					for(var j=0; j<cuantasActividades;j++)
+					{
+						actividades = actividades + '<div role="tabpanel" class="tab-pane';
+							if(j===0) actividades = actividades + ' active';
+						actividades = actividades + '" id="TabDeActividad'+numeroDeActividad+'">';
+						actividades = actividades + PanelDeActividades[numeroDeActividad];
+						actividades = actividades + '</div>';
+						numeroDeActividad++;
+					}
+					actividades = actividades + '</div></div>';
+					
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + actividades;
 				}
 				else
 				{
-					var objetoAColorear = '#lbl-'+idCampo;
-					$(objetoAColorear).parent().parent().addClass('has-error has-feedback');
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"> <strong> No se han descrito actividades aún</strong></div>';	
 				}
-				comentariosArray.push([response.data.comentarios[contador]['id'],response.data.comentarios[contador]['idCampo'], response.data.comentarios[contador]['observacion']]);	
+				
+				
+				
+
+				
+				
+				
+				/*TERMINA SECCIÓN DE ACTIVIDADES*/
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '</div>';
+				contadorDeTabs++;
+			}
+			
+			var cadHTMLCom = '';
+			var numeroDeComponente = 1;
+			var cuantosComponentes = response.data.componentes.length;		
+			
+			
+			cadHTMLCom = '<div role="tabpanel">';
+			cadHTMLCom = cadHTMLCom + '<ul class="nav nav-tabs" role="tablist">';
+			for(var i=0; i<cuantosComponentes;i++)
+			{
+				cadHTMLCom = cadHTMLCom + '<li role="presentation" ';
+				if(i===0)
+					cadHTMLCom = cadHTMLCom + 'class="active"';
+				cadHTMLCom = cadHTMLCom + '><a href="#TabDeComponente'+numeroDeComponente+'" aria-controls="home" role="tab" data-toggle="tab">Componente '+numeroDeComponente+'</a></li>';
+				numeroDeComponente++;
+			}
+			cadHTMLCom = cadHTMLCom + '</ul>';
+			numeroDeComponente = 1;
+			cadHTMLCom = cadHTMLCom + '<div class="tab-content">';
+			for(var j=0; j<cuantosComponentes;j++)
+			{
+				cadHTMLCom = cadHTMLCom + '<div role="tabpanel" class="tab-pane';
+				if(j===0) cadHTMLCom = cadHTMLCom + ' active';
+				cadHTMLCom = cadHTMLCom + '" id="TabDeComponente'+numeroDeComponente+'">';
+				cadHTMLCom = cadHTMLCom + TabComponente[numeroDeComponente];
+				cadHTMLCom = cadHTMLCom + '</div>';
+				numeroDeComponente++;
+			}
+			cadHTMLCom = cadHTMLCom + '</div></div>';
+
+			$('#panelTabsDeComponentes').html(cadHTMLCom);
+			
+			for(var contador in response.data.comentarios)
+			{
+				var idCampo = response.data.comentarios[contador]['idCampo'];
+				
+				if(response.data.comentarios[contador]['tipoComentario']=='1')//Tipo 1 = Proyecto
+				{
+					if(idCampo.substr(0,12)=='beneficiario')
+					{
+						var objetoAColorear = '#'+idCampo;
+						$(objetoAColorear).removeClass('btn-default');
+						$(objetoAColorear).addClass('btn-warning');					
+					}
+					else
+					{
+						var objetoAColorear = '#lbl-'+idCampo;
+						$(objetoAColorear).parent().parent().addClass('has-error has-feedback');
+					}
+					comentariosArray.push([response.data.comentarios[contador]['id'],response.data.comentarios[contador]['idCampo'], response.data.comentarios[contador]['observacion']]);
+				}
+				else if(response.data.comentarios[contador]['tipoComentario']=='2')//Tipo 2 = Componente
+				{
+				}
+				else if(response.data.comentarios[contador]['tipoComentario']=='3')//Tipo 3 = Actividad de Componente
+				{
+				}
+				
+					
 			}
 			
 			
