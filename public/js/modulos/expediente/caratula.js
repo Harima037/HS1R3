@@ -120,9 +120,14 @@ if($('#id').val()){
 			$('#tablink-beneficiarios').parent().removeClass('disabled');
 
 			actualizar_grid_componentes(response.data.componentes);
+
+			if(response.data.idEstatusProyecto == 2){
+				bloquear_controles();
+			}
         }
     });
 }else if($('#id-fibap').val()){
+	/*
 	var parametros = {ver:'datos-fibap'};
 	proyectoResource.get($('#id-fibap').val(),parametros,{
 		_success:function(response){
@@ -167,10 +172,11 @@ if($('#id').val()){
 			$('#totalbeneficiariosf').val(response.data.totalBeneficiariosF);
 			$('#totalbeneficiariosm').val(response.data.totalBeneficiariosM);
 
-			bloquear_controles();
+			//bloquear_controles();
 			$('.chosen-one.control-bloqueado').trigger('chosen:updated');
 		}
 	});
+	*/
 }else{
 	inicializar_comportamiento_caratula();
 	deshabilita_paneles('');
@@ -415,25 +421,29 @@ function editar_beneficiario(e){
 
             $('#id-beneficiario').val(response.data[0].idTipoBeneficiario);
 
-            var indx;
             var sexo;
             var total = 0;
-            for( indx in response.data ){
-                sexo = response.data[indx].sexo;
-                total += response.data[indx].total;
-                $('#totalbeneficiarios'+sexo).val(response.data[indx].total);
-                $('#urbana'+sexo).val(response.data[indx].urbana);
-                $('#rural'+sexo).val(response.data[indx].rural);
-                $('#mestiza'+sexo).val(response.data[indx].mestiza);
-                $('#indigena'+sexo).val(response.data[indx].indigena);
-                $('#inmigrante'+sexo).val(response.data[indx].inmigrante);
-                $('#otros'+sexo).val(response.data[indx].otros);
-                $('#muyalta'+sexo).val(response.data[indx].muyAlta);
-                $('#alta'+sexo).val(response.data[indx].alta);
-                $('#media'+sexo).val(response.data[indx].media);
-                $('#baja'+sexo).val(response.data[indx].baja);
-                $('#muybaja'+sexo).val(response.data[indx].muyBaja);
-            }
+            var beneficiarios = {'f':{},'m':{}};
+
+		    for(var i in response.data){
+		    	beneficiarios[response.data[i].sexo] = response.data[i];
+		    }
+		    
+		    for(var sexo in beneficiarios ){
+		        total += beneficiarios[sexo].total || 0;
+		        $('#totalbeneficiarios'+sexo).val(beneficiarios[sexo].total || 0);
+		        $('#urbana'+sexo).val(beneficiarios[sexo].urbana || 0);
+		        $('#rural'+sexo).val(beneficiarios[sexo].rural || 0);
+		        $('#mestiza'+sexo).val(beneficiarios[sexo].mestiza || 0);
+		        $('#indigena'+sexo).val(beneficiarios[sexo].indigena || 0);
+		        $('#inmigrante'+sexo).val(beneficiarios[sexo].inmigrante || 0);
+		        $('#otros'+sexo).val(beneficiarios[sexo].otros || 0);
+		        $('#muyalta'+sexo).val(beneficiarios[sexo].muyAlta || 0);
+		        $('#alta'+sexo).val(beneficiarios[sexo].alta || 0);
+		        $('#media'+sexo).val(beneficiarios[sexo].media || 0);
+		        $('#baja'+sexo).val(beneficiarios[sexo].baja || 0);
+		        $('#muybaja'+sexo).val(beneficiarios[sexo].muyBaja || 0);
+		    }
             $('#totalbeneficiarios').text(total);
             cargar_totales();
 			$(modal_beneficiario).modal('show');
@@ -511,21 +521,7 @@ $('#btn-beneficiario-guardar').on('click',function(){
 				MessageManager.show({data:'Datos de los beneficiarios almacenados con éxito',type:'OK',timer:3});
 	            $(modal_beneficiario).modal('hide');
 				actualizar_grid_beneficiarios(response.data);
-			},
-			_error: function(response){
-	            try{
-	                var json = $.parseJSON(response.responseText);
-	                if(!json.code)
-	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-	                else{
-	                	json.container = modal_actividad + ' .modal-body';
-	                    MessageManager.show(json);
-	                }
-	                Validation.formValidate(json.data);
-	            }catch(e){
-	                console.log(e);
-	            }                       
-	        }
+			}
 		});
 	}else{
 		proyectoResource.post(parametros,{
@@ -533,21 +529,7 @@ $('#btn-beneficiario-guardar').on('click',function(){
 				MessageManager.show({data:'Datos de los beneficiarios almacenados con éxito',type:'OK',timer:3});
 	            $(modal_beneficiario).modal('hide');
 				actualizar_grid_beneficiarios(response.data);
-			},
-			_error: function(response){
-	            try{
-	                var json = $.parseJSON(response.responseText);
-	                if(!json.code)
-	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-	                else{
-	                	json.container = modal_actividad + ' .modal-body';
-	                    MessageManager.show(json);
-	                }
-	                Validation.formValidate(json.data);
-	            }catch(e){
-	                console.log(e);
-	            }                       
-	        }
+			}
 		});
 	}
 });
@@ -679,18 +661,22 @@ $('#btn-proyecto-guardar').on('click',function(){
 	        _success: function(response){
 	            MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:3});
 	            $(form_caratula + ' #id').val(response.data.id);
-	            $(form_caratula + ' #no_proyecto_estrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
-	            $(form_caratula + ' #numeroproyectoestrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
+	            $(form_caratula + ' #no_proyecto_estrategico').text("000");
+	            $(form_caratula + ' #numeroproyectoestrategico').text("000");
 
 	            if(response.data.componentes){
 	            	actualizar_grid_componentes(response.data.componentes);
 	            }
+
+	            actualizar_grid_beneficiarios(response.data.beneficiarios);
 
 	            actualizar_tabla_metas('actividad',response.data.jurisdicciones);
             	actualizar_tabla_metas('componente',response.data.jurisdicciones);
 
 	            $('#tablink-componentes').attr('data-toggle','tab');
 				$('#tablink-componentes').parent().removeClass('disabled');
+				$('#tablink-beneficiarios').attr('data-toggle','tab');
+				$('#tablink-beneficiarios').parent().removeClass('disabled');
 	        },
 	        _error: function(response){
 	            try{
@@ -1337,9 +1323,12 @@ function cargar_totales(){
 }
 
 function bloquear_controles(){
-	$('.control-bloqueado').each(function(){
+	$('input,textarea,select').each(function(){
 		$(this).prop('disabled',true);
 		$('label[for="' + $(this).attr('id') + '"]').prepend('<span class="fa fa-lock"></span> ');
+		if($(this).hasClass('chosen-one')){
+			$(this).trigger('chosen:updated');
+		}
 	});
 }
 

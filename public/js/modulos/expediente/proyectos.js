@@ -17,7 +17,37 @@ var fibapResource = new RESTfulRequests(SERVER_HOST+'/v1/fibap');
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/proyectos');
 var moduloDatagrid = new Datagrid("#datagridCaratulas",moduloResource);
 moduloDatagrid.init();
-moduloDatagrid.actualizar();
+moduloDatagrid.actualizar({
+    _success: function(response){
+        moduloDatagrid.limpiar();
+        var datos_grid = [];
+        for(var i in response.data){
+            var item = {};
+            var clase_label = 'label-info';
+            if(response.data[i].idEstatusProyecto == 2){
+                clase_label = 'label-warning';
+            }else if(response.data[i].idEstatusProyecto == 3){
+                clase_label = 'label-danger';
+            }
+
+            item.id = response.data[i].id;
+            item.clave = response.data[i].clavePresup;
+            item.nombre_tecnico = response.data[i].nombreTecnico;
+            item.tipo_proyecto = response.data[i].clasificacionProyecto;
+            item.estatus = '<span class="label ' + clase_label + '">' + response.data[i].estatusProyecto + '</span>';
+            item.usuario = response.data[i].username;
+            item.fecha_modificado = response.data[i].modificadoAl.substring(0,11);
+
+            datos_grid.push(item);
+        }
+        moduloDatagrid.cargarDatos(datos_grid);                         
+        var total = parseInt(response.resultados/moduloDatagrid.rxpag); 
+        var plus = parseInt(response.resultados)%moduloDatagrid.rxpag;
+        if(plus>0) 
+            total++;
+        moduloDatagrid.paginacion(total);
+    }
+});
 var modal_name = '#modalCaratulas';
 var form_name = '#form_caratula';
 /*===================================*/

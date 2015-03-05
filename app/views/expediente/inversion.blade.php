@@ -7,6 +7,7 @@
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
 <script src="{{ URL::to('js/modulos/expediente/inversion.js')}}"></script>
+<script src="{{ URL::to('js/modulos/expediente/detallesProyecto.js') }}"></script>
 @stop
 
 @section('aside')
@@ -120,29 +121,8 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
-
-    <div class="modal fade" id="modalEditarProyecto" tabindex="-1" role="dialog" aria-labelledby="modalEditarLabel" aria-hidden="true" data-backdrop="static">
-        <div class="modal-dialog modal-dialog-85-screen">
-            <div class="modal-content modal-content-85-screen">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="modalEditarLabel">Proyecto de Inversión</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="col-sm-12">
-                        
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="btn-editar-proyecto" data-id-proyecto="">
-                        <span class="fa fa-pencil-square-o"></span> 
-                        Editar datos del Proyecto
-                    </button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+    
+    {{ $modal_detalle }}
 <!-- Dejar parent al ultimo -->
 @parent
 @stop

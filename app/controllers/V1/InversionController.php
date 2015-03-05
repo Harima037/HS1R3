@@ -76,7 +76,7 @@ class InversionController extends ProyectosController {
 			}
 			
 			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),'fibap.presupuestoRequerido',
-				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto',
+				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
 				'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
 								->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
 								->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
@@ -85,20 +85,7 @@ class InversionController extends ProyectosController {
 								->orderBy('id', 'desc')
 								->skip(($parametros['pagina']-1)*10)->take(10)
 								->get();
-			$proyectos = array();
-			foreach ($rows as $row) {
-				# code...
-				$proyectos[] = array(
-						'id' 					=> $row->id,
-						'clavePresup' 			=> $row->clavePresup,
-						'nombreTecnico' 		=> $row->nombreTecnico,
-						'presupuestoRequerido'	=> $row->presupuestoRequerido,
-						'estatusProyecto'		=> $row->estatusProyecto,
-						'username'				=> $row->username,
-						'modificadoAl'			=> date_format($row->modificadoAl,'d/m/Y')
-					);
-			}
-			$data = array('resultados'=>$total,'data'=>$proyectos);
+			$data = array('resultados'=>$total,'data'=>$rows);
 
 			if($total<=0){
 				$http_status = 404;
@@ -133,7 +120,20 @@ class InversionController extends ProyectosController {
 		$parametros = Input::all();
 
 		if(isset($parametros['mostrar'])){
-			if($parametros['mostrar'] == 'editar-proyecto'){
+			if($parametros['mostrar'] == 'detalles-proyecto'){
+				$recurso = Proyecto::contenidoCompleto()->find($id);
+				if($recurso){
+					$recurso->load('fibap');
+					if($recurso->fibap){
+						$recurso->fibap->load('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado');
+						$recurso->fibap->distribucionPresupuestoAgrupado->load('objetoGasto');
+					}
+					$recurso->componentes->load('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion','desgloseCompleto');
+					foreach ($recurso->componentes as $key => $componente) {
+						$recurso->componentes[$key]->actividades->load('formula','dimension','frecuencia','tipoIndicador','unidadMedida');
+					}
+				}
+			}elseif($parametros['mostrar'] == 'editar-proyecto'){
 				$recurso = Proyecto::with('jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico',
 									'fibap.documentos','beneficiarios.tipoBeneficiario')
 									->find($id);

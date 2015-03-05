@@ -10,11 +10,13 @@ class InversionController extends ProyectosController {
 	 */
 	public function index()
 	{
-		$catalogos = array(
-				'tipos_proyectos'=>TipoProyecto::all(),
-				'origenes_financiamiento' => OrigenFinanciamiento::all()
-			);
-		return parent::loadIndex('EXP','INVERSION',$catalogos);
+
+		$catalogos = array( 
+			'origenes_financiamiento' => OrigenFinanciamiento::all() 
+		);
+		$datos['tipos_proyectos'] = TipoProyecto::all();
+		$datos['modal_detalle'] = View::make('expediente.detalles-proyecto',$catalogos);
+		return parent::loadIndex('EXP','INVERSION',$datos);
 	}
 
 	public function caratula($id = NULL){
@@ -76,7 +78,7 @@ class InversionController extends ProyectosController {
 		$datos_acciones['formulario_componente'] = View::make('expediente.formulario-inversion-componente',$datos_acciones_formulario);
 		
 		$datos['formulario_acciones'] = View::make('expediente.formulario-caratula-acciones',$datos_acciones);
-		//
+
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
 		$datos['sys_activo'] = SysGrupoModulo::findByKey('EXP');
 		$datos['sys_mod_activo'] = SysModulo::findByKey('INVERSION');

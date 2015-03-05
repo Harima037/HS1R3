@@ -7,7 +7,8 @@ class Proyecto extends BaseModel
 	protected $dates = ['borradoAl'];
 	protected $table = "proyectos";
 	protected $appends = array('ClavePresupuestaria');
-
+	
+	/*
 	public static function boot(){
         parent::boot();
 
@@ -26,6 +27,7 @@ class Proyecto extends BaseModel
             $item->numeroProyectoEstrategico = ($count + 1);
         });
     }
+    */
 
     public function fibap(){
         return $this->hasOne('FIBAP','idProyecto');

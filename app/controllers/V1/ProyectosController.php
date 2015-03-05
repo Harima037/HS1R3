@@ -156,7 +156,7 @@ class ProyectosController extends BaseController {
 			}
 			
 			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
-				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto',
+				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
 				'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
 								->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
 								->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
@@ -164,7 +164,7 @@ class ProyectosController extends BaseController {
 								->orderBy('id', 'desc')
 								->skip(($parametros['pagina']-1)*10)->take(10)
 								->get();
-			$proyectos = array();
+			/*$proyectos = array();
 			foreach ($rows as $row) {
 				# code...
 				$proyectos[] = array(
@@ -176,8 +176,8 @@ class ProyectosController extends BaseController {
 						'username'				=> $row->username,
 						'modificadoAl'			=> date_format($row->modificadoAl,'d/m/Y')
 					);
-			}
-			$data = array('resultados'=>$total,'data'=>$proyectos);
+			}*/
+			$data = array('resultados'=>$total,'data'=>$rows);
 
 			if($total<=0){
 				$http_status = 404;
@@ -1298,12 +1298,13 @@ class ProyectosController extends BaseController {
 				
 				if($proyecto->idClasificacionProyecto == 2 && $es_editar){
 					$componentes_ids = $proyecto->componentes->lists('id');
-					$desgloses_componente = ComponenteDesglose::whereIn('idcomponente',$componentes_ids)->get()->lists('id');
-					
-					if(count($desgloses_componente)){
-						DesgloseBeneficiario::whereIn('idComponenteDesglose',$desgloses_componente)
-											->where('idTipoBeneficiario','=',$viejo_beneficiario)
-											->update(['idTipoBeneficiario'=>$recurso[0]->idTipoBeneficiario]);
+					if(count($componentes_ids)){
+						$desgloses_componente = ComponenteDesglose::whereIn('idComponente',$componentes_ids)->get()->lists('id');
+						if(count($desgloses_componente)){
+							DesgloseBeneficiario::whereIn('idComponenteDesglose',$desgloses_componente)
+												->where('idTipoBeneficiario','=',$viejo_beneficiario)
+												->update(['idTipoBeneficiario'=>$recurso[0]->idTipoBeneficiario]);
+						}
 					}
 				}
 

@@ -103,6 +103,9 @@ if($('#id').val()){
 				$('#tab-link-acciones-fibap').parent().removeClass('disabled');
 			}
 
+			if(response.data.idEstatusProyecto == 2){
+				bloquear_controles();
+			}
             /*
             actualizar_tabla_metas('actividad',response.data.jurisdicciones);
             actualizar_tabla_metas('componente',response.data.jurisdicciones);
@@ -141,7 +144,6 @@ function editar_accion(e){
 	proyectoResource.get(e,parametros,{
 		_success: function(response){
 			fibapAcciones.mostrar_datos(response.data);
-			//fibapAcciones.actualizar_metas_ids('componente',response.data.componente.metas_mes);
 		}
 	});
 }
@@ -696,4 +698,14 @@ function cambiar_icono_tabs(tab_id,icono){
     	return (css.match (/(^|\s)fa-\S+/g) || []).join(' ');
 	});
 	$(tab_id + ' span.fa').addClass(icono);
+}
+
+function bloquear_controles(){
+	$('input,textarea,select').each(function(){
+		$(this).prop('disabled',true);
+		$('label[for="' + $(this).attr('id') + '"]').prepend('<span class="fa fa-lock"></span> ');
+		if($(this).hasClass('chosen-one')){
+			$(this).trigger('chosen:updated');
+		}
+	});
 }

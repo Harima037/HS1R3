@@ -114,24 +114,29 @@ context.mostrar_datos = function(datos){
 
     $('#id-beneficiario').val(datos[0].idTipoBeneficiario);
 
-    var indx;
     var sexo;
     var total = 0;
-    for( indx in datos ){
-        sexo = datos[indx].sexo;
-        total += datos[indx].total;
-        $('#totalbeneficiarios'+sexo).val(datos[indx].total);
-        $('#urbana'+sexo).val(datos[indx].urbana);
-        $('#rural'+sexo).val(datos[indx].rural);
-        $('#mestiza'+sexo).val(datos[indx].mestiza);
-        $('#indigena'+sexo).val(datos[indx].indigena);
-        $('#inmigrante'+sexo).val(datos[indx].inmigrante);
-        $('#otros'+sexo).val(datos[indx].otros);
-        $('#muyalta'+sexo).val(datos[indx].muyAlta);
-        $('#alta'+sexo).val(datos[indx].alta);
-        $('#media'+sexo).val(datos[indx].media);
-        $('#baja'+sexo).val(datos[indx].baja);
-        $('#muybaja'+sexo).val(datos[indx].muyBaja);
+
+    var beneficiarios = {'f':{},'m':{}};
+
+    for(var i in datos){
+    	beneficiarios[datos[i].sexo] = datos[i];
+    }
+    
+    for(var sexo in beneficiarios ){
+        total += beneficiarios[sexo].total || 0;
+        $('#totalbeneficiarios'+sexo).val(beneficiarios[sexo].total || 0);
+        $('#urbana'+sexo).val(beneficiarios[sexo].urbana || 0);
+        $('#rural'+sexo).val(beneficiarios[sexo].rural || 0);
+        $('#mestiza'+sexo).val(beneficiarios[sexo].mestiza || 0);
+        $('#indigena'+sexo).val(beneficiarios[sexo].indigena || 0);
+        $('#inmigrante'+sexo).val(beneficiarios[sexo].inmigrante || 0);
+        $('#otros'+sexo).val(beneficiarios[sexo].otros || 0);
+        $('#muyalta'+sexo).val(beneficiarios[sexo].muyAlta || 0);
+        $('#alta'+sexo).val(beneficiarios[sexo].alta || 0);
+        $('#media'+sexo).val(beneficiarios[sexo].media || 0);
+        $('#baja'+sexo).val(beneficiarios[sexo].baja || 0);
+        $('#muybaja'+sexo).val(beneficiarios[sexo].muyBaja || 0);
     }
     $('#totalbeneficiarios').text(total);
     $('.fem,.masc').change();

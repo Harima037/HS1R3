@@ -97,10 +97,10 @@ class ReporteProyectoController extends BaseController {
 
 	 		$fibap = FIBAP::contenidoCompleto()->where('idProyecto',$idProyecto)->first();
 	 		$fibap->distribucion_presupuesto_agrupado->load(array('ObjetoGasto'));
+
+	 		$recurso['fibap'] = $fibap->toArray();
 	 	}
-
-	 	$recurso['fibap'] = $fibap->toArray();
-
+	 	
 		$data = array("data"=> $recurso);
 
 		//var_dump($recurso->toArray());die();
