@@ -121,8 +121,10 @@ if($('#id').val()){
 
 			actualizar_grid_componentes(response.data.componentes);
 
-			if(response.data.idEstatusProyecto == 2){
+			if(response.data.idEstatusProyecto != 1 && response.data.idEstatusProyecto != 3){
 				bloquear_controles();
+			}else if(response.data.idEstatusProyecto == 3){
+				mostrar_comentarios(response.data.comentarios);
 			}
         }
     });
@@ -415,6 +417,11 @@ function editar_beneficiario(e){
 	proyectoResource.get(e,parametros,{
 		_success: function(response){
 			$(modal_beneficiario).find('.modal-title').html('Editar Beneficiario');
+
+			if($('#datagridBeneficiarios tr[data-id="'+response.data[0].idTipoBeneficiario+'"]').attr('data-comentario')){
+				var comentario = $('#datagridBeneficiarios tr[data-id="'+response.data[0].idTipoBeneficiario+'"]').attr('data-comentario');
+				MessageManager.show({data:comentario,container: modal_beneficiario + ' .modal-body',type:'ADV'});
+			}
 
 			$('#tipobeneficiario').val(response.data[0].idTipoBeneficiario);
             $('#tipobeneficiario').trigger('chosen:updated');
@@ -1180,6 +1187,7 @@ function reset_modal_form(formulario){
     	$(modal_actividad + ' .alert').remove();
     }else if(formulario == form_beneficiario){
     	$(form_beneficiario + ' span.form-control').text('');
+    	$(modal_beneficiario + ' .alert').remove();
     }
 }
 
@@ -1330,6 +1338,23 @@ function bloquear_controles(){
 			$(this).trigger('chosen:updated');
 		}
 	});
+}
+
+function mostrar_comentarios(datos){
+	for(var i in datos){
+		var id_campo = datos[i].idCampo;
+		var observacion = datos[i].observacion;
+		
+		if(id_campo.substring(0,12) == 'beneficiario'){
+			console.log(id_campo.substring(12));
+			$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"]').addClass('text-warning');
+			$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"] td:eq(1)').prepend('<span class="fa fa-warning"></span> ');
+			$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"]').attr('data-comentario',observacion);
+		}else{
+			$('#'+id_campo).parent('.form-group').addClass('has-warning');
+			$('label[for="' + id_campo + '"]').prepend('<span class="fa fa-warning"></span> ');
+		}
+	}
 }
 
 function habilita_opciones(selector,habilitar_id,default_id){

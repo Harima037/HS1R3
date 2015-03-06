@@ -8,7 +8,7 @@
     @section('css')
     <link href="{{ URL::to('bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" media="screen">
     <link href="{{ URL::to('css/general.css') }}" rel="stylesheet" media="screen">    
-    <link href="{{ URL::to('css/font-awesome-4.2.0/css/font-awesome.min.css') }}" rel="stylesheet" media="screen">
+    <link href="{{ URL::to('css/font-awesome-4.3.0/css/font-awesome.min.css') }}" rel="stylesheet" media="screen">
     <link rel="shortcut icon" href="{{ URL::to('img/favicon.ico') }}">
     @show
 </head>

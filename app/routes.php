@@ -48,6 +48,11 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::any('revision-caratula',array('uses'=>'RevisionController@caratula'));		
 	});
 
+	Route::group(array('prefix'=>'rendicion-cuentas'),function(){
+		Route::get('rend-cuenta-inst',array('uses'=>'SeguimientoController@indexInstitucional'));
+		Route::get('rend-cuenta-inv',array('uses'=>'SeguimientoController@indexInversion'));
+	});
+
 	Route::group(array('prefix'=>"v1"),function(){
 		Route::get('/', function()
 		{
@@ -63,7 +68,9 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('inversion',		'V1\InversionController');
 		Route::resource('reporteProyecto',	'V1\ReporteProyectoController', array('only' => array('show')));
 		Route::resource('fibap',			'V1\FibapController');
-		
+
+		Route::resource('seguimiento', 		'V1\SeguimientoController');
+
 		Route::resource('revision-proyectos',	'V1\RevisionController');
 	});
 });

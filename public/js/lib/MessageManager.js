@@ -51,6 +51,7 @@ var MessageManager = {
 			data = "Por favor, verifica tus datos.";
 			timer = 4;
 		}
+		
 		if(code){
 			item = CatalogoErrores[code];
 			item.mensaje = '<b>'+code+' :</b> ';

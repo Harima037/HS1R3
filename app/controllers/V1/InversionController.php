@@ -64,7 +64,7 @@ class InversionController extends ProyectosController {
 			$rows = Proyecto::getModel();
 			$rows = $rows->where('unidadResponsable','=',Sentry::getUser()->claveUnidad)
 						->where('idClasificacionProyecto','=',2)
-						->whereIn('idEstatusProyecto',[1,2,3]);
+						->whereIn('idEstatusProyecto',[1,2,3,4]);
 			
 			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 			

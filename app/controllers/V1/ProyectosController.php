@@ -144,7 +144,7 @@ class ProyectosController extends BaseController {
 			$rows = Proyecto::getModel();
 			$rows = $rows->where('unidadResponsable','=',Sentry::getUser()->claveUnidad)
 						->where('idClasificacionProyecto','=',1)
-						->whereIn('idEstatusProyecto',[1,2,3]);
+						->whereIn('idEstatusProyecto',[1,2,3,4]);
 			
 			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 			
@@ -265,16 +265,15 @@ class ProyectosController extends BaseController {
 				$recurso = Beneficiario::where('idProyecto','=',$parametros['id-proyecto'])
 										->where('idTipoBeneficiario','=',$id)->get();
 			}elseif($parametros['ver'] == 'proyecto'){
-
 				$recurso = Proyecto::contenidoCompleto()->find($id);
 				if($recurso){
-					if($recurso->idClasificacionProyecto == 2){
+					/*if($recurso->idClasificacionProyecto == 2){
 						$recurso->load('fibap');
 						if($recurso->fibap){
 							$recurso->fibap->load('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado');
 							$recurso->fibap->distribucionPresupuestoAgrupado->load('objetoGasto');
 						}
-					}
+					}*/
 					$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion','desgloseCompleto'));
 					foreach ($recurso->componentes as $key => $componente) {
 						$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
@@ -288,6 +287,9 @@ class ProyectosController extends BaseController {
 		}else{
 			$recurso = Proyecto::contenidoCompleto()->find($id);
 			$recurso->componentes->load('unidadMedida');
+			if($recurso->idEstatusProyecto == 3){
+				$recurso->load('comentarios');
+			}
 			if($recurso->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
 				$jurisdicciones = Jurisdiccion::all();
 			}elseif($recurso->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
