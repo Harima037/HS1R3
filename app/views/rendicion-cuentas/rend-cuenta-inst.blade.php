@@ -32,21 +32,9 @@
                         <div class="btn-toolbar pull-right" >
                             @section('panel-botones')
                                 <div class="btn-group" style="margin:5px">
-                                    <button type="button" class="btn btn-success btn-datagrid-agregar">
-                                        <span class="glyphicon glyphicon-plus"></span> Nuevo Proyecto Institucional
+                                    <button type="button" class="btn btn-success btn-edit-rows" id="btn-detalles-proyecto">
+                                        <span class="glyphicon glyphicon-plus"></span> Ver Detalles del Proyecto
                                     </button>
-                                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu pull-right" role="menu">
-                                        <li>
-                                            <a href="#" class="btn-edit-rows"><span class="glyphicon glyphicon-edit"></span> Editar</a>
-                                        </li>
-                                        <li class="divider"></li>
-                                        <li>
-                                            <a href="#" class="btn-delete-rows"><span class="glyphicon glyphicon-remove"></span> Eliminar</a>
-                                        </li>
-                                    </ul>
                                 </div>
                             @show
                         </div>
@@ -95,22 +83,51 @@
 @stop
 
 @section('modals')
-    <div class="modal fade" id="modalDatosProyecto" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" data-backdrop="static">
-        <div class="modal-dialog">
-            <div class="modal-content">
+    <div class="modal fade" id="modalDatosSeguimiento" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-dialog-85-screen">
+            <div class="modal-content modal-content-85-screen">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 class="modal-title" id="modalLabel">Nuevo</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="row" id="datos-formulario">
-                        <form action="" id="form_proyecto">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    
-                                </div>
+                    <div role="tabpanel">
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs" role="tablist">
+                            @for($i = 1 ; $i <= 4 ; $i++)
+                            <li role="presentation" class="{{($i == 1)?'active':''}}">
+                                <a href="#trim{{$i}}" aria-controls="trim{{$i}}" role="tab" data-toggle="tab">Trim {{$i}}</a>
+                            </li>
+                            @endfor
+                        </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            @for($i = 1 ; $i <= 4 ; $i++)
+                            <div role="tabpanel" class="tab-pane {{($i == 1)?'active':''}}" id="trim{{$i}}">
+                                <table id="avance-trim-{{$i}}" class="table table-condensed table-hover table-stripped">
+                                    <thead>
+                                        <tr>
+                                            <th>Jurisdicción</th>
+                                            <th>{{$meses[$i][0]}}</th>
+                                            <th>{{$meses[$i][1]}}</th>
+                                            <th>{{$meses[$i][2]}}</th>
+                                            <th>Totales</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Totales</th>
+                                            <th id="total-trim-{{$i}}-mes-1">0</th>
+                                            <th id="total-trim-{{$i}}-mes-2">0</th>
+                                            <th id="total-trim-{{$i}}-mes-3">0</th>
+                                            <th id="total-trim-{{$i}}">0</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
                             </div>
-                        </form>
+                            @endfor
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

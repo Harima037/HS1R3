@@ -21,8 +21,8 @@ class SeguimientoController extends BaseController {
 		if(isset($parametros['formatogrid'])){
 			$rows = Proyecto::getModel();
 			$rows = $rows->where('idEstatusProyecto','=',5)
-						->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto']);
-						//->where('unidadResponsable','=',Sentry::getUser()->claveUnidad)
+						->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto'])
+						->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
 						//->where('idClasificacionProyecto','=',$)
 						
 			

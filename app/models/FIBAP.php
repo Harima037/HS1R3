@@ -11,6 +11,10 @@ class FIBAP extends BaseModel
         return $query->with('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado','acciones');
     }
 
+    public function scopeCedulasValidacion($query){
+        //return $query->select('fibap.*','proyecto.nombreTecnico','');
+    }
+
 	public function proyecto(){
         return $this->belongsTo('Proyecto','idProyecto');
     }

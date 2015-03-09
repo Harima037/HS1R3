@@ -51,3 +51,24 @@ moduloDatagrid.actualizar({
     }
 });
 
+function cargar_datos_proyecto(e){
+    $('#modalDatosSeguimiento').find(".modal-title").html("Datos del Proyecto Institucional");
+    $('#modalDatosSeguimiento').modal('show');
+    /*var parametros = {ver:'proyecto'};
+    moduloResource.get(e,parametros,{
+        _success: function(response){
+            //
+        }
+    });*/
+}
+
+/*
+$('#modalDatosSeguimiento').on('shown.bs.modal', function () {
+    $('#modalDatosSeguimiento').find('input').eq(0).focus();
+});
+*/
+/*
+$('#modalDatosSeguimiento').on('hide.bs.modal',function(e){ 
+    resetModalModuloForm();
+});
+*/

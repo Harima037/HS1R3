@@ -7,7 +7,15 @@ class SeguimientoController extends BaseController {
 	 * @return Response
 	 */
 	public function indexInstitucional(){
-		return parent::loadIndex('RENDCUENTA','RENDINST');
+		$datos = array(
+			'meses' => array(
+					'1' => array('Enero','Febrero','Marzo'),
+					'2' => array('Abril','Mayo','Junio'),
+					'3' => array('Julio','Agosto','Septiembre'),
+					'4' => array('Octubre','Noviembre','Dicembre')
+				)
+		);
+		return parent::loadIndex('RENDCUENTA','RENDINST',$datos);
 	}
 	public function indexInversion(){
 		return parent::loadIndex('RENDCUENTA','RENDINV');
