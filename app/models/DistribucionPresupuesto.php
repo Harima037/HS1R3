@@ -27,6 +27,14 @@ class DistribucionPresupuesto extends BaseModel
     	$query->select('id','idFibap','idAccion','idObjetoGasto',DB::raw('sum(cantidad) AS cantidad'))->groupBy('idObjetoGasto');
     }
 
+    public function scopeAgruparMesCompleto($query){
+        $query->select('fibapDistribucionPresupuesto.id','idFibap','idAccion','mes',
+            'idObjetoGasto','objetosGasto.descripcion AS objetoGasto'
+            ,DB::raw('sum(cantidad) AS cantidad'))
+                ->leftjoin('catalogoObjetosGasto AS objetosGasto','objetosGasto.id','=','idObjetoGasto')
+                ->groupBy('idObjetoGasto','mes');
+    }
+
     public function scopeAgruparPorLocalidad($query){
     	$query->select('fibapDistribucionPresupuesto.id','idFibap','idAccion','localidad.nombre AS localidad','municipio.nombre AS municipio','claveJurisdiccion',
                 DB::raw('sum(cantidad) AS cantidad'))

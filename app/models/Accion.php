@@ -7,6 +7,17 @@ class Accion extends BaseModel
 	protected $dates = ['borradoAl'];
 	protected $table = "fibapAcciones";
 
+    public function scopeContenidoCompleto($query){
+        return $query->with('desglosePresupuesto.metasMes','desglosePresupuesto.beneficiarios.tipoBeneficiario')
+                    ->select('fibapAcciones.*','componente.*','unidadesMedida.descripcion AS unidadMedida','entregables.descripcion AS entregable'
+                        ,'entregablesAcciones.descripcion AS entregableAccion','entregablesTipos.descripcion AS entregableTipo')
+                    ->leftjoin('proyectoComponentes AS componente','componente.id','=','fibapAcciones.idComponente')
+                    ->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','componente.idUnidadMedida')
+                    ->leftjoin('catalogoEntregables AS entregables','entregables.id','=','componente.idEntregable')
+                    ->leftjoin('catalogoEntregablesAcciones As entregablesAcciones','entregablesAcciones.id','=','componente.idEntregableAccion')
+                    ->leftjoin('catalogoEntregablesTipos AS entregablesTipos','entregablesTipos.id','=','componente.idEntregableTipo');
+    }
+
     public function fibap(){
         return $this->belongsTo('FIBAP','idFibap');
     }

@@ -12,11 +12,26 @@ class FIBAP extends BaseModel
     }
 
     public function scopeCedulasValidacion($query){
-        //return $query->select('fibap.*','proyecto.nombreTecnico','');
+        return $query->select('fibap.*','proyecto.nombreTecnico','programa_presup.descripcion AS programaPresupuestario','proyecto.idCobertura','tipoDeProyecto.descripcion AS tipoProyecto',
+            DB::raw('concat(proyecto.unidadResponsable,proyecto.finalidad,proyecto.funcion,proyecto.subfuncion,proyecto.subsubfuncion,proyecto.programaSectorial,proyecto.programaPresupuestario,proyecto.programaEspecial,proyecto.actividadInstitucional,proyecto.proyectoEstrategico,LPAD(proyecto.numeroProyectoEstrategico,3,"0")) as clavePresup')
+                        ,'coberturas.descripcion AS cobertura')
+            ->leftjoin('proyectos AS proyecto','proyecto.id','=','fibap.idProyecto')
+            ->leftjoin('catalogoProgramasPresupuestales AS programa_presup','proyecto.programaPresupuestario','=','programa_presup.clave')
+            ->leftjoin('catalogoTiposProyectos AS tipoDeProyecto','tipoDeProyecto.id','=','proyecto.idTipoProyecto')
+            ->leftjoin('catalogoCoberturas AS coberturas','coberturas.id','=','proyecto.idCobertura')
+            ->with('accionesCompletas','beneficiarios','propuestasFinanciamientoCompleto','distribucionPresupuestoMesCompleto');
     }
 
 	public function proyecto(){
         return $this->belongsTo('Proyecto','idProyecto');
+    }
+
+    public function beneficiarios(){
+        return $this->hasMany('Beneficiario','idProyecto','idProyecto')->with('tipoBeneficiario');
+    }
+
+    public function accionesCompletas(){
+        return $this->hasMany('Accion','idFibap')->contenidoCompleto();
     }
 
     public function acciones(){
@@ -43,6 +58,10 @@ class FIBAP extends BaseModel
         return $this->hasMany('PropuestaFinanciamiento','idFibap')->agrupadoPorFibap();
     }
 
+    public function propuestasFinanciamientoCompleto(){
+        return $this->hasMany('PropuestaFinanciamiento','idFibap')->agrupadoPorFibapCompleto();
+    }
+
     public function antecedentesFinancieros(){
         return $this->hasMany('AntecedenteFinanciero','idFibap');
     }
@@ -53,5 +72,9 @@ class FIBAP extends BaseModel
 
     public function distribucionPresupuestoAgrupado(){
         return $this->hasMany('DistribucionPresupuesto','idFibap')->agrupar();
+    }
+
+    public function distribucionPresupuestoMesCompleto(){
+        return $this->hasMany('DistribucionPresupuesto','idFibap')->agruparMesCompleto();
     }
 }
