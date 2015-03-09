@@ -75,6 +75,10 @@ class Proyecto extends BaseModel
 	public function componentes(){
 		return $this->hasMany('Componente','idProyecto')->with('usuario');
 	}
+
+	public function actividades(){
+		return $this->hasMany('Actividad','idProyecto')->with('usuario');
+	}
 	
 	public function beneficiarios(){
 		return $this->hasMany('Beneficiario','idProyecto')->with('tipoBeneficiario')->orderBy('id');

@@ -15,6 +15,14 @@ class Actividad extends BaseModel
 		return $this->hasMany('ActividadMetaMes','idActividad');
 	}
 
+	public function metasMesAgrupado(){
+		return $this->hasMany('ActividadMetaMes','idActividad')->agrupadoMes();
+	}
+
+	public function metasMesJurisdiccion(){
+		return $this->hasMany('ActividadMetaMes','idActividad')->agrupadoJurisdiccion();
+	}
+
 	public function usuario(){
 		return $this->belongsTo('SentryUser','actualizadoPor');
 	}

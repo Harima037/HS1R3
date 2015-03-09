@@ -96,7 +96,9 @@
                         <ul class="nav nav-tabs" role="tablist">
                             @for($i = 1 ; $i <= 4 ; $i++)
                             <li role="presentation" class="{{($i == 1)?'active':''}}">
-                                <a href="#trim{{$i}}" aria-controls="trim{{$i}}" role="tab" data-toggle="tab">Trim {{$i}}</a>
+                                <a href="#trim{{$i}}" aria-controls="trim{{$i}}" role="tab" data-toggle="tab">
+                                    <span class="fa fa-calendar"></span> Trim {{$i}}
+                                </a>
                             </li>
                             @endfor
                         </ul>
@@ -104,23 +106,24 @@
                         <div class="tab-content">
                             @for($i = 1 ; $i <= 4 ; $i++)
                             <div role="tabpanel" class="tab-pane {{($i == 1)?'active':''}}" id="trim{{$i}}">
-                                <table id="avance-trim-{{$i}}" class="table table-condensed table-hover table-stripped">
+                                <table id="avance-trim-{{$i}}" class="table table-condensed table-stripped tabla-avance-trim">
                                     <thead>
                                         <tr>
-                                            <th>Jurisdicción</th>
-                                            <th>{{$meses[$i][0]}}</th>
-                                            <th>{{$meses[$i][1]}}</th>
-                                            <th>{{$meses[$i][2]}}</th>
+                                            <th>Nivel</th>
+                                            <th>Indicador</th>
+                                            <th>{{$meses[$i][0]['mes']}}</th>
+                                            <th>{{$meses[$i][1]['mes']}}</th>
+                                            <th>{{$meses[$i][2]['mes']}}</th>
                                             <th>Totales</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
                                     <tfoot>
-                                        <tr>
-                                            <th>Totales</th>
-                                            <th id="total-trim-{{$i}}-mes-1">0</th>
-                                            <th id="total-trim-{{$i}}-mes-2">0</th>
-                                            <th id="total-trim-{{$i}}-mes-3">0</th>
+                                        <tr class="bg-success">
+                                            <th colspan="2">Totales</th>
+                                            <th id="total-trim-{{$i}}-mes-{{$meses[$i][0]['clave']}}">0</th>
+                                            <th id="total-trim-{{$i}}-mes-{{$meses[$i][1]['clave']}}">0</th>
+                                            <th id="total-trim-{{$i}}-mes-{{$meses[$i][2]['clave']}}">0</th>
                                             <th id="total-trim-{{$i}}">0</th>
                                         </tr>
                                     </tfoot>
@@ -132,7 +135,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary btn-guardar">Ir a la caratula de captura</button>
+                    <button type="button" class="btn btn-primary" id="btn-editar-avance">Editar Avance</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->

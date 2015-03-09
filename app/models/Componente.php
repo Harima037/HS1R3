@@ -43,6 +43,14 @@ class Componente extends BaseModel
 		return $this->hasMany('ComponenteMetaMes','idComponente');
 	}
 
+	public function metasMesJurisdiccion(){
+		return $this->hasMany('ComponenteMetaMes','idComponente')->agrupadoJurisdiccion();
+	}
+
+	public function metasMesAgrupado(){
+		return $this->hasMany('ComponenteMetaMes','idComponente')->agrupadoMes();
+	}
+
 	public function usuario(){
 		return $this->belongsTo('SentryUser','actualizadoPor');
 	}
