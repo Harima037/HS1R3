@@ -51,6 +51,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 	Route::group(array('prefix'=>'rendicion-cuentas'),function(){
 		Route::get('rend-cuenta-inst',array('uses'=>'SeguimientoController@indexInstitucional'));
 		Route::get('rend-cuenta-inv',array('uses'=>'SeguimientoController@indexInversion'));
+
+		Route::get('editar-avance/{id}',array('uses'=>'SeguimientoController@rendicionCuentas'));
 	});
 
 	Route::group(array('prefix'=>"v1"),function(){
