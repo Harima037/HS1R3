@@ -263,20 +263,19 @@ if($('#id').val()){
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-valornumerador'+idComponente+'"><span class="fa fa-link"></span> Numerador</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'valornumerador'+idComponente+'\',\'Numerador\',\'lbl-valornumerador'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-valornumerador'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].valorNumerador+'</p></div></div></div>';
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-valordenominador'+idComponente+'"><span class="fa fa-link"></span> Denominador</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'valordenominador'+idComponente+'\',\'Denominador\',\'lbl-valordenominador'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-valordenominador'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].valorDenominador+'</p></div></div></div>';
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-metaindicador'+idComponente+'"><span class="fa fa-link"></span> Meta</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'metaindicador'+idComponente+'\',\'Meta\',\'lbl-metaindicador'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-metaindicador'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].metaIndicador+'</p></div></div></div>';
+				
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '</div>';
 				
 				/*TERMINA SECCIÓN DE METAS*/				
 				
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"><p>&nbsp;</p></div>';
+				
 				/*COMIENZA SECCIÓN DE ACTIVIDADES*/				
-				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12 bg-info"><span class="fa fa-thumb-tack"></span> <strong> Actividades</strong></div><br>';	
-				
-				
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12 bg-info"><span class="fa fa-thumb-tack"></span> <strong> Actividades</strong></div><br>';
 				var PanelDeActividades = [];
 				var cuantasActividades = response.data.componentes[cuentaComponentes].actividades.length;
 				var contadorDeActividades = 1;
 				var actividades = '<br>';
-				
-				
 				if(cuantasActividades > 0)
 				{
 					for(var indiceActividad in response.data.componentes[cuentaComponentes].actividades)
@@ -303,11 +302,61 @@ if($('#id').val()){
 						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-tipoactividad'+idActividad+'">Tipo</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'tipoactividad'+idActividad+'\',\'Tipo\',\'lbl-tipoactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-tipoactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].tipo_indicador.descripcion+'</p></div></div></div>';	
 						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-5"><div class="form-group"><label class="control-label" for="lbl-unidadmedidaactividad'+idActividad+'">Unidad de medida</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'unidadmedidaactividad'+idActividad+'\',\'Unidad de medida\',\'lbl-unidadmedidaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-unidadmedidaactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].unidad_medida.descripcion+'</p></div></div></div>';
 						/*TERMINA SECCIÓN DE INDICADOR*/
+						/*COMIENZA SECCIÓN DE METAS*/
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-12 bg-info"><span class="fa fa-table"></span> <strong> Metas</strong></div>';
+						
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-2"><div class="form-group"><label class="control-label" for="lbl-lineabaseactividad'+idActividad+'">Línea base</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'lineabaseactividad'+idActividad+'\',\'Línea base\',\'lbl-lineabaseactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-lineabaseactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].lineaBase+'</p></div></div></div>';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-2"><div class="form-group"><label class="control-label" for="lbl-aniobaseactividad'+idActividad+'">Año base</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'aniobaseactividad'+idActividad+'\',\'Año base\',\'lbl-aniobaseactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-aniobaseactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].anioBase+'</p></div></div></div>';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-formulaactividad'+idActividad+'">Fórmula</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'formulaactividad'+idActividad+'\',\'Fórmula\',\'lbl-formulaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-formula'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].formula.descripcion+'</p></div></div></div>';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-frecuenciaactividad'+idActividad+'">Frecuencia</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'frecuenciaactividad'+idActividad+'\',\'Frecuencia\',\'lbl-frecuenciaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-frecuenciaactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].frecuencia.descripcion+'</p></div></div></div>';
+						
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-12">';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<table width=100% class="table table-bordered table-condensed"><tr>';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<th>Mes</th><th>ENE</th><th>FEB</th><th>MAR</th><th>ABR</th><th>MAY</th><th>JUN</th><th>JUL</th><th>AGO</th><th>SEP</th><th>OCT</th><th>NOV</th><th>DIC</th></tr>';
+						
+						var trim = {};
+						trim[1] = 0.0; trim[2] = 0.0; trim[3] = 0.0; trim[4] = 0.0;
+						
+						for(var cuentaJuris in response.data.jurisdicciones)
+						{
+							var mes = {};
+							var juris = response.data.jurisdicciones[cuentaJuris];
+							mes['1'] = '<td>0</td>';mes['2'] = '<td>0</td>';mes['3'] = '<td>0</td>';
+							mes['4'] = '<td>0</td>';mes['5'] = '<td>0</td>';mes['6'] = '<td>0</td>';
+							mes['7'] = '<td>0</td>';mes['8'] = '<td>0</td>';mes['9'] = '<td>0</td>';
+							mes['10'] = '<td>0</td>';mes['11'] = '<td>0</td>';mes['12'] = '<td>0</td>';
+
+							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<tr>';
+							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<td><strong>' + juris + '</strong></td>';
+							for(var cuentaMeses in response.data.componentes[cuentaComponentes].actividades[indiceActividad].metas_mes)
+							{
+								if(juris == response.data.componentes[cuentaComponentes].actividades[indiceActividad].metas_mes[cuentaMeses].claveJurisdiccion)
+								{
+									var valorTrim = Math.ceil(parseFloat(response.data.componentes[cuentaComponentes].actividades[indiceActividad].metas_mes[cuentaMeses].mes)/3) ;
+									trim[valorTrim] = trim[valorTrim] + parseFloat(response.data.componentes[cuentaComponentes].actividades[indiceActividad].metas_mes[cuentaMeses].meta);
+									mes[response.data.componentes[cuentaComponentes].actividades[indiceActividad].metas_mes[cuentaMeses].mes] = '<td>'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].metas_mes[cuentaMeses].meta+'</td>';
+								}
+							}
 							
+							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + mes['1'] + mes['2'] + mes['3'] + mes['4'] + mes['5'] + mes['6'] + mes['7'] + mes['8'] + mes['9'] + mes['10'] + mes['11'] + mes['12']; 
+							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '</tr>';
+						}
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '</table></div>';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-6 bg-success">';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades]  + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-trim1actividad'+idActividad+'"><span class="fa fa-link"></span> Trim 1</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'trim1actividad'+idActividad+'\',\'Trim 1\',\'lbl-trim1actividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-trim1actividad'+idActividad+'" class="form-control" style="height:auto">'+trim[1]+'</p></div></div></div>';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-trim2actividad'+idActividad+'"><span class="fa fa-link"></span> Trim 2</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'trim2actividad'+idActividad+'\',\'Trim 2\',\'lbl-trim2actividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-trim2actividad'+idActividad+'" class="form-control" style="height:auto">'+trim[2]+'</p></div></div></div>';						
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-trim3actividad'+idActividad+'"><span class="fa fa-link"></span> Trim 3</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'trim3actividad'+idActividad+'\',\'Trim 3\',\'lbl-trim3actividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-trim3actividad'+idActividad+'" class="form-control" style="height:auto">'+trim[3]+'</p></div></div></div>';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-trim4actividad'+idActividad+'"><span class="fa fa-link"></span> Trim 4</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'trim4actividad'+idActividad+'\',\'Trim 4\',\'lbl-trim4actividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-trim4actividad'+idActividad+'" class="form-control" style="height:auto">'+trim[4]+'</p></div></div></div>';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '</div>';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-6">';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-valornumeradoractividad'+idActividad+'"><span class="fa fa-link"></span> Numerador</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'valornumeradoractividad'+idActividad+'\',\'Numerador\',\'lbl-valornumeradoractividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-valornumeradoractividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].valorNumerador+'</p></div></div></div>';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-valordenominadoractividad'+idActividad+'"><span class="fa fa-link"></span> Denominador</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'valordenominadoractividad'+idActividad+'\',\'Denominador\',\'lbl-valordenominadoractividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-valordenominadoractividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].valorDenominador+'</p></div></div></div>';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-metaindicadoractividad'+idActividad+'"><span class="fa fa-link"></span> Meta</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'metaindicadoractividad'+idActividad+'\',\'Meta\',\'lbl-metaindicadoractividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-metaindicadoractividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].metaIndicador+'</p></div></div></div>';
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '</div>';
+						/*TERMINA SECCIÓN DE METAS*/
 						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '</div>';
 						contadorDeActividades++;
 					}
-					
 					actividades = '<br><div role="tabpanel">';
 					actividades = actividades + '<ul class="nav nav-tabs" role="tablist">';		
 					var numeroDeActividad = 1;			
@@ -341,13 +390,6 @@ if($('#id').val()){
 				{
 					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"> <strong> No se han descrito actividades aún</strong></div>';	
 				}
-				
-				
-				
-
-				
-				
-				
 				/*TERMINA SECCIÓN DE ACTIVIDADES*/
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '</div>';
 				contadorDeTabs++;
@@ -387,7 +429,7 @@ if($('#id').val()){
 			for(var contador in response.data.comentarios)
 			{
 				var idCampo = response.data.comentarios[contador]['idCampo'];
-				
+				//console.log(response.data.comentarios[contador]['tipoComentario']);
 				if(response.data.comentarios[contador]['tipoComentario']=='1')//Tipo 1 = Proyecto
 				{
 					if(idCampo.substr(0,12)=='beneficiario')
@@ -401,19 +443,23 @@ if($('#id').val()){
 						var objetoAColorear = '#lbl-'+idCampo;
 						$(objetoAColorear).parent().parent().addClass('has-error has-feedback');
 					}
-					comentariosArray.push([response.data.comentarios[contador]['id'],response.data.comentarios[contador]['idCampo'], response.data.comentarios[contador]['observacion']]);
+					comentariosArray.push([response.data.comentarios[contador]['id'],response.data.comentarios[contador]['idCampo'], response.data.comentarios[contador]['observacion'],'1']);
 				}
 				else if(response.data.comentarios[contador]['tipoComentario']=='2')//Tipo 2 = Componente
 				{
+					var objetoAColorear = '#lbl-'+idCampo;
+					$(objetoAColorear).parent().parent().addClass('has-error has-feedback');
+					comentariosArray.push([response.data.comentarios[contador]['id'],response.data.comentarios[contador]['idCampo'], response.data.comentarios[contador]['observacion'],'2']);
+					console.log(objetoAColorear);
 				}
 				else if(response.data.comentarios[contador]['tipoComentario']=='3')//Tipo 3 = Actividad de Componente
 				{
+					var objetoAColorear = '#lbl-'+idCampo;
+					$(objetoAColorear).parent().parent().addClass('has-error has-feedback');
+					comentariosArray.push([response.data.comentarios[contador]['id'],response.data.comentarios[contador]['idCampo'], response.data.comentarios[contador]['observacion'],'3']);
+					console.log(objetoAColorear);
 				}
-				
-					
-			}
-			
-			
+			}			
 			            
             cargar_totales();
 
@@ -485,6 +531,73 @@ function escribirComentario(idcampo,nombrecampo,objetoconinformacion)
 	$('#modalComentario').find(".modal-title").html("<i class=\"fa fa-pencil-square-o\"></i> Escribir comentario");    
 	$('#lbl-nombredelcampo').html(nombrecampo);
 	$('#idcampo').val(idcampo);
+	$('#tipocomentario').val('1');
+	
+	if(idcampo.substr(0,12) == 'beneficiario')
+		$('#lbl-informacioncampo').text(objetoconinformacion);
+	else
+		$('#lbl-informacioncampo').text($('#'+objetoconinformacion).text());
+	var borrarAreaText = 1;
+	
+	for(var i = 0; i < comentariosArray.length; i++)
+	{
+		var arrayTemporal = comentariosArray[i];
+		if(arrayTemporal[1]==idcampo)
+		{
+			$('#idproyectocomentarios').val(arrayTemporal[0]);
+			//$('#comentario').text(arrayTemporal[2]);
+			$('#comentario').val(arrayTemporal[2]);
+			borrarAreaText = 0;
+		}
+	}
+	if(borrarAreaText)
+	{
+		//$('#comentario').text('');
+		$('#comentario').val('');
+		$('#idproyectocomentarios').val('');
+	}
+    $('#modalComentario').modal('show');
+}
+
+function escribirComentarioComponente(idcampo,nombrecampo,objetoconinformacion)
+{	
+	$('#modalComentario').find(".modal-title").html("<i class=\"fa fa-pencil-square-o\"></i> Escribir comentario");    
+	$('#lbl-nombredelcampo').html(nombrecampo);
+	$('#idcampo').val(idcampo);
+	$('#tipocomentario').val('2');
+	
+	if(idcampo.substr(0,12) == 'beneficiario')
+		$('#lbl-informacioncampo').text(objetoconinformacion);
+	else
+		$('#lbl-informacioncampo').text($('#'+objetoconinformacion).text());
+	var borrarAreaText = 1;
+	
+	for(var i = 0; i < comentariosArray.length; i++)
+	{
+		var arrayTemporal = comentariosArray[i];
+		if(arrayTemporal[1]==idcampo)
+		{
+			$('#idproyectocomentarios').val(arrayTemporal[0]);
+			//$('#comentario').text(arrayTemporal[2]);
+			$('#comentario').val(arrayTemporal[2]);
+			borrarAreaText = 0;
+		}
+	}
+	if(borrarAreaText)
+	{
+		//$('#comentario').text('');
+		$('#comentario').val('');
+		$('#idproyectocomentarios').val('');
+	}
+    $('#modalComentario').modal('show');
+}
+
+function escribirComentarioActividad(idcampo,nombrecampo,objetoconinformacion)
+{	
+	$('#modalComentario').find(".modal-title").html("<i class=\"fa fa-pencil-square-o\"></i> Escribir comentario");    
+	$('#lbl-nombredelcampo').html(nombrecampo);
+	$('#idcampo').val(idcampo);
+	$('#tipocomentario').val('3');
 	
 	if(idcampo.substr(0,12) == 'beneficiario')
 		$('#lbl-informacioncampo').text(objetoconinformacion);
@@ -515,8 +628,8 @@ function escribirComentario(idcampo,nombrecampo,objetoconinformacion)
 $('#btnGuardarComentario').on('click',function(){
 	
 	var parametros = $(formComentario).serialize();
-	parametros = parametros + '&idproyecto=' + $('#id').val();
-		
+	parametros = parametros + '&idproyecto=' + $('#id').val()+'&tipocomentario='+$('#tipocomentario').val();
+	
 	if($('#comentario').val()=="")
 	{
 		MessageManager.show({data:'Debe escribir un comentario antes de guardar',type:'ADV',timer:3});		
@@ -540,7 +653,7 @@ $('#btnGuardarComentario').on('click',function(){
 						$(objetoAColorear).parent().parent().addClass('has-error has-feedback');
 					}
 					
-					comentariosArray.push([response.data.id, $('#idcampo').val(), $('#comentario').val()]);
+					comentariosArray.push([response.data.id, $('#idcampo').val(), $('#comentario').val(), $('#tipocomentario').val()]);
 	            	$('#modalComentario').modal('hide');
 	    	    },
 	        	_error: function(response){

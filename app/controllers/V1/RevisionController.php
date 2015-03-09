@@ -268,7 +268,7 @@ class RevisionController extends BaseController {
 			
 			/*$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion','desgloseCompleto'));*/
 			foreach ($recurso->componentes as $key => $componente) {
-				$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
+				$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida','metasMes'));
 			}
 			
 			if($recurso->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
@@ -311,6 +311,7 @@ class RevisionController extends BaseController {
 		$nuevoComentario->idProyecto = $parametros['idproyecto'];
 		$nuevoComentario->idCampo = $parametros['idcampo'];
 		$nuevoComentario->observacion = $parametros['comentario'];
+		$nuevoComentario->tipoComentario = $parametros['tipocomentario'];
 		
 		$Resultado = Validador::validar($parametros, $this->reglasComentario);
 		

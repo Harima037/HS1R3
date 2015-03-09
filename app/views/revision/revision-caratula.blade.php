@@ -93,6 +93,7 @@
                     <form action="" id="formComentario">
                     	<input type="hidden" name="idproyectocomentarios" id="idproyectocomentarios">
                     	<input type="hidden" name="idcampo" id="idcampo">
+                        <input type="hidden" name="tipocomentario" id="tipocomentario">
 						<div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group">
