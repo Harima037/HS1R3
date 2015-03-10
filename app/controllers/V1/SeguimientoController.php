@@ -4,7 +4,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
-use Proyecto,Componente,Actividad;
+use Proyecto,Componente,Actividad,Beneficiario;
 
 class SeguimientoController extends BaseController {
 
@@ -23,7 +23,9 @@ class SeguimientoController extends BaseController {
 			if(isset($parametros['grid'])){
 				if($parametros['grid'] == 'rendicion-acciones'){
 					$rows = Proyecto::with('componentes.actividades')->find($parametros['idProyecto']);
-
+					$total = count($rows);
+				}elseif($parametros['grid'] == 'rendicion-beneficiarios'){
+					$rows = Beneficiario::with('tipoBeneficiario')->where('idProyecto','=',$parametros['idProyecto'])->get();
 					$total = count($rows);
 				}
 			}else{

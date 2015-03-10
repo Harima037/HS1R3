@@ -51,11 +51,12 @@
 	                    <tr>
 	                        <th><input type="checkbox" class="check-select-all-rows"></th>
 	                        <th>Tipo de Beneficiario</th>
-	                        <th>Total</th>
+	                        <th>Total F</th>
+							<th>Avance F</th>
 	                        <th>Total M</th>
 	                        <th>Avance M</th>
-							<th>Total F</th>
-							<th>Avance F</th>
+	                        <th>Total</th>
+	                        <th>Avance</th>
 	                    </tr>
 	                </thead>
 	                <tbody>
@@ -149,7 +150,7 @@
 		                				<td class="avance-acumulado" data-acumulado="0">
 		                					0 <span class="nueva-cantidad text-primary"></span>
 		                				</td>
-		                				<td class="porcentaje-acumulado" data-procentaje="0">0</td>
+		                				<td class="porcentaje-acumulado" data-porcentaje="0">0</td>
 		                			</tr>
 		                			@foreach ($jurisdicciones as $jurisdiccion)
 		                			<tr data-clave-jurisdiccion="{{$jurisdiccion->clave}}">
@@ -161,7 +162,9 @@
 		                				<td class="avance-acumulado" data-acumulado="0">
 		                					0 <span class="nueva-cantidad text-primary"></span>
 		                				</td>
-		                				<td class="porcentaje-acumulado" data-procentaje="0">0</td>
+		                				<td class="porcentaje-acumulado" data-porcentaje="0">
+		                					0 <span class="nueva-cantidad text-primary"></span>
+		                				</td>
 		            				</tr>
 		                			@endforeach
 		                		</tbody>
@@ -199,6 +202,340 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-success btn-guardar">Guardar Avance</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="modalBeneficiario" tabindex="-1" role="dialog" aria-labelledby="modalBenefLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-85-screen">
+        <div class="modal-content modal-content-85-screen">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="modalBenefLabel">Nuevo</h4>
+            </div>
+            <div class="modal-body">
+
+<form id="form_beneficiario">
+	<input type="hidden" name="id-beneficiario" id="id-beneficiario">
+	<div class="row">
+		<div class="col-sm-12">
+			<table class="table table-bordered table-condensed">
+				<tr>
+					<th colspan="4">Zona</th>
+				</tr>
+				<tr>
+					<th colspan="2">Urbana</th>
+					<th colspan="2">Rural</th>
+				</tr>
+				<tr>
+					<td>
+						<div class="form-group">
+							<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-female"></span>
+								</span>
+								<input type="number" class="form-control sub-total-zona fem" name="urbanaf" id="urbanaf">
+							</div>
+	                    </div>
+					</td>
+					<td>
+						<div class="form-group">
+							<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-male"></span>
+								</span>
+								<input type="number" class="form-control  sub-total-zona masc" name="urbanam" id="urbanam">
+							</div>
+	                    </div>
+					</td>
+					<td>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-female"></span>
+								</span>
+								<input type="number" class="form-control sub-total-zona fem" name="ruralf" id="ruralf">
+							</div>
+	                    </div>
+	                </td>
+	                <td>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-male"></span>
+								</span>
+								<input type="number" class="form-control sub-total-zona masc" name="ruralm" id="ruralm">
+							</div>
+	                    </div>
+	                </td>
+				</tr>
+				<tr>
+					<th colspan="2">
+						<span class="fa fa-link"></span> Totales
+					</th>
+					<td>
+						<div class="input-group">
+							<span class="input-group-addon">
+								<span class="fa fa-female"></span>
+							</span>
+							<div class="form-group"><span id="total-zona-f" class="form-control"></span></div>
+						</div>
+					</td>
+					<td>
+						<div class="input-group">
+							<span class="input-group-addon">
+								<span class="fa fa-male"></span>
+							</span>
+							<div class="form-group"><span id="total-zona-m" class="form-control"></span></div>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="col-sm-12">
+			<table class="table table-bordered table-condensed">
+				<tr>
+					<th colspan="4">Población</th>
+				</tr>
+				<tr>
+					<th >Mestiza</th>
+					<th >Indigena</th>
+					<th >Inmigrante</th>
+					<th >Otros</th>
+				</tr>
+	            <tr>
+	                <td>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-female"></span>
+								</span>
+								<input type="number" class="form-control sub-total-poblacion fem" name="mestizaf" id="mestizaf">
+							</div>
+	                    </div>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-male"></span>
+								</span>
+								<input type="number" class="form-control sub-total-poblacion masc" name="mestizam" id="mestizam">
+							</div>
+	                    </div>
+	                </td>
+	                <td>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-female"></span>
+								</span>
+								<input type="number" class="form-control sub-total-poblacion fem" name="indigenaf" id="indigenaf">
+							</div>
+	                    </div>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-male"></span>
+								</span>
+								<input type="number" class="form-control sub-total-poblacion masc" name="indigenam" id="indigenam">
+							</div>
+	                    </div>
+	                </td>
+	                <td>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-female"></span>
+								</span>
+								<input type="number" class="form-control sub-total-poblacion fem" name="inmigrantef" id="inmigrantef">
+							</div>
+	                    </div>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-male"></span>
+								</span>
+								<input type="number" class="form-control sub-total-poblacion masc" name="inmigrantem" id="inmigrantem">
+							</div>
+	                    </div>
+	                </td>	           
+	                <td>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-female"></span>
+								</span>
+								<input type="number" class="form-control sub-total-poblacion fem" name="otrosf" id="otrosf">
+							</div>
+	                    </div>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-male"></span>
+								</span>
+								<input type="number" class="form-control sub-total-poblacion masc" name="otrosm" id="otrosm">
+							</div>
+	                    </div>
+	                </td>
+	            </tr>
+	            <tr>
+	                <th colspan="2">
+	                	<span class="fa fa-link"></span> Totales
+	                </th>
+	                <td>
+	                	<div class="input-group">
+							<span class="input-group-addon">
+								<span class="fa fa-female"></span>
+							</span>
+							<span id="total-poblacion-f" class="form-control"></span>
+						</div>
+	                </td>
+	                <td>
+	                	<div class="input-group">
+							<span class="input-group-addon">
+								<span class="fa fa-male"></span>
+							</span>
+							<span id="total-poblacion-m" class="form-control"></span>
+						</div>
+	                </td>
+	            </tr>
+	        </table>
+		</div>
+		<div class="col-sm-12">
+			<table class="table table-bordered table-condensed">
+	            <tr>
+	                <th colspan="5">Marginación</th>
+	            </tr>
+	            <tr>
+	                <th>Muy alta</th>
+	                <th>Alta</th>
+	                <th>Media</th>
+	                <th>Baja</th>
+	                <th>Muy baja </th>
+	            </tr>
+	            <tr>
+	                <td>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-female"></span>
+								</span>
+								<input type="number" class="form-control sub-total-marginacion fem" name="muyaltaf" id="muyaltaf">
+							</div>
+	                    </div>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-male"></span>
+								</span>
+								<input type="number" class="form-control sub-total-marginacion masc" name="muyaltam" id="muyaltam">
+							</div>
+	                    </div>
+	                </td>
+	                <td>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-female"></span>
+								</span>
+								<input type="number" class="form-control sub-total-marginacion fem" name="altaf" id="altaf">
+							</div>
+	                    </div>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-male"></span>
+								</span>
+								<input type="number" class="form-control sub-total-marginacion masc" name="altam" id="altam">
+							</div>
+	                    </div>
+	                </td>
+	                <td>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-female"></span>
+								</span>
+								<input type="number" class="form-control sub-total-marginacion fem" name="mediaf" id="mediaf">
+							</div>
+	                    </div>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-male"></span>
+								</span>
+								<input type="number" class="form-control sub-total-marginacion masc" name="mediam" id="mediam">
+							</div>
+	                    </div>
+	                </td>
+	                <td>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-female"></span>
+								</span>
+								<input type="number" class="form-control sub-total-marginacion fem" name="bajaf" id="bajaf">
+							</div>
+	                    </div>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-male"></span>
+								</span>
+								<input type="number" class="form-control sub-total-marginacion masc" name="bajam" id="bajam">
+							</div>
+	                    </div>
+	                </td>
+	                <td>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-female"></span>
+								</span>
+								<input type="number" class="form-control sub-total-marginacion fem" name="muybajaf" id="muybajaf">
+							</div>
+	                    </div>
+	                    <div class="form-group">
+	                    	<div class="input-group">
+								<span class="input-group-addon">
+									<span class="fa fa-male"></span>
+								</span>
+								<input type="number" class="form-control sub-total-marginacion masc" name="muybajam" id="muybajam">
+							</div>
+	                    </div>
+	                </td>
+	            </tr>
+	            <tr>
+	                <th colspan="3"><span class="fa fa-link"></span> Totales</th>
+	                <td>
+	                	<div class="input-group">
+							<span class="input-group-addon">
+								<span class="fa fa-female"></span>
+							</span>
+							<span id="total-marginacion-f" class="form-control"></span>
+						</div>
+	                </td>
+	                <td>
+	                	<div class="input-group">
+							<span class="input-group-addon">
+								<span class="fa fa-male"></span>
+							</span>
+							<span id="total-marginacion-m" class="form-control"></span>
+						</div>
+	                </td>
+	            </tr>
+	        </table>
+		</div>
+	</div>
+</form>
+
+
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary btn-guardar" id="btn-beneficiario-guardar">Guardar</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

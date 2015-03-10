@@ -13,11 +13,60 @@
 
 // Inicialización General para casi cualquier módulo
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/seguimiento');
-var moduloDatagrid = new Datagrid("#datagridAcciones",moduloResource,{ formatogrid:true, pagina: 1, idProyecto: $('#id').val(), grid:'rendicion-acciones'});
-moduloDatagrid.init();
-moduloDatagrid.actualizar({
+var beneficiariosDatagrid = new Datagrid("#datagridBeneficiarios",moduloResource,{ formatogrid:true, pagina: 1, idProyecto: $('#id').val(), grid:'rendicion-beneficiarios'});
+var accionesDatagrid = new Datagrid("#datagridAcciones",moduloResource,{ formatogrid:true, pagina: 1, idProyecto: $('#id').val(), grid:'rendicion-acciones'});
+
+beneficiariosDatagrid.init();
+beneficiariosDatagrid.actualizar({
     _success: function(response){
-        moduloDatagrid.limpiar();
+        beneficiariosDatagrid.limpiar();
+        var datos_grid = {};
+
+        for(var i in response.data){
+            var beneficiario = response.data[i];
+
+            if(!datos_grid[beneficiario.idTipoBeneficiario]){
+                datos_grid[beneficiario.idTipoBeneficiario] = {
+                    'id': beneficiario.idTipoBeneficiario,
+                    'tipoBeneficiario': beneficiario.tipo_beneficiario.descripcion,
+                    'f': 0,
+                    'f-avance':0,
+                    'm': 0,
+                    'm-avance':0,
+                    'total': 0,
+                    'total-avance':0
+                };
+            }
+
+            datos_grid[beneficiario.idTipoBeneficiario][beneficiario.sexo] += beneficiario.total;
+            datos_grid[beneficiario.idTipoBeneficiario]['total'] += beneficiario.total;
+        }
+        var datos = [];
+
+        for(var i in datos_grid){
+            datos_grid[i].f = datos_grid[i].f.format();
+            datos_grid[i].m = datos_grid[i].m.format();
+            datos_grid[i].total = datos_grid[i].total.format();
+            datos_grid[i]['f-avance'] = datos_grid[i]['f-avance'].format();
+            datos_grid[i]['m-avance'] = datos_grid[i]['m-avance'].format();
+            datos_grid[i]['total-avance'] = datos_grid[i]['total-avance'].format();
+
+            datos.push(datos_grid[i]);
+        }
+        
+        beneficiariosDatagrid.cargarDatos(datos);                         
+        var total = parseInt(datos.length/beneficiariosDatagrid.rxpag); 
+        var plus = parseInt(datos.length)%beneficiariosDatagrid.rxpag;
+        if(plus>0) 
+            total++;
+        beneficiariosDatagrid.paginacion(total);
+    }
+});
+
+accionesDatagrid.init();
+accionesDatagrid.actualizar({
+    _success: function(response){
+        accionesDatagrid.limpiar();
         var datos_grid = [];
         var contador_componente = 0;
         for(var i in response.data.componentes){
@@ -47,14 +96,19 @@ moduloDatagrid.actualizar({
                 datos_grid.push(item);
             }
         }
-        moduloDatagrid.cargarDatos(datos_grid);                         
-        var total = parseInt(response.resultados/moduloDatagrid.rxpag); 
-        var plus = parseInt(response.resultados)%moduloDatagrid.rxpag;
+        accionesDatagrid.cargarDatos(datos_grid);                         
+        var total = parseInt(response.resultados/accionesDatagrid.rxpag); 
+        var plus = parseInt(response.resultados)%accionesDatagrid.rxpag;
         if(plus>0) 
             total++;
-        moduloDatagrid.paginacion(total);
+        accionesDatagrid.paginacion(total);
     }
 });
+
+function seguimiento_beneficiarios(e){
+    $('#modalBeneficiario').find(".modal-title").html("Seguimiento de Beneficiarios");
+    $('#modalBeneficiario').modal('show');
+}
 
 function seguimiento_metas(e){
     var datos_id = e.split('-');
@@ -95,11 +149,17 @@ function seguimiento_metas(e){
 $('.avance-mes').on('keyup',function(){ $(this).change() });
 $('.avance-mes').on('change',function(){
     var jurisdiccion = $(this).attr('data-jurisdiccion');
-    $('#tabla-avances-metas > tbody > tr[data-clave-jurisdiccion="'+jurisdiccion+'"] > td.avance-acumulado > span.nueva-cantidad').text(' ( + '+$(this).val()+' )');
+    $('#tabla-avances-metas > tbody > tr[data-clave-jurisdiccion="'+jurisdiccion+'"] > td.avance-acumulado > span.nueva-cantidad').text(' ( + '+($(this).val() || 0)+' )');
+
+    var acumulado = $('#tabla-avances-metas > tbody > tr[data-clave-jurisdiccion="'+jurisdiccion+'"] > td.avance-acumulado').attr('data-acumulado');
+    acumulado += parseFloat($(this).val()) || 0;
+    var total_programado = $('#tabla-avances-metas > tbody > tr[data-clave-jurisdiccion="'+jurisdiccion+'"] > td.meta-programada').attr('data-meta');
+    var nuevo_porcentaje = ((acumulado * 100) / total_programado).toFixed(2);
+    $('#tabla-avances-metas > tbody > tr[data-clave-jurisdiccion="'+jurisdiccion+'"] > td.porcentaje-acumulado > span.nueva-cantidad').text(' ( '+parseFloat(nuevo_porcentaje)+' % )');
 
     var suma = 0;
     $('.avance-mes').each(function(){
-        suma += parseInt($(this).val()) || 0;
+        suma += parseFloat($(this).val()) || 0;
     });
     $('#total-avance-mes').text(suma);
 });
