@@ -8,12 +8,12 @@ class ComponenteMetaMes extends BaseModel
 	protected $table = "componenteMetasMes";
 
 	public function scopeAgrupadoMes($query){
-		$query->select('id','idProyecto','idComponente','mes',DB::raw('sum(meta) AS meta'))
+		$query->select('id','idProyecto','idComponente','mes',DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'))
 				->groupBy('idComponente','mes');
 	}
 
 	public function scopeAgrupadoJurisdiccion($query){
-		$query->select('id','idProyecto','idComponente','claveJurisdiccion',DB::raw('sum(meta) AS meta'))
+		$query->select('id','idProyecto','idComponente','claveJurisdiccion',DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'))
 				->groupBy('idComponente','claveJurisdiccion');
 	}
 }

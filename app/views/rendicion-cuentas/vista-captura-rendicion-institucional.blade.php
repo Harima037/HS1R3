@@ -116,92 +116,104 @@
             <div class="modal-body">
                 <form action="" id="form_avance">
 					<div role="tabpanel">
-						<ul class="nav nav-tabs" role="tablist">
+						<ul class="nav nav-tabs" role="tablist" id="tabs-seguimiento-metas">
 							<li role="presentation" class="active">
 								<a href="#panel-metas" aria-controls="panel-metas" role="tab" data-toggle="tab">
-									Metas
+									<span class="fa fa-table"></span> Metas
 								</a>
 							</li>
-							<li role="presentation">
-								<a href="#panel-justificacion" aria-controls="panel-justificacion" role="tab" data-toggle="tab">
-									Justificación
+							<li role="presentation" class="disabled">
+								<a href="#panel-justificacion" aria-controls="panel-justificacion" role="tab" data-toggle="" id="tab-link-justificacion">
+									<span class="fa fa-align-left"></span> Justificación
 								</a>
 							</li>
 						</ul>
-					<!-- Tab panes -->
-					<div class="tab-content">
-						<div role="tabpanel" class="tab-pane active" id="panel-metas">
-							<br>
-							<table id="tabla-avances-metas" class="table table-condensed table-hover table-bordered">
-		                		<thead>
-		                			<th>Jurisdicción</th>
-		                			<th>Meta Programada</th>
-		                			<th>Avance del Mes</th>
-		                			<th>Avance Acumulado</th>
-		                			<th>Porcentaje Acumulado</th>
-		                		</thead>
-		                		<tbody>
-		                			<tr data-clave-jurisdiccion="OC">
-		                				<td>OC - Oficina Central</td>
-		                				<td class="meta-programada" data-meta="0">0</td>
-		                				<td>
-		                					<input type="number" class="form-control avance-mes" name="avance[OC]" id="avance_OC" data-jurisdiccion="OC" disabled>
-		                				</td>
-		                				<td class="avance-acumulado" data-acumulado="0">
-		                					0 <span class="nueva-cantidad text-primary"></span>
-		                				</td>
-		                				<td class="porcentaje-acumulado" data-porcentaje="0">0</td>
-		                			</tr>
-		                			@foreach ($jurisdicciones as $jurisdiccion)
-		                			<tr data-clave-jurisdiccion="{{$jurisdiccion->clave}}">
-		                				<td>{{$jurisdiccion->clave}} - {{$jurisdiccion->nombre}}</td>
-		                				<td class="meta-programada" data-meta="0">0</td>
-		                				<td>
-		                					<input type="number" class="form-control avance-mes" name="avance[{{$jurisdiccion->clave}}]" id="avance_{{$jurisdiccion->clave}}" data-jurisdiccion="{{$jurisdiccion->clave}}" disabled>
-		                				</td>
-		                				<td class="avance-acumulado" data-acumulado="0">
-		                					0 <span class="nueva-cantidad text-primary"></span>
-		                				</td>
-		                				<td class="porcentaje-acumulado" data-porcentaje="0">
-		                					0 <span class="nueva-cantidad text-primary"></span>
-		                				</td>
-		            				</tr>
-		                			@endforeach
-		                		</tbody>
-		                		<tfoot>
-		                			<th>Totales</th>
-		                			<th id="total-meta-programada">0</th>
-		                			<th id="total-avance-mes">0</th>
-		                			<th id="total-acance-acumulado">0</th>
-		                			<th id="total-porcentaje">0%</th>
-		                		</tfoot>
-		                	</table>
-						</div>
-						<div role="tabpanel" class="tab-pane" id="panel-justificacion">
-							<br>
-							<div class="row">
-								<div class="col-sm-12">
-									<div class="form-group">
-										<label class="input-label">Analisis de Resultados Acumulado</label>
-										<textarea rows="6" class="form-control" name="analisis-resultados" id="analisis-resultados"></textarea>
+						<!-- Tab panes -->
+						<div class="tab-content">
+							<div role="tabpanel" class="tab-pane active" id="panel-metas">
+								<br>
+								<table id="tabla-avances-metas" class="table table-condensed table-hover table-bordered">
+			                		<thead>
+			                			<th>Jurisdicción</th>
+			                			<th>Meta Programada</th>
+			                			<th>Avance del Mes</th>
+			                			<th>Avance Acumulado</th>
+			                			<th>Porcentaje Acumulado</th>
+			                			<th width="1">Avance al Mes</th>
+			                		</thead>
+			                		<tbody>
+			                			<tr data-clave-jurisdiccion="OC">
+			                				<td>OC - Oficina Central</td>
+			                				<td class="meta-programada" data-meta="0">0</td>
+			                				<td>
+			                					<div class="form-group">
+			                						<input type="number" class="form-control avance-mes" name="avance[OC]" id="avance_OC" data-jurisdiccion="OC" disabled>
+			                					</div>
+			                				</td>
+			                				<td class="avance-acumulado" data-acumulado="0">
+			                					<span class="vieja-cantidad">0</span> <span class="nueva-cantidad text-primary"></span>
+			                				</td>
+			                				<td class="porcentaje-acumulado" data-porcentaje="0">
+			                					<span class="vieja-cantidad">0</span> <span class="nueva-cantidad text-primary"></span>
+			                				</td>
+			                				<td class="avance-mes" data-estado-avance=""></td>
+			                			</tr>
+			                			@foreach ($jurisdicciones as $jurisdiccion)
+			                			<tr data-clave-jurisdiccion="{{$jurisdiccion->clave}}">
+			                				<td>{{$jurisdiccion->clave}} - {{$jurisdiccion->nombre}}</td>
+			                				<td class="meta-programada" data-meta="0">0</td>
+			                				<td>
+			                					<div class="form-group">
+			                						<input type="number" class="form-control avance-mes" name="avance[{{$jurisdiccion->clave}}]" id="avance_{{$jurisdiccion->clave}}" data-jurisdiccion="{{$jurisdiccion->clave}}" disabled>
+			                					</div>
+			                				</td>
+			                				<td class="avance-acumulado" data-acumulado="0">
+			                					<span class="vieja-cantidad">0</span> <span class="nueva-cantidad text-primary"></span>
+			                				</td>
+			                				<td class="porcentaje-acumulado" data-porcentaje="0">
+			                					<span class="vieja-cantidad">0</span> <span class="nueva-cantidad text-primary"></span>
+			                				</td>
+			                				<td class="avance-mes" data-estado-avance=""></td>
+			            				</tr>
+			                			@endforeach
+			                		</tbody>
+			                		<tfoot>
+			                			<th>Totales</th>
+			                			<th id="total-meta-programada">0</th>
+			                			<th id="total-avance-mes">0</th>
+			                			<th id="total-avance-acumulado">0</th>
+			                			<th id="total-porcentaje">0%</th>
+			                			<th></th>
+			                		</tfoot>
+			                	</table>
+							</div>
+							<div role="tabpanel" class="tab-pane" id="panel-justificacion">
+								<br>
+								<div class="row">
+									<div class="col-sm-12">
+										<div class="form-group">
+											<label class="input-label">Analisis de Resultados Acumulado</label>
+											<textarea rows="6" class="form-control" name="analisis-resultados" id="analisis-resultados"></textarea>
+										</div>
 									</div>
-								</div>
-								<div class="col-sm-12">
-									<div class="form-group">
-										<label class="input-label">Justificación Acumulada</label>
-										<textarea rows="6" class="form-control" name="justificacion-acumulada" id="justificacion-acumulada"></textarea>
+									<div class="col-sm-12">
+										<div class="form-group">
+											<label class="input-label">Justificación Acumulada</label>
+											<textarea rows="6" class="form-control" name="justificacion-acumulada" id="justificacion-acumulada"></textarea>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-
-					</div>
+					<input type="hidden" name="id-avance" id="id-avance">
+					<input type="hidden" name="nivel" id="nivel">
+					<input type="hidden" name="id-accion" id="id-accion">
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success btn-guardar">Guardar Avance</button>
+                <button type="button" class="btn btn-success" id="btn-guardar-avance">Guardar Avance</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

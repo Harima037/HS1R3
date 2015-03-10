@@ -11,6 +11,10 @@ class Actividad extends BaseModel
 		return $query->with('formula','dimension','frecuencia','tipoIndicador','unidadMedida');
 	}
 
+	public function registroAvance(){
+    	return $this->hasMany('RegistroAvanceMetas','idNivel')->where('nivel','=',2);
+    }
+
 	public function metasMes(){
 		return $this->hasMany('ActividadMetaMes','idActividad');
 	}

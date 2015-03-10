@@ -280,8 +280,6 @@ function editar_componente(e){
     		$('#tablink-componente-actividades').attr('data-toggle','tab');
 			$('#tablink-componente-actividades').parent().removeClass('disabled');
 
-			$(form_componente + ' .metas-mes').attr('data-meta-id','');
-			
 			actualizar_metas('componente',response.data.metas_mes);
 			
 			var tab_id = cargar_formulario_componente_actividad('componente',response.data);
@@ -549,8 +547,8 @@ $('#btn-actividad-guardar').on('click',function(){
 	if($('#id-actividad').val()){
 		var cadena_metas = '';
 		$(form_actividad + ' .metas-mes').each(function(){
-			if($(this).data('meta-id')){
-				cadena_metas = cadena_metas + '&mes-actividad-id['+$(this).data('meta-jurisdiccion')+']['+$(this).data('meta-mes')+']='+$(this).data('meta-id');
+			if($(this).attr('data-meta-id')){
+				cadena_metas = cadena_metas + '&mes-actividad-id['+$(this).attr('data-meta-jurisdiccion')+']['+$(this).attr('data-meta-mes')+']='+$(this).attr('data-meta-id');
 			}
 		});
 		parametros = parametros + cadena_metas;
@@ -815,8 +813,8 @@ function guardar_datos_componente(cerrar){
 	if($('#id-componente').val()){
 		var cadena_metas = '';
 		$(form_componente + ' .metas-mes').each(function(){
-			if($(this).data('meta-id')){
-				cadena_metas = cadena_metas + '&mes-componente-id['+$(this).data('meta-jurisdiccion')+']['+$(this).data('meta-mes')+']='+$(this).data('meta-id');
+			if($(this).attr('data-meta-id')){
+				cadena_metas = cadena_metas + '&mes-componente-id['+$(this).attr('data-meta-jurisdiccion')+']['+$(this).attr('data-meta-mes')+']='+$(this).attr('data-meta-id');
 			}
 		});
 		parametros = parametros + cadena_metas;
@@ -1176,12 +1174,14 @@ function reset_modal_form(formulario){
     $(formulario + ' .chosen-one').trigger('chosen:updated');
     Validation.cleanFormErrors(formulario);
     if(formulario == form_componente){
+    	$(form_componente + ' .metas-mes').attr('data-meta-id','');
     	$(modal_componente + ' .alert').remove();
     	$('#id-componente').val('');
     	//$(grid_actividades + ' > table > tbody').empty();
     	$('#conteo-actividades').text(' 0 / 5 ');
     	$(grid_actividades + ' > table > tbody').html('<tr><td colspan="6" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
     }else if(formulario == form_actividad){
+    	$(form_actividad + ' .metas-mes').attr('data-meta-id','');
     	$('#id-actividad').val('');
     	$('#lista-tabs-actividad a:first').tab('show');
     	$(modal_actividad + ' .alert').remove();
@@ -1279,9 +1279,9 @@ function ejecutar_formula(identificador){
 
 function actualizar_eventos_metas(){
 	$('.metas-mes').on('change',function(){
-		var mes = $(this).data('meta-mes');
+		var mes = $(this).attr('data-meta-mes');
 		var trimestre = Math.ceil(mes/3);
-		var identificador = $(this).data('meta-identificador');
+		var identificador = $(this).attr('data-meta-identificador');
 		
 		var suma = 0;
 		var mes_inicio = 0;

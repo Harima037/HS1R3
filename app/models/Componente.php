@@ -23,6 +23,10 @@ class Componente extends BaseModel
     			->leftjoin('catalogoUnidadesMedida AS unidadMedida','unidadMedida.id','=','idUnidadMedida');
     }
 
+    public function registroAvance(){
+    	return $this->hasMany('RegistroAvanceMetas','idNivel')->where('nivel','=',1);
+    }
+
     public function accion(){
     	return $this->hasOne('Accion','idComponente');
     }
