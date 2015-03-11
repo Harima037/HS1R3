@@ -136,11 +136,10 @@
 								<table id="tabla-avances-metas" class="table table-condensed table-hover table-bordered">
 			                		<thead>
 			                			<th>Jurisdicción</th>
-			                			<th>Meta Programada</th>
+			                			<th>Meta Acumulada</th>
 			                			<th>Avance del Mes</th>
 			                			<th>Avance Acumulado</th>
-			                			<th>Porcentaje Acumulado</th>
-			                			<th width="1">Avance al Mes</th>
+			                			<th width="90">Porcentaje Acumulado</th>
 			                		</thead>
 			                		<tbody>
 			                			<tr data-clave-jurisdiccion="OC">
@@ -154,10 +153,12 @@
 			                				<td class="avance-acumulado" data-acumulado="0">
 			                					<span class="vieja-cantidad">0</span> <span class="nueva-cantidad text-primary"></span>
 			                				</td>
-			                				<td class="porcentaje-acumulado" data-porcentaje="0">
-			                					<span class="vieja-cantidad">0</span> <span class="nueva-cantidad text-primary"></span>
-			                				</td>
 			                				<td class="avance-mes" data-estado-avance=""></td>
+			                				
+			                				<!--td class="porcentaje-acumulado" data-porcentaje="0">
+			                					<span class="vieja-cantidad">0</span> <span class="nueva-cantidad text-primary"></span>
+			                				</td-->
+			                				
 			                			</tr>
 			                			@foreach ($jurisdicciones as $jurisdiccion)
 			                			<tr data-clave-jurisdiccion="{{$jurisdiccion->clave}}">
@@ -171,9 +172,9 @@
 			                				<td class="avance-acumulado" data-acumulado="0">
 			                					<span class="vieja-cantidad">0</span> <span class="nueva-cantidad text-primary"></span>
 			                				</td>
-			                				<td class="porcentaje-acumulado" data-porcentaje="0">
+			                				<!--td class="porcentaje-acumulado" data-porcentaje="0">
 			                					<span class="vieja-cantidad">0</span> <span class="nueva-cantidad text-primary"></span>
-			                				</td>
+			                				</td-->
 			                				<td class="avance-mes" data-estado-avance=""></td>
 			            				</tr>
 			                			@endforeach
@@ -184,7 +185,6 @@
 			                			<th id="total-avance-mes">0</th>
 			                			<th id="total-avance-acumulado">0</th>
 			                			<th id="total-porcentaje">0%</th>
-			                			<th></th>
 			                		</tfoot>
 			                	</table>
 							</div>

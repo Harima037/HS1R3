@@ -98,7 +98,9 @@ class SeguimientoController extends BaseController {
 			}elseif($parametros['mostrar'] == 'datos-componente-avance'){
 				$mes_actual = date("n");
 				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
-				$recurso = Componente::with(array('metasMesJurisdiccion','registroAvance'=>function($query) use ($mes_actual){
+				$recurso = Componente::with(array('metasMesJurisdiccion'=>function($query) use ($mes_actual){
+					$query->where('mes','<=',$mes_actual);
+				},'registroAvance'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
 				},'metasMes' => function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
@@ -106,7 +108,9 @@ class SeguimientoController extends BaseController {
 			}elseif($parametros['mostrar'] == 'datos-actividad-avance'){
 				$mes_actual = date("n");
 				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
-				$recurso = Actividad::with(array('metasMesJurisdiccion','registroAvance'=>function($query) use ($mes_actual){
+				$recurso = Actividad::with(array('metasMesJurisdiccion'=>function($query) use ($mes_actual){
+					$query->where('mes','<=',$mes_actual);
+				},'registroAvance'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
 				},'metasMes' => function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
@@ -215,12 +219,16 @@ class SeguimientoController extends BaseController {
 
 		//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
 		if($parametros['nivel'] == 'componente'){
-			$accion_metas = Componente::with(array('metasMes' => function($query) use ($mes_actual){
+			$accion_metas = Componente::with(array('metasMesJurisdiccion'=>function($query) use ($mes_actual){
+				$query->where('mes','<=',$mes_actual);
+			},'metasMes' => function($query) use ($mes_actual){
 				$query->where('mes','=',$mes_actual);
 			}))->find($parametros['id-accion']);
 			$registro_avance->nivel = 1;
 		}else{
-			$accion_metas = Actividad::with(array('metasMes' => function($query) use ($mes_actual){
+			$accion_metas = Actividad::with(array('metasMesJurisdiccion'=>function($query) use ($mes_actual){
+				$query->where('mes','<=',$mes_actual);
+			},'metasMes' => function($query) use ($mes_actual){
 				$query->where('mes','=',$mes_actual);
 			}))->find($parametros['id-accion']);
 			$registro_avance->nivel = 2;
@@ -231,19 +239,24 @@ class SeguimientoController extends BaseController {
 
 		$conteo_alto_bajo_avance = 0;
 		$faltan_campos = array();
-		/*foreach ($accion_metas->metasMesJurisdiccion as $metas) {
-			if($parametros['avance'][$metas->claveJurisdiccion] == ''){
-				$faltan_campos[] = json_encode(array('field'=>'avance_'.$metas->claveJurisdiccion,'error'=>'Este campo es requerido.'));
-			}
-		}*/
+		
+		$metas_acumuladas = $accion_metas->metasMesJurisdiccion->lists('meta','claveJurisdiccion');
+		$avances_acumulados = $accion_metas->metasMesJurisdiccion->lists('avance','claveJurisdiccion');
 
 		$guardar_metas = array();
 		$total_avance = 0;
 		foreach ($accion_metas->metasMes as $metas) {
 			if($parametros['avance'][$metas->claveJurisdiccion] == ''){
-				$faltan_campos[] = json_encode(array('field'=>'avance_'.$metas->claveJurisdiccion,'error'=>'Este campo es requerido.'));
+				$faltan_campos[] = json_encode(array('field'=>'avance_'.$metas->claveJurisdiccion,'error'=>'Este campo es requerido'));
 			}else{
-				$porcentaje_avance = (($parametros['avance'][$metas->claveJurisdiccion]  / $metas->meta ) * 100);
+				$meta_acumulada = $metas_acumuladas[$metas->claveJurisdiccion];
+				$avance_acumulado = $avances_acumulados[$metas->claveJurisdiccion];
+				if($es_editar){
+					$avance_acumulado -= $metas->avance;
+				}
+				$avance_acumulado += $parametros['avance'][$metas->claveJurisdiccion];
+
+				$porcentaje_avance = (( $avance_acumulado  / $meta_acumulada ) * 100);
 				if($porcentaje_avance < 90 || $porcentaje_avance > 110){
 					$conteo_alto_bajo_avance++;
 				}
