@@ -66,42 +66,7 @@ beneficiariosDatagrid.actualizar({
 accionesDatagrid.init();
 accionesDatagrid.actualizar({
     _success: function(response){
-        accionesDatagrid.limpiar();
-        var datos_grid = [];
-        var contador_componente = 0;
-        for(var i in response.data.componentes){
-            var contador_actividad = 0;
-            contador_componente++;
-            var componente = response.data.componentes[i];
-            var item = {};
-
-            item.id = '1-' + componente.id;
-            item.nivel = 'Componente ' + contador_componente;
-            item.indicador = componente.indicador;
-            item.meta = componente.valorNumerador.format();
-            item.avances_mes = 0;
-            item.avances_acumulados = 0;
-
-            datos_grid.push(item);
-            for(var j in componente.actividades){
-                contador_actividad++;
-                var actividad = componente.actividades[j];
-                var item = {};
-                item.id = '2-' + actividad.id;
-                item.nivel = 'Actividad ' + contador_componente + '.' + contador_actividad;
-                item.indicador = actividad.indicador;
-                item.meta = actividad.valorNumerador.format();
-                item.avances_mes = 0;
-                item.avances_acumulados = 0;
-                datos_grid.push(item);
-            }
-        }
-        accionesDatagrid.cargarDatos(datos_grid);                         
-        var total = parseInt(response.resultados/accionesDatagrid.rxpag); 
-        var plus = parseInt(response.resultados)%accionesDatagrid.rxpag;
-        if(plus>0) 
-            total++;
-        accionesDatagrid.paginacion(total);
+        llenar_grid_acciones(response);
     }
 });
 
@@ -122,6 +87,12 @@ $('#btn-guardar-avance').on('click',function(){
         moduloResource.put($('#id-avance').val(),parametros,{
             _success: function(response){
                 MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
+                accionesDatagrid.actualizar({
+                    _success: function(response){
+                        llenar_grid_acciones(response);
+                    }
+                });
+                $('#modalEditarAvance').modal('hide');
             },
             _error: function(response){
                 try{
@@ -141,7 +112,13 @@ $('#btn-guardar-avance').on('click',function(){
         moduloResource.post(parametros,{
             _success: function(response){
                 MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
+                accionesDatagrid.actualizar({
+                    _success: function(response){
+                        llenar_grid_acciones(response);
+                    }
+                });
                 $('#id-avance').val(response.data.id);
+                $('#modalEditarAvance').modal('hide');
             },
             _error: function(response){
                 try{
@@ -264,7 +241,7 @@ $('.avance-mes').on('change',function(){
         acumulado += parseFloat($(this).val()) || 0;
         var total_programado = $(row +' > td.meta-programada').attr('data-meta');
         var nuevo_porcentaje = ((acumulado * 100) / total_programado).toFixed(2);
-        console.log('(('+acumulado+' * 100) / '+total_programado+')');
+        
         if(nuevo_porcentaje > 0){
             $(row +' > td.porcentaje-acumulado > span.nueva-cantidad').html(' <small>('+parseFloat(nuevo_porcentaje)+'%)</small>');
         }else{
@@ -318,6 +295,78 @@ $('#modalEditarAvance').on('hide.bs.modal',function(e){
     $('#tabs-seguimiento-metas a:first').tab('show');
     Validation.cleanFormErrors('#form_avance');
 });
+
+function llenar_grid_acciones(response){
+    accionesDatagrid.limpiar();
+    var datos_grid = [];
+    var contador_componente = 0;
+    for(var i in response.data.componentes){
+        var contador_actividad = 0;
+        contador_componente++;
+        var componente = response.data.componentes[i];
+
+        var item = {};
+
+        item.id = '1-' + componente.id;
+        item.nivel = 'Componente ' + contador_componente;
+        item.indicador = componente.indicador;
+        item.meta = componente.valorNumerador.format();
+        item.avances_acumulados = 0;
+        item.avances_mes = 0;
+        item.justificacion = '';
+
+        var fecha = new Date();
+        var mes = fecha.getMonth() + 1;
+        
+        if(componente.registro_avance.length){
+            for(var j in componente.registro_avance){
+                var avance = componente.registro_avance[j];
+                item.avances_acumulados += avance.avanceMes;
+                if(avance.mes == mes){
+                    item.avances_mes += avance.avanceMes;
+                    if(avance.analisisResultados){
+                        item.justificacion = '<span class="fa fa-comment"></span>';
+                    }
+                }
+            }
+        }
+
+        datos_grid.push(item);
+        for(var j in componente.actividades){
+            contador_actividad++;
+            var actividad = componente.actividades[j];
+            var item = {};
+            item.id = '2-' + actividad.id;
+            item.nivel = 'Actividad ' + contador_componente + '.' + contador_actividad;
+            item.indicador = actividad.indicador;
+            item.meta = actividad.valorNumerador.format();
+            item.avances_acumulados = 0;
+            item.avances_mes = 0;
+            item.justificacion = '';
+            
+            if(actividad.registro_avance.length){
+                for(var j in actividad.registro_avance){
+                    var avance = actividad.registro_avance[j];
+                    item.avances_acumulados += avance.avanceMes;
+                    if(avance.mes == mes){
+                        item.avances_mes += avance.avanceMes;
+                        if(avance.analisisResultados){
+                            item.justificacion = '<span class="fa fa-comment"></span>';
+                        }
+                    }
+                }
+            }
+
+            datos_grid.push(item);
+        }
+    }
+    accionesDatagrid.cargarDatos(datos_grid);                         
+    var total = parseInt(response.resultados/accionesDatagrid.rxpag); 
+    var plus = parseInt(response.resultados)%accionesDatagrid.rxpag;
+    if(plus>0) 
+        total++;
+    accionesDatagrid.paginacion(total);
+}
 
 /*             Extras               */
 /**

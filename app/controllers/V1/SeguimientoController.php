@@ -22,8 +22,10 @@ class SeguimientoController extends BaseController {
 
 			if(isset($parametros['grid'])){
 				if($parametros['grid'] == 'rendicion-acciones'){
-					$rows = Proyecto::with('componentes.actividades')->find($parametros['idProyecto']);
+					$rows = Proyecto::with('componentes.actividades.registroAvance')->find($parametros['idProyecto']);
+					$rows->componentes->load('registroAvance');
 					$total = count($rows);
+
 				}elseif($parametros['grid'] == 'rendicion-beneficiarios'){
 					$rows = Beneficiario::with('tipoBeneficiario')->where('idProyecto','=',$parametros['idProyecto'])->get();
 					$total = count($rows);
@@ -160,6 +162,43 @@ class SeguimientoController extends BaseController {
 		return Response::json($respuesta['data'],$respuesta['http_status']);
 	}
 
+	/**
+	 * Update the specified resource in storage.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function update($id){
+		//
+		$respuesta['http_status'] = 200;
+		$respuesta['data'] = array("data"=>'');
+		try{
+			$parametros = Input::all();
+
+			if($parametros['guardar'] == 'avance-metas'){
+				$respuesta = $this->guardarAvance($parametros,$id);
+				if($respuesta['http_status'] != 200){
+					throw new Exception("Error al procesar los datos", 1);
+				}
+			}
+		}catch(\Exception $ex){
+			$respuesta['http_status'] = 500;	
+			if($respuesta['data']['data'] == ''){
+				$respuesta['data']['data'] = 'Ocurrio un error al intentar almacenar los datos';
+			}
+			if(strpos($ex->getMessage(), '{"field":') !== FALSE){
+				$respuesta['data']['code'] = 'U00';
+				$respuesta['data']['data'] = $ex->getMessage();
+			}else{
+				$respuesta['data']['ex'] = $ex->getMessage();
+			}
+			if(!isset($respuesta['data']['code'])){
+				$respuesta['data']['code'] = 'S03';
+			}
+		}
+		return Response::json($respuesta['data'],$respuesta['http_status']);
+	}
+
 	public function guardarAvance($parametros,$id = NULL){
 		$respuesta['http_status'] = 200;
 		$respuesta['data'] = array("data"=>'');
@@ -196,8 +235,6 @@ class SeguimientoController extends BaseController {
 		foreach ($accion_metas->metasMesJurisdiccion as $metas) {
 			if($parametros['avance'][$metas->claveJurisdiccion] == ''){
 				$faltan_campos[] = json_encode(array('field'=>'avance_'.$metas->claveJurisdiccion,'error'=>'Este campo es requerido.'));
-			}else{
-				
 			}
 		}
 
@@ -225,6 +262,9 @@ class SeguimientoController extends BaseController {
 			}else{
 				$registro_avance->justificacionAcumulada = $parametros['justificacion-acumulada'];
 			}
+		}else{
+			$registro_avance->analisisResultados = NULL;
+			$registro_avance->justificacionAcumulada = NULL;
 		}
 
 		if(count($faltan_campos)){
@@ -249,42 +289,5 @@ class SeguimientoController extends BaseController {
 		});
 
 		return $respuesta;
-	}
-
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update($id){
-		//
-		$respuesta['http_status'] = 200;
-		$respuesta['data'] = array("data"=>'');
-		try{
-			$parametros = Input::all();
-
-			if($parametros['guardar'] == 'avance-metas'){
-				$respuesta = $this->guardarAvance($parametros,$id);
-				if($respuesta['http_status'] != 200){
-					throw new Exception("Error al procesar los datos", 1);
-				}
-			}
-		}catch(\Exception $ex){
-			$respuesta['http_status'] = 500;	
-			if($respuesta['data']['data'] == ''){
-				$respuesta['data']['data'] = 'Ocurrio un error al intentar almacenar los datos';
-			}
-			if(strpos($ex->getMessage(), '{"field":') !== FALSE){
-				$respuesta['data']['code'] = 'U00';
-				$respuesta['data']['data'] = $ex->getMessage();
-			}else{
-				$respuesta['data']['ex'] = $ex->getMessage();
-			}
-			if(!isset($respuesta['data']['code'])){
-				$respuesta['data']['code'] = 'S03';
-			}
-		}
-		return Response::json($respuesta['data'],$respuesta['http_status']);
 	}
 }

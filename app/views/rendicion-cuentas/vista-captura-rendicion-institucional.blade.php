@@ -90,12 +90,13 @@
 	                        <th>Nivel</th>
 	                        <th>Indicador</th>
 	                        <th>Meta Programada</th>
+	                        <th>Avance Acumulado</th>
 							<th>Avances del Mes</th>
-							<th>Avance Acumulado</th>
+							<th width="50"></th>
 	                    </tr>
 	                </thead>
 	                <tbody>
-	                    <tr><td colspan="6" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>
+	                    <tr><td></td><td colspan="6" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>
 	                </tbody>
 	            </table>
 	        </div>
