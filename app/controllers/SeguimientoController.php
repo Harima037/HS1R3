@@ -31,6 +31,10 @@ class SeguimientoController extends BaseController {
 						)
 				)
 		);
+		$mes_actual = date("n");
+		$trimestre_actual = ceil(($mes_actual/3));
+		$datos['mes_avance'] = $mes_actual;
+		$datos['trimestre_avance'] = $trimestre_actual;
 		return parent::loadIndex('RENDCUENTA','RENDINST',$datos);
 	}
 	public function indexInversion(){

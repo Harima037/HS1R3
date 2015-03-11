@@ -180,9 +180,9 @@ function seguimiento_metas(e){
                     $(row + ' > td.avance-acumulado > span.vieja-cantidad').text(dato.avance);
                     $(row + ' > td.avance-acumulado').attr('data-acumulado',dato.avance);
                 }
-                if(dato.meta > 0){
+                /*if(dato.meta > 0){
                     $('#avance_'+dato.claveJurisdiccion).attr('disabled',false);
-                }
+                }*/
             }
 
             for(var i in response.data.metas_mes){
@@ -198,6 +198,10 @@ function seguimiento_metas(e){
                     $(row + ' > td.avance-acumulado > span.vieja-cantidad').text(avance_jurisdiccion - dato.avance);
                     $(row + ' > td.avance-acumulado').attr('data-acumulado',(avance_jurisdiccion - dato.avance));
                     $('#avance_'+dato.claveJurisdiccion).change();
+                }
+
+                if(dato.meta){
+                    $('#avance_'+dato.claveJurisdiccion).attr('disabled',false);
                 }
 
                 var avance_metas = $(row + ' > td.avance-acumulado').attr('data-acumulado');

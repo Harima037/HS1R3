@@ -41,15 +41,15 @@
                     </div>
                 </div>
             </div>
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" data-mes-activo="{{$mes_avance}}" data-trim-activo="{{$trimestre_avance}}">
                 <thead>
                     <tr>
                         <th><input type="checkbox" class="check-select-all-rows"></th>
                         <th>Clave</th>
                         <th>Nombre Técnico</th>
-                        <th width="90">Mes 1</th>
-                        <th width="90">Mes 2</th>
-                        <th width="90">Mes 3</th>
+                        <th width="90">{{$meses[$trimestre_avance][0]['mes']}}</th>
+                        <th width="90">{{$meses[$trimestre_avance][1]['mes']}}</th>
+                        <th width="90">{{$meses[$trimestre_avance][2]['mes']}}</th>
                         <th width="100">Trimestre</th>
                     </tr>
                 </thead>

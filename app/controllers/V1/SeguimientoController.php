@@ -48,7 +48,7 @@ class SeguimientoController extends BaseController {
 				}
 				
 				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
-					'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
+				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
 					'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
 									->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
 									->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
@@ -215,40 +215,43 @@ class SeguimientoController extends BaseController {
 
 		//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
 		if($parametros['nivel'] == 'componente'){
-			$accion_metas = Componente::with(array('metasMesJurisdiccion','metasMes' => function($query) use ($mes_actual){
+			$accion_metas = Componente::with(array('metasMes' => function($query) use ($mes_actual){
 				$query->where('mes','=',$mes_actual);
 			}))->find($parametros['id-accion']);
 			$registro_avance->nivel = 1;
 		}else{
-			$accion_metas = Actividad::with(array('metasMesJurisdiccion','metasMes' => function($query) use ($mes_actual){
+			$accion_metas = Actividad::with(array('metasMes' => function($query) use ($mes_actual){
 				$query->where('mes','=',$mes_actual);
 			}))->find($parametros['id-accion']);
 			$registro_avance->nivel = 2;
 		}
-
 
 		$registro_avance->idNivel = $parametros['id-accion'];
 		$registro_avance->mes = $mes_actual;
 
 		$conteo_alto_bajo_avance = 0;
 		$faltan_campos = array();
-		foreach ($accion_metas->metasMesJurisdiccion as $metas) {
+		/*foreach ($accion_metas->metasMesJurisdiccion as $metas) {
 			if($parametros['avance'][$metas->claveJurisdiccion] == ''){
 				$faltan_campos[] = json_encode(array('field'=>'avance_'.$metas->claveJurisdiccion,'error'=>'Este campo es requerido.'));
 			}
-		}
+		}*/
 
 		$guardar_metas = array();
 		$total_avance = 0;
 		foreach ($accion_metas->metasMes as $metas) {
-			$porcentaje_avance = (($parametros['avance'][$metas->claveJurisdiccion]  / $metas->meta ) * 100);
-			if($porcentaje_avance < 90 || $porcentaje_avance > 110){
-				$conteo_alto_bajo_avance++;
-			}
+			if($parametros['avance'][$metas->claveJurisdiccion] == ''){
+				$faltan_campos[] = json_encode(array('field'=>'avance_'.$metas->claveJurisdiccion,'error'=>'Este campo es requerido.'));
+			}else{
+				$porcentaje_avance = (($parametros['avance'][$metas->claveJurisdiccion]  / $metas->meta ) * 100);
+				if($porcentaje_avance < 90 || $porcentaje_avance > 110){
+					$conteo_alto_bajo_avance++;
+				}
 
-			$total_avance += $parametros['avance'][$metas->claveJurisdiccion];
-			$metas->avance = $parametros['avance'][$metas->claveJurisdiccion];
-			$guardar_metas[] = $metas;
+				$total_avance += $parametros['avance'][$metas->claveJurisdiccion];
+				$metas->avance = $parametros['avance'][$metas->claveJurisdiccion];
+				$guardar_metas[] = $metas;
+			}
 		}
 
 		if($conteo_alto_bajo_avance){

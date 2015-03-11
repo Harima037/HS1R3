@@ -19,26 +19,29 @@ moduloDatagrid.actualizar({
     _success: function(response){
         moduloDatagrid.limpiar();
         var datos_grid = [];
+        var mes_activo = $('#datagridProyectos > table').attr('data-mes-activo');
         for(var i in response.data){
             var item = {};
-            var clase_label = 'label-info';
-            if(response.data[i].idEstatusProyecto == 2){
+
+            /*var clase_label = 'label-default';
+            var clase_icon = 'fa-lock';
+            if(response.data[i].mes == 2){
                 clase_label = 'label-warning';
             }else if(response.data[i].idEstatusProyecto == 3){
                 clase_label = 'label-danger';
             }else if(response.data[i].idEstatusProyecto == 4){
                 clase_label = 'label-primary';
-            }
+            }*/
 
             item.id = response.data[i].id;
             item.clave = response.data[i].clavePresup;
             item.nombre_tecnico = response.data[i].nombreTecnico;
 
-            item.primerMes = '<span class="label label-info"><span class="fa fa-square-o"></span> ENERO</span>';
-            item.segundoMes = '<span class="label label-info"><span class="fa fa-square-o"></span> FEBRERO</span>';
-            item.tercerMes = '<span class="label label-info"><span class="fa fa-square-o"></span> MARZO</span>';
+            item.primerMes = '<span class="label label-default"><span class="fa fa-lock"></span></span>';
+            item.segundoMes = '<span class="label label-default"><span class="fa fa-lock"></span></span>';
+            item.tercerMes = '<span class="label label-default"><span class="fa fa-lock"></span></span>';
             
-            item.estatus = '<span class="label label-info"><span class="fa fa-square-o"></span> Trimestre</span>';
+            item.estatus = '<span class="label label-default"><span class="fa fa-square-o"></span></span>';
 
             datos_grid.push(item);
         }
@@ -95,7 +98,7 @@ function cargar_datos_proyecto(e){
                     var trimestre = Math.ceil(parseFloat(metas_mes.mes/3));
                     var ajuste = (trimestre - 1) * 3;
                     var mes_del_trimestre = metas_mes.mes - ajuste;
-                    $('#avance-trim-'+trimestre+' > tbody > tr[data-nivel="1"][data-id="'+componente.id+'"] > td[data-trim-mes="'+mes_del_trimestre+'"]').text(metas_mes.meta + ' / 0');
+                    $('#avance-trim-'+trimestre+' > tbody > tr[data-nivel="1"][data-id="'+componente.id+'"] > td[data-trim-mes="'+mes_del_trimestre+'"]').text(metas_mes.meta + ' / ' + (metas_mes.avance || 0));
                 }
                 for(var k in componente.actividades){
                     var actividad = componente.actividades[k];
@@ -104,7 +107,7 @@ function cargar_datos_proyecto(e){
                         var trimestre = Math.ceil(parseFloat(metas_mes.mes/3));
                         var ajuste = (trimestre - 1) * 3;
                         var mes_del_trimestre = metas_mes.mes - ajuste;
-                        $('#avance-trim-'+trimestre+' > tbody > tr[data-nivel="2"][data-id="'+actividad.id+'"] > td[data-trim-mes="'+mes_del_trimestre+'"]').text(metas_mes.meta + ' / 0');
+                        $('#avance-trim-'+trimestre+' > tbody > tr[data-nivel="2"][data-id="'+actividad.id+'"] > td[data-trim-mes="'+mes_del_trimestre+'"]').text(metas_mes.meta + ' / ' + (metas_mes.avance || 0));
                     }
                 }
             }
