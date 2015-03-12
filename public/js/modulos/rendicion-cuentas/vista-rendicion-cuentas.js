@@ -19,47 +19,7 @@ var accionesDatagrid = new Datagrid("#datagridAcciones",moduloResource,{ formato
 beneficiariosDatagrid.init();
 beneficiariosDatagrid.actualizar({
     _success: function(response){
-        beneficiariosDatagrid.limpiar();
-        var datos_grid = {};
-
-        for(var i in response.data){
-            var beneficiario = response.data[i];
-
-            if(!datos_grid[beneficiario.idTipoBeneficiario]){
-                datos_grid[beneficiario.idTipoBeneficiario] = {
-                    'id': beneficiario.idTipoBeneficiario,
-                    'tipoBeneficiario': beneficiario.tipo_beneficiario.descripcion,
-                    'f': 0,
-                    'f-avance':0,
-                    'm': 0,
-                    'm-avance':0,
-                    'total': 0,
-                    'total-avance':0
-                };
-            }
-
-            datos_grid[beneficiario.idTipoBeneficiario][beneficiario.sexo] += beneficiario.total;
-            datos_grid[beneficiario.idTipoBeneficiario]['total'] += beneficiario.total;
-        }
-        var datos = [];
-
-        for(var i in datos_grid){
-            datos_grid[i].f = datos_grid[i].f.format();
-            datos_grid[i].m = datos_grid[i].m.format();
-            datos_grid[i].total = datos_grid[i].total.format();
-            datos_grid[i]['f-avance'] = datos_grid[i]['f-avance'].format();
-            datos_grid[i]['m-avance'] = datos_grid[i]['m-avance'].format();
-            datos_grid[i]['total-avance'] = datos_grid[i]['total-avance'].format();
-
-            datos.push(datos_grid[i]);
-        }
-        
-        beneficiariosDatagrid.cargarDatos(datos);                         
-        var total = parseInt(datos.length/beneficiariosDatagrid.rxpag); 
-        var plus = parseInt(datos.length)%beneficiariosDatagrid.rxpag;
-        if(plus>0) 
-            total++;
-        beneficiariosDatagrid.paginacion(total);
+        llenar_grid_beneficiarios(response);
     }
 });
 
@@ -67,6 +27,66 @@ accionesDatagrid.init();
 accionesDatagrid.actualizar({
     _success: function(response){
         llenar_grid_acciones(response);
+    }
+});
+
+$('#btn-beneficiario-guardar').on('click',function(){
+    var parametros = $('#form_beneficiario').serialize();
+    parametros += '&guardar=avance-beneficiarios&id-proyecto='+$('#id').val();
+
+    Validation.cleanFormErrors('#form_beneficiario');
+    var hay_avance = parseInt($('#hay-avance').val());
+    if(hay_avance){
+        moduloResource.put($('#id-beneficiario').val(),parametros,{
+            _success: function(response){
+                MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
+                beneficiariosDatagrid.actualizar({
+                    _success: function(response){
+                        llenar_grid_beneficiarios(response);
+                    }
+                });
+                $('#modalBeneficiario').modal('hide');
+            },
+            _error: function(response){
+                try{
+                    var json = $.parseJSON(response.responseText);
+                    if(!json.code)
+                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                    else{
+                        MessageManager.show(json);
+                    }
+                    Validation.formValidate(json.data);
+                }catch(e){
+                    console.log(e);
+                }                       
+            }
+        });
+    }else{
+        moduloResource.post(parametros,{
+            _success: function(response){
+                MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
+                beneficiariosDatagrid.actualizar({
+                    _success: function(response){
+                        llenar_grid_beneficiarios(response);
+                    }
+                });
+                //$('#id-beneficiario').val(response.data.id);
+                $('#modalBeneficiario').modal('hide');
+            },
+            _error: function(response){
+                try{
+                    var json = $.parseJSON(response.responseText);
+                    if(!json.code)
+                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                    else{
+                        MessageManager.show(json);
+                    }
+                    Validation.formValidate(json.data);
+                }catch(e){
+                    console.log(e);
+                }                       
+            }
+        });
     }
 });
 
@@ -138,8 +158,54 @@ $('#btn-guardar-avance').on('click',function(){
 });
 
 function seguimiento_beneficiarios(e){
-    $('#modalBeneficiario').find(".modal-title").html("Seguimiento de Beneficiarios");
-    $('#modalBeneficiario').modal('show');
+    var parametros = {'mostrar':'datos-beneficiarios-avance','id-proyecto':$('#id').val()};
+    moduloResource.get(e,parametros,{
+        _success: function(response){
+            $('#form_beneficiario input.masc').attr('disabled',true);
+            $('#form_beneficiario input.fem').attr('disabled',true);
+
+            $('#modalBeneficiario').find(".modal-title").html('Seguimiento de Beneficiarios');
+            var beneficiario = response.data[0].tipo_beneficiario;
+            $('#tipo-beneficiario').text(beneficiario.descripcion);
+            $('#id-beneficiario').val(beneficiario.id);
+            var suma = 0;
+            var avances = {f:0,m:0};
+            for(var i in response.data){
+                var beneficiario = response.data[i];
+                $('#total-'+beneficiario.sexo).text(beneficiario.total.format());
+                $('#total-'+beneficiario.sexo).attr('data-valor',beneficiario.total)
+                suma += beneficiario.total;
+
+                if(beneficiario.sexo == 'f'){
+                    $('#form_beneficiario input.fem').attr('disabled',false);
+                }else{
+                    $('#form_beneficiario input.masc').attr('disabled',false);
+                }
+
+                if(beneficiario.registro_avance.length){
+                    $('#hay-avance').val(1);
+                }
+
+                for(var j in beneficiario.registro_avance){
+                    var avance = beneficiario.registro_avance[j];
+                    avances[avance.sexo] += avance.total;
+                }
+            }
+
+            for(var i in avances){
+                $('#acumulado-'+i).text(avances[i].format());
+                $('#acumulado-'+i).attr('data-valor',avances[i])
+            }
+
+            $('#acumulado-beneficiario').text((avances.f + avances.m).format());
+            $('#acumulado-beneficiario').attr('data-valor',avances.f + avances.m);
+
+            $('#total-beneficiario').text(suma.format());
+            $('#total-beneficiario').attr('data-valor',suma);
+
+            $('#modalBeneficiario').modal('show');
+        }
+    });
 }
 
 function seguimiento_metas(e){
@@ -180,11 +246,6 @@ function seguimiento_metas(e){
                     $(row + ' > td.avance-acumulado > span.vieja-cantidad').text(dato.avance);
                     $(row + ' > td.avance-acumulado').attr('data-acumulado',dato.avance);
                 }
-
-                //$('#avance_'+dato.claveJurisdiccion).attr('disabled',false);
-                /*if(dato.meta > 0){
-                    $('#avance_'+dato.claveJurisdiccion).attr('disabled',false);
-                }*/
             }
 
             for(var i in response.data.metas_mes){
@@ -192,7 +253,6 @@ function seguimiento_metas(e){
                 var row = '#tabla-avances-metas > tbody > tr[data-clave-jurisdiccion="'+dato.claveJurisdiccion+'"]';
                 
                 $('#avance_'+dato.claveJurisdiccion).attr('data-meta-programada',dato.meta);
-                //$(row + ' > td.meta-programada').text('-->' + dato.meta);
 
                 if(dato.avance != null){
                     $('#avance_'+dato.claveJurisdiccion).val(dato.avance);
@@ -203,14 +263,6 @@ function seguimiento_metas(e){
                     $(row + ' > td.avance-acumulado').attr('data-acumulado',(avance_jurisdiccion - dato.avance));
                     $('#avance_'+dato.claveJurisdiccion).change();
                 }
-
-                //$('#avance_'+dato.claveJurisdiccion).attr('disabled',false);
-
-                //var avance_metas = $(row + ' > td.avance-acumulado').attr('data-acumulado');
-                //var total_metas = $(row +' > td.meta-programada').attr('data-meta');
-                //var viejo_porcentaje = ((avance_metas * 100) / total_metas).toFixed(2);
-                //$(row + ' > td.porcentaje-acumulado').attr('data-porcentaje',viejo_porcentaje);
-                //$(row + ' > td.porcentaje-acumulado > span.vieja-cantidad').text(parseFloat(viejo_porcentaje)+'% ');
             }
 
             if(response.data.registro_avance.length){
@@ -255,7 +307,7 @@ $('.avance-mes').on('change',function(){
             var avance_mes = parseFloat(((acumulado  / total_programado ) * 100).toFixed(2)) || 0;
 
             if(avance_mes > 110){
-                $(row +' > td.avance-mes').html('<small class="text-primary"><span class="fa fa-arrow-up"></span> '+avance_mes+'%</small>');
+                $(row +' > td.avance-mes').html('<small class="text-danger"><span class="fa fa-arrow-up"></span> '+avance_mes+'%</small>');
                 $(row +' > td.avance-mes').attr('data-estado-avance','1');
             }else if(avance_mes < 90){
                 $(row +' > td.avance-mes').html('<small class="text-danger"><span class="fa fa-arrow-down"></span> '+avance_mes+'%</small>');
@@ -299,6 +351,15 @@ $('.avance-mes').on('change',function(){
         //$('#tab-link-justificacion').attr('data-toggle','');
         //$('#tab-link-justificacion').parent().addClass('disabled');
     }
+});
+
+$('#modalBeneficiario').on('hide.bs.modal',function(e){
+    $('#modalBeneficiario .alert').remove();
+    $('#form_beneficiario').get(0).reset();
+    $('#form_beneficiario input[type="hidden"]').val('');
+    $('#form_beneficiario .cant-benficiarios').text('0');
+    $('#form_beneficiario .cant-benficiarios').attr('data-valor','0');
+    Validation.cleanFormErrors('#form_beneficiario');
 });
 
 $('#modalEditarAvance').on('hide.bs.modal',function(e){
@@ -351,7 +412,7 @@ function llenar_grid_acciones(response){
                 if(avance.mes == mes){
                     item.justificacion += '<span class="fa fa-floppy-o"></span> ';
                     item.avances_mes += avance.avanceMes;
-                    if(avance.tipoAvance){
+                    if(avance.planMejora){
                         item.justificacion += '<span class="fa fa-align-left"></span>';
                     }
                 }
@@ -379,7 +440,7 @@ function llenar_grid_acciones(response){
                     if(avance.mes == mes){
                         item.justificacion += '<span class="fa fa-floppy-o"></span> ';
                         item.avances_mes += avance.avanceMes;
-                        if(avance.tipoAvance){
+                        if(avance.planMejora){
                             item.justificacion += '<span class="fa fa-align-left"></span>';
                         }
                     }
@@ -395,6 +456,50 @@ function llenar_grid_acciones(response){
     if(plus>0) 
         total++;
     accionesDatagrid.paginacion(total);
+}
+
+function llenar_grid_beneficiarios(response){
+    beneficiariosDatagrid.limpiar();
+    var datos_grid = {};
+
+    for(var i in response.data){
+        var beneficiario = response.data[i];
+
+        if(!datos_grid[beneficiario.idTipoBeneficiario]){
+            datos_grid[beneficiario.idTipoBeneficiario] = {
+                'id': beneficiario.idTipoBeneficiario,
+                'tipoBeneficiario': beneficiario.tipo_beneficiario.descripcion,
+                'f': 0,
+                'f-avance':0,
+                'm': 0,
+                'm-avance':0,
+                'total': 0,
+                'total-avance':0
+            };
+        }
+
+        datos_grid[beneficiario.idTipoBeneficiario][beneficiario.sexo] += beneficiario.total;
+        datos_grid[beneficiario.idTipoBeneficiario]['total'] += beneficiario.total;
+    }
+    var datos = [];
+
+    for(var i in datos_grid){
+        datos_grid[i].f = datos_grid[i].f.format();
+        datos_grid[i].m = datos_grid[i].m.format();
+        datos_grid[i].total = datos_grid[i].total.format();
+        datos_grid[i]['f-avance'] = datos_grid[i]['f-avance'].format();
+        datos_grid[i]['m-avance'] = datos_grid[i]['m-avance'].format();
+        datos_grid[i]['total-avance'] = datos_grid[i]['total-avance'].format();
+
+        datos.push(datos_grid[i]);
+    }
+    
+    beneficiariosDatagrid.cargarDatos(datos);                         
+    var total = parseInt(datos.length/beneficiariosDatagrid.rxpag); 
+    var plus = parseInt(datos.length)%beneficiariosDatagrid.rxpag;
+    if(plus>0) 
+        total++;
+    beneficiariosDatagrid.paginacion(total);
 }
 
 /*             Extras               */

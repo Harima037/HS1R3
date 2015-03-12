@@ -16,7 +16,7 @@
 @section('content')
 <div class="row">
     <div class="col-md-12">
-        <div class="panel panel-default datagrid" id="datagridProyectos" data-edit-row="cargar_datos_proyecto">
+        <div class="panel panel-default datagrid" id="datagridProyectos" data-edit-row="cargar_datos_proyecto" data-trim-activo="{{$trimestre_avance}}" data-mes-activo="{{$mes_avance}}">
             <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> {{ $sys_mod_activo->nombre }}</h4></div>
             <div class="panel-body">
                 <div class="row">
@@ -41,16 +41,17 @@
                     </div>
                 </div>
             </div>
-            <table class="table table-striped table-hover" data-mes-activo="{{$mes_avance}}" data-trim-activo="{{$trimestre_avance}}">
+            <table class="table table-striped table-hover">
                 <thead>
                     <tr>
                         <th><input type="checkbox" class="check-select-all-rows"></th>
                         <th>Clave</th>
                         <th>Nombre Técnico</th>
-                        <th width="90">{{$meses[$trimestre_avance][0]['mes']}}</th>
-                        <th width="90">{{$meses[$trimestre_avance][1]['mes']}}</th>
-                        <th width="90">{{$meses[$trimestre_avance][2]['mes']}}</th>
-                        <th width="100">Trimestre</th>
+                        @foreach ($meses as $mes)
+                            <th width="35">{{$mes[0]['abrev']}}</th>
+                            <th width="35">{{$mes[1]['abrev']}}</th>
+                            <th width="35">{{$mes[2]['abrev']}}</th>
+                        @endforeach
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -91,45 +92,89 @@
                     <h4 class="modal-title" id="modalLabel">Nuevo</h4>
                 </div>
                 <div class="modal-body">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Nombre Técnico</label>
+                                        <p class="form-control-static" id="nombre-tecnico"></p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Programa Presupuestario</label>
+                                        <p class="form-control-static" id="programa-presupuestario"></p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label class="control-label">Función</label>
+                                        <p class="form-control-static" id="funcion"></p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="form-group">
+                                        <label class="control-label">Subfunción</label>
+                                        <p class="form-control-static" id="subfuncion"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div role="tabpanel">
-                        <!-- Nav tabs -->
                         <ul class="nav nav-tabs" role="tablist">
-                            @for($i = 1 ; $i <= 4 ; $i++)
-                            <li role="presentation" class="{{($i == 1)?'active':''}}">
-                                <a href="#trim{{$i}}" aria-controls="trim{{$i}}" role="tab" data-toggle="tab">
-                                    <span class="fa fa-calendar"></span> Trim {{$i}}
+                            <li role="presentation" class="active">
+                                <a href="#panel-metas" aria-controls="panel-metas" role="tab" data-toggle="tab">
+                                    <span class="fa fa-table"></span> Seguimiento de Metas
                                 </a>
                             </li>
-                            @endfor
                         </ul>
-                        <!-- Tab panes -->
                         <div class="tab-content">
-                            @for($i = 1 ; $i <= 4 ; $i++)
-                            <div role="tabpanel" class="tab-pane {{($i == 1)?'active':''}}" id="trim{{$i}}">
-                                <table id="avance-trim-{{$i}}" class="table table-condensed table-stripped tabla-avance-trim">
-                                    <thead>
-                                        <tr>
-                                            <th>Nivel</th>
-                                            <th>Indicador</th>
-                                            <th>{{$meses[$i][0]['mes']}}</th>
-                                            <th>{{$meses[$i][1]['mes']}}</th>
-                                            <th>{{$meses[$i][2]['mes']}}</th>
-                                            <th>Totales</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                    <tfoot>
-                                        <tr class="bg-success">
-                                            <th colspan="2">Totales</th>
-                                            <th id="total-trim-{{$i}}-mes-{{$meses[$i][0]['clave']}}">0</th>
-                                            <th id="total-trim-{{$i}}-mes-{{$meses[$i][1]['clave']}}">0</th>
-                                            <th id="total-trim-{{$i}}-mes-{{$meses[$i][2]['clave']}}">0</th>
-                                            <th id="total-trim-{{$i}}">0</th>
-                                        </tr>
-                                    </tfoot>
-                                </table>
+                            <div role="tabpanel" class="active" id="panel-metas">
+                                <div role="tabpanel">
+                                    <!-- Nav tabs -->
+                                    <ul class="nav nav-pills" role="tablist">
+                                        @for($i = 1 ; $i <= 4 ; $i++)
+                                        <li role="presentation" class="{{($i == 1)?'active':''}}">
+                                            <a href="#trim{{$i}}" aria-controls="trim{{$i}}" role="tab" data-toggle="tab">
+                                                <span class="fa fa-calendar"></span> Trim {{$i}}
+                                            </a>
+                                        </li>
+                                        @endfor
+                                    </ul>
+                                    <!-- Tab panes -->
+                                    <div class="tab-content">
+                                        @for($i = 1 ; $i <= 4 ; $i++)
+                                        <div role="tabpanel" class="tab-pane {{($i == 1)?'active':''}}" id="trim{{$i}}">
+                                            <table id="avance-trim-{{$i}}" class="table table-hover table-condensed table-stripped tabla-avance-trim">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Nivel</th>
+                                                        <th>Indicador</th>
+                                                        <th>{{$meses[$i][0]['mes']}}</th>
+                                                        <th>{{$meses[$i][1]['mes']}}</th>
+                                                        <th>{{$meses[$i][2]['mes']}}</th>
+                                                        <th>Totales</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                                <tfoot>
+                                                    <tr class="bg-success">
+                                                        <th colspan="2">Totales</th>
+                                                        <th id="total-mes-{{$meses[$i][0]['clave']}}">0</th>
+                                                        <th id="total-mes-{{$meses[$i][1]['clave']}}">0</th>
+                                                        <th id="total-mes-{{$meses[$i][2]['clave']}}">0</th>
+                                                        <th id="total-trim-{{$i}}">0</th>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                        @endfor
+                                    </div>
+                                </div>
                             </div>
-                            @endfor
                         </div>
                     </div>
                 </div>

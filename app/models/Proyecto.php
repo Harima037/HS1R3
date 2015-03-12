@@ -56,6 +56,10 @@ class Proyecto extends BaseModel
 			'objetivoPed','estatusProyecto','jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico');
 	}
 
+	public function registroAvance(){
+    	return $this->hasMany('RegistroAvanceMetas','idProyecto');
+    }
+
 	public function jefeInmediato(){
 		return $this->belongsTo('Titular','idJefeInmediato')->withTrashed();
 	}

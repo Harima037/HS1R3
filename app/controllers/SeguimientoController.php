@@ -11,24 +11,24 @@ class SeguimientoController extends BaseController {
 		$datos = array(
 			'meses' => array(
 					'1' => array(
-							array('mes'=>'Enero',		'clave'=>1),
-							array('mes'=>'Febrero',		'clave'=>2),
-							array('mes'=>'Marzo',		'clave'=>3)
+							array('clave'=>1,	'mes'=>'Enero',			'abrev'=>'E'),
+							array('clave'=>2,	'mes'=>'Febrero',		'abrev'=>'F'),
+							array('clave'=>3,	'mes'=>'Marzo',			'abrev'=>'M')
 						),
 					'2' => array(
-							array('mes'=>'Abril',		'clave'=>4),
-							array('mes'=>'Mayo',		'clave'=>5),
-							array('mes'=>'Junio',		'clave'=>6)
+							array('clave'=>4,	'mes'=>'Abril',			'abrev'=>'A'),
+							array('clave'=>5,	'mes'=>'Mayo',			'abrev'=>'M'),
+							array('clave'=>6,	'mes'=>'Junio',			'abrev'=>'J')
 						),
 					'3' => array(
-							array('mes'=>'Julio',		'clave'=>7),
-							array('mes'=>'Agosto',		'clave'=>8),
-							array('mes'=>'Septiembre',	'clave'=>9)
+							array('clave'=>7,	'mes'=>'Julio',			'abrev'=>'J'),
+							array('clave'=>8,	'mes'=>'Agosto',		'abrev'=>'A'),
+							array('clave'=>9,	'mes'=>'Septiembre',	'abrev'=>'S')
 						),
 					'4' => array(
-							array('mes'=>'Octubre',		'clave'=>10),
-							array('mes'=>'Noviembre',	'clave'=>11),
-							array('mes'=>'Dicembre',	'clave'=>12)
+							array('clave'=>10,	'mes'=>'Octubre',		'abrev'=>'O'),
+							array('clave'=>11,	'mes'=>'Noviembre',		'abrev'=>'N'),
+							array('clave'=>12,	'mes'=>'Dicembre',		'abrev'=>'D')
 						)
 				)
 		);

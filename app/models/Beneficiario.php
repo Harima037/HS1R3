@@ -10,4 +10,8 @@ class Beneficiario extends BaseModel
 	public function tipoBeneficiario(){
 		return $this->belongsTo('TipoBeneficiario','idTipoBeneficiario');
 	}
+
+	public function registroAvance(){
+    	return $this->hasMany('RegistroAvanceBeneficiario','idProyectoBeneficiario');
+    }
 }

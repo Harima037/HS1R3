@@ -23,26 +23,34 @@ moduloDatagrid.actualizar({
         for(var i in response.data){
             var item = {};
 
-            /*var clase_label = 'label-default';
-            var clase_icon = 'fa-lock';
-            if(response.data[i].mes == 2){
-                clase_label = 'label-warning';
-            }else if(response.data[i].idEstatusProyecto == 3){
-                clase_label = 'label-danger';
-            }else if(response.data[i].idEstatusProyecto == 4){
-                clase_label = 'label-primary';
-            }*/
+            var mes_activo = $('#datagridProyectos').attr('data-mes-activo'); 
+            var trimestre = $('#datagridProyectos').attr('data-trim-activo');
+            var mes_inicia = ((trimestre - 1) * 3) + 1;
+            var meses = [1,2,3,4,5,6,7,8,9,10,11,12];
+
 
             item.id = response.data[i].id;
             item.clave = response.data[i].clavePresup;
             item.nombre_tecnico = response.data[i].nombreTecnico;
 
-            item.primerMes = '<span class="label label-default"><span class="fa fa-lock"></span></span>';
-            item.segundoMes = '<span class="label label-default"><span class="fa fa-lock"></span></span>';
-            item.tercerMes = '<span class="label label-default"><span class="fa fa-lock"></span></span>';
-            
-            item.estatus = '<span class="label label-default"><span class="fa fa-square-o"></span></span>';
+            for(var j in meses){
+                if(meses[j] == mes_activo){
+                    item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class=""><span class="fa fa-unlock"></span></span>';
+                }else if(meses[j] < mes_activo){
+                    item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class="text-muted"><span class="fa fa-times"></span></span>';
+                }else{
+                    item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class=""><span class="fa fa-lock"></span></span>';
+                }
+            }
 
+            for(var j in response.data[i].registro_avance){
+                var avance = response.data[i].registro_avance[j];
+                if(parseInt(avance.planMejora) > 0){
+                    item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class="text-danger"><span class="fa fa-circle"></span></span>';
+                }else{
+                    item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class="text-success"><span class="fa fa-circle"></span></span>';
+                }
+            }
             datos_grid.push(item);
         }
         moduloDatagrid.cargarDatos(datos_grid);                         
@@ -58,8 +66,12 @@ function cargar_datos_proyecto(e){
     var parametros = {'mostrar':'datos-proyecto-avance'};
     moduloResource.get(e,parametros,{
         _success: function(response){
-            $('#modalDatosSeguimiento').find(".modal-title").html("Avance del Proyecto Institucional");
+            $('#modalDatosSeguimiento').find(".modal-title").html('Clave: <small>' + response.data.ClavePresupuestaria + '</small>');
 
+            $('#nombre-tecnico').text(response.data.nombreTecnico);
+            $('#programa-presupuestario').text(response.data.datos_programa_presupuestario.clave + ' ' + response.data.datos_programa_presupuestario.descripcion);
+            $('#funcion').text(response.data.datos_funcion.clave + ' ' + response.data.datos_funcion.descripcion);
+            $('#subfuncion').text(response.data.datos_sub_funcion.clave + ' ' + response.data.datos_sub_funcion.descripcion);
             var html_tbody = '';
             var contador_componente = 0;
             var contador_actividad = 0;
@@ -67,23 +79,23 @@ function cargar_datos_proyecto(e){
                 contador_componente++;
                 contador_actividad = 0;
                 var componente = response.data.componentes[i];
-                html_tbody += '<tr class="bg-primary" data-nivel="1" data-id="'+componente.id+'">';
-                html_tbody += '<td>Componente '+contador_componente+'</td>'
+                html_tbody += '<tr data-nivel="1" data-id="'+componente.id+'">';
+                html_tbody += '<td>C '+contador_componente+'</td>'
                 html_tbody += '<td>'+componente.indicador+'</td>'
-                html_tbody += '<td data-trim-mes="1">0/0</td>';
-                html_tbody += '<td data-trim-mes="2">0/0</td>';
-                html_tbody += '<td data-trim-mes="3">0/0</td>';
+                html_tbody += '<td data-trim-mes="1">-</td>';
+                html_tbody += '<td data-trim-mes="2">-</td>';
+                html_tbody += '<td data-trim-mes="3">-</td>';
                 html_tbody += '<td data-total-id="'+componente.id+'">0</td>';
                 html_tbody += '</tr>';
                 for(var j in componente.actividades){
                     contador_actividad++;
                     var actividad = componente.actividades[j];
-                    html_tbody += '<tr class="bg-info" data-nivel="2" data-id="'+actividad.id+'">';
-                    html_tbody += '<td>Actividad '+contador_componente+'.'+contador_actividad+'</td>'
-                    html_tbody += '<td>'+componente.indicador+'</td>'
-                    html_tbody += '<td data-trim-mes="1">0/0</td>';
-                    html_tbody += '<td data-trim-mes="2">0/0</td>';
-                    html_tbody += '<td data-trim-mes="3">0/0</td>';
+                    html_tbody += '<tr data-nivel="2" data-id="'+actividad.id+'">';
+                    html_tbody += '<td>A '+contador_componente+'.'+contador_actividad+'</td>'
+                    html_tbody += '<td>'+actividad.indicador+'</td>'
+                    html_tbody += '<td data-trim-mes="1">-</td>';
+                    html_tbody += '<td data-trim-mes="2">-</td>';
+                    html_tbody += '<td data-trim-mes="3">-</td>';
                     html_tbody += '<td data-total-id="'+actividad.id+'">0</td>';
                     html_tbody += '</tr>';
                 }
@@ -91,25 +103,62 @@ function cargar_datos_proyecto(e){
             $('.tabla-avance-trim > tbody').empty();
             $('.tabla-avance-trim > tbody').append(html_tbody);
 
+            var total_trimestres = {1:{},2:{},3:{},4:{}};
             for(var i in response.data.componentes){
                 var componente = response.data.componentes[i];
-                for(var j in componente.metas_mes_agrupado){
-                    var metas_mes = componente.metas_mes_agrupado[j];
-                    var trimestre = Math.ceil(parseFloat(metas_mes.mes/3));
+                var sumatoria_componente = {1:0,2:0,3:0,4:0};
+                //var sumatorias_trimestres = ;
+                for(var j in componente.registro_avance){
+                    var avance = componente.registro_avance[j];
+                    var trimestre = Math.ceil(parseFloat(avance.mes/3));
                     var ajuste = (trimestre - 1) * 3;
-                    var mes_del_trimestre = metas_mes.mes - ajuste;
-                    $('#avance-trim-'+trimestre+' > tbody > tr[data-nivel="1"][data-id="'+componente.id+'"] > td[data-trim-mes="'+mes_del_trimestre+'"]').text(metas_mes.meta + ' / ' + (metas_mes.avance || 0));
+                    var mes_del_trimestre = avance.mes - ajuste;
+                    if(avance.planMejora){
+                        var colo_texto = 'text-danger';
+                    }else{
+                        var colo_texto = 'text-primary';
+                    }
+                    var celda = '<span class="'+colo_texto+'">'+avance.avanceMes+'</span>';
+                    $('#avance-trim-'+trimestre+' > tbody > tr[data-nivel="1"][data-id="'+componente.id+'"] > td[data-trim-mes="'+mes_del_trimestre+'"]').html(celda);
+                    sumatoria_componente[trimestre] += avance.avanceMes;
+                    total_trimestres[trimestre][avance.mes] = (parseFloat(total_trimestres[trimestre][avance.mes]) || 0) + avance.avanceMes;
+                }
+                for(var j in sumatoria_componente){
+                    $('#avance-trim-'+j+' > tbody > tr[data-nivel="1"][data-id="'+componente.id+'"] > td[data-total-id="'+componente.id+'"]').html(sumatoria_componente[j]);
                 }
                 for(var k in componente.actividades){
                     var actividad = componente.actividades[k];
-                    for(var j in actividad.metas_mes_agrupado){
-                        var metas_mes = actividad.metas_mes_agrupado[j];
-                        var trimestre = Math.ceil(parseFloat(metas_mes.mes/3));
+                    var sumatoria_actividad = {1:0,2:0,3:0,4:0};
+                    for(var j in actividad.registro_avance){
+                        var avance = actividad.registro_avance[j];
+                        var trimestre = Math.ceil(parseFloat(avance.mes/3));
                         var ajuste = (trimestre - 1) * 3;
-                        var mes_del_trimestre = metas_mes.mes - ajuste;
-                        $('#avance-trim-'+trimestre+' > tbody > tr[data-nivel="2"][data-id="'+actividad.id+'"] > td[data-trim-mes="'+mes_del_trimestre+'"]').text(metas_mes.meta + ' / ' + (metas_mes.avance || 0));
+                        var mes_del_trimestre = avance.mes - ajuste;
+                        if(avance.planMejora){
+                            var colo_texto = 'text-danger';
+                        }else{
+                            var colo_texto = 'text-primary';
+                        }
+                        var celda = '<span class="'+colo_texto+'">'+avance.avanceMes+'</span>';
+                        $('#avance-trim-'+trimestre+' > tbody > tr[data-nivel="2"][data-id="'+actividad.id+'"] > td[data-trim-mes="'+mes_del_trimestre+'"]').html(celda);
+                        sumatoria_actividad[trimestre] += avance.avanceMes;
+                        total_trimestres[trimestre][avance.mes] = (parseFloat(total_trimestres[trimestre][avance.mes]) || 0) + avance.avanceMes;
+                    }
+                    for(var j in sumatoria_actividad){
+                        $('#avance-trim-'+j+' > tbody > tr[data-nivel="2"][data-id="'+actividad.id+'"] > td[data-total-id="'+actividad.id+'"]').html(sumatoria_actividad[j]);
                     }
                 }
+            }
+
+            for(var i in total_trimestres){
+                // i = trimestre
+                var meses = total_trimestres[i];
+                var suma = 0;
+                for(var j in meses){
+                    $('#total-mes-'+j).text(meses[j]);
+                    suma += meses[j];
+                }
+                $('#total-trim-'+i).text(suma);
             }
 
             $('#btn-editar-avance').attr('data-id-proyecto',e);

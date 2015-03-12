@@ -5,9 +5,34 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
-use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes;
+use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario;
 
 class SeguimientoController extends BaseController {
+	private $reglasBeneficiarios = array(
+		'id-beneficiario'			=> 'required',
+		'altaf' 					=> 'required|integer|min:0',
+		'altam' 					=> 'required|integer|min:0',
+		'bajaf' 					=> 'required|integer|min:0',
+		'bajam' 					=> 'required|integer|min:0',
+		'indigenaf'					=> 'required|integer|min:0',
+		'indigenam'					=> 'required|integer|min:0',
+		'inmigrantef' 				=> 'required|integer|min:0',
+		'inmigrantem' 				=> 'required|integer|min:0',
+		'mediaf' 					=> 'required|integer|min:0',
+		'mediam' 					=> 'required|integer|min:0',
+		'mestizaf' 					=> 'required|integer|min:0',
+		'mestizam'					=> 'required|integer|min:0',
+		'muyaltaf' 					=> 'required|integer|min:0',
+		'muyaltam' 					=> 'required|integer|min:0',
+		'muybajaf' 					=> 'required|integer|min:0',
+		'muybajam' 					=> 'required|integer|min:0',
+		'otrosf' 					=> 'required|integer|min:0',
+		'otrosm' 					=> 'required|integer|min:0',
+		'ruralf' 					=> 'required|integer|min:0',
+		'ruralm' 					=> 'required|integer|min:0',
+		'urbanaf' 					=> 'required|integer|min:0',
+		'urbanam' 					=> 'required|integer|min:0'
+	);
 
 	/**
 	 * Display a listing of the resource.
@@ -37,8 +62,10 @@ class SeguimientoController extends BaseController {
 							->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto'])
 							->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
 							//->where('idClasificacionProyecto','=',$)
-							
-				
+				//$rows = $rows->with('registroAvance');
+				$rows = $rows->with(array('registroAvance'=>function($query){
+					$query->select('id','idProyecto','mes',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'),DB::raw('count(idNivel) as registros'))->groupBy('idProyecto','mes');
+				}));
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				
 				if(isset($parametros['buscar'])){				
@@ -95,7 +122,8 @@ class SeguimientoController extends BaseController {
 
 		if(isset($parametros['mostrar'])){
 			if($parametros['mostrar'] == 'datos-proyecto-avance'){
-				$recurso = Proyecto::with('componentes.metasMesAgrupado','componentes.actividades.metasMesAgrupado')->find($id);
+				$recurso = Proyecto::with('datosFuncion','datosSubFuncion','datosProgramaPresupuestario','componentes.metasMesAgrupado'
+					,'componentes.registroAvance','componentes.actividades.metasMesAgrupado','componentes.actividades.registroAvance')->find($id);
 			}elseif($parametros['mostrar'] == 'datos-componente-avance'){
 				$mes_actual = Util::obtenerMesActual();
 				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
@@ -116,6 +144,11 @@ class SeguimientoController extends BaseController {
 				},'metasMes' => function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
 				}))->find($id);
+			}elseif($parametros['mostrar'] == 'datos-beneficiarios-avance'){
+				$mes_actual = Util::obtenerMesActual();
+				$recurso = Beneficiario::with(array('tipoBeneficiario','registroAvance'=>function($query) use ($mes_actual){
+					$query->where('mes','<=',$mes_actual);
+				}))->where('idProyecto','=',$parametros['id-proyecto'])->where('idTipoBeneficiario','=',$id)->get();
 			}
 		}
 
@@ -147,6 +180,8 @@ class SeguimientoController extends BaseController {
 				if($respuesta['http_status'] != 200){
 					throw new Exception("Error al procesar los datos", 1);
 				}
+			}elseif($parametros['guardar'] == 'avance-beneficiarios'){
+				$respuesta = $this->guardarAvanceBeneficiario($parametros);
 			}
 		}catch(\Exception $ex){
 			$respuesta['http_status'] = 500;	
@@ -204,6 +239,56 @@ class SeguimientoController extends BaseController {
 		return Response::json($respuesta['data'],$respuesta['http_status']);
 	}
 
+	public function guardarAvanceBeneficiario($parametros, $es_editar = FALSE){
+		$respuesta['http_status'] = 200;
+		$respuesta['data'] = array("data"=>'');
+
+		$validacion = Validador::validar(Input::all(), $this->reglasBeneficiarios);
+
+		if($validacion === TRUE){
+			$mes_actual = Util::obtenerMesActual();
+			$recurso = Beneficiario::with(array('registroAvance'=>function($query) use ($mes_actual){
+							$query->where('mes','=',$mes_actual);
+						}))->where('idProyecto','=',$parametros['id-proyecto'])
+						->where('idTipoBeneficiario','=',$parametros['id-beneficiario'])
+						->get();
+			//
+			$respuesta['data'] = DB::transaction(function() use ($recurso,$es_editar,$mes_actual,$parametros){
+				foreach ($recurso as $beneficiario) {
+					$sexo = $beneficiario->sexo;
+					if($es_editar){
+						$avance = $beneficiario->registroAvance[0];
+					}else{
+						$avance = new RegistroAvanceBeneficiario;
+					}
+					$avance->idProyecto 		= $beneficiario->idProyecto;
+					$avance->idTipoBeneficiario	= $beneficiario->idTipoBeneficiario;
+					$avance->sexo 				= $sexo;
+					$avance->mes 				= $mes_actual;
+					$avance->total 				= $parametros['urbana'.$sexo] + $parametros['rural'.$sexo];
+					$avance->urbana 			= $parametros['urbana'.$sexo];
+					$avance->rural 				= $parametros['rural'.$sexo];
+					$avance->mestiza 			= $parametros['mestiza'.$sexo];
+					$avance->indigena 			= $parametros['indigena'.$sexo];
+					$avance->inmigrante 		= $parametros['inmigrante'.$sexo];
+					$avance->otros 				= $parametros['otros'.$sexo];
+					$avance->muyAlta 			= $parametros['muyalta'.$sexo];
+					$avance->alta 				= $parametros['alta'.$sexo];
+					$avance->media 				= $parametros['media'.$sexo];
+					$avance->baja 				= $parametros['baja'.$sexo];
+					$avance->muyBaja 			= $parametros['muybaja'.$sexo];
+
+					$beneficiario->registroAvance()->save($avance);
+				}
+			});
+		}else{
+			$respuesta['http_status'] = $validacion['http_status'];
+			$respuesta['data'] = $validacion['data'];
+		}
+
+		return $respuesta;
+	}
+
 	public function guardarAvance($parametros,$id = NULL){
 		$respuesta['http_status'] = 200;
 		$respuesta['data'] = array("data"=>'');
@@ -235,6 +320,7 @@ class SeguimientoController extends BaseController {
 			$registro_avance->nivel = 2;
 		}
 
+		$registro_avance->idProyecto = $accion_metas->idProyecto;
 		$registro_avance->idNivel = $parametros['id-accion'];
 		$registro_avance->mes = $mes_actual;
 
@@ -243,7 +329,7 @@ class SeguimientoController extends BaseController {
 		
 		$metas_acumuladas = $accion_metas->metasMesJurisdiccion->lists('meta','claveJurisdiccion');
 		$avances_acumulados = $accion_metas->metasMesJurisdiccion->lists('avance','claveJurisdiccion');
-
+		
 		$guardar_metas = array();
 		$total_avance = 0;
 		foreach ($accion_metas->metasMes as $metas) {
@@ -252,7 +338,8 @@ class SeguimientoController extends BaseController {
 			}else{
 				$meta_acumulada = $metas_acumuladas[$metas->claveJurisdiccion];
 				$avance_acumulado = $avances_acumulados[$metas->claveJurisdiccion];
-				if($es_editar){
+
+				if($metas->avance){
 					$avance_acumulado -= $metas->avance;
 				}
 				$avance_acumulado += $parametros['avance'][$metas->claveJurisdiccion];
@@ -308,10 +395,10 @@ class SeguimientoController extends BaseController {
 			}else{
 				$registro_avance->justificacionAcumulada = $parametros['justificacion-acumulada'];
 			}
-			$registro_avance->tipoAvance = 1;
+			$registro_avance->planMejora = 1;
 		}else{
 			$registro_avance->justificacionAcumulada = 'El avance se encuentra dentro de los parametros establecidos';
-			$registro_avance->tipoAvance = 0;
+			$registro_avance->planMejora = 0;
 		}
 
 		if(count($faltan_campos)){
