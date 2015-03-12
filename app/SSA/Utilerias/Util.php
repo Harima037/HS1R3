@@ -3,6 +3,9 @@ namespace SSA\Utilerias;
 
 class Util 
 {
+	public static function obtenerMesActual(){
+		return date("n");
+	}
 	public static function transformarFecha($fecha)
 	{
 		$fecha= explode("-",$fecha);

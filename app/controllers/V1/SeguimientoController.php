@@ -3,8 +3,9 @@
 namespace V1;
 
 use SSA\Utilerias\Validador;
+use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
-use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas;
+use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes;
 
 class SeguimientoController extends BaseController {
 
@@ -96,7 +97,7 @@ class SeguimientoController extends BaseController {
 			if($parametros['mostrar'] == 'datos-proyecto-avance'){
 				$recurso = Proyecto::with('componentes.metasMesAgrupado','componentes.actividades.metasMesAgrupado')->find($id);
 			}elseif($parametros['mostrar'] == 'datos-componente-avance'){
-				$mes_actual = date("n");
+				$mes_actual = Util::obtenerMesActual();
 				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
 				$recurso = Componente::with(array('metasMesJurisdiccion'=>function($query) use ($mes_actual){
 					$query->where('mes','<=',$mes_actual);
@@ -106,7 +107,7 @@ class SeguimientoController extends BaseController {
 					$query->where('mes','=',$mes_actual);
 				}))->find($id);
 			}elseif($parametros['mostrar'] == 'datos-actividad-avance'){
-				$mes_actual = date("n");
+				$mes_actual = Util::obtenerMesActual();
 				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
 				$recurso = Actividad::with(array('metasMesJurisdiccion'=>function($query) use ($mes_actual){
 					$query->where('mes','<=',$mes_actual);
@@ -208,7 +209,7 @@ class SeguimientoController extends BaseController {
 		$respuesta['data'] = array("data"=>'');
 		$es_editar = FALSE;
 
-		$mes_actual = date("n");
+		$mes_actual = Util::obtenerMesActual();
 
 		if($id){
 			$registro_avance = RegistroAvanceMetas::find($id);
@@ -256,10 +257,15 @@ class SeguimientoController extends BaseController {
 				}
 				$avance_acumulado += $parametros['avance'][$metas->claveJurisdiccion];
 
-				$porcentaje_avance = (( $avance_acumulado  / $meta_acumulada ) * 100);
-				if($porcentaje_avance < 90 || $porcentaje_avance > 110){
+				if($meta_acumulada > 0){
+					$porcentaje_avance = (( $avance_acumulado  / $meta_acumulada ) * 100);
+					if($porcentaje_avance < 90 || $porcentaje_avance > 110){
+						$conteo_alto_bajo_avance++;
+					}
+				}else{
 					$conteo_alto_bajo_avance++;
 				}
+				
 
 				$total_avance += $parametros['avance'][$metas->claveJurisdiccion];
 				$metas->avance = $parametros['avance'][$metas->claveJurisdiccion];
@@ -267,20 +273,45 @@ class SeguimientoController extends BaseController {
 			}
 		}
 
-		if($conteo_alto_bajo_avance){
-			if(trim($parametros['analisis-resultados']) == ''){
-				$faltan_campos[] = json_encode(array('field'=>'analisis-resultados','error'=>'Este campo es requerido.'));
-			}else{
-				$registro_avance->analisisResultados = $parametros['analisis-resultados'];
+		//Si las metas capturadas no fueron puestas en la programación entonces ahi que agregarlas ya que no estan en la tabla
+		$jurisdicciones_capturadas = $accion_metas->metasMes->lists('claveJurisdiccion');
+		$jurisdicciones_formulario = array_keys($parametros['avance']);
+		$metas_nuevas = array_diff($jurisdicciones_formulario, $jurisdicciones_capturadas);
+		foreach ($metas_nuevas as $jurisdiccion) {
+			if($parametros['avance'][$jurisdiccion] > 0){
+				if($parametros['nivel'] == 'componente'){
+					$meta = new ComponenteMetaMes;
+					//$meta->idComponente = $parametros['id-accion'];
+				}else{
+					$meta = new ActividadMetaMes;
+					//$meta->idActividad = $parametros['id-accion'];
+				}
+				$meta->claveJurisdiccion = $jurisdiccion;
+				$meta->mes = $mes_actual;
+				$meta->meta = 0;
+				$meta->avance = $parametros['avance'][$jurisdiccion];
+				$meta->idProyecto = $accion_metas->idProyecto;
+				$guardar_metas[] = $meta;
+				$conteo_alto_bajo_avance++;
 			}
+		}
+		
+		if(trim($parametros['analisis-resultados']) == ''){
+			$faltan_campos[] = json_encode(array('field'=>'analisis-resultados','error'=>'Este campo es requerido.'));
+		}else{
+			$registro_avance->analisisResultados = $parametros['analisis-resultados'];
+		}
+
+		if($conteo_alto_bajo_avance){
 			if(trim($parametros['justificacion-acumulada']) == ''){
 				$faltan_campos[] = json_encode(array('field'=>'justificacion-acumulada','error'=>'Este campo es requerido.'));
 			}else{
 				$registro_avance->justificacionAcumulada = $parametros['justificacion-acumulada'];
 			}
+			$registro_avance->tipoAvance = 1;
 		}else{
-			$registro_avance->analisisResultados = NULL;
-			$registro_avance->justificacionAcumulada = NULL;
+			$registro_avance->justificacionAcumulada = 'El avance se encuentra dentro de los parametros establecidos';
+			$registro_avance->tipoAvance = 0;
 		}
 
 		if(count($faltan_campos)){

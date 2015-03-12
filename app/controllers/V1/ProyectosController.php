@@ -394,7 +394,8 @@ class ProyectosController extends BaseController {
 					}
 					$actividad->lineaBase 				= ($parametros['linea-base-actividad'])?$parametros['linea-base-actividad']:NULL;
 					$actividad->anioBase 				= ($parametros['anio-base-actividad'])?$parametros['anio-base-actividad']:NULL;
-					
+					$actividad->idProyecto 				= $componente->idProyecto;
+
 					$respuesta['data'] = DB::transaction(function() use ($parametros, $componente, $actividad){
 						if($componente->actividades()->save($actividad)){
 							$actividad->load('usuario');
@@ -1439,6 +1440,10 @@ class ProyectosController extends BaseController {
 					$recurso->idEntregableTipo	= $parametros['tipo-entregable'] ;
 				}
 				$recurso->idEntregableAccion	= $parametros['accion-entregable'];
+			}
+
+			if($selector == 'actividad'){
+				$recurso->idProyecto = $componente->idProyecto;
 			}
 
 			$respuesta['data'] = DB::transaction(function() use ($parametros, $proyecto, $componente, $recurso, $selector, $es_editar){

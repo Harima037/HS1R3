@@ -1,4 +1,5 @@
 <?php
+use SSA\Utilerias\Util;
 
 class SeguimientoController extends BaseController {
 	/**
@@ -31,7 +32,7 @@ class SeguimientoController extends BaseController {
 						)
 				)
 		);
-		$mes_actual = date("n");
+		$mes_actual = Util::obtenerMesActual();
 		$trimestre_actual = ceil(($mes_actual/3));
 		$datos['mes_avance'] = $mes_actual;
 		$datos['trimestre_avance'] = $trimestre_actual;
@@ -50,6 +51,11 @@ class SeguimientoController extends BaseController {
 		}elseif($proyecto->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
 			$jurisdicciones = Region::obtenerJurisdicciones($proyecto->claveRegion)->get();
 		}
+		$meses = array(1=>'Enero',2=>'Febrero',3=>'Marzo',4=>'Abril',5=>'Mayo',6=>'Junio',
+						7=>'Julio',8=>'Agosto',9=>'Septiembre',10=>'Octubre',11=>'Noviembre',12=>'Dicembre');
+
+		$datos['mes_clave'] = Util::obtenerMesActual();
+		$datos['mes'] = $meses[Util::obtenerMesActual()];
 		$datos['jurisdicciones'] = $jurisdicciones;
 		$datos['id'] = $id;
 		$datos['sys_sistemas'] = SysGrupoModulo::all();

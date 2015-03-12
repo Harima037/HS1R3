@@ -13,7 +13,10 @@
 @stop
 
 @section('content')
-
+<div class="panel panel-default">
+<div class="panel-heading">
+	<h3 class="panel-title">Rendición de cuentas del mes de {{$mes}}</h3>
+</div>
 <div class="panel-body" id="panel-rendicion-cuentas">
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" class="active">
@@ -29,23 +32,21 @@
     </ul>
     <div class="tab-content">
     	<div role="tabpanel" class="tab-pane" id="seguimiento-beneficiarios">
+    		<div class="row">
+                <div class="col-lg-6 col-md-6"></div>
+                <div class="col-lg-6">
+                    <div class="btn-toolbar pull-right" >
+                        @section('panel-botones')
+                            <div class="btn-group" style="margin:5px">
+                                <button type="button" class="btn btn-primary btn-edit-rows">
+                                    <span class="glyphicon glyphicon-plus"></span> Actualizar Seguimiento
+                                </button>
+                            </div>
+                        @show
+                    </div>
+                </div>
+            </div>
     		<div class="panel panel-default datagrid" id="datagridBeneficiarios" data-edit-row="seguimiento_beneficiarios">
-	            <div class="panel-body">
-	                <div class="row">
-	                    <div class="col-lg-6 col-md-6"></div>
-	                    <div class="col-lg-6">
-	                        <div class="btn-toolbar pull-right" >
-	                            @section('panel-botones')
-	                                <div class="btn-group" style="margin:5px">
-	                                    <button type="button" class="btn btn-primary btn-edit-rows">
-	                                        <span class="glyphicon glyphicon-plus"></span> Actualizar Seguimiento
-	                                    </button>
-	                                </div>
-	                            @show
-	                        </div>
-	                    </div>
-	                </div>
-	            </div>
 	            <table class="table table-striped table-hover">
 	                <thead>
 	                    <tr>
@@ -66,23 +67,21 @@
 	        </div>
     	</div>
         <div role="tabpanel" class="tab-pane active" id="seguimiento-metas">
+        	<div class="row">
+                <div class="col-lg-6 col-md-6"></div>
+                <div class="col-lg-6">
+                    <div class="btn-toolbar pull-right" >
+                        @section('panel-botones')
+                            <div class="btn-group" style="margin:5px">
+                                <button type="button" class="btn btn-primary btn-edit-rows">
+                                    <span class="glyphicon glyphicon-plus"></span> Actualizar Seguimiento
+                                </button>
+                            </div>
+                        @show
+                    </div>
+                </div>
+            </div>
             <div class="panel panel-default datagrid" id="datagridAcciones" data-edit-row="seguimiento_metas">
-	            <div class="panel-body">
-	                <div class="row">
-	                    <div class="col-lg-6 col-md-6"></div>
-	                    <div class="col-lg-6">
-	                        <div class="btn-toolbar pull-right" >
-	                            @section('panel-botones')
-	                                <div class="btn-group" style="margin:5px">
-	                                    <button type="button" class="btn btn-primary btn-edit-rows">
-	                                        <span class="glyphicon glyphicon-plus"></span> Actualizar Seguimiento
-	                                    </button>
-	                                </div>
-	                            @show
-	                        </div>
-	                    </div>
-	                </div>
-	            </div>
 	            <table class="table table-striped table-hover">
 	                <thead>
 	                    <tr>
@@ -103,7 +102,10 @@
         </div>
     </div>
 </div>
+
+</div>
 <input type="hidden" id="id" name="id" value="{{$id}}">
+<input type="hidden" id="mes" name="mes" value="{{$mes_clave}}">
 @stop
 
 @section('modals')
@@ -123,8 +125,8 @@
 									<span class="fa fa-table"></span> Metas
 								</a>
 							</li>
-							<li role="presentation" class="disabled">
-								<a href="#panel-justificacion" aria-controls="panel-justificacion" role="tab" data-toggle="" id="tab-link-justificacion">
+							<li role="presentation">
+								<a href="#panel-justificacion" aria-controls="panel-justificacion" role="tab" data-toggle="tab" id="tab-link-justificacion">
 									<span class="fa fa-align-left"></span> Justificación
 								</a>
 							</li>
@@ -147,7 +149,7 @@
 			                				<td class="meta-programada" data-meta="0">0</td>
 			                				<td>
 			                					<div class="form-group">
-			                						<input type="number" class="form-control avance-mes" name="avance[OC]" id="avance_OC" data-jurisdiccion="OC" disabled>
+			                						<input type="number" class="form-control avance-mes" name="avance[OC]" id="avance_OC" data-jurisdiccion="OC">
 			                					</div>
 			                				</td>
 			                				<td class="avance-acumulado" data-acumulado="0">
@@ -166,7 +168,7 @@
 			                				<td class="meta-programada" data-meta="0">0</td>
 			                				<td>
 			                					<div class="form-group">
-			                						<input type="number" class="form-control avance-mes" name="avance[{{$jurisdiccion->clave}}]" id="avance_{{$jurisdiccion->clave}}" data-jurisdiccion="{{$jurisdiccion->clave}}" disabled>
+			                						<input type="number" class="form-control avance-mes" name="avance[{{$jurisdiccion->clave}}]" id="avance_{{$jurisdiccion->clave}}" data-jurisdiccion="{{$jurisdiccion->clave}}">
 			                					</div>
 			                				</td>
 			                				<td class="avance-acumulado" data-acumulado="0">
@@ -200,7 +202,7 @@
 									<div class="col-sm-12">
 										<div class="form-group">
 											<label class="input-label">Justificación Acumulada</label>
-											<textarea rows="6" class="form-control" name="justificacion-acumulada" id="justificacion-acumulada"></textarea>
+											<textarea rows="6" class="form-control" name="justificacion-acumulada" id="justificacion-acumulada" disabled></textarea>
 										</div>
 									</div>
 								</div>
