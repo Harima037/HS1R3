@@ -5,7 +5,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception;
 use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
-	FibapDatosProyecto, Titular, ComponenteDesglose, ProyectoComentario;
+	FibapDatosProyecto, Titular, ComponenteDesglose, ProyectoComentario, Accion, DistribucionPresupuesto;
 
 class RevisionController extends BaseController {
 	private $reglasProyecto = array(
@@ -133,11 +133,12 @@ class RevisionController extends BaseController {
 			}
 			
 			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
-				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto',
+				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','catalogoUnidadesResponsables.descripcion AS unidadResponsable',
 				'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
 								->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
 								->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
 								->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
+								->join('catalogoUnidadesResponsables','catalogoUnidadesResponsables.clave','=','proyectos.unidadResponsable')
 								->orderBy('id', 'desc')
 								->skip(($parametros['pagina']-1)*10)->take(10)
 								->get();
@@ -149,6 +150,7 @@ class RevisionController extends BaseController {
 						'clavePresup' 			=> $row->clavePresup,
 						'nombreTecnico' 		=> $row->nombreTecnico,
 						'clasificacionProyecto'	=> $row->clasificacionProyecto,
+						'unidadResponsable'		=> $row->unidadResponsable,
 						'estatusProyecto'		=> $row->estatusProyecto,
 						'username'				=> $row->username,
 						'modificadoAl'			=> date_format($row->modificadoAl,'d/m/Y')
@@ -206,8 +208,11 @@ class RevisionController extends BaseController {
 		$data = array();
 
 		$parametros = Input::all();
+		
+		
 
 		if($parametros){
+			//throw new Exception(json_encode($parametros),1);
 			if($parametros['ver'] == 'componente'){
 				$recurso = Componente::with('actividades.unidadMedida','metasMes')->find($id);
 			}elseif ($parametros['ver'] == 'lista-desglose') {
@@ -242,8 +247,7 @@ class RevisionController extends BaseController {
 
 				$recurso = Proyecto::contenidoCompleto()->find($id);
 				//$comentarios = ProyectoComentario::where('idProyecto', '=', $id)->get();								
-				if($recurso){
-					
+				if($recurso){					
 					if($recurso->idClasificacionProyecto == 2){
 						$recurso->load('fibap');
 						if($recurso->fibap){
@@ -260,11 +264,43 @@ class RevisionController extends BaseController {
 			}elseif($parametros['ver'] == 'datos-fibap'){
 				$recurso = FibapDatosProyecto::where('idFibap','=',$id)->get();
 				$recurso = $recurso[0];
+			}elseif($parametros['ver'] == 'detalles-presupuesto')
+			{
+				$desglose = ComponenteDesglose::with('metasMes','beneficiarios.tipoBeneficiario')->find($id);
+
+				$recurso = Accion::with('partidas')->find($desglose->idAccion);
+				
+				$calendarizado = DistribucionPresupuesto::where('idAccion','=',$desglose->idAccion)
+													->whereIn('idObjetoGasto',$recurso->partidas->lists('id'))
+													->where('claveJurisdiccion','=',$desglose->claveJurisdiccion);
+				if($desglose->claveJurisdiccion != 'OC'){
+					$calendarizado = $calendarizado->where('claveMunicipio','=',$desglose->claveMunicipio)
+												->where('claveLocalidad','=',$desglose->claveLocalidad);
+				}
+				$calendarizado = $calendarizado->get();
+				$recurso['desglose'] = $desglose;
+				$recurso['calendarizado'] = $calendarizado;
+				// 
 			}
+			
 		}else{
 			$recurso = Proyecto::contenidoCompleto()->find($id);
-			$recurso->componentes->load('unidadMedida','dimension','tipoIndicador','metasMes','formula','frecuencia','actividades');
+			$recurso->componentes->load('unidadMedida','dimension','tipoIndicador','metasMes','formula','frecuencia','actividades','entregable','entregableTipo','entregableAccion','accion.partidas','accion.propuestasFinanciamiento.origen','accion.distribucionPresupuesto','accion.desglosePresupuesto');
 			$recurso->load('comentarios');
+			
+			if($recurso->idClasificacionProyecto == 2){
+				$recurso->load('fibap');
+				if($recurso->fibap)
+				{
+					$recurso->fibap->load('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado');
+					$recurso->fibap->distribucionPresupuestoAgrupado->load('objetoGasto');
+				}
+			}
+			
+			/*$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion','desgloseCompleto'));
+			foreach ($recurso->componentes as $key => $componente) {
+				$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
+			}*/
 			
 			/*$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion','desgloseCompleto'));*/
 			foreach ($recurso->componentes as $key => $componente) {
@@ -305,7 +341,7 @@ class RevisionController extends BaseController {
 		$respuesta['data'] = array("data"=>'');
 
 		$parametros = Input::all();
-					
+
 		$nuevoComentario = new ProyectoComentario;
 		
 		$nuevoComentario->idProyecto = $parametros['idproyecto'];
@@ -342,26 +378,56 @@ class RevisionController extends BaseController {
 		$respuesta['data'] = array("data"=>'');
 		
 		$parametros = Input::all();
-
-		$recurso = ProyectoComentario::find($id);
 		
 		
-		if(is_null($recurso)){
-			$respuesta['http_status'] = 404;
-			$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
-		}else{
-			$recurso->idProyecto = $parametros['idproyecto'];
-			$recurso->idCampo = $parametros['idcampo'];
-			$recurso->observacion = $parametros['comentario'];
+		
+		if($parametros['actualizarproyecto'])
+		{
+			//throw new Exception($parametros['actualizarproyecto'],1);
 			
-			$Resultado = Validador::validar($parametros, $this->reglasComentario);
-						
-			if($Resultado===true)
-				$recurso->save();
-			else
+			if($parametros['actualizarproyecto']=="aprobar") //Poner estatus 4 (Aprobado)
 			{
-				$respuesta['http_status'] = 500;
-				$respuesta = $Resultado;
+				$recurso = Proyecto::find($id);
+				if(is_null($recurso)){
+					$respuesta['http_status'] = 404;
+					$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+				}else{
+					$recurso->idEstatusProyecto = 4;
+					$recurso->save();
+				}
+			}
+			else if($parametros['actualizarproyecto']=="regresar") //Poner estatus 3 (Regreso a corrección)
+			{
+				$recurso = Proyecto::find($id);
+				if(is_null($recurso)){
+					$respuesta['http_status'] = 404;
+					$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+				}else{
+					$recurso->idEstatusProyecto = 3;
+					$recurso->save();
+				}
+			}
+		}
+		else
+		{
+			$recurso = ProyectoComentario::find($id);
+			if(is_null($recurso)){
+				$respuesta['http_status'] = 404;
+				$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+			}else{
+				$recurso->idProyecto = $parametros['idproyecto'];
+				$recurso->idCampo = $parametros['idcampo'];
+				$recurso->observacion = $parametros['comentario'];
+			
+				$Resultado = Validador::validar($parametros, $this->reglasComentario);
+							
+				if($Resultado===true)
+					$recurso->save();
+				else
+				{
+					$respuesta['http_status'] = 500;
+					$respuesta = $Resultado;
+				}
 			}
 		}
 		

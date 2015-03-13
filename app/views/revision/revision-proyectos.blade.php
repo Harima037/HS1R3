@@ -49,6 +49,7 @@
                         <th>Clave</th>
                         <th>Nombre Técnico</th>
                         <th>Tipo de Proyecto</th>
+                        <th>Área</th>
                         <th style="width:100px;">Estatus</th>
                         <th style="text-align:center; width:85px;"><span class="glyphicon glyphicon-user"></span></th>
                         <th style="text-align:center; width:120px;"><span class="glyphicon glyphicon-calendar"></span></th>
@@ -84,6 +85,9 @@
 @stop
 
 @section('modals')
+
+
+
     <div class="modal fade" id="modalCaratulas" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" data-backdrop="static">
         <div class="modal-dialog modal-dialog-85-screen">
             <div class="modal-content modal-content-85-screen">
@@ -265,120 +269,7 @@
                                 <div role="tabpanel" class="tab-pane" id="tab-beneficiarios">
                                     <br>
                                     <div id="datos-beneficiarios">
-                                        <table class="table table-condensed table-bordered">
-                                            <tr>
-                                                <th width="1" style="white-space:nowrap;">Descripción de Beneficiario</th>
-                                                <th>Total</th>
-                                                <th colspan="2">Por Genero</th>
-                                            </tr>
-                                            <tr>
-                                                <td rowspan="2"><p id="lbl_tipo_beneficiario" class="form-control-static"></p></td>
-                                                <td rowspan="2"><p id="lbl_total_beneficiarios"></p></td>
-                                                <td width="1"><span class="fa fa-female fa-2x"></span></td>
-                                                <td><p class="form-control-static" id="lbl_beneficiarios_f"></p></td>
-                                            </tr>
-                                            <tr>
-                                                <td><span class="fa fa-male fa-2x"></span></td>
-                                                <td><p class="form-control-static" id="lbl_beneficiarios_m"></p></td>
-                                            </tr>
-                                        </table>
-
-                                        <div role="tabpanel">
-                                            <!-- Nav tabs -->
-                                            <ul class="nav nav-pills" role="tablist">
-                                                <li role="presentation" class="active">
-                                                    <a href="#benef-zona" aria-controls="benef-zona" role="tab" data-toggle="pill">
-                                                        Zona
-                                                    </a>
-                                                </li>
-                                                <li role="presentation">
-                                                    <a href="#benef-pob" aria-controls="benef-pob" role="tab" data-toggle="pill">
-                                                        Población
-                                                    </a>
-                                                </li>
-                                                <li role="presentation">
-                                                    <a href="#benef-marg" aria-controls="benef-marg" role="tab" data-toggle="pill">
-                                                        Marginación
-                                                    </a>
-                                                </li>
-                                            </ul>
-                                            <br>
-                                            <!-- Tab panes -->
-                                            <div class="tab-content">
-                                                <div role="tabpanel" class="tab-pane active" id="benef-zona">
-                                                    <table class="table table-condensed table-bordered">
-                                                        <tr>
-                                                            <th width="1">Generos</th>
-                                                            <th>Urbana</th>
-                                                            <th>Rural</th>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><span class="fa fa-female fa-2x"></span></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_urbana_f"></p></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_rural_f"></p></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><span class="fa fa-male fa-2x"></span></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_urbana_m"></p></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_rural_m"></p></td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                                <div role="tabpanel" class="tab-pane" id="benef-pob">
-                                                    <table class="table table-condensed table-bordered">
-                                                        <tr>
-                                                            <th width="1">Generos</th>
-                                                            <th>Mestiza</th>
-                                                            <th>Indigena</th>
-                                                            <th>Inmigrante</th>
-                                                            <th>Otros</th>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><span class="fa fa-female fa-2x"></span></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_mestiza_f"></p></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_indigena_f"></p></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_inmigrante_f"></p></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_otros_f"></p></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><span class="fa fa-male fa-2x"></span></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_mestiza_m"></p></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_indigena_m"></p></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_inmigrante_m"></p></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_otros_m"></p></td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                                <div role="tabpanel" class="tab-pane" id="benef-marg">
-                                                    <table class="table table-condensed table-bordered">
-                                                        <tr>
-                                                            <th width="1">Generos</th>
-                                                            <th>Muy Alta</th>
-                                                            <th>Alta</th>
-                                                            <th>Media</th>
-                                                            <th>Baja</th>
-                                                            <th>Muy Baja</th>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><span class="fa fa-female fa-2x"></span></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_muy_alta_f"></p></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_alta_f"></p></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_media_f"></p></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_baja_f"></p></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_muy_baja_f"></p></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td><span class="fa fa-male fa-2x"></span></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_muy_alta_m"></p></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_alta_m"></p></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_media_m"></p></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_baja_m"></p></td>
-                                                            <td><p class="form-control-static" id="lbl_benef_muy_baja_m"></p></td>
-                                                        </tr>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
+                                                                               
                                     </div>
                                 </div>
                                 <div role="tabpanel" class="tab-pane" id="tab-componente"></div>
@@ -540,9 +431,9 @@
                         </div>
                         <div>
                             <br>
-                            <button type="button" class="btn btn-success" id="btn-aprobar">
+                            <!--<button type="button" class="btn btn-success" id="btn-aprobar">
                                 <span class="glyphicon glyphicon-thumbs-up"></span> Aprobar proyecto
-                            </button>
+                            </button>-->
                         </div>
                     </div>
                 </div>
