@@ -29,8 +29,40 @@
                 <span class="fa fa-users"></span> Seguimiento de Beneficiarios
             </a>
         </li>
+        <li role="presentation">
+        	<a href="#analisis-funcional" aria-controls="analisis-funcional" role="tab" data-toggle="tab" id="tab-link-beneficiarios">
+                <span class="fa fa-check-square"></span> Analisis Funcional
+            </a>
+        </li>
     </ul>
     <div class="tab-content">
+    	<div role="tabpanel" class="tab-pane" id="analisis-funcional">
+    		<div class="row">
+    			<div class="col-sm-6">
+    				<div class="form-group">
+    					<label class="control-label">Analisis de Resultado</label>
+    					<textarea rows="6" class="form-control"></textarea>
+    				</div>
+    			</div>
+    			<div class="col-sm-6">
+    				<div class="form-group">
+    					<label class="control-label">Beneficiarios</label>
+    					<textarea rows="6" class="form-control"></textarea>
+    				</div>
+    			</div>
+    			<div class="col-sm-12">
+    				<div class="form-group">
+    					<label class="control-label">Justificación Global del Proyecto</label>
+    					<textarea rows="6" class="form-control"></textarea>
+    				</div>
+    			</div>
+    		</div>
+    		<div class="row">
+    			<div class="col-sm-6">
+    				<button type="button" class="btn btn-primary" ><span class="fa fa-floppy-o"></span> Guardar</button>
+    			</div>
+    		</div>
+    	</div>
     	<div role="tabpanel" class="tab-pane" id="seguimiento-beneficiarios">
     		<div class="row">
                 <div class="col-lg-6 col-md-6"></div>

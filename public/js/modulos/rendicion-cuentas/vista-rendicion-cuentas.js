@@ -401,8 +401,8 @@ $('.avance-mes').on('change',function(){
         }else{
             $(row +' > td.avance-acumulado > span.nueva-cantidad').text('');
         }
-
-        if(total_programado > 0 && $(this).attr('data-meta-programada')){
+        
+        if(total_programado > 0 && $(this).attr('data-meta-programada') > 0){
             var avance_mes = parseFloat(((acumulado  / total_programado ) * 100).toFixed(2)) || 0;
 
             if(avance_mes > 110){

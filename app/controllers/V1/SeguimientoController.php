@@ -379,24 +379,28 @@ class SeguimientoController extends BaseController {
 				if($metas->avance){
 					$avance_acumulado -= $metas->avance;
 				}
+
 				$avance_acumulado += $parametros['avance'][$metas->claveJurisdiccion];
 
-				if($meta_acumulada > 0){
+				if($meta_acumulada > 0 && $metas->meta > 0){
 					$porcentaje_avance = (( $avance_acumulado  / $meta_acumulada ) * 100);
 					if($porcentaje_avance < 90 || $porcentaje_avance > 110){
 						$conteo_alto_bajo_avance++;
 					}
-				}else{
+				}elseif($meta_acumulada == 0 && $parametros['avance'][$metas->claveJurisdiccion] > 0){
 					$conteo_alto_bajo_avance++;
 				}
-				
 
 				$total_avance += $parametros['avance'][$metas->claveJurisdiccion];
 				$metas->avance = $parametros['avance'][$metas->claveJurisdiccion];
 				$guardar_metas[] = $metas;
+
+				if($metas->meta == 0 && $metas->avance > 0){
+					$conteo_alto_bajo_avance++;
+				}
 			}
 		}
-
+		
 		//Si las metas capturadas no fueron puestas en la programación entonces ahi que agregarlas ya que no estan en la tabla
 		$jurisdicciones_capturadas = $accion_metas->metasMes->lists('claveJurisdiccion');
 		$jurisdicciones_formulario = array_keys($parametros['avance']);
@@ -417,6 +421,7 @@ class SeguimientoController extends BaseController {
 				$meta->idProyecto = $accion_metas->idProyecto;
 				$guardar_metas[] = $meta;
 				$conteo_alto_bajo_avance++;
+				$total_avance += $parametros['avance'][$jurisdiccion];
 			}
 		}
 		
