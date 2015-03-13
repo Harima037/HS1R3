@@ -46,8 +46,7 @@ if($('#id').val()){
 	//load data
 	proyectoResource.get($('#id').val(),null,{
         _success: function(response){
-        	inicializar_comportamiento_caratula();
-
+        	//inicializar_comportamiento_caratula();
         	$('#lbl-lider-proyecto').text(response.data.lider_proyecto.nombre);
 			$('#lbl-jefe-inmediato').text(response.data.jefe_inmediato.nombre);
 			$('#lbl-jefe-planeacion').text(response.data.jefe_planeacion.nombre);
@@ -185,6 +184,77 @@ if($('#id').val()){
 			
 			$('#tabla-beneficiarios').html(cadenaHTML);		
 			
+			if(response.data.idClasificacionProyecto==2)
+			{
+				var fibapHTML = '';
+				
+				fibapHTML = fibapHTML + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-organismo-publico">Organismo Público</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentario(\'organismo-publico\',\'Organismo Público\',\'lbl-organismo-publico\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-organismo-publico" class="form-control" style="height:auto">'+response.data.fibap.organismoPublico+'</p></div></div></div>';
+				fibapHTML = fibapHTML + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-sector">Sector</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentario(\'sector\',\'Sector\',\'lbl-sector\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-sector" class="form-control" style="height:auto">'+response.data.fibap.sector+'</p></div></div></div>';
+				fibapHTML = fibapHTML + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-subcomite">Subcomité</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentario(\'subcomite\',\'Subcomité\',\'lbl-subcomite\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-subcomite" class="form-control" style="height:auto">'+response.data.fibap.subcomite+'</p></div></div></div>';
+				fibapHTML = fibapHTML + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-grupotrabajo">Grupo de trabajo</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentario(\'grupotrabajo\',\'Grupo de trabajo\',\'lbl-grupotrabajo\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-grupotrabajo" class="form-control" style="height:auto">'+response.data.fibap.grupoTrabajo+'</p></div></div></div>';				
+				fibapHTML = fibapHTML + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-justificacionproyecto">Justificación del Proyecto</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentario(\'justificacionproyecto\',\'Justificación del Proyecto\',\'lbl-justificacionproyecto\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-justificacionproyecto" class="form-control" style="height:auto">'+response.data.fibap.justificacionProyecto+'</p></div></div></div>';				
+				fibapHTML = fibapHTML + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-descripcionproyecto">Descripción del Proyecto</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentario(\'descripcionproyecto\',\'Descripción del Proyecto\',\'lbl-descripcionproyecto\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-descripcionproyecto" class="form-control" style="height:auto">'+response.data.fibap.descripcionProyecto+'</p></div></div></div>';
+				fibapHTML = fibapHTML + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-objetivoproyecto">Objetivo del Proyecto</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentario(\'objetivoproyecto\',\'Objetivo del Proyecto\',\'lbl-objetivoproyecto\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-objetivoproyecto" class="form-control" style="height:auto">'+response.data.fibap.objetivoProyecto+'</p></div></div></div>';
+				fibapHTML = fibapHTML + '<div class="col-sm-12"><div class="form-group"><label class="control-label">Alineación a los Objetivos de Desarrollo del Milenio</label></div></div>';
+				fibapHTML = fibapHTML + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-alineacionespecifica">Alineación específica</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentario(\'alineacionespecifica\',\'Alineación específica\',\'lbl-alineacionespecifica\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-alineacionespecifica" class="form-control" style="height:auto">'+response.data.fibap.alineacionEspecifica+'</p></div></div></div>';
+				fibapHTML = fibapHTML + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-alineaciongeneral">Alineación general</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentario(\'alineaciongeneral\',\'Alineación general\',\'lbl-alineaciongeneral\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-alineaciongeneral" class="form-control" style="height:auto">'+response.data.fibap.alineacionGeneral+'</p></div></div></div>';
+				fibapHTML = fibapHTML + '<div class="col-sm-5"><div class="form-group"><label class="control-label" for="lbl-presupuestorequerido">Presupuesto requerido</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentario(\'presupuestorequerido\',\'Presupuesto requerido\',\'lbl-presupuestorequerido\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-presupuestorequerido" class="form-control" style="height:auto">'+response.data.fibap.presupuestoRequerido+'</p></div></div></div>';
+												
+				var fechaInicio = response.data.fibap.periodoEjecucionInicio.substr(8,2)+'/'+response.data.fibap.periodoEjecucionInicio.substr(5,2)+'/'+response.data.fibap.periodoEjecucionInicio.substr(0,4);
+				var fechaFinal = response.data.fibap.periodoEjecucionFinal.substr(8,2)+'/'+response.data.fibap.periodoEjecucionFinal.substr(5,2)+'/'+response.data.fibap.periodoEjecucionFinal.substr(0,4);
+				
+				fibapHTML = fibapHTML + '<div class="col-sm-7"><div class="form-group"><label class="control-label" for="lbl-periodoejecucion">Periodo de ejecución</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentario(\'periodoejecucion\',\'Periodo de ejecución\',\'lbl-periodoejecucion\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-periodoejecucion" class="form-control" style="height:auto">Del: '+fechaInicio+' - Al: '+fechaFinal+'</p></div></div></div>';
+				
+				fibapHTML = fibapHTML +'<div class="row"><div class="col-sm-12"><div class="panel panel-primary"><div class="panel-heading"><b>Documentación de soporte</b></div><div class="panel-body"><div class="row">';
+				
+				fibapHTML = fibapHTML +'<div class="col-sm-4"><button type="button" class="btn btn-default" id="documentos'+response.data.fibap.id+'" onclick="escribirComentario(\'documentos'+response.data.fibap.id+'\',\'Documentación de soporte\',\''+response.data.fibap.descripcionProyecto+'\')" ><i class="fa fa-pencil-square-o"></i>Comentar</button></div>';
+				
+				for(var documento in response.data.fibap.documentos)
+				{
+					fibapHTML = fibapHTML +'<div class="col-sm-4">';
+					fibapHTML = fibapHTML + '<div class="form-group"><label class="control-label" id="lbl-documento'+response.data.fibap.documentos[documento].id+'">'+response.data.fibap.documentos[documento].descripcion+'</label></div>';
+					fibapHTML = fibapHTML +'</div>';
+				}
+                fibapHTML = fibapHTML +'</div></div></div></div></div>';		
+				
+				$('#panelfibap').html(fibapHTML);
+				
+				var antecedentesHTML = '';
+				
+				antecedentesHTML = antecedentesHTML +'<div class="row"><div class="col-sm-12"><div class="panel panel-default"><div class="panel-heading"><b>Antecedentes financieros</b></div><div class="panel-body"><div class="row">';
+				
+				antecedentesHTML = antecedentesHTML +'<div class="col-sm-4"><button type="button" class="btn btn-default" id="antecedentes'+response.data.fibap.id+'" onclick="escribirComentario(\'antecedentes'+response.data.fibap.id+'\',\'Antecedentes financieros\',\''+response.data.fibap.descripcionProyecto+'\')" ><i class="fa fa-pencil-square-o"></i>Comentar</button></div><div class="col-sm-8">&nbsp;</div></div><div class="row">';
+				antecedentesHTML = antecedentesHTML +'<div class="col-sm-2"><strong>Año</strong></div>';
+				antecedentesHTML = antecedentesHTML +'<div class="col-sm-3"><strong>Autorizado</strong></div>';
+				antecedentesHTML = antecedentesHTML +'<div class="col-sm-3"><strong>Ejercido</strong></div>';
+				antecedentesHTML = antecedentesHTML +'<div class="col-sm-2"><strong>%</strong></div>';
+				antecedentesHTML = antecedentesHTML +'<div class="col-sm-2"><strong>Fecha de corte</strong></div>';
+				
+				for(var antecedente in response.data.fibap.antecedentes_financieros)
+				{
+					antecedentesHTML = antecedentesHTML +'<div class="col-sm-2">'+response.data.fibap.antecedentes_financieros[antecedente].anio+'</div>';
+					antecedentesHTML = antecedentesHTML +'<div class="col-sm-3">'+response.data.fibap.antecedentes_financieros[antecedente].autorizado+'</div>';
+					antecedentesHTML = antecedentesHTML +'<div class="col-sm-3">'+response.data.fibap.antecedentes_financieros[antecedente].ejercido+'</div>';
+					antecedentesHTML = antecedentesHTML +'<div class="col-sm-2">'+response.data.fibap.antecedentes_financieros[antecedente].porcentaje+'</div>';
+					antecedentesHTML = antecedentesHTML +'<div class="col-sm-2">'+response.data.fibap.antecedentes_financieros[antecedente].fechaCorte+'</div>';
+				
+				}
+                antecedentesHTML = antecedentesHTML +'</div></div></div></div></div>';
+							
+				antecedentesHTML = antecedentesHTML + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-resultadosobtenidos">Resultados obtenidos</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentario(\'resultadosobtenidos\',\'Resultados obtenidos\',\'lbl-resultadosobtenidos\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-resultadosobtenidos" class="form-control" style="height:auto">'+response.data.fibap.resultadosObtenidos+'</p></div></div></div>';
+				antecedentesHTML = antecedentesHTML + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-resultadosesperados">Resultados esperados</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentario(\'resultadosesperados\',\'Resultados esperados\',\'lbl-resultadosesperados\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-resultadosesperados" class="form-control" style="height:auto">'+response.data.fibap.resultadosEsperados+'</p></div></div></div>';
+				$('#panelantecedentes').html(antecedentesHTML);
+			}
+			else
+			{
+				$('#fibap').hide();
+				$('#tablink-fibap').hide();
+				$('#antecedentes').hide();
+				$('#tablink-antecedentes').hide();
+			}
+			
+			
+			
 			var TabComponente = [];
 			var contadorDeTabs = 1;
 			
@@ -195,7 +265,13 @@ if($('#id').val()){
 				TabComponente[contadorDeTabs] = '<div class="col-sm-12">';
 				
 				/*COMIENZA SECCIÓN DE OBJETIVOS*/
-				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<br><div class="col-sm-12 bg-info"><span class="fa fa-crosshairs"></span> <strong>Objetivo</strong></div>';										
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<br><div class="col-sm-12 bg-info"><span class="fa fa-crosshairs"></span> <strong>Objetivo</strong></div>';
+				if(response.data.idClasificacionProyecto==2)
+				{
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-entregable'+idComponente+'">Entregable</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'entregable'+idComponente+'\',\'Entregable\',\'lbl-entregable'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-entregable'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].entregable.descripcion+'</p></div></div></div>';
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-entregabletipo'+idComponente+'">Tipo</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'entregabletipo'+idComponente+'\',\'Tipo\',\'lbl-entregabletipo'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-entregabletipo'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].entregable_tipo.descripcion+'</p></div></div></div>';
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-entregableaccion'+idComponente+'">Acción</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'entregableaccion'+idComponente+'\',\'Acción\',\'lbl-entregableaccion'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-entregableaccion'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].entregable_accion.descripcion+'</p></div></div></div>';
+				}
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-descripcion'+idComponente+'">Descripción</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'descripcion'+idComponente+'\',\'Descripción\',\'lbl-descripcion'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-descripcion'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].objetivo+'</p></div></div></div>';
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-mediosverificacion'+idComponente+'">Medios de verificación</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'mediosverificacion'+idComponente+'\',\'Medios de verificación\',\'lbl-mediosverificacion'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-mediosverificacion'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].mediosVerificacion+'</p></div></div></div>';
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-supuestos'+idComponente+'">Supuestos</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'supuestos'+idComponente+'\',\'Supuestos\',\'lbl-supuestos'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-supuestos'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].supuestos+'</p></div></div></div>';
@@ -269,7 +345,88 @@ if($('#id').val()){
 				/*TERMINA SECCIÓN DE METAS*/				
 				
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"><p>&nbsp;</p></div>';
+				/*COMIENZA SECCIÓN DE PRESUPUESTO*/
+				if(response.data.idClasificacionProyecto==2)
+				{
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<br><div class="col-sm-12 bg-info"><span class="fa fa-usd"></span> <strong>Presupuesto</strong></div>';
+					var presupuestoHTML = '';					
+					presupuestoHTML = presupuestoHTML +'<div class="col-sm-12"><div class="panel panel-default"><div class="panel-heading"><div class="row"><div class="col-sm-12"><strong>Partidas capturadas</strong></div></div></div><div class="panel-body">';
+					
+					presupuestoHTML = presupuestoHTML +'<div class="col-sm-12"><button type="button" class="btn btn-default" id="partidas'+idComponente+'" onclick="escribirComentarioComponente(\'partidas'+idComponente+'\',\'Partidas del componente\',\''+response.data.componentes[cuentaComponentes].objetivo+'\')" ><i class="fa fa-pencil-square-o"></i>Comentar</button></div>';
+					presupuestoHTML = presupuestoHTML +'<div class="col-sm-2"><strong>Clave</strong></div>';
+					presupuestoHTML = presupuestoHTML +'<div class="col-sm-10"><strong>Descripción</strong></div>';
+					for(var partida in response.data.componentes[cuentaComponentes].accion.partidas)
+					{
+						presupuestoHTML = presupuestoHTML +'<div class="col-sm-2">'+response.data.componentes[cuentaComponentes].accion.partidas[partida].clave+'</div>';
+						presupuestoHTML = presupuestoHTML +'<div class="col-sm-10">'+response.data.componentes[cuentaComponentes].accion.partidas[partida].descripcion+'</div>';
+					}
+					presupuestoHTML = presupuestoHTML +'</div></div></div>';
+					presupuestoHTML = presupuestoHTML +'<br><div class="col-sm-12"><strong>Origen del presupuesto</strong></div>';
+					
+					for(var propuesta in response.data.componentes[cuentaComponentes].accion.propuestas_financiamiento)
+					{
+						var descripcionpropuesta = response.data.componentes[cuentaComponentes].accion.propuestas_financiamiento[propuesta].origen.descripcion;
+						presupuestoHTML = presupuestoHTML + '<div class="col-sm-4">';
+						presupuestoHTML = presupuestoHTML + '<div class="form-group">';
+						presupuestoHTML = presupuestoHTML + '<label class="control-label" for="lbl-propuesta'+descripcionpropuesta+idComponente+'">'+descripcionpropuesta+'</label>';
+						presupuestoHTML = presupuestoHTML + '<div class="input-group">';
+						presupuestoHTML = presupuestoHTML + '<span class="input-group-btn" onclick="escribirComentarioComponente(\'propuesta'+descripcionpropuesta+idComponente+'\',\''+descripcionpropuesta+'\',\'lbl-propuesta'+descripcionpropuesta+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-propuesta'+response.data.componentes[cuentaComponentes].accion.propuestas_financiamiento[propuesta].origen.descripcion+idComponente+'" class="form-control" style="height:auto"> $'+response.data.componentes[cuentaComponentes].accion.propuestas_financiamiento[propuesta].cantidad+'</p>';
+						presupuestoHTML = presupuestoHTML + '</div>';
+						presupuestoHTML = presupuestoHTML + '</div>';
+						presupuestoHTML = presupuestoHTML + '</div>';
+					}
+					
+					presupuestoHTML = presupuestoHTML +'<br><div class="col-sm-12">&nbsp;</div>';
+					
+					presupuestoHTML = presupuestoHTML + '<div class="col-sm-4"><div class="form-group">';
+					presupuestoHTML = presupuestoHTML + '<label class="control-label" for="lbl-presupuestorequerido'+idComponente+'">Presupuesto Requerido</label>';
+					presupuestoHTML = presupuestoHTML + '<div class="input-group">';
+					
+					presupuestoHTML = presupuestoHTML + '<span class="input-group-btn" onclick="escribirComentarioComponente(\'presupuestorequerido'+idComponente+'\',\'Presupuesto Requerido\',\'lbl-presupuestorequerido'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-presupuestorequerido'+idComponente+'" class="form-control" style="height:auto"> $'+response.data.componentes[cuentaComponentes].accion.presupuestoRequerido+'</p>';
+					presupuestoHTML = presupuestoHTML + '</div>';
+					presupuestoHTML = presupuestoHTML + '</div></div>';
+					
+					presupuestoHTML = presupuestoHTML + '<br><div class="col-sm-12 bg-info"><span class="fa fa-usd"></span><span class="fa fa-usd"></span> <strong>Distribución del Presupuesto</strong></div><br>';
+					
+					presupuestoHTML = presupuestoHTML + '<table class="table table-striped table-hover">';
+					presupuestoHTML = presupuestoHTML + '<thead>';
+					presupuestoHTML = presupuestoHTML + '<tr>';
+					presupuestoHTML = presupuestoHTML + '<th>Localidad</th>';
+					presupuestoHTML = presupuestoHTML + '<th>Municipio</th>';
+					presupuestoHTML = presupuestoHTML + '<th>Jurisdicción</th>';
+					presupuestoHTML = presupuestoHTML + '<th>Monto</th>';
+					presupuestoHTML = presupuestoHTML + '<th>Ver</th>';
+					presupuestoHTML = presupuestoHTML + '<th>Comentario</th>';
+					presupuestoHTML = presupuestoHTML + '</tr></thead>';
+					presupuestoHTML = presupuestoHTML + '<tbody>';
+
+					for(var localidad in response.data.componentes[cuentaComponentes].accion.desglose_presupuesto)
+					{
+						var local = response.data.componentes[cuentaComponentes].accion.desglose_presupuesto[localidad].localidad;
+						var munic = response.data.componentes[cuentaComponentes].accion.desglose_presupuesto[localidad].municipio;
+						var juris = response.data.componentes[cuentaComponentes].accion.desglose_presupuesto[localidad].jurisdiccion;
+						var descripcion = response.data.componentes[cuentaComponentes].indicador;
+						var unidadmedida = response.data.componentes[cuentaComponentes].unidad_medida.descripcion;
+						var idDelDesglose = response.data.componentes[cuentaComponentes].accion.desglose_presupuesto[localidad].id;
+						
+						presupuestoHTML = presupuestoHTML +'<tr>';
+						presupuestoHTML = presupuestoHTML +'<td>'+local+'</td>';
+						presupuestoHTML = presupuestoHTML +'<td>'+munic+'</td>';
+						presupuestoHTML = presupuestoHTML +'<td>'+juris+'</td>';
+						presupuestoHTML = presupuestoHTML +'<td> $ '+response.data.componentes[cuentaComponentes].accion.desglose_presupuesto[localidad].presupuesto+'</td>';
+						presupuestoHTML = presupuestoHTML +'<td><button class="btn btn-info" onclick="verdetallepresupuesto(\''+idDelDesglose+'\',\''+local+'\',\''+munic+'\',\''+juris+'\',\''+descripcion+'\',\''+unidadmedida+'\')"><i class="fa fa-eye"></i> Ver</button></td>';
+						presupuestoHTML = presupuestoHTML +'<td><button id="desglose'+idComponente+'-'+idDelDesglose+'" class="btn btn-default" onclick="escribirComentarioComponente(\'desglose'+idComponente+'-'+idDelDesglose+'\',\'Distribución del presupuesto en la Localidad:\',\''+local+'\');"><i class="fa fa-pencil-square-o"></i> Comentar</button></td>';
+						presupuestoHTML = presupuestoHTML +'</tr>';
+						//console.log(response.data.componentes[cuentaComponentes].accion.desglose_presupuesto[localidad].id);
+					}
+					presupuestoHTML = presupuestoHTML + '</tbody></table>';
+					
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + presupuestoHTML;
+				}
 				
+				/*TERMINA SECCIÓN DE PRESUPUESTO*/
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"><p>&nbsp;</p></div>';
+								
 				/*COMIENZA SECCIÓN DE ACTIVIDADES*/				
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12 bg-info"><span class="fa fa-thumb-tack"></span> <strong> Actividades</strong></div><br>';
 				var PanelDeActividades = [];
@@ -397,8 +554,7 @@ if($('#id').val()){
 			
 			var cadHTMLCom = '';
 			var numeroDeComponente = 1;
-			var cuantosComponentes = response.data.componentes.length;		
-			
+			var cuantosComponentes = response.data.componentes.length;
 			
 			cadHTMLCom = '<div role="tabpanel">';
 			cadHTMLCom = cadHTMLCom + '<ul class="nav nav-tabs" role="tablist">';
@@ -438,6 +594,18 @@ if($('#id').val()){
 						$(objetoAColorear).removeClass('btn-default');
 						$(objetoAColorear).addClass('btn-warning');					
 					}
+					else if(idCampo.substr(0,10)=='documentos')
+					{
+						var objetoAColorear = '#'+idCampo;
+						$(objetoAColorear).removeClass('btn-default');
+						$(objetoAColorear).addClass('btn-warning');
+					}
+					else if(idCampo.substr(0,12)=='antecedentes')
+					{
+						var objetoAColorear = '#'+idCampo;
+						$(objetoAColorear).removeClass('btn-default');
+						$(objetoAColorear).addClass('btn-warning');
+					}
 					else
 					{
 						var objetoAColorear = '#lbl-'+idCampo;
@@ -447,29 +615,43 @@ if($('#id').val()){
 				}
 				else if(response.data.comentarios[contador]['tipoComentario']=='2')//Tipo 2 = Componente
 				{
-					var objetoAColorear = '#lbl-'+idCampo;
-					$(objetoAColorear).parent().parent().addClass('has-error has-feedback');
+					if(idCampo.substr(0,8)=='partidas')
+					{
+						var objetoAColorear = '#'+idCampo;
+						$(objetoAColorear).removeClass('btn-default');
+						$(objetoAColorear).addClass('btn-warning');					
+					}
+					if(idCampo.substr(0,8)=='desglose')
+					{
+						var objetoAColorear = '#'+idCampo;
+						$(objetoAColorear).removeClass('btn-default');
+						$(objetoAColorear).addClass('btn-warning');					
+					}
+					
+					else
+					{
+						var objetoAColorear = '#lbl-'+idCampo;
+						$(objetoAColorear).parent().parent().addClass('has-error has-feedback');
+					}
 					comentariosArray.push([response.data.comentarios[contador]['id'],response.data.comentarios[contador]['idCampo'], response.data.comentarios[contador]['observacion'],'2']);
-					console.log(objetoAColorear);
+					//console.log(objetoAColorear);
 				}
 				else if(response.data.comentarios[contador]['tipoComentario']=='3')//Tipo 3 = Actividad de Componente
 				{
+					//
 					var objetoAColorear = '#lbl-'+idCampo;
 					$(objetoAColorear).parent().parent().addClass('has-error has-feedback');
 					comentariosArray.push([response.data.comentarios[contador]['id'],response.data.comentarios[contador]['idCampo'], response.data.comentarios[contador]['observacion'],'3']);
-					console.log(objetoAColorear);
+					//console.log(objetoAColorear);
 				}
 			}			
 			            
-            cargar_totales();
-
+            /*cargar_totales();
             actualizar_tabla_metas('actividad',response.data.jurisdicciones);
             actualizar_tabla_metas('componente',response.data.jurisdicciones);
-
             $('#tablink-componentes').attr('data-toggle','tab');
 			$('#tablink-componentes').parent().removeClass('disabled');
-
-			actualizar_grid_componentes(response.data.componentes);
+			actualizar_grid_componentes(response.data.componentes);*/
         }
     });
 }else if($('#id-fibap').val()){
@@ -526,6 +708,168 @@ if($('#id').val()){
 	deshabilita_paneles('');*/
 }
 
+function construyebeneficiarios(datos){
+	//console.log(datos);
+	
+    var beneficiarios = [];
+    var beneficiario;
+	var acumulaF = 0;
+	var acumulaM = 0;
+	
+    for(var indx in datos){
+       beneficiario = {};
+       beneficiario.id = datos[indx].idTipoBeneficiario;
+       beneficiario.tipoBeneficiario = datos[indx].tipo_beneficiario.descripcion;
+       beneficiario.totalF = datos[indx].totalF;
+       beneficiario.totalM = datos[indx].totalM;
+
+	   acumulaF += beneficiario.totalF;
+	   acumulaM += beneficiario.totalM;
+	   beneficiarios[datos[indx].idTipoBeneficiario] = beneficiario;
+    }
+    $('#tabla_beneficiarios > tbody').empty();
+    var html = '';
+    for(var i in beneficiarios){
+        html += '<tr>';
+        html += '<td>' + beneficiarios[i].tipoBeneficiario + '</td>';
+        html += '<td><div class="form-group"><input type="text" class="form-control" name="beneficiarios[' + beneficiarios[i].id + '][f]" id="beneficiarios-' + beneficiarios[i].id + '-f" data-tipo-beneficiario="' + beneficiarios[i].id + '" value="'+beneficiarios[i].totalF+'"></div></td>';
+        html += '<td><div class="form-group"><input type="text" class="form-control" name="beneficiarios[' + beneficiarios[i].id + '][m]" id="beneficiarios-' + beneficiarios[i].id + '-m" data-tipo-beneficiario="' + beneficiarios[i].id + '" value="'+beneficiarios[i].totalM+'"></div></td>';
+        html += '<td><span id="beneficiarios-' + beneficiarios[i].id + '-total">';
+		html += beneficiarios[i].totalF+beneficiarios[i].totalM;
+		'</span></td>';
+        html += '</tr>';
+    }
+    $('#tabla_beneficiarios > tbody').html(html);
+	$('#total-beneficiarios-lbl').html(acumulaF+acumulaM);       
+}
+
+
+function verdetallepresupuesto(iddesglose, localidad, municipio, jurisdiccion, descri, udadmedida)
+{
+	var parametros = {};	
+	parametros['ver'] = 'detalles-presupuesto';
+
+	proyectoResource.get(iddesglose,parametros,{
+        _success: function(response){
+
+			$('#jurisdiccion-accion').val(jurisdiccion);
+			$('#municipio-accion').val(municipio);
+			$('#localidad-accion').val(localidad);
+			construyebeneficiarios(response.data.desglose.beneficiarios);
+
+			var partidaXMes = [];
+			var cont = 1;
+					
+			for(var partida in response.data.partidas)
+			{
+				var partes = [];
+				
+				partes[1] = '<div class="input-group grupo-partida-presupuestal">';
+				partes[1] += '<span class="input-group-addon" title="';
+				partes[1] += response.data.partidas[partida].descripcion+'">';
+				partes[1] += response.data.partidas[partida].clave;
+				partes[1] += '</span>';
+				partes[1] += '<input id="mes-';
+				
+				partes[2] = '-'+response.data.partidas[partida].id;
+				
+				partes[3] = '" name="mes-';
+				
+				partes[4] = '-'+response.data.partidas[partida].id;
+				
+				partes[5] = '" type="text" class="form-control presupuesto-mes" data-presupuesto-partida="'+response.data.partidas[partida].id;
+				
+				partes[6] = '" data-presupuesto-mes="';
+				
+				partes[7] = '" data-presupuesto-id="';
+				
+				partes[8] = response.data.partidas[partida].id+'"></div>';
+				
+				partidaXMes[cont] = partes;
+				
+				cont++;
+			}
+			
+			var htmlPARTIDAS = '';
+			var paraElMes = [];
+			
+			for(cont = 1; cont<=12; cont++)
+			{
+				var arrayAux = [];
+				for(var i in partidaXMes)
+				{
+					arrayAux[i] = partidaXMes[i][1]+cont+partidaXMes[i][2]+partidaXMes[i][3]+cont+partidaXMes[i][4]+partidaXMes[i][5]+partidaXMes[i][6]+cont+partidaXMes[i][7]+cont+partidaXMes[i][8];
+				}
+				paraElMes[cont] = arrayAux;
+			}
+			
+			var meses = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+			var numerodemes = 1;
+			
+			for(var mes in meses)
+			{			
+				htmlPARTIDAS += '<div class="col-sm-3"><div class="form-group grupo-partidas" data-grupo-mes="'+numerodemes+'">';
+				htmlPARTIDAS += '<label class="control-label">'+meses[mes]+'</label>';
+				for(var x in paraElMes[numerodemes])
+					htmlPARTIDAS += paraElMes[numerodemes][x];			
+				htmlPARTIDAS += '</div></div>';
+				numerodemes++;
+			}
+			
+			$('#calendario-partidas').html(htmlPARTIDAS);
+
+			for(var j in response.data.calendarizado)
+			{
+				var objetoParaValor = '#mes-'+response.data.calendarizado[j].mes+'-'+response.data.calendarizado[j].idObjetoGasto;
+				$(objetoParaValor).val(response.data.calendarizado[j].cantidad);
+			}
+			
+			$('#cantidad-presupuesto-lbl').html(response.data.desglose.presupuesto);
+			
+			$('#indicador_texto').html(descri);
+			$('#unidad_medida_texto').html(udadmedida);
+			
+			htmlMETAS = '';
+			numerodemes = 1;
+			for(var mes in meses)
+			{
+				htmlMETAS += '<div class="col-sm-4">';
+				htmlMETAS += '<div class="form-group">';
+				htmlMETAS += '<div class="input-group">';
+				htmlMETAS += '<span class="input-group-addon">'+meses[mes]+'</span>';
+				htmlMETAS += '<input id="meta-mes-'+numerodemes+'" name="meta-mes-'+numerodemes+'" type="text" class="form-control meta-mes" data-meta-mes="'+numerodemes+'" disabled="">' ;
+				htmlMETAS += '</div></div></div>';
+				numerodemes++;
+			}
+			
+			$('#calendario-metas').html(htmlMETAS);
+			
+			var acumulaTrim = [];
+			acumulaTrim[1] = 0.0; acumulaTrim[2] = 0.0; acumulaTrim[3] = 0.0; acumulaTrim[4] = 0.0;
+			
+			for(var meta in response.data.desglose.metas_mes)
+			{
+				var MesEntero = response.data.desglose.metas_mes[meta].mes;
+				var objetoParaValor = '#meta-mes-'+MesEntero;
+				$(objetoParaValor).val(response.data.desglose.metas_mes[meta].meta);
+
+				var valorTrim = Math.ceil(parseFloat(MesEntero)/3);
+				acumulaTrim[valorTrim] += parseFloat(response.data.desglose.metas_mes[meta].meta);
+			}
+			
+			$('#trim1-lbl').html(acumulaTrim[1]);
+			$('#trim2-lbl').html(acumulaTrim[2]);
+			$('#trim3-lbl').html(acumulaTrim[3]);
+			$('#trim4-lbl').html(acumulaTrim[4]);
+			$('#cantidad-meta-lbl').html(acumulaTrim[1]+acumulaTrim[2]+acumulaTrim[3]+acumulaTrim[4]);
+			
+		}
+	});
+	
+	
+	$('#modal-presupuesto').modal('show');
+}
+
 function escribirComentario(idcampo,nombrecampo,objetoconinformacion)
 {	
 	$('#modalComentario').find(".modal-title").html("<i class=\"fa fa-pencil-square-o\"></i> Escribir comentario");    
@@ -534,6 +878,10 @@ function escribirComentario(idcampo,nombrecampo,objetoconinformacion)
 	$('#tipocomentario').val('1');
 	
 	if(idcampo.substr(0,12) == 'beneficiario')
+		$('#lbl-informacioncampo').text(objetoconinformacion);
+	else if(idcampo.substr(0,10) == 'documentos')
+		$('#lbl-informacioncampo').text(objetoconinformacion);
+	else if(idcampo.substr(0,12) == 'antecedentes')
 		$('#lbl-informacioncampo').text(objetoconinformacion);
 	else
 		$('#lbl-informacioncampo').text($('#'+objetoconinformacion).text());
@@ -567,6 +915,10 @@ function escribirComentarioComponente(idcampo,nombrecampo,objetoconinformacion)
 	$('#tipocomentario').val('2');
 	
 	if(idcampo.substr(0,12) == 'beneficiario')
+		$('#lbl-informacioncampo').text(objetoconinformacion);
+	else if(idcampo.substr(0,8) == 'partidas')
+		$('#lbl-informacioncampo').text(objetoconinformacion);
+	else if(idcampo.substr(0,8) == 'desglose')
 		$('#lbl-informacioncampo').text(objetoconinformacion);
 	else
 		$('#lbl-informacioncampo').text($('#'+objetoconinformacion).text());
@@ -647,6 +999,30 @@ $('#btnGuardarComentario').on('click',function(){
 						$(objetoAColorear).removeClass('btn-default');
 						$(objetoAColorear).addClass('btn-warning');	
 					}
+					else if($('#idcampo').val().substr(0,10)=='documentos')
+					{
+						var objetoAColorear = '#'+$('#idcampo').val();
+						$(objetoAColorear).removeClass('btn-default');
+						$(objetoAColorear).addClass('btn-warning');
+					}
+					else if($('#idcampo').val().substr(0,12)=='antecedentes')
+					{
+						var objetoAColorear = '#'+$('#idcampo').val();
+						$(objetoAColorear).removeClass('btn-default');
+						$(objetoAColorear).addClass('btn-warning');
+					}
+					else if($('#idcampo').val().substr(0,8)=='partidas')
+					{
+						var objetoAColorear = '#'+$('#idcampo').val();
+						$(objetoAColorear).removeClass('btn-default');
+						$(objetoAColorear).addClass('btn-warning');
+					}
+					else if($('#idcampo').val().substr(0,8)=='desglose')
+					{
+						var objetoAColorear = '#'+$('#idcampo').val();
+						$(objetoAColorear).removeClass('btn-default');
+						$(objetoAColorear).addClass('btn-warning');
+					}						
 					else
 					{
 						var objetoAColorear = '#lbl-'+$('#idcampo').val();
@@ -735,6 +1111,30 @@ $('#btnQuitarComentario').on('click',function(){
 								$(objetoADesColorear).removeClass('btn-warning');
 								$(objetoADesColorear).addClass('btn-default');	
 							}
+							else if($('#idcampo').val().substr(0,10)=='documentos')
+							{
+								var objetoADesColorear = '#'+$('#idcampo').val();
+								$(objetoADesColorear).removeClass('btn-warning');
+								$(objetoADesColorear).addClass('btn-default');	
+							}
+							else if($('#idcampo').val().substr(0,12)=='antecedentes')
+							{
+								var objetoADesColorear = '#'+$('#idcampo').val();
+								$(objetoADesColorear).removeClass('btn-warning');
+								$(objetoADesColorear).addClass('btn-default');	
+							}
+							else if($('#idcampo').val().substr(0,8)=='partidas')
+							{
+								var objetoADesColorear = '#'+$('#idcampo').val();
+								$(objetoADesColorear).removeClass('btn-warning');
+								$(objetoADesColorear).addClass('btn-default');	
+							}
+							else if($('#idcampo').val().substr(0,8)=='desglose')
+							{
+								var objetoADesColorear = '#'+$('#idcampo').val();
+								$(objetoADesColorear).removeClass('btn-warning');
+								$(objetoADesColorear).addClass('btn-default');	
+							}
 							else
 							{
 								var objetoADesColorear = '#lbl-'+$('#idcampo').val();
@@ -749,17 +1149,88 @@ $('#btnQuitarComentario').on('click',function(){
 				}
 		});
 	}
-	
-		
-	
-		
-		
-		
-				
-	
-		
 });
 
+$('#btnRegresarCorregir').on('click',function(){
+	if(comentariosArray.length>0)
+	{
+		Confirm.show({
+				titulo:"Regresar el proyecto para correcciones",
+				mensaje: "¿Estás seguro que desea devolver el proyecto para que éste sea corregido?",
+				callback: function(){
+					var parametros = 'actualizarproyecto=regresar';					
+					proyectoResource.put($('#id').val(),parametros,{
+						_success: function(response){
+							window.location = "../revision/revision-proyectos";
+							MessageManager.show({data:'El proyecto ha sido devuelto para correcciones',type:'OK',timer:3});					
+						},
+						_error: function(response){
+							try{
+								var json = $.parseJSON(response.responseText);
+								if(!json.code)
+									MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+								else{
+									json.container = modal_actividad + ' .modal-body';
+									MessageManager.show(json);
+								}
+								Validation.formValidate(json.data);
+							}catch(e){
+								console.log(e);
+							}
+						}
+					});
+				}
+		});
+	}
+	else
+	{
+		MessageManager.show({data:'Debe escribir al menos un comentario en algún elemento del proyecto, para devolver a corrección',type:'ADV',timer:3});
+	}
+});
+
+
+$('#btnAprobarProyecto').on('click',function(){
+	if(comentariosArray.length>0)
+	{
+		MessageManager.show({data:'Existen comentarios sobre el proyecto, si desea autorizarlos, por favor, elimine los comentarios',type:'ADV',timer:3});		
+	}
+	else
+	{
+		Confirm.show({
+				titulo:"Aprobar el proyecto",
+				//botones:[], 
+				mensaje: "¿Estás seguro que deseas aprobar toda la información del proyecto?",
+				//si: 'Actualizar',
+				//no: 'No, gracias',
+				callback: function(){
+					var parametros = 'actualizarproyecto=aprobar';					
+					proyectoResource.put($('#id').val(),parametros,{
+						_success: function(response){
+							window.location = "../revision/revision-proyectos";
+							MessageManager.show({data:'El proyecto ha sido validado en la información con que cuenta',type:'OK',timer:3});					
+						},
+						_error: function(response){
+							try{
+								var json = $.parseJSON(response.responseText);
+								if(!json.code)
+									MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+								else{
+									json.container = modal_actividad + ' .modal-body';
+									MessageManager.show(json);
+								}
+								Validation.formValidate(json.data);
+							}catch(e){
+								console.log(e);
+							}
+						}
+					});
+				}
+		});
+	}
+});
+
+
+/*REVISAR DESDE ACÁ HACIA ABAJO CUÁLES FUNCIONES REALMENTE SE UTILIZAN, LAS QUE NO, QUE SE BORREN*/
 
 function inicializar_comportamiento_caratula(){
 	/*$('#entregable').on('change',function(){
@@ -878,6 +1349,7 @@ function editar_componente(e){
 }
 
 ///*****  Comportamiento_del_grid_de_Desglose
+/*
 $(grid_desglose + " .btn-next-rows").off('click');
 $(grid_desglose + " .btn-next-rows").on('click', function(e) {           
 	e.preventDefault();	
@@ -946,11 +1418,11 @@ function busqueda_rapida_desglose(id_componente,parametros){
 			$(modal_componente).modal('show');
 		}
 	},'Cargando el desglose del componente...');
-}
+}*/
 ///***** Termina Comportamiento_del_grid_de_Desglose
 
 function cargar_formulario_componente_actividad(identificador,datos){
-	var errores_metas = false;
+	/*var errores_metas = false;
 	if($('#trim1-'+identificador).val() != datos.numeroTrim1 && datos.numeroTrim1 != null){
 		Validation.printFieldsErrors('trim1-'+identificador,'Valor anterior de '+datos.numeroTrim1+'.');
 		errores_metas = true;
@@ -986,11 +1458,11 @@ function cargar_formulario_componente_actividad(identificador,datos){
 		return '#tablink-'+identificador+'-desgloce-metas';
 	}else{
 		return '#tablink-'+identificador+'-actividades';
-	}
+	}*/
 }
 
 function editar_actividad(e){
-	var parametros = {'ver':'actividad'};
+	/*var parametros = {'ver':'actividad'};
 	proyectoResource.get(e,parametros,{
         _success: function(response){
             var titulo_modal = 'Editar Actividad';
@@ -1037,10 +1509,11 @@ function editar_actividad(e){
 
             $(modal_actividad).modal('show');
         }
-    });
+    });*/
 }
 
 //***********************     Funcionalidad de botones y elementos del formulario ++++++++++++++++++++++++++++++++++++
+/*
 $('#btn-componente-guardar-salir').on('click',function(){
 	guardar_datos_componente(true);
 });
@@ -1109,7 +1582,7 @@ $('#btn-actividad-guardar').on('click',function(){
 	        }
 	    });
 	}
-});
+});*/
 
 $('#btn-proyecto-guardar').on('click',function(){
 
@@ -1274,6 +1747,7 @@ $(modal_actividad).on('hide.bs.modal',function(e){
 
 //***********************     Funciones             +++++++++++++++++++++++++++++++++
 function guardar_datos_componente(cerrar){
+/*	
 	Validation.cleanFormErrors(form_componente);
 	var parametros = $(form_componente).serialize();
 	parametros = parametros + '&guardar=componente';
@@ -1343,7 +1817,7 @@ function guardar_datos_componente(cerrar){
 	            }                       
 	        }
 	    });
-	}
+	}*/
 }
 
 /**                            Reescribiendo comportamiento del datagrid                                 **/

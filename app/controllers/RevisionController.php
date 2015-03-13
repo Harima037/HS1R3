@@ -115,6 +115,22 @@ class RevisionController extends \BaseController {
 				'NOV'=>'Noviembre',
 				'DIC'=>'Diciembre'
 			);
+			
+
+
+
+		/*$origenes_financiamiento = OrigenFinanciamiento::all();
+		$meses = array( 
+					'1'=>'ENE','2'=>'FEB','3'=>'MAR', '4'=>'ABR', '5'=>'MAY', '6'=>'JUN', 
+					'7'=>'JUL','8'=>'AGO','9'=>'SEP','10'=>'OCT','11'=>'NOV','12'=>'DIC'
+				);
+		
+		$datos_acciones = array(
+			origenes_financiamiento' => $origenes_financiamiento,
+			meses' => $meses
+		);
+		
+		$datos['datos_acciones'] = $datos_acciones;*/
 		
 		$datos['formulario_actividades'] = View::make('expediente.formulario-componente',$datos_componentes);
 

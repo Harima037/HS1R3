@@ -68,30 +68,87 @@ function editar (e){
             $('#lbl_jefe_lider').text((response.data.jefe_inmediato)?response.data.jefe_inmediato.nombre:'No asignado');
             $('#lbl_jefe_ṕlaneacion').text((response.data.jefe_planeacion)?response.data.jefe_planeacion.nombre:'No asignado');
             $('#lbl_coordinador_grupo').text((response.data.coordinador_grupo_estrategico)?response.data.coordinador_grupo_estrategico.nombre:'No asignado');
-
-
-            /*$('#lbl_tipo_beneficiario').text(response.data.tipo_beneficiario.descripcion);
-            $('#lbl_total_beneficiarios').text(response.data.totalBeneficiarios.format());
-            $('#lbl_beneficiarios_f').text(response.data.totalBeneficiariosF.format());
-            $('#lbl_beneficiarios_m').text(response.data.totalBeneficiariosM.format());
-
-            var indx;
-            var sexo;
-            for( indx in response.data.beneficiarios ){
-                sexo = response.data.beneficiarios[indx].sexo;
-                $('#lbl_benef_urbana_'+sexo).text(response.data.beneficiarios[indx].urbana.format());
-                $('#lbl_benef_rural_'+sexo).text(response.data.beneficiarios[indx].rural.format());
-                $('#lbl_benef_mestiza_'+sexo).text(response.data.beneficiarios[indx].mestiza.format());
-                $('#lbl_benef_indigena_'+sexo).text(response.data.beneficiarios[indx].indigena.format());
-                $('#lbl_benef_inmigrante_'+sexo).text(response.data.beneficiarios[indx].inmigrante.format());
-                $('#lbl_benef_otros_'+sexo).text(response.data.beneficiarios[indx].otros.format());
-                $('#lbl_benef_muy_alta_'+sexo).text(response.data.beneficiarios[indx].muyAlta.format());
-                $('#lbl_benef_alta_'+sexo).text(response.data.beneficiarios[indx].alta.format());
-                $('#lbl_benef_media_'+sexo).text(response.data.beneficiarios[indx].media.format());
-                $('#lbl_benef_baja_'+sexo).text(response.data.beneficiarios[indx].baja.format());
-                $('#lbl_benef_muy_baja_'+sexo).text(response.data.beneficiarios[indx].muyBaja.format());
-            }*/
-
+			
+			var cuantasFilasBeneficiarios = response.data.beneficiarios.length;			
+			var cadenaHTML = '<table width=100% class="table table-bordered table-condensed"><tr>';
+			var encabezado = 0;
+			var sePusoTotales = 0;
+			var banderaCelda = 0;
+			
+			for(var cuentabeneficia in response.data.beneficiarios)
+			{
+				if(encabezado==0)
+				{
+					cadenaHTML = cadenaHTML + '<td colspan="3"><strong> &nbsp;Tipo de beneficiario: </strong></td><td colspan="11">&nbsp;'+response.data.beneficiarios[cuentabeneficia].tipo_beneficiario.descripcion+'</td></tr><tr><td colspan="2" rowspan="2" align="center"><strong>Total</strong></td><td rowspan="2" align="center"><strong>Género</strong></td><td colspan="2" align="center"><strong>Zona</strong></td><td colspan="4" align="center"><strong>Población</strong></td><td colspan="5" align="center"><strong>Marginación</strong></td></tr><tr><td align="center"><strong>Urbana</strong></td><td align="center"><strong>Rural</strong></td><td align="center"><strong>Mestiza</strong></td><td align="center"><strong>Indígena</strong></td><td align="center"><strong>Inmigrante</strong></td><td align="center"><strong>Otros</strong></td><td align="center"><strong>Muy Alta</strong></td><td align="center"><strong>Alta</strong></td><td align="center"><strong>Media</strong></td><td align="center"><strong>Baja</strong></td><td align="center"><strong>Muy Baja</strong></td></tr><tr>';					
+					encabezado = 1;
+				}
+																		
+				if((parseInt(cuentabeneficia,10)+2)<=cuantasFilasBeneficiarios)
+				{
+					var siguienteIndice = parseInt(cuentabeneficia,10)+1;										
+					if(response.data.beneficiarios[cuentabeneficia].idTipoBeneficiario == response.data.beneficiarios[siguienteIndice].idTipoBeneficiario)
+					{
+						var sumaTotales = response.data.beneficiarios[cuentabeneficia].total + response.data.beneficiarios[siguienteIndice].total;
+						cadenaHTML = cadenaHTML +'<td rowspan="2" align="right">'+sumaTotales+'</td>';
+						sePusoTotales = 1;
+					}
+					else
+					{
+						if(sePusoTotales == 0)
+						{
+							var sumaTotales = response.data.beneficiarios[cuentabeneficia].total;
+							cadenaHTML = cadenaHTML +'<td align="right">'+sumaTotales+'</td>';
+						}
+						else
+						{
+							sePusoTotales = 0;
+							banderaCelda = 1;
+						}
+						encabezado = 0;
+					}
+				}
+				else
+				{					
+					if(sePusoTotales == 0)
+					{
+						var sumaTotales = response.data.beneficiarios[cuentabeneficia].total;	
+						cadenaHTML = cadenaHTML +'<td align="right">'+sumaTotales+'</td>';
+					}
+					else
+					{
+						banderaCelda = 1;
+					}
+					encabezado = 0;
+				}
+				
+				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].total+'</td>';
+				if(response.data.beneficiarios[cuentabeneficia].sexo == 'f')
+					cadenaHTML = cadenaHTML +'<td align="center"><span class="fa fa-female"></span> Femenino</td>';
+				else
+					cadenaHTML = cadenaHTML +'<td align="center"><span class="fa fa-male"></span> Masculino</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].urbana+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].rural+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].mestiza+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].indigena+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].inmigrante+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].otros+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].muyAlta+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].alta+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].media+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].baja+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].muyBaja+'</td>';
+				
+				if(banderaCelda==1)
+				{
+					banderaCelda=0;
+					//cadenaHTML = cadenaHTML + '<td>&nbsp;</td>';	
+				}
+				
+				cadenaHTML = cadenaHTML + '</tr>';
+			}
+			cadenaHTML = cadenaHTML + '</table>';		
+			$('#datos-beneficiarios').html(cadenaHTML);
+			
             $('#id').val(response.data.id);
 
             if(response.data.idClasificacionProyecto == 2){
@@ -113,7 +170,6 @@ function editar (e){
             
             $('#datos-formulario').hide();
             $('#datos-proyecto').show();
-
             $('#proyecto-tab-panel-list a:first').tab('show');
             $(modal_name).modal('show');
         }
