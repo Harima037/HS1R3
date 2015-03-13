@@ -402,7 +402,7 @@ $('.avance-mes').on('change',function(){
             $(row +' > td.avance-acumulado > span.nueva-cantidad').text('');
         }
 
-        if(total_programado > 0){
+        if(total_programado > 0 && $(this).attr('data-meta-programada')){
             var avance_mes = parseFloat(((acumulado  / total_programado ) * 100).toFixed(2)) || 0;
 
             if(avance_mes > 110){
@@ -416,8 +416,12 @@ $('.avance-mes').on('change',function(){
                 $(row +' > td.avance-mes').attr('data-estado-avance','');
             }
         }else{
-            var avance_mes = acumulado * 100;
-
+            if(total_programado > 0){
+                var avance_mes = parseFloat(((acumulado  / total_programado ) * 100).toFixed(2)) || 0;
+            }else{
+                var avance_mes = acumulado * 100;
+            }
+            
             if(avance_mes == 0){
                 $(row +' > td.avance-mes').html('<small class="text-success">'+avance_mes+'%</small>');
                 $(row +' > td.avance-mes').attr('data-estado-avance','');
