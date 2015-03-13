@@ -35,17 +35,65 @@ $('#btn-beneficiario-guardar').on('click',function(){
     parametros += '&guardar=avance-beneficiarios&id-proyecto='+$('#id').val();
 
     Validation.cleanFormErrors('#form_beneficiario');
+
+    var total_marginacion = [];
+    var total_poblacion = [];
+    var total_zona = [];
+
+    total_marginacion['f'] = 0;
+    $('.sub-total-marginacion.fem').each(function(){ total_marginacion['f'] += parseInt($(this).val()) || 0; });
+    total_poblacion['f'] = 0;
+    $('.sub-total-poblacion.fem').each(function(){ total_poblacion['f'] += parseInt($(this).val()) || 0; });
+    total_zona['f'] = 0;
+    $('.sub-total-zona.fem').each(function(){ total_zona['f'] += parseInt($(this).val()) || 0; });
+
+    total_marginacion['m'] = 0;
+    $('.sub-total-marginacion.masc').each(function(){ total_marginacion['m'] += parseInt($(this).val()) || 0; });
+    total_poblacion['m'] = 0;
+    $('.sub-total-poblacion.masc').each(function(){ total_poblacion['m'] += parseInt($(this).val()) || 0; });
+    total_zona['m'] = 0;
+    $('.sub-total-zona.masc').each(function(){ total_zona['m'] += parseInt($(this).val()) || 0; });
+
+    var sexos = ['f','m'];
+    for(var i in sexos){
+        if(total_marginacion[sexos[i]] != total_poblacion[sexos[i]] || total_marginacion[sexos[i]] != total_zona[sexos[i]] || total_zona[sexos[i]] != total_poblacion[sexos[i]]){
+            MessageManager.show({data:'Los totales capturados no coinciden entre si.',container:'#modalBeneficiario .modal-body',type:'ERR'});
+            return false;
+        }
+    }
+
+    var total_f = $('#total-f').attr('data-valor');
+    var total_m = $('#total-m').attr('data-valor');
+    
+    if(total_zona['f'] > total_f || total_zona['m'] > total_m){
+        Confirm.show({
+                titulo:"¿Esta seguro de guardarl los datos?",
+                mensaje: "Los totales capturados son mayores a los programados para el proyecto, ¿Desea continuar?",
+                callback: function(){
+                    guardar_datos_beneficiarios(parametros);
+                }
+        });
+    }else{
+        guardar_datos_beneficiarios(parametros);
+    }
+});
+
+function guardar_datos_beneficiarios(parametros){
     var hay_avance = parseInt($('#hay-avance').val());
     if(hay_avance){
         moduloResource.put($('#id-beneficiario').val(),parametros,{
             _success: function(response){
-                MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
+                if(response.advertencia){
+                    MessageManager.show({data:response.advertencia,container:'#modalBeneficiario .modal-body',type:'ADV'});
+                }else{
+                    MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
+                    $('#modalBeneficiario').modal('hide');
+                }
                 beneficiariosDatagrid.actualizar({
                     _success: function(response){
                         llenar_grid_beneficiarios(response);
                     }
                 });
-                $('#modalBeneficiario').modal('hide');
             },
             _error: function(response){
                 try{
@@ -64,14 +112,18 @@ $('#btn-beneficiario-guardar').on('click',function(){
     }else{
         moduloResource.post(parametros,{
             _success: function(response){
-                MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
+                if(response.advertencia){
+                    MessageManager.show({data:response.advertencia,container:'#modalBeneficiario .modal-body',type:'ADV'});
+                    $('#hay-avance').val(1);
+                }else{
+                    MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
+                    $('#modalBeneficiario').modal('hide');
+                }
                 beneficiariosDatagrid.actualizar({
                     _success: function(response){
                         llenar_grid_beneficiarios(response);
                     }
                 });
-                //$('#id-beneficiario').val(response.data.id);
-                $('#modalBeneficiario').modal('hide');
             },
             _error: function(response){
                 try{
@@ -88,7 +140,7 @@ $('#btn-beneficiario-guardar').on('click',function(){
             }
         });
     }
-});
+}
 
 $('#btn-guardar-avance').on('click',function(){
     if($('td.avance-mes[data-estado-avance=1]').length){
@@ -247,6 +299,11 @@ function seguimiento_metas(e){
                 $('#modalEditarAvance').find(".modal-title").html("Seguimiento de Metas del Componente");
                 $('#nivel').val('componente');
             }
+
+            $('#indicador').text(response.data.indicador);
+            $('#interpretacion').text(response.data.interpretacion);
+            $('#unidad-medida').text(response.data.unidad_medida.descripcion);
+            $('#meta-total').text(response.data.valorNumerador.format());
             
             $('#id-accion').val(response.data.id);
 
@@ -279,7 +336,7 @@ function seguimiento_metas(e){
                     $('#avance_'+dato.claveJurisdiccion).val(dato.avance);
                     total_avance += dato.avance;
                     total_acumulado -= dato.avance;
-                    avance_jurisdiccion = parseFloat($(row + ' > td.avance-acumulado').attr('data-acumulado'));
+                    avance_jurisdiccion = parseFloat($(row + ' > td.avance-acumulado').attr('data-acumulado')) || 0;
                     $(row + ' > td.avance-acumulado > span.vieja-cantidad').text(avance_jurisdiccion - dato.avance);
                     $(row + ' > td.avance-acumulado').attr('data-acumulado',(avance_jurisdiccion - dato.avance));
                     $('#avance_'+dato.claveJurisdiccion).change();
@@ -386,6 +443,9 @@ $('.avance-mes').on('change',function(){
 
     if($('td.avance-mes[data-estado-avance=1]').length){
         $('#justificacion-acumulada').attr('disabled',false);
+        if($('#justificacion-acumulada').val() == 'El avance se encuentra dentro de los parametros establecidos'){
+            $('#justificacion-acumulada').val('');
+        }
         //$('#tab-link-justificacion').attr('data-toggle','tab');
         //$('#tab-link-justificacion').parent().removeClass('disabled');
     }else{
@@ -518,6 +578,12 @@ function llenar_grid_beneficiarios(response){
                 'total': 0,
                 'total-avance':0
             };
+        }
+
+        if(beneficiario.registro_avance.length){
+            var avance = beneficiario.registro_avance[0];
+            datos_grid[beneficiario.idTipoBeneficiario][beneficiario.sexo+'-avance'] += parseInt(avance.total) || 0;
+            datos_grid[beneficiario.idTipoBeneficiario]['total-avance'] += parseInt(avance.total) || 0;
         }
 
         datos_grid[beneficiario.idTipoBeneficiario][beneficiario.sexo] += beneficiario.total;
