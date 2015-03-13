@@ -165,13 +165,12 @@ function seguimiento_beneficiarios(e){
             $('#form_beneficiario input.fem').attr('disabled',true);
 
             $('#modalBeneficiario').find(".modal-title").html('Seguimiento de Beneficiarios');
-            var beneficiario = response.data[0].tipo_beneficiario;
+            var beneficiario = response.data.beneficiario[0].tipo_beneficiario;
             $('#tipo-beneficiario').text(beneficiario.descripcion);
             $('#id-beneficiario').val(beneficiario.id);
             var suma = 0;
-            var avances = {f:0,m:0};
-            for(var i in response.data){
-                var beneficiario = response.data[i];
+            for(var i in response.data.beneficiario){
+                var beneficiario = response.data.beneficiario[i];
                 $('#total-'+beneficiario.sexo).text(beneficiario.total.format());
                 $('#total-'+beneficiario.sexo).attr('data-valor',beneficiario.total)
                 suma += beneficiario.total;
@@ -188,17 +187,39 @@ function seguimiento_beneficiarios(e){
 
                 for(var j in beneficiario.registro_avance){
                     var avance = beneficiario.registro_avance[j];
-                    avances[avance.sexo] += avance.total;
+
+                    $('#muyalta'+avance.sexo).val(avance.muyAlta);
+                    $('#alta'+avance.sexo).val(avance.alta);
+                    $('#media'+avance.sexo).val(avance.media);
+                    $('#baja'+avance.sexo).val(avance.baja);
+                    $('#muybaja'+avance.sexo).val(avance.muyBaja);
+
+                    $('#indigena'+avance.sexo).val(avance.indigena);
+                    $('#inmigrante'+avance.sexo).val(avance.inmigrante);
+                    $('#mestiza'+avance.sexo).val(avance.mestiza);
+                    $('#otros'+avance.sexo).val(avance.otros);
+
+                    $('#rural'+avance.sexo).val(avance.rural);
+                    $('#urbana'+avance.sexo).val(avance.urbana);
                 }
             }
 
-            for(var i in avances){
-                $('#acumulado-'+i).text(avances[i].format());
-                $('#acumulado-'+i).attr('data-valor',avances[i])
+            $('#muybajaf').change();
+            $('#otrosf').change();
+            $('#urbanaf').change();
+            $('#muybajam').change();
+            $('#otrosm').change();
+            $('#urbanam').change();
+
+            var suma_acumulados = 0;
+            for(var i in response.data.acumulado){
+                $('#acumulado-'+response.data.acumulado[i].sexo).text(parseInt(response.data.acumulado[i].total).format());
+                $('#acumulado-'+response.data.acumulado[i].sexo).attr('data-valor',response.data.acumulado[i].total);
+                suma_acumulados += parseInt(response.data.acumulado[i].total);
             }
 
-            $('#acumulado-beneficiario').text((avances.f + avances.m).format());
-            $('#acumulado-beneficiario').attr('data-valor',avances.f + avances.m);
+            $('#acumulado-beneficiario').text(suma_acumulados.format());
+            $('#acumulado-beneficiario').attr('data-valor',suma_acumulados);
 
             $('#total-beneficiario').text(suma.format());
             $('#total-beneficiario').attr('data-valor',suma);
@@ -280,6 +301,27 @@ function seguimiento_metas(e){
         }
     });    
 }
+
+$('.fem,.masc').on('keyup',function(){ $(this).change(); });
+$('.fem').on('change',function(){
+    if($(this).hasClass('sub-total-zona')){
+        sumar_valores('.sub-total-zona.fem','#total-zona-f');
+    }else if($(this).hasClass('sub-total-poblacion')){
+        sumar_valores('.sub-total-poblacion.fem','#total-poblacion-f');
+    }else if($(this).hasClass('sub-total-marginacion')){
+        sumar_valores('.sub-total-marginacion.fem','#total-marginacion-f');
+    }
+});
+$('.masc').on('change',function(){
+    if($(this).hasClass('sub-total-zona')){
+        sumar_valores('.sub-total-zona.masc','#total-zona-m');
+    }else if($(this).hasClass('sub-total-poblacion')){
+        sumar_valores('.sub-total-poblacion.masc','#total-poblacion-m');
+    }else if($(this).hasClass('sub-total-marginacion')){
+        sumar_valores('.sub-total-marginacion.masc','#total-marginacion-m');
+    }
+});
+
 $('.avance-mes').on('keyup',function(){ $(this).change() });
 $('.avance-mes').on('change',function(){
     var jurisdiccion = $(this).attr('data-jurisdiccion');
@@ -500,6 +542,18 @@ function llenar_grid_beneficiarios(response){
     if(plus>0) 
         total++;
     beneficiariosDatagrid.paginacion(total);
+}
+
+function sumar_valores(identificador,resultado){
+    var sumatoria = 0;
+    $(identificador).each(function(){
+        sumatoria += parseFloat($(this).val()) || 0;
+    });
+    if($(resultado).is('input')){
+        $(resultado).val(sumatoria.format()).change();
+    }else{
+        $(resultado).text(sumatoria.format());
+    }
 }
 
 /*             Extras               */

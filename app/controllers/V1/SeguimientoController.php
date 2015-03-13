@@ -10,28 +10,28 @@ use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMet
 class SeguimientoController extends BaseController {
 	private $reglasBeneficiarios = array(
 		'id-beneficiario'			=> 'required',
-		'altaf' 					=> 'required|integer|min:0',
-		'altam' 					=> 'required|integer|min:0',
-		'bajaf' 					=> 'required|integer|min:0',
-		'bajam' 					=> 'required|integer|min:0',
-		'indigenaf'					=> 'required|integer|min:0',
-		'indigenam'					=> 'required|integer|min:0',
-		'inmigrantef' 				=> 'required|integer|min:0',
-		'inmigrantem' 				=> 'required|integer|min:0',
-		'mediaf' 					=> 'required|integer|min:0',
-		'mediam' 					=> 'required|integer|min:0',
-		'mestizaf' 					=> 'required|integer|min:0',
-		'mestizam'					=> 'required|integer|min:0',
-		'muyaltaf' 					=> 'required|integer|min:0',
-		'muyaltam' 					=> 'required|integer|min:0',
-		'muybajaf' 					=> 'required|integer|min:0',
-		'muybajam' 					=> 'required|integer|min:0',
-		'otrosf' 					=> 'required|integer|min:0',
-		'otrosm' 					=> 'required|integer|min:0',
-		'ruralf' 					=> 'required|integer|min:0',
-		'ruralm' 					=> 'required|integer|min:0',
-		'urbanaf' 					=> 'required|integer|min:0',
-		'urbanam' 					=> 'required|integer|min:0'
+		'altaf' 					=> 'sometimes|required|integer|min:0',
+		'altam' 					=> 'sometimes|required|integer|min:0',
+		'bajaf' 					=> 'sometimes|required|integer|min:0',
+		'bajam' 					=> 'sometimes|required|integer|min:0',
+		'indigenaf'					=> 'sometimes|required|integer|min:0',
+		'indigenam'					=> 'sometimes|required|integer|min:0',
+		'inmigrantef' 				=> 'sometimes|required|integer|min:0',
+		'inmigrantem' 				=> 'sometimes|required|integer|min:0',
+		'mediaf' 					=> 'sometimes|required|integer|min:0',
+		'mediam' 					=> 'sometimes|required|integer|min:0',
+		'mestizaf' 					=> 'sometimes|required|integer|min:0',
+		'mestizam'					=> 'sometimes|required|integer|min:0',
+		'muyaltaf' 					=> 'sometimes|required|integer|min:0',
+		'muyaltam' 					=> 'sometimes|required|integer|min:0',
+		'muybajaf' 					=> 'sometimes|required|integer|min:0',
+		'muybajam' 					=> 'sometimes|required|integer|min:0',
+		'otrosf' 					=> 'sometimes|required|integer|min:0',
+		'otrosm' 					=> 'sometimes|required|integer|min:0',
+		'ruralf' 					=> 'sometimes|required|integer|min:0',
+		'ruralm' 					=> 'sometimes|required|integer|min:0',
+		'urbanaf' 					=> 'sometimes|required|integer|min:0',
+		'urbanam' 					=> 'sometimes|required|integer|min:0'
 	);
 
 	/**
@@ -146,8 +146,11 @@ class SeguimientoController extends BaseController {
 				}))->find($id);
 			}elseif($parametros['mostrar'] == 'datos-beneficiarios-avance'){
 				$mes_actual = Util::obtenerMesActual();
-				$recurso = Beneficiario::with(array('tipoBeneficiario','registroAvance'=>function($query) use ($mes_actual){
-					$query->where('mes','<=',$mes_actual);
+				$recurso['acumulado'] = RegistroAvanceBeneficiario::where('idProyecto','=',$parametros['id-proyecto'])->where('idTipoBeneficiario','=',$id)
+														->where('mes','<',$mes_actual)->groupBy('idTipoBeneficiario','sexo')
+														->select('idTipoBeneficiario','sexo',DB::raw('sum(total) AS total'))->get();
+				$recurso['beneficiario'] = Beneficiario::with(array('tipoBeneficiario','registroAvance'=>function($query) use ($mes_actual){
+					$query->where('mes','=',$mes_actual);
 				}))->where('idProyecto','=',$parametros['id-proyecto'])->where('idTipoBeneficiario','=',$id)->get();
 			}
 		}
@@ -192,7 +195,7 @@ class SeguimientoController extends BaseController {
 				$respuesta['data']['code'] = 'U00';
 				$respuesta['data']['data'] = $ex->getMessage();
 			}else{
-				$respuesta['data']['ex'] = $ex->getMessage();
+				$respuesta['data']['data'] = $ex->getMessage();
 			}
 			$respuesta['data']['line'] = $ex->getLine();
 			if(!isset($respuesta['data']['code'])){
@@ -220,6 +223,8 @@ class SeguimientoController extends BaseController {
 				if($respuesta['http_status'] != 200){
 					throw new Exception("Error al procesar los datos", 1);
 				}
+			}elseif($parametros['guardar'] == 'avance-beneficiarios'){
+				$respuesta = $this->guardarAvanceBeneficiario($parametros,TRUE);
 			}
 		}catch(\Exception $ex){
 			$respuesta['http_status'] = 500;	
@@ -246,6 +251,27 @@ class SeguimientoController extends BaseController {
 		$validacion = Validador::validar(Input::all(), $this->reglasBeneficiarios);
 
 		if($validacion === TRUE){
+
+			if(isset($parametros['urbanaf'])){
+				$suma_zona_f		= $parametros['urbanaf'] + $parametros['ruralf'];
+				$suma_poblacion_f	= $parametros['mestizaf'] + $parametros['indigenaf'] + $parametros['inmigrantef'] + $parametros['otrosf'];
+				$suma_marginacion_f	= $parametros['muyaltaf'] + $parametros['altaf'] + $parametros['mediaf'] + $parametros['bajaf'] + $parametros['muybajaf'];
+
+				if(($suma_zona_f != $suma_poblacion_f) || ($suma_poblacion_f != $suma_marginacion_f) || ($suma_marginacion_f != $suma_zona_f)){
+					throw new Exception('Los totales de los Benefiiciarios no corresponden', 1);
+				}
+			}
+
+			if(isset($parametros['urbanam'])){
+				$suma_zona_m		= $parametros['urbanam'] + $parametros['ruralm'];
+				$suma_poblacion_m	= $parametros['mestizam'] + $parametros['indigenam'] + $parametros['inmigrantem'] + $parametros['otrosm'];
+				$suma_marginacion_m	= $parametros['muyaltam'] + $parametros['altam'] + $parametros['mediam'] + $parametros['bajam'] + $parametros['muybajam'];
+
+				if(($suma_zona_m != $suma_poblacion_m) || ($suma_poblacion_m != $suma_marginacion_m) || ($suma_marginacion_m != $suma_zona_m)){
+					throw new Exception('Los totales de los Beneficiarios no corresponden', 1);
+				}
+			}
+			
 			$mes_actual = Util::obtenerMesActual();
 			$recurso = Beneficiario::with(array('registroAvance'=>function($query) use ($mes_actual){
 							$query->where('mes','=',$mes_actual);
@@ -266,12 +292,15 @@ class SeguimientoController extends BaseController {
 					$avance->sexo 				= $sexo;
 					$avance->mes 				= $mes_actual;
 					$avance->total 				= $parametros['urbana'.$sexo] + $parametros['rural'.$sexo];
+
 					$avance->urbana 			= $parametros['urbana'.$sexo];
 					$avance->rural 				= $parametros['rural'.$sexo];
+
 					$avance->mestiza 			= $parametros['mestiza'.$sexo];
 					$avance->indigena 			= $parametros['indigena'.$sexo];
 					$avance->inmigrante 		= $parametros['inmigrante'.$sexo];
 					$avance->otros 				= $parametros['otros'.$sexo];
+
 					$avance->muyAlta 			= $parametros['muyalta'.$sexo];
 					$avance->alta 				= $parametros['alta'.$sexo];
 					$avance->media 				= $parametros['media'.$sexo];
@@ -285,7 +314,6 @@ class SeguimientoController extends BaseController {
 			$respuesta['http_status'] = $validacion['http_status'];
 			$respuesta['data'] = $validacion['data'];
 		}
-
 		return $respuesta;
 	}
 
