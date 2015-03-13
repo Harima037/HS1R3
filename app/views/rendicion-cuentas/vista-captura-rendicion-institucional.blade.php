@@ -47,17 +47,21 @@
                 </div>
             </div>
     		<div class="panel panel-default datagrid" id="datagridBeneficiarios" data-edit-row="seguimiento_beneficiarios">
-	            <table class="table table-striped table-hover">
+	            <table class="table table-striped table-hover table-bordered">
 	                <thead>
+	                	<tr>
+	                		<th rowspan="2"><input type="checkbox" class="check-select-all-rows"></th>
+	                        <th rowspan="2">Beneficiario</th>
+	                        <th colspan="2">Femenino</th>
+	                        <th colspan="2">Masculino</th>
+	                        <th rowspan="2">Total</th>
+	                        <th rowspan="2">Acumulado</th>
+	                	</tr>
 	                    <tr>
-	                        <th><input type="checkbox" class="check-select-all-rows"></th>
-	                        <th>Tipo de Beneficiario</th>
-	                        <th>Total F</th>
-							<th>Avance F</th>
-	                        <th>Total M</th>
-	                        <th>Avance M</th>
 	                        <th>Total</th>
-	                        <th>Avance</th>
+							<th>Acumulado</th>
+	                        <th>Total</th>
+	                        <th>Acumulado</th>
 	                    </tr>
 	                </thead>
 	                <tbody>
@@ -117,6 +121,36 @@
                 <h4 class="modal-title" id="modalEditarAvanceLabel">Nuevo</h4>
             </div>
             <div class="modal-body">
+            	<div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label">Indicador</label>
+                                    <p class="form-control-static" id="indicador"></p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label">Interpretación</label>
+                                    <p class="form-control-static" id="interpretacion"></p>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label class="control-label">Unidad de Medida</label>
+                                    <p class="form-control-static" id="unidad-medida"></p>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label class="control-label">Meta Total Programada</label>
+                                    <p class="form-control-static" id="meta-total"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <form action="" id="form_avance">
 					<div role="tabpanel">
 						<ul class="nav nav-tabs" role="tablist" id="tabs-seguimiento-metas">
@@ -127,7 +161,7 @@
 							</li>
 							<li role="presentation">
 								<a href="#panel-justificacion" aria-controls="panel-justificacion" role="tab" data-toggle="tab" id="tab-link-justificacion">
-									<span class="fa fa-align-left"></span> Justificación
+									<span class="fa fa-align-left"></span> Analisis y Justificación
 								</a>
 							</li>
 						</ul>
@@ -253,6 +287,9 @@
 				</tr>
     		</tbody>
     	</table>
+    </div>
+    <div class="form-group">
+    	<input type="hidden" id="errorbeneficiarios">
     </div>
     <div role="tabpanel">
 		<!-- Nav tabs -->

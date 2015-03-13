@@ -51,9 +51,11 @@ class SeguimientoController extends BaseController {
 					$rows = Proyecto::with('componentes.actividades.registroAvance')->find($parametros['idProyecto']);
 					$rows->componentes->load('registroAvance');
 					$total = count($rows);
-
 				}elseif($parametros['grid'] == 'rendicion-beneficiarios'){
-					$rows = Beneficiario::with('tipoBeneficiario')->where('idProyecto','=',$parametros['idProyecto'])->get();
+					$rows = Beneficiario::with(array('registroAvance'=>function($query){
+						$query->select('id','idProyectoBeneficiario','idTipoBeneficiario','sexo',DB::raw('sum(total) AS total'))
+								->groupBy('idTipoBeneficiario','sexo');
+					},'tipoBeneficiario'))->where('idProyecto','=',$parametros['idProyecto'])->get();
 					$total = count($rows);
 				}
 			}else{
@@ -133,7 +135,7 @@ class SeguimientoController extends BaseController {
 					$query->where('mes','=',$mes_actual);
 				},'metasMes' => function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
-				}))->find($id);
+				},'unidadMedida'))->find($id);
 			}elseif($parametros['mostrar'] == 'datos-actividad-avance'){
 				$mes_actual = Util::obtenerMesActual();
 				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
@@ -143,10 +145,11 @@ class SeguimientoController extends BaseController {
 					$query->where('mes','=',$mes_actual);
 				},'metasMes' => function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
-				}))->find($id);
+				},'unidadMedida'))->find($id);
 			}elseif($parametros['mostrar'] == 'datos-beneficiarios-avance'){
 				$mes_actual = Util::obtenerMesActual();
-				$recurso['acumulado'] = RegistroAvanceBeneficiario::where('idProyecto','=',$parametros['id-proyecto'])->where('idTipoBeneficiario','=',$id)
+				$recurso['acumulado'] = RegistroAvanceBeneficiario::where('idProyecto','=',$parametros['id-proyecto'])
+														->where('idTipoBeneficiario','=',$id)
 														->where('mes','<',$mes_actual)->groupBy('idTipoBeneficiario','sexo')
 														->select('idTipoBeneficiario','sexo',DB::raw('sum(total) AS total'))->get();
 				$recurso['beneficiario'] = Beneficiario::with(array('tipoBeneficiario','registroAvance'=>function($query) use ($mes_actual){
@@ -195,7 +198,7 @@ class SeguimientoController extends BaseController {
 				$respuesta['data']['code'] = 'U00';
 				$respuesta['data']['data'] = $ex->getMessage();
 			}else{
-				$respuesta['data']['data'] = $ex->getMessage();
+				$respuesta['data']['ex'] = $ex->getMessage();
 			}
 			$respuesta['data']['line'] = $ex->getLine();
 			if(!isset($respuesta['data']['code'])){
@@ -237,6 +240,7 @@ class SeguimientoController extends BaseController {
 			}else{
 				$respuesta['data']['ex'] = $ex->getMessage();
 			}
+			$respuesta['data']['line'] = $ex->getLine();
 			if(!isset($respuesta['data']['code'])){
 				$respuesta['data']['code'] = 'S03';
 			}
@@ -251,35 +255,29 @@ class SeguimientoController extends BaseController {
 		$validacion = Validador::validar(Input::all(), $this->reglasBeneficiarios);
 
 		if($validacion === TRUE){
-
-			if(isset($parametros['urbanaf'])){
-				$suma_zona_f		= $parametros['urbanaf'] + $parametros['ruralf'];
-				$suma_poblacion_f	= $parametros['mestizaf'] + $parametros['indigenaf'] + $parametros['inmigrantef'] + $parametros['otrosf'];
-				$suma_marginacion_f	= $parametros['muyaltaf'] + $parametros['altaf'] + $parametros['mediaf'] + $parametros['bajaf'] + $parametros['muybajaf'];
-
-				if(($suma_zona_f != $suma_poblacion_f) || ($suma_poblacion_f != $suma_marginacion_f) || ($suma_marginacion_f != $suma_zona_f)){
-					throw new Exception('Los totales de los Benefiiciarios no corresponden', 1);
-				}
-			}
-
-			if(isset($parametros['urbanam'])){
-				$suma_zona_m		= $parametros['urbanam'] + $parametros['ruralm'];
-				$suma_poblacion_m	= $parametros['mestizam'] + $parametros['indigenam'] + $parametros['inmigrantem'] + $parametros['otrosm'];
-				$suma_marginacion_m	= $parametros['muyaltam'] + $parametros['altam'] + $parametros['mediam'] + $parametros['bajam'] + $parametros['muybajam'];
-
-				if(($suma_zona_m != $suma_poblacion_m) || ($suma_poblacion_m != $suma_marginacion_m) || ($suma_marginacion_m != $suma_zona_m)){
-					throw new Exception('Los totales de los Beneficiarios no corresponden', 1);
-				}
-			}
-			
 			$mes_actual = Util::obtenerMesActual();
 			$recurso = Beneficiario::with(array('registroAvance'=>function($query) use ($mes_actual){
 							$query->where('mes','=',$mes_actual);
 						}))->where('idProyecto','=',$parametros['id-proyecto'])
 						->where('idTipoBeneficiario','=',$parametros['id-beneficiario'])
 						->get();
+
+			$sexos_registrados = $recurso->lists('sexo');
+			foreach ($sexos_registrados as $sexo) {
+				$suma_zona		= $parametros['urbana'.$sexo] + $parametros['rural'.$sexo];
+				$suma_poblacion	= $parametros['mestiza'.$sexo] + $parametros['indigena'.$sexo] + $parametros['inmigrante'.$sexo] + $parametros['otros'.$sexo];
+				$suma_marginacion	= $parametros['muyalta'.$sexo] + $parametros['alta'.$sexo] + $parametros['media'.$sexo] + $parametros['baja'.$sexo] + $parametros['muybaja'.$sexo];
+
+				if(($suma_zona != $suma_poblacion) || ($suma_poblacion != $suma_marginacion) || ($suma_marginacion != $suma_zona)){
+					$respuesta['data'] = array('data'=>array(json_encode(array('field'=>'errorbeneficiarios','error'=>'Los totales capturados no corresponden entre si.'))),'code'=>'U00');
+					$respuesta['http_status'] = 500;
+					return $respuesta;
+				}
+			}
+			//
 			//
 			$respuesta['data'] = DB::transaction(function() use ($recurso,$es_editar,$mes_actual,$parametros){
+				$advertencia = '';
 				foreach ($recurso as $beneficiario) {
 					$sexo = $beneficiario->sexo;
 					if($es_editar){
@@ -309,6 +307,17 @@ class SeguimientoController extends BaseController {
 
 					$beneficiario->registroAvance()->save($avance);
 				}
+				$total_beneficiarios = $recurso->lists('total','sexo');
+				$beneficiarios_acumulados = RegistroAvanceBeneficiario::where('idProyecto','=',$parametros['id-proyecto'])
+															->where('idTipoBeneficiario','=',$parametros['id-beneficiario'])
+															->where('mes','<=',$mes_actual)->groupBy('idTipoBeneficiario','sexo')
+															->select('idTipoBeneficiario','sexo',DB::raw('sum(total) AS total'))->get();
+				foreach ($beneficiarios_acumulados as $acumulado) {
+					if($acumulado->total > $total_beneficiarios[$acumulado->sexo]){
+						$advertencia = 'Los datos del avance de beneficiarios han sido guardados, sin embargo algunos totales capturados son mayores a los programados en el proyecto';
+					}
+				}
+				return array('advertencia'=>$advertencia);
 			});
 		}else{
 			$respuesta['http_status'] = $validacion['http_status'];
