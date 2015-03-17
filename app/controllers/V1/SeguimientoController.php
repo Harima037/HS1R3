@@ -513,6 +513,9 @@ class SeguimientoController extends BaseController {
 			$validacion = Validador::validar(Input::all(), $this->reglasPlanMejora);
 
 			if($validacion === TRUE){
+
+				$fechas = $this->validar_fechas($parametros['fecha-inicio'], $parametros['fecha-termino'], $parametros['fecha-notificacion']);
+
 				if(count($accion_metas->planMejora)){
 					$plan_mejora = $accion_metas->planMejora[0];
 				}else{
@@ -525,9 +528,9 @@ class SeguimientoController extends BaseController {
 				$plan_mejora->accionMejora 					= $parametros['accion-mejora'];
 				$plan_mejora->grupoTrabajo 					= $parametros['grupo-trabajo'];
 				$plan_mejora->documentacionComprobatoria 	= $parametros['documentacion-comprobatoria'];
-				$plan_mejora->fechaInicio 					= $parametros['fecha-inicio'];
-				$plan_mejora->fechaTermino 					= $parametros['fecha-termino'];
-				$plan_mejora->fechaNotificacion 			= $parametros['fecha-notificacion'];
+				$plan_mejora->fechaInicio 					= $fechas['inicio'];
+				$plan_mejora->fechaTermino 					= $fechas['termino'];
+				$plan_mejora->fechaNotificacion 			= $fechas['notificacion'];
 			}else{
 				$respuesta['http_status'] = $validacion['http_status'];
 				$respuesta['data'] = $validacion['data'];
@@ -552,5 +555,39 @@ class SeguimientoController extends BaseController {
 		});
 
 		return $respuesta;
+	}
+
+	private function validar_fechas($fecha_inicial, $fecha_final, $fecha_noti){
+		$fecha_inicio = DateTime::createFromFormat('d/m/Y',$fecha_inicial);
+		$fecha_termino = DateTime::createFromFormat('d/m/Y',$fecha_final);
+		$fecha_notificacion = DateTime::createFromFormat('d/m/Y',$fecha_noti);
+
+		if(!$fecha_inicio){ $fecha_inicio = DateTime::createFromFormat('Y-m-d',$fecha_inicial); }
+
+		if(!$fecha_termino){ $fecha_termino = DateTime::createFromFormat('Y-m-d',$fecha_final); }
+
+		if(!$fecha_notificacion){ $fecha_notificacion = DateTime::createFromFormat('Y-m-d',$fecha_noti); }
+
+		if(!$fecha_inicio){
+			throw new Exception('{"field":"fecha-inicio","error":"La fecha de inicio del periodo de ejecución no tiene el formato correcto."}');
+		}
+
+		if(!$fecha_termino){
+			throw new Exception('{"field":"fecha-termino","error":"La fecha final del periodo de ejecución no tiene el formato correcto."}');
+		}
+
+		if(!$fecha_notificacion){
+			throw new Exception('{"field":"fecha-notificacion","error":"La fecha final del periodo de ejecución no tiene el formato correcto."}');
+		}		
+
+		if($fecha_termino < $fecha_inicio){
+			throw new Exception('{"field":"fecha-termino","error":"La fecha de termino no puede ser menor que la de inicio."}');
+		}
+
+		if($fecha_notificacion < $fecha_termino){
+			throw new Exception('{"field":"fecha-notificacion","error":"La fecha de notificación no puede ser menor que la de termino."}');
+		}
+
+		return array('inicio' =>$fecha_inicio, 'termino' => $fecha_termino, 'notificacion' => $fecha_notificacion);
 	}
 }

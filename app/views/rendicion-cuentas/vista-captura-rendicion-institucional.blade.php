@@ -170,7 +170,7 @@
         <div class="modal-content modal-content-85-screen">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="modalEditarAvanceLabel">Nuevo</h4>
+                <h4 class="modal-title" id="modalEditarAvanceLabel">Seguimiento de Metas</h4>
             </div>
             <div class="modal-body">
             	<div class="panel panel-default">
@@ -182,12 +182,6 @@
                                     <p class="form-control-static" id="indicador"></p>
                                 </div>
                             </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label class="control-label">Interpretación</label>
-                                    <p class="form-control-static" id="interpretacion"></p>
-                                </div>
-                            </div>
                             <div class="col-sm-3">
                                 <div class="form-group">
                                     <label class="control-label">Unidad de Medida</label>
@@ -195,10 +189,10 @@
                                 </div>
                             </div>
                             <div class="col-sm-3">
-                                <div class="form-group">
-                                    <label class="control-label">Meta Total Programada</label>
-                                    <p class="form-control-static" id="meta-total"></p>
-                                </div>
+                            	<div class="form-group">
+                            		<label class="control-label">Meta Total Programada</label>
+                            		<p class="form-control-static" id="meta-total"></p>
+								</div>
                             </div>
                         </div>
                     </div>
@@ -217,7 +211,7 @@
 								</a>
 							</li>
 							<li role="presentation">
-								<a href="#panel-plan-mejora" aria-controls="panel-plan-mejora" role="tab" data-toggle="tab" id="tab-link-plan-mejora">
+								<a href="#panel-plan-mejora" aria-controls="panel-plan-mejora" role="tab" data-toggle="" id="tab-link-plan-mejora" class="disabled">
 									<span class="fa fa-file"></span> Plan de Mejora
 								</a>
 							</li>
@@ -351,7 +345,7 @@
         <div class="modal-content modal-content-85-screen">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="modalBenefLabel">Nuevo</h4>
+                <h4 class="modal-title" id="modalBenefLabel">Beneficiarios</h4>
             </div>
             <div class="modal-body">
 
