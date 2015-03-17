@@ -46,6 +46,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 	Route::group(array('prefix'=>'revision'), function(){
 		Route::get('revision-proyectos',array('uses'=>'RevisionController@index'));
 		Route::any('revision-caratula',array('uses'=>'RevisionController@caratula'));		
+		
+		Route::get('segui-proyectos-inst',array('uses'=>'SeguimientoInstitucionalController@index'));
 	});
 
 	Route::group(array('prefix'=>'rendicion-cuentas'),function(){
@@ -74,6 +76,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('seguimiento', 		'V1\SeguimientoController');
 
 		Route::resource('revision-proyectos',	'V1\RevisionController');
+		Route::resource('segui-proyectos-inst', 'V1\SeguimientoInstitucionalController');
+
 		Route::resource('reporte-evaluacion',	'V1\ReporteEvaluacionController', array('only'=>array('show')));
 	});
 });
