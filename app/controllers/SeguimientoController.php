@@ -33,7 +33,7 @@ class SeguimientoController extends BaseController {
 				)
 		);
 		$mes_actual = Util::obtenerMesActual();
-		$trimestre_actual = ceil(($mes_actual/3));
+		$trimestre_actual = Util::obtenerTrimestre();
 		$datos['mes_avance'] = $mes_actual;
 		$datos['trimestre_avance'] = $trimestre_actual;
 		return parent::loadIndex('RENDCUENTA','RENDINST',$datos);
@@ -43,7 +43,22 @@ class SeguimientoController extends BaseController {
 	}
 
 	public function rendicionCuentas($id){
+		$datos['sys_sistemas'] = SysGrupoModulo::all();
+		$datos['sys_activo'] = SysGrupoModulo::findByKey('RENDCUENTA');
+		$datos['sys_mod_activo'] = SysModulo::findByKey('RENDINST');
+		$datos['usuario'] = Sentry::getUser();
+
 		$mes_actual = Util::obtenerMesActual();
+
+		if($mes_actual == 0){
+			return Response::view('errors.mes_no_disponible', array(
+				'usuario'=>$datos['usuario'],
+				'sys_activo'=>null,
+				'sys_sistemas'=>$datos['sys_sistemas'],
+				'sys_mod_activo'=>null), 403
+			);
+		}
+
 		$proyecto = Proyecto::with(array('analisisFuncional'=>function($query) use ($mes_actual){
 			$query->where('mes','=',$mes_actual);
 		}))->find($id);
@@ -70,13 +85,9 @@ class SeguimientoController extends BaseController {
 			$datos['id_analisis'] = '';
 		}
 
-		$datos['sys_sistemas'] = SysGrupoModulo::all();
-		$datos['sys_activo'] = SysGrupoModulo::findByKey('RENDCUENTA');
-		$datos['sys_mod_activo'] = SysModulo::findByKey('RENDINST');
 		$uri = 'rendicion-cuentas.vista-captura-rendicion-institucional';
 		$permiso = 'RENDCUENTA.RENDINST.C';
-		$datos['usuario'] = Sentry::getUser();
-
+		
 		if(Sentry::hasAccess($permiso)){
 			return View::make($uri)->with($datos);
 		}else{

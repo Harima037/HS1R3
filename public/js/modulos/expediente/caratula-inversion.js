@@ -103,8 +103,11 @@ if($('#id').val()){
 				$('#tab-link-acciones-fibap').parent().removeClass('disabled');
 			}
 
-			if(response.data.idEstatusProyecto == 2){
+
+			if(response.data.idEstatusProyecto != 1 && response.data.idEstatusProyecto != 3){
 				bloquear_controles();
+			}else if(response.data.idEstatusProyecto == 3){
+				mostrar_comentarios(response.data.comentarios);
 			}
             /*
             actualizar_tabla_metas('actividad',response.data.jurisdicciones);
@@ -343,7 +346,6 @@ $('#btn-proyecto-guardar').on('click',function(){
 		proyectoResource.put($('#id').val(),parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:3});
-
 	            if(response.extras){
 	            	if(response.extras.municipios){
 	            		fibapAcciones.cargar_municipios(response.extras.municipios);
@@ -708,4 +710,24 @@ function bloquear_controles(){
 			$(this).trigger('chosen:updated');
 		}
 	});
+}
+
+function mostrar_comentarios(datos){
+	for(var i in datos){
+		var id_campo = datos[i].idCampo;
+		var observacion = datos[i].observacion;
+		
+		if(id_campo.substring(0,12) == 'beneficiario'){
+			console.log(id_campo.substring(12));
+			$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"]').addClass('text-warning');
+			$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"] td:eq(1)').prepend('<span class="fa fa-warning"></span> ');
+			$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"]').attr('data-comentario',observacion);
+		}else{
+			$('#'+id_campo).parent('.form-group').addClass('has-warning');
+			var texto_lbl = $('label[for="' + id_campo + '"]').text();
+			$('label[for="' + id_campo + '"]').html('<span class="proyecto-comentario" data-placement="auto top" data-toggle="popover" data-trigger="click" data-content="'+observacion+'">'+texto_lbl+'</span>');
+			$('label[for="' + id_campo + '"]').prepend('<span class="fa fa-warning"></span> ');
+			$('.proyecto-comentario').popover();
+		}
+	}
 }

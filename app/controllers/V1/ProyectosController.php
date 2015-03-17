@@ -577,6 +577,17 @@ class ProyectosController extends BaseController {
 			if($parametros['guardar'] == 'validar-proyecto'){
 				$proyecto = Proyecto::find($id);
 				if($proyecto->idEstatusProyecto == 1 || $proyecto->idEstatusProyecto == 3){
+					$proyecto->load('beneficiarios','componentes','actividades');
+					if(count($proyecto->beneficiarios) == 0){
+						$respuesta['data'] = array('data'=>'El proyecto debe tener al menos un beneficiario capturado.');
+						throw new Exception("No hay beneficiarios", 1);
+					}elseif(count($proyecto->componentes) == 0){
+						$respuesta['data'] = array('data'=>'El proyecto debe tener al menos un componente capturado.');
+						throw new Exception("No hay componentes", 1);
+					}elseif(count($proyecto->actividades) == 0){
+						$respuesta['data'] = array('data'=>'El proyecto debe tener al menos una actividad capturada.');
+						throw new Exception("No hay actividades", 1);
+					}
 					$proyecto->idEstatusProyecto = 2;
 					$proyecto->save();
 					$respuesta['data'] = array('data'=>'El Proyecto fue enviado a Revisión');
