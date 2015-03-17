@@ -79,7 +79,7 @@
 		                    <div class="btn-toolbar pull-right" >
 		                        <div class="btn-group" style="margin:5px">
 		                            <button type="button" class="btn btn-primary btn-edit-rows">
-		                                <span class="fa fa-edit"></span> Actualizar Seguimiento
+		                                <span class="fa fa-edit"></span> Actualizar Beneficiarios
 		                            </button>
 		                        </div>
 		                    </div>
@@ -119,7 +119,7 @@
 		                    <div class="btn-toolbar pull-right" >
 		                        <div class="btn-group" style="margin:5px">
 		                            <button type="button" class="btn btn-primary btn-edit-rows">
-		                                <span class="fa fa-edit"></span> Actualizar Seguimiento
+		                                <span class="fa fa-edit"></span> Actualizar Metas
 		                            </button>
 		                        </div>
 		                    </div>

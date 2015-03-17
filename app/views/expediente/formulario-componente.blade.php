@@ -193,7 +193,7 @@
                             <tr>
                                 <th>Mes</th>
                                 @foreach ($meses as $clave => $mes)
-                                    <th>{{$clave}}</th>
+                                    <th>{{$mes}}</th>
                                 @endforeach
                             </tr>
                         </thead>

@@ -30,13 +30,11 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="btn-toolbar pull-right" >
-                            @section('panel-botones')
-                                <div class="btn-group" style="margin:5px">
-                                    <button type="button" class="btn btn-success btn-edit-rows" id="btn-detalles-proyecto">
-                                        <span class="glyphicon glyphicon-plus"></span> Ver Detalles del Proyecto
-                                    </button>
-                                </div>
-                            @show
+                            <div class="btn-group" style="margin:5px">
+                                <button type="button" class="btn btn-success btn-edit-rows" id="btn-detalles-proyecto">
+                                    <span class="fa fa-edit"></span> Ver Detalles del Proyecto
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -180,7 +178,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="btn-editar-avance">Editar Avance</button>
+                    <button type="button" class="btn btn-primary" id="btn-editar-avance"><span class="fa fa-pencil"></span> Capturar Avance</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->

@@ -4,7 +4,34 @@ namespace SSA\Utilerias;
 class Util 
 {
 	public static function obtenerMesActual(){
-		return date("n");
+		return 3;
+		//return date("n");
+		$mes = date('n');
+		$dia = date('j');
+		if($dia <= 10){
+			$mes = $mes - 1;
+		}else{
+			$mes = 0;
+		}
+		return $mes;
+	}
+	public static function obtenerMesTrimestre(){
+		$mes_actual = self::obtenerMesActual();
+		if($mes_actual == 0){
+			$mes_actual = date('n');
+		}
+		$trimestre = ceil($mes_actual/3);
+        $ajuste = ($trimestre - 1) * 3;
+        $mes_del_trimestre = $mes_actual - $ajuste;
+        return $mes_del_trimestre;
+	}
+	public static function obtenerTrimestre(){
+		$mes_actual = self::obtenerMesActual();
+		if($mes_actual == 0){
+			$mes_actual = date('n');
+		}
+		$trimestre = ceil($mes_actual/3);
+		return $trimestre;
 	}
 	public static function transformarFecha($fecha)
 	{

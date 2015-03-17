@@ -1352,7 +1352,10 @@ function mostrar_comentarios(datos){
 			$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"]').attr('data-comentario',observacion);
 		}else{
 			$('#'+id_campo).parent('.form-group').addClass('has-warning');
+			var texto_lbl = $('label[for="' + id_campo + '"]').text();
+			$('label[for="' + id_campo + '"]').html('<span class="proyecto-comentario" data-placement="auto top" data-toggle="popover" data-trigger="click" data-content="'+observacion+'">'+texto_lbl+'</span>');
 			$('label[for="' + id_campo + '"]').prepend('<span class="fa fa-warning"></span> ');
+			$('.proyecto-comentario').popover();
 		}
 	}
 }

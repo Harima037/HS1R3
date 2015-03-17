@@ -343,7 +343,6 @@ $('#btn-proyecto-guardar').on('click',function(){
 		proyectoResource.put($('#id').val(),parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:3});
-
 	            if(response.extras){
 	            	if(response.extras.municipios){
 	            		fibapAcciones.cargar_municipios(response.extras.municipios);

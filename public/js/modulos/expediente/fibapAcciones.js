@@ -950,6 +950,9 @@ function habilitar_meses_captura(fechaInicio, fechaFinal){
     ejecucion_fecha_inicio = inicio;
     ejecucion_fecha_fin = fin;
 
+    habilitar_meses_metas('actividad', inicio, fin);
+    $(form_accion + ' .metas-mes').prop('disabled',true);
+    
     var primer_mes = parseInt(inicio.substring(5,7));
     var ultimo_mes = parseInt(fin.substring(5,7));
     $('.meta-mes').each(function(){
