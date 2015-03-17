@@ -43,7 +43,10 @@ class SeguimientoController extends BaseController {
 	}
 
 	public function rendicionCuentas($id){
-		$proyecto = Proyecto::find($id);
+		$mes_actual = Util::obtenerMesActual();
+		$proyecto = Proyecto::with(array('analisisFuncional'=>function($query) use ($mes_actual){
+			$query->where('mes','=',$mes_actual);
+		}))->find($id);
 		if($proyecto->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
 			$jurisdicciones = Jurisdiccion::all();
 		}elseif($proyecto->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
@@ -56,8 +59,17 @@ class SeguimientoController extends BaseController {
 
 		$datos['mes_clave'] = Util::obtenerMesActual();
 		$datos['mes'] = $meses[Util::obtenerMesActual()];
+
 		$datos['jurisdicciones'] = $jurisdicciones;
+
 		$datos['id'] = $id;
+
+		if(count($proyecto->analisisFuncional)){
+			$datos['id_analisis'] = $proyecto->analisisFuncional[0]->id;
+		}else{
+			$datos['id_analisis'] = '';
+		}
+
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
 		$datos['sys_activo'] = SysGrupoModulo::findByKey('RENDCUENTA');
 		$datos['sys_mod_activo'] = SysModulo::findByKey('RENDINST');

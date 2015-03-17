@@ -30,6 +30,10 @@ accionesDatagrid.actualizar({
     }
 });
 
+$('#btn-proyecto-cancelar').on('click',function(){
+    window.location.href = SERVER_HOST+'/rendicion-cuentas/rend-cuenta-inst';
+});
+
 $('#btn-beneficiario-guardar').on('click',function(){
     var parametros = $('#form_beneficiario').serialize();
     parametros += '&guardar=avance-beneficiarios&id-proyecto='+$('#id').val();
@@ -141,6 +145,74 @@ function guardar_datos_beneficiarios(parametros){
         });
     }
 }
+
+if($('#id-analisis').val()){
+    var parametros = 'mostrar=analisis-funcional';
+    moduloResource.get($('#id-analisis').val(),parametros,{
+        _success: function(response){
+            $('#analisis-resultado').val(response.data.analisisResultado);
+            $('#beneficiarios').val(response.data.beneficiarios);
+            $('#justificacion-global').val(response.data.justificacionGlobal);
+        },
+        _error: function(response){
+            try{
+                var json = $.parseJSON(response.responseText);
+                if(!json.code)
+                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                else{
+                    MessageManager.show(json);
+                }
+                Validation.formValidate(json.data);
+            }catch(e){
+                console.log(e);
+            }                       
+        }
+    });
+}
+$('#btn-guadar-analisis-funcional').on('click',function(){
+    var parametros = $('#form_analisis').serialize();
+    parametros += '&guardar=analisis-funcional&id-proyecto='+$('#id').val();
+    if($('#id-analisis').val()){
+        moduloResource.put($('#id-analisis').val(),parametros,{
+            _success: function(response){
+                MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
+            },
+            _error: function(response){
+                try{
+                    var json = $.parseJSON(response.responseText);
+                    if(!json.code)
+                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                    else{
+                        MessageManager.show(json);
+                    }
+                    Validation.formValidate(json.data);
+                }catch(e){
+                    console.log(e);
+                }                       
+            }
+        });
+    }else{
+        moduloResource.post(parametros,{
+            _success: function(response){
+                MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
+                $('#id-analisis').val(response.data.id);
+            },
+            _error: function(response){
+                try{
+                    var json = $.parseJSON(response.responseText);
+                    if(!json.code)
+                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                    else{
+                        MessageManager.show(json);
+                    }
+                    Validation.formValidate(json.data);
+                }catch(e){
+                    console.log(e);
+                }                       
+            }
+        });
+    }
+});
 
 $('#btn-guardar-avance').on('click',function(){
     if($('td.avance-mes[data-estado-avance=1]').length){
@@ -288,7 +360,7 @@ function seguimiento_metas(e){
     }else{
         var nivel = 'actividad';
     }
-    var parametros = {'mostrar':'datos-'+nivel+'-avance'};
+    var parametros = {'mostrar':'datos-metas-avance','nivel':nivel};
     var id = datos_id[1];
     moduloResource.get(id,parametros,{
         _success: function(response){
@@ -347,6 +419,16 @@ function seguimiento_metas(e){
                 $('#id-avance').val(response.data.registro_avance[0].id);
                 $('#analisis-resultados').val(response.data.registro_avance[0].analisisResultados);
                 $('#justificacion-acumulada').val(response.data.registro_avance[0].justificacionAcumulada);
+            }
+
+            if(response.data.plan_mejora.length){
+                var plan_mejora = response.data.plan_mejora[0];
+                $('#accion-mejora').val(plan_mejora.accionMejora);
+                $('#grupo-trabajo').val(plan_mejora.grupoTrabajo);
+                $('#documentacion-comprobatoria').val(plan_mejora.documentacionComprobatoria);
+                $('#fecha-inicio').val(plan_mejora.fechaInicio);
+                $('#fecha-termino').val(plan_mejora.fechaTermino);
+                $('#fecha-notificacion').val(plan_mejora.fechaNotificacion);
             }
 
             var total_porcentaje_acumulado = parseFloat((((total_acumulado + total_avance) * 100) / total_programado).toFixed(2)) || 0;

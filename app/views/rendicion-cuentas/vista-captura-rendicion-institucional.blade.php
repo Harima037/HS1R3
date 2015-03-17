@@ -37,48 +37,55 @@
     </ul>
     <div class="tab-content">
     	<div role="tabpanel" class="tab-pane" id="analisis-funcional">
+    		<br>
+    		<form id="form_analisis">
+	    		<div class="row">
+	    			<div class="col-sm-6">
+	    				<div class="form-group">
+	    					<label class="control-label" for="analisis-resultado">Analisis de Resultado</label>
+	    					<textarea id="analisis-resultado" name="analisis-resultado" rows="6" class="form-control"></textarea>
+	    				</div>
+	    			</div>
+	    			<div class="col-sm-6">
+	    				<div class="form-group">
+	    					<label class="control-label" for="beneficiarios">Beneficiarios</label>
+	    					<textarea id="beneficiarios" name="beneficiarios" rows="6" class="form-control"></textarea>
+	    				</div>
+	    			</div>
+	    			<div class="col-sm-12">
+	    				<div class="form-group">
+	    					<label class="control-label" for="justificacion-global">Justificación Global del Proyecto</label>
+	    					<textarea id="justificacion-global" name="justificacion-global" rows="6" class="form-control"></textarea>
+	    				</div>
+	    			</div>
+	    		</div>
+    		</form>
+    		<input type="hidden" name="id-analisis" id="id-analisis" value="{{$id_analisis}}">
     		<div class="row">
     			<div class="col-sm-6">
-    				<div class="form-group">
-    					<label class="control-label">Analisis de Resultado</label>
-    					<textarea rows="6" class="form-control"></textarea>
-    				</div>
-    			</div>
-    			<div class="col-sm-6">
-    				<div class="form-group">
-    					<label class="control-label">Beneficiarios</label>
-    					<textarea rows="6" class="form-control"></textarea>
-    				</div>
-    			</div>
-    			<div class="col-sm-12">
-    				<div class="form-group">
-    					<label class="control-label">Justificación Global del Proyecto</label>
-    					<textarea rows="6" class="form-control"></textarea>
-    				</div>
-    			</div>
-    		</div>
-    		<div class="row">
-    			<div class="col-sm-6">
-    				<button type="button" class="btn btn-primary" ><span class="fa fa-floppy-o"></span> Guardar</button>
+    				<button type="button" class="btn btn-primary" id="btn-guadar-analisis-funcional">
+    					<span class="fa fa-floppy-o"></span> Guardar Analisis Funcional
+    				</button>
     			</div>
     		</div>
     	</div>
     	<div role="tabpanel" class="tab-pane" id="seguimiento-beneficiarios">
-    		<div class="row">
-                <div class="col-lg-6 col-md-6"></div>
-                <div class="col-lg-6">
-                    <div class="btn-toolbar pull-right" >
-                        @section('panel-botones')
-                            <div class="btn-group" style="margin:5px">
-                                <button type="button" class="btn btn-primary btn-edit-rows">
-                                    <span class="glyphicon glyphicon-plus"></span> Actualizar Seguimiento
-                                </button>
-                            </div>
-                        @show
-                    </div>
-                </div>
-            </div>
+    		<br>
     		<div class="panel panel-default datagrid" id="datagridBeneficiarios" data-edit-row="seguimiento_beneficiarios">
+    			<div class="panel-body">
+    				<div class="row">
+		                <div class="col-lg-6 col-md-6"></div>
+		                <div class="col-lg-6">
+		                    <div class="btn-toolbar pull-right" >
+		                        <div class="btn-group" style="margin:5px">
+		                            <button type="button" class="btn btn-primary btn-edit-rows">
+		                                <span class="fa fa-edit"></span> Actualizar Seguimiento
+		                            </button>
+		                        </div>
+		                    </div>
+		                </div>
+		            </div>
+    			</div>
 	            <table class="table table-striped table-hover table-bordered">
 	                <thead>
 	                	<tr>
@@ -103,21 +110,22 @@
 	        </div>
     	</div>
         <div role="tabpanel" class="tab-pane active" id="seguimiento-metas">
-        	<div class="row">
-                <div class="col-lg-6 col-md-6"></div>
-                <div class="col-lg-6">
-                    <div class="btn-toolbar pull-right" >
-                        @section('panel-botones')
-                            <div class="btn-group" style="margin:5px">
-                                <button type="button" class="btn btn-primary btn-edit-rows">
-                                    <span class="glyphicon glyphicon-plus"></span> Actualizar Seguimiento
-                                </button>
-                            </div>
-                        @show
-                    </div>
-                </div>
-            </div>
+        	<br>
             <div class="panel panel-default datagrid" id="datagridAcciones" data-edit-row="seguimiento_metas">
+            	<div class="panel-body">
+            		<div class="row">
+		                <div class="col-lg-6 col-md-6"></div>
+		                <div class="col-lg-6">
+		                    <div class="btn-toolbar pull-right" >
+		                        <div class="btn-group" style="margin:5px">
+		                            <button type="button" class="btn btn-primary btn-edit-rows">
+		                                <span class="fa fa-edit"></span> Actualizar Seguimiento
+		                            </button>
+		                        </div>
+		                    </div>
+		                </div>
+		            </div>
+            	</div>
 	            <table class="table table-striped table-hover">
 	                <thead>
 	                    <tr>
@@ -139,6 +147,18 @@
     </div>
 </div>
 
+<div class="panel-footer">
+    <div class="row">
+        <div class="col-sm-12">
+            <button type="button" class="btn btn-default" id="btn-proyecto-cancelar">
+                <span class="fa fa-chevron-left"></span> Regresar a la lista de Proyectos
+            </button>
+            <button type="button" class="btn btn-success" id="btn-enviar-proyecto">
+                <span class="fa fa-send-o"></span> Enviar Proyecto a Revisión
+            </button>
+        </div>
+    </div>
+</div>
 </div>
 <input type="hidden" id="id" name="id" value="{{$id}}">
 <input type="hidden" id="mes" name="mes" value="{{$mes_clave}}">
@@ -194,6 +214,11 @@
 							<li role="presentation">
 								<a href="#panel-justificacion" aria-controls="panel-justificacion" role="tab" data-toggle="tab" id="tab-link-justificacion">
 									<span class="fa fa-align-left"></span> Analisis y Justificación
+								</a>
+							</li>
+							<li role="presentation">
+								<a href="#panel-plan-mejora" aria-controls="panel-plan-mejora" role="tab" data-toggle="tab" id="tab-link-plan-mejora">
+									<span class="fa fa-file"></span> Plan de Mejora
 								</a>
 							</li>
 						</ul>
@@ -253,14 +278,55 @@
 								<div class="row">
 									<div class="col-sm-12">
 										<div class="form-group">
-											<label class="input-label">Analisis de Resultados Acumulado</label>
+											<label class="input-label" for="analisis-resultados">Analisis de Resultados Acumulado</label>
 											<textarea rows="6" class="form-control" name="analisis-resultados" id="analisis-resultados"></textarea>
 										</div>
 									</div>
 									<div class="col-sm-12">
 										<div class="form-group">
-											<label class="input-label">Justificación Acumulada</label>
+											<label class="input-label" for="justificacion-acumulada">Justificación Acumulada</label>
 											<textarea rows="6" class="form-control" name="justificacion-acumulada" id="justificacion-acumulada" disabled></textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div role="tabpanel" class="tab-pane" id="panel-plan-mejora">
+								<br>
+								<div class="row">
+									<div class="col-sm-12">
+										<div class="form-group">
+											<label class="input-label" for="accion-mejora">Acción de Mejora</label>
+											<textarea rows="4" class="form-control" name="accion-mejora" id="accion-mejora"></textarea>
+										</div>
+									</div>
+									<div class="col-sm-12">
+										<div class="form-group">
+											<label class="input-label" for="grupo-trabajo">Grupo de Trabajo</label>
+											<textarea rows="4" class="form-control" name="grupo-trabajo" id="grupo-trabajo"></textarea>
+										</div>
+									</div>
+									<div class="col-sm-4">
+										<div class="form-group">
+											<label class="input-label" for="fecha-inicio">Fecha de Inicio</label>
+											<input type="date" class="form-control" name="fecha-inicio" id="fecha-inicio">
+										</div>
+									</div>
+									<div class="col-sm-4">
+										<div class="form-group">
+											<label class="input-label" for="fecha-termino">Fecha de Termino</label>
+											<input type="date" class="form-control" name="fecha-termino" id="fecha-termino">
+										</div>
+									</div>
+									<div class="col-sm-4">
+										<div class="form-group">
+											<label class="input-label" for="fecha-notificacion">Fecha de Notificación</label>
+											<input type="date" class="form-control" name="fecha-notificacion" id="fecha-notificacion">
+										</div>
+									</div>
+									<div class="col-sm-12">
+										<div class="form-group">
+											<label class="input-label" for="documentacion-comprobatoria">Documentación Comprobatoria</label>
+											<textarea rows="4" class="form-control" name="documentacion-comprobatoria" id="documentacion-comprobatoria"></textarea>
 										</div>
 									</div>
 								</div>

@@ -15,6 +15,10 @@ class Actividad extends BaseModel
     	return $this->hasMany('RegistroAvanceMetas','idNivel')->where('nivel','=',2);
     }
 
+    public function planMejora(){
+    	return $this->hasMany('EvaluacionPlanMejora','idNivel')->where('nivel','=',2);
+    }
+
 	public function metasMes(){
 		return $this->hasMany('ActividadMetaMes','idActividad');
 	}

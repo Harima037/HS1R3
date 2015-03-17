@@ -74,6 +74,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('seguimiento', 		'V1\SeguimientoController');
 
 		Route::resource('revision-proyectos',	'V1\RevisionController');
+		Route::resource('reporte-evaluacion',	'V1\ReporteEvaluacionController', array('only'=>array('show')));
 	});
 });
 
