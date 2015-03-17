@@ -4,7 +4,7 @@ namespace SSA\Utilerias;
 class Util 
 {
 	public static function obtenerMesActual(){
-		return 3;
+		//return 3;
 		//return date("n");
 		$mes = date('n');
 		$dia = date('j');

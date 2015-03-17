@@ -109,6 +109,11 @@ context.init = function(id,resource){
 context.mostrar_datos = function(datos){
 	$(modal_beneficiario).find('.modal-title').html('Editar Beneficiario');
 
+	if($('#datagridBeneficiarios tr[data-id="'+datos[0].idTipoBeneficiario+'"]').attr('data-comentario')){
+		var comentario = $('#datagridBeneficiarios tr[data-id="'+datos[0].idTipoBeneficiario+'"]').attr('data-comentario');
+		MessageManager.show({data:comentario,container: modal_beneficiario + ' .modal-body',type:'ADV'});
+	}
+
 	$('#tipobeneficiario').val(datos[0].idTipoBeneficiario);
     $('#tipobeneficiario').trigger('chosen:updated');
 

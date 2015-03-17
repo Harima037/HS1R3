@@ -137,6 +137,9 @@ class InversionController extends ProyectosController {
 				$recurso = Proyecto::with('jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico',
 									'fibap.documentos','beneficiarios.tipoBeneficiario')
 									->find($id);
+				if($recurso->idEstatusProyecto == 3){
+					$recurso->load('comentarios');
+				}
 				if($recurso->fibap){
 					$recurso->fibap->load('antecedentesFinancieros','acciones.datosComponenteDetalle','distribucionPresupuestoAgrupado.objetoGasto');
 					$recurso->fibap->acciones->load('propuestasFinanciamiento');
@@ -408,6 +411,17 @@ class InversionController extends ProyectosController {
 			if($parametros['guardar'] == 'validar-proyecto'){
 				$proyecto = Proyecto::find($id);
 				if($proyecto->idEstatusProyecto == 1 || $proyecto->idEstatusProyecto == 3){
+					$proyecto->load('beneficiarios','componentes','actividades');
+					if(count($proyecto->beneficiarios) == 0){
+						$respuesta['data'] = array('data'=>'El proyecto debe tener al menos un beneficiario capturado.');
+						throw new Exception("No hay beneficiarios", 1);
+					}elseif(count($proyecto->componentes) == 0){
+						$respuesta['data'] = array('data'=>'El proyecto debe tener al menos un componente capturado.');
+						throw new Exception("No hay componentes", 1);
+					}elseif(count($proyecto->actividades) == 0){
+						$respuesta['data'] = array('data'=>'El proyecto debe tener al menos una actividad capturada.');
+						throw new Exception("No hay actividades", 1);
+					}
 					$proyecto->idEstatusProyecto = 2;
 					$proyecto->save();
 					$respuesta['data'] = array('data'=>'El Proyecto fue enviado a Revisión');
