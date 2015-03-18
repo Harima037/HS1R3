@@ -431,9 +431,9 @@
                         </div>
                         <div>
                             <br>
-                            <!--<button type="button" class="btn btn-success" id="btn-aprobar">
-                                <span class="glyphicon glyphicon-thumbs-up"></span> Aprobar proyecto
-                            </button>-->
+                            <button type="button" class="btn btn-success" id="btn-firmar-proyecto">
+                                <span class="glyphicon glyphicon-pencil"></span> Firmar proyecto
+                            </button>
                         </div>
                     </div>
                 </div>

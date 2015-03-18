@@ -17,7 +17,40 @@
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/revision-proyectos');
 var moduloDatagrid = new Datagrid("#datagridCaratulas",moduloResource);
 moduloDatagrid.init();
-moduloDatagrid.actualizar();
+moduloDatagrid.actualizar({
+    _success: function(response){
+        moduloDatagrid.limpiar();
+        var datos_grid = [];
+        for(var i in response.data){
+            var item = {};
+            var clase_label = 'label-info';
+            if(response.data[i].idEstatusProyecto == 2){
+                clase_label = 'label-warning';
+            }else if(response.data[i].idEstatusProyecto == 3){
+                clase_label = 'label-danger';
+            }else if(response.data[i].idEstatusProyecto == 4){
+                clase_label = 'label-primary';
+            }
+
+            item.id = response.data[i].id;
+            item.clave = response.data[i].clavePresup;
+            item.nombre_tecnico = response.data[i].nombreTecnico;
+            item.tipo_proyecto = response.data[i].clasificacionProyecto;
+			item.unidadResponsable = response.data[i].unidadResponsable;			
+            item.estatus = '<span class="label ' + clase_label + '">' + response.data[i].estatusProyecto + '</span>';
+            item.usuario = response.data[i].username;
+            item.fecha_modificado = response.data[i].modificadoAl.substring(0,11);
+
+            datos_grid.push(item);
+        }
+        moduloDatagrid.cargarDatos(datos_grid);                         
+        var total = parseInt(response.resultados/moduloDatagrid.rxpag); 
+        var plus = parseInt(response.resultados)%moduloDatagrid.rxpag;
+        if(plus>0) 
+            total++;
+        moduloDatagrid.paginacion(total);
+    }
+});
 var modal_name = '#modalCaratulas';
 var form_name = '#form_caratula';
 /*===================================*/
@@ -167,6 +200,13 @@ function editar (e){
             }
 
             construir_panel_componentes(response.data.componentes);
+			
+			if(response.data.idEstatusProyecto==4)
+	            $('#btn-firmar-proyecto').show();
+			else
+			    $('#btn-firmar-proyecto').hide();
+						
+			
             
             $('#datos-formulario').hide();
             $('#datos-proyecto').show();
@@ -246,6 +286,81 @@ $('#clasificacion_proyecto').on('change',function(){
         $('#lista_fibap').addClass('hidden');
         $('#lista_fibap').empty();
     }
+});
+
+
+$('#btn-firmar-proyecto').on('click', function () {
+	
+	Confirm.show({
+				titulo:"¿Poner el proyecto en el estatus de firma?",
+				mensaje: "¿Estás seguro que desea poner el estatus de firma? Una vez hecho esto, el proyecto ya no es modificable, y se entiende que se aprobó y firmó.",
+				callback: function(){
+					var parametros = 'actualizarproyecto=firmar';					
+					moduloResource.put($('#id').val(),parametros,{
+						_success: function(response){
+							
+							moduloDatagrid.actualizar({
+   								_success: function(response){
+									moduloDatagrid.limpiar();
+									var datos_grid = [];
+									for(var i in response.data){
+										var item = {};
+										var clase_label = 'label-info';
+										if(response.data[i].idEstatusProyecto == 2){
+											clase_label = 'label-warning';
+										}else if(response.data[i].idEstatusProyecto == 3){
+											clase_label = 'label-danger';
+										}else if(response.data[i].idEstatusProyecto == 4){
+											clase_label = 'label-primary';
+										}
+										item.id = response.data[i].id;
+										item.clave = response.data[i].clavePresup;
+										item.nombre_tecnico = response.data[i].nombreTecnico;
+										item.tipo_proyecto = response.data[i].clasificacionProyecto;
+										item.unidadResponsable = response.data[i].unidadResponsable;
+										item.estatus = '<span class="label ' + clase_label + '">' + response.data[i].estatusProyecto + '</span>';
+										item.usuario = response.data[i].username;
+										item.fecha_modificado = response.data[i].modificadoAl.substring(0,11);
+										datos_grid.push(item);
+									}
+									moduloDatagrid.cargarDatos(datos_grid);
+									var total = parseInt(response.resultados/moduloDatagrid.rxpag); 
+									var plus = parseInt(response.resultados)%moduloDatagrid.rxpag;
+									if(plus>0) 
+										total++;
+									moduloDatagrid.paginacion(total);
+								}
+							});
+							MessageManager.show({data:'El proyecto ha sido puesto en el estatus de firma',type:'OK',timer:3});	
+							$('#modalCaratulas').modal('hide');	
+
+						},
+						_error: function(response){
+							try{
+								var json = $.parseJSON(response.responseText);
+								if(!json.code)
+									MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+								else{
+									json.container = modal_actividad + ' .modal-body';
+									MessageManager.show(json);
+								}
+								Validation.formValidate(json.data);
+							}catch(e){
+								console.log(e);
+							}
+						}
+					});
+				}
+		});
+	
+	
+	
+	
+    /*$(modal_name).find(".modal-title").html("Revisión de proyecto");
+    $(modal_name).modal('show');
+    $('#datos-formulario').show();
+	
+    $('#modalCaratulas').hide();*/
 });
 
 /*$('#btn-mostrar-desgloce').on('click',function(){
