@@ -65,7 +65,7 @@ function seguimiento_metas(e){
                 $(row + ' > td.meta-programada').text(dato.meta);
                 if(dato.avance){
                     total_acumulado += dato.avance;
-                    $(row + ' > td.avance-acumulado > span.vieja-cantidad').text(dato.avance);
+                    $(row + ' > td.avance-acumulado').text(dato.avance);
                     $(row + ' > td.avance-acumulado').attr('data-acumulado',dato.avance);
                 }
             }
@@ -85,7 +85,7 @@ function seguimiento_metas(e){
                     total_avance += dato.avance;
                     total_acumulado -= dato.avance;
                     avance_jurisdiccion = parseFloat($(row + ' > td.avance-acumulado').attr('data-acumulado')) || 0;
-                    $(row + ' > td.avance-acumulado > span.vieja-cantidad').text(avance_jurisdiccion - dato.avance);
+                    $(row + ' > td.avance-acumulado').text(avance_jurisdiccion - dato.avance);
                     $(row + ' > td.avance-acumulado').attr('data-acumulado',(avance_jurisdiccion - dato.avance));
                     $('#avance_'+dato.claveJurisdiccion).change();
                 }
@@ -183,7 +183,7 @@ $('.avance-mes').on('change',function(){
     var row = '#tabla-avances-metas > tbody > tr[data-clave-jurisdiccion="'+jurisdiccion+'"]';
 
     if($(this).val() == ''){
-        $(row +' > td.avance-acumulado > span.nueva-cantidad').text('');
+        //$(row +' > td.avance-acumulado > span.nueva-cantidad').text('');
         $(row +' > td.avance-mes').html('');
         $(row +' > td.avance-mes').attr('data-estado-avance','');
     }else{
@@ -193,11 +193,14 @@ $('.avance-mes').on('change',function(){
         acumulado += avance;
         var total_programado = $(row +' > td.meta-programada').attr('data-meta');
 
-        if(acumulado > 0){
+        /*if(acumulado > 0){
             $(row +' > td.avance-acumulado > span.nueva-cantidad').text('+'+avance);
         }else{
             $(row +' > td.avance-acumulado > span.nueva-cantidad').text('');
-        }
+        }*/
+
+        $(row +' > td.avance-total').text(acumulado);
+        $(row +' > td.avance-total').attr('data-avance-total',acumulado);
         
         if(total_programado > 0 && $(this).attr('data-meta-programada') > 0){
             var avance_mes = parseFloat(((acumulado  / total_programado ) * 100).toFixed(2)) || 0;
@@ -239,8 +242,24 @@ $('.avance-mes').on('change',function(){
     total_programado = parseFloat($('#total-meta-programada').text());
     total_acumulado = parseFloat($('#total-avance-acumulado').text());
     var total_porcentaje_acumulado = parseFloat((((total_acumulado + suma) * 100) / total_programado).toFixed(2))||0;
-    $('#total-porcentaje').text(total_porcentaje_acumulado+'% ');
+    if(total_porcentaje_acumulado > 110){
+        total_porcentaje_acumulado = '<small class="text-danger"><span class="fa fa-arrow-up"></span> '+total_porcentaje_acumulado+'%</small>';
+        //$(row +' > td.avance-mes').attr('data-estado-avance','1');
+    }else if(total_porcentaje_acumulado < 90){
+        total_porcentaje_acumulado = '<small class="text-danger"><span class="fa fa-arrow-down"></span> '+total_porcentaje_acumulado+'%</small>';
+        //$(row +' > td.avance-mes').attr('data-estado-avance','1');
+    }else{
+        total_porcentaje_acumulado = '<small class="text-success">'+total_porcentaje_acumulado+'%</small>';
+        //$(row +' > td.avance-mes').attr('data-estado-avance','');
+    }
+    $('#total-porcentaje').html(total_porcentaje_acumulado);
 
+    var suma = 0;
+    $('.avance-total').each(function(){
+        suma += parseFloat($(this).attr('data-avance-total')) || 0;
+    });
+    suma = parseFloat(suma.toFixed(2));
+    $('#total-avance-total').text(suma);
 
     if($('td.avance-mes[data-estado-avance=1]').length){
         $('#justificacion-acumulada').attr('disabled',false);

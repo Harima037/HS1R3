@@ -14,4 +14,8 @@ class Beneficiario extends BaseModel
 	public function registroAvance(){
     	return $this->hasMany('RegistroAvanceBeneficiario','idProyectoBeneficiario');
     }
+
+	public function registroAvanceAcumulado(){
+    	return $this->hasMany('RegistroAvanceBeneficiario','idProyectoBeneficiario');
+    }    
 }
