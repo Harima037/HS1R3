@@ -68,9 +68,6 @@ context.init = function(id,resource){
     accionesDatagrid = new Datagrid("#datagridAcciones",fibap_resource);
     accionesDatagrid.init();
 
-    distribucionDatagrid = new Datagrid("#datagridDistribucion",fibap_resource); 
-    distribucionDatagrid.init();
-
     llenar_datagrid_acciones([]);
     llenar_datagrid_actividades([]);
     llenar_tabla_distribucion([]);
@@ -266,34 +263,6 @@ context.init = function(id,resource){
     });
 
     $(modal_actividad).on('hide.bs.modal',function(e){ reset_modal_form(form_actividad); });
-
-    $("#datagridDistribucion .btn-delete-rows").unbind('click');
-    $("#datagridDistribucion .btn-delete-rows").on('click',function(e){
-        e.preventDefault();
-        var rows = [];
-        var contador= 0;
-        $("#datagridDistribucion").find("tbody").find("input[type=checkbox]:checked").each(function () {
-            contador++;
-            rows.push($(this).parent().parent().data("id"));
-        });
-        if(contador>0){
-            var id_accion = $('#datagridDistribucion').attr('data-selected-id');
-            Confirm.show({
-                    titulo:"Eliminar presupuesto",
-                    mensaje: "¿Estás seguro que deseas eliminar los presupuestos seleccionados?",
-                    callback: function(){
-                        fibap_resource.delete(rows,{'rows': rows, 'eliminar': 'desglose-presupuesto', 'id-accion': id_accion, 'id-proyecto': $('#id').val()},{
-                            _success: function(response){
-                                llenar_datagrid_distribucion(response.desglose_presupuesto,response.presupuesto_requerido);
-                                llenar_tabla_distribucion(response.distribucion_total);
-                                MessageManager.show({data:'Presupuesto(s) eliminado(s) con éxito.',timer:3});
-                            },
-                            _error: function(jqXHR){  MessageManager.show(jqXHR.responseJSON); }
-                        });
-                    }
-            });
-        }else{ MessageManager.show({data:'No has seleccionado ningún registro.',type:'ADV',timer:3}); }
-    });
 
     $("#datagridActividades .btn-delete-rows").unbind('click');
     $("#datagridActividades .btn-delete-rows").on('click',function(e){
@@ -567,14 +536,14 @@ context.mostrar_detalles = function(id){
 
     if($('#datagrid-contenedor-' + id).length){
         $('#datagridAcciones > table > tbody > tr.contendor-desechable').remove();
-        llenar_datagrid_distribucion([],0);
+        llenar_datagrid_distribucion(0,0);
     }else{
         var parametros = {'mostrar':'desglose-componente'};
         fibap_resource.get(id,parametros,{
             _success:function(response){
                 //
                 $('#datagridAcciones > table > tbody > tr.contendor-desechable').remove();
-                llenar_datagrid_distribucion(response.data.desglose_presupuesto,response.data.presupuestoRequerido);
+                llenar_datagrid_distribucion(response.data.idComponente,response.data.presupuestoRequerido);
 
                 $('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"]').addClass('bg-info');
                 $('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"]').addClass('text-primary');
@@ -594,8 +563,8 @@ context.mostrar_detalles = function(id){
     }
 };
 
-context.llenar_datagrid_distribucion = function(datos,total_presupuesto){
-    llenar_datagrid_distribucion(datos,total_presupuesto);
+context.llenar_datagrid_distribucion = function(id_componente,total_presupuesto){
+    llenar_datagrid_distribucion(id_componente,total_presupuesto);
 };
 
 context.llenar_tabla_distribucion_general = function(datos){
@@ -664,42 +633,87 @@ context.habilitar_meses = function(fechaInicio,fechaFinal){
 /***********************************************************************************************
                     Funciones Privadas
 ************************************************************************************************/
-function llenar_datagrid_distribucion(datos,total_presupuesto){
-    var distribucion = [];
-    $('#datagridDistribucion > table > tbody').empty();
-    var total_porcentaje = 0;
-    for(var indx in datos){
-        var presupuesto = {};
-
-        var porcentaje = (datos[indx].presupuesto * 100) / parseInt(total_presupuesto);
-
-        presupuesto.id = datos[indx].id;
-
-        if(datos[indx].claveJurisdiccion != 'OC'){
-            presupuesto.localidad = datos[indx].localidad;
-            presupuesto.municipio = datos[indx].municipio;
-            presupuesto.jurisdiccion = datos[indx].jurisdiccion;
-        }else{
-            presupuesto.localidad = 'OFICINA CENTRAL';
-            presupuesto.municipio = 'OFICINA CENTRAL';
-            presupuesto.jurisdiccion = 'OFICINA CENTRAL';
-        }
-        
-        presupuesto.monto = '$ ' + datos[indx].presupuesto.format();
-
-        total_porcentaje += parseFloat(porcentaje.toFixed(2));
-
-        distribucion.push(presupuesto);
-    }
-
-    if(distribucion.length == 0){
+function llenar_datagrid_distribucion(id_componente,total_presupuesto){
+    if(id_componente == 0){
+        $("#datagridDistribucion .txt-quick-search").val('');
         actualiza_porcentaje('#porcentaje_accion',0);
         $('#datagridDistribucion > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
+        distribucionDatagrid.paginacion(1);
+        distribucionDatagrid.setPagina(1);
     }else{
-        actualiza_porcentaje('#porcentaje_accion',total_porcentaje);
-        distribucionDatagrid.cargarDatos(distribucion);
-    }
+        distribucionDatagrid = new Datagrid("#datagridDistribucion",fibap_resource,{ desglosegrid:true, pagina: 1, idComponente: id_componente}); 
+        distribucionDatagrid.init();
+        distribucionDatagrid.actualizar({ 
+            _success: function(response){ 
+                var distribucion = [];
+                $('#datagridDistribucion > table > tbody').empty();
+                var total_porcentaje = 0;
+                var total_desglose = response.total_presupuesto;
+                var datos = response.data;
+                for(var indx in datos){
+                    var presupuesto = {};
 
+                    presupuesto.id = datos[indx].id;
+
+                    if(datos[indx].claveJurisdiccion != 'OC'){
+                        presupuesto.localidad = datos[indx].localidad;
+                        presupuesto.municipio = datos[indx].municipio;
+                        presupuesto.jurisdiccion = datos[indx].jurisdiccion;
+                    }else{
+                        presupuesto.localidad = 'OFICINA CENTRAL';
+                        presupuesto.municipio = 'OFICINA CENTRAL';
+                        presupuesto.jurisdiccion = 'OFICINA CENTRAL';
+                    }
+                    
+                    presupuesto.monto = '$ ' + datos[indx].presupuesto.format();
+
+                    distribucion.push(presupuesto);
+                }
+
+                total_porcentaje = (total_desglose * 100) / parseInt(total_presupuesto);
+
+                if(distribucion.length == 0){
+                    actualiza_porcentaje('#porcentaje_accion',0);
+                }else{
+                    actualiza_porcentaje('#porcentaje_accion',total_porcentaje);
+                }
+                distribucionDatagrid.cargarDatos(distribucion);
+                var total = parseInt(response.resultados/distribucionDatagrid.rxpag); 
+                var plus = parseInt(response.resultados)%distribucionDatagrid.rxpag;
+                if(plus>0) 
+                    total++;
+                distribucionDatagrid.paginacion(total);
+            }
+        });
+        $("#datagridDistribucion .btn-delete-rows").unbind('click');
+        $("#datagridDistribucion .btn-delete-rows").on('click',function(e){
+            e.preventDefault();
+            var rows = [];
+            var contador= 0;
+            $("#datagridDistribucion").find("tbody").find("input[type=checkbox]:checked").each(function () {
+                contador++;
+                rows.push($(this).parent().parent().data("id"));
+            });
+            if(contador>0){
+                var id_accion = $('#datagridDistribucion').attr('data-selected-id');
+                Confirm.show({
+                        titulo:"Eliminar presupuesto",
+                        mensaje: "¿Estás seguro que deseas eliminar los presupuestos seleccionados?",
+                        callback: function(){
+                            fibap_resource.delete(rows,{'rows': rows, 'eliminar': 'desglose-presupuesto', 'id-accion': id_accion, 'id-proyecto': $('#id').val()},{
+                                _success: function(response){
+                                    //llenar_datagrid_distribucion(response.id_componente,response.presupuesto_requerido);
+                                    distribucionDatagrid.actualizar();
+                                    llenar_tabla_distribucion(response.distribucion_total);
+                                    MessageManager.show({data:'Presupuesto(s) eliminado(s) con éxito.',timer:3});
+                                },
+                                _error: function(jqXHR){  MessageManager.show(jqXHR.responseJSON); }
+                            });
+                        }
+                });
+            }else{ MessageManager.show({data:'No has seleccionado ningún registro.',type:'ADV',timer:3}); }
+        });
+    }
 }
 
 function llenar_datagrid_acciones(datos){

@@ -1,4 +1,4 @@
-/*=====================================
+ /*=====================================
 
     # Nombre:
         Datagrid.js
@@ -21,11 +21,40 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
 	this.rxpag = 10;
 	this.source = pSource || new RESTfulRequests('');
 	this.parametros = pParametros || { formatogrid:true, pagina: 1};
+	this.actualizar_default_callbacks = {
+        _error: function(jqXHR){
+			//console.log('{ error => "'+jqXHR.status +' - '+ jqXHR.statusText +'", response => "'+ jqXHR.responseText +'" }'); 
+			var json = $.parseJSON(jqXHR.responseText);
+			if(json.code == "W00"){
+				context.limpiar();
+				var colspan = $(context.selector + " thead > tr th").length;
+				$(context.selector + " tbody").append("<tr><td colspan='"+colspan+"' style='text-align:left'><i class='fa fa-info-circle'></i> "+json.data+"</td></tr>");
+
+			}else{
+				json.type = 'ERR';
+				MessageManager.show(json);
+				context.limpiar();
+			}
+			
+        },  
+        _success: function(response){
+			context.limpiar();
+			context.cargarDatos(response.data);
+
+         	var total = parseInt(response.resultados/context.rxpag); 
+            var plus = parseInt(response.resultados)%context.rxpag;
+            if(plus>0) 
+                total++;
+            context.paginacion(total);
+        }
+    };
 
 	this.init = function(){
 		// Inicializamos las propiedades del datagrid: paginacion etc.
 		var context = this;
-		$(this.selector + " .btn-next-rows").on('click', function(e) {           
+
+		$(this.selector + " .btn-next-rows").off('click');
+		$(this.selector + " .btn-next-rows").on('click', function(e) {
 			e.preventDefault();	
 			var pagina  = parseInt(context.getPagina())+1;
  
@@ -34,6 +63,8 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
 		     context.cambiarPagina();
 		    }
         });
+
+        $(this.selector + " .btn-back-rows").off('click');
 		$(this.selector + " .btn-back-rows").on('click',function(e){
 			e.preventDefault();	
            
@@ -45,35 +76,41 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
 		    context.cambiarPagina();
 		});
 
-		$(this.selector + " .btn-go-first-rows").on('click',function(e){           
+		$(this.selector + " .btn-go-first-rows").off('click');
+		$(this.selector + " .btn-go-first-rows").on('click',function(e){
 			e.preventDefault();	
 			context.setPagina(1);
 		    context.cambiarPagina();
 		});
 
+		$(this.selector + " .btn-go-last-rows").off('click');
 		$(this.selector + " .btn-go-last-rows").on('click',function(e){
 			e.preventDefault();	
 			context.setPagina(context.getMaxPagina());
 		    context.cambiarPagina();
 		});
 
+		$(this.selector + " .txt-go-page").off('keydown');
 		$(this.selector + " .txt-go-page").on('keydown', function(event){
 			if (event.which == 13) {
 				context.cambiarPagina();
 		   	}
 		});
 
+		$(this.selector + " .txt-quick-search").off('keydown');
 		$(this.selector + " .txt-quick-search").on('keydown', function(event){
 			if (event.which == 13) {
 				context.quickSearch($(this).val());	
 		   	}
 		});
 		
+		$(this.selector + " .btn-quick-search").off('click');
 		$(this.selector + " .btn-quick-search").on('click',function(e){
 			e.preventDefault();		
 			context.quickSearch($(context.selector + " .txt-quick-search").val());			
 		});
 
+		$(this.selector + " tbody").off('dblclick');
 		$(this.selector + " tbody").on('dblclick','tr td:not(.disabled)', function (e) {
 	        if ($(this).index() != 0){
 	            //var data = $(this).parents(".datagrid").data("edit-row");
@@ -85,6 +122,7 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
 	        }
 		});
 
+		$(this.selector + " .btn-edit-rows").off('click');
 		$(this.selector + " .btn-edit-rows").on('click', function (e) {
 			e.preventDefault();
 	      	
@@ -112,7 +150,8 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
 			}
 		});
 
-		$(this.selector + " .check-select-all-rows").on('click', function (e) {       
+		$(this.selector + " .check-select-all-rows").off('click');
+		$(this.selector + " .check-select-all-rows").on('click', function (e) {
 	        if ($(this).is(':checked')) {
 			  //$(this).parents(".datagrid").find("tbody").find("input[type=checkbox]").prop('checked', true);
 			  $(this).closest(".datagrid").find("tbody").find("input[type=checkbox]").prop('checked', true);
@@ -122,6 +161,7 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
 	        }
 		});
 
+		$(this.selector + " .btn-delete-rows").off('click');
 		$(this.selector + " .btn-delete-rows").on('click',function(e){
 			e.preventDefault();
 			
@@ -188,35 +228,37 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
                             context.paginacion(total);
                         }
         	}
+        	this.actualizar_default_callbacks = fnCallbacks;
 		}else{
 			
-			fnCallbacks = {
-                        _error: function(jqXHR){
-							//console.log('{ error => "'+jqXHR.status +' - '+ jqXHR.statusText +'", response => "'+ jqXHR.responseText +'" }'); 
-							var json = $.parseJSON(jqXHR.responseText);
-							if(json.code == "W00"){
-								context.limpiar();
-								var colspan = $(context.selector + " thead > tr th").length;
-								$(context.selector + " tbody").append("<tr><td colspan='"+colspan+"' style='text-align:left'><i class='fa fa-info-circle'></i> "+json.data+"</td></tr>");
+			fnCallbacks = this.actualizar_default_callbacks;
+			/*{
+                _error: function(jqXHR){
+					//console.log('{ error => "'+jqXHR.status +' - '+ jqXHR.statusText +'", response => "'+ jqXHR.responseText +'" }'); 
+					var json = $.parseJSON(jqXHR.responseText);
+					if(json.code == "W00"){
+						context.limpiar();
+						var colspan = $(context.selector + " thead > tr th").length;
+						$(context.selector + " tbody").append("<tr><td colspan='"+colspan+"' style='text-align:left'><i class='fa fa-info-circle'></i> "+json.data+"</td></tr>");
 
-							}else{
-								json.type = 'ERR';
-								MessageManager.show(json);
-								context.limpiar();
-							}
-							
-                        },  
-                        _success: function(response){
-							context.limpiar();
-							context.cargarDatos(response.data);
+					}else{
+						json.type = 'ERR';
+						MessageManager.show(json);
+						context.limpiar();
+					}
+					
+                },  
+                _success: function(response){
+					context.limpiar();
+					context.cargarDatos(response.data);
 
-                         	var total = parseInt(response.resultados/context.rxpag); 
-                            var plus = parseInt(response.resultados)%context.rxpag;
-                            if(plus>0) 
-                                total++;
-                            context.paginacion(total);
-                        }
-                    }
+                 	var total = parseInt(response.resultados/context.rxpag); 
+                    var plus = parseInt(response.resultados)%context.rxpag;
+                    if(plus>0) 
+                        total++;
+                    context.paginacion(total);
+                }
+            }*/
 		}
 		
 		parametros.formatogrid = true;
@@ -282,7 +324,6 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
 		$(this.selector + " tbody").find("input[type=checkbox]:checked").parent().parent().remove();
 	}
 	this.paginacion = function(total){
-	
 		$(this.selector + " .btn-total-paginas").html('de '+total);
 		$(this.selector + " .btn-total-paginas").data('pages',total);
 	}

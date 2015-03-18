@@ -60,32 +60,72 @@ class InversionController extends ProyectosController {
 
 		$parametros = Input::all();
 		if(isset($parametros['formatogrid'])){
+			if(isset($parametros['desglosegrid'])){
+				$recurso = array();
 
-			$rows = Proyecto::getModel();
-			$rows = $rows->where('unidadResponsable','=',Sentry::getUser()->claveUnidad)
-						->where('idClasificacionProyecto','=',2)
-						->whereIn('idEstatusProyecto',[1,2,3,4]);
-			
-			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
-			
-			if(isset($parametros['buscar'])){				
-				$rows = $rows->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%');
-				$total = $rows->count();
-			}else{				
-				$total = $rows->count();						
+				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
+				
+				$pagina = $parametros['pagina'];
+
+				//$rows = ComponenteDesglose::listarDatos()->where('idComponente','=',$parametros['id-componente']);
+				$rows = ComponenteDesglose::listarDatos()->where('idComponente','=',$parametros['idComponente']);
+				$totales = ComponenteDesglose::listarDatos()->where('idComponente','=',$parametros['idComponente']);
+				if(isset($parametros['buscar'])){
+					$rows = $rows->where(function($query) use ($parametros){
+									$query->where('jurisdiccion.nombre','like','%'.$parametros['buscar'].'%')
+										->orWhere('municipio.nombre','like','%'.$parametros['buscar'].'%')
+										->orWhere('localidad.nombre','like','%'.$parametros['buscar'].'%');
+								});
+					$totales = $totales->where(function($query) use ($parametros){
+									$query->where('jurisdiccion.nombre','like','%'.$parametros['buscar'].'%')
+										->orWhere('municipio.nombre','like','%'.$parametros['buscar'].'%')
+										->orWhere('localidad.nombre','like','%'.$parametros['buscar'].'%');
+								});
+					//$total = $rows->count();
+					/*$queries = DB::getQueryLog();
+					$data['query'] = print_r(end($queries),true);*/
+				}/*else{				
+					//$total = $rows->count();						
+				}*/
+				//$totales = $rows;
+				$totales = $totales->select(DB::raw('count(componenteDesglose.id) AS cuantos'),DB::raw('sum(componenteDesglose.presupuesto) AS totalPresupuesto'))->get();
+				$totales = $totales[0];
+				
+				$total = $totales->cuantos;
+				$recurso['resultados'] = $totales->cuantos;
+				$recurso['total_presupuesto'] = $totales->totalPresupuesto;
+				$recurso['data'] = $rows->orderBy('componenteDesglose.id', 'desc')
+							->skip(($pagina-1)*10)->take(10)
+							->get();
+
+				$data = $recurso;
+			}else{
+				$rows = Proyecto::getModel();
+				$rows = $rows->where('unidadResponsable','=',Sentry::getUser()->claveUnidad)
+							->where('idClasificacionProyecto','=',2)
+							->whereIn('idEstatusProyecto',[1,2,3,4]);
+				
+				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
+				
+				if(isset($parametros['buscar'])){				
+					$rows = $rows->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%');
+					$total = $rows->count();
+				}else{				
+					$total = $rows->count();						
+				}
+				
+				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),'fibap.presupuestoRequerido',
+					'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
+					'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
+									->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
+									->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
+									->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
+									->leftjoin('fibap','proyectos.id','=','fibap.idProyecto')
+									->orderBy('id', 'desc')
+									->skip(($parametros['pagina']-1)*10)->take(10)
+									->get();
+				$data = array('resultados'=>$total,'data'=>$rows);
 			}
-			
-			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),'fibap.presupuestoRequerido',
-				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
-				'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
-								->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
-								->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
-								->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
-								->leftjoin('fibap','proyectos.id','=','fibap.idProyecto')
-								->orderBy('id', 'desc')
-								->skip(($parametros['pagina']-1)*10)->take(10)
-								->get();
-			$data = array('resultados'=>$total,'data'=>$rows);
 
 			if($total<=0){
 				$http_status = 404;
@@ -175,7 +215,30 @@ class InversionController extends ProyectosController {
 				$recurso = Actividad::with('metasMes')->find($id);
 			}elseif ($parametros['mostrar'] == 'desglose-componente') {
 				# code...
-				$recurso = Accion::with('desglosePresupuesto','datosComponenteDetalle','partidas')->find($id);
+				//$recurso = Accion::with('datosComponenteDetalle','partidas','desglosePresupuesto')->find($id);
+				$recurso = Accion::with('datosComponenteDetalle','partidas')->find($id);
+				/*
+				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
+				$pagina = $parametros['pagina'];
+
+				$rows = ComponenteDesglose::listarDatos()->where('idComponente','=',$recurso->idComponente);
+
+				if(isset($parametros['buscar'])){
+					$rows = $rows->where(function($query) use ($parametros){
+									$query->where('jurisdiccion.nombre','like','%'.$parametros['buscar'].'%')
+										->orWhere('municipio.nombre','like','%'.$parametros['buscar'].'%')
+										->orWhere('localidad.nombre','like','%'.$parametros['buscar'].'%');
+								});
+					$total = $rows->count();
+					/*$queries = DB::getQueryLog();
+					$data['query'] = print_r(end($queries),true);*/
+				/*}else{				
+					$total = $rows->count();						
+				}*/
+				/*$recurso['total_desglose'] = $total;
+				$recurso['desglosePresupuesto'] = $rows->orderBy('id', 'desc')
+							->skip(($pagina-1)*10)->take(10)
+							->get();*/
 				/*if($recurso->distribucionPresupuestoAgrupado){
 					$recurso->distribucionPresupuestoAgrupado->load('jurisdiccion');
 				}*/
@@ -1063,7 +1126,8 @@ class InversionController extends ProyectosController {
 						***/
 						$accion = Accion::with('fibap.distribucionPresupuestoAgrupado.objetoGasto','desglosePresupuesto')
 										->find($id_padre);
-						$data['desglose_presupuesto'] = $accion->desglosePresupuesto;
+						$data['id_componete'] = $accion->idComponente;
+						//$data['desglose_presupuesto'] = $accion->desglosePresupuesto;
 						$data['distribucion_total'] = $accion->fibap->distribucionPresupuestoAgrupado;
 						$data['presupuesto_requerido'] = $accion->presupuestoRequerido;
 					}elseif($parametros['eliminar'] == 'antecedente'){
@@ -1415,7 +1479,7 @@ class InversionController extends ProyectosController {
 					$desglose->beneficiarios()->saveMany($beneficiarios_desglose);
 				}
 				
-				$accion->load('desglosePresupuesto');
+				//$accion->load('desglosePresupuesto');
 				return array('data'=>$accion);
 			});
 

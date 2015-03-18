@@ -513,7 +513,8 @@ $('#btn-presupuesto-guardar').on('click',function(){
 		proyectoResource.put($('#id-desglose').val(),parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Cambios almacenados con éxito',type:'OK',timer:3});
-	            fibapAcciones.llenar_datagrid_distribucion(response.data.desglose_presupuesto,response.data.presupuestoRequerido);
+	            //fibapAcciones.llenar_datagrid_distribucion(response.data.desglose_presupuesto,response.data.presupuestoRequerido);
+	            fibapAcciones.llenar_datagrid_distribucion(response.data.idComponente,response.data.presupuestoRequerido);
 	            fibapAcciones.llenar_tabla_distribucion_general(response.extras.distribucion_total);
 	            $(modal_presupuesto).modal('hide');
 	        },
@@ -535,7 +536,8 @@ $('#btn-presupuesto-guardar').on('click',function(){
 		proyectoResource.post(parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Presupuesto almacenado con éxito',type:'OK',timer:3});
-	            fibapAcciones.llenar_datagrid_distribucion(response.data.desglose_presupuesto,response.data.presupuestoRequerido);
+	            //fibapAcciones.llenar_datagrid_distribucion(response.data.desglose_presupuesto,response.data.presupuestoRequerido);
+	            fibapAcciones.llenar_datagrid_distribucion(response.data.idComponente,response.data.presupuestoRequerido);
 	            fibapAcciones.llenar_tabla_distribucion_general(response.extras.distribucion_total);
 	            $(modal_presupuesto).modal('hide');
 	        },
