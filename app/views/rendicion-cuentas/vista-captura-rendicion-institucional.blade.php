@@ -24,18 +24,21 @@
                 <span class="fa fa-calendar"></span> Seguimiento de Metas
             </a>
         </li>
+        @if($trimestre_activo)
         <li role="presentation">
             <a href="#seguimiento-beneficiarios" aria-controls="seguimiento-beneficiarios" role="tab" data-toggle="tab" id="tab-link-beneficiarios">
                 <span class="fa fa-users"></span> Seguimiento de Beneficiarios
             </a>
         </li>
         <li role="presentation">
-        	<a href="#analisis-funcional" aria-controls="analisis-funcional" role="tab" data-toggle="tab" id="tab-link-beneficiarios">
+        	<a href="#analisis-funcional" aria-controls="analisis-funcional" role="tab" data-toggle="tab" id="tab-link-analisis-funcional">
                 <span class="fa fa-check-square"></span> Analisis Funcional
             </a>
         </li>
+        @endif
     </ul>
     <div class="tab-content">
+    	@if($trimestre_activo)
     	<div role="tabpanel" class="tab-pane" id="analisis-funcional">
     		<br>
     		<form id="form_analisis">
@@ -109,6 +112,7 @@
 	            </table>
 	        </div>
     	</div>
+    	@endif
         <div role="tabpanel" class="tab-pane active" id="seguimiento-metas">
         	<br>
             <div class="panel panel-default datagrid" id="datagridAcciones" data-edit-row="seguimiento_metas">
@@ -210,11 +214,13 @@
 									<span class="fa fa-align-left"></span> Analisis y Justificación
 								</a>
 							</li>
-							<li role="presentation">
-								<a href="#panel-plan-mejora" aria-controls="panel-plan-mejora" role="tab" data-toggle="" id="tab-link-plan-mejora" class="disabled">
+							@if($trimestre_activo)
+							<li role="presentation" class="disabled">
+								<a href="#panel-plan-mejora" aria-controls="panel-plan-mejora" role="tab" data-toggle="" id="tab-link-plan-mejora">
 									<span class="fa fa-file"></span> Plan de Mejora
 								</a>
 							</li>
+							@endif
 						</ul>
 						<!-- Tab panes -->
 						<div class="tab-content">
@@ -224,6 +230,7 @@
 			                		<thead>
 			                			<th>Jurisdicción</th>
 			                			<th>Meta Acumulada</th>
+			                			<th>Meta Programada</th>
 			                			<th>Avance del Mes</th>
 			                			<th>Avance Acumulado</th>
 			                			<th width="90">Porcentaje Acumulado</th>
@@ -232,9 +239,10 @@
 			                			<tr data-clave-jurisdiccion="OC">
 			                				<td>OC - Oficina Central</td>
 			                				<td class="meta-programada" data-meta="0">0</td>
+			                				<td class="meta-del-mes" data-meta-mes="0">0</td>
 			                				<td>
 			                					<div class="form-group" style="margin-bottom:0;">
-			                						<input type="number" class="form-control avance-mes" name="avance[OC]" id="avance_OC" data-jurisdiccion="OC">
+			                						<input type="number" class="form-control avance-mes" name="avance[OC]" id="avance_OC" data-jurisdiccion="OC" data-meta-programada="">
 			                					</div>
 			                				</td>
 			                				<td class="avance-acumulado" data-acumulado="0">
@@ -246,9 +254,10 @@
 			                			<tr data-clave-jurisdiccion="{{$jurisdiccion->clave}}">
 			                				<td>{{$jurisdiccion->clave}} - {{$jurisdiccion->nombre}}</td>
 			                				<td class="meta-programada" data-meta="0">0</td>
+			                				<td class="meta-del-mes" data-meta-mes="0">0</td>
 			                				<td>
 			                					<div class="form-group" style="margin-bottom:0;">
-			                						<input type="number" class="form-control avance-mes" name="avance[{{$jurisdiccion->clave}}]" id="avance_{{$jurisdiccion->clave}}" data-jurisdiccion="{{$jurisdiccion->clave}}">
+			                						<input type="number" class="form-control avance-mes" name="avance[{{$jurisdiccion->clave}}]" id="avance_{{$jurisdiccion->clave}}" data-jurisdiccion="{{$jurisdiccion->clave}}" data-meta-programada="">
 			                					</div>
 			                				</td>
 			                				<td class="avance-acumulado" data-acumulado="0">
@@ -261,6 +270,7 @@
 			                		<tfoot>
 			                			<th>Totales</th>
 			                			<th id="total-meta-programada">0</th>
+			                			<th id="total-meta-mes">0</th>
 			                			<th id="total-avance-mes">0</th>
 			                			<th id="total-avance-acumulado">0</th>
 			                			<th id="total-porcentaje">0%</th>
@@ -284,6 +294,7 @@
 									</div>
 								</div>
 							</div>
+							@if($trimestre_activo)
 							<div role="tabpanel" class="tab-pane" id="panel-plan-mejora">
 								<br>
 								<div class="row">
@@ -325,6 +336,7 @@
 									</div>
 								</div>
 							</div>
+							@endif
 						</div>
 					</div>
 					<input type="hidden" name="id-avance" id="id-avance">
@@ -340,6 +352,7 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+@if($trimestre_activo)
 <div class="modal fade" id="modalBeneficiario" tabindex="-1" role="dialog" aria-labelledby="modalBenefLabel" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-dialog-85-screen">
         <div class="modal-content modal-content-85-screen">
@@ -729,6 +742,7 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+@endif
 <!-- Dejar parent al ultimo -->
 @parent
 @stop

@@ -74,6 +74,12 @@ class SeguimientoController extends BaseController {
 
 		$datos['mes_clave'] = Util::obtenerMesActual();
 		$datos['mes'] = $meses[Util::obtenerMesActual()];
+		$mes_del_trimestre = Util::obtenerMesTrimestre();
+		if($mes_del_trimestre == 3){
+			$datos['trimestre_activo'] = TRUE;
+		}else{
+			$datos['trimestre_activo'] = FALSE;
+		}
 
 		$datos['jurisdicciones'] = $jurisdicciones;
 

@@ -203,27 +203,31 @@ class SeguimientoController extends BaseController {
 			}elseif($parametros['guardar'] == 'avance-beneficiarios'){
 				$respuesta = $this->guardarAvanceBeneficiario($parametros);
 			}elseif ($parametros['guardar'] == 'analisis-funcional') {
-				//
-				$validacion = Validador::validar(Input::all(), $this->reglasAnalisisFuncional);
-
-				if($validacion === TRUE){
-					//
-					$mes_actual = Util::obtenerMesActual();
-					$recurso = new EvaluacionAnalisisFuncional;
-					$recurso->mes 					= $mes_actual;
-					$recurso->idProyecto 			= $parametros['id-proyecto'];
-					$recurso->analisisResultado 	= $parametros['analisis-resultado'];
-					$recurso->beneficiarios 		= $parametros['beneficiarios'];
-					$recurso->justificacionGlobal 	= $parametros['justificacion-global'];
-
-					if($recurso->save()){
-						$respuesta['data'] = array('data'=>$recurso);
-					}else{
-						throw new Exception("Ocurrio un error al intentar guardar los datos", 1);
-					}
+				$mes_del_trimestre = Util::obtenerMesTrimestre();
+				if($mes_del_trimestre != 3){
+					$respuesta['http_status'] = 500;
+					$respuesta['data'] = array('data'=>'Los datos del Analisis Funcional solo se pueden capturar en el ultimo mes del trimestre','code'=>'S01');
 				}else{
-					$respuesta['http_status'] = $validacion['http_status'];
-					$respuesta['data'] = $validacion['data'];
+					$validacion = Validador::validar(Input::all(), $this->reglasAnalisisFuncional);
+					if($validacion === TRUE){
+						//
+						$mes_actual = Util::obtenerMesActual();
+						$recurso = new EvaluacionAnalisisFuncional;
+						$recurso->mes 					= $mes_actual;
+						$recurso->idProyecto 			= $parametros['id-proyecto'];
+						$recurso->analisisResultado 	= $parametros['analisis-resultado'];
+						$recurso->beneficiarios 		= $parametros['beneficiarios'];
+						$recurso->justificacionGlobal 	= $parametros['justificacion-global'];
+
+						if($recurso->save()){
+							$respuesta['data'] = array('data'=>$recurso);
+						}else{
+							throw new Exception("Ocurrio un error al intentar guardar los datos", 1);
+						}
+					}else{
+						$respuesta['http_status'] = $validacion['http_status'];
+						$respuesta['data'] = $validacion['data'];
+					}
 				}
 			}
 		}catch(\Exception $ex){
@@ -267,24 +271,29 @@ class SeguimientoController extends BaseController {
 				$respuesta = $this->guardarAvanceBeneficiario($parametros,TRUE);
 			}elseif ($parametros['guardar'] == 'analisis-funcional') {
 				//
-				$validacion = Validador::validar(Input::all(), $this->reglasAnalisisFuncional);
-
-				if($validacion === TRUE){
-					//
-					$mes_actual = Util::obtenerMesActual();
-					$recurso = EvaluacionAnalisisFuncional::find($id);
-					$recurso->analisisResultado 	= $parametros['analisis-resultado'];
-					$recurso->beneficiarios 		= $parametros['beneficiarios'];
-					$recurso->justificacionGlobal 	= $parametros['justificacion-global'];
-
-					if($recurso->save()){
-						$respuesta['data'] = array('data'=>$recurso);
-					}else{
-						throw new Exception("Ocurrio un error al intentar guardar los datos", 1);
-					}
+				$mes_del_trimestre = Util::obtenerMesTrimestre();
+				if($mes_del_trimestre != 3){
+					$respuesta['http_status'] = 500;
+					$respuesta['data'] = array('data'=>'Los datos del Analisis Funcional solo se pueden capturar en el ultimo mes del trimestre','code'=>'S01');
 				}else{
-					$respuesta['http_status'] = $validacion['http_status'];
-					$respuesta['data'] = $validacion['data'];
+					$validacion = Validador::validar(Input::all(), $this->reglasAnalisisFuncional);
+					if($validacion === TRUE){
+						//
+						$mes_actual = Util::obtenerMesActual();
+						$recurso = EvaluacionAnalisisFuncional::find($id);
+						$recurso->analisisResultado 	= $parametros['analisis-resultado'];
+						$recurso->beneficiarios 		= $parametros['beneficiarios'];
+						$recurso->justificacionGlobal 	= $parametros['justificacion-global'];
+
+						if($recurso->save()){
+							$respuesta['data'] = array('data'=>$recurso);
+						}else{
+							throw new Exception("Ocurrio un error al intentar guardar los datos", 1);
+						}
+					}else{
+						$respuesta['http_status'] = $validacion['http_status'];
+						$respuesta['data'] = $validacion['data'];
+					}
 				}
 			}
 		}catch(\Exception $ex){
@@ -309,6 +318,13 @@ class SeguimientoController extends BaseController {
 	public function guardarAvanceBeneficiario($parametros, $es_editar = FALSE){
 		$respuesta['http_status'] = 200;
 		$respuesta['data'] = array("data"=>'');
+
+		$mes_del_trimestre = Util::obtenerMesTrimestre();
+		if($mes_del_trimestre != 3){
+			$respuesta['http_status'] = 500;
+			$respuesta['data'] = array('data'=>'Los datos de seguimiento de Beneficiarios solo se pueden capturar en el ultimo mes del trimestre','code'=>'S01');
+			return $respuesta;
+		}
 
 		$validacion = Validador::validar(Input::all(), $this->reglasBeneficiarios);
 
@@ -509,7 +525,11 @@ class SeguimientoController extends BaseController {
 			$respuesta['data']['data'] = $faltan_campos;
 			return $respuesta;
 			//throw new Exception("Error en la captura", 1);
-		}elseif($registro_avance->planMejora){
+		}
+
+		$mes_del_trimestre = Util::obtenerMesTrimestre();
+
+		if($registro_avance->planMejora && $mes_del_trimestre == 3){
 			$validacion = Validador::validar(Input::all(), $this->reglasPlanMejora);
 
 			if($validacion === TRUE){
@@ -542,8 +562,10 @@ class SeguimientoController extends BaseController {
 		
 		$respuesta['data'] = DB::transaction(function() use ($registro_avance, $guardar_metas, $accion_metas, $plan_mejora){
 			if($registro_avance->save()){
-				if($plan_mejora){
+				if($registro_avance->planMejora && $plan_mejora){
 					$plan_mejora->save();
+				}elseif(!$registro_avance->planMejora && count($accion_metas->planMejora)){
+					$accion_metas->planMejora[0]->delete();
 				}
 				$accion_metas->metasMes()->saveMany($guardar_metas);
 				return array('data'=>$registro_avance);
