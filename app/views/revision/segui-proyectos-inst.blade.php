@@ -180,7 +180,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <!--<button type="button" class="btn btn-primary" id="btn-editar-avance">Comentar Avances</button>-->
+                    <button type="button" class="btn btn-primary" id="btn-comentar-avance">Comentar Avances</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->

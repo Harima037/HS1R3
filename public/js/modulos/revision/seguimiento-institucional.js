@@ -161,16 +161,15 @@ function cargar_datos_proyecto(e){
                 $('#total-trim-'+i).text(suma);
             }
 
-            $('#btn-editar-avance').attr('data-id-proyecto',e);
-
+            $('#btn-comentar-avance').attr('data-id-proyecto',e);
             $('#modalDatosSeguimiento').modal('show');
         }
     });
 }
 
 //rend-cuenta-inst-editar
-$('#btn-editar-avance').on('click',function(){
-    window.location.href = SERVER_HOST+'/rendicion-cuentas/editar-avance/' + $('#btn-editar-avance').attr('data-id-proyecto');
+$('#btn-comentar-avance').on('click',function(){
+    window.location.href = SERVER_HOST+'/revision/comentar-avance/' + $('#btn-comentar-avance').attr('data-id-proyecto');
 });
 
 /*

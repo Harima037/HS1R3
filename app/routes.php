@@ -48,6 +48,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::any('revision-caratula',array('uses'=>'RevisionController@caratula'));		
 		
 		Route::get('segui-proyectos-inst',array('uses'=>'SeguimientoInstitucionalController@index'));
+		Route::get('comentar-avance/{id}',array('uses'=>'SeguimientoInstitucionalController@rendicionCuentas'));
+		
 	});
 
 	Route::group(array('prefix'=>'rendicion-cuentas'),function(){
