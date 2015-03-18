@@ -228,12 +228,19 @@
 								<br>
 								<table id="tabla-avances-metas" class="table table-condensed table-hover table-bordered">
 			                		<thead>
-			                			<th>Jurisdicción</th>
-			                			<th>Meta Acumulada</th>
-			                			<th>Meta Programada</th>
-			                			<th>Avance del Mes</th>
-			                			<th>Avance Acumulado</th>
-			                			<th width="90">Porcentaje Acumulado</th>
+			                			<tr>
+			                				<th rowspan="2">Jurisdicción</th>
+				                			<th colspan="2" class="bg-success">Meta Programada</th>
+				                			<th colspan="3" class="bg-info">Avance</th>
+				                			<th rowspan="2" width="90">Porcentaje Acumulado</th>
+			                			</tr>
+			                			<tr>
+			                				<th class="bg-success">Acumulada</th>
+			                				<th class="bg-success" nowrap="nowrap">Mes actual</th>
+			                				<th class="bg-info" nowrap="nowrap">Mes actual</th>
+			                				<th class="bg-info">Acumulado</th>
+			                				<th class="bg-info">Total</th>
+			                			</tr>
 			                		</thead>
 			                		<tbody>
 			                			<tr data-clave-jurisdiccion="OC">
@@ -245,9 +252,8 @@
 			                						<input type="number" class="form-control avance-mes" name="avance[OC]" id="avance_OC" data-jurisdiccion="OC" data-meta-programada="">
 			                					</div>
 			                				</td>
-			                				<td class="avance-acumulado" data-acumulado="0">
-			                					<span class="vieja-cantidad">0</span> <span class="nueva-cantidad text-primary"></span>
-			                				</td>
+			                				<td class="avance-acumulado" data-acumulado="0">0</td>
+			                				<td class="avance-total" data-avance-total="0">0</td>
 			                				<td class="avance-mes" data-estado-avance=""></td>
 			                			</tr>
 			                			@foreach ($jurisdicciones as $jurisdiccion)
@@ -260,9 +266,8 @@
 			                						<input type="number" class="form-control avance-mes" name="avance[{{$jurisdiccion->clave}}]" id="avance_{{$jurisdiccion->clave}}" data-jurisdiccion="{{$jurisdiccion->clave}}" data-meta-programada="">
 			                					</div>
 			                				</td>
-			                				<td class="avance-acumulado" data-acumulado="0">
-			                					<span class="vieja-cantidad">0</span> <span class="nueva-cantidad text-primary"></span>
-			                				</td>
+			                				<td class="avance-acumulado" data-acumulado="0">0</td>
+			                				<td class="avance-total" data-avance-total="0">0</td>
 			                				<td class="avance-mes" data-estado-avance=""></td>
 			            				</tr>
 			                			@endforeach
@@ -273,6 +278,7 @@
 			                			<th id="total-meta-mes">0</th>
 			                			<th id="total-avance-mes">0</th>
 			                			<th id="total-avance-acumulado">0</th>
+			                			<th id="total-avance-total">0</th>
 			                			<th id="total-porcentaje">0%</th>
 			                		</tfoot>
 			                	</table>

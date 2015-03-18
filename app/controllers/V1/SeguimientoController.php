@@ -140,7 +140,7 @@ class SeguimientoController extends BaseController {
 		if(isset($parametros['mostrar'])){
 			if($parametros['mostrar'] == 'datos-proyecto-avance'){
 				$recurso = Proyecto::with('datosFuncion','datosSubFuncion','datosProgramaPresupuestario','componentes.metasMesAgrupado'
-					,'componentes.registroAvance','componentes.actividades.metasMesAgrupado','componentes.actividades.registroAvance')->find($id);
+					,'componentes.registroAvance','componentes.actividades.metasMesAgrupado','componentes.actividades.registroAvance','beneficiarios.registroAvance','beneficiarios.tipoBeneficiario')->find($id);
 			}elseif($parametros['mostrar'] == 'datos-metas-avance'){
 				$mes_actual = Util::obtenerMesActual();
 				if($parametros['nivel'] == 'componente'){
