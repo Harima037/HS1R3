@@ -21,33 +21,7 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
 	this.rxpag = 10;
 	this.source = pSource || new RESTfulRequests('');
 	this.parametros = pParametros || { formatogrid:true, pagina: 1};
-	this.actualizar_default_callbacks = {
-        _error: function(jqXHR){
-			//console.log('{ error => "'+jqXHR.status +' - '+ jqXHR.statusText +'", response => "'+ jqXHR.responseText +'" }'); 
-			var json = $.parseJSON(jqXHR.responseText);
-			if(json.code == "W00"){
-				context.limpiar();
-				var colspan = $(context.selector + " thead > tr th").length;
-				$(context.selector + " tbody").append("<tr><td colspan='"+colspan+"' style='text-align:left'><i class='fa fa-info-circle'></i> "+json.data+"</td></tr>");
-
-			}else{
-				json.type = 'ERR';
-				MessageManager.show(json);
-				context.limpiar();
-			}
-			
-        },  
-        _success: function(response){
-			context.limpiar();
-			context.cargarDatos(response.data);
-
-         	var total = parseInt(response.resultados/context.rxpag); 
-            var plus = parseInt(response.resultados)%context.rxpag;
-            if(plus>0) 
-                total++;
-            context.paginacion(total);
-        }
-    };
+	this.actualizar_default_callbacks = null;
 
 	this.init = function(){
 		// Inicializamos las propiedades del datagrid: paginacion etc.
@@ -230,7 +204,35 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
         	}
         	this.actualizar_default_callbacks = fnCallbacks;
 		}else{
-			
+			if(!this.actualizar_default_callbacks){
+				this.actualizar_default_callbacks = {
+			        _error: function(jqXHR){
+						//console.log('{ error => "'+jqXHR.status +' - '+ jqXHR.statusText +'", response => "'+ jqXHR.responseText +'" }'); 
+						var json = $.parseJSON(jqXHR.responseText);
+						if(json.code == "W00"){
+							context.limpiar();
+							var colspan = $(context.selector + " thead > tr th").length;
+							$(context.selector + " tbody").append("<tr><td colspan='"+colspan+"' style='text-align:left'><i class='fa fa-info-circle'></i> "+json.data+"</td></tr>");
+
+						}else{
+							json.type = 'ERR';
+							MessageManager.show(json);
+							context.limpiar();
+						}
+						
+			        },  
+			        _success: function(response){
+						context.limpiar();
+						context.cargarDatos(response.data);
+
+			         	var total = parseInt(response.resultados/context.rxpag); 
+			            var plus = parseInt(response.resultados)%context.rxpag;
+			            if(plus>0) 
+			                total++;
+			            context.paginacion(total);
+			        }
+			    };
+			}
 			fnCallbacks = this.actualizar_default_callbacks;
 			/*{
                 _error: function(jqXHR){
