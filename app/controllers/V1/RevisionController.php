@@ -121,7 +121,7 @@ class RevisionController extends BaseController {
 
 			$rows = Proyecto::getModel();
 			//$rows = $rows->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
-			$rows = $rows->where('idEstatusProyecto','=','2');
+			$rows = $rows->wherein('idEstatusProyecto',array(2, 4));
 			
 			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 			
@@ -174,7 +174,7 @@ class RevisionController extends BaseController {
 								->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
 								->leftjoin('fibap','proyectos.id','=','fibap.idProyecto')
 								->orderBy('proyectos.id','desc')
-								->where('proyectos.idClasificacionProyecto','=',DB::raw('2'))
+								->wherein('proyectos.idClasificacionProyecto',array(2, 4))
 								->where('unidadResponsable','=',Sentry::getUser()->claveUnidad)
 								->whereNull('fibap.id')
 								->get();
@@ -381,7 +381,7 @@ class RevisionController extends BaseController {
 		
 		
 		
-		if($parametros['actualizarproyecto'])
+		if(isset($parametros['actualizarproyecto']))
 		{
 			//throw new Exception($parametros['actualizarproyecto'],1);
 			
@@ -407,6 +407,18 @@ class RevisionController extends BaseController {
 					$recurso->save();
 				}
 			}
+			else if($parametros['actualizarproyecto']=="firmar") //Poner estatus 5 (Enviar a firma)
+			{
+				$recurso = Proyecto::find($id);
+				if(is_null($recurso)){
+					$respuesta['http_status'] = 404;
+					$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+				}else{
+					$recurso->idEstatusProyecto = 5;
+					$recurso->save();
+				}
+			}
+			
 		}
 		else
 		{
