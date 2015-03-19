@@ -43,22 +43,28 @@
     		<br>
     		<form id="form_analisis">
 	    		<div class="row">
-	    			<div class="col-sm-6">
+	    			<div class="col-sm-12">
 	    				<div class="form-group">
-	    					<label class="control-label" for="analisis-resultado">Analisis de Resultado</label>
-	    					<textarea id="analisis-resultado" name="analisis-resultado" rows="6" class="form-control"></textarea>
+	    					<label class="control-label" for="finalidad-proyecto">Finalidad del Proyecto</label>
+	    					<textarea id="finalidad-proyecto" name="finalidad-proyecto" rows="4" class="form-control"></textarea>
 	    				</div>
 	    			</div>
-	    			<div class="col-sm-6">
+	    			<div class="col-sm-12">
+	    				<div class="form-group">
+	    					<label class="control-label" for="analisis-resultado">Analisis de Resultado</label>
+	    					<textarea id="analisis-resultado" name="analisis-resultado" rows="4" class="form-control"></textarea>
+	    				</div>
+	    			</div>
+	    			<div class="col-sm-12">
 	    				<div class="form-group">
 	    					<label class="control-label" for="beneficiarios">Beneficiarios</label>
-	    					<textarea id="beneficiarios" name="beneficiarios" rows="6" class="form-control"></textarea>
+	    					<textarea id="beneficiarios" name="beneficiarios" rows="4" class="form-control"></textarea>
 	    				</div>
 	    			</div>
 	    			<div class="col-sm-12">
 	    				<div class="form-group">
 	    					<label class="control-label" for="justificacion-global">Justificación Global del Proyecto</label>
-	    					<textarea id="justificacion-global" name="justificacion-global" rows="6" class="form-control"></textarea>
+	    					<textarea id="justificacion-global" name="justificacion-global" rows="4" class="form-control"></textarea>
 	    				</div>
 	    			</div>
 	    		</div>
@@ -226,7 +232,7 @@
 						<div class="tab-content">
 							<div role="tabpanel" class="tab-pane active" id="panel-metas">
 								<br>
-								<table id="tabla-avances-metas" class="table table-condensed table-hover table-bordered">
+								<table id="tabla-avances-metas" class="table table-condensed table-bordered">
 			                		<thead>
 			                			<tr>
 			                				<th rowspan="2">Jurisdicción</th>
@@ -245,7 +251,7 @@
 			                		<tbody>
 			                			<tr data-clave-jurisdiccion="OC">
 			                				<td>OC - Oficina Central</td>
-			                				<td class="meta-programada" data-meta="0">0</td>
+			                				<td class="meta-programada bg-success" data-meta="0">0</td>
 			                				<td class="meta-del-mes" data-meta-mes="0">0</td>
 			                				<td>
 			                					<div class="form-group" style="margin-bottom:0;">
@@ -253,13 +259,13 @@
 			                					</div>
 			                				</td>
 			                				<td class="avance-acumulado" data-acumulado="0">0</td>
-			                				<td class="avance-total" data-avance-total="0">0</td>
+			                				<td class="avance-total bg-info" data-avance-total="0">0</td>
 			                				<td class="avance-mes" data-estado-avance=""></td>
 			                			</tr>
 			                			@foreach ($jurisdicciones as $jurisdiccion)
 			                			<tr data-clave-jurisdiccion="{{$jurisdiccion->clave}}">
 			                				<td>{{$jurisdiccion->clave}} - {{$jurisdiccion->nombre}}</td>
-			                				<td class="meta-programada" data-meta="0">0</td>
+			                				<td class="meta-programada bg-success" data-meta="0">0</td>
 			                				<td class="meta-del-mes" data-meta-mes="0">0</td>
 			                				<td>
 			                					<div class="form-group" style="margin-bottom:0;">
@@ -267,18 +273,18 @@
 			                					</div>
 			                				</td>
 			                				<td class="avance-acumulado" data-acumulado="0">0</td>
-			                				<td class="avance-total" data-avance-total="0">0</td>
+			                				<td class="avance-total bg-info" data-avance-total="0">0</td>
 			                				<td class="avance-mes"></td>
 			            				</tr>
 			                			@endforeach
 			                		</tbody>
 			                		<tfoot>
 			                			<th>Totales</th>
-			                			<th id="total-meta-programada">0</th>
+			                			<th class="bg-success" id="total-meta-programada">0</th>
 			                			<th id="total-meta-mes">0</th>
 			                			<th id="total-avance-mes">0</th>
 			                			<th id="total-avance-acumulado">0</th>
-			                			<th id="total-avance-total">0</th>
+			                			<th class="bg-info" id="total-avance-total">0</th>
 			                			<th id="total-porcentaje" data-estado-avance="">0%</th>
 			                		</tfoot>
 			                	</table>

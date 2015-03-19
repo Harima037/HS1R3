@@ -42,10 +42,9 @@ class CuentaController extends \BaseController {
 
 		try{
 			$recurso = Sentry::getUser();
-			$valid_result = Validador::validar(Input::all(), $this->reglas);
-			if($valid_result === true){
-				$recurso->password = Input::get('password');
-
+			$parametros = Input::all();
+			if(isset($parametros['formulario'])){
+				$recurso->mesCaptura = $parametros['mes-captura'];
 				if($recurso->save()){
 					$respuesta['http_status'] = 200;
 					$respuesta['data'] = array("data"=>$recurso->toArray());
@@ -54,8 +53,21 @@ class CuentaController extends \BaseController {
 					$respuesta['data'] = array("data"=>'No se pudieron guardar los cambios.','code'=>'S03');
 				}
 			}else{
-					$respuesta['http_status'] = $valid_result['http_status'];
-					$respuesta['data'] = $valid_result['data'];
+				$valid_result = Validador::validar(Input::all(), $this->reglas);
+				if($valid_result === true){
+					$recurso->password = Input::get('password');
+
+					if($recurso->save()){
+						$respuesta['http_status'] = 200;
+						$respuesta['data'] = array("data"=>$recurso->toArray());
+					}else{
+						$respuesta['http_status'] = 500;
+						$respuesta['data'] = array("data"=>'No se pudieron guardar los cambios.','code'=>'S03');
+					}
+				}else{
+						$respuesta['http_status'] = $valid_result['http_status'];
+						$respuesta['data'] = $valid_result['data'];
+				}
 			}
 		}catch (\Cartalyst\Sentry\Users\UserNotFoundException $e){
     		$respuesta['http_status'] = 404;

@@ -4,8 +4,12 @@ namespace SSA\Utilerias;
 class Util 
 {
 	public static function obtenerMesActual(){
-		//return 7;
-		return date("n");
+		$usuario = \Sentry::getUser();
+		if($usuario->mesCaptura){
+			return $usuario->mesCaptura;
+		}else{
+			return date("n");
+		}
 		$mes = date('n');
 		$dia = date('j');
 		if($dia <= 10){

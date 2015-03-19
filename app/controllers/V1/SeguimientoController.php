@@ -215,6 +215,7 @@ class SeguimientoController extends BaseController {
 						$recurso = new EvaluacionAnalisisFuncional;
 						$recurso->mes 					= $mes_actual;
 						$recurso->idProyecto 			= $parametros['id-proyecto'];
+						$recurso->finalidadProyecto		= $parametros['finalidad-proyecto'];
 						$recurso->analisisResultado 	= $parametros['analisis-resultado'];
 						$recurso->beneficiarios 		= $parametros['beneficiarios'];
 						$recurso->justificacionGlobal 	= $parametros['justificacion-global'];
@@ -281,6 +282,7 @@ class SeguimientoController extends BaseController {
 						//
 						$mes_actual = Util::obtenerMesActual();
 						$recurso = EvaluacionAnalisisFuncional::find($id);
+						$recurso->finalidadProyecto		= $parametros['finalidad-proyecto'];
 						$recurso->analisisResultado 	= $parametros['analisis-resultado'];
 						$recurso->beneficiarios 		= $parametros['beneficiarios'];
 						$recurso->justificacionGlobal 	= $parametros['justificacion-global'];
