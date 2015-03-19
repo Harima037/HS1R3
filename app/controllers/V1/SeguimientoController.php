@@ -443,35 +443,33 @@ class SeguimientoController extends BaseController {
 		
 		$guardar_metas = array();
 		$total_avance = 0;
+		$meta_acumulada = $accion_metas->metasMesJurisdiccion->sum('meta');
+		$avance_acumulado = $accion_metas->metasMesJurisdiccion->sum('avance');
+
 		foreach ($accion_metas->metasMes as $metas) {
 			if($parametros['avance'][$metas->claveJurisdiccion] == ''){
 				$faltan_campos[] = json_encode(array('field'=>'avance_'.$metas->claveJurisdiccion,'error'=>'Este campo es requerido'));
 			}else{
-				$meta_acumulada = $metas_acumuladas[$metas->claveJurisdiccion];
-				$avance_acumulado = $avances_acumulados[$metas->claveJurisdiccion];
-
+				//$meta_acumulada += $metas_acumuladas[$metas->claveJurisdiccion];
+				//$avance_acumulado += $avances_acumulados[$metas->claveJurisdiccion];
 				if($metas->avance){
 					$avance_acumulado -= $metas->avance;
 				}
-
-				$avance_acumulado += $parametros['avance'][$metas->claveJurisdiccion];
-
-				if($meta_acumulada > 0 && $metas->meta > 0){
+				//$avance_acumulado += $parametros['avance'][$metas->claveJurisdiccion];
+				/*if($meta_acumulada > 0 && $metas->meta > 0){
 					$porcentaje_avance = (( $avance_acumulado  / $meta_acumulada ) * 100);
 					if($porcentaje_avance < 90 || $porcentaje_avance > 110){
-						$conteo_alto_bajo_avance++;
+						//$conteo_alto_bajo_avance++;
 					}
 				}elseif($meta_acumulada == 0 && $parametros['avance'][$metas->claveJurisdiccion] > 0){
-					$conteo_alto_bajo_avance++;
-				}
-
+					//$conteo_alto_bajo_avance++;
+				}*/
 				$total_avance += $parametros['avance'][$metas->claveJurisdiccion];
 				$metas->avance = $parametros['avance'][$metas->claveJurisdiccion];
 				$guardar_metas[] = $metas;
-
-				if($metas->meta == 0 && $metas->avance > 0){
-					$conteo_alto_bajo_avance++;
-				}
+				/*if($metas->meta == 0 && $metas->avance > 0){
+					//$conteo_alto_bajo_avance++;
+				}*/
 			}
 		}
 		
@@ -494,15 +492,25 @@ class SeguimientoController extends BaseController {
 				$meta->avance = $parametros['avance'][$jurisdiccion];
 				$meta->idProyecto = $accion_metas->idProyecto;
 				$guardar_metas[] = $meta;
-				$conteo_alto_bajo_avance++;
+				//$conteo_alto_bajo_avance++;
 				$total_avance += $parametros['avance'][$jurisdiccion];
 			}
 		}
-		
-		if(trim($parametros['analisis-resultados']) == ''){
-			$faltan_campos[] = json_encode(array('field'=>'analisis-resultados','error'=>'Este campo es requerido.'));
+
+		$registro_avance->avanceMes = $total_avance;
+
+		$avance_acumulado += $total_avance;
+		if($avance_acumulado > 0 && $meta_acumulada == 0){
+			$porcentaje_avance = 1;
+		}elseif($meta_acumulada > 0){
+			$porcentaje_avance = (( $avance_acumulado  / $meta_acumulada ) * 100);
 		}else{
-			$registro_avance->analisisResultados = $parametros['analisis-resultados'];
+			$porcentaje_avance = 100;
+		}
+		//throw new Exception($porcentaje_avance, 1);
+		
+		if($porcentaje_avance < 90 || $porcentaje_avance > 110){
+			$conteo_alto_bajo_avance++;
 		}
 
 		if($conteo_alto_bajo_avance){
@@ -515,6 +523,12 @@ class SeguimientoController extends BaseController {
 		}else{
 			$registro_avance->justificacionAcumulada = 'El avance se encuentra dentro de los parametros establecidos';
 			$registro_avance->planMejora = 0;
+		}
+
+		if(trim($parametros['analisis-resultados']) == ''){
+			$faltan_campos[] = json_encode(array('field'=>'analisis-resultados','error'=>'Este campo es requerido.'));
+		}else{
+			$registro_avance->analisisResultados = $parametros['analisis-resultados'];
 		}
 
 		$plan_mejora = NULL;
@@ -557,8 +571,6 @@ class SeguimientoController extends BaseController {
 				return $respuesta;
 			}
 		}
-
-		$registro_avance->avanceMes = $total_avance;
 		
 		$respuesta['data'] = DB::transaction(function() use ($registro_avance, $guardar_metas, $accion_metas, $plan_mejora){
 			if($registro_avance->save()){

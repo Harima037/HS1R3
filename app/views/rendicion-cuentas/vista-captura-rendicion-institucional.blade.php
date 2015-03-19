@@ -268,7 +268,7 @@
 			                				</td>
 			                				<td class="avance-acumulado" data-acumulado="0">0</td>
 			                				<td class="avance-total" data-avance-total="0">0</td>
-			                				<td class="avance-mes" data-estado-avance=""></td>
+			                				<td class="avance-mes"></td>
 			            				</tr>
 			                			@endforeach
 			                		</tbody>
@@ -279,7 +279,7 @@
 			                			<th id="total-avance-mes">0</th>
 			                			<th id="total-avance-acumulado">0</th>
 			                			<th id="total-avance-total">0</th>
-			                			<th id="total-porcentaje">0%</th>
+			                			<th id="total-porcentaje" data-estado-avance="">0%</th>
 			                		</tfoot>
 			                	</table>
 							</div>

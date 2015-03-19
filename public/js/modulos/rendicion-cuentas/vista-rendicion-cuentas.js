@@ -26,6 +26,65 @@ var accionesDatagrid = new Datagrid("#datagridAcciones",moduloResource,{ formato
 accionesDatagrid.init();
 accionesDatagrid.actualizar({ _success: function(response){ llenar_grid_acciones(response); } });
 
+$('#btn-guardar-avance').on('click',function(){
+    if($('#total-porcentaje').attr('data-estado-avance')){
+        if(($('#analisis-resultados').val().trim() == '') || ($('#justificacion-acumulada').val().trim() == '')){
+            MessageManager.show({data:'Es necesario capturar una justificacion en base al porcentaje de avance del mes.',container:'#modalEditarAvance .modal-body',type:'ADV'});
+            $('#tab-link-justificacion').tab('show');
+            return;
+        }
+    }
+    var parametros = $('#form_avance').serialize();
+    parametros += '&guardar=avance-metas';
+
+    Validation.cleanFormErrors('#form_avance');
+
+    if($('#id-avance').val()){
+        moduloResource.put($('#id-avance').val(),parametros,{
+            _success: function(response){
+                MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
+                accionesDatagrid.actualizar({ _success: function(response){ llenar_grid_acciones(response); } });
+                $('#modalEditarAvance').modal('hide');
+            },
+            _error: function(response){
+                try{
+                    var json = $.parseJSON(response.responseText);
+                    if(!json.code)
+                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                    else{
+                        MessageManager.show(json);
+                    }
+                    Validation.formValidate(json.data);
+                }catch(e){
+                    console.log(e);
+                }                       
+            }
+        });
+    }else{
+        moduloResource.post(parametros,{
+            _success: function(response){
+                MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
+                accionesDatagrid.actualizar({ _success: function(response){ llenar_grid_acciones(response); } });
+                $('#id-avance').val(response.data.id);
+                $('#modalEditarAvance').modal('hide');
+            },
+            _error: function(response){
+                try{
+                    var json = $.parseJSON(response.responseText);
+                    if(!json.code)
+                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                    else{
+                        MessageManager.show(json);
+                    }
+                    Validation.formValidate(json.data);
+                }catch(e){
+                    console.log(e);
+                }                       
+            }
+        });
+    }
+});
+
 function seguimiento_metas(e){
     var datos_id = e.split('-');
     if(datos_id[0] == '1'){
@@ -85,9 +144,10 @@ function seguimiento_metas(e){
                     total_avance += dato.avance;
                     total_acumulado -= dato.avance;
                     avance_jurisdiccion = parseFloat($(row + ' > td.avance-acumulado').attr('data-acumulado')) || 0;
-                    $(row + ' > td.avance-acumulado').text(avance_jurisdiccion - dato.avance);
+                    $(row + ' > td.avance-acumulado').text((avance_jurisdiccion - dato.avance).format());
                     $(row + ' > td.avance-acumulado').attr('data-acumulado',(avance_jurisdiccion - dato.avance));
-                    $('#avance_'+dato.claveJurisdiccion).change();
+                    $(row + ' > td.avance-total').attr('data-avance-total',avance_jurisdiccion);
+                    $(row + ' > td.avance-total').text(avance_jurisdiccion.format());
                 }
             }
 
@@ -107,75 +167,19 @@ function seguimiento_metas(e){
                 $('#fecha-notificacion').val(plan_mejora.fechaNotificacion);
             }
 
-            var total_porcentaje_acumulado = parseFloat((((total_acumulado + total_avance) * 100) / total_programado).toFixed(2)) || 0;
+            //var total_porcentaje_acumulado = parseFloat((((total_acumulado + total_avance) * 100) / total_programado).toFixed(2)) || 0;
             $('#total-meta-programada').text(total_programado.format());
+            $('#total-meta-programada').attr('data-total-programado',total_programado);
             $('#total-meta-mes').text(total_programado_mes.format());
             $('#total-avance-mes').text(total_avance.format());
             $('#total-avance-acumulado').text(total_acumulado.format());
-            $('#total-porcentaje').text(total_porcentaje_acumulado+'% ');
+            //$('#total-porcentaje').text(total_porcentaje_acumulado+'% ');
+            $('.avance-mes').change();
             $('#modalEditarAvance').modal('show');
         }
     });    
 }
 
-$('#btn-guardar-avance').on('click',function(){
-    if($('td.avance-mes[data-estado-avance=1]').length){
-        if(($('#analisis-resultados').val().trim() == '') || ($('#justificacion-acumulada').val().trim() == '')){
-            MessageManager.show({data:'Es necesario capturar una justificacion en base al porcentaje de avance del mes.',container:'#modalEditarAvance .modal-body',type:'ADV'});
-            $('#tab-link-justificacion').tab('show');
-            return;
-        }
-    }
-    var parametros = $('#form_avance').serialize();
-    parametros += '&guardar=avance-metas';
-
-    Validation.cleanFormErrors('#form_avance');
-
-    if($('#id-avance').val()){
-        moduloResource.put($('#id-avance').val(),parametros,{
-            _success: function(response){
-                MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
-                accionesDatagrid.actualizar({ _success: function(response){ llenar_grid_acciones(response); } });
-                $('#modalEditarAvance').modal('hide');
-            },
-            _error: function(response){
-                try{
-                    var json = $.parseJSON(response.responseText);
-                    if(!json.code)
-                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-                    else{
-                        MessageManager.show(json);
-                    }
-                    Validation.formValidate(json.data);
-                }catch(e){
-                    console.log(e);
-                }                       
-            }
-        });
-    }else{
-        moduloResource.post(parametros,{
-            _success: function(response){
-                MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
-                accionesDatagrid.actualizar({ _success: function(response){ llenar_grid_acciones(response); } });
-                $('#id-avance').val(response.data.id);
-                $('#modalEditarAvance').modal('hide');
-            },
-            _error: function(response){
-                try{
-                    var json = $.parseJSON(response.responseText);
-                    if(!json.code)
-                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-                    else{
-                        MessageManager.show(json);
-                    }
-                    Validation.formValidate(json.data);
-                }catch(e){
-                    console.log(e);
-                }                       
-            }
-        });
-    }
-});
 $('.avance-mes').on('keyup',function(){ $(this).change() });
 $('.avance-mes').on('change',function(){
     var jurisdiccion = $(this).attr('data-jurisdiccion');
@@ -183,37 +187,29 @@ $('.avance-mes').on('change',function(){
     var row = '#tabla-avances-metas > tbody > tr[data-clave-jurisdiccion="'+jurisdiccion+'"]';
 
     if($(this).val() == ''){
-        //$(row +' > td.avance-acumulado > span.nueva-cantidad').text('');
         $(row +' > td.avance-mes').html('');
-        $(row +' > td.avance-mes').attr('data-estado-avance','');
+        //$(row +' > td.avance-mes').attr('data-estado-avance','');
+        $(row +' > td.avance-total').text('0');
+        $(row +' > td.avance-total').attr('data-avance-total','');
     }else{
         var avance = parseFloat($(this).val()) || 0;
         //Actualiza la columna de porcentaje acumulado
         var acumulado = parseFloat($(row +' > td.avance-acumulado').attr('data-acumulado')) || 0;
         acumulado += avance;
-        var total_programado = $(row +' > td.meta-programada').attr('data-meta');
-
-        /*if(acumulado > 0){
-            $(row +' > td.avance-acumulado > span.nueva-cantidad').text('+'+avance);
-        }else{
-            $(row +' > td.avance-acumulado > span.nueva-cantidad').text('');
-        }*/
-
         $(row +' > td.avance-total').text(acumulado);
         $(row +' > td.avance-total').attr('data-avance-total',acumulado);
-        
+
+        var total_programado = $(row +' > td.meta-programada').attr('data-meta');
+
         if(total_programado > 0 && $(this).attr('data-meta-programada') > 0){
             var avance_mes = parseFloat(((acumulado  / total_programado ) * 100).toFixed(2)) || 0;
 
             if(avance_mes > 110){
                 $(row +' > td.avance-mes').html('<small class="text-danger"><span class="fa fa-arrow-up"></span> '+avance_mes+'%</small>');
-                $(row +' > td.avance-mes').attr('data-estado-avance','1');
             }else if(avance_mes < 90){
                 $(row +' > td.avance-mes').html('<small class="text-danger"><span class="fa fa-arrow-down"></span> '+avance_mes+'%</small>');
-                $(row +' > td.avance-mes').attr('data-estado-avance','1');
             }else{
                 $(row +' > td.avance-mes').html('<small class="text-success">'+avance_mes+'%</small>');
-                $(row +' > td.avance-mes').attr('data-estado-avance','');
             }
         }else{
             if(total_programado > 0){
@@ -237,31 +233,51 @@ $('.avance-mes').on('change',function(){
         suma += parseFloat($(this).val()) || 0;
     });
     suma = parseFloat(suma.toFixed(2));
-    $('#total-avance-mes').text(suma);
-
-    total_programado = parseFloat($('#total-meta-programada').text());
-    total_acumulado = parseFloat($('#total-avance-acumulado').text());
-    var total_porcentaje_acumulado = parseFloat((((total_acumulado + suma) * 100) / total_programado).toFixed(2))||0;
-    if(total_porcentaje_acumulado > 110){
-        total_porcentaje_acumulado = '<small class="text-danger"><span class="fa fa-arrow-up"></span> '+total_porcentaje_acumulado+'%</small>';
-        //$(row +' > td.avance-mes').attr('data-estado-avance','1');
-    }else if(total_porcentaje_acumulado < 90){
-        total_porcentaje_acumulado = '<small class="text-danger"><span class="fa fa-arrow-down"></span> '+total_porcentaje_acumulado+'%</small>';
-        //$(row +' > td.avance-mes').attr('data-estado-avance','1');
-    }else{
-        total_porcentaje_acumulado = '<small class="text-success">'+total_porcentaje_acumulado+'%</small>';
-        //$(row +' > td.avance-mes').attr('data-estado-avance','');
-    }
-    $('#total-porcentaje').html(total_porcentaje_acumulado);
+    $('#total-avance-mes').text(suma.format());
 
     var suma = 0;
     $('.avance-total').each(function(){
         suma += parseFloat($(this).attr('data-avance-total')) || 0;
     });
     suma = parseFloat(suma.toFixed(2));
-    $('#total-avance-total').text(suma);
+    $('#total-avance-total').attr('data-total-avance',suma);
+    $('#total-avance-total').text(suma.format());
 
-    if($('td.avance-mes[data-estado-avance=1]').length){
+    total_programado = parseFloat($('#total-meta-programada').attr('data-total-programado'));
+    total_acumulado = parseFloat($('#total-avance-total').attr('data-total-avance'));
+    
+
+    if(total_programado == 0 && total_acumulado ==  0){
+        total_porcentaje_acumulado = '<small class="text-success">0%</small>';
+        $('#total-porcentaje').attr('data-estado-avance','');
+    }else{
+        if(total_programado > 0){
+            var total_porcentaje_acumulado = parseFloat(((total_acumulado * 100) / total_programado).toFixed(2))||0;
+        }else{
+            if(total_acumulado > 0){
+                var total_porcentaje_acumulado = 100;
+            }else{
+                var total_porcentaje_acumulado = 0;
+            }
+        }
+        if(total_porcentaje_acumulado > 110){
+            total_porcentaje_acumulado = '<small class="text-danger"><span class="fa fa-arrow-up"></span> '+total_porcentaje_acumulado+'%</small>';
+            $('#total-porcentaje').attr('data-estado-avance','1');
+        }else if(total_porcentaje_acumulado < 90){
+            total_porcentaje_acumulado = '<small class="text-danger"><span class="fa fa-arrow-down"></span> '+total_porcentaje_acumulado+'%</small>';
+            $('#total-porcentaje').attr('data-estado-avance','1');
+        }else if(total_programado == 0 && total_porcentaje_acumulado > 0){
+            total_porcentaje_acumulado = '<small class="text-info"><span class="fa fa-arrow-up"></span> '+total_porcentaje_acumulado+'%</small>';
+            $('#total-porcentaje').attr('data-estado-avance','1');
+        }else{
+            total_porcentaje_acumulado = '<small class="text-success">'+total_porcentaje_acumulado+'%</small>';
+            $('#total-porcentaje').attr('data-estado-avance','');
+        }
+    }
+
+    $('#total-porcentaje').html(total_porcentaje_acumulado);
+
+    if($('#total-porcentaje').attr('data-estado-avance')){
         $('#justificacion-acumulada').attr('disabled',false);
         if($('#justificacion-acumulada').val() == 'El avance se encuentra dentro de los parametros establecidos'){
             $('#justificacion-acumulada').val('');
@@ -282,14 +298,21 @@ $('#modalEditarAvance').on('hide.bs.modal',function(e){
     //$('#form_avance input[type="number"]').attr('disabled',true);
     $('#form_avance input[type="number"]').attr('data-meta-programada','');
     $('td.avance-mes').text('');
-    $('td.avance-mes').attr('data-estado-avance','');
+    //$('td.avance-mes').attr('data-estado-avance','');
     $('td.avance-acumulado').attr('data-acumulado','');
+    $('td.avance-acumulado').text('0');
     $('td.meta-programada').attr('data-meta','0');
     $('td.meta-programada').text('0');
     $('td.meta-del-mes').attr('data-meta-mes','');
     $('td.meta-del-mes').text('0');
-    $('span.nueva-cantidad').text('');
-    $('span.vieja-cantidad').text('0');
+    $('td.avance-total').attr('data-avance-total','');
+    $('td.avance-total').text('0');
+    $('#total-avance-total').attr('data-total-avance','');
+    $('#total-avance-total').text('0');
+    $('#total-porcentaje').attr('data-estado-avance','');
+    $('#total-porcentaje').text('0%');
+    //$('span.nueva-cantidad').text('');
+    //$('span.vieja-cantidad').text('0');
     $('#justificacion-acumulada').attr('disabled',true);
     $('#tab-link-plan-mejora').attr('data-toggle','');
     $('#tab-link-plan-mejora').parent().addClass('disabled');
