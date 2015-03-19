@@ -325,19 +325,19 @@
 									<div class="col-sm-4">
 										<div class="form-group">
 											<label class="input-label" for="fecha-inicio">Fecha de Inicio</label>
-											<input type="date" class="form-control" name="fecha-inicio" id="fecha-inicio">
+											<input type="date" placeholder="aaaa-mm-dd" class="form-control" name="fecha-inicio" id="fecha-inicio">
 										</div>
 									</div>
 									<div class="col-sm-4">
 										<div class="form-group">
 											<label class="input-label" for="fecha-termino">Fecha de Termino</label>
-											<input type="date" class="form-control" name="fecha-termino" id="fecha-termino">
+											<input type="date" placeholder="aaaa-mm-dd" class="form-control" name="fecha-termino" id="fecha-termino">
 										</div>
 									</div>
 									<div class="col-sm-4">
 										<div class="form-group">
 											<label class="input-label" for="fecha-notificacion">Fecha de Notificación</label>
-											<input type="date" class="form-control" name="fecha-notificacion" id="fecha-notificacion">
+											<input type="date" placeholder="aaaa-mm-dd" class="form-control" name="fecha-notificacion" id="fecha-notificacion">
 										</div>
 									</div>
 									<div class="col-sm-12">

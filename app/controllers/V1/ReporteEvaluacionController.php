@@ -62,6 +62,7 @@ class ReporteEvaluacionController extends BaseController {
 			        $sheet->loadView('rendicion-cuentas.excel.seguimiento-metas-mes', $datos);
 			    });
 			}
+			//$excel->getActiveSheet(0)->getRowDimension(1)->setRowHeight(-1);
 		})->export('xls');
 
 	}

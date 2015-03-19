@@ -2,107 +2,222 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<style type="text/css">
+		.titulo1{
+			font-weight: bold;
+			font-family: Arial;
+			font-size: 18;
+		}
+		.titulo2{
+			font-weight: bold;
+			font-family: Arial;
+			font-size: 16;
+		}
+		.titulo3{
+			font-weight: bold;
+			font-family: Arial;
+			font-size: 14;
+		}
+		.texto{
+			font-family: Arial;
+			font-size: 12;
+		}
+		.negrita{
+			font-weight: bold;
+		}
+		.texto-medio{
+			vertical-align: middle;
+		}
+		.texto-derecha{
+			text-align: right;
+		}
+		.texto-izquierda{
+			text-align: left;
+		}
+		.encabezado-tabla{
+			font-family: Arial;
+			font-size: 11;
+			font-weight: bold;
+			text-align: center;
+			vertical-align: middle;
+			color: #FFFFFF;
+			background-color: #0070C0;
+		}
+		.tabla-datos td{
+			border: 1 solid #000000;
+			border-collapse: collapse;
+			padding:1;
+		}
+		.subtitulo-tabla{
+			font-weight: bold;
+			background-color: #DDDDDD;
+		}
+		.nota-titulo{
+			font-family: Arial;
+			font-size:8;
+			font-weight: bold;
+		}
+		.nota-contenido{
+			font-family: Arial;
+			font-size:8;
+		}
+	</style>
 </head>
 <body>
 	<table>
 		<tr>
-			<td colspan="10" align="center">INSTITUTO DE SALUD</td>
+			<td height="20" class="titulo1" colspan="10" align="center">INSTITUTO DE SALUD</td>
 		</tr>
 		<tr>
-			<td colspan="10" align="center">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td>
+			<td height="19" class="titulo2" colspan="10" align="center">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td>
 		</tr>
 		<tr>
-			<td colspan="10" align="center">SUBDIRECCIÓN DE PROGRAMACIÓN, ORGANIZACIÓN Y PRESUPUESTO</td>
+			<td height="18" class="titulo3" colspan="10" align="center">SUBDIRECCIÓN DE PROGRAMACIÓN, ORGANIZACIÓN Y PRESUPUESTO</td>
 		</tr>
 		<tr>
-			<td colspan="10" align="center">DEPARTAMENTO DE EVALUACIÓN</td>
+			<td height="18" class="titulo3" colspan="10" align="center">DEPARTAMENTO DE EVALUACIÓN</td>
 		</tr>
 		<tr>
-			<td colspan="10" align="center">SEGUIMIENTO DE METAS {{$proyecto['ejercicio']}}</td>
+			<td height="18" class="titulo3" colspan="10" align="center">SEGUIMIENTO DE METAS {{$proyecto['ejercicio']}}</td>
 		</tr>
 		<tr>
-			<td colspan="10" align="right">Formato Rc-3</td>
+			<td height="18" colspan="10" align="right" class="negrita">Formato Rc-3</td>
 		</tr>
 
 
 
-		<tr>
-			<td colspan="3">Nombre del proyecto: {{ $proyecto['nombreTecnico'] }}</td>
-			<td colspan="3">Clave presupuestaria: {{ $proyecto['ClavePresupuestaria'] }}</td>
-			<td colspan="3">Al mes de: {{$mes['mes']}}</td>
+		<tr height="90" class="texto-medio texto">
+			<td class="texto-derecha">Nombre del proyecto: </td>
+			<td class="negrita" colspan="2">{{ $proyecto['nombreTecnico'] }}</td>
+			<td class="texto-derecha">Clave presupuestaria: </td>
+			<td class="negrita" colspan="2">{{ $proyecto['ClavePresupuestaria'] }}</td>
+			<td class="texto-derecha">Al mes de: </td>
+			<td class="negrita">{{$mes['mes']}}</td>
+			<td></td>
 			<td></td>
 		</tr>
-		<tr>
-			<td>Información</td>
-			<td><b>Estatal</b></td>
+
+
+
+		<tr height="20" class="texto">
+			<td class="texto-derecha">Información: </td>
+			<td class="negrita">Estatal</td>
 			<td colspan="8"></td>
 		</tr>
+
+
+		<tr height="15"><td colspan="10"></td></tr>
+
+		<tr class="tabla-datos" height="40">
+			<td width="18" class="encabezado-tabla">NIVEL</td>
+			<td width="58" class="encabezado-tabla">INDICADOR</td>
+			<td width="16" class="encabezado-tabla">META <br>PROGRAMADA</td>
+			<td width="17" class="encabezado-tabla">META MODIFICADA</td>
+			<td width="17" class="encabezado-tabla">AVANCES DEL MES</td>
+			<td width="20" class="encabezado-tabla">AVANCE ACUMULADO</td>
+			<td width="16" class="encabezado-tabla">% DE AVANCE <br>ACUMULADO</td>
+			<td width="16" class="encabezado-tabla">% DE AVANCE <br>MODIFICADO</td>
+			<td width="36" class="encabezado-tabla">ANALISIS DE RESULTADOS 	ACUMULADO</td>
+			<td width="36" class="encabezado-tabla">JUSTIFICACIÓN ACUMULADA</td>
+		</tr>
+
+		@for ($componentes = 1; $componentes <= 8; $componentes++)
+		<tr class="tabla-datos">
+			<td>Componente {{$componentes}}</td>
+			<td>Indicador del Componente o Actividad</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		@endfor
+		<tr>
+			<td class="nota-titulo">Fuente de información:</td>
+			<td class="nota-contenido" colspan="3"></td>
+		</tr>
 		<tr><td colspan="10"></td></tr>
-		<tr>
-			<td>NIVEL</td>
-			<td>INDICADOR</td>
-			<td>META PROGRAMADA</td>
-			<td>META MODIFICADA</td>
-			<td>AVANCES DEL MES</td>
-			<td>AVANCE ACUMULADO</td>
-			<td>% DE AVANCE ACUMULADO</td>
-			<td>% DE AVANCE MODIFICADO</td>
-			<td>ANALISIS DE RESULTADOS 	ACUMULADO</td>
-			<td>JUSTIFICACIÓN ACUMULADA</td>
-		</tr>
-		<tr><td colspan="10"></td></tr>
-		<tr>
-			<td><b>Fuente de información:</b></td>
-			<td colspan="3"></td>
-		</tr>
-		<tr><td colspan="10"></td></tr>
 
 
 
 		<tr>
 			<td></td>
-			<td colspan="3" align="center">RESPONSABLE DE LA INFORMACIÓN</td>
+			<td colspan="2" align="center">RESPONSABLE DE LA INFORMACIÓN</td>
 			<td colspan="2"></td>
-			<td colspan="3" align="center">LIDER DEL PROYECTO</td>
+			<td colspan="4" align="center">LIDER DEL PROYECTO</td>
 			<td></td>
 		</tr>
 		<tr>
 			<td></td>
-			<td colspan="3" align="center">______________________________________</td>
+			<td colspan="2" align="center">______________________________________</td>
 			<td colspan="2"></td>
-			<td colspan="3" align="center">______________________________________</td>
+			<td colspan="4" align="center">______________________________________</td>
 			<td></td>
 		</tr>
 		<tr>
 			<td></td>
-			<td colspan="3" align="center">Nombre</td>
+			<td colspan="2" align="center">Nombre</td>
 			<td colspan="2"></td>
-			<td colspan="3" align="center">Nombre</td>
+			<td colspan="4" align="center">Nombre</td>
 			<td></td>
 		</tr>
 		<tr>
 			<td></td>
-			<td colspan="3" align="center">Cargo</td>
+			<td colspan="2" align="center">Cargo</td>
 			<td colspan="2"></td>
-			<td colspan="3" align="center">Cargo</td>
+			<td colspan="4" align="center">Cargo</td>
 			<td></td>
 		</tr>
 
 		<tr><td colspan="10"></td></tr>
-		<tr>
-			<td>NIVEL</td>
-			<td>INDICADOR</td>
-			<td>META PROGRAMADA</td>
-			<td>META MODIFICADA</td>
-			<td>AVANCES DEL MES</td>
-			<td>AVANCE ACUMULADO</td>
-			<td>% DE AVANCE ACUMULADO</td>
-			<td>% DE AVANCE MODIFICADO</td>
+		<tr class="tabla-datos" height="40">
+			<td width="18" class="encabezado-tabla">NIVEL</td>
+			<td width="58" class="encabezado-tabla">INDICADOR</td>
+			<td width="16" class="encabezado-tabla">META <br>PROGRAMADA</td>
+			<td width="17" class="encabezado-tabla">META MODIFICADA</td>
+			<td width="17" class="encabezado-tabla">AVANCES DEL MES</td>
+			<td width="20" class="encabezado-tabla">AVANCE ACUMULADO</td>
+			<td width="16" class="encabezado-tabla">% DE AVANCE <br>ACUMULADO</td>
+			<td width="16" class="encabezado-tabla">% DE AVANCE <br>MODIFICADO</td>
+		</tr>
+
+		@for ($componentes = 1; $componentes <= 8; $componentes++)
+		<tr class="tabla-datos">
+			<td class="subtitulo-tabla">Componente {{$componentes}}</td>
+			<td class="subtitulo-tabla">Indicador del Componente o Actividad</td>
+			<td class="subtitulo-tabla"></td>
+			<td class="subtitulo-tabla"></td>
+			<td class="subtitulo-tabla"></td>
+			<td class="subtitulo-tabla"></td>
+			<td class="subtitulo-tabla"></td>
+			<td class="subtitulo-tabla"></td>
+		</tr>
+		<tr class="tabla-datos">
+			<td></td>
+			<td>Oficina Central</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
 			<td></td>
 			<td></td>
 		</tr>
-
-		<tr></tr>
+		@for ($jurisdicciones = 0; $jurisdicciones < 10; $jurisdicciones++)
+		<tr class="tabla-datos">
+			<td></td>
+			<td>Jurisdiccion {{$jurisdicciones}}</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		@endfor
+		@endfor
 	</table>
 </body>
 </html>

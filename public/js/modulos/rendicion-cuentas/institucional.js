@@ -243,6 +243,10 @@ $('#btn-editar-avance').on('click',function(){
     window.location.href = SERVER_HOST+'/rendicion-cuentas/editar-avance/' + $('#btn-editar-avance').attr('data-id-proyecto');
 });
 
+$('#btn-reporte').on('click',function(){
+    window.open(SERVER_HOST+'/v1/reporte-evaluacion/' +  + $('#btn-editar-avance').attr('data-id-proyecto'));
+});
+
 /*
 $('#modalDatosSeguimiento').on('shown.bs.modal', function () {
     $('#modalDatosSeguimiento').find('input').eq(0).focus();

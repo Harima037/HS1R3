@@ -212,8 +212,13 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-success pull-left" id="btn-reporte">
+                        <span class="fa fa-file-excel-o"></span> Imprimir Reporte
+                    </button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="btn-editar-avance"><span class="fa fa-pencil"></span> Capturar Avance</button>
+                    <button type="button" class="btn btn-primary" id="btn-editar-avance">
+                        <span class="fa fa-pencil"></span> Capturar Avance
+                    </button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
