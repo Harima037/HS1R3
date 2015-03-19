@@ -5,7 +5,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
-use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionPlanMejora;
+use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionPlanMejora,EvaluacionComentario;
 
 class SeguimientoInstitucionalController extends BaseController {
 	private $reglasBeneficiarios = array(
@@ -48,6 +48,12 @@ class SeguimientoInstitucionalController extends BaseController {
 		'fecha-termino'					=> 'required|date',
 		'fecha-notificacion'			=> 'required|date'
 	);
+	
+	private $reglasComentario = array(
+			'idproyecto' => 'required',
+			'idcampo' => 'required',
+			'comentario' => 'required'
+		);
 
 	/**
 	 * Display a listing of the resource.
@@ -168,7 +174,7 @@ class SeguimientoInstitucionalController extends BaseController {
 					$query->where('mes','=',$mes_actual);
 				}))->where('idProyecto','=',$parametros['id-proyecto'])->where('idTipoBeneficiario','=',$id)->get();
 			}elseif ($parametros['mostrar'] == 'analisis-funcional') {
-				$recurso = EvaluacionAnalisisFuncional::find($id);
+				$recurso = EvaluacionAnalisisFuncional::with('comentarios')->find($id);
 			}
 		}
 
@@ -194,54 +200,28 @@ class SeguimientoInstitucionalController extends BaseController {
 
 		$parametros = Input::all();
 
-		try{
-			if($parametros['guardar'] == 'avance-metas'){
-				$respuesta = $this->guardarAvance($parametros);
-				if($respuesta['http_status'] != 200){
-					throw new Exception("Error al procesar los datos", 1);
-				}
-			}elseif($parametros['guardar'] == 'avance-beneficiarios'){
-				$respuesta = $this->guardarAvanceBeneficiario($parametros);
-			}elseif ($parametros['guardar'] == 'analisis-funcional') {
-				//
-				$validacion = Validador::validar(Input::all(), $this->reglasAnalisisFuncional);
+		$nuevoComentario = new EvaluacionComentario;
+		
+		$nuevoComentario->idProyecto = $parametros['idproyecto'];
+		$nuevoComentario->mes = Util::obtenerMesActual();		
+		$nuevoComentario->idCampo = $parametros['idcampo'];
+		$nuevoComentario->tipoElemento = $parametros['tipocomentario'];
+		$nuevoComentario->idElemento = $parametros['idelemento'];
+		$nuevoComentario->observacion = $parametros['comentario'];
 
-				if($validacion === TRUE){
-					//
-					$mes_actual = Util::obtenerMesActual();
-					$recurso = new EvaluacionAnalisisFuncional;
-					$recurso->mes 					= $mes_actual;
-					$recurso->idProyecto 			= $parametros['id-proyecto'];
-					$recurso->analisisResultado 	= $parametros['analisis-resultado'];
-					$recurso->beneficiarios 		= $parametros['beneficiarios'];
-					$recurso->justificacionGlobal 	= $parametros['justificacion-global'];
-
-					if($recurso->save()){
-						$respuesta['data'] = array('data'=>$recurso);
-					}else{
-						throw new Exception("Ocurrio un error al intentar guardar los datos", 1);
-					}
-				}else{
-					$respuesta['http_status'] = $validacion['http_status'];
-					$respuesta['data'] = $validacion['data'];
-				}
-			}
-		}catch(\Exception $ex){
-			$respuesta['http_status'] = 500;	
-			if($respuesta['data']['data'] == ''){
-				$respuesta['data']['data'] = 'Ocurrio un error al intentar almacenar los datos';
-			}
-			if(strpos($ex->getMessage(), '{"field":') !== FALSE){
-				$respuesta['data']['code'] = 'U00';
-				$respuesta['data']['data'] = $ex->getMessage();
-			}else{
-				$respuesta['data']['ex'] = $ex->getMessage();
-			}
-			$respuesta['data']['line'] = $ex->getLine();
-			if(!isset($respuesta['data']['code'])){
-				$respuesta['data']['code'] = 'S03';
-			}
+		$Resultado = Validador::validar($parametros, $this->reglasComentario);
+		
+		if($Resultado === true)
+		{
+			$nuevoComentario->save();
+			$respuesta['data']['data'] = $nuevoComentario;
 		}
+		else
+		{
+			$respuesta['http_status'] = 500;
+			$respuesta = $Resultado;
+		}
+		
 		return Response::json($respuesta['data'],$respuesta['http_status']);
 	}
 
@@ -253,7 +233,82 @@ class SeguimientoInstitucionalController extends BaseController {
 	 */
 	public function update($id){
 		//
+		
 		$respuesta['http_status'] = 200;
+		$respuesta['data'] = array("data"=>'');
+		
+		$parametros = Input::all();
+
+		if(isset($parametros['actualizarproyecto']))
+		{
+			//throw new Exception($parametros['actualizarproyecto'],1);
+			
+			if($parametros['actualizarproyecto']=="aprobar") //Poner estatus 4 (Aprobado)
+			{
+				$recurso = Proyecto::find($id);
+				if(is_null($recurso)){
+					$respuesta['http_status'] = 404;
+					$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+				}else{
+					$recurso->idEstatusProyecto = 4;
+					$recurso->save();
+				}
+			}
+			else if($parametros['actualizarproyecto']=="regresar") //Poner estatus 3 (Regreso a corrección)
+			{
+				$recurso = Proyecto::find($id);
+				if(is_null($recurso)){
+					$respuesta['http_status'] = 404;
+					$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+				}else{
+					$recurso->idEstatusProyecto = 3;
+					$recurso->save();
+				}
+			}
+			else if($parametros['actualizarproyecto']=="firmar") //Poner estatus 5 (Enviar a firma)
+			{
+				$recurso = Proyecto::find($id);
+				if(is_null($recurso)){
+					$respuesta['http_status'] = 404;
+					$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+				}else{
+					$recurso->idEstatusProyecto = 5;
+					$recurso->save();
+				}
+			}
+			
+		}
+		else
+		{
+			$recurso = EvaluacionComentario::find($id);
+			if(is_null($recurso)){
+				$respuesta['http_status'] = 404;
+				$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+			}else{
+						
+				$recurso->idProyecto = $parametros['idproyecto'];
+				$recurso->mes = Util::obtenerMesActual();		
+				$recurso->idCampo = $parametros['idcampo'];
+				$recurso->tipoElemento = $parametros['tipocomentario'];
+				$recurso->idElemento = $parametros['idelemento'];
+				$recurso->observacion = $parametros['comentario'];
+			
+				$Resultado = Validador::validar($parametros, $this->reglasComentario);
+							
+				if($Resultado===true)
+					$recurso->save();
+				else
+				{
+					$respuesta['http_status'] = 500;
+					$respuesta = $Resultado;
+				}
+			}
+		}
+		
+		
+		return Response::json($respuesta['data'],$respuesta['http_status']);
+		
+		/*$respuesta['http_status'] = 200;
 		$respuesta['data'] = array("data"=>'');
 		try{
 			$parametros = Input::all();
@@ -303,8 +358,30 @@ class SeguimientoInstitucionalController extends BaseController {
 				$respuesta['data']['code'] = 'S03';
 			}
 		}
-		return Response::json($respuesta['data'],$respuesta['http_status']);
+		return Response::json($respuesta['data'],$respuesta['http_status']);*/
 	}
+	
+	public function destroy($id)
+	{
+		//
+		$http_status = 200;
+		$data = array();
+
+		try{
+			$recurso = EvaluacionComentario::where('id','=',$id)->delete();
+			
+			if(is_null($recurso)){
+				$respuesta['http_status'] = 404;
+				$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+			}
+		}catch(Exception $ex){
+			$http_status = 500;	
+			$data = array('data' => "No se puede eliminar el comentario",'ex'=>$ex->getMessage(),'code'=>'S03');	
+		}
+
+		return Response::json($data,$http_status);
+	}
+	
 
 	public function guardarAvanceBeneficiario($parametros, $es_editar = FALSE){
 		$respuesta['http_status'] = 200;

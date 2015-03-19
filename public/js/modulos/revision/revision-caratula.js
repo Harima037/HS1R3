@@ -1099,7 +1099,7 @@ $('#btnQuitarComentario').on('click',function(){
 	else
 	{
 		Confirm.show({
-			titulo:"Eliminar actividad",
+			titulo:"Eliminar comentario",
 			mensaje: "¿Estás seguro de eliminar el comentario seleccionado?",
 				//si: 'Actualizar',
 				//no: 'No, gracias',

@@ -58,6 +58,7 @@ class SeguimientoInstitucionalController extends BaseController {
 						7=>'Julio',8=>'Agosto',9=>'Septiembre',10=>'Octubre',11=>'Noviembre',12=>'Dicembre');
 
 		$datos['mes_clave'] = Util::obtenerMesActual();
+		$datos['trimestre_activo']= Util::obtenerTrimestre();
 		$datos['mes'] = $meses[Util::obtenerMesActual()];
 
 		$datos['jurisdicciones'] = $jurisdicciones;
@@ -71,10 +72,10 @@ class SeguimientoInstitucionalController extends BaseController {
 		}
 
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
-		$datos['sys_activo'] = SysGrupoModulo::findByKey('RENDCUENTA');
-		$datos['sys_mod_activo'] = SysModulo::findByKey('RENDINST');
-		$uri = 'rendicion-cuentas.vista-captura-rendicion-institucional';
-		$permiso = 'RENDCUENTA.RENDINST.C';
+		$datos['sys_activo'] = SysGrupoModulo::findByKey('REVISION');
+		$datos['sys_mod_activo'] = SysModulo::findByKey('SEGUIINST');
+		$uri = 'revision.segui-rendicion-institucional';
+		$permiso = 'REVISION.SEGUIINST.C';
 		$datos['usuario'] = Sentry::getUser();
 
 		if(Sentry::hasAccess($permiso)){
