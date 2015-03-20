@@ -32,14 +32,38 @@ class SeguimientoController extends BaseController {
 						)
 				)
 		);
-		$mes_actual = Util::obtenerMesActual();
-		$trimestre_actual = Util::obtenerTrimestre();
-		$datos['mes_avance'] = $mes_actual;
-		$datos['trimestre_avance'] = $trimestre_actual;
+		$datos['mes_avance'] = Util::obtenerMesActual();
+		$datos['trimestre_avance'] = Util::obtenerTrimestre();
 		return parent::loadIndex('RENDCUENTA','RENDINST',$datos);
 	}
 	public function indexInversion(){
-		return parent::loadIndex('RENDCUENTA','RENDINV');
+		$datos = array(
+			'meses' => array(
+					'1' => array(
+							array('clave'=>1,	'mes'=>'Enero',			'abrev'=>'ENE'),
+							array('clave'=>2,	'mes'=>'Febrero',		'abrev'=>'FEB'),
+							array('clave'=>3,	'mes'=>'Marzo',			'abrev'=>'MAR')
+						),
+					'2' => array(
+							array('clave'=>4,	'mes'=>'Abril',			'abrev'=>'ABR'),
+							array('clave'=>5,	'mes'=>'Mayo',			'abrev'=>'MAY'),
+							array('clave'=>6,	'mes'=>'Junio',			'abrev'=>'JUN')
+						),
+					'3' => array(
+							array('clave'=>7,	'mes'=>'Julio',			'abrev'=>'JUL'),
+							array('clave'=>8,	'mes'=>'Agosto',		'abrev'=>'AGO'),
+							array('clave'=>9,	'mes'=>'Septiembre',	'abrev'=>'SEP')
+						),
+					'4' => array(
+							array('clave'=>10,	'mes'=>'Octubre',		'abrev'=>'OCT'),
+							array('clave'=>11,	'mes'=>'Noviembre',		'abrev'=>'NOV'),
+							array('clave'=>12,	'mes'=>'Dicembre',		'abrev'=>'DIC')
+						)
+				)
+		);
+		$datos['mes_avance'] = Util::obtenerMesActual();
+		$datos['trimestre_avance'] = Util::obtenerTrimestre();
+		return parent::loadIndex('RENDCUENTA','RENDINV',$datos);
 	}
 
 	public function rendicionCuentas($id){
@@ -81,9 +105,10 @@ class SeguimientoController extends BaseController {
 			$datos['trimestre_activo'] = FALSE;
 		}
 
-		$datos['jurisdicciones'] = $jurisdicciones;
-
+		$datos['jurisdicciones'] = array('OC'=>'Oficina Central') + $jurisdicciones->lists('nombre','clave');
+		
 		$datos['id'] = $id;
+		$datos['id_clasificacion'] = $proyecto->idClasificacionProyecto;
 
 		if(count($proyecto->analisisFuncional)){
 			$datos['id_analisis'] = $proyecto->analisisFuncional[0]->id;

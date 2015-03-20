@@ -160,7 +160,7 @@
 <div class="panel-footer">
     <div class="row">
         <div class="col-sm-12">
-            <button type="button" class="btn btn-default" id="btn-proyecto-cancelar">
+            <button type="button" class="btn btn-default" id="btn-proyecto-cancelar" data-clase-proyecto="{{$id_clasificacion}}">
                 <span class="fa fa-chevron-left"></span> Regresar a la lista de Proyectos
             </button>
             <button type="button" class="btn btn-success" id="btn-enviar-proyecto">
@@ -249,27 +249,16 @@
 			                			</tr>
 			                		</thead>
 			                		<tbody>
-			                			<tr data-clave-jurisdiccion="OC">
-			                				<td>OC - Oficina Central</td>
-			                				<td class="meta-programada bg-success" data-meta="0">0</td>
-			                				<td class="meta-del-mes" data-meta-mes="0">0</td>
-			                				<td>
-			                					<div class="form-group" style="margin-bottom:0;">
-			                						<input type="number" class="form-control avance-mes" name="avance[OC]" id="avance_OC" data-jurisdiccion="OC" data-meta-programada="">
-			                					</div>
+			                			@foreach ($jurisdicciones as $clave => $jurisdiccion)
+			                			<tr data-clave-jurisdiccion="{{$clave}}">
+			                				<td class="accion-municipio btn-link">
+			                					<span class="caret"></span> {{$clave}} - {{$jurisdiccion}}
 			                				</td>
-			                				<td class="avance-acumulado" data-acumulado="0">0</td>
-			                				<td class="avance-total bg-info" data-avance-total="0">0</td>
-			                				<td class="avance-mes" data-estado-avance=""></td>
-			                			</tr>
-			                			@foreach ($jurisdicciones as $jurisdiccion)
-			                			<tr data-clave-jurisdiccion="{{$jurisdiccion->clave}}">
-			                				<td>{{$jurisdiccion->clave}} - {{$jurisdiccion->nombre}}</td>
 			                				<td class="meta-programada bg-success" data-meta="0">0</td>
 			                				<td class="meta-del-mes" data-meta-mes="0">0</td>
 			                				<td>
 			                					<div class="form-group" style="margin-bottom:0;">
-			                						<input type="number" class="form-control avance-mes" name="avance[{{$jurisdiccion->clave}}]" id="avance_{{$jurisdiccion->clave}}" data-jurisdiccion="{{$jurisdiccion->clave}}" data-meta-programada="">
+			                						<input type="number" class="form-control avance-mes" name="avance[{{$clave}}]" id="avance_{{$clave}}" data-jurisdiccion="{{$clave}}" data-meta-programada="">
 			                					</div>
 			                				</td>
 			                				<td class="avance-acumulado" data-acumulado="0">0</td>

@@ -7,7 +7,7 @@
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
 <script src="{{ URL::to('js/modulos/rendicion-cuentas/institucional.js')}}"></script>
-<script src="{{ URL::to('js/modulos/expediente/detallesProyecto.js') }}"></script>
+<script src="{{ URL::to('js/modulos/rendicion-cuentas/lista-proyectos-rendicion.js') }}"></script>
 @stop
 
 @section('aside')

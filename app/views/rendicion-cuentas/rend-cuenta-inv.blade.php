@@ -7,7 +7,7 @@
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
 <script src="{{ URL::to('js/modulos/rendicion-cuentas/inversion.js')}}"></script>
-<script src="{{ URL::to('js/modulos/expediente/detallesProyecto.js') }}"></script>
+<script src="{{ URL::to('js/modulos/rendicion-cuentas/lista-proyectos-rendicion.js') }}"></script>
 @stop
 
 @section('aside')
@@ -16,7 +16,7 @@
 @section('content')
 <div class="row">
     <div class="col-md-12">
-        <div class="panel panel-default datagrid" id="datagridProyectos" data-edit-row="cargar_datos_proyecto">
+        <div class="panel panel-default datagrid" id="datagridProyectos" data-edit-row="cargar_datos_proyecto" data-trim-activo="{{$trimestre_avance}}" data-mes-activo="{{$mes_avance}}">
             <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> {{ $sys_mod_activo->nombre }}</h4></div>
             <div class="panel-body">
                 <div class="row">
@@ -30,39 +30,26 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="btn-toolbar pull-right" >
-                            @section('panel-botones')
-                                <div class="btn-group" style="margin:5px">
-                                    <button type="button" class="btn btn-success btn-datagrid-agregar">
-                                        <span class="glyphicon glyphicon-plus"></span> Nuevo Proyecto de Inversión
-                                    </button>
-                                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                                        <span class="caret"></span>
-                                    </button>
-                                    <ul class="dropdown-menu pull-right" role="menu">
-                                        <li>
-                                            <a href="#" class="btn-edit-rows"><span class="glyphicon glyphicon-edit"></span> Editar</a>
-                                        </li>
-                                        <li class="divider"></li>
-                                        <li>
-                                            <a href="#" class="btn-delete-rows"><span class="glyphicon glyphicon-remove"></span> Eliminar</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            @show
+                            <div class="btn-group" style="margin:5px">
+                                <button type="button" class="btn btn-success btn-edit-rows" id="btn-detalles-proyecto">
+                                    <span class="fa fa-edit"></span> Ver Detalles del Proyecto
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <table class="table table-striped table-hover">
                 <thead>
-                    <tr>
+                    <tr height="50">
                         <th><input type="checkbox" class="check-select-all-rows"></th>
                         <th>Clave</th>
                         <th>Nombre Técnico</th>
-                        <th>Presupuesto</th>
-                        <th style="width:100px;">Estatus</th>
-                        <th style="text-align:center; width:85px;"><span class="glyphicon glyphicon-user"></span></th>
-                        <th style="text-align:center; width:120px;"><span class="glyphicon glyphicon-calendar"></span></th>
+                        @foreach ($meses as $mes)
+                            <th width="35"><p class="texto-vertical">{{$mes[0]['abrev']}} </p></th>
+                            <th width="35"><p class="texto-vertical">{{$mes[1]['abrev']}} </p></th>
+                            <th width="35"><p class="texto-vertical">{{$mes[2]['abrev']}} </p></th>
+                        @endforeach
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -95,31 +82,147 @@
 @stop
 
 @section('modals')
-    <div class="modal fade" id="modalNuevoProyecto" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" data-backdrop="static">
-        <div class="modal-dialog">
-            <div class="modal-content">
+    <div class="modal fade" id="modalDatosSeguimiento" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal-dialog modal-dialog-85-screen">
+            <div class="modal-content modal-content-85-screen">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 class="modal-title" id="modalLabel">Nuevo</h4>
                 </div>
                 <div class="modal-body">
-                    <div class="row" id="datos-formulario">
-                        <form action="" id="form_proyecto">
-                            <div class="col-sm-12">
-                                <div class="form-group">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Nombre Técnico</label>
+                                        <p class="form-control-static" id="nombre-tecnico"></p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="control-label">Programa Presupuestario</label>
+                                        <p class="form-control-static" id="programa-presupuestario"></p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label class="control-label">Función</label>
+                                        <p class="form-control-static" id="funcion"></p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="form-group">
+                                        <label class="control-label">Subfunción</label>
+                                        <p class="form-control-static" id="subfuncion"></p>
+                                    </div>
                                 </div>
                             </div>
-                        </form>
+                        </div>
+                    </div>
+
+                    <div role="tabpanel">
+                        <ul class="nav nav-pills" role="tablist">
+                            @for($i = 1 ; $i <= 4 ; $i++)
+                            <li role="presentation" class="{{($i == 1)?'active':''}}">
+                                <a href="#panel-trim-{{$i}}" aria-controls="panel-trim-{{$i}}" role="tab" data-toggle="tab">
+                                    <span class="fa {{($trimestre_avance == $i)?'fa-calendar-o':'fa-calendar'}}"></span> Trim {{$i}}
+                                </a>
+                            </li>
+                            @endfor
+                        </ul>
+                        <div class="tab-content">
+                            <br>
+                            @for($trim = 1 ; $trim <= 4 ; $trim++)
+                            <div role="tabpanel" class="tab-pane {{($trim == 1)?'active':''}}" id="panel-trim-{{$trim}}">
+                                <div role="tabpanel">
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li role="presentation" class="active">
+                                            <a href="#panel-metas-trim-{{$trim}}" aria-controls="panel-metas-trim-{{$trim}}" role="tab" data-toggle="tab">
+                                                <span class="fa fa-table"></span> Seguimiento de Metas
+                                            </a>
+                                        </li>
+                                        <li role="presentation" >
+                                            <a href="#panel-beneficiarios-trim-{{$trim}}" aria-controls="panel-beneficiarios-trim-{{$trim}}" role="tab" data-toggle="tab">
+                                                <span class="fa fa-users"></span> Seguimiento de Beneficiarios
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div role="tabpanel" class="tab-pane active" id="panel-metas-trim-{{$trim}}">
+                                            <table id="avance-trim-{{$trim}}" class="table table-hover table-condensed table-stripped tabla-avance-trim">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Nivel</th>
+                                                        <th>Indicador</th>
+                                                        <th>{{$meses[$trim][0]['mes']}}</th>
+                                                        <th>{{$meses[$trim][1]['mes']}}</th>
+                                                        <th>{{$meses[$trim][2]['mes']}}</th>
+                                                        <th>Totales</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                                <tfoot>
+                                                    <tr class="bg-success">
+                                                        <th colspan="2">Totales</th>
+                                                        <th id="total-mes-{{$meses[$trim][0]['clave']}}">0</th>
+                                                        <th id="total-mes-{{$meses[$trim][1]['clave']}}">0</th>
+                                                        <th id="total-mes-{{$meses[$trim][2]['clave']}}">0</th>
+                                                        <th id="total-trim-{{$trim}}">0</th>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                        <div role="tabpanel" class="tab-pane" id="panel-beneficiarios-trim-{{$trim}}">
+                                            <div style="overflow-x:auto;">
+                                                <table id='beneficiarios-trim-{{$trim}}' class="table table-stripped table-condensed table-hover tabla-avance-beneficiarios">
+                                                    <thead>
+                                                        <tr>
+                                                            <th nowrap="nowrap" rowspan="2">Descripción de Beneficiario</th>
+                                                            <th colspan="2" rowspan="2">Total</th>
+                                                            <th rowspan="2">Genero</th>
+                                                            <th colspan="2">Zona</th>
+                                                            <th colspan="4">Población</th>
+                                                            <th colspan="5">Marginación</th>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>Urbana</th>
+                                                            <th>Rural</th>
+                                                            <th>Mestiza</th>
+                                                            <th>Indigena</th>
+                                                            <th>Inmigrante</th>
+                                                            <th>Otros</th>
+                                                            <th nowrap="nowrap">Muy alta</th>
+                                                            <th>Alta</th>
+                                                            <th>Media</th>
+                                                            <th>Baja</th>
+                                                            <th nowrap="nowrap">Muy baja</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endfor
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-success pull-left" id="btn-reporte">
+                        <span class="fa fa-file-excel-o"></span> Imprimir Reporte
+                    </button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary btn-guardar">Ir a la caratula de captura</button>
+                    <button type="button" class="btn btn-primary" id="btn-editar-avance">
+                        <span class="fa fa-pencil"></span> Capturar Avance
+                    </button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
-    
 <!-- Dejar parent al ultimo -->
 @parent
 @stop

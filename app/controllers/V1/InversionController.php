@@ -1516,9 +1516,9 @@ class InversionController extends ProyectosController {
 					$partidas_anteriores = array();
 				}
 
-				if($partidas_formulario[0] == $partidas_formulario[1]){ //ciclo
+				/*if($partidas_formulario[0] == $partidas_formulario[1]){ //ciclo
 					throw new Exception('{"field":"objeto-gasto-presupuesto","error":"Las partidas no deben ser iguales"}', 1);
-				}
+				}*/
 
 				//Sacamos las diferencias de las partidas seleccionadas y las ya capturadas
 				$partidas['nuevas'] = array_diff($partidas_formulario, $partidas_anteriores);

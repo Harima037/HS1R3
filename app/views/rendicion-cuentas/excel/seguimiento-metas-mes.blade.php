@@ -121,11 +121,11 @@
 			<td width="36" class="encabezado-tabla">JUSTIFICACIÓN ACUMULADA</td>
 		</tr>
 
-		@for ($componentes = 1; $componentes <= 8; $componentes++)
+		@foreach ($proyecto->componentes as $index => $componente)
 		<tr class="tabla-datos">
-			<td>Componente {{$componentes}}</td>
-			<td>Indicador del Componente o Actividad</td>
-			<td></td>
+			<td>Componente {{$index+1}}</td>
+			<td>{{ $componente->indicador }}</td>
+			<td>{{ $componente->valorNumerador }}</td>
 			<td></td>
 			<td></td>
 			<td></td>
@@ -134,7 +134,23 @@
 			<td></td>
 			<td></td>
 		</tr>
-		@endfor
+		
+		@foreach ($componente->actividades as $indice => $actividad)
+		<tr class="tabla-datos">
+			<td>Actividad {{$index+1}}.{{$indice+1}}</td>
+			<td>{{ $actividad->indicador }}</td>
+			<td>{{ $actividad->valorNumerador }}</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		@endforeach
+		@endforeach
+
 		<tr>
 			<td class="nota-titulo">Fuente de información:</td>
 			<td class="nota-contenido" colspan="3"></td>
@@ -184,11 +200,11 @@
 			<td width="16" class="encabezado-tabla">% DE AVANCE <br>MODIFICADO</td>
 		</tr>
 
-		@for ($componentes = 1; $componentes <= 8; $componentes++)
+		@foreach ($proyecto->componentes as $index => $componente)
 		<tr class="tabla-datos">
-			<td class="subtitulo-tabla">Componente {{$componentes}}</td>
-			<td class="subtitulo-tabla">Indicador del Componente o Actividad</td>
-			<td class="subtitulo-tabla"></td>
+			<td class="subtitulo-tabla">Componente {{$index+1}}</td>
+			<td class="subtitulo-tabla">{{ $componente->indicador }}</td>
+			<td class="subtitulo-tabla">{{ $componente->valorNumerador }}</td>
 			<td class="subtitulo-tabla"></td>
 			<td class="subtitulo-tabla"></td>
 			<td class="subtitulo-tabla"></td>
@@ -217,7 +233,41 @@
 			<td></td>
 		</tr>
 		@endfor
+		@foreach ($componente->actividades as $indice => $actividad)
+		<tr class="tabla-datos">
+			<td class="subtitulo-tabla">Actividad {{$index+1}}.{{$indice+1}}</td>
+			<td class="subtitulo-tabla">{{ $actividad->indicador }}</td>
+			<td class="subtitulo-tabla">{{ $actividad->valorNumerador }}</td>
+			<td class="subtitulo-tabla"></td>
+			<td class="subtitulo-tabla"></td>
+			<td class="subtitulo-tabla"></td>
+			<td class="subtitulo-tabla"></td>
+			<td class="subtitulo-tabla"></td>
+		</tr>
+		<tr class="tabla-datos">
+			<td></td>
+			<td>Oficina Central</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		@for ($jurisdicciones = 0; $jurisdicciones < 10; $jurisdicciones++)
+		<tr class="tabla-datos">
+			<td></td>
+			<td>Jurisdiccion {{$jurisdicciones}}</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
 		@endfor
+		@endforeach
+		@endforeach
 	</table>
 </body>
 </html>

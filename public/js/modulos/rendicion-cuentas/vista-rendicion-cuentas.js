@@ -15,7 +15,11 @@
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/seguimiento');
 
 $('#btn-proyecto-cancelar').on('click',function(){
-    window.location.href = SERVER_HOST+'/rendicion-cuentas/rend-cuenta-inst';
+    if($(this).attr('data-clase-proyecto') == 1){
+        window.location.href = SERVER_HOST+'/rendicion-cuentas/rend-cuenta-inst';
+    }else if($(this).attr('data-clase-proyecto') == 2){
+        window.location.href = SERVER_HOST+'/rendicion-cuentas/rend-cuenta-inv';
+    }
 });
 
 

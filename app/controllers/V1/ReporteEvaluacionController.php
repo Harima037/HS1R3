@@ -35,7 +35,6 @@ class ReporteEvaluacionController extends BaseController {
 
 		$nombreArchivo = ($recurso->idClasificacionProyecto== 2) ? 'Rendición de Cuentas Inversión' : 'Rendición de Cuentas Institucional';
 		$nombreArchivo.=' - '.$recurso->ClavePresupuestaria;
-		$data['data'] = $recurso;
 		$data['mes_actual'] = Util::obtenerMesActual();
 		$data['meses'] = array(
 			1 => array('mes'=>'Enero',			'abrev'=>'ENE'),
@@ -52,17 +51,22 @@ class ReporteEvaluacionController extends BaseController {
 			12 => array('mes'=>'Dicembre',		'abrev'=>'DIC')
 		);
 		$data['recurso'] = $recurso;
+	
+		/*$datos['mes'] = $data['meses'][1];
+		$datos['proyecto'] = $data['recurso'];
+		return View::make('rendicion-cuentas.excel.seguimiento-metas-mes')->with($datos);*/
 
 		Excel::create($nombreArchivo, function($excel) use ($data){
 			$mes_actual = $data['mes_actual'];
-			for ($i=1; $i < $mes_actual ; $i++) { 
+			for ($i=1; $i <= $mes_actual ; $i++) {
+
 				$datos['mes'] = $data['meses'][$i];
 				$datos['proyecto'] = $data['recurso'];
+
 				$excel->sheet('SM '.$datos['mes']['abrev'], function($sheet)  use ($datos){
 			        $sheet->loadView('rendicion-cuentas.excel.seguimiento-metas-mes', $datos);
 			    });
 			}
-			//$excel->getActiveSheet(0)->getRowDimension(1)->setRowHeight(-1);
 		})->export('xls');
 
 	}
