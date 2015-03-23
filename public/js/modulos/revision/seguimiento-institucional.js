@@ -12,7 +12,7 @@
 =====================================*/
 
 // Inicialización General para casi cualquier módulo
-var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/seguimiento');
+var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/segui-proyectos-inst');
 var moduloDatagrid = new Datagrid("#datagridProyectos",moduloResource,{ formatogrid:true, pagina: 1, clasificacionProyecto: 1});
 moduloDatagrid.init();
 moduloDatagrid.actualizar({

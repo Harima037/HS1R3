@@ -171,4 +171,8 @@ class Proyecto extends BaseModel
 	public function comentarios(){
 		return $this->hasMany('ProyectoComentario','idProyecto');
 	}
+	
+	public function evaluacionMeses(){
+		return $this->hasMany('EvaluacionProyectoMes','idProyecto');
+	}
 }
