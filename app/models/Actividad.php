@@ -54,4 +54,7 @@ class Actividad extends BaseModel
 	public function unidadMedida(){
 		return $this->belongsTo('UnidadMedida','idUnidadMedida');
 	}
+	public function comentarios(){
+    	return $this->hasMany('EvaluacionComentario','idElemento')->where('tipoElemento','=',3);
+    }
 }

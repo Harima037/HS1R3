@@ -98,4 +98,7 @@ class Componente extends BaseModel
 	public function entregableAccion(){
 		return $this->belongsTo('EntregableAccion','idEntregableAccion');
 	}
+	public function comentarios(){
+    	return $this->hasMany('EvaluacionComentario','idElemento')->where('tipoElemento','=',2);
+    }
 }

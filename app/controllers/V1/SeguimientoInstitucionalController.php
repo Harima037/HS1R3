@@ -5,7 +5,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
-use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionPlanMejora,EvaluacionComentario;
+use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionPlanMejora,EvaluacionComentario,EvaluacionProyectoMes;
 
 class SeguimientoInstitucionalController extends BaseController {
 	private $reglasBeneficiarios = array(
@@ -73,13 +73,14 @@ class SeguimientoInstitucionalController extends BaseController {
 					$rows->componentes->load('registroAvance');
 					$total = count($rows);
 				}elseif($parametros['grid'] == 'rendicion-beneficiarios'){
-					$rows = Beneficiario::with(array('registroAvance'=>function($query){
+					$rows = Beneficiario::with(array('comentarios','registroAvance'=>function($query){
 						$query->select('id','idProyectoBeneficiario','idTipoBeneficiario','sexo',DB::raw('sum(total) AS total'))
 								->groupBy('idTipoBeneficiario','sexo');
 					},'tipoBeneficiario'))->where('idProyecto','=',$parametros['idProyecto'])->get();
 					$total = count($rows);
 				}
 			}else{
+				$mes_actual = Util::obtenerMesActual();
 				$rows = Proyecto::getModel();
 				$rows = $rows->where('idEstatusProyecto','=',5)
 							->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto'])
@@ -98,12 +99,24 @@ class SeguimientoInstitucionalController extends BaseController {
 					$total = $rows->count();						
 				}
 				
+				$rows = $rows -> wherein('evaluacionProyectoMes.idEstatus', array(2, 4));
+				
 				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
 					'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
 									->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
-									->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
+									->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')									
 									->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
+									
+									
+									->join('evaluacionProyectoMes', function($join) use($mes_actual)
+										{
+											$join->on('proyectos.id', '=', 'evaluacionProyectoMes.idProyecto')
+											->where('evaluacionProyectoMes.mes', '=', $mes_actual)
+											->where('evaluacionProyectoMes.anio', '=', date('Y'));
+									})
+									
+									//->join('evaluacionProyectoMes','evaluacionProyectoMes.idProyecto','=','proyectos.id')
 									->orderBy('id', 'desc')
 									->skip(($parametros['pagina']-1)*10)->take(10)
 									->get();
@@ -150,9 +163,9 @@ class SeguimientoInstitucionalController extends BaseController {
 			}elseif($parametros['mostrar'] == 'datos-metas-avance'){
 				$mes_actual = Util::obtenerMesActual();
 				if($parametros['nivel'] == 'componente'){
-					$recurso = Componente::getModel();
+					$recurso = Componente::getModel()->with(array('comentarios'));
 				}else{
-					$recurso = Actividad::getModel();
+					$recurso = Actividad::getModel()->with(array('comentarios'));
 				}
 				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
 				$recurso = $recurso->with(array('metasMesJurisdiccion'=>function($query) use ($mes_actual){
@@ -170,7 +183,7 @@ class SeguimientoInstitucionalController extends BaseController {
 														->where('idTipoBeneficiario','=',$id)
 														->where('mes','<',$mes_actual)->groupBy('idTipoBeneficiario','sexo')
 														->select('idTipoBeneficiario','sexo',DB::raw('sum(total) AS total'))->get();
-				$recurso['beneficiario'] = Beneficiario::with(array('tipoBeneficiario','registroAvance'=>function($query) use ($mes_actual){
+				$recurso['beneficiario'] = Beneficiario::with(array('tipoBeneficiario','comentarios','registroAvance'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
 				}))->where('idProyecto','=',$parametros['id-proyecto'])->where('idTipoBeneficiario','=',$id)->get();
 			}elseif ($parametros['mostrar'] == 'analisis-funcional') {
@@ -238,34 +251,58 @@ class SeguimientoInstitucionalController extends BaseController {
 		$respuesta['data'] = array("data"=>'');
 		
 		$parametros = Input::all();
+		$mes_actual = Util::obtenerMesActual();
 
 		if(isset($parametros['actualizarproyecto']))
 		{
 			//throw new Exception($parametros['actualizarproyecto'],1);
 			
-			if($parametros['actualizarproyecto']=="aprobar") //Poner estatus 4 (Aprobado)
+			if($parametros['actualizarproyecto']=="aprobar") //Poner estatus 5 (Aprobado)
 			{
-				$recurso = Proyecto::find($id);
-				if(is_null($recurso)){
-					$respuesta['http_status'] = 404;
-					$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
-				}else{
-					$recurso->idEstatusProyecto = 4;
-					$recurso->save();
+				$validar = DB::table('evaluacionComentarios')
+                    ->where('idProyecto', '=', $id)
+					->where('mes','=',$mes_actual)
+					//->where('anio','=',date("Y"))
+					->whereNull('borradoAl')
+					->select('evaluacionComentarios.id')->get();
+							
+				
+				if(count($validar)>0) //Existen comentarios, no se puede aprobar
+				{
+					$respuesta['http_status'] = 500;
+					$respuesta['data'] = array("data"=>"Debe eliminar todos los comentarios para poder aprobar el avance.",'code'=>'U06');
+				}
+				else
+				{
+					$recurso = EvaluacionProyectoMes::where('idProyecto','=',$id)
+								->where('mes','=',$mes_actual)
+								->where('anio','=',date("Y"))
+								->update(array('idEstatus' => '5'));
 				}
 			}
 			else if($parametros['actualizarproyecto']=="regresar") //Poner estatus 3 (Regreso a corrección)
 			{
-				$recurso = Proyecto::find($id);
-				if(is_null($recurso)){
-					$respuesta['http_status'] = 404;
-					$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
-				}else{
-					$recurso->idEstatusProyecto = 3;
-					$recurso->save();
+				$validar = DB::table('evaluacionComentarios')
+                    ->where('idProyecto', '=', $id)
+					->where('mes','=',$mes_actual)
+					->whereNull('borradoAl')
+					->select('evaluacionComentarios.id')->get();
+							
+				
+				if(count($validar)>0) //Existen comentarios, se puede enviar a corregir
+				{
+					$recurso = EvaluacionProyectoMes::where('idProyecto','=',$id)
+								->where('mes','=',$mes_actual)
+								->where('anio','=',date("Y"))
+								->update(array('idEstatus' => '3'));
+				}
+				else
+				{
+					$respuesta['http_status'] = 500;
+					$respuesta['data'] = array("data"=>"Debe escribir al menos un comentario, para poder regresar el proyecto a corrección.",'code'=>'U06');
 				}
 			}
-			else if($parametros['actualizarproyecto']=="firmar") //Poner estatus 5 (Enviar a firma)
+			/*else if($parametros['actualizarproyecto']=="firmar") //Poner estatus 5 (Enviar a firma)
 			{
 				$recurso = Proyecto::find($id);
 				if(is_null($recurso)){
@@ -275,7 +312,7 @@ class SeguimientoInstitucionalController extends BaseController {
 					$recurso->idEstatusProyecto = 5;
 					$recurso->save();
 				}
-			}
+			}*/
 			
 		}
 		else

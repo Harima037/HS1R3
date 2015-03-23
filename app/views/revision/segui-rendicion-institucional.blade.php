@@ -18,6 +18,17 @@
 	<h3 class="panel-title">Rendición de cuentas del mes de {{$mes}}</h3>
 </div>
 <div class="panel-body" id="panel-rendicion-cuentas">
+
+	<div class="btn-toolbar pull-right">
+		<div class="btn-group" style="margin:5px">
+	    	<button type="button" id="btnAcciones" class="btn btn-primary"><i class="fa fa-gears"></i> Acciones</button>
+    	    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+        	<ul class="dropdown-menu pull-right" role="menu">
+        		<li id="btnAprobarProyecto" name="btnAprobarProyecto"><a href="#" class="btn-default"><i class="fa fa-thumbs-o-up"></i> Aprobar el avance del mes</a></li>
+	            <li id="btnRegresarCorregir" name="btnRegresarCorregir"><a href="#" class="btn-default"><i class="fa fa-mail-reply-all"></i> Regresar para correción</a></li>
+    	    </ul>
+		</div>
+	</div>
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" class="active">
             <a href="#seguimiento-metas" aria-controls="seguimiento-metas" role="tab" data-toggle="tab">
@@ -43,14 +54,24 @@
     		<br>
     		<form id="form_analisis">
 	    		<div class="row">
-	    			<div class="col-sm-6">
+                
+                	<div class="col-sm-12">
+	    				<div class="form-group">
+	    					<label class="control-label" for="lbl-analisis-resultado">Finalidad del proyecto </label>
+	    					<p id="lbl-finalidad" name="lbl-finalidad" rows="6" class="form-control"></p>
+                            <p align="right"><button type="button" class="btn btn-default" onclick="escribirComentario('finalidad','Finalidad del Proyecto','lbl-finalidad','4','id-analisis');"><span class="fa fa-edit"></span> Comentar Finalidad del proyecto</button></p>
+	    				</div>
+	    			</div>
+                
+                
+	    			<div class="col-sm-12">
 	    				<div class="form-group">
 	    					<label class="control-label" for="lbl-analisis-resultado">Analisis de Resultado </label>
 	    					<p id="lbl-analisis-resultado" name="lbl-analisis-resultado" rows="6" class="form-control"></p>
                             <p align="right"><button type="button" class="btn btn-default" onclick="escribirComentario('analisis-resultado','Análisis de resultado','lbl-analisis-resultado','4','id-analisis');"><span class="fa fa-edit"></span> Comentar Analisis de Resultado</button></p>
 	    				</div>
 	    			</div>
-	    			<div class="col-sm-6">
+	    			<div class="col-sm-12">
 	    				<div class="form-group">
 	    					<label class="control-label" for="lbl-analisis-beneficiarios">Beneficiarios</label>
 	    					<p id="lbl-analisis-beneficiarios" name="lbl-analisis-beneficiarios" rows="6" class="form-control"></p>
@@ -85,7 +106,7 @@
 		                    <div class="btn-toolbar pull-right" >
 		                        <div class="btn-group" style="margin:5px">
 		                            <button type="button" class="btn btn-primary btn-edit-rows">
-		                                <span class="fa fa-edit"></span> Actualizar Beneficiarios
+		                                <span class="fa fa-eye"></span> Ver Información de los Beneficiarios
 		                            </button>
 		                        </div>
 		                    </div>
@@ -230,54 +251,62 @@
 						<div class="tab-content">
 							<div role="tabpanel" class="tab-pane active" id="panel-metas">
 								<br>
-								<table id="tabla-avances-metas" class="table table-condensed table-hover table-bordered">
+                                <button type="button" class="btn btn-default" id="avancesmetas" name="avancesmetas" onclick="escribirComentario('avancesmetas','Avances de las metas','indicador','nivel','nivel');"><span class="fa fa-edit"></span> Comentar Avances de las Metas</button>
+                                <p></p>
+								<table id="tabla-avances-metas" class="table table-condensed table-bordered">
 			                		<thead>
-			                			<th>Jurisdicción</th>
-			                			<th>Meta Acumulada</th>
-			                			<th>Meta Programada</th>
-			                			<th>Avance del Mes</th>
-			                			<th>Avance Acumulado</th>
-			                			<th width="90">Porcentaje Acumulado</th>
+			                			<tr>
+			                				<th rowspan="2">Jurisdicción</th>
+				                			<th colspan="2" class="bg-success">Meta Programada</th>
+				                			<th colspan="3" class="bg-info">Avance</th>
+				                			<th rowspan="2" width="90">Porcentaje Acumulado</th>
+			                			</tr>
+			                			<tr>
+			                				<th class="bg-success">Acumulada</th>
+			                				<th class="bg-success" nowrap="nowrap">Mes actual</th>
+			                				<th class="bg-info" nowrap="nowrap">Mes actual</th>
+			                				<th class="bg-info">Acumulado</th>
+			                				<th class="bg-info">Total</th>
+			                			</tr>
 			                		</thead>
 			                		<tbody>
 			                			<tr data-clave-jurisdiccion="OC">
 			                				<td>OC - Oficina Central</td>
-			                				<td class="meta-programada" data-meta="0">0</td>
+			                				<td class="meta-programada bg-success" data-meta="0">0</td>
 			                				<td class="meta-del-mes" data-meta-mes="0">0</td>
 			                				<td>
 			                					<div class="form-group" style="margin-bottom:0;">
-			                						<input type="number" class="form-control avance-mes" name="avance[OC]" id="avance_OC" data-jurisdiccion="OC" data-meta-programada="">
+			                						<input type="number" class="form-control avance-mes" name="avance[OC]" id="avance_OC" data-jurisdiccion="OC" data-meta-programada="" disabled="disabled">
 			                					</div>
 			                				</td>
-			                				<td class="avance-acumulado" data-acumulado="0">
-			                					<span class="vieja-cantidad">0</span> <span class="nueva-cantidad text-primary"></span>
-			                				</td>
+			                				<td class="avance-acumulado" data-acumulado="0">0</td>
+			                				<td class="avance-total bg-info" data-avance-total="0">0</td>
 			                				<td class="avance-mes" data-estado-avance=""></td>
 			                			</tr>
 			                			@foreach ($jurisdicciones as $jurisdiccion)
 			                			<tr data-clave-jurisdiccion="{{$jurisdiccion->clave}}">
 			                				<td>{{$jurisdiccion->clave}} - {{$jurisdiccion->nombre}}</td>
-			                				<td class="meta-programada" data-meta="0">0</td>
+			                				<td class="meta-programada bg-success" data-meta="0">0</td>
 			                				<td class="meta-del-mes" data-meta-mes="0">0</td>
 			                				<td>
 			                					<div class="form-group" style="margin-bottom:0;">
 			                						<input type="number" class="form-control avance-mes" name="avance[{{$jurisdiccion->clave}}]" id="avance_{{$jurisdiccion->clave}}" data-jurisdiccion="{{$jurisdiccion->clave}}" data-meta-programada="">
 			                					</div>
 			                				</td>
-			                				<td class="avance-acumulado" data-acumulado="0">
-			                					<span class="vieja-cantidad">0</span> <span class="nueva-cantidad text-primary"></span>
-			                				</td>
-			                				<td class="avance-mes" data-estado-avance=""></td>
+			                				<td class="avance-acumulado" data-acumulado="0">0</td>
+			                				<td class="avance-total bg-info" data-avance-total="0">0</td>
+			                				<td class="avance-mes"></td>
 			            				</tr>
 			                			@endforeach
 			                		</tbody>
 			                		<tfoot>
 			                			<th>Totales</th>
-			                			<th id="total-meta-programada">0</th>
+			                			<th class="bg-success" id="total-meta-programada">0</th>
 			                			<th id="total-meta-mes">0</th>
 			                			<th id="total-avance-mes">0</th>
 			                			<th id="total-avance-acumulado">0</th>
-			                			<th id="total-porcentaje">0%</th>
+			                			<th class="bg-info" id="total-avance-total">0</th>
+			                			<th id="total-porcentaje" data-estado-avance="">0%</th>
 			                		</tfoot>
 			                	</table>
 							</div>
@@ -286,14 +315,16 @@
 								<div class="row">
 									<div class="col-sm-12">
 										<div class="form-group">
-											<label class="input-label" for="analisis-resultados">Analisis de Resultados Acumulado</label>
-											<textarea rows="6" class="form-control" name="analisis-resultados" id="analisis-resultados"></textarea>
+											<label class="input-label" for="lbl-analisis-resultados">Analisis de Resultados Acumulado</label>
+											<p class="form-control" name="lbl-analisis-resultados" id="lbl-analisis-resultados"></p>
+                                            <button type="button" class="btn btn-default" onclick="escribirComentario('analisis-resultados','Análisis de Resultados Acumulado','lbl-analisis-resultados','nivel','nivel');"><span class="fa fa-edit"></span> Comentar Analisis de Resultados Acumulado</button>
 										</div>
 									</div>
 									<div class="col-sm-12">
 										<div class="form-group">
-											<label class="input-label" for="justificacion-acumulada">Justificación Acumulada</label>
-											<textarea rows="6" class="form-control" name="justificacion-acumulada" id="justificacion-acumulada" disabled></textarea>
+											<label class="input-label" for="lbl-justificacion-acumulada">Justificación Acumulada</label>
+											<p class="form-control" name="lbl-justificacion-acumulada" id="lbl-justificacion-acumulada"></p>
+                                            <button type="button" class="btn btn-default" onclick="escribirComentario('justificacion-acumulada','Justificación Acumulada','lbl-justificacion-acumulada','nivel','nivel');"><span class="fa fa-edit"></span> Comentar Justificación Acumulada</button>
 										</div>
 									</div>
 								</div>
@@ -304,38 +335,43 @@
 								<div class="row">
 									<div class="col-sm-12">
 										<div class="form-group">
-											<label class="input-label" for="accion-mejora">Acción de Mejora</label>
-											<textarea rows="4" class="form-control" name="accion-mejora" id="accion-mejora"></textarea>
+											<label class="input-label" for="lbl-accion-mejora">Acción de Mejora</label>
+                                            <p id="lbl-accion-mejora" name="lbl-accion-mejora" class="form-control" style="height:auto"></p>                                            <button type="button" class="btn btn-default" onclick="escribirComentario('accion-mejora','Acción de mejora','lbl-accion-mejora','nivel','nivel');"><span class="fa fa-edit"></span> Comentar Acción de Mejora</button>
 										</div>
 									</div>
 									<div class="col-sm-12">
 										<div class="form-group">
-											<label class="input-label" for="grupo-trabajo">Grupo de Trabajo</label>
-											<textarea rows="4" class="form-control" name="grupo-trabajo" id="grupo-trabajo"></textarea>
+											<label class="input-label" for="lbl-grupo-trabajo">Grupo de Trabajo</label>
+											<p class="form-control" name="lbl-grupo-trabajo" id="lbl-grupo-trabajo" style="height:auto"></p>
+                                            <button type="button" class="btn btn-default" onclick="escribirComentario('grupo-trabajo','Grupo de Trabajo','lbl-grupo-trabajo','nivel','nivel');"><span class="fa fa-edit"></span> Comentar Grupo de Trabajo</button>
 										</div>
 									</div>
 									<div class="col-sm-4">
 										<div class="form-group">
-											<label class="input-label" for="fecha-inicio">Fecha de Inicio</label>
-											<input type="date" class="form-control" name="fecha-inicio" id="fecha-inicio">
+											<label class="input-label" for="lbl-fecha-inicio">Fecha de Inicio</label>
+											<p class="form-control" name="lbl-fecha-inicio" id="lbl-fecha-inicio" style="height:auto"></p>
+                                            <button type="button" class="btn btn-default" onclick="escribirComentario('fecha-inicio','Fecha de Inicio','lbl-fecha-inicio','nivel','nivel');"><span class="fa fa-edit"></span> Comentar Fecha de Inicio</button>
 										</div>
 									</div>
 									<div class="col-sm-4">
 										<div class="form-group">
-											<label class="input-label" for="fecha-termino">Fecha de Termino</label>
-											<input type="date" class="form-control" name="fecha-termino" id="fecha-termino">
+											<label class="input-label" for="lbl-fecha-termino">Fecha de Término</label>
+											<p class="form-control" name="lbl-fecha-termino" id="lbl-fecha-termino" style="height:auto"></p>
+                                            <button type="button" class="btn btn-default" onclick="escribirComentario('fecha-termino','Fecha de Término','lbl-fecha-termino','nivel','nivel');"><span class="fa fa-edit"></span> Comentar Fecha de Término</button>
 										</div>
 									</div>
 									<div class="col-sm-4">
 										<div class="form-group">
-											<label class="input-label" for="fecha-notificacion">Fecha de Notificación</label>
-											<input type="date" class="form-control" name="fecha-notificacion" id="fecha-notificacion">
+											<label class="input-label" for="lbl-fecha-notificacion">Fecha de Notificación</label>
+											<p class="form-control" name="lbl-fecha-notificacion" id="lbl-fecha-notificacion" style="height:auto"></p>
+                                            <button type="button" class="btn btn-default" onclick="escribirComentario('fecha-notificacion','Fecha de Notificación','lbl-fecha-notificacion','nivel','nivel');"><span class="fa fa-edit"></span> Comentar Fecha de Notificación</button>
 										</div>
 									</div>
 									<div class="col-sm-12">
 										<div class="form-group">
-											<label class="input-label" for="documentacion-comprobatoria">Documentación Comprobatoria</label>
-											<textarea rows="4" class="form-control" name="documentacion-comprobatoria" id="documentacion-comprobatoria"></textarea>
+											<label class="input-label" for="lbl-documentacion-comprobatoria">Documentación Comprobatoria</label>
+											<p class="form-control" name="lbl-documentacion-comprobatoria" id="lbl-documentacion-comprobatoria" style="height:auto"></p>
+                                            <button type="button" class="btn btn-default" onclick="escribirComentario('documentacion-comprobatoria','Documentación Comprobatoria','lbl-documentacion-comprobatoria','nivel','nivel');"><span class="fa fa-edit"></span> Comentar Documentación Comprobatoria</button>
 										</div>
 									</div>
 								</div>
@@ -349,8 +385,8 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success" id="btn-guardar-avance">Guardar Avance</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <!--<button type="button" class="btn btn-success" id="btn-guardar-avance">Guardar Avance</button>-->
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
@@ -396,11 +432,6 @@
         </div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-
-
-
-
-
 
 @if($trimestre_activo)
 <div class="modal fade" id="modalBeneficiario" tabindex="-1" role="dialog" aria-labelledby="modalBenefLabel" aria-hidden="true" data-backdrop="static">
@@ -780,20 +811,14 @@
 		</div>
 	</div>
 </form>
-
-
-
-
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary btn-guardar" id="btn-beneficiario-guardar">Guardar</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <!--<button type="button" class="btn btn-primary btn-guardar" id="btn-beneficiario-guardar">Guardar</button>-->
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-
-
 
 @endif
 <!-- Dejar parent al ultimo -->
