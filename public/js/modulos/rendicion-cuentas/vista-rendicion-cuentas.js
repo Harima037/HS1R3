@@ -179,9 +179,168 @@ function seguimiento_metas(e){
             $('#total-avance-acumulado').text(total_acumulado.format());
             //$('#total-porcentaje').text(total_porcentaje_acumulado+'% ');
             $('.avance-mes').change();
+
+            if(response.data.desglose_municipios){
+                if(response.data.desglose_municipios.length){
+                    asignar_municipios(response.data.desglose_municipios);
+                    $('input.avance-mes').attr('disabled',true);
+                }
+            }
             $('#modalEditarAvance').modal('show');
         }
     });    
+}
+
+function asignar_municipios(datos){
+    //datos
+    var municipios = {};
+    for(var i in datos){
+        if(!municipios[datos[i].claveJurisdiccion]){
+            municipios[datos[i].claveJurisdiccion] = {
+                'claveJurisdiccion': datos[i].claveJurisdiccion,
+                'municipios': []
+            };
+        }
+        municipios[datos[i].claveJurisdiccion].municipios.push({
+            'clave': datos[i].clave,
+            'nombre': datos[i].nombre
+        })
+    }
+    
+    for(var i in municipios){
+        var claveJurisdiccion = municipios[i].claveJurisdiccion;
+        var row = '#tabla-avances-metas > tbody > tr[data-clave-jurisdiccion="'+claveJurisdiccion+'"]';
+        
+        $(row + ' td.accion-municipio').addClass('btn-link');
+        $(row + ' td.accion-municipio span').addClass('caret');
+        $(row + ' td.accion-municipio').on('click',function(){ $('#desglose-avance-'+$(this).parent().attr('data-clave-jurisdiccion')).removeClass('hidden'); });
+
+        $(row).after('<tr id="desglose-avance-'+claveJurisdiccion+'" class="lista-localidades-jurisdiccion hidden"><td colspan="7"><div id="panel-localidades-'+claveJurisdiccion+'" class="panel panel-primary" style="margin-bottom:0;"></div></td></tr>');
+
+        var panel_id = '#panel-localidades-'+claveJurisdiccion;
+        $(panel_id).html($('#panel-estructura-localidades').html());
+        $(panel_id + ' .select-lista-municipios').attr('data-jurisdiccion',claveJurisdiccion);
+        $(panel_id + ' .btn-guardar-avance-localidades').attr('data-jurisdiccion',claveJurisdiccion);
+        $(panel_id + ' .btn-ocultar-avance-localidades').attr('data-jurisdiccion',claveJurisdiccion);
+
+        var opciones = [];
+        opciones.push('<option value="">Selecciona un municipio</option>');
+        for(var j in municipios[i].municipios){
+            var municipio = municipios[i].municipios[j];
+            opciones.push('<option value="'+ municipio.clave +'">'+ municipio.nombre +'</option>');
+        }
+        $(panel_id + ' .select-lista-municipios').html(opciones.join(''));
+    }
+
+    $('.btn-ocultar-avance-localidades').on('click',function(){
+        $('#desglose-avance-'+$(this).attr('data-jurisdiccion')+' .select-lista-municipios').val('');
+        $('#panel-localidades-'+$(this).attr('data-jurisdiccion')+' table.tabla-avance-localidades tbody').empty();
+        $('#desglose-avance-'+$(this).attr('data-jurisdiccion')).addClass('hidden');
+    });
+
+    $('.btn-guardar-avance-localidades').on('click',function(){
+        enviar_datos_municipio($(this).attr('data-jurisdiccion'));
+    });
+
+    $('.select-lista-municipios').on('change',function(){
+        buscar_localidades($(this).attr('data-jurisdiccion'),$(this).val());
+    });
+}
+
+function enviar_datos_municipio(jurisdiccion){
+    var municipio = $('#panel-localidades-'+jurisdiccion+' select.select-lista-municipios[data-jurisdiccion="'+jurisdiccion+'"]').val();
+    if(municipio == ''){
+        return false;
+    }
+
+    var parametros = $('#form_avance').serialize();
+    parametros += '&guardar=avance-localidad-metas&clave-municipio='+municipio;
+
+    Validation.cleanFormErrors('#form_avance');
+
+    moduloResource.post(parametros,{
+        _success: function(response){
+            MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
+            var jurisdiccion = response.data.claveJurisdiccion;
+            var avance = response.data.avance;
+            $('#avance_'+jurisdiccion).val(avance).change();
+            accionesDatagrid.actualizar({ _success: function(response){ llenar_grid_acciones(response); } });
+        },
+        _error: function(response){
+            try{
+                var json = $.parseJSON(response.responseText);
+                if(!json.code)
+                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                else{
+                    MessageManager.show(json);
+                }
+                Validation.formValidate(json.data);
+            }catch(e){
+                console.log(e);
+            }                       
+        }
+    });
+}
+
+function buscar_localidades(jurisdiccion,municipio){
+    //sconsole.log('Jurisdiccion = '+jurisdiccion+'| Municipio = '+municipio);
+    if(municipio == ''){
+        $('#panel-localidades-'+jurisdiccion+' table.tabla-avance-localidades tbody').empty();
+        return false;
+    }
+    var parametros = {
+        'mostrar':'datos-municipio-avance',
+        'nivel':$('#nivel').val(),
+        'clave-municipio':municipio
+    };
+    moduloResource.get($('#id-accion').val(),parametros,{
+        _success: function(response){
+            //
+            var tabla = '#panel-localidades-'+jurisdiccion+' table.tabla-avance-localidades tbody';
+            $(tabla).empty();
+            var html_rows = '';
+            for(var i in response.data){
+                var dato = response.data[i];
+                if(dato.metas_mes.length > 0){
+                    var datos_meta = {
+                        meta: dato.metas_mes[0].meta || 0,
+                        avance: dato.metas_mes[0].avance,
+                    };
+                }else{
+                    var datos_meta = {meta:0,avance:0};
+                }
+                if(dato.metas_mes_acumuladas){
+                    var datos_acumulado = {
+                        meta: dato.metas_mes_acumuladas.meta || 0,
+                        avance: dato.metas_mes_acumuladas.avance || 0
+                    }
+                }else{
+                    var datos_acumulado = {meta:0, avance:0}
+                }
+                var avance_anterior = datos_acumulado.avance - (datos_meta.avance || 0); 
+                html_rows += '<tr data-clave-localidad="'+dato.claveLocalidad+'"><td>' + dato.localidad + '</td>' +
+                                '<td class="localidad-metas-acumuladas bg-success" data-metas-acumuladas="'+datos_acumulado.meta+'">'+datos_acumulado.meta.format()+'</td>' + 
+                                '<td class="localidad-meta-mes" data-meta-mes="'+datos_meta.meta+'">'+datos_meta.meta.format()+'</td>' +
+                                '<td><div class="form-group"><input name="localidad-avance-mes['+dato.claveLocalidad+']" id="localidad_avance_mes_'+dato.claveLocalidad+'" type="number" class="form-control localidad-avance" value="'+datos_meta.avance+'" data-localidad="'+dato.claveLocalidad+'" data-jurisdiccion="'+jurisdiccion+'"></div></td>' + 
+                                '<td class="localidad-avance-acumulado" data-avance-acumulado="'+avance_anterior+'">'+avance_anterior.format()+'</td>' +
+                                '<td class="localidad-total-avance bg-info" data-avance-total="'+datos_acumulado.avance+'">'+datos_acumulado.avance.format()+'</td></tr>';
+            }
+            $(tabla).html(html_rows);
+            $('.localidad-avance').on('keyup',function(){ $(this).change() });
+            $('.localidad-avance').on('change',function(){
+                var jurisdiccion = $(this).attr('data-jurisdiccion');
+                var localidad = $(this).attr('data-localidad');
+
+                var row = '#panel-localidades-'+jurisdiccion+' table.tabla-avance-localidades tbody tr[data-clave-localidad="'+localidad+'"]';
+
+                var avance_acumulado = parseFloat($(row + ' td.localidad-avance-acumulado').attr('data-avance-acumulado')) || 0;
+                avance_acumulado += parseFloat($(this).val()) || 0;
+
+                $(row + ' td.localidad-total-avance').attr('data-avance-total',avance_acumulado);
+                $(row + ' td.localidad-total-avance').text(avance_acumulado.format());
+            });
+        }
+    });
 }
 
 $('.avance-mes').on('keyup',function(){ $(this).change() });
@@ -304,12 +463,16 @@ $('#modalEditarAvance').on('hide.bs.modal',function(e){
     $('#total-avance-total').text('0');
     $('#total-porcentaje').attr('data-estado-avance','');
     $('#total-porcentaje').text('0%');
+    $('.accion-municipio').removeClass('btn-link');
+    $('.accion-municipio span').removeClass('caret');
+    $('input.avance-mes').attr('disabled',false);
     //$('span.nueva-cantidad').text('');
     //$('span.vieja-cantidad').text('0');
     $('#justificacion-acumulada').attr('disabled',true);
     $('#tab-link-plan-mejora').attr('data-toggle','');
     $('#tab-link-plan-mejora').parent().addClass('disabled');
     $('#tabs-seguimiento-metas a:first').tab('show');
+    $('.lista-localidades-jurisdiccion').remove();
     Validation.cleanFormErrors('#form_avance');
 });
 

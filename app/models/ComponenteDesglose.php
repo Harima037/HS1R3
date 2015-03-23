@@ -11,8 +11,19 @@ class ComponenteDesglose extends BaseModel
 		return $this->hasMany('DesgloseMetasMes','idComponenteDesglose');
 	}
 
+	public function metasMesAcumuladas(){
+		return $this->hasOne('DesgloseMetasMes','idComponenteDesglose')->acumulado();
+	}
+
 	public function beneficiarios(){
 		return $this->hasMany('DesgloseBeneficiario','idComponenteDesglose');
+	}
+
+	public function scopeListarMunicipios($query){
+		$query->select('componenteDesglose.id','ComponenteDesglose.idComponente','ComponenteDesglose.idAccion','componenteDesglose.claveJurisdiccion','municipio.*')
+                ->leftjoin('vistaMunicipios AS municipio','municipio.clave','=','componenteDesglose.claveMunicipio')
+                ->groupBy('componenteDesglose.claveJurisdiccion','municipio.clave')
+                ->orderBy('municipio.nombre','ASC');
 	}
 
 	public function scopeListarDatos($query){

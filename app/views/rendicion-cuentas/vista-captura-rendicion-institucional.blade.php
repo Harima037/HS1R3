@@ -251,8 +251,8 @@
 			                		<tbody>
 			                			@foreach ($jurisdicciones as $clave => $jurisdiccion)
 			                			<tr data-clave-jurisdiccion="{{$clave}}">
-			                				<td class="accion-municipio btn-link">
-			                					<span class="caret"></span> {{$clave}} - {{$jurisdiccion}}
+			                				<td class="accion-municipio">
+			                					<span class=""></span> {{$clave}} - {{$jurisdiccion}}
 			                				</td>
 			                				<td class="meta-programada bg-success" data-meta="0">0</td>
 			                				<td class="meta-del-mes" data-meta-mes="0">0</td>
@@ -277,6 +277,41 @@
 			                			<th id="total-porcentaje" data-estado-avance="">0%</th>
 			                		</tfoot>
 			                	</table>
+			                	<div id="panel-estructura-localidades" class="hidden">
+			                		<table class="table table-condensed">
+				                		<thead>
+				                			<tr>
+					                			<th>Municipios</th>
+					                			<th>
+					                				<select class="form-control select-lista-municipios">
+					                					<option value="">Selecciona un municipio</option>
+					                				</select>
+					                			</th>
+					                			<th width="1"><button type="button" class="btn btn-primary btn-guardar-avance-localidades">Guardar</button></th>
+					                			<th width="1"><button type="button" class="btn btn-link btn-ocultar-avance-localidades">Ocultar</button></th>
+					                		</tr>
+				                		</thead>
+				                	</table>
+				                	<div style="max-height:200px; overflow-x:auto;">
+				                		<table class="table table-condensed table-bordered tabla-avance-localidades">
+				                			<thead>
+					                			<tr>
+					                				<th rowspan="2">Localidad</th>
+						                			<th colspan="2" class="bg-success">Meta Programada</th>
+						                			<th colspan="3" class="bg-info">Avance</th>
+					                			</tr>
+					                			<tr>
+					                				<th class="bg-success">Acumulada</th>
+					                				<th class="bg-success" nowrap="nowrap">Mes actual</th>
+					                				<th class="bg-info" nowrap="nowrap">Mes actual</th>
+					                				<th class="bg-info">Acumulado</th>
+					                				<th class="bg-info">Total</th>
+					                			</tr>
+					                		</thead>
+					                		<tbody></tbody>
+					                	</table>
+				                	</div>
+			                	</div>
 							</div>
 							<div role="tabpanel" class="tab-pane" id="panel-justificacion">
 								<br>

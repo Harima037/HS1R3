@@ -5,7 +5,8 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
-use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionPlanMejora;
+use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,
+	EvaluacionPlanMejora,ComponenteDesglose,DesgloseMetasMes;
 
 class SeguimientoController extends BaseController {
 	private $reglasBeneficiarios = array(
@@ -141,6 +142,18 @@ class SeguimientoController extends BaseController {
 			if($parametros['mostrar'] == 'datos-proyecto-avance'){
 				$recurso = Proyecto::with('datosFuncion','datosSubFuncion','datosProgramaPresupuestario','componentes.metasMesAgrupado'
 					,'componentes.registroAvance','componentes.actividades.metasMesAgrupado','componentes.actividades.registroAvance','beneficiarios.registroAvance','beneficiarios.tipoBeneficiario')->find($id);
+			}elseif ($parametros['mostrar'] == 'datos-municipio-avance') {
+				//$id = idComponente y $parametros['clave-municipio'] y $parametros['nivel'] = 'componente'
+				$mes_actual = Util::obtenerMesActual();
+				if($parametros['nivel'] == 'componente'){
+					$recurso = ComponenteDesglose::listarDatos()->where('claveMunicipio','=',$parametros['clave-municipio'])
+													->where('idComponente','=',$id);
+				}
+				$recurso = $recurso->with(array('metasMes'=>function($query) use ($mes_actual){
+					$query->where('mes','=',$mes_actual);
+				},'metasMesAcumuladas'=>function($query) use ($mes_actual){
+					$query->where('mes','<=',$mes_actual);
+				}))->get();
 			}elseif($parametros['mostrar'] == 'datos-metas-avance'){
 				$mes_actual = Util::obtenerMesActual();
 				if($parametros['nivel'] == 'componente'){
@@ -158,6 +171,12 @@ class SeguimientoController extends BaseController {
 				},'planMejora'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
 				},'unidadMedida'))->find($id);
+
+				if($parametros['nivel'] == 'componente'){
+					$recurso->load('desgloseMunicipios');
+					//$queries = DB::getQueryLog();
+					//throw new Exception(print_r(end($queries),true), 1);
+				}
 			}elseif($parametros['mostrar'] == 'datos-beneficiarios-avance'){
 				$mes_actual = Util::obtenerMesActual();
 				$recurso['acumulado'] = RegistroAvanceBeneficiario::where('idProyecto','=',$parametros['id-proyecto'])
@@ -197,6 +216,11 @@ class SeguimientoController extends BaseController {
 		try{
 			if($parametros['guardar'] == 'avance-metas'){
 				$respuesta = $this->guardarAvance($parametros);
+				if($respuesta['http_status'] != 200){
+					throw new Exception("Error al procesar los datos", 1);
+				}
+			}elseif ($parametros['guardar'] == 'avance-localidad-metas') {
+				$respuesta = $this->guardarAvanceLocalidad($parametros);
 				if($respuesta['http_status'] != 200){
 					throw new Exception("Error al procesar los datos", 1);
 				}
@@ -265,6 +289,11 @@ class SeguimientoController extends BaseController {
 
 			if($parametros['guardar'] == 'avance-metas'){
 				$respuesta = $this->guardarAvance($parametros,$id);
+				if($respuesta['http_status'] != 200){
+					throw new Exception("Error al procesar los datos", 1);
+				}
+			}elseif ($parametros['guardar'] == 'avance-localidad-metas') {
+				$respuesta = $this->guardarAvanceLocalidad($parametros);
 				if($respuesta['http_status'] != 200){
 					throw new Exception("Error al procesar los datos", 1);
 				}
@@ -402,6 +431,95 @@ class SeguimientoController extends BaseController {
 		return $respuesta;
 	}
 
+	public function guardarAvanceLocalidad($parametros){
+		$respuesta['http_status'] = 200;
+		$respuesta['data'] = array("data"=>'');
+		$es_editar = FALSE;
+
+		$mes_actual = Util::obtenerMesActual();
+		$clave_municipio = $parametros['clave-municipio'];
+		
+		if($parametros['nivel'] == 'componente'){
+			$accion = Componente::with(array('desglose'=>function($query) use ($clave_municipio){
+				$query->where('claveMunicipio','=',$clave_municipio);
+			},'desglose.metasMes'=>function($query) use ($mes_actual){
+				$query->where('mes','=',$mes_actual);
+			}))->find($parametros['id-accion']);
+		}else{
+			throw new Exception("Elemento no soportado por el momento", 1);
+		}
+		
+		$guardar_metas_localidades = array(); //Para guardar nuevo/editar
+		$faltan_campos = array(); //faltan localidades por capturar
+
+		$avance_anterior = 0; //avance anterior
+		$avance_total = 0; //avance nuevo
+
+		$clave_jurisdiccion = $accion->desglose[0]->claveJurisdiccion;
+
+		foreach ($accion->desglose as $desglose) {
+			if($parametros['localidad-avance-mes'][$desglose->claveLocalidad] == ''){
+				$faltan_campos[] = json_encode(array('field'=>'localidad_avance_mes_'.$desglose->claveLocalidad,'error'=>'Este campo es requerido'));
+			}else{
+				if(count($desglose->metasMes)){
+					if($desglose->metasMes[0]->avance){
+						$avance_anterior += $desglose->metasMes[0]->avance;
+					}
+					$desglose->metasMes[0]->avance = $parametros['localidad-avance-mes'][$desglose->claveLocalidad];
+					$guardar_metas_localidades[] = $desglose->metasMes[0];
+				}else{
+					$nueva_meta = new DesgloseMetasMes;
+					$nueva_meta->idComponenteDesglose = $desglose->id;
+					$nueva_meta->mes = $mes_actual;
+					$nueva_meta->meta = 0;
+					$nueva_meta->avance = $parametros['localidad-avance-mes'][$desglose->claveLocalidad];
+					$guardar_metas_localidades[] = $nueva_meta;
+				}
+				$avance_total += $parametros['localidad-avance-mes'][$desglose->claveLocalidad];
+			}
+		}
+
+		if(count($faltan_campos)){
+			$respuesta['http_status'] = 500;
+			$respuesta['data']['code'] = 'U00';
+			$respuesta['data']['data'] = $faltan_campos;
+			return $respuesta;
+		}
+
+		$accion->load(array('metasMes' => function($query) use ($mes_actual,$clave_jurisdiccion){
+			$query->where('mes','=',$mes_actual)->where('claveJurisdiccion','=',$clave_jurisdiccion);
+		}));
+
+		$meta_jurisdiccion = NULL;
+		if(count($accion->metasMes)){
+			$meta_jurisdiccion = $accion->metasMes[0];
+		}else{
+			$meta_jurisdiccion = new ComponenteMetaMes;
+			$meta_jurisdiccion->claveJurisdiccion = $jurisdiccion;
+			$meta_jurisdiccion->mes = $mes_actual;
+			$meta_jurisdiccion->meta = 0;
+			$meta_jurisdiccion->idProyecto = $accion->idProyecto;
+		}
+		$meta_jurisdiccion->avance -= $avance_anterior;
+		$meta_jurisdiccion->avance += $avance_total;
+		
+		$respuesta['data'] = DB::transaction(function() use($accion, $guardar_metas_localidades, $meta_jurisdiccion){
+			if($accion->metasMes()->save($meta_jurisdiccion)){
+				foreach ($guardar_metas_localidades as $meta) {
+					$meta->save();
+				}
+				//$accion->desglose()->metasMes()->saveMany($guardar_metas_localidades);
+				return array('data'=>$meta_jurisdiccion);
+			}else{
+				//No se pudieron guardar los datos del proyecto
+				$respuesta['data']['code'] = 'S01';
+				throw new Exception("Error al guardar los datos de la FIBAP: Error en el guardado de la ficha", 1);
+			}
+		});
+
+		return $respuesta;
+	}
+
 	public function guardarAvance($parametros,$id = NULL){
 		$respuesta['http_status'] = 200;
 		$respuesta['data'] = array("data"=>'');
@@ -440,68 +558,74 @@ class SeguimientoController extends BaseController {
 		$conteo_alto_bajo_avance = 0;
 		$faltan_campos = array();
 		
-		$metas_acumuladas = $accion_metas->metasMesJurisdiccion->lists('meta','claveJurisdiccion');
-		$avances_acumulados = $accion_metas->metasMesJurisdiccion->lists('avance','claveJurisdiccion');
+		//$metas_acumuladas = $accion_metas->metasMesJurisdiccion->lists('meta','claveJurisdiccion');
+		//$avances_acumulados = $accion_metas->metasMesJurisdiccion->lists('avance','claveJurisdiccion');
 		
 		$guardar_metas = array();
 		$total_avance = 0;
 		$meta_acumulada = $accion_metas->metasMesJurisdiccion->sum('meta');
 		$avance_acumulado = $accion_metas->metasMesJurisdiccion->sum('avance');
-
-		foreach ($accion_metas->metasMes as $metas) {
-			if($parametros['avance'][$metas->claveJurisdiccion] == ''){
-				$faltan_campos[] = json_encode(array('field'=>'avance_'.$metas->claveJurisdiccion,'error'=>'Este campo es requerido'));
-			}else{
-				//$meta_acumulada += $metas_acumuladas[$metas->claveJurisdiccion];
-				//$avance_acumulado += $avances_acumulados[$metas->claveJurisdiccion];
-				if($metas->avance){
-					$avance_acumulado -= $metas->avance;
+		$tiene_desglose = FALSE;
+		//Checar desglose
+		if($parametros['nivel'] == 'componente'){
+			$accion_metas->load('desglose');
+			if(count($accion_metas->desglose)){
+				$tiene_desglose = TRUE;
+				$id_desgloses = $accion_metas->desglose->lists('id');
+				$avances_faltantes = DesgloseMetasMes::whereIn('idComponenteDesglose',$id_desgloses)
+													->where('mes','=',$mes_actual)
+													->whereNull('avance')
+													->get();
+				//
+				if(count($avances_faltantes)){
+					$respuesta['http_status'] = 500;
+					$respuesta['data']['code'] = 'S01';
+					$respuesta['data']['data'] = 'Aún hay avances que no han sido capturados, capturalos para poder guardar los datos.';
+					return $respuesta;
 				}
-				//$avance_acumulado += $parametros['avance'][$metas->claveJurisdiccion];
-				/*if($meta_acumulada > 0 && $metas->meta > 0){
-					$porcentaje_avance = (( $avance_acumulado  / $meta_acumulada ) * 100);
-					if($porcentaje_avance < 90 || $porcentaje_avance > 110){
-						//$conteo_alto_bajo_avance++;
-					}
-				}elseif($meta_acumulada == 0 && $parametros['avance'][$metas->claveJurisdiccion] > 0){
-					//$conteo_alto_bajo_avance++;
-				}*/
-				$total_avance += $parametros['avance'][$metas->claveJurisdiccion];
-				$metas->avance = $parametros['avance'][$metas->claveJurisdiccion];
-				$guardar_metas[] = $metas;
-				/*if($metas->meta == 0 && $metas->avance > 0){
-					//$conteo_alto_bajo_avance++;
-				}*/
 			}
 		}
-		
-		//Si las metas capturadas no fueron puestas en la programación entonces ahi que agregarlas ya que no estan en la tabla
-		$jurisdicciones_capturadas = $accion_metas->metasMes->lists('claveJurisdiccion');
-		$jurisdicciones_formulario = array_keys($parametros['avance']);
-		$metas_nuevas = array_diff($jurisdicciones_formulario, $jurisdicciones_capturadas);
-		foreach ($metas_nuevas as $jurisdiccion) {
-			if($parametros['avance'][$jurisdiccion] > 0){
-				if($parametros['nivel'] == 'componente'){
-					$meta = new ComponenteMetaMes;
-					//$meta->idComponente = $parametros['id-accion'];
+
+		if(!$tiene_desglose){
+			foreach ($accion_metas->metasMes as $metas) {
+				if($parametros['avance'][$metas->claveJurisdiccion] == ''){
+					$faltan_campos[] = json_encode(array('field'=>'avance_'.$metas->claveJurisdiccion,'error'=>'Este campo es requerido'));
 				}else{
-					$meta = new ActividadMetaMes;
-					//$meta->idActividad = $parametros['id-accion'];
+					if($metas->avance){
+						$avance_acumulado -= $metas->avance;
+					}
+					$total_avance += $parametros['avance'][$metas->claveJurisdiccion];
+					$metas->avance = $parametros['avance'][$metas->claveJurisdiccion];
+					$guardar_metas[] = $metas;
 				}
-				$meta->claveJurisdiccion = $jurisdiccion;
-				$meta->mes = $mes_actual;
-				$meta->meta = 0;
-				$meta->avance = $parametros['avance'][$jurisdiccion];
-				$meta->idProyecto = $accion_metas->idProyecto;
-				$guardar_metas[] = $meta;
-				//$conteo_alto_bajo_avance++;
-				$total_avance += $parametros['avance'][$jurisdiccion];
 			}
+			
+			//Si las metas capturadas no fueron puestas en la programación entonces ahi que agregarlas ya que no estan en la tabla
+			$jurisdicciones_capturadas = $accion_metas->metasMes->lists('claveJurisdiccion');
+			$jurisdicciones_formulario = array_keys($parametros['avance']);
+			$metas_nuevas = array_diff($jurisdicciones_formulario, $jurisdicciones_capturadas);
+			foreach ($metas_nuevas as $jurisdiccion) {
+				if($parametros['avance'][$jurisdiccion] > 0){
+					if($parametros['nivel'] == 'componente'){
+						$meta = new ComponenteMetaMes;
+					}else{
+						$meta = new ActividadMetaMes;
+					}
+					$meta->claveJurisdiccion = $jurisdiccion;
+					$meta->mes = $mes_actual;
+					$meta->meta = 0;
+					$meta->avance = $parametros['avance'][$jurisdiccion];
+					$meta->idProyecto = $accion_metas->idProyecto;
+					$guardar_metas[] = $meta;
+					$total_avance += $parametros['avance'][$jurisdiccion];
+				}
+			}
+			$registro_avance->avanceMes = $total_avance;
+			$avance_acumulado += $total_avance;
+		}else{
+			$registro_avance->avanceMes = $accion_metas->metasMes->sum('avance');
 		}
 
-		$registro_avance->avanceMes = $total_avance;
-
-		$avance_acumulado += $total_avance;
 		if($avance_acumulado > 0 && $meta_acumulada == 0){
 			$porcentaje_avance = 1;
 		}elseif($meta_acumulada > 0){
@@ -509,7 +633,6 @@ class SeguimientoController extends BaseController {
 		}else{
 			$porcentaje_avance = 100;
 		}
-		//throw new Exception($porcentaje_avance, 1);
 		
 		if($porcentaje_avance < 90 || $porcentaje_avance > 110){
 			$conteo_alto_bajo_avance++;
@@ -581,7 +704,9 @@ class SeguimientoController extends BaseController {
 				}elseif(!$registro_avance->planMejora && count($accion_metas->planMejora)){
 					$accion_metas->planMejora[0]->delete();
 				}
-				$accion_metas->metasMes()->saveMany($guardar_metas);
+				if(count($guardar_metas)){
+					$accion_metas->metasMes()->saveMany($guardar_metas);
+				}
 				return array('data'=>$registro_avance);
 			}else{
 				//No se pudieron guardar los datos del proyecto
