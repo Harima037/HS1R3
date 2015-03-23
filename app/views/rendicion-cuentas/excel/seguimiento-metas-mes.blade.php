@@ -135,9 +135,21 @@
 			<td></td>
 			<td>{{$avances_mes['componentes'][$componente['id']]['avance_mes']}}</td>
 			<td>{{$avances_mes['componentes'][$componente['id']]['avance_acumulado']}}</td>
-			<td>{{
-				(($avances_mes['componentes'][$componente['id']]['avance_acumulado']/$avances_mes['componentes'][$componente['id']]['meta_programada'])*100)
-			}} %</td>
+			<td>
+			@if($avances_mes['componentes'][$componente['id']]['meta_programada'] > 0)
+				{{
+				(
+					(
+						$avances_mes['componentes'][$componente['id']]['avance_acumulado']/
+						$avances_mes['componentes'][$componente['id']]['meta_programada']
+					)
+					*100
+				)
+				}}
+			@else
+				100
+			@endif
+			 %</td>
 			<td></td>
 			<td>{{$avances_mes['componentes'][$componente['id']]['analisis_resultados']}}</td>
 			<td>{{$avances_mes['componentes'][$componente['id']]['justificacion_acumulada']}}</td>
@@ -151,9 +163,21 @@
 			<td></td>
 			<td>{{$avances_mes['actividades'][$actividad['id']]['avance_mes']}}</td>
 			<td>{{$avances_mes['actividades'][$actividad['id']]['avance_acumulado']}}</td>
-			<td>{{
-				(($avances_mes['actividades'][$actividad['id']]['avance_acumulado']/$avances_mes['actividades'][$actividad['id']]['meta_programada'])*100)
-			}} %</td>
+			<td>
+			@if($avances_mes['actividades'][$actividad['id']]['meta_programada'] > 0)
+				{{
+				(
+					(
+						$avances_mes['actividades'][$actividad['id']]['avance_acumulado']/
+						$avances_mes['actividades'][$actividad['id']]['meta_programada']
+					)
+					*100
+				)
+				}}
+			@else
+				100
+			@endif
+			 %</td>
 			<td></td>
 			<td>{{$avances_mes['actividades'][$actividad['id']]['analisis_resultados']}}</td>
 			<td>{{$avances_mes['actividades'][$actividad['id']]['justificacion_acumulada']}}</td>
@@ -186,7 +210,7 @@
 			<td></td>
 			<td colspan="2" align="center">Nombre</td>
 			<td colspan="2"></td>
-			<td colspan="4" align="center">Nombre</td>
+			<td colspan="4" align="center">{{ $proyecto['liderProyecto'] }}</td>
 			<td></td>
 		</tr>
 		<tr class="negrita" height="20">
@@ -217,9 +241,21 @@
 			<td class="subtitulo-tabla"></td>
 			<td class="subtitulo-tabla">{{$avances_mes['componentes'][$componente['id']]['avance_mes']}}</td>
 			<td class="subtitulo-tabla">{{$avances_mes['componentes'][$componente['id']]['avance_acumulado']}}</td>
-			<td class="subtitulo-tabla">{{
-				(($avances_mes['componentes'][$componente['id']]['avance_acumulado']/$avances_mes['componentes'][$componente['id']]['meta_programada'])*100)
-			}}</td>
+			<td class="subtitulo-tabla">
+			@if($avances_mes['componentes'][$componente['id']]['meta_programada'] > 0)
+				{{
+				(
+					(
+						$avances_mes['componentes'][$componente['id']]['avance_acumulado']/
+						$avances_mes['componentes'][$componente['id']]['meta_programada']
+					)
+					*100
+				)
+				}}
+			@else
+				100
+			@endif
+			 %</td>
 			<td class="subtitulo-tabla"></td>
 		</tr>
 
@@ -232,9 +268,21 @@
 					<td></td>
 					<td>{{$jurisdicciones_mes['componentes'][$componente['id']][$clave]['avance_mes']}}</td>
 					<td>{{$jurisdicciones_mes['componentes'][$componente['id']][$clave]['avance_acumulado']}}</td>
-					<td>{{
-						(($jurisdicciones_mes['componentes'][$componente['id']][$clave]['avance_acumulado']/$jurisdicciones_mes['componentes'][$componente['id']][$clave]['meta_programada'])*100)
-					}} %</td>
+					<td>
+					@if($jurisdicciones_mes['componentes'][$componente['id']][$clave]['meta_programada'] > 0)
+						{{
+						(
+							(
+								$jurisdicciones_mes['componentes'][$componente['id']][$clave]['avance_acumulado']/
+								$jurisdicciones_mes['componentes'][$componente['id']][$clave]['meta_programada']
+							)
+							*100
+						)
+						}}
+					@else
+						100
+					@endif
+					 %</td>
 				@else
 					<td>0</td>
 					<td></td>
@@ -254,9 +302,21 @@
 				<td class="subtitulo-tabla"></td>
 				<td class="subtitulo-tabla">{{$avances_mes['actividades'][$actividad['id']]['avance_mes']}}</td>
 				<td class="subtitulo-tabla">{{$avances_mes['actividades'][$actividad['id']]['avance_acumulado']}}</td>
-				<td class="subtitulo-tabla">{{
-					(($avances_mes['actividades'][$actividad['id']]['avance_acumulado']/$avances_mes['actividades'][$actividad['id']]['meta_programada'])*100)
-				}}</td>
+				<td class="subtitulo-tabla">
+				@if($avances_mes['actividades'][$actividad['id']]['meta_programada'] > 0)
+					{{
+					(
+						(
+							$avances_mes['actividades'][$actividad['id']]['avance_acumulado']/
+							$avances_mes['actividades'][$actividad['id']]['meta_programada']
+						)
+						*100
+					)
+					}}
+				@else
+					100
+				@endif
+				 %</td>
 				<td class="subtitulo-tabla"></td>
 			</tr>
 
@@ -269,9 +329,21 @@
 						<td></td>
 						<td>{{$jurisdicciones_mes['actividades'][$actividad['id']][$clave]['avance_mes']}}</td>
 						<td>{{$jurisdicciones_mes['actividades'][$actividad['id']][$clave]['avance_acumulado']}}</td>
-						<td>{{
-							(($jurisdicciones_mes['actividades'][$actividad['id']][$clave]['avance_acumulado']/$jurisdicciones_mes['actividades'][$actividad['id']][$clave]['meta_programada'])*100)
-						}} %</td>
+						<td>
+						@if($jurisdicciones_mes['actividades'][$actividad['id']][$clave]['meta_programada'] > 0)
+							{{
+							(
+								(
+									$jurisdicciones_mes['actividades'][$actividad['id']][$clave]['avance_acumulado']/
+									$jurisdicciones_mes['actividades'][$actividad['id']][$clave]['meta_programada']
+								)
+								*100
+							)
+							}}
+						@else
+							100
+						@endif
+						 %</td>
 					@else
 						<td>0</td>
 						<td></td>
