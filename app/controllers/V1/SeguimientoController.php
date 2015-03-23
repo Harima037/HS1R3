@@ -5,7 +5,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
-use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,
+use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionProyectoMes,
 	EvaluacionPlanMejora,ComponenteDesglose,DesgloseMetasMes;
 
 class SeguimientoController extends BaseController {
@@ -75,6 +75,8 @@ class SeguimientoController extends BaseController {
 					$total = count($rows);
 				}
 			}else{
+				$mes_actual = Util::obtenerMesActual();
+
 				$rows = Proyecto::getModel();
 				$rows = $rows->where('idEstatusProyecto','=',5)
 							->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto'])
@@ -83,6 +85,8 @@ class SeguimientoController extends BaseController {
 				//$rows = $rows->with('registroAvance');
 				$rows = $rows->with(array('registroAvance'=>function($query){
 					$query->select('id','idProyecto','mes',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'),DB::raw('count(idNivel) as registros'))->groupBy('idProyecto','mes');
+				},'evaluacionMeses'=>function($query) use ($mes_actual){
+					$query->where('mes','=',$mes_actual);
 				}));
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				
@@ -214,6 +218,30 @@ class SeguimientoController extends BaseController {
 		$parametros = Input::all();
 
 		try{
+			$mes_actual = Util::obtenerMesActual();
+			$seguimiento_mes = EvaluacionProyectoMes::where('idProyecto','=',$parametros['id-proyecto'])
+													->where('mes','=',$mes_actual)
+													->first();
+			
+			
+			if($seguimiento_mes){
+				switch ($seguimiento_mes->idEstatus) {
+					case 2:
+						$respuesta['data']['data'] = 'El proyecto se encuentra en proceso de revisión, por tanto no es posible editarlo';
+						break;
+					case 4:
+						$respuesta['data']['data'] = 'El proyecto se encuentra registrado, por tanto no es posible editarlo';
+						break;
+					case 5:
+						$respuesta['data']['data'] = 'El proyecto ya fue firmado, por tanto no es posible editarlo';
+						break;
+					default:
+						$respuesta['data']['data'] = 'El estatus del proyecto es desconocido';
+						break;
+				}
+				throw new Exception("El proyecto se encuentra en un estatus en el que no esta disponible para edición", 1);
+			}
+
 			if($parametros['guardar'] == 'avance-metas'){
 				$respuesta = $this->guardarAvance($parametros);
 				if($respuesta['http_status'] != 200){
@@ -286,6 +314,50 @@ class SeguimientoController extends BaseController {
 		$respuesta['data'] = array("data"=>'');
 		try{
 			$parametros = Input::all();
+
+			$mes_actual = Util::obtenerMesActual();
+
+			if($parametros['guardar'] == 'validar-seguimiento'){
+				$seguimiento_mes = EvaluacionProyectoMes::where('idProyecto','=',$id)->where('mes','=',$mes_actual)->first();
+				if(!$seguimiento_mes){
+					$seguimiento_mes = new EvaluacionProyectoMes;
+					$seguimiento_mes->idEstatus = 1;
+					$seguimiento_mes->mes = $mes_actual;
+					$seguimiento_mes->idProyecto = $id;
+				}
+
+				if($seguimiento_mes->idEstatus == 1 || $seguimiento_mes->idEstatus == 3){
+					//$seguimiento_mes->load('beneficiarios','componentes','actividades');
+					$seguimiento_mes->idEstatus = 2;
+					$seguimiento_mes->save();
+					$respuesta['data'] = 'El Proyecto fue enviado a Revisión';
+					return $respuesta;
+				}
+			}else{
+				$seguimiento_mes = EvaluacionProyectoMes::where('idProyecto','=',$parametros['id-proyecto'])
+														->where('mes','=',$mes_actual)
+														->first();
+			}
+
+			if($seguimiento_mes){
+				switch ($seguimiento_mes->idEstatus) {
+					case 2:
+						$respuesta['data']['data'] = 'El proyecto se encuentra en proceso de revisión, por tanto no es posible editarlo';
+						break;
+					case 4:
+						$respuesta['data']['data'] = 'El proyecto se encuentra registrado, por tanto no es posible editarlo';
+						break;
+					case 5:
+						$respuesta['data']['data'] = 'El proyecto ya fue firmado, por tanto no es posible editarlo';
+						break;
+					default:
+						$respuesta['data']['data'] = 'El estatus del proyecto es desconocido';
+						break;
+				}
+				throw new Exception("El proyecto se encuentra en un estatus en el que no esta disponible para edición", 1);
+			}
+
+
 
 			if($parametros['guardar'] == 'avance-metas'){
 				$respuesta = $this->guardarAvance($parametros,$id);

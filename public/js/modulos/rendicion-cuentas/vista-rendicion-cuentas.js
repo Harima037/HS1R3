@@ -26,6 +26,28 @@ $('#btn-proyecto-cancelar').on('click',function(){
     }
 });
 
+$('#btn-enviar-proyecto').on('click',function(){
+    parametros = 'guardar=validar-seguimiento';
+
+    moduloResource.put($('#id').val(),parametros,{
+        _success: function(response){
+            MessageManager.show({data:response.data,type:'OK',timer:6});
+        },
+        _error: function(response){
+            try{
+                var json = $.parseJSON(response.responseText);
+                if(!json.code)
+                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                else{
+                    MessageManager.show(json);
+                }
+                Validation.formValidate(json.data);
+            }catch(e){
+                console.log(e);
+            }                       
+        }
+    });
+});
 
 /********************************************************************************************************************************
         Inicio: Seguimiento de Metas
@@ -43,7 +65,7 @@ $('#btn-guardar-avance').on('click',function(){
         }
     }
     var parametros = $('#form_avance').serialize();
-    parametros += '&guardar=avance-metas';
+    parametros += '&guardar=avance-metas&id-proyecto='+$('#id').val();
 
     Validation.cleanFormErrors('#form_avance');
 
@@ -267,7 +289,7 @@ function enviar_datos_municipio(jurisdiccion){
     }
 
     var parametros = $('#form_avance').serialize();
-    parametros += '&guardar=avance-localidad-metas&clave-municipio='+municipio;
+    parametros += '&guardar=avance-localidad-metas&clave-municipio='+municipio+'&id-proyecto='+$('#id').val();
 
     Validation.cleanFormErrors('#form_avance');
 
