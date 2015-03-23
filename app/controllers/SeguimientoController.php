@@ -68,8 +68,6 @@ class SeguimientoController extends BaseController {
 
 	public function rendicionCuentas($id){
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
-		$datos['sys_activo'] = SysGrupoModulo::findByKey('RENDCUENTA');
-		$datos['sys_mod_activo'] = SysModulo::findByKey('RENDINST');
 		$datos['usuario'] = Sentry::getUser();
 
 		$mes_actual = Util::obtenerMesActual();
@@ -97,7 +95,7 @@ class SeguimientoController extends BaseController {
 						7=>'Julio',8=>'Agosto',9=>'Septiembre',10=>'Octubre',11=>'Noviembre',12=>'Dicembre');
 
 		$datos['mes_clave'] = Util::obtenerMesActual();
-		$datos['mes'] = $meses[Util::obtenerMesActual()];
+		$datos['mes'] = $meses[$datos['mes_clave']];
 		$mes_del_trimestre = Util::obtenerMesTrimestre();
 		if($mes_del_trimestre == 3){
 			$datos['trimestre_activo'] = TRUE;
@@ -116,8 +114,17 @@ class SeguimientoController extends BaseController {
 			$datos['id_analisis'] = '';
 		}
 
+		$datos['sys_activo'] = SysGrupoModulo::findByKey('RENDCUENTA');
+
+		if($proyecto->idClasificacionProyecto == 1){
+			$datos['sys_mod_activo'] = SysModulo::findByKey('RENDINST');
+			$permiso = 'RENDCUENTA.RENDINST.R';
+		}else{
+			$datos['sys_mod_activo'] = SysModulo::findByKey('RENDINV');
+			$permiso = 'RENDCUENTA.RENDINV.R';
+		}
+		
 		$uri = 'rendicion-cuentas.vista-captura-rendicion-institucional';
-		$permiso = 'RENDCUENTA.RENDINST.C';
 		
 		if(Sentry::hasAccess($permiso)){
 			return View::make($uri)->with($datos);

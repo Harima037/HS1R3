@@ -39,7 +39,7 @@ class ReporteEvaluacionController extends BaseController {
 			$query->where('mes','<=',$mes_actual)->orderBy('mes','ASC');
 		},'componentes.actividades.metasMes'=>function($query) use ($mes_actual){
 			$query->where('mes','<=',$mes_actual)->orderBy('mes','ASC');
-		}))->find($id);
+		}),'liderProyecto')->find($id);
 
 		if($recurso->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
 			$jurisdicciones = Jurisdiccion::all();
@@ -167,7 +167,12 @@ class ReporteEvaluacionController extends BaseController {
 			for ($i=1; $i <= $mes_actual ; $i++) {
 
 				$datos['mes'] = $data['meses'][$i];
-				$datos['proyecto'] = $data['recurso'];
+				$datos['proyecto'] = array(
+					'ejercicio' => $data['recurso']->ejercicio,
+					'nombreTecnico' => $data['recurso']->nombreTecnico,
+					'ClavePresupuestaria' => $data['recurso']->ClavePresupuestaria,
+					'liderProyecto' => $data['recurso']->liderProyecto->nombre
+				);
 				$datos['componentes'] = $data['componentes'];
 				$datos['avances_mes']['componentes'] = $data['avances_mes']['componentes'][$i];
 				$datos['avances_mes']['actividades'] = $data['avances_mes']['actividades'][$i];

@@ -12,7 +12,11 @@
 =====================================*/
 
 // Inicialización General para casi cualquier módulo
-var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/seguimiento');
+if($('#btn-proyecto-cancelar').attr('data-clase-proyecto') == 1){
+    var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/rend-cuenta-inst');
+}else if($('#btn-proyecto-cancelar').attr('data-clase-proyecto') == 2){
+    var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/rend-cuenta-inv');
+}
 
 $('#btn-proyecto-cancelar').on('click',function(){
     if($(this).attr('data-clase-proyecto') == 1){
