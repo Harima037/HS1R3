@@ -25,6 +25,9 @@
 		.negrita{
 			font-weight: bold;
 		}
+		.linea-firma{
+			border-bottom: 1 solid #000000;
+		}
 		.texto-medio{
 			vertical-align: middle;
 		}
@@ -125,7 +128,7 @@
 		</tr>
 
 		@foreach($componentes as $index => $componente)
-		<tr class="tabla-datos">
+		<tr height="38" class="tabla-datos">
 			<td>Componente {{$index+1}}</td>
 			<td>{{$componente['indicador']}}</td>
 			<td>{{$avances_mes['componentes'][$componente['id']]['meta_programada']}}</td>
@@ -134,14 +137,14 @@
 			<td>{{$avances_mes['componentes'][$componente['id']]['avance_acumulado']}}</td>
 			<td>{{
 				(($avances_mes['componentes'][$componente['id']]['avance_acumulado']/$avances_mes['componentes'][$componente['id']]['meta_programada'])*100)
-			}}</td>
+			}} %</td>
 			<td></td>
 			<td>{{$avances_mes['componentes'][$componente['id']]['analisis_resultados']}}</td>
 			<td>{{$avances_mes['componentes'][$componente['id']]['justificacion_acumulada']}}</td>
 		</tr>
 
 		@foreach($componente['actividades'] as $indice => $actividad)
-		<tr class="tabla-datos">
+		<tr height="38" class="tabla-datos">
 			<td>Actividad {{$index+1}}.{{$indice+1}}</td>
 			<td>{{$actividad['indicador']}}</td>
 			<td>{{$avances_mes['actividades'][$actividad['id']]['meta_programada']}}</td>
@@ -150,7 +153,7 @@
 			<td>{{$avances_mes['actividades'][$actividad['id']]['avance_acumulado']}}</td>
 			<td>{{
 				(($avances_mes['actividades'][$actividad['id']]['avance_acumulado']/$avances_mes['actividades'][$actividad['id']]['meta_programada'])*100)
-			}}</td>
+			}} %</td>
 			<td></td>
 			<td>{{$avances_mes['actividades'][$actividad['id']]['analisis_resultados']}}</td>
 			<td>{{$avances_mes['actividades'][$actividad['id']]['justificacion_acumulada']}}</td>
@@ -165,28 +168,28 @@
 
 
 
-		<tr>
+		<tr class="negrita" height="20">
 			<td></td>
 			<td colspan="2" align="center">RESPONSABLE DE LA INFORMACIÓN</td>
 			<td colspan="2"></td>
 			<td colspan="4" align="center">LIDER DEL PROYECTO</td>
 			<td></td>
 		</tr>
-		<tr>
+		<tr height="40">
 			<td></td>
-			<td colspan="2" align="center">______________________________________</td>
+			<td colspan="2" class="linea-firma"></td>
 			<td colspan="2"></td>
-			<td colspan="4" align="center">______________________________________</td>
+			<td colspan="4" class="linea-firma"></td>
 			<td></td>
 		</tr>
-		<tr>
+		<tr class="negrita" height="20">
 			<td></td>
 			<td colspan="2" align="center">Nombre</td>
 			<td colspan="2"></td>
 			<td colspan="4" align="center">Nombre</td>
 			<td></td>
 		</tr>
-		<tr>
+		<tr class="negrita" height="20">
 			<td></td>
 			<td colspan="2" align="center">Cargo</td>
 			<td colspan="2"></td>
@@ -206,40 +209,81 @@
 			<td class="encabezado-tabla">% DE AVANCE MODIFICADO</td>
 		</tr>
 
-		@for ($componentes = 1; $componentes <= 8; $componentes++)
-		<tr class="tabla-datos">
-			<td class="subtitulo-tabla">Componente {{$componentes}}</td>
-			<td class="subtitulo-tabla">Indicador del Componente o Actividad</td>
+		@foreach($componentes as $index => $componente)
+		<tr height="20" class="tabla-datos">
+			<td class="subtitulo-tabla">Componente {{$index+1}}</td>
+			<td class="subtitulo-tabla">{{$componente['indicador']}}</td>
+			<td class="subtitulo-tabla">{{$avances_mes['componentes'][$componente['id']]['meta_programada']}}</td>
 			<td class="subtitulo-tabla"></td>
-			<td class="subtitulo-tabla"></td>
-			<td class="subtitulo-tabla"></td>
-			<td class="subtitulo-tabla"></td>
-			<td class="subtitulo-tabla"></td>
+			<td class="subtitulo-tabla">{{$avances_mes['componentes'][$componente['id']]['avance_mes']}}</td>
+			<td class="subtitulo-tabla">{{$avances_mes['componentes'][$componente['id']]['avance_acumulado']}}</td>
+			<td class="subtitulo-tabla">{{
+				(($avances_mes['componentes'][$componente['id']]['avance_acumulado']/$avances_mes['componentes'][$componente['id']]['meta_programada'])*100)
+			}}</td>
 			<td class="subtitulo-tabla"></td>
 		</tr>
-		<tr class="tabla-datos">
-			<td></td>
-			<td>Oficina Central</td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-		@for ($jurisdicciones = 0; $jurisdicciones < 10; $jurisdicciones++)
-		<tr class="tabla-datos">
-			<td></td>
-			<td>Jurisdiccion {{$jurisdicciones}}</td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-		</tr>
-		@endfor
-		@endfor
+
+			@foreach($jurisdicciones as $clave => $jurisdiccion)
+			<tr height="20" class="tabla-datos">
+				<td></td>
+				<td>{{$clave}} {{$jurisdiccion}}</td>
+				@if(isset($jurisdicciones_mes['componentes'][$componente['id']][$clave]))
+					<td>{{$jurisdicciones_mes['componentes'][$componente['id']][$clave]['meta_programada']}}</td>
+					<td></td>
+					<td>{{$jurisdicciones_mes['componentes'][$componente['id']][$clave]['avance_mes']}}</td>
+					<td>{{$jurisdicciones_mes['componentes'][$componente['id']][$clave]['avance_acumulado']}}</td>
+					<td>{{
+						(($jurisdicciones_mes['componentes'][$componente['id']][$clave]['avance_acumulado']/$jurisdicciones_mes['componentes'][$componente['id']][$clave]['meta_programada'])*100)
+					}} %</td>
+				@else
+					<td>0</td>
+					<td></td>
+					<td>0</td>
+					<td>0</td>
+					<td></td>
+				@endif
+				<td></td>
+			</tr>
+			@endforeach
+
+			@foreach($componente['actividades'] as $indice => $actividad)
+			<tr height="20" class="tabla-datos">
+				<td class="subtitulo-tabla">Actividad {{$index+1}}.{{$indice+1}}</td>
+				<td class="subtitulo-tabla">{{$actividad['indicador']}}</td>
+				<td class="subtitulo-tabla">{{$avances_mes['actividades'][$actividad['id']]['meta_programada']}}</td>
+				<td class="subtitulo-tabla"></td>
+				<td class="subtitulo-tabla">{{$avances_mes['actividades'][$actividad['id']]['avance_mes']}}</td>
+				<td class="subtitulo-tabla">{{$avances_mes['actividades'][$actividad['id']]['avance_acumulado']}}</td>
+				<td class="subtitulo-tabla">{{
+					(($avances_mes['actividades'][$actividad['id']]['avance_acumulado']/$avances_mes['actividades'][$actividad['id']]['meta_programada'])*100)
+				}}</td>
+				<td class="subtitulo-tabla"></td>
+			</tr>
+
+				@foreach($jurisdicciones as $clave => $jurisdiccion)
+				<tr height="20" class="tabla-datos">
+					<td></td>
+					<td>{{$clave}} {{$jurisdiccion}}</td>
+					@if(isset($jurisdicciones_mes['actividades'][$actividad['id']][$clave]))
+						<td>{{$jurisdicciones_mes['actividades'][$actividad['id']][$clave]['meta_programada']}}</td>
+						<td></td>
+						<td>{{$jurisdicciones_mes['actividades'][$actividad['id']][$clave]['avance_mes']}}</td>
+						<td>{{$jurisdicciones_mes['actividades'][$actividad['id']][$clave]['avance_acumulado']}}</td>
+						<td>{{
+							(($jurisdicciones_mes['actividades'][$actividad['id']][$clave]['avance_acumulado']/$jurisdicciones_mes['actividades'][$actividad['id']][$clave]['meta_programada'])*100)
+						}} %</td>
+					@else
+						<td>0</td>
+						<td></td>
+						<td>0</td>
+						<td>0</td>
+						<td></td>
+					@endif
+					<td></td>
+				</tr>
+				@endforeach
+			@endforeach
+		@endforeach
 	</table>
 </body>
 </html>

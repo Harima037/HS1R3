@@ -292,7 +292,7 @@
 					                		</tr>
 				                		</thead>
 				                	</table>
-				                	<div style="max-height:200px; overflow-x:auto;">
+				                	<div style="max-height:300px; overflow-x:auto;">
 				                		<table class="table table-condensed table-bordered tabla-avance-localidades">
 				                			<thead>
 					                			<tr>
@@ -311,6 +311,18 @@
 					                		<tbody></tbody>
 					                	</table>
 				                	</div>
+				                	<table class="table table-condensed tabla-totales-municipio">
+				                		<tfoot>
+				                			<tr>
+					                			<th>Meta Programada Acumulada</th>
+					                			<td class="total-municipio-meta">0</td>
+					                			<th>Avance Acumulado</th>
+					                			<td class="total-municipio-avance">0</td>
+					                			<th>Porcentaje de Avance</th>
+					                			<td class="total-municipio-porcentaje">0%</td>
+					                		</tr>
+				                		</tfoot>
+				                	</table>
 			                	</div>
 							</div>
 							<div role="tabpanel" class="tab-pane" id="panel-justificacion">

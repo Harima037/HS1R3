@@ -213,7 +213,10 @@ function asignar_municipios(datos){
         
         $(row + ' td.accion-municipio').addClass('btn-link');
         $(row + ' td.accion-municipio span').addClass('caret');
-        $(row + ' td.accion-municipio').on('click',function(){ $('#desglose-avance-'+$(this).parent().attr('data-clave-jurisdiccion')).removeClass('hidden'); });
+        $(row + ' td.accion-municipio').on('click',function(){ 
+            $('.lista-localidades-jurisdiccion .btn-ocultar-avance-localidades').click();
+            $('#desglose-avance-'+$(this).parent().attr('data-clave-jurisdiccion')).removeClass('hidden'); 
+        });
 
         $(row).after('<tr id="desglose-avance-'+claveJurisdiccion+'" class="lista-localidades-jurisdiccion hidden"><td colspan="7"><div id="panel-localidades-'+claveJurisdiccion+'" class="panel panel-primary" style="margin-bottom:0;"></div></td></tr>');
 
@@ -235,6 +238,12 @@ function asignar_municipios(datos){
     $('.btn-ocultar-avance-localidades').on('click',function(){
         $('#desglose-avance-'+$(this).attr('data-jurisdiccion')+' .select-lista-municipios').val('');
         $('#panel-localidades-'+$(this).attr('data-jurisdiccion')+' table.tabla-avance-localidades tbody').empty();
+        var tabla_totales = '#panel-localidades-'+$(this).attr('data-jurisdiccion')+' table.tabla-totales-municipio tfoot';
+        $(tabla_totales + ' tr td.total-municipio-meta').text('0');
+        $(tabla_totales + ' tr td.total-municipio-avance').text('0');
+        $(tabla_totales + ' tr td.total-municipio-avance').attr('data-valor',0);
+        $(tabla_totales + ' tr td.total-municipio-porcentaje').text('0');
+        $(tabla_totales + ' tr td.total-municipio-porcentaje').attr('data-valor',0);
         $('#desglose-avance-'+$(this).attr('data-jurisdiccion')).addClass('hidden');
     });
 
@@ -286,6 +295,12 @@ function buscar_localidades(jurisdiccion,municipio){
     //sconsole.log('Jurisdiccion = '+jurisdiccion+'| Municipio = '+municipio);
     if(municipio == ''){
         $('#panel-localidades-'+jurisdiccion+' table.tabla-avance-localidades tbody').empty();
+        var tabla_totales = '#panel-localidades-'+jurisdiccion+' table.tabla-totales-municipio tfoot';
+        $(tabla_totales + ' tr td.total-municipio-meta').text('0');
+        $(tabla_totales + ' tr td.total-municipio-meta').attr('data-valor',0);
+        $(tabla_totales + ' tr td.total-municipio-avance').text('0');
+        $(tabla_totales + ' tr td.total-municipio-avance').attr('data-valor',0);
+        $(tabla_totales + ' tr td.total-municipio-porcentaje').text('0');
         return false;
     }
     var parametros = {
@@ -299,6 +314,8 @@ function buscar_localidades(jurisdiccion,municipio){
             var tabla = '#panel-localidades-'+jurisdiccion+' table.tabla-avance-localidades tbody';
             $(tabla).empty();
             var html_rows = '';
+            var suma_metas = 0;
+            var suma_avances = 0;
             for(var i in response.data){
                 var dato = response.data[i];
                 if(dato.metas_mes.length > 0){
@@ -324,8 +341,19 @@ function buscar_localidades(jurisdiccion,municipio){
                                 '<td><div class="form-group"><input name="localidad-avance-mes['+dato.claveLocalidad+']" id="localidad_avance_mes_'+dato.claveLocalidad+'" type="number" class="form-control localidad-avance" value="'+datos_meta.avance+'" data-localidad="'+dato.claveLocalidad+'" data-jurisdiccion="'+jurisdiccion+'"></div></td>' + 
                                 '<td class="localidad-avance-acumulado" data-avance-acumulado="'+avance_anterior+'">'+avance_anterior.format()+'</td>' +
                                 '<td class="localidad-total-avance bg-info" data-avance-total="'+datos_acumulado.avance+'">'+datos_acumulado.avance.format()+'</td></tr>';
+                suma_metas += datos_acumulado.meta;
+                suma_avances += datos_acumulado.avance;
             }
             $(tabla).html(html_rows);
+
+            var tabla_totales = '#panel-localidades-'+jurisdiccion+' table.tabla-totales-municipio tfoot';
+            $(tabla_totales + ' tr td.total-municipio-meta').attr('data-valor',suma_metas);
+            $(tabla_totales + ' tr td.total-municipio-meta').text(suma_metas.format());
+            $(tabla_totales + ' tr td.total-municipio-avance').attr('data-valor',suma_avances);
+            $(tabla_totales + ' tr td.total-municipio-avance').text(suma_avances.format());
+            var porcentaje = parseFloat(((suma_avances * 100) / suma_metas).toFixed(2)) || 0;
+            $(tabla_totales + ' tr td.total-municipio-porcentaje').text(porcentaje.format() + ' %');
+
             $('.localidad-avance').on('keyup',function(){ $(this).change() });
             $('.localidad-avance').on('change',function(){
                 var jurisdiccion = $(this).attr('data-jurisdiccion');
@@ -336,8 +364,24 @@ function buscar_localidades(jurisdiccion,municipio){
                 var avance_acumulado = parseFloat($(row + ' td.localidad-avance-acumulado').attr('data-avance-acumulado')) || 0;
                 avance_acumulado += parseFloat($(this).val()) || 0;
 
+                var avance_anterior = parseFloat($(row + ' td.localidad-total-avance').attr('data-avance-total')) || 0;
+
                 $(row + ' td.localidad-total-avance').attr('data-avance-total',avance_acumulado);
                 $(row + ' td.localidad-total-avance').text(avance_acumulado.format());
+
+                var tabla_totales = '#panel-localidades-'+jurisdiccion+' table.tabla-totales-municipio tfoot tr';
+
+                var total_metas = parseFloat($(tabla_totales + ' td.total-municipio-meta').attr('data-valor')) || 0;
+                var total_avance = parseFloat($(tabla_totales + ' td.total-municipio-avance').attr('data-valor')) || 0;
+
+                total_avance -= avance_anterior;
+                total_avance += avance_acumulado;
+
+                $(tabla_totales + ' td.total-municipio-avance').attr('data-valor',total_avance);
+                $(tabla_totales + ' td.total-municipio-avance').text(total_avance.format());
+
+                var porcentaje = parseFloat(((total_avance * 100) / total_metas).toFixed(2)) || 0;
+                $(tabla_totales + ' td.total-municipio-porcentaje').text(porcentaje.format() + ' %');
             });
         }
     });

@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, View;
-use Excel, Proyecto, FIBAP, ComponenteMetaMes, ActividadMetaMes;
+use Excel, Proyecto, FIBAP, ComponenteMetaMes, ActividadMetaMes,Jurisdiccion,Municipio,Region;
 
 class ReporteEvaluacionController extends BaseController {
 
@@ -40,7 +40,15 @@ class ReporteEvaluacionController extends BaseController {
 		},'componentes.actividades.metasMes'=>function($query) use ($mes_actual){
 			$query->where('mes','<=',$mes_actual)->orderBy('mes','ASC');
 		}))->find($id);
-		//$recurso->componentes->load('registroAvance');
+
+		if($recurso->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
+			$jurisdicciones = Jurisdiccion::all();
+		}elseif($recurso->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
+			$jurisdicciones = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
+		}elseif($recurso->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
+			$jurisdicciones = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
+		}
+		$data['jurisdicciones'] = array('OC'=>'Oficina Central') + $jurisdicciones->lists('nombre','clave');
 
 		$nombreArchivo = ($recurso->idClasificacionProyecto== 2) ? 'Rendición de Cuentas Inversión' : 'Rendición de Cuentas Institucional';
 		$nombreArchivo.=' - '.$recurso->ClavePresupuestaria;
@@ -62,8 +70,8 @@ class ReporteEvaluacionController extends BaseController {
 		);
 		$data['recurso'] = $recurso;
 		$data['componentes'] = array();
-		$data['avances_mes'] = array();
-		$data['jurisdicciones_mes'] = array();
+		$data['avances_mes'] = array('componentes'=>array(),'actividades'=>array());
+		$data['jurisdicciones_mes'] = array('componentes'=>array(),'actividades'=>array());
 		$data['conteo_elementos'] = 0;
 		foreach ($recurso->componentes as $componente) {
 			$data['conteo_elementos']++;
@@ -77,7 +85,7 @@ class ReporteEvaluacionController extends BaseController {
 			foreach ($componente->registroAvance as $avance){
 				$avance_acumulado += $avance->avanceMes;
 				$data['avances_mes']['componentes'][$avance->mes][$componente->id] = array(
-					'meta_programada' => 0,
+					'meta_programada' => 0.0,
 					'avance_mes' => $avance->avanceMes,
 					'avance_acumulado' => $avance_acumulado,
 					'analisis_resultados' => $avance->analisisResultados,
@@ -89,6 +97,7 @@ class ReporteEvaluacionController extends BaseController {
 			$meta_mes_programada = 0;
 			$metas_programada = array();
 			$avance_acumulado = array();
+			
 			foreach ($componente->metasMes as $meta_mes){
 				if(!isset($metas_programada[$meta_mes->claveJurisdiccion])){
 					$metas_programada[$meta_mes->claveJurisdiccion] = 0;
@@ -96,7 +105,7 @@ class ReporteEvaluacionController extends BaseController {
 				}
 
 				$meta_mes_programada += $meta_mes->meta;
-				$data['avances_mes']['componentes'][$meta_mes->mes][$componente->id]['meta_programada'] += $meta_mes_programada;
+				$data['avances_mes']['componentes'][$meta_mes->mes][$componente->id]['meta_programada'] += $meta_mes->meta;
 
 				$metas_programada[$meta_mes->claveJurisdiccion] += $meta_mes->meta;
 				$avance_acumulado[$meta_mes->claveJurisdiccion] += $meta_mes->avance;
@@ -136,7 +145,7 @@ class ReporteEvaluacionController extends BaseController {
 					}
 
 					$meta_mes_programada += $meta_mes->meta;
-					$data['avances_mes']['actividades'][$meta_mes->mes][$actividad->id]['meta_programada'] += $meta_mes_programada;
+					$data['avances_mes']['actividades'][$meta_mes->mes][$actividad->id]['meta_programada'] += $meta_mes->meta;
 
 					$metas_programada[$meta_mes->claveJurisdiccion] += $meta_mes->meta;
 					$avance_acumulado[$meta_mes->claveJurisdiccion] += $meta_mes->avance;
@@ -151,9 +160,6 @@ class ReporteEvaluacionController extends BaseController {
 			$data['componentes'][] = $datos_componente;
 		}
 		//var_dump($data);die();
-		/*$datos['mes'] = $data['meses'][1];
-		$datos['proyecto'] = $data['recurso'];
-		return View::make('rendicion-cuentas.excel.seguimiento-metas-mes')->with($datos);*/
 
 		Excel::create($nombreArchivo, function($excel) use ($data){
 
@@ -168,13 +174,18 @@ class ReporteEvaluacionController extends BaseController {
 				$datos['jurisdicciones_mes']['componentes'] = $data['jurisdicciones_mes']['componentes'][$i];
 				$datos['jurisdicciones_mes']['actividades'] = $data['jurisdicciones_mes']['actividades'][$i];
 
+				$datos['jurisdicciones'] = $data['jurisdicciones'];
+
 				$excel->sheet('SM '.$datos['mes']['abrev'], function($sheet)  use ($datos){
 			        $sheet->loadView('rendicion-cuentas.excel.seguimiento-metas-mes', $datos);
 			    });
 
 			    $excel->getActiveSheet()->getStyle('A7:J7')->getAlignment()->setWrapText(true); 
 			    $excel->getActiveSheet()->getStyle('A10:J10')->getAlignment()->setWrapText(true); 
+
 			    $elementos = $data['conteo_elementos'];
+			    $excel->getActiveSheet()->getStyle('A11:J'.(11 + $elementos))->getAlignment()->setWrapText(true); 
+
 			    $numero_fila = 10 + $elementos + 8;
 			    $excel->getActiveSheet()->getStyle('A'.$numero_fila.':J'.$numero_fila)->getAlignment()->setWrapText(true); 
 			}
