@@ -55,18 +55,18 @@ class ReporteEvaluacionController extends BaseController {
 
 		$data['mes_actual'] = $mes_actual;
 		$data['meses'] = array(
-			1 => array('mes'=>'Enero',			'abrev'=>'ENE'),
-			2 => array('mes'=>'Febrero',		'abrev'=>'FEB'),
-			3 => array('mes'=>'Marzo',			'abrev'=>'MAR'),
-			4 => array('mes'=>'Abril',			'abrev'=>'ABR'),
-			5 => array('mes'=>'Mayo',			'abrev'=>'MAy'),
-			6 => array('mes'=>'Junio',			'abrev'=>'JUN'),
-			7 => array('mes'=>'Julio',			'abrev'=>'JUL'),
-			8 => array('mes'=>'Agosto',			'abrev'=>'AGO'),
-			9 => array('mes'=>'Septiembre',		'abrev'=>'SEP'),
-			10 => array('mes'=>'Octubre',		'abrev'=>'OCT'),
-			11 => array('mes'=>'Noviembre',		'abrev'=>'NOV'),
-			12 => array('mes'=>'Dicembre',		'abrev'=>'DIC')
+			1 => array('mes'=>'Enero',			'abrev'=>'ENE',	'trimestre'=>1),
+			2 => array('mes'=>'Febrero',		'abrev'=>'FEB',	'trimestre'=>1),
+			3 => array('mes'=>'Marzo',			'abrev'=>'MAR',	'trimestre'=>1),
+			4 => array('mes'=>'Abril',			'abrev'=>'ABR',	'trimestre'=>2),
+			5 => array('mes'=>'Mayo',			'abrev'=>'MAy',	'trimestre'=>2),
+			6 => array('mes'=>'Junio',			'abrev'=>'JUN',	'trimestre'=>2),
+			7 => array('mes'=>'Julio',			'abrev'=>'JUL',	'trimestre'=>3),
+			8 => array('mes'=>'Agosto',			'abrev'=>'AGO',	'trimestre'=>3),
+			9 => array('mes'=>'Septiembre',		'abrev'=>'SEP',	'trimestre'=>3),
+			10 => array('mes'=>'Octubre',		'abrev'=>'OCT',	'trimestre'=>4),
+			11 => array('mes'=>'Noviembre',		'abrev'=>'NOV',	'trimestre'=>4),
+			12 => array('mes'=>'Dicembre',		'abrev'=>'DIC',	'trimestre'=>4)
 		);
 		$data['recurso'] = $recurso;
 		$data['componentes'] = array();
@@ -228,6 +228,15 @@ class ReporteEvaluacionController extends BaseController {
 
 			    $numero_fila = 10 + $elementos + 8;
 			    $excel->getActiveSheet()->getStyle('A'.$numero_fila.':J'.$numero_fila)->getAlignment()->setWrapText(true); 
+
+			    $datos_beneficiarios['proyecto'] = $datos['proyecto'];
+			    $datos_beneficiarios['mes'] = $data['meses'][$i];
+			    if(($i % 3) == 0){
+			    	$excel->sheet('SB'.$datos['mes']['trimestre'].'TRIM', function($sheet)  use ($datos_beneficiarios){
+				        $sheet->loadView('rendicion-cuentas.excel.seguimiento-beneficiarios', $datos_beneficiarios);
+				    });
+				    $excel->getActiveSheet()->getStyle('A9:O9')->getAlignment()->setWrapText(true); 
+			    }
 			}
 		})->export('xls');
 
