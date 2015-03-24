@@ -45,8 +45,8 @@
 	    		<div class="row">
 	    			<div class="col-sm-12">
 	    				<div class="form-group">
-	    					<label class="control-label" for="finalidad-proyecto">Finalidad del Proyecto</label>
-	    					<textarea id="finalidad-proyecto" name="finalidad-proyecto" rows="4" class="form-control"></textarea>
+	    					<label class="control-label" for="finalidad">Finalidad del Proyecto</label>
+	    					<textarea id="finalidad" name="finalidad" rows="4" class="form-control"></textarea>
 	    				</div>
 	    			</div>
 	    			<div class="col-sm-12">
@@ -57,8 +57,8 @@
 	    			</div>
 	    			<div class="col-sm-12">
 	    				<div class="form-group">
-	    					<label class="control-label" for="beneficiarios">Beneficiarios</label>
-	    					<textarea id="beneficiarios" name="beneficiarios" rows="4" class="form-control"></textarea>
+	    					<label class="control-label" for="analisis-beneficiarios">Beneficiarios</label>
+	    					<textarea id="analisis-beneficiarios" name="analisis-beneficiarios" rows="4" class="form-control"></textarea>
 	    				</div>
 	    			</div>
 	    			<div class="col-sm-12">

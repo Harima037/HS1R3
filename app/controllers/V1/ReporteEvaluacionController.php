@@ -105,7 +105,19 @@ class ReporteEvaluacionController extends BaseController {
 				}
 
 				$meta_mes_programada += $meta_mes->meta;
-				$data['avances_mes']['componentes'][$meta_mes->mes][$componente->id]['meta_programada'] += $meta_mes->meta;
+
+				if(isset($data['avances_mes']['componentes'][$meta_mes->mes][$componente->id])){
+					$data['avances_mes']['componentes'][$meta_mes->mes][$componente->id]['meta_programada'] = $meta_mes_programada;
+				}else{
+					$data['avances_mes']['componentes'][$meta_mes->mes][$componente->id] = array(
+						'meta_programada' => $meta_mes_programada,
+						'avance_mes' => 0,
+						'avance_acumulado' => 0,
+						'analisis_resultados' => '',
+						'justificacion_acumulada' => '',
+						'plan_mejora' => 0
+					);
+				}
 
 				$metas_programada[$meta_mes->claveJurisdiccion] += $meta_mes->meta;
 				$avance_acumulado[$meta_mes->claveJurisdiccion] += $meta_mes->avance;
@@ -145,7 +157,19 @@ class ReporteEvaluacionController extends BaseController {
 					}
 
 					$meta_mes_programada += $meta_mes->meta;
-					$data['avances_mes']['actividades'][$meta_mes->mes][$actividad->id]['meta_programada'] += $meta_mes->meta;
+
+					if(isset($data['avances_mes']['actividades'][$meta_mes->mes][$actividad->id])){
+						$data['avances_mes']['actividades'][$meta_mes->mes][$actividad->id]['meta_programada'] = $meta_mes_programada;
+					}else{
+						$data['avances_mes']['actividades'][$meta_mes->mes][$actividad->id] = array(
+							'meta_programada' => $meta_mes_programada,
+							'avance_mes' => 0,
+							'avance_acumulado' => 0,
+							'analisis_resultados' => '',
+							'justificacion_acumulada' => '',
+							'plan_mejora' => 0
+						);
+					}
 
 					$metas_programada[$meta_mes->claveJurisdiccion] += $meta_mes->meta;
 					$avance_acumulado[$meta_mes->claveJurisdiccion] += $meta_mes->avance;
@@ -174,8 +198,19 @@ class ReporteEvaluacionController extends BaseController {
 					'liderProyecto' => $data['recurso']->liderProyecto->nombre
 				);
 				$datos['componentes'] = $data['componentes'];
-				$datos['avances_mes']['componentes'] = $data['avances_mes']['componentes'][$i];
-				$datos['avances_mes']['actividades'] = $data['avances_mes']['actividades'][$i];
+
+				if(isset($data['avances_mes']['componentes'][$i])){
+					$datos['avances_mes']['componentes'] = $data['avances_mes']['componentes'][$i];
+				}else{
+					$datos['avances_mes']['componentes'] = array();
+				}
+				
+				if(isset($data['avances_mes']['actividades'][$i])){
+					$datos['avances_mes']['actividades'] = $data['avances_mes']['actividades'][$i];
+				}else{
+					$datos['avances_mes']['actividades'] = array();
+				}
+				
 				$datos['jurisdicciones_mes']['componentes'] = $data['jurisdicciones_mes']['componentes'][$i];
 				$datos['jurisdicciones_mes']['actividades'] = $data['jurisdicciones_mes']['actividades'][$i];
 

@@ -58,12 +58,11 @@ moduloDatagrid.actualizar({
             
             for(var j in response.data[i].registro_avance){
                 var avance = response.data[i].registro_avance[j];
+                var clase_icono = (avance.mes == mes_activo)?'fa-unlock':'fa-circle';
                 if(parseInt(avance.planMejora) > 0){
-                    var clase_icono = (avance.mes == mes_activo)?'fa-unlock':'fa-circle';
-                    item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class="text-danger"><span class="fa '+clase_icono+'"></span></span>';
+                    item['mes_'+avance.mes] = '<span id="grid-mes-'+avance.mes+'" class="text-danger"><span class="fa '+clase_icono+'"></span></span>';
                 }else{
-                    var clase_icono = (avance.mes == mes_activo)?'fa-unlock':'fa-circle';
-                    item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class="text-success"><span class="fa '+clase_icono+'"></span></span>';
+                    item['mes_'+avance.mes] = '<span id="grid-mes-'+avance.mes+'" class="text-success"><span class="fa '+clase_icono+'"></span></span>';
                 }
             }
             datos_grid.push(item);
@@ -245,6 +244,16 @@ function cargar_datos_proyecto(e){
             }
 
             $('#btn-editar-avance').attr('data-id-proyecto',e);
+
+            if(response.data.evaluacion_meses.length){
+                if(response.data.evaluacion_meses[0].idEstatus == 4 || response.data.evaluacion_meses[0].idEstatus == 5){
+                    $('#btn-reporte').removeClass('hidden');
+                }else{
+                    $('#btn-reporte').addClass('hidden');
+                }
+            }else{
+                $('#btn-reporte').addClass('hidden');
+            }
 
             $('#modalDatosSeguimiento').modal('show');
         }

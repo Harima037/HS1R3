@@ -60,6 +60,10 @@ class Proyecto extends BaseModel
     	return $this->hasMany('RegistroAvanceMetas','idProyecto');
     }
 
+    public function registroAvanceBeneficiarios(){
+    	return $this->hasMany('RegistroAvanceBeneficiario','idProyecto');
+    }
+
     public function analisisFuncional(){
     	return $this->hasMany('EvaluacionAnalisisFuncional','idProyecto');
     }

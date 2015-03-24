@@ -225,7 +225,6 @@ function seguimiento_metas(e){
                         $('#'+id_campo).after('<p class="texto-comentario help-block"><span class="fa fa-warning"></span> '+observacion+'</p>');
                     }
                 }
-                $('.proyecto-comentario').popover();
             }
             $('#modalEditarAvance').modal('show');
         }
@@ -656,6 +655,7 @@ if((parseInt($('#mes').val()) % 3) == 0){
     var beneficiariosDatagrid = new Datagrid("#datagridBeneficiarios",moduloResource,{ formatogrid:true, pagina: 1, idProyecto: $('#id').val(), grid:'rendicion-beneficiarios'});
     beneficiariosDatagrid.init();
     beneficiariosDatagrid.actualizar({ _success: function(response){ llenar_grid_beneficiarios(response); } });
+
     function seguimiento_beneficiarios(e){
         var parametros = {'mostrar':'datos-beneficiarios-avance','id-proyecto':$('#id').val()};
         moduloResource.get(e,parametros,{
@@ -700,6 +700,12 @@ if((parseInt($('#mes').val()) % 3) == 0){
 
                         $('#rural'+avance.sexo).val(avance.rural);
                         $('#urbana'+avance.sexo).val(avance.urbana);
+                    }
+
+                    if(beneficiario.comentarios.length){
+                        var comentario = beneficiario.comentarios[0];
+                        $('#errorbeneficiarios').parent('.form-group').addClass('has-warning');
+                        $('#errorbeneficiarios').after('<p class="texto-comentario help-block"><span class="fa fa-warning"></span> '+comentario.observacion+'</p>');
                     }
                 }
 
@@ -852,6 +858,8 @@ if((parseInt($('#mes').val()) % 3) == 0){
 
     $('#modalBeneficiario').on('hide.bs.modal',function(e){
         $('#modalBeneficiario .alert').remove();
+        $('#modalBeneficiario .texto-comentario').remove();
+        $('#modalBeneficiario .has-warning').removeClass('has-warning');
         $('#form_beneficiario').get(0).reset();
         $('#form_beneficiario input[type="hidden"]').val('');
         $('#form_beneficiario .cant-benficiarios').text('0');
@@ -883,6 +891,10 @@ if((parseInt($('#mes').val()) % 3) == 0){
                 var avance = beneficiario.registro_avance[0];
                 datos_grid[beneficiario.idTipoBeneficiario][beneficiario.sexo+'-avance'] += parseInt(avance.total) || 0;
                 datos_grid[beneficiario.idTipoBeneficiario]['total-avance'] += parseInt(avance.total) || 0;
+            }
+
+            if(beneficiario.comentarios.length){
+                datos_grid[beneficiario.idTipoBeneficiario]['tipoBeneficiario'] = '<span class="fa fa-warning"></span> '+beneficiario.tipo_beneficiario.descripcion;
             }
 
             datos_grid[beneficiario.idTipoBeneficiario][beneficiario.sexo] += beneficiario.total;
@@ -920,10 +932,20 @@ if($('#id-analisis').val()){
     var parametros = 'mostrar=analisis-funcional';
     moduloResource.get($('#id-analisis').val(),parametros,{
         _success: function(response){
-            $('#finalidad-proyecto').val(response.data.finalidadProyecto);
+            $('#finalidad').val(response.data.finalidadProyecto);
             $('#analisis-resultado').val(response.data.analisisResultado);
-            $('#beneficiarios').val(response.data.beneficiarios);
+            $('#analisis-beneficiarios').val(response.data.beneficiarios);
             $('#justificacion-global').val(response.data.justificacionGlobal);
+
+            if(response.data.comentarios.length){
+                for(var i in response.data.comentarios){
+                    var comentario = response.data.comentarios[i];
+                    var id_campo = comentario.idCampo;
+                    var observacion = comentario.observacion;
+                    $('#'+id_campo).parent('.form-group').addClass('has-warning');
+                    $('#'+id_campo).after('<p class="texto-comentario help-block"><span class="fa fa-warning"></span> '+observacion+'</p>');
+                }
+            }
         },
         _error: function(response){
             try{

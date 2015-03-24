@@ -36,9 +36,10 @@ class SeguimientoController extends BaseController {
 	);
 
 	private $reglasAnalisisFuncional = array(
-		'analisis-resultado'	=> 'required',
-		'beneficiarios'			=> 'required',
-		'justificacion-global'	=> 'required'
+		'finalidad'		=> 'required',
+		'analisis-resultado'		=> 'required',
+		'analisis-beneficiarios'	=> 'required',
+		'justificacion-global'		=> 'required'
 	);
 
 	private $reglasPlanMejora = array(
@@ -72,7 +73,7 @@ class SeguimientoController extends BaseController {
 					$rows = Beneficiario::with(array('registroAvance'=>function($query){
 						$query->select('id','idProyectoBeneficiario','idTipoBeneficiario','sexo',DB::raw('sum(total) AS total'))
 								->groupBy('idTipoBeneficiario','sexo');
-					},'tipoBeneficiario'))->where('idProyecto','=',$parametros['idProyecto'])->get();
+					},'tipoBeneficiario','comentarios'))->where('idProyecto','=',$parametros['idProyecto'])->get();
 					$total = count($rows);
 				}
 			}else{
@@ -145,8 +146,11 @@ class SeguimientoController extends BaseController {
 
 		if(isset($parametros['mostrar'])){
 			if($parametros['mostrar'] == 'datos-proyecto-avance'){
-				$recurso = Proyecto::with('datosFuncion','datosSubFuncion','datosProgramaPresupuestario','componentes.metasMesAgrupado'
-					,'componentes.registroAvance','componentes.actividades.metasMesAgrupado','componentes.actividades.registroAvance','beneficiarios.registroAvance','beneficiarios.tipoBeneficiario')->find($id);
+				$mes_actual = Util::obtenerMesActual();
+				$recurso = Proyecto::with(array('datosFuncion','datosSubFuncion','datosProgramaPresupuestario','componentes.metasMesAgrupado','componentes.registroAvance','componentes.actividades.metasMesAgrupado','componentes.actividades.registroAvance','beneficiarios.registroAvance','beneficiarios.tipoBeneficiario',
+					'evaluacionMeses'=>function($query) use ($mes_actual){
+						$query->where('mes','=',$mes_actual);
+					}))->find($id);
 			}elseif ($parametros['mostrar'] == 'datos-municipio-avance') {
 				//$id = idComponente y $parametros['clave-municipio'] y $parametros['nivel'] = 'componente'
 				$mes_actual = Util::obtenerMesActual();
@@ -190,9 +194,9 @@ class SeguimientoController extends BaseController {
 														->select('idTipoBeneficiario','sexo',DB::raw('sum(total) AS total'))->get();
 				$recurso['beneficiario'] = Beneficiario::with(array('tipoBeneficiario','registroAvance'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
-				}))->where('idProyecto','=',$parametros['id-proyecto'])->where('idTipoBeneficiario','=',$id)->get();
+				},'comentarios'))->where('idProyecto','=',$parametros['id-proyecto'])->where('idTipoBeneficiario','=',$id)->get();
 			}elseif ($parametros['mostrar'] == 'analisis-funcional') {
-				$recurso = EvaluacionAnalisisFuncional::find($id);
+				$recurso = EvaluacionAnalisisFuncional::with('comentarios')->find($id);
 			}
 		}
 
@@ -270,9 +274,9 @@ class SeguimientoController extends BaseController {
 						$recurso = new EvaluacionAnalisisFuncional;
 						$recurso->mes 					= $mes_actual;
 						$recurso->idProyecto 			= $parametros['id-proyecto'];
-						$recurso->finalidadProyecto		= $parametros['finalidad-proyecto'];
+						$recurso->finalidadProyecto		= $parametros['finalidad'];
 						$recurso->analisisResultado 	= $parametros['analisis-resultado'];
-						$recurso->beneficiarios 		= $parametros['beneficiarios'];
+						$recurso->beneficiarios 		= $parametros['analisis-beneficiarios'];
 						$recurso->justificacionGlobal 	= $parametros['justificacion-global'];
 
 						if($recurso->save()){
@@ -321,33 +325,36 @@ class SeguimientoController extends BaseController {
 			$mes_actual = Util::obtenerMesActual();
 
 			if($parametros['guardar'] == 'validar-seguimiento'){
-				$recurso = Proyecto::with(array('componentes.registroAvance'=>function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'actividades.registroAvance'=>function($query) use ($mes_actual){
+				$recurso = Proyecto::with(array('actividades','componentes','registroAvance'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
 				}))->find($id);
 
 				$elementos = count($recurso->componentes);
-				$registro_elementos = 0;
-				foreach ($recurso->componentes as $componente) {
-					if(count($componente->registroAvance)){
-						$registro_elementos++;
-					}
-				}
-
 				$elementos += count($recurso->actividades);
-				foreach ($recurso->actividades as $actividad) {
-					if(count($actividad->registroAvance)){
-						$registro_elementos++;
-					}
-				}
+				$registro_elementos = count($recurso->registroAvance);
 
 				if($elementos != $registro_elementos){
-					$respuesta['data']['data'] = 'No se ha podido enviar el proyecto a revisión ya que hacen falta avances por capturar';
-					throw new Exception('Se han capturado '.$registro_elementos.' de '.$elementos.' elementos.', 1);
+					$respuesta['data']['data']='No se ha podido enviar el proyecto a revisión ya que hacen falta avances por capturar';
+					throw new Exception('Se han capturado el avance en '.$registro_elementos.' de '.$elementos.' elementos.', 1);
 				}
 
-				//checar si tiene analisis y beneficiarios cuando sea trimestral
+				if(($mes_actual % 3) == 0){
+					$recurso->load(array('beneficiarios','analisisFuncional'=>function($query) use ($mes_actual){
+						$query->where('mes','=',$mes_actual);
+					},'registroAvanceBeneficiarios'=>function($query) use ($mes_actual){
+						$query->where('mes','=',$mes_actual);
+					}));
+
+					if(count($recurso->beneficiarios) != count($recurso->registroAvanceBeneficiarios)){
+						$respuesta['data']['data']='No se ha podido enviar el proyecto a revisión ya que no se ha capturado en su totalidad el avance de beneficiarios';
+						throw new Exception('Se han capturado '.count($recurso->registroAvanceBeneficiarios).' de '.count($recurso->beneficiarios).' Beneficiarios.', 1);
+					}
+
+					if(count($recurso->analisisFuncional) == 0){
+						$respuesta['data']['data']='No se ha podido enviar el proyecto a revisión ya que no se ha capturado el Analisis Funcional';
+						throw new Exception('falta analisis funcional.', 1);
+					}
+				}
 
 				$seguimiento_mes = EvaluacionProyectoMes::where('idProyecto','=',$id)->where('mes','=',$mes_actual)->first();
 				if(!$seguimiento_mes){
@@ -359,7 +366,6 @@ class SeguimientoController extends BaseController {
 				}
 
 				if($seguimiento_mes->idEstatus == 1 || $seguimiento_mes->idEstatus == 3){
-					//$seguimiento_mes->load('beneficiarios','componentes','actividades');
 					$seguimiento_mes->idEstatus = 2;
 					$seguimiento_mes->save();
 					$respuesta['data'] = 'El Proyecto fue enviado a Revisión';
@@ -391,8 +397,6 @@ class SeguimientoController extends BaseController {
 				}
 			}
 
-
-
 			if($parametros['guardar'] == 'avance-metas'){
 				$respuesta = $this->guardarAvance($parametros,$id);
 				if($respuesta['http_status'] != 200){
@@ -417,9 +421,9 @@ class SeguimientoController extends BaseController {
 						//
 						$mes_actual = Util::obtenerMesActual();
 						$recurso = EvaluacionAnalisisFuncional::find($id);
-						$recurso->finalidadProyecto		= $parametros['finalidad-proyecto'];
+						$recurso->finalidadProyecto		= $parametros['finalidad'];
 						$recurso->analisisResultado 	= $parametros['analisis-resultado'];
-						$recurso->beneficiarios 		= $parametros['beneficiarios'];
+						$recurso->beneficiarios 		= $parametros['analisis-beneficiarios'];
 						$recurso->justificacionGlobal 	= $parametros['justificacion-global'];
 
 						if($recurso->save()){
