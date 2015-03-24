@@ -11,24 +11,24 @@ class SeguimientoInstitucionalController extends BaseController {
 		$datos = array(
 			'meses' => array(
 					'1' => array(
-							array('clave'=>1,	'mes'=>'Enero',			'abrev'=>'E'),
-							array('clave'=>2,	'mes'=>'Febrero',		'abrev'=>'F'),
-							array('clave'=>3,	'mes'=>'Marzo',			'abrev'=>'M')
+							array('clave'=>1,	'mes'=>'Enero',			'abrev'=>'ENE'),
+							array('clave'=>2,	'mes'=>'Febrero',		'abrev'=>'FEB'),
+							array('clave'=>3,	'mes'=>'Marzo',			'abrev'=>'MAR')
 						),
 					'2' => array(
-							array('clave'=>4,	'mes'=>'Abril',			'abrev'=>'A'),
-							array('clave'=>5,	'mes'=>'Mayo',			'abrev'=>'M'),
-							array('clave'=>6,	'mes'=>'Junio',			'abrev'=>'J')
+							array('clave'=>4,	'mes'=>'Abril',			'abrev'=>'ABR'),
+							array('clave'=>5,	'mes'=>'Mayo',			'abrev'=>'MAY'),
+							array('clave'=>6,	'mes'=>'Junio',			'abrev'=>'JUN')
 						),
 					'3' => array(
-							array('clave'=>7,	'mes'=>'Julio',			'abrev'=>'J'),
-							array('clave'=>8,	'mes'=>'Agosto',		'abrev'=>'A'),
-							array('clave'=>9,	'mes'=>'Septiembre',	'abrev'=>'S')
+							array('clave'=>7,	'mes'=>'Julio',			'abrev'=>'JUL'),
+							array('clave'=>8,	'mes'=>'Agosto',		'abrev'=>'AGO'),
+							array('clave'=>9,	'mes'=>'Septiembre',	'abrev'=>'SEP')
 						),
 					'4' => array(
-							array('clave'=>10,	'mes'=>'Octubre',		'abrev'=>'O'),
-							array('clave'=>11,	'mes'=>'Noviembre',		'abrev'=>'N'),
-							array('clave'=>12,	'mes'=>'Dicembre',		'abrev'=>'D')
+							array('clave'=>10,	'mes'=>'Octubre',		'abrev'=>'OCT'),
+							array('clave'=>11,	'mes'=>'Noviembre',		'abrev'=>'NOV'),
+							array('clave'=>12,	'mes'=>'Dicembre',		'abrev'=>'DIC')
 						)
 				)
 		);
@@ -39,7 +39,33 @@ class SeguimientoInstitucionalController extends BaseController {
 		return parent::loadIndex('REVISION','SEGUIINST',$datos);
 	}
 	public function indexInversion(){
-		return parent::loadIndex('RENDCUENTA','RENDINV');
+		$datos = array(
+			'meses' => array(
+					'1' => array(
+							array('clave'=>1,	'mes'=>'Enero',			'abrev'=>'ENE'),
+							array('clave'=>2,	'mes'=>'Febrero',		'abrev'=>'FEB'),
+							array('clave'=>3,	'mes'=>'Marzo',			'abrev'=>'MAR')
+						),
+					'2' => array(
+							array('clave'=>4,	'mes'=>'Abril',			'abrev'=>'ABR'),
+							array('clave'=>5,	'mes'=>'Mayo',			'abrev'=>'MAY'),
+							array('clave'=>6,	'mes'=>'Junio',			'abrev'=>'JUN')
+						),
+					'3' => array(
+							array('clave'=>7,	'mes'=>'Julio',			'abrev'=>'JUL'),
+							array('clave'=>8,	'mes'=>'Agosto',		'abrev'=>'AGO'),
+							array('clave'=>9,	'mes'=>'Septiembre',	'abrev'=>'SEP')
+						),
+					'4' => array(
+							array('clave'=>10,	'mes'=>'Octubre',		'abrev'=>'OCT'),
+							array('clave'=>11,	'mes'=>'Noviembre',		'abrev'=>'NOV'),
+							array('clave'=>12,	'mes'=>'Dicembre',		'abrev'=>'DIC')
+						)
+				)
+		);
+		$datos['mes_avance'] = Util::obtenerMesActual();
+		$datos['trimestre_avance'] = Util::obtenerTrimestre();
+		return parent::loadIndex('REVISION','SEGUIINV',$datos);
 	}
 
 	public function rendicionCuentas($id){

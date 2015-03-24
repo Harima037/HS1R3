@@ -49,6 +49,9 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		
 		Route::get('segui-proyectos-inst',array('uses'=>'SeguimientoInstitucionalController@index'));
 		Route::get('comentar-avance/{id}',array('uses'=>'SeguimientoInstitucionalController@rendicionCuentas'));
+		Route::get('segui-proyectos-inv',array('uses'=>'SeguimientoInstitucionalController@indexInversion'));
+		
+		
 		
 	});
 
