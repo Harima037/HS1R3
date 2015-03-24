@@ -330,13 +330,13 @@
 								<div class="row">
 									<div class="col-sm-12">
 										<div class="form-group">
-											<label class="input-label" for="analisis-resultados">Analisis de Resultados Acumulado</label>
+											<label class="control-label" for="analisis-resultados">Analisis de Resultados Acumulado</label>
 											<textarea rows="6" class="form-control" name="analisis-resultados" id="analisis-resultados"></textarea>
 										</div>
 									</div>
 									<div class="col-sm-12">
 										<div class="form-group">
-											<label class="input-label" for="justificacion-acumulada">Justificación Acumulada</label>
+											<label class="control-label" for="justificacion-acumulada">Justificación Acumulada</label>
 											<textarea rows="6" class="form-control" name="justificacion-acumulada" id="justificacion-acumulada" disabled></textarea>
 										</div>
 									</div>
@@ -348,37 +348,37 @@
 								<div class="row">
 									<div class="col-sm-12">
 										<div class="form-group">
-											<label class="input-label" for="accion-mejora">Acción de Mejora</label>
+											<label class="control-label" for="accion-mejora">Acción de Mejora</label>
 											<textarea rows="4" class="form-control" name="accion-mejora" id="accion-mejora"></textarea>
 										</div>
 									</div>
 									<div class="col-sm-12">
 										<div class="form-group">
-											<label class="input-label" for="grupo-trabajo">Grupo de Trabajo</label>
+											<label class="control-label" for="grupo-trabajo">Grupo de Trabajo</label>
 											<textarea rows="4" class="form-control" name="grupo-trabajo" id="grupo-trabajo"></textarea>
 										</div>
 									</div>
 									<div class="col-sm-4">
 										<div class="form-group">
-											<label class="input-label" for="fecha-inicio">Fecha de Inicio</label>
+											<label class="control-label" for="fecha-inicio">Fecha de Inicio</label>
 											<input type="date" placeholder="aaaa-mm-dd" class="form-control" name="fecha-inicio" id="fecha-inicio">
 										</div>
 									</div>
 									<div class="col-sm-4">
 										<div class="form-group">
-											<label class="input-label" for="fecha-termino">Fecha de Termino</label>
+											<label class="control-label" for="fecha-termino">Fecha de Termino</label>
 											<input type="date" placeholder="aaaa-mm-dd" class="form-control" name="fecha-termino" id="fecha-termino">
 										</div>
 									</div>
 									<div class="col-sm-4">
 										<div class="form-group">
-											<label class="input-label" for="fecha-notificacion">Fecha de Notificación</label>
+											<label class="control-label" for="fecha-notificacion">Fecha de Notificación</label>
 											<input type="date" placeholder="aaaa-mm-dd" class="form-control" name="fecha-notificacion" id="fecha-notificacion">
 										</div>
 									</div>
 									<div class="col-sm-12">
 										<div class="form-group">
-											<label class="input-label" for="documentacion-comprobatoria">Documentación Comprobatoria</label>
+											<label class="control-label" for="documentacion-comprobatoria">Documentación Comprobatoria</label>
 											<textarea rows="4" class="form-control" name="documentacion-comprobatoria" id="documentacion-comprobatoria"></textarea>
 										</div>
 									</div>

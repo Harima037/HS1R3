@@ -50,7 +50,7 @@
                             <th width="35"><p class="texto-vertical">{{$mes[1]['abrev']}} </p></th>
                             <th width="35"><p class="texto-vertical">{{$mes[2]['abrev']}} </p></th>
                         @endforeach
-                        <th width="90">Estado</th>
+                        <th width="100">Estado</th>
                     </tr>
                 </thead>
                 <tbody></tbody>

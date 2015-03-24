@@ -212,6 +212,21 @@ function seguimiento_metas(e){
                     $('input.avance-mes').attr('disabled',true);
                 }
             }
+
+            if(response.data.comentarios.length){
+                for(var i in response.data.comentarios){
+                    var comentario = response.data.comentarios[i];
+                    var id_campo = comentario.idCampo;
+                    var observacion = comentario.observacion;
+                    if(id_campo == 'avancesmetas'){
+                        $('#tabla-avances-metas').before('<p class="texto-comentario text-warning"><span class="fa fa-warning"></span> '+observacion+'</p>');
+                    }else{
+                        $('#'+id_campo).parent('.form-group').addClass('has-warning');
+                        $('#'+id_campo).after('<p class="texto-comentario help-block"><span class="fa fa-warning"></span> '+observacion+'</p>');
+                    }
+                }
+                $('.proyecto-comentario').popover();
+            }
             $('#modalEditarAvance').modal('show');
         }
     });    
@@ -517,6 +532,8 @@ $('#modalEditarAvance').on('hide.bs.modal',function(e){
     $('#modalEditarAvance .alert').remove();
     $('#form_avance').get(0).reset();
     $('#form_avance input[type="hidden"]').val('');
+    $('#form_avance .texto-comentario').remove();
+    $('#form_avance .has-warning').removeClass('has-warning');
     //$('#form_avance input[type="number"]').attr('disabled',true);
     $('#form_avance input[type="number"]').attr('data-meta-programada','');
     $('td.avance-mes').text('');
@@ -556,9 +573,12 @@ function llenar_grid_acciones(response){
         var componente = response.data.componentes[i];
 
         var item = {};
-
         item.id = '1-' + componente.id;
-        item.nivel = 'Componente ' + contador_componente;
+        if(componente.comentarios.length){
+            item.nivel = '<span class="fa fa-warning"></span> Componente ' + contador_componente;
+        }else{
+            item.nivel = 'Componente ' + contador_componente;
+        }
         item.indicador = componente.indicador;
         item.meta = componente.valorNumerador.format();
         item.avances_acumulados = 0;
@@ -582,14 +602,18 @@ function llenar_grid_acciones(response){
                 }
             }
         }
-
         datos_grid.push(item);
+
         for(var j in componente.actividades){
             contador_actividad++;
             var actividad = componente.actividades[j];
             var item = {};
             item.id = '2-' + actividad.id;
-            item.nivel = 'Actividad ' + contador_componente + '.' + contador_actividad;
+            if(actividad.comentarios.length){
+                item.nivel = '<span class="fa fa-warning"></span> Actividad ' + contador_componente + '.' + contador_actividad;
+            }else{
+                item.nivel = 'Actividad ' + contador_componente + '.' + contador_actividad;
+            }
             item.indicador = actividad.indicador;
             item.meta = actividad.valorNumerador.format();
             item.avances_acumulados = 0;
@@ -597,7 +621,6 @@ function llenar_grid_acciones(response){
             item.justificacion = '';
             
             if(actividad.registro_avance.length){
-                
                 for(var j in actividad.registro_avance){
                     var avance = actividad.registro_avance[j];
                     item.avances_acumulados += avance.avanceMes;
@@ -610,7 +633,6 @@ function llenar_grid_acciones(response){
                     }
                 }
             }
-
             datos_grid.push(item);
         }
     }
@@ -629,260 +651,263 @@ function llenar_grid_acciones(response){
 /********************************************************************************************************************************
         Inicio: Seguimiento de Beneficiarios
 *********************************************************************************************************************************/
-var beneficiariosDatagrid = new Datagrid("#datagridBeneficiarios",moduloResource,{ formatogrid:true, pagina: 1, idProyecto: $('#id').val(), grid:'rendicion-beneficiarios'});
-beneficiariosDatagrid.init();
-beneficiariosDatagrid.actualizar({ _success: function(response){ llenar_grid_beneficiarios(response); } });
-function seguimiento_beneficiarios(e){
-    var parametros = {'mostrar':'datos-beneficiarios-avance','id-proyecto':$('#id').val()};
-    moduloResource.get(e,parametros,{
-        _success: function(response){
-            $('#form_beneficiario input.masc').attr('disabled',true);
-            $('#form_beneficiario input.fem').attr('disabled',true);
+//Si es fin de trimestre
+if((parseInt($('#mes').val()) % 3) == 0){
+    var beneficiariosDatagrid = new Datagrid("#datagridBeneficiarios",moduloResource,{ formatogrid:true, pagina: 1, idProyecto: $('#id').val(), grid:'rendicion-beneficiarios'});
+    beneficiariosDatagrid.init();
+    beneficiariosDatagrid.actualizar({ _success: function(response){ llenar_grid_beneficiarios(response); } });
+    function seguimiento_beneficiarios(e){
+        var parametros = {'mostrar':'datos-beneficiarios-avance','id-proyecto':$('#id').val()};
+        moduloResource.get(e,parametros,{
+            _success: function(response){
+                $('#form_beneficiario input.masc').attr('disabled',true);
+                $('#form_beneficiario input.fem').attr('disabled',true);
 
-            $('#modalBeneficiario').find(".modal-title").html('Seguimiento de Beneficiarios');
-            var beneficiario = response.data.beneficiario[0].tipo_beneficiario;
-            $('#tipo-beneficiario').text(beneficiario.descripcion);
-            $('#id-beneficiario').val(beneficiario.id);
-            var suma = 0;
-            for(var i in response.data.beneficiario){
-                var beneficiario = response.data.beneficiario[i];
-                $('#total-'+beneficiario.sexo).text(beneficiario.total.format());
-                $('#total-'+beneficiario.sexo).attr('data-valor',beneficiario.total)
-                suma += beneficiario.total;
+                $('#modalBeneficiario').find(".modal-title").html('Seguimiento de Beneficiarios');
+                var beneficiario = response.data.beneficiario[0].tipo_beneficiario;
+                $('#tipo-beneficiario').text(beneficiario.descripcion);
+                $('#id-beneficiario').val(beneficiario.id);
+                var suma = 0;
+                for(var i in response.data.beneficiario){
+                    var beneficiario = response.data.beneficiario[i];
+                    $('#total-'+beneficiario.sexo).text(beneficiario.total.format());
+                    $('#total-'+beneficiario.sexo).attr('data-valor',beneficiario.total)
+                    suma += beneficiario.total;
 
-                if(beneficiario.sexo == 'f'){
-                    $('#form_beneficiario input.fem').attr('disabled',false);
-                }else{
-                    $('#form_beneficiario input.masc').attr('disabled',false);
+                    if(beneficiario.sexo == 'f'){
+                        $('#form_beneficiario input.fem').attr('disabled',false);
+                    }else{
+                        $('#form_beneficiario input.masc').attr('disabled',false);
+                    }
+
+                    if(beneficiario.registro_avance.length){
+                        $('#hay-avance').val(1);
+                    }
+
+                    for(var j in beneficiario.registro_avance){
+                        var avance = beneficiario.registro_avance[j];
+
+                        $('#muyalta'+avance.sexo).val(avance.muyAlta);
+                        $('#alta'+avance.sexo).val(avance.alta);
+                        $('#media'+avance.sexo).val(avance.media);
+                        $('#baja'+avance.sexo).val(avance.baja);
+                        $('#muybaja'+avance.sexo).val(avance.muyBaja);
+
+                        $('#indigena'+avance.sexo).val(avance.indigena);
+                        $('#inmigrante'+avance.sexo).val(avance.inmigrante);
+                        $('#mestiza'+avance.sexo).val(avance.mestiza);
+                        $('#otros'+avance.sexo).val(avance.otros);
+
+                        $('#rural'+avance.sexo).val(avance.rural);
+                        $('#urbana'+avance.sexo).val(avance.urbana);
+                    }
                 }
 
-                if(beneficiario.registro_avance.length){
-                    $('#hay-avance').val(1);
+                $('#muybajaf').change();
+                $('#otrosf').change();
+                $('#urbanaf').change();
+                $('#muybajam').change();
+                $('#otrosm').change();
+                $('#urbanam').change();
+
+                var suma_acumulados = 0;
+                for(var i in response.data.acumulado){
+                    $('#acumulado-'+response.data.acumulado[i].sexo).text(parseInt(response.data.acumulado[i].total).format());
+                    $('#acumulado-'+response.data.acumulado[i].sexo).attr('data-valor',response.data.acumulado[i].total);
+                    suma_acumulados += parseInt(response.data.acumulado[i].total);
                 }
 
-                for(var j in beneficiario.registro_avance){
-                    var avance = beneficiario.registro_avance[j];
+                $('#acumulado-beneficiario').text(suma_acumulados.format());
+                $('#acumulado-beneficiario').attr('data-valor',suma_acumulados);
 
-                    $('#muyalta'+avance.sexo).val(avance.muyAlta);
-                    $('#alta'+avance.sexo).val(avance.alta);
-                    $('#media'+avance.sexo).val(avance.media);
-                    $('#baja'+avance.sexo).val(avance.baja);
-                    $('#muybaja'+avance.sexo).val(avance.muyBaja);
+                $('#total-beneficiario').text(suma.format());
+                $('#total-beneficiario').attr('data-valor',suma);
 
-                    $('#indigena'+avance.sexo).val(avance.indigena);
-                    $('#inmigrante'+avance.sexo).val(avance.inmigrante);
-                    $('#mestiza'+avance.sexo).val(avance.mestiza);
-                    $('#otros'+avance.sexo).val(avance.otros);
-
-                    $('#rural'+avance.sexo).val(avance.rural);
-                    $('#urbana'+avance.sexo).val(avance.urbana);
-                }
+                $('#modalBeneficiario').modal('show');
             }
+        });
+    }
+    $('#btn-beneficiario-guardar').on('click',function(){
+        var parametros = $('#form_beneficiario').serialize();
+        parametros += '&guardar=avance-beneficiarios&id-proyecto='+$('#id').val();
 
-            $('#muybajaf').change();
-            $('#otrosf').change();
-            $('#urbanaf').change();
-            $('#muybajam').change();
-            $('#otrosm').change();
-            $('#urbanam').change();
+        Validation.cleanFormErrors('#form_beneficiario');
 
-            var suma_acumulados = 0;
-            for(var i in response.data.acumulado){
-                $('#acumulado-'+response.data.acumulado[i].sexo).text(parseInt(response.data.acumulado[i].total).format());
-                $('#acumulado-'+response.data.acumulado[i].sexo).attr('data-valor',response.data.acumulado[i].total);
-                suma_acumulados += parseInt(response.data.acumulado[i].total);
+        var total_marginacion = [];
+        var total_poblacion = [];
+        var total_zona = [];
+
+        total_marginacion['f'] = 0;
+        $('.sub-total-marginacion.fem').each(function(){ total_marginacion['f'] += parseInt($(this).val()) || 0; });
+        total_poblacion['f'] = 0;
+        $('.sub-total-poblacion.fem').each(function(){ total_poblacion['f'] += parseInt($(this).val()) || 0; });
+        total_zona['f'] = 0;
+        $('.sub-total-zona.fem').each(function(){ total_zona['f'] += parseInt($(this).val()) || 0; });
+
+        total_marginacion['m'] = 0;
+        $('.sub-total-marginacion.masc').each(function(){ total_marginacion['m'] += parseInt($(this).val()) || 0; });
+        total_poblacion['m'] = 0;
+        $('.sub-total-poblacion.masc').each(function(){ total_poblacion['m'] += parseInt($(this).val()) || 0; });
+        total_zona['m'] = 0;
+        $('.sub-total-zona.masc').each(function(){ total_zona['m'] += parseInt($(this).val()) || 0; });
+
+        var sexos = ['f','m'];
+        for(var i in sexos){
+            if(total_marginacion[sexos[i]] != total_poblacion[sexos[i]] || total_marginacion[sexos[i]] != total_zona[sexos[i]] || total_zona[sexos[i]] != total_poblacion[sexos[i]]){
+                MessageManager.show({data:'Los totales capturados no coinciden entre si.',container:'#modalBeneficiario .modal-body',type:'ERR'});
+                return false;
             }
+        }
 
-            $('#acumulado-beneficiario').text(suma_acumulados.format());
-            $('#acumulado-beneficiario').attr('data-valor',suma_acumulados);
-
-            $('#total-beneficiario').text(suma.format());
-            $('#total-beneficiario').attr('data-valor',suma);
-
-            $('#modalBeneficiario').modal('show');
+        var total_f = $('#total-f').attr('data-valor');
+        var total_m = $('#total-m').attr('data-valor');
+        
+        if(total_zona['f'] > total_f || total_zona['m'] > total_m){
+            Confirm.show({
+                    titulo:"¿Esta seguro de guardarl los datos?",
+                    mensaje: "Los totales capturados son mayores a los programados para el proyecto, ¿Desea continuar?",
+                    callback: function(){
+                        guardar_datos_beneficiarios(parametros);
+                    }
+            });
+        }else{
+            guardar_datos_beneficiarios(parametros);
         }
     });
-}
-$('#btn-beneficiario-guardar').on('click',function(){
-    var parametros = $('#form_beneficiario').serialize();
-    parametros += '&guardar=avance-beneficiarios&id-proyecto='+$('#id').val();
 
-    Validation.cleanFormErrors('#form_beneficiario');
-
-    var total_marginacion = [];
-    var total_poblacion = [];
-    var total_zona = [];
-
-    total_marginacion['f'] = 0;
-    $('.sub-total-marginacion.fem').each(function(){ total_marginacion['f'] += parseInt($(this).val()) || 0; });
-    total_poblacion['f'] = 0;
-    $('.sub-total-poblacion.fem').each(function(){ total_poblacion['f'] += parseInt($(this).val()) || 0; });
-    total_zona['f'] = 0;
-    $('.sub-total-zona.fem').each(function(){ total_zona['f'] += parseInt($(this).val()) || 0; });
-
-    total_marginacion['m'] = 0;
-    $('.sub-total-marginacion.masc').each(function(){ total_marginacion['m'] += parseInt($(this).val()) || 0; });
-    total_poblacion['m'] = 0;
-    $('.sub-total-poblacion.masc').each(function(){ total_poblacion['m'] += parseInt($(this).val()) || 0; });
-    total_zona['m'] = 0;
-    $('.sub-total-zona.masc').each(function(){ total_zona['m'] += parseInt($(this).val()) || 0; });
-
-    var sexos = ['f','m'];
-    for(var i in sexos){
-        if(total_marginacion[sexos[i]] != total_poblacion[sexos[i]] || total_marginacion[sexos[i]] != total_zona[sexos[i]] || total_zona[sexos[i]] != total_poblacion[sexos[i]]){
-            MessageManager.show({data:'Los totales capturados no coinciden entre si.',container:'#modalBeneficiario .modal-body',type:'ERR'});
-            return false;
-        }
-    }
-
-    var total_f = $('#total-f').attr('data-valor');
-    var total_m = $('#total-m').attr('data-valor');
-    
-    if(total_zona['f'] > total_f || total_zona['m'] > total_m){
-        Confirm.show({
-                titulo:"¿Esta seguro de guardarl los datos?",
-                mensaje: "Los totales capturados son mayores a los programados para el proyecto, ¿Desea continuar?",
-                callback: function(){
-                    guardar_datos_beneficiarios(parametros);
-                }
-        });
-    }else{
-        guardar_datos_beneficiarios(parametros);
-    }
-});
-
-function guardar_datos_beneficiarios(parametros){
-    var hay_avance = parseInt($('#hay-avance').val());
-    if(hay_avance){
-        moduloResource.put($('#id-beneficiario').val(),parametros,{
-            _success: function(response){
-                if(response.advertencia){
-                    MessageManager.show({data:response.advertencia,container:'#modalBeneficiario .modal-body',type:'ADV'});
-                }else{
-                    MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
-                    $('#modalBeneficiario').modal('hide');
-                }
-                beneficiariosDatagrid.actualizar({ _success: function(response){ llenar_grid_beneficiarios(response); } });
-            },
-            _error: function(response){
-                try{
-                    var json = $.parseJSON(response.responseText);
-                    if(!json.code)
-                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-                    else{
-                        MessageManager.show(json);
+    function guardar_datos_beneficiarios(parametros){
+        var hay_avance = parseInt($('#hay-avance').val());
+        if(hay_avance){
+            moduloResource.put($('#id-beneficiario').val(),parametros,{
+                _success: function(response){
+                    if(response.advertencia){
+                        MessageManager.show({data:response.advertencia,container:'#modalBeneficiario .modal-body',type:'ADV'});
+                    }else{
+                        MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
+                        $('#modalBeneficiario').modal('hide');
                     }
-                    Validation.formValidate(json.data);
-                }catch(e){
-                    console.log(e);
-                }                       
-            }
-        });
-    }else{
-        moduloResource.post(parametros,{
-            _success: function(response){
-                if(response.advertencia){
-                    MessageManager.show({data:response.advertencia,container:'#modalBeneficiario .modal-body',type:'ADV'});
-                    $('#hay-avance').val(1);
-                }else{
-                    MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
-                    $('#modalBeneficiario').modal('hide');
+                    beneficiariosDatagrid.actualizar({ _success: function(response){ llenar_grid_beneficiarios(response); } });
+                },
+                _error: function(response){
+                    try{
+                        var json = $.parseJSON(response.responseText);
+                        if(!json.code)
+                            MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                        else{
+                            MessageManager.show(json);
+                        }
+                        Validation.formValidate(json.data);
+                    }catch(e){
+                        console.log(e);
+                    }                       
                 }
-                beneficiariosDatagrid.actualizar({ _success: function(response){ llenar_grid_beneficiarios(response); } });
-            },
-            _error: function(response){
-                try{
-                    var json = $.parseJSON(response.responseText);
-                    if(!json.code)
-                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-                    else{
-                        MessageManager.show(json);
+            });
+        }else{
+            moduloResource.post(parametros,{
+                _success: function(response){
+                    if(response.advertencia){
+                        MessageManager.show({data:response.advertencia,container:'#modalBeneficiario .modal-body',type:'ADV'});
+                        $('#hay-avance').val(1);
+                    }else{
+                        MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
+                        $('#modalBeneficiario').modal('hide');
                     }
-                    Validation.formValidate(json.data);
-                }catch(e){
-                    console.log(e);
-                }                       
+                    beneficiariosDatagrid.actualizar({ _success: function(response){ llenar_grid_beneficiarios(response); } });
+                },
+                _error: function(response){
+                    try{
+                        var json = $.parseJSON(response.responseText);
+                        if(!json.code)
+                            MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                        else{
+                            MessageManager.show(json);
+                        }
+                        Validation.formValidate(json.data);
+                    }catch(e){
+                        console.log(e);
+                    }                       
+                }
+            });
+        }
+    }
+    $('.fem,.masc').on('keyup',function(){ $(this).change(); });
+    $('.fem').on('change',function(){
+        if($(this).hasClass('sub-total-zona')){
+            sumar_valores('.sub-total-zona.fem','#total-zona-f');
+        }else if($(this).hasClass('sub-total-poblacion')){
+            sumar_valores('.sub-total-poblacion.fem','#total-poblacion-f');
+        }else if($(this).hasClass('sub-total-marginacion')){
+            sumar_valores('.sub-total-marginacion.fem','#total-marginacion-f');
+        }
+    });
+    $('.masc').on('change',function(){
+        if($(this).hasClass('sub-total-zona')){
+            sumar_valores('.sub-total-zona.masc','#total-zona-m');
+        }else if($(this).hasClass('sub-total-poblacion')){
+            sumar_valores('.sub-total-poblacion.masc','#total-poblacion-m');
+        }else if($(this).hasClass('sub-total-marginacion')){
+            sumar_valores('.sub-total-marginacion.masc','#total-marginacion-m');
+        }
+    });
+
+    $('#modalBeneficiario').on('hide.bs.modal',function(e){
+        $('#modalBeneficiario .alert').remove();
+        $('#form_beneficiario').get(0).reset();
+        $('#form_beneficiario input[type="hidden"]').val('');
+        $('#form_beneficiario .cant-benficiarios').text('0');
+        $('#form_beneficiario .cant-benficiarios').attr('data-valor','0');
+        Validation.cleanFormErrors('#form_beneficiario');
+    });
+
+    function llenar_grid_beneficiarios(response){
+        beneficiariosDatagrid.limpiar();
+        var datos_grid = {};
+
+        for(var i in response.data){
+            var beneficiario = response.data[i];
+
+            if(!datos_grid[beneficiario.idTipoBeneficiario]){
+                datos_grid[beneficiario.idTipoBeneficiario] = {
+                    'id': beneficiario.idTipoBeneficiario,
+                    'tipoBeneficiario': beneficiario.tipo_beneficiario.descripcion,
+                    'f': 0,
+                    'f-avance':0,
+                    'm': 0,
+                    'm-avance':0,
+                    'total': 0,
+                    'total-avance':0
+                };
             }
-        });
-    }
-}
-$('.fem,.masc').on('keyup',function(){ $(this).change(); });
-$('.fem').on('change',function(){
-    if($(this).hasClass('sub-total-zona')){
-        sumar_valores('.sub-total-zona.fem','#total-zona-f');
-    }else if($(this).hasClass('sub-total-poblacion')){
-        sumar_valores('.sub-total-poblacion.fem','#total-poblacion-f');
-    }else if($(this).hasClass('sub-total-marginacion')){
-        sumar_valores('.sub-total-marginacion.fem','#total-marginacion-f');
-    }
-});
-$('.masc').on('change',function(){
-    if($(this).hasClass('sub-total-zona')){
-        sumar_valores('.sub-total-zona.masc','#total-zona-m');
-    }else if($(this).hasClass('sub-total-poblacion')){
-        sumar_valores('.sub-total-poblacion.masc','#total-poblacion-m');
-    }else if($(this).hasClass('sub-total-marginacion')){
-        sumar_valores('.sub-total-marginacion.masc','#total-marginacion-m');
-    }
-});
 
-$('#modalBeneficiario').on('hide.bs.modal',function(e){
-    $('#modalBeneficiario .alert').remove();
-    $('#form_beneficiario').get(0).reset();
-    $('#form_beneficiario input[type="hidden"]').val('');
-    $('#form_beneficiario .cant-benficiarios').text('0');
-    $('#form_beneficiario .cant-benficiarios').attr('data-valor','0');
-    Validation.cleanFormErrors('#form_beneficiario');
-});
+            if(beneficiario.registro_avance.length){
+                var avance = beneficiario.registro_avance[0];
+                datos_grid[beneficiario.idTipoBeneficiario][beneficiario.sexo+'-avance'] += parseInt(avance.total) || 0;
+                datos_grid[beneficiario.idTipoBeneficiario]['total-avance'] += parseInt(avance.total) || 0;
+            }
 
-function llenar_grid_beneficiarios(response){
-    beneficiariosDatagrid.limpiar();
-    var datos_grid = {};
-
-    for(var i in response.data){
-        var beneficiario = response.data[i];
-
-        if(!datos_grid[beneficiario.idTipoBeneficiario]){
-            datos_grid[beneficiario.idTipoBeneficiario] = {
-                'id': beneficiario.idTipoBeneficiario,
-                'tipoBeneficiario': beneficiario.tipo_beneficiario.descripcion,
-                'f': 0,
-                'f-avance':0,
-                'm': 0,
-                'm-avance':0,
-                'total': 0,
-                'total-avance':0
-            };
+            datos_grid[beneficiario.idTipoBeneficiario][beneficiario.sexo] += beneficiario.total;
+            datos_grid[beneficiario.idTipoBeneficiario]['total'] += beneficiario.total;
         }
+        var datos = [];
 
-        if(beneficiario.registro_avance.length){
-            var avance = beneficiario.registro_avance[0];
-            datos_grid[beneficiario.idTipoBeneficiario][beneficiario.sexo+'-avance'] += parseInt(avance.total) || 0;
-            datos_grid[beneficiario.idTipoBeneficiario]['total-avance'] += parseInt(avance.total) || 0;
+        for(var i in datos_grid){
+            datos_grid[i].f = datos_grid[i].f.format();
+            datos_grid[i].m = datos_grid[i].m.format();
+            datos_grid[i].total = datos_grid[i].total.format();
+            datos_grid[i]['f-avance'] = datos_grid[i]['f-avance'].format();
+            datos_grid[i]['m-avance'] = datos_grid[i]['m-avance'].format();
+            datos_grid[i]['total-avance'] = datos_grid[i]['total-avance'].format();
+
+            datos.push(datos_grid[i]);
         }
-
-        datos_grid[beneficiario.idTipoBeneficiario][beneficiario.sexo] += beneficiario.total;
-        datos_grid[beneficiario.idTipoBeneficiario]['total'] += beneficiario.total;
+        
+        beneficiariosDatagrid.cargarDatos(datos);                         
+        var total = parseInt(datos.length/beneficiariosDatagrid.rxpag); 
+        var plus = parseInt(datos.length)%beneficiariosDatagrid.rxpag;
+        if(plus>0) 
+            total++;
+        beneficiariosDatagrid.paginacion(total);
     }
-    var datos = [];
-
-    for(var i in datos_grid){
-        datos_grid[i].f = datos_grid[i].f.format();
-        datos_grid[i].m = datos_grid[i].m.format();
-        datos_grid[i].total = datos_grid[i].total.format();
-        datos_grid[i]['f-avance'] = datos_grid[i]['f-avance'].format();
-        datos_grid[i]['m-avance'] = datos_grid[i]['m-avance'].format();
-        datos_grid[i]['total-avance'] = datos_grid[i]['total-avance'].format();
-
-        datos.push(datos_grid[i]);
-    }
-    
-    beneficiariosDatagrid.cargarDatos(datos);                         
-    var total = parseInt(datos.length/beneficiariosDatagrid.rxpag); 
-    var plus = parseInt(datos.length)%beneficiariosDatagrid.rxpag;
-    if(plus>0) 
-        total++;
-    beneficiariosDatagrid.paginacion(total);
 }
 /********************************************************************************************************************************
         Fin: Seguimiento de Beneficiarios
