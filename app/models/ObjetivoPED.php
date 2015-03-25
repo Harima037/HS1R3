@@ -10,4 +10,8 @@ class ObjetivoPED extends BaseModel
 	public function hijos(){
 		return $this->hasMany('ObjetivoPED','idPadre')->with('hijos');
 	}
+
+	public function padre(){
+		return $this->hasOne('ObjetivoPED','id','idPadre')->with('padre');
+	}
 }

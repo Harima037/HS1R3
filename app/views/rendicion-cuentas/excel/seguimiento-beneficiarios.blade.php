@@ -40,6 +40,9 @@
 		.texto-izquierda{
 			text-align: left;
 		}
+		.sin-bordes{
+			border: 1px solid #FFFFFF;
+		}
 		.encabezado-tabla{
 			font-family: Arial;
 			font-size: 11;
@@ -53,6 +56,7 @@
 			border: 1 solid #000000;
 			border-collapse: collapse;
 			padding:1;
+			font-weight: normal;
 		}
 		.subtitulo-tabla{
 			font-weight: bold;
@@ -87,7 +91,7 @@
 			<td height="18" class="titulo3" colspan="15" align="center">SEGUIMIENTO DE BENEFICIARIOS {{$proyecto['ejercicio']}}</td>
 		</tr>
 		<tr>
-			<td height="18" colspan="15" align="right" class="negrita">Formato Rc-5</td>
+			<td height="18" colspan="15" align="right" class="negrita">Formato RC-5</td>
 		</tr>
 
 		<tr height="90" class="texto-medio texto">
@@ -104,30 +108,161 @@
 			<td></td>
 		</tr>
 
-		<tr height="30"></tr>
+		@foreach($beneficiarios as $beneficiario)
+		<tr height="40"></tr>
 
-		<tr class="tabla-datos" height="40">
-			<td class="encabezado-tabla" rowspan="2">TIPO</td>
-			<td class="encabezado-tabla" rowspan="2">GÉNERO</td>
-			<td class="encabezado-tabla" rowspan="2">TOTAL</td>
-			<td class="encabezado-tabla" rowspan="2">ZONA URBANA</td>
-			<td class="encabezado-tabla" rowspan="2">ZONA RURAL</td>
+		<tr class="tabla-datos" height="25">
+			<td class="sin-bordes"></td>
+			<td class="sin-bordes"></td>
+			<td class="sin-bordes"></td>
+			<td class="sin-bordes"></td>
+			<td class="sin-bordes"></td>
 			<td class="encabezado-tabla" colspan="4">POBLACIÓN</td>
 			<td class="encabezado-tabla" colspan="5">MARGINACIÓN</td>
-			<td class="encabezado-tabla" rowspan="2">POBLACIÓN ACUMULADA</td>
+			<td class="sin-bordes"></td>
 		</tr>
 
-		<tr class="tabla-datos">
-			<td class="encabezado-tabla">MESTIZA</td>
-			<td class="encabezado-tabla">INDÍGENA</td>
-			<td class="encabezado-tabla">INMIGRANTE</td>
-			<td class="encabezado-tabla">OTROS</td>
-			<td class="encabezado-tabla">MUY ALTA</td>
-			<td class="encabezado-tabla">ALTA</td>
-			<td class="encabezado-tabla">MEDIA</td>
-			<td class="encabezado-tabla">BAJA</td>
-			<td class="encabezado-tabla">MUY BAJA</td>
+		<tr class="tabla-datos" height="30">
+			<td class="encabezado-tabla">TIPO</td>
+			<td width="22" class="encabezado-tabla">GÉNERO</td>
+			<td width="22" class="encabezado-tabla">TOTAL</td>
+			<td width="22" class="encabezado-tabla">ZONA URBANA</td>
+			<td width="22" class="encabezado-tabla">ZONA RURAL</td>
+			<td width="22" class="encabezado-tabla">MESTIZA</td>
+			<td width="22" class="encabezado-tabla">INDÍGENA</td>
+			<td width="22" class="encabezado-tabla">INMIGRANTE</td>
+			<td width="22" class="encabezado-tabla">OTROS</td>
+			<td width="22" class="encabezado-tabla">MUY ALTA</td>
+			<td width="22" class="encabezado-tabla">ALTA</td>
+			<td width="22" class="encabezado-tabla">MEDIA</td>
+			<td width="22" class="encabezado-tabla">BAJA</td>
+			<td width="22" class="encabezado-tabla">MUY BAJA</td>
+			<td width="22" class="encabezado-tabla">POBLACIÓN ACUMULADA</td>
 		</tr>
+
+		<tr class="tabla-datos" height="40">
+			<td class="texto-centro texto-medio">{{$beneficiario['tipoBeneficiario']}}</td>
+			<td class="texto-centro texto-medio negrita">Femenino</td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['total']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['urbana']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['rural']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['mestiza']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['indigena']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['inmigrante']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['otros']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['muyAlta']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['alta']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['media']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['baja']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['muyBaja']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['acumulado']}} </td>
+		</tr>
+
+		<tr class="tabla-datos" height="40">
+			<td class="texto-centro texto-medio"></td>
+			<td class="texto-centro texto-medio negrita">Masculino</td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['total']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['urbana']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['rural']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['mestiza']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['indigena']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['inmigrante']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['otros']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['muyAlta']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['alta']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['media']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['baja']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['muyBaja']}} </td>
+			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['acumulado']}} </td>
+		</tr>
+
+		<tr class="tabla-datos" height="40">
+			<td class="texto-centro texto-medio"></td>
+			<td class="texto-centro texto-medio negrita">Total</td>
+			<td class="texto-centro texto-medio">
+				{{ $beneficiarios_avances[$beneficiario['id']]['f']['total'] + $beneficiarios_avances[$beneficiario['id']]['m']['total'] }}
+			</td>
+			<td class="texto-centro texto-medio">
+				{{ $beneficiarios_avances[$beneficiario['id']]['f']['urbana'] + $beneficiarios_avances[$beneficiario['id']]['m']['urbana'] }}
+			</td>
+			<td class="texto-centro texto-medio">
+				{{ $beneficiarios_avances[$beneficiario['id']]['f']['rural'] + $beneficiarios_avances[$beneficiario['id']]['m']['rural'] }}
+			</td>
+			<td class="texto-centro texto-medio">
+				{{ $beneficiarios_avances[$beneficiario['id']]['f']['mestiza'] + $beneficiarios_avances[$beneficiario['id']]['m']['mestiza'] }}
+			</td>
+			<td class="texto-centro texto-medio">
+				{{ $beneficiarios_avances[$beneficiario['id']]['f']['indigena'] + $beneficiarios_avances[$beneficiario['id']]['m']['indigena'] }}
+			</td>
+			<td class="texto-centro texto-medio">
+				{{ $beneficiarios_avances[$beneficiario['id']]['f']['inmigrante'] + $beneficiarios_avances[$beneficiario['id']]['m']['inmigrante'] }}
+			</td>
+			<td class="texto-centro texto-medio">
+				{{ $beneficiarios_avances[$beneficiario['id']]['f']['otros'] + $beneficiarios_avances[$beneficiario['id']]['m']['otros'] }}
+			</td>
+			<td class="texto-centro texto-medio">
+				{{ $beneficiarios_avances[$beneficiario['id']]['f']['muyAlta'] + $beneficiarios_avances[$beneficiario['id']]['m']['muyAlta'] }}
+			</td>
+			<td class="texto-centro texto-medio">
+				{{ $beneficiarios_avances[$beneficiario['id']]['f']['alta'] + $beneficiarios_avances[$beneficiario['id']]['m']['alta'] }}
+			</td>
+			<td class="texto-centro texto-medio">
+				{{ $beneficiarios_avances[$beneficiario['id']]['f']['media'] + $beneficiarios_avances[$beneficiario['id']]['m']['media'] }}
+			</td>
+			<td class="texto-centro texto-medio">
+				{{ $beneficiarios_avances[$beneficiario['id']]['f']['baja'] + $beneficiarios_avances[$beneficiario['id']]['m']['baja'] }}
+			</td>
+			<td class="texto-centro texto-medio">
+				{{ $beneficiarios_avances[$beneficiario['id']]['f']['muyBaja'] + $beneficiarios_avances[$beneficiario['id']]['m']['muyBaja'] }}
+			</td>
+			<td class="texto-centro texto-medio">
+				{{ $beneficiarios_avances[$beneficiario['id']]['f']['acumulado'] + $beneficiarios_avances[$beneficiario['id']]['m']['acumulado'] }}
+			</td>
+		</tr>
+
+		<tr height="40"></tr>
+
+		<tr class="negrita" height="20">
+			<td></td>
+			<td></td>
+			<td></td>
+			<td colspan="4" align="center">RESPONSABLE DE LA INFORMACIÓN</td>
+			<td></td>
+			<td colspan="5" align="center">LIDER DEL PROYECTO</td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr height="40">
+			<td></td>
+			<td></td>
+			<td></td>
+			<td colspan="4" class="linea-firma"></td>
+			<td></td>
+			<td colspan="5" class="linea-firma"></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr class="negrita" height="20">
+			<td></td>
+			<td></td>
+			<td></td>
+			<td colspan="4" align="center">Nombre</td>
+			<td></td>
+			<td colspan="5" align="center">{{ $proyecto['liderProyecto'] }}</td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr class="negrita" height="20">
+			<td></td>
+			<td></td>
+			<td></td>
+			<td colspan="4" align="center">Cargo</td>
+			<td></td>
+			<td colspan="5" align="center">Cargo</td>
+			<td></td>
+			<td></td>
+		</tr>
+		@endforeach
 
 	</table>
 </body>

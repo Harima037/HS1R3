@@ -164,6 +164,10 @@ class Proyecto extends BaseModel
 		return $this->belongsTo('ObjetivoPED','idObjetivoPED');
 	}
 
+	public function objetivoPedCompleto(){
+		return $this->belongsTo('ObjetivoPED','idObjetivoPED')->with('padre');
+	}	
+
 	/*public function tipoBeneficiario(){
 		return $this->belongsTo('TipoBeneficiario','idTipoBeneficiario');
 	}*/

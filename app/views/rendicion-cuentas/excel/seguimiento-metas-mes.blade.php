@@ -87,7 +87,7 @@
 			<td height="18" class="titulo3" colspan="10" align="center">SEGUIMIENTO DE METAS {{$proyecto['ejercicio']}}</td>
 		</tr>
 		<tr>
-			<td height="18" colspan="10" align="right" class="negrita">Formato Rc-3</td>
+			<td height="18" colspan="10" align="right" class="negrita">Formato RC-3</td>
 		</tr>
 
 
