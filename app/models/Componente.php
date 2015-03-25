@@ -43,6 +43,10 @@ class Componente extends BaseModel
 		return $this->hasMany('ComponenteDesglose','idComponente')->listarMunicipios();
 	}
 	
+	public function desgloseConDatos(){
+		return $this->hasMany('ComponenteDesglose','idComponente')->listarDatos();
+	}
+
 	public function desgloseCompleto(){
 		return $this->hasMany('ComponenteDesglose','idComponente')->listarDatos()->with('metasMes');
 	}

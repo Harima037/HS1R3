@@ -72,112 +72,117 @@
 <body>
 	<table>
 		<tr>
-			<td height="20" class="titulo1" colspan="4" align="center">GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS</td>
+			<td height="20" class="titulo1" colspan="6" align="center">GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS</td>
 		</tr>
 		<tr>
-			<td height="19" class="titulo2" colspan="4" align="center">INSTITUTO DE SALUD</td>
+			<td height="19" class="titulo2" colspan="6" align="center">INSTITUTO DE SALUD</td>
 		</tr>
 		<tr>
-			<td height="18" class="titulo3" colspan="4" align="center">ANÁLISIS FUNCIONAL {{$mes['trimestre_letras']}} TRIMESTRE {{$proyecto['ejercicio']}}</td>
+			<td height="18" class="titulo3" colspan="6" align="center">ANÁLISIS FUNCIONAL {{$mes['trimestre_letras']}} TRIMESTRE {{$proyecto['ejercicio']}}</td>
 		</tr>
+		<tr><td colspan="6"></td></tr>
 		<tr>
-			<td height="18" colspan="4" align="right" class="negrita">Formato RC-6</td>
+			<td height="18" colspan="6" align="right" class="negrita">Formato RC-6</td>
 		</tr>
 
-		<tr><td colspan="4"></td></tr>
+		<tr>
+			<td width="20px"></td><td width="20px"></td>
+			<td width="300"></td><td width="300"></td>
+			<td width="20px"></td><td width="20px"></td>
+		</tr>
 
 		<tr class="tabla-datos" height="20">
-			<th width="300" class="encabezado-tabla texto-izquierda">EJE:</th>
-			<th width="300" class="encabezado-tabla texto-izquierda">TEMA:</th>
-			<th width="300" class="encabezado-tabla texto-izquierda">POLITICA PÚBLICA:</th>
-			<th width="320" class="encabezado-tabla texto-izquierda">PROGRAMA PRESUPUESTARIO:</th>
+			<th colspan="2" class="encabezado-tabla texto-izquierda">EJE:</th>
+			<th class="encabezado-tabla texto-izquierda">TEMA:</th>
+			<th class="encabezado-tabla texto-izquierda">POLITICA PÚBLICA:</th>
+			<th colspan="2" class="encabezado-tabla texto-izquierda">PROGRAMA PRESUPUESTARIO:</th>
 		</tr>
-		<tr class="tabla-datos" height="30">
-			<td>{{$proyecto['eje']}}</td>
-			<td>{{$proyecto['tema']}}</td>
-			<td>{{$proyecto['politicaPublica']}}</td>
-			<td>{{$proyecto['programaPresupuestario']}}</td>
+		<tr class="tabla-datos" height="50">
+			<td class="texto-medio" colspan="2">{{$proyecto['eje']}}</td>
+			<td class="texto-medio">{{$proyecto['tema']}}</td>
+			<td class="texto-medio">{{$proyecto['politicaPublica']}}</td>
+			<td class="texto-medio" colspan="2">{{$proyecto['programaPresupuestario']}}</td>
 		</tr>
 
-		<tr><td colspan="4"></td></tr>
+		<tr><td colspan="6"></td></tr>
 
 		<tr class="tabla-datos" height="20">
-			<th class="encabezado-tabla texto-izquierda">FUNCIÓN:</th>
+			<th colspan="2" class="encabezado-tabla texto-izquierda">FUNCIÓN:</th>
 			<th class="encabezado-tabla texto-izquierda">SUBFUNCIÓN:</th>
 			<th class="encabezado-tabla texto-izquierda">FUENTE DE FINANCIAMIENTO:</th>
-			<th class="encabezado-tabla texto-izquierda">SUBFUENTE DE FINANCIAMIENTO:</th>
+			<th colspan="2" class="encabezado-tabla texto-izquierda">SUBFUENTE DE FINANCIAMIENTO:</th>
 		</tr>
 		<tr class="tabla-datos" height="100">
-			<td class="texto-medio">{{$proyecto['funcion']}}</td>
+			<td colspan="2" class="texto-medio">{{$proyecto['funcion']}}</td>
 			<td class="texto-medio">{{$proyecto['subFuncion']}}</td>
 			<td></td>
-			<td></td>
+			<td colspan="2"></td>
 		</tr>
 
-		<tr><td colspan="4"></td></tr>
+		<tr><td colspan="6"></td></tr>
 
 		<tr class="tabla-datos" height="20">
-			<th class="encabezado-tabla texto-izquierda">CLAVE PRESUPUESTAL:</th>
-			<th colspan="3" class="encabezado-tabla texto-izquierda">NOMBRE DEL PROYECTO:</th>
+			<th colspan="2" class="encabezado-tabla texto-izquierda">CLAVE PRESUPUESTAL:</th>
+			<th colspan="4" class="encabezado-tabla texto-izquierda">NOMBRE DEL PROYECTO:</th>
 		</tr>
 		<tr class="tabla-datos" height="30">
-			<td class="texto-medio">{{ $proyecto['ClavePresupuestaria'] }}</td>
-			<td class="texto-medio" colspan="3"> {{ $proyecto['nombreTecnico'] }} </td>
+			<td colspan="2" class="texto-medio">{{ $proyecto['ClavePresupuestaria'] }}</td>
+			<td colspan="4" class="texto-medio"> {{ $proyecto['nombreTecnico'] }} </td>
 		</tr>
 
-		<tr><td colspan="4"></td></tr>
+		<tr><td colspan="6"></td></tr>
 
 		<tr class="tabla-datos">
-			<th colspan="4" class="encabezado-tabla">FINALIDAD DEL PROYECTO</th>
+			<th colspan="6" class="encabezado-tabla">FINALIDAD DEL PROYECTO</th>
 		</tr>
 		<tr class="tabla-datos" height="50">
-			<td class="texto-medio" colspan="4">{{$analisis_funcional->finalidadProyecto}}</td>
+			<td class="texto-medio" colspan="6">{{$analisis_funcional->finalidadProyecto}}</td>
 		</tr>
 
-		<tr><td colspan="4"></td></tr>
+		<tr><td colspan="6"></td></tr>
 
 		<tr class="tabla-datos">
-			<th colspan="4" class="encabezado-tabla">ANALISIS DE RESULTADO</th>
+			<th colspan="6" class="encabezado-tabla">ANALISIS DE RESULTADO</th>
 		</tr>
 		<tr class="tabla-datos" height="150">
-			<td class="texto-medio" colspan="4">{{$analisis_funcional->analisisResultado}}</td>
+			<td class="texto-medio" colspan="6">{{$analisis_funcional->analisisResultado}}</td>
 		</tr>
 
-		<tr><td colspan="4"></td></tr>
+		<tr><td colspan="6"></td></tr>
 
 		<tr class="tabla-datos">
-			<th colspan="4" class="encabezado-tabla">BENEFICIARIOS</th>
+			<th colspan="6" class="encabezado-tabla">BENEFICIARIOS</th>
 		</tr>
 		<tr class="tabla-datos" height="50">
-			<td class="texto-medio" colspan="4">{{$analisis_funcional->beneficiarios}}</td>
+			<td class="texto-medio" colspan="6">{{$analisis_funcional->beneficiarios}}</td>
 		</tr>
 
-		<tr><td colspan="4"></td></tr>
+		<tr><td colspan="6"></td></tr>
 
 		<tr class="tabla-datos">
-			<th colspan="4" class="encabezado-tabla">JUSTIFICACIÓN GLOBAL DEL PROYECTO</th>
+			<th colspan="6" class="encabezado-tabla">JUSTIFICACIÓN GLOBAL DEL PROYECTO</th>
 		</tr>
 		<tr class="tabla-datos" height="150">
-			<td class="texto-medio" colspan="4">{{$analisis_funcional->justificacionGlobal}}</td>
+			<td class="texto-medio" colspan="6">{{$analisis_funcional->justificacionGlobal}}</td>
 		</tr>
 
-		<tr><td colspan="4"></td></tr>
+		<tr><td colspan="6"></td></tr>
 
 		<tr class="negrita" height="20">
-			<td colspan="2" align="center">RESPONSABLE DE LA INFORMACIÓN</td>
-			<td colspan="2" align="center">LIDER DEL PROYECTO</td>
+			<td colspan="3" align="center">RESPONSABLE DE LA INFORMACIÓN</td>
+			<td colspan="3" align="center">LIDER DEL PROYECTO</td>
 		</tr>
 		<tr height="40">
-			<td colspan="2" class="texto-centro">___________________________________________________</td>
-			<td colspan="2" class="texto-centro">___________________________________________________</td>
+			<td colspan="3" class="texto-centro">___________________________________________________</td>
+			<td colspan="3" class="texto-centro">___________________________________________________</td>
 		</tr>
 		<tr class="negrita" height="20">
-			<td colspan="2" align="center">Nombre</td>
-			<td colspan="2" align="center">{{ $proyecto['liderProyecto'] }}</td>
+			<td colspan="3" align="center">Nombre</td>
+			<td colspan="3" align="center">{{ $proyecto['liderProyecto'] }}</td>
 		</tr>
 		<tr class="negrita" height="20">
-			<td colspan="2" align="center">Cargo</td>
-			<td colspan="2" align="center">Cargo</td>
+			<td colspan="3" align="center">Cargo</td>
+			<td colspan="3" align="center">Cargo</td>
 		</tr>
 
 	</table>
