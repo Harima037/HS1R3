@@ -190,10 +190,12 @@
 </div>
 </div>
 <input type="hidden" id="id" name="id" value="{{$id}}">
+<input type="hidden" id="id_clasificacion" name="id_clasificacion" value="{{$id_clasificacion}}">
 <input type="hidden" id="mes" name="mes" value="{{$mes_clave}}">
 @stop
 
 @section('modals')
+
 <div class="modal fade" id="modalEditarAvance" tabindex="-1" role="dialog" aria-labelledby="modalEditarAvanceLabel" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-dialog-85-screen">
         <div class="modal-content modal-content-85-screen">
@@ -270,34 +272,23 @@
 			                			</tr>
 			                		</thead>
 			                		<tbody>
-			                			<tr data-clave-jurisdiccion="OC">
-			                				<td>OC - Oficina Central</td>
-			                				<td class="meta-programada bg-success" data-meta="0">0</td>
-			                				<td class="meta-del-mes" data-meta-mes="0">0</td>
-			                				<td>
-			                					<div class="form-group" style="margin-bottom:0;">
-			                						<input type="number" class="form-control avance-mes" name="avance[OC]" id="avance_OC" data-jurisdiccion="OC" data-meta-programada="" disabled="disabled">
-			                					</div>
+			                			@foreach ($jurisdicciones as $clave => $jurisdiccion)
+			                			<tr data-clave-jurisdiccion="{{$clave}}">
+			                				<td class="accion-municipio">
+			                					<span class=""></span> {{$clave}} - {{$jurisdiccion}}
 			                				</td>
-			                				<td class="avance-acumulado" data-acumulado="0">0</td>
-			                				<td class="avance-total bg-info" data-avance-total="0">0</td>
-			                				<td class="avance-mes" data-estado-avance=""></td>
-			                			</tr>
-			                			@foreach ($jurisdicciones as $jurisdiccion)
-			                			<tr data-clave-jurisdiccion="{{$jurisdiccion->clave}}">
-			                				<td>{{$jurisdiccion->clave}} - {{$jurisdiccion->nombre}}</td>
 			                				<td class="meta-programada bg-success" data-meta="0">0</td>
 			                				<td class="meta-del-mes" data-meta-mes="0">0</td>
 			                				<td>
 			                					<div class="form-group" style="margin-bottom:0;">
-			                						<input type="number" class="form-control avance-mes" name="avance[{{$jurisdiccion->clave}}]" id="avance_{{$jurisdiccion->clave}}" data-jurisdiccion="{{$jurisdiccion->clave}}" data-meta-programada="">
+			                						<input type="text" class="form-control avance-mes" name="avance[{{$clave}}]" id="avance_{{$clave}}" data-jurisdiccion="{{$clave}}" data-meta-programada="" disabled="disabled">
 			                					</div>
 			                				</td>
 			                				<td class="avance-acumulado" data-acumulado="0">0</td>
 			                				<td class="avance-total bg-info" data-avance-total="0">0</td>
 			                				<td class="avance-mes"></td>
 			            				</tr>
-			                			@endforeach
+			                			@endforeach                                        
 			                		</tbody>
 			                		<tfoot>
 			                			<th>Totales</th>
@@ -309,6 +300,52 @@
 			                			<th id="total-porcentaje" data-estado-avance="">0%</th>
 			                		</tfoot>
 			                	</table>
+			                	<div id="panel-estructura-localidades" class="hidden">
+			                		<table class="table table-condensed">
+				                		<thead>
+				                			<tr>
+					                			<th>Municipios</th>
+					                			<th>
+					                				<select class="form-control select-lista-municipios">
+					                					<option value="">Selecciona un municipio</option>
+					                				</select>
+					                			</th>
+					                			<th width="1"><button type="button" class="btn btn-link btn-ocultar-avance-localidades">Ocultar</button></th>
+					                		</tr>
+				                		</thead>
+				                	</table>
+				                	<div style="max-height:300px; overflow-x:auto;">
+				                		<table class="table table-condensed table-bordered tabla-avance-localidades">
+				                			<thead>
+					                			<tr>
+					                				<th rowspan="2">Localidad</th>
+						                			<th colspan="2" class="bg-success">Meta Programada</th>
+						                			<th colspan="3" class="bg-info">Avance</th>
+					                			</tr>
+					                			<tr>
+					                				<th class="bg-success">Acumulada</th>
+					                				<th class="bg-success" nowrap="nowrap">Mes actual</th>
+					                				<th class="bg-info" nowrap="nowrap">Mes actual</th>
+					                				<th class="bg-info">Acumulado</th>
+					                				<th class="bg-info">Total</th>
+					                			</tr>
+					                		</thead>
+					                		<tbody></tbody>
+					                	</table>
+				                	</div>
+				                	<table class="table table-condensed tabla-totales-municipio">
+				                		<tfoot>
+				                			<tr>
+					                			<th>Meta Programada Acumulada</th>
+					                			<td class="total-municipio-meta">0</td>
+					                			<th>Avance Acumulado</th>
+					                			<td class="total-municipio-avance">0</td>
+					                			<th>Porcentaje de Avance</th>
+					                			<td class="total-municipio-porcentaje">0%</td>
+					                		</tr>
+				                		</tfoot>
+				                	</table>
+			                	</div>
 							</div>
 							<div role="tabpanel" class="tab-pane" id="panel-justificacion">
 								<br>
@@ -385,7 +422,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                 <!--<button type="button" class="btn btn-success" id="btn-guardar-avance">Guardar Avance</button>-->
             </div>
         </div><!-- /.modal-content -->
