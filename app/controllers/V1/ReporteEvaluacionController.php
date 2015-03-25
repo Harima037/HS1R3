@@ -47,6 +47,10 @@ class ReporteEvaluacionController extends BaseController {
 			$query->where('mes','=',$mes_actual)->orderBy('mes','ASC');
 		},'componentes.actividades.planMejora'=>function($query) use ($mes_actual){
 			$query->where('mes','=',$mes_actual)->orderBy('mes','ASC');
+		},'componentes.desgloseConDatos.metasMes'=>function($query) use ($mes_actual){
+			$query->where('mes','=',$mes_actual)->orderBy('mes','ASC');
+		},'componentes.desgloseConDatos.metasMesAcumuladas'=>function($query) use ($mes_actual){
+			$query->where('mes','<',$mes_actual)->orderBy('mes','ASC');
 		},'analisisFuncional'=>function($query) use ($mes_actual){
 			$query->where('mes','=',$mes_actual)->orderBy('mes','ASC');
 		}))->find($id);
@@ -84,6 +88,7 @@ class ReporteEvaluacionController extends BaseController {
 		$data['beneficiarios_avances'] = array();
 		$data['avances_mes'] = array('componentes'=>array(),'actividades'=>array());
 		$data['jurisdicciones_mes'] = array('componentes'=>array(),'actividades'=>array());
+		$data['localidades_mes'] = array('componentes'=>array(),'actividades'=>array());
 		$data['conteo_elementos'] = 0;
 		$data['planes_mejora'] = array('componentes'=>array(),'actividades'=>array());
 		foreach ($recurso->componentes as $componente) {
@@ -150,6 +155,16 @@ class ReporteEvaluacionController extends BaseController {
 					'meta_programada' => $metas_programada[$meta_mes->claveJurisdiccion],
 					'avance_mes' => $meta_mes->avance,
 					'avance_acumulado' => $avance_acumulado[$meta_mes->claveJurisdiccion]
+				);
+			}
+
+			foreach ($componente->desgloseConDatos as $desglose) {
+				$data['localidades_mes']['componentes'][$componente->id][$desglose->claveJurisdiccion][] = array(
+					'municipio' => $desglose->municipio,
+					'localidad' => $desglose->localidad,
+					'meta_programada' => $desglose->metasMes[0]->meta + ((count($desglose->metasMesAcumuladas))?$desglose->metasMesAcumuladas[0]->meta:0),
+					'avance_mes' => $desglose->metasMes[0]->avance,
+					'avance_acumulado' => $desglose->metasMes[0]->avance + ((count($desglose->metasMesAcumuladas))?$desglose->metasMesAcumuladas[0]->avance:0)
 				);
 			}
 
@@ -305,10 +320,19 @@ class ReporteEvaluacionController extends BaseController {
 				$datos['jurisdicciones_mes']['componentes'] = $data['jurisdicciones_mes']['componentes'][$i];
 				$datos['jurisdicciones_mes']['actividades'] = $data['jurisdicciones_mes']['actividades'][$i];
 
+				$datos['localidades_mes']['componentes'] = $data['localidades_mes']['componentes'];
+				$datos['localidades_mes']['actividades'] = $data['localidades_mes']['actividades'];
+
+				//var_dump($datos['localidades_mes']['componentes']); die;
+
 				$datos['jurisdicciones'] = $data['jurisdicciones'];
 
 				$excel->sheet('SM '.$datos['mes']['abrev'], function($sheet)  use ($datos){
 			        $sheet->loadView('rendicion-cuentas.excel.seguimiento-metas-mes', $datos);
+			        $imagen = $this->obtenerImagen('LogoFederal.png','A1');
+					$imagen->setWorksheet($sheet);
+			        $imagen = $this->obtenerImagen('LogoInstitucional.png','J1');
+					$imagen->setWorksheet($sheet);
 			    });
 
 			    $excel->getActiveSheet()->getStyle('A7:J7')->getAlignment()->setWrapText(true); 
@@ -328,14 +352,19 @@ class ReporteEvaluacionController extends BaseController {
 
 			    	$excel->sheet('SB'.$datos['mes']['trimestre'].'TRIM', function($sheet)  use ($datos_beneficiarios){
 				        $sheet->loadView('rendicion-cuentas.excel.seguimiento-beneficiarios', $datos_beneficiarios);
+				        $imagen = $this->obtenerImagen('LogoFederal.png','A1');
+						$imagen->setWorksheet($sheet);
+				        $imagen = $this->obtenerImagen('LogoInstitucional.png','N1');
+						$imagen->setWorksheet($sheet);
+				        $sheet->getStyle('A7:O7')->getAlignment()->setWrapText(true);
 				    });
 
 				    $total_beneficiarios = count($datos_beneficiarios['beneficiarios']);
 				    $row = 9;
-				    
+
 				   	for($i = 0 ; $i < $total_beneficiarios ; $i++){
-				   		$excel->getActiveSheet()->getStyle('F'.$row.':N'.$row)->getAlignment()->setWrapText(true);
-				    	$excel->getActiveSheet()->getStyle('A'.($row+1).':O'.($row+1))->getAlignment()->setWrapText(true);
+				   		$excel->getActiveSheet()->getStyle('F'.$row.':O'.$row)->getAlignment()->setWrapText(true);
+				    	$excel->getActiveSheet()->getStyle('A'.($row+1).':N'.($row+1))->getAlignment()->setWrapText(true);
 				    	$row += 11;
 				    	//throw new \Exception($row, 1);
 				   	}
@@ -352,7 +381,14 @@ class ReporteEvaluacionController extends BaseController {
 				   	$datos_analisis['analisis_funcional'] = $data['recurso']->analisisFuncional[0];
 				   	$excel->sheet('CP'.$datos['mes']['trimestre'].'TRIM', function($sheet)  use ($datos_analisis){
 				        $sheet->loadView('rendicion-cuentas.excel.analisis-funcional', $datos_analisis);
+
+				        $imagen = $this->obtenerImagen('LogoFederal.png','A1');
+				        $imagen->setWorksheet($sheet);
+						
+				        $imagen = $this->obtenerImagen('LogoInstitucional.png','E1',60);
+						$imagen->setWorksheet($sheet);
 				    });
+				    $excel->getActiveSheet()->getStyle('A8:D8')->getAlignment()->setWrapText(true);
 				    $excel->getActiveSheet()->getStyle('A10:D10')->getAlignment()->setWrapText(true);
 
 				    $datos_plan['componentes'] = $data['componentes'];
@@ -364,12 +400,24 @@ class ReporteEvaluacionController extends BaseController {
 				        $sheet->getStyle('A7:M7')->getAlignment()->setWrapText(true);
 				        $sheet->getStyle('A10:M10')->getAlignment()->setWrapText(true);
 				        $sheet->getStyle('A11:M'.(11 + $elementos))->getAlignment()->setWrapText(true); 
+				        $imagen = $this->obtenerImagen('LogoFederal.png','A1');
+						$imagen->setWorksheet($sheet);
+				        $imagen = $this->obtenerImagen('LogoInstitucional.png','L1',60);
+						$imagen->setWorksheet($sheet);
 				    });
 				    //$excel->getActiveSheet()->getStyle('A9:M9')->getAlignment()->setWrapText(true);
 			    }
 			//}
 		})->download('xls');
-
 	}
 
+	private function obtenerImagen($imagen,$celda,$offset = 10){
+		$objDrawing = new \PHPExcel_Worksheet_Drawing();
+		$objDrawing->setPath('./img/'.$imagen);// filesystem reference for the image file
+		$objDrawing->setHeight(100);// sets the image height to 36px (overriding the actual image height); 
+		$objDrawing->setWidth(200);// sets the image height to 36px (overriding the actual image height); 
+		$objDrawing->setCoordinates($celda);// pins the top-left corner of the image to cell D24
+		$objDrawing->setOffsetX($offset);// pins the top left corner of the image at an offset of 10 points horizontally to the right of the top-left corner of the cell
+		return $objDrawing;
+	}
 }

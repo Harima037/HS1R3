@@ -110,35 +110,35 @@
 		</tr>
 
 		<tr class="tabla-datos" height="50">
-			<th width="28" class="encabezado-tabla">NIVEL</th>
-			<th width="58" class="encabezado-tabla">INDICADOR</th>
-			<th width="20" class="encabezado-tabla">% DE AVANCE ACUMULADO</th>
-			<th width="45" class="encabezado-tabla">ANÁLISIS DE RESULTADOS </th>
-			<th width="36" class="encabezado-tabla">JUSTIFICACIÓN</th>
-			<th width="16" class="encabezado-tabla">SI</th>
-			<th width="16" class="encabezado-tabla">NO</th>
+			<th width="18" class="encabezado-tabla">NIVEL</th>
+			<th width="30" class="encabezado-tabla">INDICADOR</th>
+			<th width="15" class="encabezado-tabla">% DE AVANCE ACUMULADO</th>
+			<th width="30" class="encabezado-tabla">ANÁLISIS DE RESULTADOS </th>
+			<th width="30" class="encabezado-tabla">JUSTIFICACIÓN</th>
+			<th width="10" class="encabezado-tabla">SI</th>
+			<th width="10" class="encabezado-tabla">NO</th>
 			<th width="22" class="encabezado-tabla">ACCIÓN DE MEJORA</th>
 			<th width="22" class="encabezado-tabla">GRUPO DE TRABAJO</th>
-			<th width="22" class="encabezado-tabla">FECHA DE INICIO</th>
-			<th width="22" class="encabezado-tabla">FECHA DE TERMINO</th>
-			<th width="22" class="encabezado-tabla">FECHA DE NOTIFICACIÓN</th>
-			<th width="32" class="encabezado-tabla">DOCUMENTACIÓN COMPROBATORIA</th>
+			<th width="12" class="encabezado-tabla">FECHA DE INICIO</th>
+			<th width="12" class="encabezado-tabla">FECHA DE TERMINO</th>
+			<th width="13" class="encabezado-tabla">FECHA DE NOTIFICACIÓN</th>
+			<th width="25" class="encabezado-tabla">DOCUMENTACIÓN COMPROBATORIA</th>
 		</tr>
 
 		@foreach($componentes as $index => $componente)
-		<tr height="60" class="tabla-datos">
+		<tr height="90" class="tabla-datos">
 			<td class="texto-medio">Componente {{$index+1}}</td>
 			<td class="texto-medio">{{$componente['indicador']}}</td>
-			<td class="texto-medio">
+			<td class="texto-medio texto-centro">
 			@if($avances_mes['componentes'][$componente['id']]['meta_programada'] > 0)
 				{{
-				(
+				round(
 					(
 						$avances_mes['componentes'][$componente['id']]['avance_acumulado']/
 						$avances_mes['componentes'][$componente['id']]['meta_programada']
 					)
 					*100
-				)
+				,2)
 				}}
 			@else
 				100
@@ -168,19 +168,19 @@
 		</tr>
 
 		@foreach($componente['actividades'] as $indice => $actividad)
-		<tr height="60" class="tabla-datos">
+		<tr height="90" class="tabla-datos">
 			<td class="texto-medio">Actividad {{$index+1}}.{{$indice+1}}</td>
 			<td class="texto-medio">{{$actividad['indicador']}}</td>
-			<td class="texto-medio">
+			<td class="texto-medio texto-centro">
 			@if($avances_mes['actividades'][$actividad['id']]['meta_programada'] > 0)
 				{{
-				(
+				round(
 					(
 						$avances_mes['actividades'][$actividad['id']]['avance_acumulado']/
 						$avances_mes['actividades'][$actividad['id']]['meta_programada']
 					)
 					*100
-				)
+				,2)
 				}}
 			@else
 				100
