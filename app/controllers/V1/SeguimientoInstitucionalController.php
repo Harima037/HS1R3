@@ -5,7 +5,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
-use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionPlanMejora,EvaluacionComentario,EvaluacionProyectoMes;
+use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionPlanMejora,EvaluacionComentario,EvaluacionProyectoMes,ComponenteDesglose;
 
 class SeguimientoInstitucionalController extends BaseController {
 	private $reglasBeneficiarios = array(
@@ -160,6 +160,41 @@ class SeguimientoInstitucionalController extends BaseController {
 			if($parametros['mostrar'] == 'datos-proyecto-avance'){
 				$recurso = Proyecto::with('datosFuncion','datosSubFuncion','datosProgramaPresupuestario','componentes.metasMesAgrupado'
 					,'componentes.registroAvance','componentes.actividades.metasMesAgrupado','componentes.actividades.registroAvance')->find($id);
+			}elseif ($parametros['mostrar'] == 'datos-municipio-avance') {
+				//$id = idComponente y $parametros['clave-municipio'] y $parametros['nivel'] = 'componente'
+				$mes_actual = Util::obtenerMesActual();
+				if($parametros['nivel'] == 'componente'){
+					$recurso = ComponenteDesglose::listarDatos()->where('claveMunicipio','=',$parametros['clave-municipio'])
+													->where('idComponente','=',$id);
+				}
+				$recurso = $recurso->with(array('metasMes'=>function($query) use ($mes_actual){
+					$query->where('mes','=',$mes_actual);
+				},'metasMesAcumuladas'=>function($query) use ($mes_actual){
+					$query->where('mes','<=',$mes_actual);
+				}))->get();
+			}elseif($parametros['mostrar'] == 'datos-metas-avance'){
+				$mes_actual = Util::obtenerMesActual();
+				if($parametros['nivel'] == 'componente'){
+					$recurso = Componente::getModel();
+				}else{
+					$recurso = Actividad::getModel();
+				}
+				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
+				$recurso = $recurso->with(array('metasMesJurisdiccion'=>function($query) use ($mes_actual){
+					$query->where('mes','<=',$mes_actual);
+				},'registroAvance'=>function($query) use ($mes_actual){
+					$query->where('mes','=',$mes_actual);
+				},'metasMes' => function($query) use ($mes_actual){
+					$query->where('mes','=',$mes_actual);
+				},'planMejora'=>function($query) use ($mes_actual){
+					$query->where('mes','=',$mes_actual);
+				},'unidadMedida','comentarios'))->find($id);
+
+				if($parametros['nivel'] == 'componente'){
+					$recurso->load('desgloseMunicipios');
+					//$queries = DB::getQueryLog();
+					//throw new Exception(print_r(end($queries),true), 1);
+				}
 			}elseif($parametros['mostrar'] == 'datos-metas-avance'){
 				$mes_actual = Util::obtenerMesActual();
 				if($parametros['nivel'] == 'componente'){
@@ -177,6 +212,13 @@ class SeguimientoInstitucionalController extends BaseController {
 				},'planMejora'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
 				},'unidadMedida'))->find($id);
+				
+				if($parametros['nivel'] == 'componente'){
+					$recurso->load('desgloseMunicipios');
+					//$queries = DB::getQueryLog();
+					//throw new Exception(print_r(end($queries),true), 1);
+				}
+				
 			}elseif($parametros['mostrar'] == 'datos-beneficiarios-avance'){
 				$mes_actual = Util::obtenerMesActual();
 				$recurso['acumulado'] = RegistroAvanceBeneficiario::where('idProyecto','=',$parametros['id-proyecto'])
