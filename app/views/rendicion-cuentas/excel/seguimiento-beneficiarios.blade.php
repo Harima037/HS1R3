@@ -42,6 +42,7 @@
 		}
 		.sin-bordes{
 			border: 1px solid #FFFFFF;
+			border-collapse: collapse;
 		}
 		.encabezado-tabla{
 			font-family: Arial;
@@ -119,25 +120,24 @@
 			<td class="sin-bordes"></td>
 			<td class="encabezado-tabla" colspan="4">POBLACIÓN</td>
 			<td class="encabezado-tabla" colspan="5">MARGINACIÓN</td>
-			<td class="sin-bordes"></td>
+			<td rowspan="2" width="15" class="encabezado-tabla">POBLACIÓN ACUMULADA</td>
+			<!--td class="sin-bordes"></td-->
 		</tr>
-
 		<tr class="tabla-datos" height="30">
-			<td class="encabezado-tabla">TIPO</td>
-			<td width="22" class="encabezado-tabla">GÉNERO</td>
-			<td width="22" class="encabezado-tabla">TOTAL</td>
-			<td width="22" class="encabezado-tabla">ZONA URBANA</td>
-			<td width="22" class="encabezado-tabla">ZONA RURAL</td>
-			<td width="22" class="encabezado-tabla">MESTIZA</td>
-			<td width="22" class="encabezado-tabla">INDÍGENA</td>
-			<td width="22" class="encabezado-tabla">INMIGRANTE</td>
-			<td width="22" class="encabezado-tabla">OTROS</td>
-			<td width="22" class="encabezado-tabla">MUY ALTA</td>
-			<td width="22" class="encabezado-tabla">ALTA</td>
-			<td width="22" class="encabezado-tabla">MEDIA</td>
-			<td width="22" class="encabezado-tabla">BAJA</td>
-			<td width="22" class="encabezado-tabla">MUY BAJA</td>
-			<td width="22" class="encabezado-tabla">POBLACIÓN ACUMULADA</td>
+			<td width="25" class="encabezado-tabla">TIPO</td>
+			<td width="12" class="encabezado-tabla">GÉNERO</td>
+			<td width="15" class="encabezado-tabla">TOTAL</td>
+			<td width="15" class="encabezado-tabla">ZONA URBANA</td>
+			<td width="15" class="encabezado-tabla">ZONA RURAL</td>
+			<td width="15" class="encabezado-tabla">MESTIZA</td>
+			<td width="15" class="encabezado-tabla">INDÍGENA</td>
+			<td width="15" class="encabezado-tabla">INMIGRANTE</td>
+			<td width="15" class="encabezado-tabla">OTROS</td>
+			<td width="15" class="encabezado-tabla">MUY ALTA</td>
+			<td width="15" class="encabezado-tabla">ALTA</td>
+			<td width="15" class="encabezado-tabla">MEDIA</td>
+			<td width="15" class="encabezado-tabla">BAJA</td>
+			<td width="15" class="encabezado-tabla">MUY BAJA</td>
 		</tr>
 
 		<tr class="tabla-datos" height="40">
@@ -146,6 +146,7 @@
 			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['total']}} </td>
 			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['urbana']}} </td>
 			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['rural']}} </td>
+			<!--td width="0"></td-->
 			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['mestiza']}} </td>
 			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['indigena']}} </td>
 			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['f']['inmigrante']}} </td>
@@ -164,6 +165,7 @@
 			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['total']}} </td>
 			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['urbana']}} </td>
 			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['rural']}} </td>
+			<!--td width="0"></td-->
 			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['mestiza']}} </td>
 			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['indigena']}} </td>
 			<td class="texto-centro texto-medio"> {{$beneficiarios_avances[$beneficiario['id']]['m']['inmigrante']}} </td>
@@ -188,6 +190,7 @@
 			<td class="texto-centro texto-medio">
 				{{ $beneficiarios_avances[$beneficiario['id']]['f']['rural'] + $beneficiarios_avances[$beneficiario['id']]['m']['rural'] }}
 			</td>
+			<!--td width="0"></td-->
 			<td class="texto-centro texto-medio">
 				{{ $beneficiarios_avances[$beneficiario['id']]['f']['mestiza'] + $beneficiarios_avances[$beneficiario['id']]['m']['mestiza'] }}
 			</td>
