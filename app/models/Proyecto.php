@@ -13,7 +13,7 @@ class Proyecto extends BaseModel
         parent::boot();
 
         static::updating(function($item){
-        	if($item->idEstatusProyecto == 5 && $item->numeroProyectoEstrategico == 0){
+        	if($item->idEstatusProyecto == 4 && $item->numeroProyectoEstrategico == 0){
         		$count = Proyecto::where('unidadResponsable',$item->unidadResponsable)
         					 ->where('finalidad',$item->finalidad)
         					 ->where('funcion',$item->funcion)
