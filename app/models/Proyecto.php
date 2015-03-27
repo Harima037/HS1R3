@@ -8,12 +8,13 @@ class Proyecto extends BaseModel
 	protected $table = "proyectos";
 	protected $appends = array('ClavePresupuestaria');
 	
-	/*
+	
 	public static function boot(){
         parent::boot();
 
-        static::creating(function($item){
-        	$count = Proyecto::where('unidadResponsable',$item->unidadResponsable)
+        static::updating(function($item){
+        	if($item->idEstatusProyecto == 4 && $item->numeroProyectoEstrategico == 0){
+        		$count = Proyecto::where('unidadResponsable',$item->unidadResponsable)
         					 ->where('finalidad',$item->finalidad)
         					 ->where('funcion',$item->funcion)
         					 ->where('subFuncion',$item->subFuncion)
@@ -24,10 +25,11 @@ class Proyecto extends BaseModel
         					 ->where('actividadInstitucional',$item->actividadInstitucional)
         					 ->where('proyectoEstrategico',$item->proyectoEstrategico)
         					 ->max('numeroProyectoEstrategico');
-            $item->numeroProyectoEstrategico = ($count + 1);
+            	$item->numeroProyectoEstrategico = ($count + 1);
+        	}
         });
     }
-    */
+    
 
     public function fibap(){
         return $this->hasOne('FIBAP','idProyecto');

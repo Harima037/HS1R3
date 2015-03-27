@@ -41,6 +41,9 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		
 		Route::get('fibap',array('uses'=>'FibapController@index'));
 		Route::any('formulario-fibap',array('uses'=>'FibapController@formulario'));
+
+		Route::get('programas-presupuestarios',array('uses'=>'ProgramaPresupuestarioController@index'));
+		Route::get('editar-programa/{id?}',array('uses'=>'ProgramaPresupuestarioController@editar'));
 	});
 	
 	Route::group(array('prefix'=>'revision'), function(){
@@ -84,6 +87,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('revision-proyectos',	'V1\RevisionController');
 		Route::resource('segui-proyectos-inst', 'V1\SeguimientoInstitucionalController');
 		Route::resource('segui-proyectos-inv', 'V1\SeguimientoInstitucionalController');
+
+		Route::resource('programas-presupuestarios','V1\ProgramaPresupuestarioController');
 
 		Route::resource('reporte-evaluacion',	'V1\ReporteEvaluacionController', array('only'=>array('show')));
 	});
