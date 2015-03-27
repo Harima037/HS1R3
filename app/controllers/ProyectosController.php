@@ -46,7 +46,11 @@ class ProyectosController extends \BaseController {
 		$datos['grid_componentes'] = View::make('expediente.listado-componentes');
 
 		//$datos['grid_beneficiarios'] = View::make('expediente.formulario-caratula-beneficiarios');
-		
+		$datos_financiamiento = array(
+			'subfuentes_financiamiento' => SubFuenteFinanciamiento::all()
+		);
+		$datos['grid_fuentes_financiamiento'] = View::make('expediente.formulario-caratula-financiamiento',$datos_financiamiento);
+
 		//Cargar el formulario para dar de alta actividades
 		$datos_componentes['identificador'] = 'actividad'; //El identificador se agrega al id de los elementos del formulario
 		$datos_componentes['jurisdicciones'] = array('OC'=>'O.C.');
@@ -54,20 +58,7 @@ class ProyectosController extends \BaseController {
 			'1'=>'ENE','2'=>'FEB','3'=>'MAR', '4'=>'ABR', '5'=>'MAY', '6'=>'JUN', 
 			'7'=>'JUL','8'=>'AGO','9'=>'SEP','10'=>'OCT','11'=>'NOV','12'=>'DIC'
 		);
-		/*array(
-			'ENE'=>'Enero',
-			'FEB'=>'Febrero',
-			'MAR'=>'Marzo',
-			'ABR'=>'Abril',
-			'MAY'=>'Mayo',
-			'JUN'=>'Junio',
-			'JUL'=>'Julio',
-			'AGO'=>'Agosto',
-			'SEP'=>'Septiembre',
-			'OCT'=>'Octubre',
-			'NOV'=>'Noviembre',
-			'DIC'=>'Diciembre'
-		);*/
+		
 		$datos['formulario_actividades'] = View::make('expediente.formulario-componente',$datos_componentes);
 
 		//Cargar el formulario para dar de alta compoenentes

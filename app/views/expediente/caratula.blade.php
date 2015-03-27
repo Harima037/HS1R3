@@ -14,6 +14,7 @@
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
 <script src="{{ URL::to('js/modulos/expediente/caratula.js')}}"></script>
+<script src="{{ URL::to('js/modulos/expediente/fuenteFinanciamiento.js')}}"></script>
 @stop
 
 @section('aside')
@@ -44,6 +45,11 @@
                         </a>
                     </li>
                     <li role="presentation" class="disabled">
+                        <a id="tablink-fuentes-financiamiento" href="#caratula-fuentes-financiamiento" role="tab">
+                            Financiamiento
+                        </a>
+                    </li>
+                    <li role="presentation" class="disabled">
                         <a id="tablink-componentes" href="#componentes" role="tab">
                             Componentes <span class="badge">0 / 2</span>
                         </a>
@@ -58,6 +64,10 @@
                     <div role="tabpanel" class="tab-pane" id="caratula-beneficiarios">
                         <br>
                         {{$grid_beneficiarios}}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="caratula-fuentes-financiamiento">
+                        <br>
+                        {{$grid_fuentes_financiamiento}}
                     </div>
                     <div role="tabpanel" class="tab-pane" id="componentes">
                         <br>

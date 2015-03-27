@@ -118,6 +118,8 @@ if($('#id').val()){
 			$('#tablink-componentes').parent().removeClass('disabled');
 			$('#tablink-beneficiarios').attr('data-toggle','tab');
 			$('#tablink-beneficiarios').parent().removeClass('disabled');
+			$('#tablink-fuentes-financiamiento').attr('data-toggle','tab');
+			$('#tablink-fuentes-financiamiento').parent().removeClass('disabled');
 
 			actualizar_grid_componentes(response.data.componentes);
 
@@ -126,6 +128,8 @@ if($('#id').val()){
 			}else if(response.data.idEstatusProyecto == 3){
 				mostrar_comentarios(response.data.comentarios);
 			}
+
+			fuenteFinanciamiento.init();
         }
     });
 }else if($('#id-fibap').val()){
@@ -682,6 +686,8 @@ $('#btn-proyecto-guardar').on('click',function(){
 				$('#tablink-componentes').parent().removeClass('disabled');
 				$('#tablink-beneficiarios').attr('data-toggle','tab');
 				$('#tablink-beneficiarios').parent().removeClass('disabled');
+				$('#tablink-fuentes-financiamiento').attr('data-toggle','tab');
+				$('#tablink-fuentes-financiamiento').parent().removeClass('disabled');
 	        },
 	        _error: function(response){
 	            try{
