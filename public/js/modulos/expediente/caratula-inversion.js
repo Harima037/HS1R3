@@ -53,6 +53,8 @@ if($('#id').val()){
 			$('#tab-link-datos-fibap').parent().removeClass('disabled');
 			$('#tab-link-caratula-beneficiarios').attr('data-toggle','tab');
 			$('#tab-link-caratula-beneficiarios').parent().removeClass('disabled');
+			$('#tablink-fuentes-financiamiento').attr('data-toggle','tab');
+			$('#tablink-fuentes-financiamiento').parent().removeClass('disabled');
 
 			if(response.extras.municipios){
         		fibapAcciones.cargar_municipios(response.extras.municipios);
@@ -108,6 +110,12 @@ if($('#id').val()){
 				bloquear_controles();
 			}else if(response.data.idEstatusProyecto == 3){
 				mostrar_comentarios(response.data.comentarios);
+			}
+
+			fuenteFinanciamiento.init(proyectoResource,$('#id').val());
+			if(response.data.fuentes_financiamiento.length){
+				fuenteFinanciamiento.llenar_datagrid(response.data.fuentes_financiamiento);
+				cambiar_icono_tabs('#tablink-fuentes-financiamiento','fa-check-square-o');
 			}
             /*
             actualizar_tabla_metas('actividad',response.data.jurisdicciones);
@@ -172,6 +180,10 @@ function editar_presupuesto(e){
 			fibapAcciones.mostrar_datos_presupuesto(response.data);
 		}
 	});
+}
+
+function editar_fuente_financiamiento(e){
+	fuenteFinanciamiento.editar_fuente(e);
 }
 /***********************************************************************************************
 								Acciones de Guardado
@@ -391,6 +403,8 @@ $('#btn-proyecto-guardar').on('click',function(){
 				$('#tab-link-datos-fibap').parent().removeClass('disabled');
 				$('#tab-link-caratula-beneficiarios').attr('data-toggle','tab');
 				$('#tab-link-caratula-beneficiarios').parent().removeClass('disabled');
+				$('#tablink-fuentes-financiamiento').attr('data-toggle','tab');
+				$('#tablink-fuentes-financiamiento').parent().removeClass('disabled');
 				if(response.extras){
 					if(response.extras.municipios){
 	            		fibapAcciones.cargar_municipios(response.extras.municipios);
@@ -400,6 +414,7 @@ $('#btn-proyecto-guardar').on('click',function(){
 						fibapAcciones.cargar_jurisdicciones(response.extras.jurisdicciones);
 					}
 				}
+				fuenteFinanciamiento.init(proyectoResource,$('#id').val());
 	        },
 	        _error: function(response){
 	            try{

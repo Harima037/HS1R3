@@ -391,7 +391,7 @@ function constructor_grupo_acordiones(padre,item,tipo,contenido_extra){ //tipo =
     contenido += '<div class="panel-heading" role="tab" id="cabecera_'+tipo+'_'+item.id+'">';
     contenido += '<h4 class="panel-title">';
     contenido += '<a data-toggle="collapse" data-parent="#'+padre+'" href="#contenido_'+tipo+'_'+item.id+'" aria-controls="contenido_'+tipo+'_'+item.id+'">';
-    contenido += item.objetivo;
+    contenido += item.indicador;
     contenido += '</a>';
     contenido += '</h4>';
     contenido += '</div>';

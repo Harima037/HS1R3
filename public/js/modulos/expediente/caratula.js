@@ -1191,7 +1191,7 @@ function checar_error_totales(){
 function sumar_totales(tipo,campo_suma,campo_total,mensaje){
 	var sub_total = 0;
 	$(tipo).each(function(){
-		sub_total += parseInt($(this).val()) || 0;
+		sub_total += parseInt($(this).val().replace(',','')) || 0;
 	});
 	$('#'+campo_suma).text(sub_total);
 	if(parseInt($('#'+campo_total).val()) != sub_total){

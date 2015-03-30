@@ -6,7 +6,7 @@ use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
 use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
 	FibapDatosProyecto, Titular, ComponenteDesglose, AntecedenteFinanciero, DesgloseMetasMes, DistribucionPresupuesto,Accion,
-	PropuestaFinanciamiento, DesgloseBeneficiario;
+	PropuestaFinanciamiento, DesgloseBeneficiario, ProyectoFinanciamiento, ProyectoFinanciamientoSubFuente;
 
 class InversionController extends ProyectosController {
 	private $reglasFibap = array(
@@ -101,9 +101,12 @@ class InversionController extends ProyectosController {
 				$data = $recurso;
 			}else{
 				$rows = Proyecto::getModel();
-				$rows = $rows->where('unidadResponsable','=',Sentry::getUser()->claveUnidad)
-							->where('idClasificacionProyecto','=',2)
+				$rows = $rows->where('idClasificacionProyecto','=',2)
 							->whereIn('idEstatusProyecto',[1,2,3,4]);
+
+				if(Sentry::getUser()->claveUnidad){
+					$rows = $rows->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
+				}
 				
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				
@@ -175,7 +178,8 @@ class InversionController extends ProyectosController {
 				}
 			}elseif($parametros['mostrar'] == 'editar-proyecto'){
 				$recurso = Proyecto::with('jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico',
-									'fibap.documentos','beneficiarios.tipoBeneficiario')
+									'fibap.documentos','beneficiarios.tipoBeneficiario',
+									'fuentesFinanciamiento.destinoGasto','fuentesFinanciamiento.fuenteFinanciamiento','fuentesFinanciamiento.subFuentesFinanciamiento')
 									->find($id);
 				if($recurso->idEstatusProyecto == 3){
 					$recurso->load('comentarios');
@@ -208,40 +212,11 @@ class InversionController extends ProyectosController {
 			}elseif ($parametros['mostrar'] == 'editar-antecedente') {
 				$recurso = AntecedenteFinanciero::find($id);
 			}elseif ($parametros['mostrar'] == 'editar-componente') {
-				# code...
 				$recurso = Accion::with('componente.actividades.unidadMedida','componente.metasMes','partidas','propuestasFinanciamiento')->find($id);
 			}elseif ($parametros['mostrar'] == 'editar-actividad') {
-				# code...
 				$recurso = Actividad::with('metasMes')->find($id);
 			}elseif ($parametros['mostrar'] == 'desglose-componente') {
-				# code...
-				//$recurso = Accion::with('datosComponenteDetalle','partidas','desglosePresupuesto')->find($id);
 				$recurso = Accion::with('datosComponenteDetalle','partidas')->find($id);
-				/*
-				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
-				$pagina = $parametros['pagina'];
-
-				$rows = ComponenteDesglose::listarDatos()->where('idComponente','=',$recurso->idComponente);
-
-				if(isset($parametros['buscar'])){
-					$rows = $rows->where(function($query) use ($parametros){
-									$query->where('jurisdiccion.nombre','like','%'.$parametros['buscar'].'%')
-										->orWhere('municipio.nombre','like','%'.$parametros['buscar'].'%')
-										->orWhere('localidad.nombre','like','%'.$parametros['buscar'].'%');
-								});
-					$total = $rows->count();
-					/*$queries = DB::getQueryLog();
-					$data['query'] = print_r(end($queries),true);*/
-				/*}else{				
-					$total = $rows->count();						
-				}*/
-				/*$recurso['total_desglose'] = $total;
-				$recurso['desglosePresupuesto'] = $rows->orderBy('id', 'desc')
-							->skip(($pagina-1)*10)->take(10)
-							->get();*/
-				/*if($recurso->distribucionPresupuestoAgrupado){
-					$recurso->distribucionPresupuestoAgrupado->load('jurisdiccion');
-				}*/
 			}elseif ($parametros['mostrar'] == 'editar-presupuesto'){
 				/***
 				*	Obtiene los datos del desglose del presupuesto de la Accion (GET)
@@ -267,6 +242,10 @@ class InversionController extends ProyectosController {
 				//
 				$recurso['desglose'] = $desglose;
 				$recurso['calendarizado'] = $calendarizado;
+			}
+		}elseif(isset($parametros['ver'])){
+			if($parametros['ver'] == 'financiamiento'){
+				$recurso = ProyectoFinanciamiento::with('subFuentesFinanciamiento')->find($id);
 			}
 		}
 
@@ -365,7 +344,7 @@ class InversionController extends ProyectosController {
 
 					$recurso = new FIBAP;
 
-					$recurso->claveUnidadResponsable = Sentry::getUser()->claveUnidad;
+					//$recurso->claveUnidadResponsable = Sentry::getUser()->claveUnidad;
 					$recurso->organismoPublico 		 = $parametros['organismo-publico'];
 					$recurso->sector 				 = $parametros['sector'];
 					$recurso->subcomite 			 = $parametros['subcomite'];
@@ -438,6 +417,8 @@ class InversionController extends ProyectosController {
 				*	- Guardar el desglose de metas por mes del componente
 				***/
 				$respuesta = $this->guardar_datos_desglose_presupuesto($parametros);
+			}elseif($parametros['guardar'] == 'financiamiento'){
+				$respuesta = parent::guardar_datos_financiamiento($parametros);
 			}
 		}catch(\Exception $ex){
 			$respuesta['http_status'] = 500;	
@@ -623,7 +604,7 @@ class InversionController extends ProyectosController {
 					$periodo_ant['inicio']	= $recurso->periodoEjecucionInicio;
 					$periodo_ant['fin'] 	= $recurso->periodoEjecucionFinal;
 
-					$recurso->claveUnidadResponsable = Sentry::getUser()->claveUnidad;
+					//$recurso->claveUnidadResponsable = Sentry::getUser()->claveUnidad;
 					$recurso->organismoPublico 		 = $parametros['organismo-publico'];
 					$recurso->sector 				 = $parametros['sector'];
 					$recurso->subcomite 			 = $parametros['subcomite'];
@@ -785,6 +766,8 @@ class InversionController extends ProyectosController {
 				*	- Guardar el desglose de metas por mes del componente
 				***/
 				$respuesta = $this->guardar_datos_desglose_presupuesto($parametros,$id);
+			}elseif($parametros['guardar'] == 'financiamiento'){
+				$respuesta = parent::guardar_datos_financiamiento($parametros,$id);
 			}
 		}catch(\Exception $ex){
 			$respuesta['http_status'] = 500;	
@@ -1033,6 +1016,15 @@ class InversionController extends ProyectosController {
 						//Eliminamos las actividades
 						return AntecedenteFinanciero::wherein('id',$ids)->delete();
 					});
+				}elseif($parametros['eliminar'] == 'financiamiento'){
+					$id_padre = $parametros['id-proyecto'];
+					$rows = DB::transaction(function() use ($ids){
+						$financiamiento = ProyectoFinanciamiento::whereIn('id',$ids)->get();
+						foreach ($financiamiento as $fuente) {
+							$fuente->subFuentesFinanciamiento()->detach();
+						}
+						return ProyectoFinanciamiento::whereIn('id',$ids)->delete();
+					});
 				}
 			}else{  //Sin parametros el delete viene de la lista de Proyectos de Inversión
 				/***
@@ -1100,6 +1092,12 @@ class InversionController extends ProyectosController {
 					Componente::whereIn('idProyecto',$ids)->delete();
 					Beneficiario::whereIn('idProyecto',$ids)->delete();
 
+					$fuentes_financiamiento = ProyectoFinanciamiento::whereIn('idProyecto',$ids)->get();
+					foreach ($fuentes_financiamiento as $fuente) {
+						$fuente->subFuentesFinanciamiento()->detach();
+					}
+					ProyectoFinanciamiento::whereIn('idProyecto',$ids)->delete();
+
 					return Proyecto::whereIn('id',$ids)->delete();
 				});
 			}
@@ -1145,6 +1143,9 @@ class InversionController extends ProyectosController {
 						$fibap->acciones->load('datosComponenteDetalle','propuestasFinanciamiento');
 						$data['acciones'] = $fibap->acciones;
 						$data['distribucion_total'] = $fibap->distribucionPresupuestoAgrupado;
+					}elseif($parametros['eliminar'] == 'financiamiento'){
+						$data['financiamiento'] = ProyectoFinanciamiento::with('destinoGasto','fuenteFinanciamiento','subFuentesFinanciamiento')
+																		->where('idProyecto','=',$id_padre)->get();
 					}
 				}
 			}else{

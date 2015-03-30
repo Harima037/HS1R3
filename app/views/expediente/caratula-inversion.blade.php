@@ -18,6 +18,7 @@
 <script src="{{ URL::to('js/modulos/expediente/caratulaFibap.js')}}"></script>
 <script src="{{ URL::to('js/modulos/expediente/fibapAntecedentes.js')}}"></script>
 <script src="{{ URL::to('js/modulos/expediente/fibapAcciones.js')}}"></script>
+<script src="{{ URL::to('js/modulos/expediente/fuenteFinanciamiento.js')}}"></script>
 <script src="{{ URL::to('js/modulos/expediente/caratula-inversion.js')}}"></script>
 @stop
 
@@ -49,6 +50,11 @@
                         </a>
                     </li>
                     <li role="presentation" class="disabled">
+                        <a id="tablink-fuentes-financiamiento" href="#caratula-fuentes-financiamiento" role="tab">
+                            <span class="fa fa-square-o"></span> Financiamiento
+                        </a>
+                    </li>
+                    <li role="presentation" class="disabled">
                         <a href="#caratula-fibap" aria-controls="caratula-fibap" role="tab" data-toggle="" id="tab-link-datos-fibap">
                             <span class="fa fa-square-o"></span> FIBAP
                         </a>
@@ -58,7 +64,7 @@
                             <span class="fa fa-square-o"></span> Antecedentes
                         </a>
                     </li>
-                    <li role="presentation" class="disabled pull-right">
+                    <li role="presentation" class="disabled">
                         <a href="#acciones-fibap" aria-controls="acciones-fibap" role="tab" data-toggle="" id="tab-link-acciones-fibap">
                             <span class="fa fa-square-o"></span> Componentes <span class="badge">0 / 2</span>
                         </a>
@@ -73,6 +79,10 @@
                     <div role="tabpanel" class="tab-pane" id="caratula-beneficiarios">
                         <br>
                         {{$grid_beneficiarios}}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="caratula-fuentes-financiamiento">
+                        <br>
+                        {{$grid_fuentes_financiamiento}}
                     </div>
                     <div role="tabpanel" class="tab-pane" id="caratula-fibap">
                         <br>

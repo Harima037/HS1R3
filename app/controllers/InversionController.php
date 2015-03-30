@@ -39,6 +39,13 @@ class InversionController extends ProyectosController {
 			'documentos_soporte' => DocumentoSoporte::all()
 		);
 
+		$datos_financiamiento = array(
+			'fuentes_financiamiento'	=> FuenteFinanciamiento::where('nivel','=',4)->get(),
+			'destino_gasto'				=> DestinoGasto::all(),
+			'subfuentes_financiamiento' => SubFuenteFinanciamiento::all()
+		);
+		$datos['grid_fuentes_financiamiento'] = View::make('expediente.formulario-caratula-financiamiento',$datos_financiamiento);
+
 		$datos['formulario_fibap'] = View::make('expediente.formulario-caratula-fibap',$catalogos_fibap);
 		$datos['formulario_antecedentes'] = View::make('expediente.formulario-caratula-antecedente');
 
