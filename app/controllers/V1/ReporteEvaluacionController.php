@@ -31,8 +31,8 @@ class ReporteEvaluacionController extends BaseController {
 	 */
 	public function show($id){
 		$mes_actual = Util::obtenerMesActual();
-		$recurso = Proyecto::with(array('liderProyecto','beneficiarios.tipoBeneficiario','datosProgramaPresupuestario','datosFuncion','datosSubFuncion',
-			'objetivoPedCompleto',
+		$recurso = Proyecto::with(array('liderProyecto','beneficiarios.tipoBeneficiario','datosProgramaPresupuestario','datosFuncion',
+			'datosSubFuncion','objetivoPedCompleto','fuentesFinanciamiento.fuenteFinanciamiento','fuentesFinanciamiento.subFuentesFinanciamiento',
 		'componentes.registroAvance'=>function($query) use ($mes_actual){
 			$query->where('mes','<=',$mes_actual)->orderBy('mes','ASC');
 		},'componentes.metasMes'=>function($query) use ($mes_actual){
@@ -377,6 +377,7 @@ class ReporteEvaluacionController extends BaseController {
 					$datos['proyecto']['eje'] = $data['recurso']->objetivoPedCompleto->padre->padre->padre->clave . ' ' . $data['recurso']->objetivoPedCompleto->padre->padre->padre->descripcion;
 
 				   	$datos_analisis['proyecto'] = $datos['proyecto'];
+				   	$datos_analisis['fuentes_financiamiento'] = $data['recurso']->fuentesFinanciamiento;
 				   	$datos_analisis['mes'] = $data['meses'][$i];
 				   	$datos_analisis['analisis_funcional'] = $data['recurso']->analisisFuncional[0];
 				   	$excel->sheet('CP'.$datos['mes']['trimestre'].'TRIM', function($sheet)  use ($datos_analisis){
@@ -389,6 +390,7 @@ class ReporteEvaluacionController extends BaseController {
 						$imagen->setWorksheet($sheet);
 				    });
 				    $excel->getActiveSheet()->getStyle('A8:D8')->getAlignment()->setWrapText(true);
+				    $excel->getActiveSheet()->getStyle('A11:E11')->getAlignment()->setWrapText(true);
 				    $excel->getActiveSheet()->getStyle('A10:D10')->getAlignment()->setWrapText(true);
 
 				    $datos_plan['componentes'] = $data['componentes'];

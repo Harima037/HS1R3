@@ -115,8 +115,18 @@
 		<tr class="tabla-datos" height="100">
 			<td colspan="2" class="texto-medio">{{$proyecto['funcion']}}</td>
 			<td class="texto-medio">{{$proyecto['subFuncion']}}</td>
-			<td></td>
-			<td colspan="2"></td>
+			<td class="texto-medio">
+				@foreach ($fuentes_financiamiento as $fuente)
+					{{$fuente->fuenteFinanciamiento->clave}}. {{$fuente->fuenteFinanciamiento->descripcion}} <br>
+				@endforeach
+			</td>
+			<td class="texto-medio" colspan="2">
+				@foreach ($fuentes_financiamiento as $fuente)
+					@foreach ($fuente->subFuentesFinanciamiento as $subfuente)
+						{{$subfuente->clave}} {{$subfuente->descripcion}} <br>
+					@endforeach
+				@endforeach
+			</td>
 		</tr>
 
 		<tr><td colspan="6"></td></tr>

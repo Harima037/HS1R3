@@ -83,8 +83,8 @@ class SeguimientoInstitucionalController extends BaseController {
 				$mes_actual = Util::obtenerMesActual();
 				$rows = Proyecto::getModel();
 				$rows = $rows->where('idEstatusProyecto','=',5)
-							->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto'])
-							->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
+							->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto']);
+							//->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
 							//->where('idClasificacionProyecto','=',$)
 				//$rows = $rows->with('registroAvance');
 				$rows = $rows->with(array('registroAvance'=>function($query){

@@ -162,98 +162,144 @@ class InversionController extends ProyectosController {
 		$data = array();
 		$parametros = Input::all();
 
-		if(isset($parametros['mostrar'])){
-			if($parametros['mostrar'] == 'detalles-proyecto'){
-				$recurso = Proyecto::contenidoCompleto()->find($id);
-				if($recurso){
-					$recurso->load('fibap');
+		try{
+
+			if(isset($parametros['mostrar'])){
+				if($parametros['mostrar'] == 'detalles-proyecto'){
+					$recurso = Proyecto::contenidoCompleto()->find($id);
+					if($recurso){
+						$recurso->load('fibap');
+						if($recurso->fibap){
+							$recurso->fibap->load('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado');
+							$recurso->fibap->distribucionPresupuestoAgrupado->load('objetoGasto');
+						}
+						$recurso->componentes->load('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion','desgloseCompleto');
+						foreach ($recurso->componentes as $key => $componente) {
+							$recurso->componentes[$key]->actividades->load('formula','dimension','frecuencia','tipoIndicador','unidadMedida');
+						}
+					}
+				}elseif($parametros['mostrar'] == 'editar-proyecto'){
+					$recurso = Proyecto::with('jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico',
+										'fibap.documentos','beneficiarios.tipoBeneficiario',
+										'fuentesFinanciamiento.destinoGasto','fuentesFinanciamiento.fuenteFinanciamiento','fuentesFinanciamiento.subFuentesFinanciamiento')
+										->find($id);
+					if($recurso->idEstatusProyecto == 3){
+						$recurso->load('comentarios');
+					}
 					if($recurso->fibap){
-						$recurso->fibap->load('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado');
-						$recurso->fibap->distribucionPresupuestoAgrupado->load('objetoGasto');
+						$recurso->fibap->load('antecedentesFinancieros','acciones.datosComponenteDetalle','distribucionPresupuestoAgrupado.objetoGasto');
+						$recurso->fibap->acciones->load('propuestasFinanciamiento');
 					}
-					$recurso->componentes->load('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion','desgloseCompleto');
-					foreach ($recurso->componentes as $key => $componente) {
-						$recurso->componentes[$key]->actividades->load('formula','dimension','frecuencia','tipoIndicador','unidadMedida');
+					if(!is_null($recurso)){
+						$extras = array();
+						if($recurso->idCobertura == 1){ 
+						//Cobertura Estado => Todos las Jurisdicciones
+							$extras['jurisdicciones'] = Jurisdiccion::all();
+							//$extras['municipios'] = Municipio::with('localidades')->get(); //Todos los municipios
+						}elseif($recurso->idCobertura == 2){ 
+						//Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
+							$extras['jurisdicciones'] = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
+							//$extras['municipios'] = Municipio::with('localidades')->where('clave','=',$recurso->claveMunicipio)->get(); //Obtenemos el municipio seleccionado
+						}elseif($recurso->idCobertura == 3){ 
+						//Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
+							$extras['jurisdicciones'] = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
+							//$region = Region::with('municipios.localidades')->where('region','=',$recurso->claveRegion)->get();
+							//$extras['municipios'] = $region[0]->municipios;
+						}
+						$data["extras"] = $extras;
 					}
-				}
-			}elseif($parametros['mostrar'] == 'editar-proyecto'){
-				$recurso = Proyecto::with('jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico',
-									'fibap.documentos','beneficiarios.tipoBeneficiario',
-									'fuentesFinanciamiento.destinoGasto','fuentesFinanciamiento.fuenteFinanciamiento','fuentesFinanciamiento.subFuentesFinanciamiento')
-									->find($id);
-				if($recurso->idEstatusProyecto == 3){
-					$recurso->load('comentarios');
-				}
-				if($recurso->fibap){
-					$recurso->fibap->load('antecedentesFinancieros','acciones.datosComponenteDetalle','distribucionPresupuestoAgrupado.objetoGasto');
-					$recurso->fibap->acciones->load('propuestasFinanciamiento');
-				}
-				if(!is_null($recurso)){
-					$extras = array();
-					if($recurso->idCobertura == 1){ 
+				}elseif($parametros['mostrar'] == 'editar-beneficiario'){
+					$recurso = Beneficiario::where('idProyecto','=',$parametros['id-proyecto'])
+											->where('idTipoBeneficiario','=',$id)->get();
+				}elseif ($parametros['mostrar'] == 'editar-antecedente') {
+					$recurso = AntecedenteFinanciero::find($id);
+				}elseif ($parametros['mostrar'] == 'editar-componente') {
+					$recurso = Accion::with('componente.actividades.unidadMedida','componente.metasMes','partidas','propuestasFinanciamiento')->find($id);
+				}elseif ($parametros['mostrar'] == 'editar-actividad') {
+					$recurso = Actividad::with('metasMes')->find($id);
+				}elseif ($parametros['mostrar'] == 'desglose-componente') {
+					$recurso = Accion::with('datosComponenteDetalle','partidas')->find($id);
+				}elseif ($parametros['mostrar'] == 'editar-presupuesto'){
+					/***
+					*	Obtiene los datos del desglose del presupuesto de la Accion (GET)
+					*
+					*	- Obtiene la distribución de presupuesto concentrado por mes y partida
+					* 	- Obtiene los datos del desglose del componete (datos a exportar al proyecto) (Metas,Beneficiarios,Localidad)
+					*	- Obtiene el desglose de metas por mes del componente
+					*	- Obtiene datos generales de la accion
+					*
+					***/
+					$desglose = ComponenteDesglose::with('metasMes','beneficiarios')->find($id);
+
+					$recurso = Accion::with('partidas')->find($desglose->idAccion);
+					
+					$calendarizado = DistribucionPresupuesto::where('idAccion','=',$desglose->idAccion)
+														->whereIn('idObjetoGasto',$recurso->partidas->lists('id'))
+														->where('claveJurisdiccion','=',$desglose->claveJurisdiccion);
+					if($desglose->claveJurisdiccion != 'OC'){
+						$calendarizado = $calendarizado->where('claveMunicipio','=',$desglose->claveMunicipio)
+													->where('claveLocalidad','=',$desglose->claveLocalidad);
+					}
+					$calendarizado = $calendarizado->get();
+					//
+					$recurso['desglose'] = $desglose;
+					$recurso['calendarizado'] = $calendarizado;
+				}elseif($parametros['mostrar'] == 'listar-municipios'){
+					//listar municipios
+					$id_proyecto = $parametros['id-proyecto'];
+					$clave_jurisdiccion = $parametros['jurisdiccion'];
+
+					$proyecto = Proyecto::find($id_proyecto);
+					if($proyecto->idCobertura == 1){ 
 					//Cobertura Estado => Todos las Jurisdicciones
-						$extras['jurisdicciones'] = Jurisdiccion::all();
-						$extras['municipios'] = Municipio::with('localidades')->get(); //Todos los municipios
-					}elseif($recurso->idCobertura == 2){ 
+						$jurisdiccion = Jurisdiccion::with('municipios')->where('clave','=',$clave_jurisdiccion)->first();
+						$recurso = $jurisdiccion->municipios;
+					}elseif($proyecto->idCobertura == 2){ 
 					//Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
-						$extras['jurisdicciones'] = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
-						$extras['municipios'] = Municipio::with('localidades')->where('clave','=',$recurso->claveMunicipio)->get(); //Obtenemos el municipio seleccionado
-					}elseif($recurso->idCobertura == 3){ 
+						$recurso = Municipio::where('clave','=',$proyecto->claveMunicipio)->get();
+					}elseif($proyecto->idCobertura == 3){ 
 					//Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
-						$extras['jurisdicciones'] = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
-						$region = Region::with('municipios.localidades')->where('region','=',$recurso->claveRegion)->get();
-						$extras['municipios'] = $region[0]->municipios;
+						$jurisdiccion = Jurisdiccion::where('clave','=',$clave_jurisdiccion)->first();
+
+						$region = Region::with(array('municipios'=>function($query) use ($jurisdiccion){
+							$query->where('idJurisdiccion','=',$jurisdiccion->id);
+						}))->where('region','=',$proyecto->claveRegion)->first();
+						$recurso = $region->municipios;
 					}
-					$data["extras"] = $extras;
+				}elseif($parametros['mostrar'] == 'listar-localidades'){
+					//listar localidades
+					$municipio = $parametros['municipio'];
+					$recurso = Municipio::with('localidades')->where('clave','=',$municipio)->first();
+					$recurso = $recurso->localidades;
 				}
-			}elseif($parametros['mostrar'] == 'editar-beneficiario'){
-				$recurso = Beneficiario::where('idProyecto','=',$parametros['id-proyecto'])
-										->where('idTipoBeneficiario','=',$id)->get();
-			}elseif ($parametros['mostrar'] == 'editar-antecedente') {
-				$recurso = AntecedenteFinanciero::find($id);
-			}elseif ($parametros['mostrar'] == 'editar-componente') {
-				$recurso = Accion::with('componente.actividades.unidadMedida','componente.metasMes','partidas','propuestasFinanciamiento')->find($id);
-			}elseif ($parametros['mostrar'] == 'editar-actividad') {
-				$recurso = Actividad::with('metasMes')->find($id);
-			}elseif ($parametros['mostrar'] == 'desglose-componente') {
-				$recurso = Accion::with('datosComponenteDetalle','partidas')->find($id);
-			}elseif ($parametros['mostrar'] == 'editar-presupuesto'){
-				/***
-				*	Obtiene los datos del desglose del presupuesto de la Accion (GET)
-				*
-				*	- Obtiene la distribución de presupuesto concentrado por mes y partida
-				* 	- Obtiene los datos del desglose del componete (datos a exportar al proyecto) (Metas,Beneficiarios,Localidad)
-				*	- Obtiene el desglose de metas por mes del componente
-				*	- Obtiene datos generales de la accion
-				*
-				***/
-				$desglose = ComponenteDesglose::with('metasMes','beneficiarios')->find($id);
-
-				$recurso = Accion::with('partidas')->find($desglose->idAccion);
-				
-				$calendarizado = DistribucionPresupuesto::where('idAccion','=',$desglose->idAccion)
-													->whereIn('idObjetoGasto',$recurso->partidas->lists('id'))
-													->where('claveJurisdiccion','=',$desglose->claveJurisdiccion);
-				if($desglose->claveJurisdiccion != 'OC'){
-					$calendarizado = $calendarizado->where('claveMunicipio','=',$desglose->claveMunicipio)
-												->where('claveLocalidad','=',$desglose->claveLocalidad);
+			}elseif(isset($parametros['ver'])){
+				if($parametros['ver'] == 'financiamiento'){
+					$recurso = ProyectoFinanciamiento::with('subFuentesFinanciamiento')->find($id);
 				}
-				$calendarizado = $calendarizado->get();
-				//
-				$recurso['desglose'] = $desglose;
-				$recurso['calendarizado'] = $calendarizado;
 			}
-		}elseif(isset($parametros['ver'])){
-			if($parametros['ver'] == 'financiamiento'){
-				$recurso = ProyectoFinanciamiento::with('subFuentesFinanciamiento')->find($id);
-			}
-		}
 
-		if(is_null($recurso)){
-			$http_status = 404;
-			$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
-		}else{
-			$data["data"] = $recurso;
+			if(is_null($recurso)){
+				$http_status = 404;
+				$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+			}else{
+				$data["data"] = $recurso;
+			}
+
+		}catch(\Exception $ex){
+			$http_status = 500;	
+			if($data['data'] == ''){
+				$data['data'] = 'Ocurrio un error al intentar almacenar los datos';
+			}
+			if(strpos($ex->getMessage(), '{"field":') !== FALSE){
+				$data['code'] = 'U00';
+				$data['data'] = $ex->getMessage();
+			}else{
+				$data['ex'] = $ex->getMessage();
+			}
+			$data['line'] = $ex->getLine();
+			if(!isset($data['code'])){
+				$data['code'] = 'S03';
+			}
 		}
 
 		return Response::json($data,$http_status);
@@ -303,16 +349,16 @@ class InversionController extends ProyectosController {
 					if($recurso->idCobertura == 1){ 
 					//Cobertura Estado => Todos las Jurisdicciones
 						$extras['jurisdicciones'] = Jurisdiccion::all();
-						$extras['municipios'] = Municipio::with('localidades')->get(); //Todos los municipios
+						//$extras['municipios'] = Municipio::with('localidades')->get(); //Todos los municipios
 					}elseif($recurso->idCobertura == 2){ 
 					//Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
 						$extras['jurisdicciones'] = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
-						$extras['municipios'] = Municipio::with('localidades')->where('clave','=',$recurso->claveMunicipio)->get(); //Obtenemos el municipio seleccionado
+						//$extras['municipios'] = Municipio::with('localidades')->where('clave','=',$recurso->claveMunicipio)->get(); //Obtenemos el municipio seleccionado
 					}elseif($recurso->idCobertura == 3){ 
 					//Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
 						$extras['jurisdicciones'] = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
-						$region = Region::with('municipios.localidades')->where('region','=',$recurso->claveRegion)->get();
-						$extras['municipios'] = $region[0]->municipios;
+						//$region = Region::with('municipios.localidades')->where('region','=',$recurso->claveRegion)->get();
+						//$extras['municipios'] = $region[0]->municipios;
 					}
 					
 					$respuesta['data']['extras'] = $extras;

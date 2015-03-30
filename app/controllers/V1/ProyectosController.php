@@ -1190,7 +1190,7 @@ class ProyectosController extends BaseController {
 
 			if($es_editar){
 				if($recurso->idCobertura != $parametros['cobertura']){
-					$recurso->idCobertura 			= $parametros['cobertura'];
+					$recurso->idCobertura = $parametros['cobertura'];
 				}
 				if($parametros['cobertura'] == 2){
 					if($recurso->claveMunicipio != $parametros['municipio']){
@@ -1212,7 +1212,7 @@ class ProyectosController extends BaseController {
 					}
 				}
 			}else{
-				$recurso->idCobertura 				= $parametros['cobertura'];
+				$recurso->idCobertura = $parametros['cobertura'];
 				if($parametros['cobertura'] == 2){
 					$recurso->claveMunicipio = $parametros['municipio'];
 				}elseif($parametros['cobertura'] == 3){
