@@ -47,6 +47,8 @@ class ProyectosController extends \BaseController {
 
 		//$datos['grid_beneficiarios'] = View::make('expediente.formulario-caratula-beneficiarios');
 		$datos_financiamiento = array(
+			'fuentes_financiamiento'	=> FuenteFinanciamiento::where('nivel','=',4)->get(),
+			'destino_gasto'				=> DestinoGasto::all(),
 			'subfuentes_financiamiento' => SubFuenteFinanciamiento::all()
 		);
 		$datos['grid_fuentes_financiamiento'] = View::make('expediente.formulario-caratula-financiamiento',$datos_financiamiento);
@@ -133,7 +135,6 @@ class ProyectosController extends \BaseController {
 			'clasificacion_proyecto' => $clasificacion[$parametros['clasificacion-proyecto']],
 			'tipo_proyecto' => $tipo[$parametros['tipo-proyecto']],
 			'tipos_acciones' => TipoAccion::where('id','=',7)->get(),
-			'unidades_responsables' => UnidadResponsable::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->where('clave','=',Sentry::getUser()->claveUnidad)->get(),
 			'funciones_gasto' => $funciones_gasto,
 			'programas_sectoriales' => ProgramaSectorial::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
 			'programas_presupuestarios' => ProgramaPresupuestario::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
@@ -146,6 +147,12 @@ class ProyectosController extends \BaseController {
 			'municipios' => Municipio::all(),
 			'regiones' => Region::all()
 		);
+		
+		if(Sentry::getUSer()->claveUnidad){
+			$datos['unidades_responsables'] = UnidadResponsable::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->where('clave','=',Sentry::getUser()->claveUnidad)->get();
+		}else{
+			$datos['unidades_responsables'] = UnidadResponsable::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get();
+		}
 
 		/*$datos['clasificacion_proyecto_id'] = $parametros['clasificacion-proyecto'];
 		$datos['clasificacion_proyecto'] = $clasificacion[$parametros['clasificacion-proyecto']];

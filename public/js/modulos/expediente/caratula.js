@@ -128,61 +128,13 @@ if($('#id').val()){
 			}else if(response.data.idEstatusProyecto == 3){
 				mostrar_comentarios(response.data.comentarios);
 			}
-
-			fuenteFinanciamiento.init();
+			
+			fuenteFinanciamiento.init(proyectoResource,$('#id').val());
+			if(response.data.fuentes_financiamiento.length){
+				fuenteFinanciamiento.llenar_datagrid(response.data.fuentes_financiamiento);
+			}
         }
     });
-}else if($('#id-fibap').val()){
-	/*
-	var parametros = {ver:'datos-fibap'};
-	proyectoResource.get($('#id-fibap').val(),parametros,{
-		_success:function(response){
-			inicializar_comportamiento_caratula();
-			
-			//.addClass('control-bloqueado');
-			$('#nombretecnico').addClass('control-bloqueado');
-			$('#vinculacionped').addClass('control-bloqueado');
-			$('#programapresupuestario').addClass('control-bloqueado');
-			$('#cobertura').addClass('control-bloqueado');
-			if(response.data.claveMunicipio){
-				$('#municipio').addClass('control-bloqueado');
-			}
-			if(response.data.claveRegion){
-				$('#region').addClass('control-bloqueado');
-			}
-			$('#tipobeneficiario').addClass('control-bloqueado');
-			$('#totalbeneficiariosf').addClass('control-bloqueado');
-			$('#totalbeneficiariosm').addClass('control-bloqueado');
-
-			$('#nombretecnico').val(response.data.nombreTecnico);
-			$('#vinculacionped').val(response.data.idObjetivoPED);
-			$('#vinculacionped').trigger('chosen:updated');
-			$('#programa_presupuestario').text(response.data.programaPresupuestario);
-			$('#programapresupuestario').val(response.data.programaPresupuestario);
-            $('#programapresupuestario').trigger('chosen:updated');
-			$('#cobertura').val(response.data.idCobertura);
-			$('#cobertura').trigger('chosen:updated');
-			$('#cobertura').chosen().change();
-			deshabilita_paneles($('#cobertura').val());
-			if(response.data.claveMunicipio){
-				$('#municipio').val(response.data.claveMunicipio);
-				$('#municipio').trigger('chosen:updated');
-			}
-			if(response.data.claveRegion){
-				$('#region').val(response.data.claveRegion);
-				$('#region').trigger('chosen:updated');
-			}
-			$('#tipobeneficiario').val(response.data.idTipoBeneficiario);
-			$('#tipobeneficiario').trigger('chosen:updated');
-			$('#totalbeneficiarios').text(response.data.totalBeneficiarios);
-			$('#totalbeneficiariosf').val(response.data.totalBeneficiariosF);
-			$('#totalbeneficiariosm').val(response.data.totalBeneficiariosM);
-
-			//bloquear_controles();
-			$('.chosen-one.control-bloqueado').trigger('chosen:updated');
-		}
-	});
-	*/
 }else{
 	inicializar_comportamiento_caratula();
 	deshabilita_paneles('');
@@ -239,9 +191,14 @@ function inicializar_comportamiento_caratula(){
 			sumar_totales('.sub-total-marginacion.masc','total-marginacion-m','totalbeneficiariosm','Los subtotales de Marginación no concuerdan.');
 		}
 	});
+	//fuenteFinanciamiento.init(proyectoResource,$('#id').val());
 }
 
 /***********************************           Comportamiento de los datagrids          ***********************************/
+function editar_fuente_financiamiento(e){
+	fuenteFinanciamiento.editar_fuente(e);
+}
+
 function editar_componente(e){
 	var parametros = {'ver':'componente'};
 	proyectoResource.get(e,parametros,{
@@ -672,6 +629,8 @@ $('#btn-proyecto-guardar').on('click',function(){
 	            $(form_caratula + ' #id').val(response.data.id);
 	            $(form_caratula + ' #no_proyecto_estrategico').text("000");
 	            $(form_caratula + ' #numeroproyectoestrategico').text("000");
+
+	            fuenteFinanciamiento.init(proyectoResource,$('#id').val());
 
 	            if(response.data.componentes){
 	            	actualizar_grid_componentes(response.data.componentes);
