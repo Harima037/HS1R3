@@ -16,14 +16,23 @@ var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/programas-presupuestar
 var moduloDatagrid = new Datagrid("#datagridIndicadores",moduloResource);
 //moduloDatagrid.init();
 //moduloDatagrid.actualizar();
-var modal_name = '#modal_programa_indicador';
+var modal_indicador = '#modal_programa_indicador';
 var modal_problema = '#modal_problema';
 var modal_objetivo = '#modal_objetivo';
-var form_name = '#form_programa_indicador';
+var form_indicador = '#form_programa';
 
+$('.chosen-one').chosen({width:'100%'});
+
+/**
+    Funciones de modales
+**/
 $('#datagridIndicadores .btn-datagrid-agregar').on('click', function () {
-    $(modal_name).find(".modal-title").html("Nuevo Indicador");
-    $(modal_name).modal('show');
+    $(modal_indicador).find(".modal-title").html("Nuevo Indicador");
+    $(modal_indicador).modal('show');
+});
+
+$(modal_indicador).on('hide.bs.modal',function(e){
+    reset_modal_form(form_indicador);
 });
 
 $('#datagridProblemas .btn-datagrid-agregar').on('click', function () {
@@ -39,3 +48,15 @@ $('#datagridObjetivos .btn-datagrid-agregar').on('click', function () {
 $('#btn-programa-cancelar').on('click',function(){
     window.location.href = SERVER_HOST+'/expediente/programas-presupuestarios';
 });
+
+function reset_modal_form(formulario){
+    $(formulario).get(0).reset();
+    $(formulario + ' input[type="hidden"]').val('');
+    Validation.cleanFormErrors(formulario);
+    $(formulario + ' .chosen-one').trigger('chosen:updated');
+
+    if(formulario == form_indicador){
+        $('#tipo-indicador').val('');
+        $('#tipo-indicador').trigger('chosen:updated');
+    }
+}

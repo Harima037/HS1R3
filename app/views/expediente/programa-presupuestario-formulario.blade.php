@@ -2,8 +2,14 @@
 
 @section('title-page') {{ $sys_mod_activo->nombre }} @stop
 
+@section('css')
+@parent
+<link href="{{ URL::to('css/chosen.bootstrap.min.css') }}" rel="stylesheet" type="text/css" media="screen">
+@stop
+
 @section('js')
 @parent
+<script src="{{ URL::to('js/dependencias/chosen.jquery.min.js') }}"></script>
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
 <script src="{{ URL::to('js/modulos/expediente/programa-presupuestario-formulario.js')}}"></script>
@@ -26,7 +32,7 @@
                             </a>
                         </li>
                         <li role="presentation">
-                            <a href="#diagnostico" aria-controls="diagnostico" role="tab" data-toggle="tab">Diagnostico</a>
+                            <a href="#diagnostico" aria-controls="diagnostico" role="tab" data-toggle="tab">Diagnóstico</a>
                         </li>
                         <li role="presentation">
                             <a href="#indicadores" aria-controls="indicadores" role="tab" data-toggle="tab">Indicadores</a>
@@ -47,7 +53,7 @@
                                 </div>
                                 <div class="col-sm-10">
                                     <div class="form-group">
-                                        <label class="control-label">Area de Enfoque Potencial</label>
+                                        <label class="control-label">Área de Enfoque Potencial</label>
                                         <input type="text" class="form-control" id="enfoque-potencial" name="enfoque-potencial">
                                     </div>
                                 </div>
@@ -59,7 +65,7 @@
                                 </div>
                                 <div class="col-sm-10">
                                     <div class="form-group">
-                                        <label class="control-label">Area de Enfoque Objetivo</label>
+                                        <label class="control-label">Área de Enfoque Objetivo</label>
                                         <input type="text" class="form-control" id="enfoque-objetivo" name="enfoque-objetivo">
                                     </div>
                                 </div>
@@ -92,12 +98,14 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <label class="control-label" for="descripcion-problema">Arbol del Problema</label>
+                                                <label class="control-label" for="descripcion-problema">Árbol del Problema</label>
                                                 <textarea class="form-control" id="descripcion-problema" name="descripcion-problema" rows="5"></textarea>
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
-                                            <button id="btn-guardar-problema" type="button" class="btn btn-info">Guardar Descripción</button>
+                                            <button id="btn-guardar-problema" type="button" class="btn btn-info">
+                                                <span class="fa fa-save"></span> Guardar Descripción
+                                            </button>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="btn-toolbar pull-right" >
@@ -143,12 +151,14 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <label class="control-label" for="descripcion-objetivo">Arbol de Objetivos</label>
+                                                <label class="control-label" for="descripcion-objetivo">Árbol de Objetivos</label>
                                                 <textarea class="form-control" id="descripcion-objetivo" name="descripcion-objetivo" rows="5"></textarea>
                                             </div>
                                         </div>
                                         <div class="col-sm-6">
-                                            <button id="btn-guardar-objetivo" type="button" class="btn btn-info">Guardar Descripción</button>
+                                            <button id="btn-guardar-objetivo" type="button" class="btn btn-info">
+                                                <span class="fa fa-save"></span> Guardar Descripción
+                                            </button>
                                         </div>
                                         <div class="col-sm-6">
                                             <div class="btn-toolbar pull-right" >
@@ -289,7 +299,7 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-sm-12">
-                        <select class="form-control" id="tipo-indicador">
+                        <select class="form-control chosen-one" id="tipo-indicador">
                             <option value="">Selecciona una opción</option>
                             <option value="1">Fin</option>
                             <option value="2">Proposito</option>

@@ -1,5 +1,5 @@
 <form action="" id="form_{{$identificador}}">
-    <ul class="nav {{(isset($lista_actividades))?'nav-tabs':'nav-pills'}}" role="tablist" id="lista-tabs-{{$identificador}}">
+    <ul class="nav {{($identificador != 'actividad')?'nav-tabs':'nav-pills'}}" role="tablist" id="lista-tabs-{{$identificador}}">
         <li role="presentation" class="active">
             <a href="#objetivos_{{$identificador}}" role="tab" data-toggle="tab">
                 <span class="fa fa-crosshairs"></span> Objetivo
@@ -170,7 +170,7 @@
                     </div>
                 </div>
                 <div class="col-sm-4">
-                    <div clasS="form-group">
+                    <div class="form-group">
                         <label class="control-label" for="formula-{{$identificador}}">
                             Formula
                         </label>
@@ -178,7 +178,7 @@
                     </div>
                 </div>
                 <div class="col-sm-4">
-                    <div clasS="form-group">
+                    <div class="form-group">
                         <label class="control-label" for="frecuencia-{{$identificador}}">
                             Frecuencia
                         </label>
@@ -187,6 +187,7 @@
                 </div>
             </div>
             <div class="row">
+                @if($identificador != 'programa')
                 <div class="col-sm-12">
                     <table id="tabla-{{$identificador}}-metas-mes" class="table table-condensed table-hover table-striped">
                         <thead>
@@ -263,6 +264,56 @@
                         <input type="hidden" id="meta-{{$identificador}}" name="meta-{{$identificador}}">
                     </div>
                 </div>
+                @endif
+                @if($identificador == 'programa')
+                <div class="col-sm-12">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="control-label">Trim 1</label>
+                                <input type="number" class="form-control" id="trim1-{{$identificador}}" name="trim1-{{$identificador}}">
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="control-label">Trim 2</label>
+                                <input type="number" class="form-control" id="trim2-{{$identificador}}" name="trim2-{{$identificador}}">
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="control-label">Trim 3</label>
+                                <input type="number" class="form-control" id="trim3-{{$identificador}}" name="trim3-{{$identificador}}">
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="control-label">Trim 4</label>
+                                <input type="number" class="form-control" id="trim4-{{$identificador}}" name="trim4-{{$identificador}}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label"><span class="fa fa-link"></span> Numerador</label>
+                        <span class="form-control" data-espejo-id="#numerador-{{$identificador}}"></span>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" for="denominador-{{$identificador}}">Denominador</label>
+                        <input type="number" class="form-control" id="denominador-{{$identificador}}" name="denominador-{{$identificador}}">
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label"><span class="fa fa-link"></span> Meta</label>
+                        <span class="form-control" id="lbl-meta-{{$identificador}}"></span>
+                        <input type="hidden" id="meta-{{$identificador}}" name="meta-{{$identificador}}">
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
         <input type="hidden" id="id-{{$identificador}}" name="id-{{$identificador}}">
