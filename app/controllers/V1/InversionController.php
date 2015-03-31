@@ -84,9 +84,7 @@ class InversionController extends ProyectosController {
 					//$total = $rows->count();
 					/*$queries = DB::getQueryLog();
 					$data['query'] = print_r(end($queries),true);*/
-				}/*else{				
-					//$total = $rows->count();						
-				}*/
+				}
 				//$totales = $rows;
 				$totales = $totales->select(DB::raw('count(componenteDesglose.id) AS cuantos'),DB::raw('sum(componenteDesglose.presupuesto) AS totalPresupuesto'))->get();
 				$totales = $totales[0];
@@ -145,24 +143,30 @@ class InversionController extends ProyectosController {
 				$proyecto = Proyecto::find($id_proyecto);
 				if($proyecto->idCobertura == 1){ 
 				//Cobertura Estado => Todos las Jurisdicciones
-					$jurisdiccion = Jurisdiccion::with('municipios')->where('clave','=',$clave_jurisdiccion)->first();
+					$jurisdiccion = Jurisdiccion::with(array('municipios'=>function($query){
+						$query->select('idJurisdiccion','idEntidad','idRegion','id','clave','nombre');
+					}))->where('clave','=',$clave_jurisdiccion)->first();
 					$recurso = $jurisdiccion->municipios;
 				}elseif($proyecto->idCobertura == 2){ 
 				//Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
-					$recurso = Municipio::where('clave','=',$proyecto->claveMunicipio)->get();
+					$recurso = Municipio::select('idJurisdiccion','idEntidad','idRegion','id','clave','nombre')
+										->where('clave','=',$proyecto->claveMunicipio)->get();
 				}elseif($proyecto->idCobertura == 3){ 
 				//Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
 					$jurisdiccion = Jurisdiccion::where('clave','=',$clave_jurisdiccion)->first();
 
 					$region = Region::with(array('municipios'=>function($query) use ($jurisdiccion){
-						$query->where('idJurisdiccion','=',$jurisdiccion->id);
+						$query->select('idJurisdiccion','idEntidad','idRegion','id','clave','nombre')
+							->where('idJurisdiccion','=',$jurisdiccion->id);
 					}))->where('region','=',$proyecto->claveRegion)->first();
 					$recurso = $region->municipios;
 				}
 			}elseif($parametros['listar'] == 'localidades'){
 				//listar localidades
 				$municipio = $parametros['municipio'];
-				$recurso = Municipio::with('localidades')->where('clave','=',$municipio)->first();
+				$recurso = Municipio::with(array('localidades'=>function($query){
+					$query->select('id','idMunicipio','clave','nombre','idEntidad');
+				}))->where('clave','=',$municipio)->first();
 				$recurso = $recurso->localidades;
 			}
 			$data = array('data'=>$recurso);
@@ -189,7 +193,7 @@ class InversionController extends ProyectosController {
 	public function show($id){
 		//
 		$http_status = 200;
-		$data = array('data');
+		$data = array();
 		$parametros = Input::all();
 
 		try{
@@ -225,19 +229,16 @@ class InversionController extends ProyectosController {
 						if($recurso->idCobertura == 1){ 
 						//Cobertura Estado => Todos las Jurisdicciones
 							$extras['jurisdicciones'] = Jurisdiccion::all();
-							//$extras['municipios'] = Municipio::with('localidades')->get(); //Todos los municipios
 						}elseif($recurso->idCobertura == 2){ 
 						//Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
 							$extras['jurisdicciones'] = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
-							//$extras['municipios'] = Municipio::with('localidades')->where('clave','=',$recurso->claveMunicipio)->get(); //Obtenemos el municipio seleccionado
 						}elseif($recurso->idCobertura == 3){ 
 						//Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
 							$extras['jurisdicciones'] = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
-							//$region = Region::with('municipios.localidades')->where('region','=',$recurso->claveRegion)->get();
-							//$extras['municipios'] = $region[0]->municipios;
 						}
 						$data["extras"] = $extras;
 					}
+
 				}elseif($parametros['mostrar'] == 'editar-beneficiario'){
 					$recurso = Beneficiario::where('idProyecto','=',$parametros['id-proyecto'])
 											->where('idTipoBeneficiario','=',$id)->get();
@@ -257,8 +258,8 @@ class InversionController extends ProyectosController {
 					* 	- Obtiene los datos del desglose del componete (Metas,Beneficiarios,Localidad)
 					*	- Obtiene el desglose de metas por mes del componente
 					*	- Obtiene datos generales de la accion
-					*	- Obtiene la lista de municipios de la jurisdiccion seleccionada
-					*	- Obtiene la lista de localiades del municipio seleccionado
+					*	- Obtiene la lista de municipios de la jurisdiccion seleccionada (Para llenar los selects)
+					*	- Obtiene la lista de localiades del municipio seleccionado (Para llenar los selects)
 					*
 					***/
 					$desglose = ComponenteDesglose::with('metasMes','beneficiarios')->find($id);
@@ -277,14 +278,22 @@ class InversionController extends ProyectosController {
 					$recurso['desglose'] = $desglose;
 					$recurso['calendarizado'] = $calendarizado;
 
+					/*
+						Para obtener el grupo de municipios de la jurisdiccion seleccionada  y las localidades del
+						municipio selccionado
+					*/
+
 					$municipio = Municipio::where('clave','=',$desglose->claveMunicipio)->first();
 
 					$proyecto = Proyecto::find($parametros['id-proyecto']);
 					if($proyecto->idCobertura == 1){ 
 
 					//Cobertura Estado => Todos las Jurisdicciones
-						$jurisdiccion = Jurisdiccion::with(array('municipios.localidades'=>function($query) use ($municipio){
-							$query->where('idMunicipio','=',$municipio->id);
+						$jurisdiccion = Jurisdiccion::with(array('municipios'=>function($query){
+							$query->select('idJurisdiccion','idEntidad','idRegion','id','clave','nombre');
+						},'municipios.localidades'=>function($query) use ($municipio){
+							$query->select('idMunicipio','idEntidad','id','clave','nombre')
+									->where('idMunicipio','=',$municipio->id);
 						}))->where('clave','=',$desglose->claveJurisdiccion)->first();
 
 						$recurso['municipios'] = $jurisdiccion->municipios;
@@ -292,9 +301,11 @@ class InversionController extends ProyectosController {
 					}elseif($proyecto->idCobertura == 2){ 
 
 					//Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
-						$recurso['municipios'] = Municipio::with(array('localidades'=>function($query) use ($municipio){
-							$query->where('idMunicipio','=',$municipio->id);
-						}))->where('clave','=',$desglose->claveMunicipio)->get();
+						$recurso['municipios'] = Municipio::select('idJurisdiccion','idEntidad','idRegion','id','clave','nombre')
+															->with(array('localidades'=>function($query) use ($municipio){
+																$query->select('idMunicipio','idEntidad','id','clave','nombre')
+																		->where('idMunicipio','=',$municipio->id);
+															}))->where('clave','=',$desglose->claveMunicipio)->get();
 
 					}elseif($proyecto->idCobertura == 3){ 
 
@@ -302,9 +313,11 @@ class InversionController extends ProyectosController {
 						$jurisdiccion = Jurisdiccion::where('clave','=',$desglose->claveJurisdiccion)->first();
 
 						$region = Region::with(array('municipios'=>function($query) use ($jurisdiccion){
-							$query->where('idJurisdiccion','=',$jurisdiccion->id);
+							$query->select('idJurisdiccion','idEntidad','idRegion','id','clave','nombre')
+									->where('idJurisdiccion','=',$jurisdiccion->id);
 						},'municipios.localidades'=>function($query) use ($municipio){
-							$query->where('idMunicipio','=',$municipio->id);
+							$query->select('idMunicipio','idEntidad','id','clave','nombre')
+									->where('idMunicipio','=',$municipio->id);
 						}))->where('region','=',$proyecto->claveRegion)->first();
 						$recurso['municipios'] = $region->municipios;
 					}
@@ -319,7 +332,7 @@ class InversionController extends ProyectosController {
 				$http_status = 404;
 				$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
 			}else{
-				$data["data"] = $recurso;
+				$data['data'] = $recurso;
 			}
 
 		}catch(\Exception $ex){
@@ -391,16 +404,12 @@ class InversionController extends ProyectosController {
 					if($recurso->idCobertura == 1){ 
 					//Cobertura Estado => Todos las Jurisdicciones
 						$extras['jurisdicciones'] = Jurisdiccion::all();
-						//$extras['municipios'] = Municipio::with('localidades')->get(); //Todos los municipios
 					}elseif($recurso->idCobertura == 2){ 
 					//Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
 						$extras['jurisdicciones'] = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
-						//$extras['municipios'] = Municipio::with('localidades')->where('clave','=',$recurso->claveMunicipio)->get(); //Obtenemos el municipio seleccionado
 					}elseif($recurso->idCobertura == 3){ 
 					//Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
 						$extras['jurisdicciones'] = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
-						//$region = Region::with('municipios.localidades')->where('region','=',$recurso->claveRegion)->get();
-						//$extras['municipios'] = $region[0]->municipios;
 					}
 					
 					$respuesta['data']['extras'] = $extras;
@@ -633,16 +642,12 @@ class InversionController extends ProyectosController {
 					if($recurso->idCobertura == 1 && ($datos_anteriores['claveMunicipio'] != NULL || $datos_anteriores['claveRegion'] != NULL)){
 					//Cobertura Estado => Todos las Jurisdicciones
 						$extras['jurisdicciones'] = Jurisdiccion::all();
-						$extras['municipios'] = Municipio::with('localidades')->get(); //Todos los municipios
 					}elseif($recurso->idCobertura == 2 && $recurso->claveMunicipio != $datos_anteriores['claveMunicipio']){ 
 					//Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
 						$extras['jurisdicciones'] = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
-						$extras['municipios'] = Municipio::with('localidades')->where('clave','=',$recurso->claveMunicipio)->get();
 					}elseif($recurso->idCobertura == 3 && $recurso->claveRegion != $datos_anteriores['claveRegion']){ 
 					//Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
 						$extras['jurisdicciones'] = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
-						$region = Region::with('municipios.localidades')->where('region','=',$recurso->claveRegion)->get();
-						$extras['municipios'] = $region[0]->municipios;
 					}
 
 					if(count($extras)){
@@ -715,10 +720,10 @@ class InversionController extends ProyectosController {
 					$respuesta['data'] = DB::transaction(function() use ($recurso, $docs, $periodo_ant){
 						if($recurso->save()){
 							if(count($docs['borrar'])){
-								$recurso->documentos()->detach($docs_borrar);
+								$recurso->documentos()->detach($docs['borrar']);
 							}
 							if(count($docs['nuevos'])){
-								$recurso->documentos()->attach($docs_nuevos);
+								$recurso->documentos()->attach($docs['nuevos']);
 							}
 
 							$distribucion_borrada = 0;
@@ -761,7 +766,6 @@ class InversionController extends ProyectosController {
 																->orWhere('mes','>',$mes['fin']);
 														})->delete();
 									}
-									//
 									$cantidades_desglose = array();
 									foreach ($distribucion_borrada as $distribucion) {
 										if($distribucion->claveJurisdiccion != 'OC'){
@@ -776,7 +780,6 @@ class InversionController extends ProyectosController {
 											$cantidades_desglose[$index] += $distribucion->cantidad;
 										}
 									}
-
 									//$actualizar_desglose = array();
 									foreach ($desgloses_completo as $desglose) {
 										if(isset($cantidades_desglose[$desglose->idAccion.'.'.$desglose->claveJurisdiccion.'.'.$desglose->claveMunicipio.'.'.$desglose->claveLocalidad])){
@@ -804,7 +807,6 @@ class InversionController extends ProyectosController {
 							$respuesta['data']['code'] = 'S01';
 							throw new Exception("Error al intentar guardar los datos de la ficha: Error en el guardado de la ficha", 1);
 						}
-						//
 					});
 				}else{
 					$respuesta['http_status'] 	= $validacion['http_status'];

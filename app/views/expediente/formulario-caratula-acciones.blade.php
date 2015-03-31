@@ -217,11 +217,6 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-sm-12">
-                            <div class="form-group">
-                                <label class="control-label">Calenderización</label>
-                            </div>
-                        </div>
                     </div>
                     <div role="tabpanel">
                         <!-- Nav tabs -->
