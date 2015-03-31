@@ -219,30 +219,6 @@
                         </div>
                         <div class="col-sm-12">
                             <div class="form-group">
-                                <table id="tabla_beneficiarios" class="table table-condensed table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Tipo Beneficiario</th>
-                                            <th width="20%"><span class="fa fa-female"></span> Femenino</th>
-                                            <th width="20%"><span class="fa fa-male"></span> Masculino</th>
-                                            <th width="20%">Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td colspan="3"></td>
-                                            <td>
-                                                <span class="form-control" id="total-beneficiarios-lbl">0</span>
-                                                <input type="hidden" id="total-beneficiarios" name="total-beneficiarios">
-                                            </td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="col-sm-12">
-                            <div class="form-group">
                                 <label class="control-label">Calenderización</label>
                             </div>
                         </div>
@@ -251,6 +227,11 @@
                         <!-- Nav tabs -->
                         <ul class="nav nav-tabs" role="tablist">
                             <li role="presentation" class="active">
+                                <a href="#desglose-beneficiarios" aria-controls="desglose-beneficiarios" role="tab" data-toggle="tab">
+                                    <span class="fa fa-users"></span> Beneficiarios
+                                </a>
+                            </li>
+                            <li role="presentation">
                                 <a href="#calendarizado-presupuesto" aria-controls="calendarizado-presupuesto" role="tab" data-toggle="tab">
                                     <span class="fa fa-usd"></span> Presupuesto
                                 </a>
@@ -263,7 +244,32 @@
                         </ul>
                         <!-- Tab panes -->
                         <div class="tab-content">
-                            <div role="tabpanel" class="tab-pane active" id="calendarizado-presupuesto">
+                            <div role="tabpanel" class="tab-pane active" id="desglose-beneficiarios">
+                                <br>
+                                <div class="form-group">
+                                    <table id="tabla_beneficiarios" class="table table-condensed table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Tipo Beneficiario</th>
+                                                <th width="20%"><span class="fa fa-female"></span> Femenino</th>
+                                                <th width="20%"><span class="fa fa-male"></span> Masculino</th>
+                                                <th width="20%">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="3"></td>
+                                                <td>
+                                                    <span class="form-control" id="total-beneficiarios-lbl">0</span>
+                                                    <input type="hidden" id="total-beneficiarios" name="total-beneficiarios">
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="calendarizado-presupuesto">
                                 <br>
                                 <div class="row">
                                     @foreach ($meses as $clave => $mes)

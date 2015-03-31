@@ -56,9 +56,9 @@ if($('#id').val()){
 			$('#tablink-fuentes-financiamiento').attr('data-toggle','tab');
 			$('#tablink-fuentes-financiamiento').parent().removeClass('disabled');
 
-			if(response.extras.municipios){
+			/*if(response.extras.municipios){
         		fibapAcciones.cargar_municipios(response.extras.municipios);
-        	}
+        	}*/
         	
         	if(response.extras.jurisdicciones){
         		fibapAcciones.cargar_jurisdicciones(response.extras.jurisdicciones);
@@ -174,7 +174,7 @@ function editar_presupuesto(e){
 	}
 	$(modal_presupuesto).find(".modal-title").html("Editar Presupuesto");
 	
-	var parametros = {'mostrar':'editar-presupuesto'};
+	var parametros = {'mostrar':'editar-presupuesto','id-proyecto':$('#id').val()};
 	proyectoResource.get(e,parametros,{
 		_success: function(response){
 			fibapAcciones.mostrar_datos_presupuesto(response.data);
@@ -359,9 +359,9 @@ $('#btn-proyecto-guardar').on('click',function(){
 	        _success: function(response){
 	            MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:3});
 	            if(response.extras){
-	            	if(response.extras.municipios){
+	            	/*if(response.extras.municipios){
 	            		fibapAcciones.cargar_municipios(response.extras.municipios);
-	            	}
+	            	}*/
 	            	if(response.extras.jurisdicciones){
 	            		fibapAcciones.actualizar_metas_mes(response.extras.jurisdicciones);
 	            		fibapAcciones.cargar_jurisdicciones(response.extras.jurisdicciones);
@@ -406,9 +406,9 @@ $('#btn-proyecto-guardar').on('click',function(){
 				$('#tablink-fuentes-financiamiento').attr('data-toggle','tab');
 				$('#tablink-fuentes-financiamiento').parent().removeClass('disabled');
 				if(response.extras){
-					if(response.extras.municipios){
+					/*if(response.extras.municipios){
 	            		fibapAcciones.cargar_municipios(response.extras.municipios);
-	            	}
+	            	}*/
 					if(response.extras.jurisdicciones){
 						fibapAcciones.actualizar_metas_mes(response.extras.jurisdicciones);
 						fibapAcciones.cargar_jurisdicciones(response.extras.jurisdicciones);

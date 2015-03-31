@@ -43,9 +43,9 @@ context.cargar_jurisdicciones = function(datos){
     llenar_select_jurisdicciones(datos);
 };
 
-context.cargar_municipios = function(datos){
-    llenar_select_municipios(datos);
-}
+/*context.cargar_municipios = function(datos){
+    //llenar_select_municipios(datos);
+}*/
 
 context.actualizar_total_presupuesto = function(presupuesto){
     $('#total-presupuesto-requerido').text('$ ' + presupuesto.format());
@@ -202,47 +202,60 @@ context.init = function(id,resource){
     $('#denominador-actividad').on('keyup',function(){ $(this).change(); });
     $('#denominador-actividad').on('change',function(){ ejecutar_formula('actividad'); });
 
+    $('#jurisdiccion-accion').off('change');
     $('#jurisdiccion-accion').on('change',function(){
-        var selector = '#municipio-accion';
-        var habilitar_id = $('#jurisdiccion-accion option:selected').attr('data-jurisdiccion-id');
-        var default_id;
+        if($('#jurisdiccion-accion').val() == '' || $('#jurisdiccion-accion').val() == 'OC' ){
+            $('#municipio-accion').html('<option value="">Selecciona un Municipio</option>');
+            $('#localidad-accion').html('<option value="">Selecciona un Localidad</option>');
+            $('#municipio-accion').trigger("chosen:updated");
+            $('#localidad-accion').trigger("chosen:updated");
+        }else{
+            var parametros = {
+                'listar':'municipios',
+                'id-proyecto':$('#id').val(),
+                'jurisdiccion': $('#jurisdiccion-accion').val()
+            };
 
-        var suma = $(selector + ' option[data-habilita-id="' + habilitar_id + '"]').length;
-
-        $(selector + ' option[data-habilita-id]').attr('disabled',true).addClass('hidden');
-        $(selector + ' option[data-habilita-id="' + habilitar_id + '"]').attr('disabled',false).removeClass('hidden');
-
-        if(suma == 0 && default_id){
-            $(selector + ' option[data-habilita-id="' + default_id + '"]').attr('disabled',false).removeClass('hidden');
-        }
-
-        $(selector).val('');
-        $(selector).change();
-
-        if($(selector).hasClass('chosen-one')){
-            $(selector).trigger("chosen:updated");
+            fibap_resource.get(null,parametros,{
+                _success: function(response){
+                    var html_options = '<option value="">Selecciona un Municipio</option>';
+                    for(var i in response.data){
+                        var municipio = response.data[i];
+                        html_options += '<option value="'+municipio.clave+'">'+municipio.nombre+'</option>';
+                    }
+                    $('#municipio-accion').html(html_options);
+                    if($('#municipio-accion').hasClass('chosen-one')){
+                        $('#municipio-accion').trigger("chosen:updated");
+                    }
+                }
+            });
         }
     });
-
+    
+    $('#municipio-accion').off('change');
     $('#municipio-accion').on('change',function(){
-        var selector = '#localidad-accion';
-        var habilitar_id = $('#municipio-accion option:selected').attr('data-municipio-id');
-        var default_id;
+        if($('#municipio-accion').val() == ''){
+            $('#localidad-accion').html('<option value="">Selecciona una Localidad</option>');
+            $('#localidad-accion').trigger("chosen:updated");
+        }else{
+            var parametros = {
+                'listar':'localidades',
+                'municipio': $('#municipio-accion').val()
+            };
 
-        var suma = $(selector + ' option[data-habilita-id="' + habilitar_id + '"]').length;
-
-        $(selector + ' option[data-habilita-id]').attr('disabled',true).addClass('hidden');
-        $(selector + ' option[data-habilita-id="' + habilitar_id + '"]').attr('disabled',false).removeClass('hidden');
-
-        if(suma == 0 && default_id){
-            $(selector + ' option[data-habilita-id="' + default_id + '"]').attr('disabled',false).removeClass('hidden');
-        }
-
-        $(selector).val('');
-        $(selector).change();
-
-        if($(selector).hasClass('chosen-one')){
-            $(selector).trigger("chosen:updated");
+            fibap_resource.get(null,parametros,{
+                _success: function(response){
+                    var html_options = '<option value="">Selecciona una Localidad</option>';
+                    for(var i in response.data){
+                        var localidad = response.data[i];
+                        html_options += '<option value="'+localidad.clave+'">'+localidad.nombre+'</option>';
+                    }
+                    $('#localidad-accion').html(html_options);
+                    if($('#localidad-accion').hasClass('chosen-one')){
+                        $('#localidad-accion').trigger("chosen:updated");
+                    }
+                }
+            });
         }
     });
 
@@ -330,18 +343,17 @@ context.init = function(id,resource){
 
 context.mostrar_datos_presupuesto = function(datos){
     $(modal_presupuesto).find(".modal-title").html("Editar Presupuesto");
-    //$(modal_presupuesto).find(".modal-title").html("Editar Presupuesto");
     $('#jurisdiccion-accion').val(datos.calendarizado[0].claveJurisdiccion);
     $('#jurisdiccion-accion').trigger('chosen:updated');
-    $('#jurisdiccion-accion').chosen().change();
+
+    llenar_select_municipios(datos.municipios);
 
     var desglose = datos.desglose;
     if(desglose.claveMunicipio){
         $('#municipio-accion').val(desglose.claveMunicipio);
         $('#municipio-accion').trigger('chosen:updated');
-        $('#municipio-accion').chosen().change();
 
-        $('#localidad-accion').val(desglose.claveMunicipio + '|' + desglose.claveLocalidad);
+        $('#localidad-accion').val(desglose.claveLocalidad);
         $('#localidad-accion').trigger('chosen:updated');
     }
     
@@ -358,9 +370,6 @@ context.mostrar_datos_presupuesto = function(datos){
         $('#beneficiarios-'+beneficiario.idTipoBeneficiario+'-m').val(beneficiario.totalM).change();
     }
 
-    //$('#cantidad-presupuesto').val(desglose.presupuesto);
-    //$('#cantidad-presupuesto').change();
-    
     var calendarizacion = datos.calendarizado;
     for(var indx in calendarizacion){
         $('#mes-'+calendarizacion[indx].mes+'-'+calendarizacion[indx].idObjetoGasto).val(calendarizacion[indx].cantidad);
@@ -869,26 +878,22 @@ function llenar_select_jurisdicciones(datos){
 }
 
 function llenar_select_municipios(datos){
-    var municipios = $("#municipio-accion");
-    var localidades = $("#localidad-accion");
+    var html_municipios = '<option value="">Selecciona un Municipio</option>';
+    var html_localidades = '<option value="">Selecciona una Localidad</option>';
+    
+    for(var i in datos){
+        html_municipios += '<option value="'+datos[i].clave+'">'+datos[i].nombre+'</option>';
 
-    localidades.html('<option value="">Selecciona una Localidad</option>')
-    municipios.html('<option value="">Selecciona un Municipio</option>')
-
-    $.each(datos, function() {
-        for(var i in this.localidades){
-            localidades.append($("<option />").attr('data-habilita-id',this.localidades[i].idMunicipio)
-                                            .attr('data-clave-municipio',this.clave)
-                                            .attr('disabled',true)
-                                            .addClass('hidden')
-                                            .val(this.clave + '|' + this.localidades[i].clave).text(this.localidades[i].nombre));
+        if(datos[i].localidades.length){
+            for(var j in datos[i].localidades){
+                var localidad = datos[i].localidades[j];
+                html_localidades += '<option value="'+localidad.clave+'">'+localidad.nombre+'</option>';
+            }
         }
-        municipios.append($("<option />").attr('data-habilita-id',this.idJurisdiccion)
-                                        .attr('data-municipio-id',this.id)
-                                        .attr('disabled',true)
-                                        .addClass('hidden')
-                                        .val(this.clave).text(this.nombre));
-    });
+    }
+
+    $("#municipio-accion").html(html_municipios);
+    $("#localidad-accion").html(html_localidades);
 }
 
 function ocultar_detalles(remover_contendor){

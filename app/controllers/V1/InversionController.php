@@ -135,18 +135,48 @@ class InversionController extends ProyectosController {
 				$data = array('resultados'=>$total,"data"=>"No hay datos",'code'=>'W00');
 			}
 			
-			return Response::json($data,$http_status);
+			//return Response::json($data,$http_status);
+		}elseif(isset($parametros['listar'])){
+			if($parametros['listar'] == 'municipios'){
+				//listar municipios
+				$id_proyecto = $parametros['id-proyecto'];
+				$clave_jurisdiccion = $parametros['jurisdiccion'];
+
+				$proyecto = Proyecto::find($id_proyecto);
+				if($proyecto->idCobertura == 1){ 
+				//Cobertura Estado => Todos las Jurisdicciones
+					$jurisdiccion = Jurisdiccion::with('municipios')->where('clave','=',$clave_jurisdiccion)->first();
+					$recurso = $jurisdiccion->municipios;
+				}elseif($proyecto->idCobertura == 2){ 
+				//Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
+					$recurso = Municipio::where('clave','=',$proyecto->claveMunicipio)->get();
+				}elseif($proyecto->idCobertura == 3){ 
+				//Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
+					$jurisdiccion = Jurisdiccion::where('clave','=',$clave_jurisdiccion)->first();
+
+					$region = Region::with(array('municipios'=>function($query) use ($jurisdiccion){
+						$query->where('idJurisdiccion','=',$jurisdiccion->id);
+					}))->where('region','=',$proyecto->claveRegion)->first();
+					$recurso = $region->municipios;
+				}
+			}elseif($parametros['listar'] == 'localidades'){
+				//listar localidades
+				$municipio = $parametros['municipio'];
+				$recurso = Municipio::with('localidades')->where('clave','=',$municipio)->first();
+				$recurso = $recurso->localidades;
+			}
+			$data = array('data'=>$recurso);
+			//return Response::json($data,$http_status);
+		}else{
+			$rows = Proyecto::all();
+			if(count($rows) == 0){
+				$http_status = 404;
+				$data = array("data"=>"No hay datos",'code'=>'W00');
+			}else{
+				$data = array("data"=>$rows->toArray());
+			}
 		}
 		
-		$rows = Proyecto::all();
-
-		if(count($rows) == 0){
-			$http_status = 404;
-			$data = array("data"=>"No hay datos",'code'=>'W00');
-		}else{
-			$data = array("data"=>$rows->toArray());
-		}
-
 		return Response::json($data,$http_status);
 	}
 
@@ -159,7 +189,7 @@ class InversionController extends ProyectosController {
 	public function show($id){
 		//
 		$http_status = 200;
-		$data = array();
+		$data = array('data');
 		$parametros = Input::all();
 
 		try{
@@ -224,9 +254,11 @@ class InversionController extends ProyectosController {
 					*	Obtiene los datos del desglose del presupuesto de la Accion (GET)
 					*
 					*	- Obtiene la distribución de presupuesto concentrado por mes y partida
-					* 	- Obtiene los datos del desglose del componete (datos a exportar al proyecto) (Metas,Beneficiarios,Localidad)
+					* 	- Obtiene los datos del desglose del componete (Metas,Beneficiarios,Localidad)
 					*	- Obtiene el desglose de metas por mes del componente
 					*	- Obtiene datos generales de la accion
+					*	- Obtiene la lista de municipios de la jurisdiccion seleccionada
+					*	- Obtiene la lista de localiades del municipio seleccionado
 					*
 					***/
 					$desglose = ComponenteDesglose::with('metasMes','beneficiarios')->find($id);
@@ -241,36 +273,41 @@ class InversionController extends ProyectosController {
 													->where('claveLocalidad','=',$desglose->claveLocalidad);
 					}
 					$calendarizado = $calendarizado->get();
-					//
+
 					$recurso['desglose'] = $desglose;
 					$recurso['calendarizado'] = $calendarizado;
-				}elseif($parametros['mostrar'] == 'listar-municipios'){
-					//listar municipios
-					$id_proyecto = $parametros['id-proyecto'];
-					$clave_jurisdiccion = $parametros['jurisdiccion'];
 
-					$proyecto = Proyecto::find($id_proyecto);
+					$municipio = Municipio::where('clave','=',$desglose->claveMunicipio)->first();
+
+					$proyecto = Proyecto::find($parametros['id-proyecto']);
 					if($proyecto->idCobertura == 1){ 
+
 					//Cobertura Estado => Todos las Jurisdicciones
-						$jurisdiccion = Jurisdiccion::with('municipios')->where('clave','=',$clave_jurisdiccion)->first();
-						$recurso = $jurisdiccion->municipios;
+						$jurisdiccion = Jurisdiccion::with(array('municipios.localidades'=>function($query) use ($municipio){
+							$query->where('idMunicipio','=',$municipio->id);
+						}))->where('clave','=',$desglose->claveJurisdiccion)->first();
+
+						$recurso['municipios'] = $jurisdiccion->municipios;
+
 					}elseif($proyecto->idCobertura == 2){ 
+
 					//Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
-						$recurso = Municipio::where('clave','=',$proyecto->claveMunicipio)->get();
+						$recurso['municipios'] = Municipio::with(array('localidades'=>function($query) use ($municipio){
+							$query->where('idMunicipio','=',$municipio->id);
+						}))->where('clave','=',$desglose->claveMunicipio)->get();
+
 					}elseif($proyecto->idCobertura == 3){ 
+
 					//Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
-						$jurisdiccion = Jurisdiccion::where('clave','=',$clave_jurisdiccion)->first();
+						$jurisdiccion = Jurisdiccion::where('clave','=',$desglose->claveJurisdiccion)->first();
 
 						$region = Region::with(array('municipios'=>function($query) use ($jurisdiccion){
 							$query->where('idJurisdiccion','=',$jurisdiccion->id);
+						},'municipios.localidades'=>function($query) use ($municipio){
+							$query->where('idMunicipio','=',$municipio->id);
 						}))->where('region','=',$proyecto->claveRegion)->first();
-						$recurso = $region->municipios;
+						$recurso['municipios'] = $region->municipios;
 					}
-				}elseif($parametros['mostrar'] == 'listar-localidades'){
-					//listar localidades
-					$municipio = $parametros['municipio'];
-					$recurso = Municipio::with('localidades')->where('clave','=',$municipio)->first();
-					$recurso = $recurso->localidades;
 				}
 			}elseif(isset($parametros['ver'])){
 				if($parametros['ver'] == 'financiamiento'){
@@ -287,9 +324,14 @@ class InversionController extends ProyectosController {
 
 		}catch(\Exception $ex){
 			$http_status = 500;	
-			if($data['data'] == ''){
-				$data['data'] = 'Ocurrio un error al intentar almacenar los datos';
+			if(isset($data['data'])){
+				if($data['data'] == ''){
+					$data['data'] = 'Ocurrio un error al intentar mostrar los datos';
+				}
+			}else{
+				$data['data'] = 'Ocurrio un error al intentar mostrar los datos';
 			}
+			
 			if(strpos($ex->getMessage(), '{"field":') !== FALSE){
 				$data['code'] = 'U00';
 				$data['data'] = $ex->getMessage();
@@ -1223,8 +1265,9 @@ class InversionController extends ProyectosController {
 			if($clave_jurisdiccion != 'OC'){
 				$clave_municipio = $parametros['municipio-accion'];
 				//La clave de la localidad se envia concatenada con la clave del municipio municipio|localidad
-				$clave_localidad = explode('|',$parametros['localidad-accion']);
-				$clave_localidad = $clave_localidad[1];
+				$clave_localidad = $parametros['localidad-accion'];
+				//$clave_localidad = explode('|',$parametros['localidad-accion']);
+				//$clave_localidad = $clave_localidad[1];
 			}else{
 				$clave_municipio = '0';
 				$clave_localidad = '0';
