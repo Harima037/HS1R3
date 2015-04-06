@@ -57,8 +57,9 @@
                     <tr>
                         <th><input type="checkbox" class="check-select-all-rows"></th>
                         <th>Clave</th>
-                        <th>Nombre Técnico</th>
-                        <th>Presupuesto</th>
+                        <th>Programa Presupuestario</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Termino</th>
                         <th style="width:100px;">Estatus</th>
                         <th style="text-align:center; width:85px;"><span class="glyphicon glyphicon-user"></span></th>
                         <th style="text-align:center; width:120px;"><span class="glyphicon glyphicon-calendar"></span></th>

@@ -43,6 +43,9 @@ class ProgramaPresupuestarioController extends \BaseController {
 					'7'=>'JUL','8'=>'AGO','9'=>'SEP','10'=>'OCT','11'=>'NOV','12'=>'DIC'
 				);
 		$datos['formulario_programa'] = View::make('expediente.formulario-componente',$datos_programa);
+		$datos['odm'] = ObjetivoDesarrolloMilenio::whereNull('idPadre')->with('hijos')->get();
+		$datos['modalidades'] = Modalidad::all();
+		$datos['programas_presupuestarios'] = ProgramaPresupuestario::all();
 
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
 		$datos['usuario'] = Sentry::getUser();

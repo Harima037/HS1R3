@@ -19,6 +19,7 @@
 @stop
 
 @section('content')
+<input type="hidden" id="id" name="id" value="">
 <div class="row">
     <div class="col-md-12">
         <div class="panel panel-default">
@@ -27,22 +28,75 @@
                 <div role="tabpanel">
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active">
-                            <a href="#programa-presupuestario" aria-controls="programa-presupuestario" role="tab" data-toggle="tab">
+                            <a href="#panel-programa-presupuestario" aria-controls="panel-programa-presupuestario" role="tab" data-toggle="tab">
                                 Programa Prespuestario
                             </a>
                         </li>
-                        <li role="presentation">
-                            <a href="#diagnostico" aria-controls="diagnostico" role="tab" data-toggle="tab">Diagnóstico</a>
+                        <li role="presentation" class="disabled">
+                            <a href="#diagnostico" aria-controls="diagnostico" role="tab" data-toggle="" id="tab-link-diagnostico">Diagnóstico</a>
                         </li>
-                        <li role="presentation">
-                            <a href="#indicadores" aria-controls="indicadores" role="tab" data-toggle="tab">Indicadores</a>
+                        <li role="presentation" class="disabled">
+                            <a href="#indicadores" aria-controls="indicadores" role="tab" data-toggle="" id="tab-link-indicadores">Indicadores</a>
                         </li>
                     </ul>
                     <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane active" id="programa-presupuestario">
+                        <div role="tabpanel" class="tab-pane active" id="panel-programa-presupuestario">
                             <br>
                             <form id="form_programa_datos">
                             <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" for="programa-presupuestario">Programa Presupuestario</label>
+                                        <select class="form-control chosen-one" id="programa-presupuestario" name="programa-presupuestario">
+                                            <option value="">Selecciona un Programa</option>
+                                            @foreach($programas_presupuestarios as $programa)
+                                                <option value="{{$programa->clave}}">{{$programa->clave}} {{$programa->descripcion}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" for="odm">ODM</label>
+                                        <select class="form-control chosen-one" id="odm" name="odm">
+                                            <option value="">Selecciona un Objetivo</option>
+                                            @foreach($odm as $objetivo)
+                                                @if(count($objetivo->hijos))
+                                                    <optgroup label="{{$objetivo->clave}} {{$objetivo->descripcion}}">
+                                                        @foreach($objetivo->hijos as $hijo)
+                                                            <option value="{{$hijo->id}}">{{$hijo->clave}} {{$hijo->descripcion}}</option>
+                                                        @endforeach
+                                                    </optgroup>
+                                                @else
+                                                    <option value="{{$objetivo->id}}">{{$objetivo->clave}} {{$objetivo->descripcion}}</option>
+                                                @endif
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label class="control-label" for="modalidad">Modalidad</label>
+                                        <select class="form-control chosen-one" id="modalidad" name="modalidad">
+                                            <option value="">Selecciona una Modalidad</option>
+                                            @foreach($modalidades as $modalidad)
+                                                <option value="{{$modalidad->id}}">{{$modalidad->clave}} {{$modalidad->descripcion}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label class="control-label" for="fecha-inicio">Fecha de Inicio</label>
+                                        <input type="date" class="form-control" id="fecha-inicio" name="fecha-inicio">
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <div class="form-group">
+                                        <label class="control-label" for="fecha-termino">Fecha de Termino</label>
+                                        <input type="date" class="form-control" id="fecha-termino" name="fecha-termino">
+                                    </div>
+                                </div>
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label class="control-label" for="resultados-esperados">
@@ -51,33 +105,33 @@
                                         <textarea class="form-control" rows="5" id="resultados-esperados" name="resultados-esperados"></textarea>
                                     </div>
                                 </div>
-                                <div class="col-sm-10">
+                                <div class="col-sm-9">
                                     <div class="form-group">
-                                        <label class="control-label">Área de Enfoque Potencial</label>
+                                        <label class="control-label" for="enfoque-potencial">Área de Enfoque Potencial</label>
                                         <input type="text" class="form-control" id="enfoque-potencial" name="enfoque-potencial">
                                     </div>
                                 </div>
-                                <div class="col-sm-2">
+                                <div class="col-sm-3">
                                     <div class="form-group">
-                                        <label class="control-label">Cuantificación</label>
-                                        <input type="text" class="form-control" id="cuantificacion-potencial" name="cuantificacion-potencial">
+                                        <label class="control-label" for="cuantificacion-potencial">Cuantificación</label>
+                                        <input type="number" class="form-control" id="cuantificacion-potencial" name="cuantificacion-potencial">
                                     </div>
                                 </div>
-                                <div class="col-sm-10">
+                                <div class="col-sm-9">
                                     <div class="form-group">
-                                        <label class="control-label">Área de Enfoque Objetivo</label>
+                                        <label class="control-label" for="enfoque-objetivo">Área de Enfoque Objetivo</label>
                                         <input type="text" class="form-control" id="enfoque-objetivo" name="enfoque-objetivo">
                                     </div>
                                 </div>
-                                <div class="col-sm-2">
+                                <div class="col-sm-3">
                                     <div class="form-group">
-                                        <label class="control-label">Cuantificación</label>
-                                        <input type="text" class="form-control" id="cuantificacion-objetivo" name="cuantificacion-potencial">
+                                        <label class="control-label" for="cuantificacion-objetivo">Cuantificación</label>
+                                        <input type="number" class="form-control" id="cuantificacion-objetivo" name="cuantificacion-objetivo">
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <label class="control-label" for="resultados-esperados">Justificación del Programa</label>
+                                        <label class="control-label" for="justificacion-programa">Justificación del Programa</label>
                                         <textarea class="form-control" rows="5" id="justificacion-programa" name="justificacion-programa"></textarea>
                                     </div>
                                 </div>
@@ -204,12 +258,6 @@
                             <div class="panel panel-default datagrid" id="datagridIndicadores" data-edit-row="cargar_datos_proyecto">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-6">
-                                        <div class="input-group" style="margin:5px">                            
-                                            <input type="text" class="form-control txt-quick-search" placeholder="Buscar">
-                                            <span class="input-group-btn">
-                                                <button class="btn btn-default btn-quick-search" type="button"><span class="glyphicon glyphicon-search"></span></button>
-                                            </span>
-                                        </div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="btn-toolbar pull-right" >
@@ -247,28 +295,6 @@
                                     </thead>
                                     <tbody></tbody>
                                 </table>
-                                <div class="panel-footer">
-                                    <div class="btn-toolbar ">
-                                        <div class="btn-group pull-right" style="margin-left:5px; margin-bottom:5px;">
-                                            <button class="btn btn-default btn-back-rows"><i class="glyphicon glyphicon-arrow-left"></i></button>
-                                            <button class="btn btn-default btn-next-rows"><i class="glyphicon glyphicon-arrow-right"></i></button>
-                                        </div>
-                                        <div class="btn-group pull-right " style="width:200px; ">   
-                                            <div class="input-group" > 
-                                                <span class="input-group-addon">Pág.</span> 
-                                                <input type="text" class="txt-go-page form-control" style="text-align:center" value="1" >     
-                                                <span class="input-group-addon btn-total-paginas" data-pages="0">de 0</span> 
-                                                <div class="input-group-btn dropup">
-                                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
-                                                    <ul class="dropdown-menu pull-right">
-                                                        <li><a class="btn-go-first-rows" href="#">Primera Página</a></li>
-                                                        <li><a class="btn-go-last-rows" href="#">Última Página</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>

@@ -14,8 +14,8 @@
 // Inicialización General para casi cualquier módulo
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/programas-presupuestarios');
 var moduloDatagrid = new Datagrid("#datagridProgramas",moduloResource);
-//moduloDatagrid.init();
-//moduloDatagrid.actualizar();
+moduloDatagrid.init();
+moduloDatagrid.actualizar();
 var modal_name = '#modal_programa_datos';
 var form_name = '#form_programa_datos';
 

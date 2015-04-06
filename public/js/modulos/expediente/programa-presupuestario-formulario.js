@@ -19,20 +19,20 @@ var moduloDatagrid = new Datagrid("#datagridIndicadores",moduloResource);
 var modal_indicador = '#modal_programa_indicador';
 var modal_problema = '#modal_problema';
 var modal_objetivo = '#modal_objetivo';
+var form_programa = '#form_programa_datos';
 var form_indicador = '#form_programa';
 
 $('.chosen-one').chosen({width:'100%'});
 
-/**
-    Funciones de modales
-**/
+/****************************************************************** Funciones de modales ********************************************************************/
+$(modal_indicador).on('hide.bs.modal',function(e){
+    reset_modal_form(form_indicador);
+});
+
+/****************************************************************** Funciones de datagrids ********************************************************************/
 $('#datagridIndicadores .btn-datagrid-agregar').on('click', function () {
     $(modal_indicador).find(".modal-title").html("Nuevo Indicador");
     $(modal_indicador).modal('show');
-});
-
-$(modal_indicador).on('hide.bs.modal',function(e){
-    reset_modal_form(form_indicador);
 });
 
 $('#datagridProblemas .btn-datagrid-agregar').on('click', function () {
@@ -43,6 +43,58 @@ $('#datagridProblemas .btn-datagrid-agregar').on('click', function () {
 $('#datagridObjetivos .btn-datagrid-agregar').on('click', function () {
     $(modal_objetivo).find(".modal-title").html("Nuevo Medio/Fin");
     $(modal_objetivo).modal('show');
+});
+
+/****************************************************************** Funciones de Botones ********************************************************************/
+$('#btn-programa-guardar').on('click',function(){
+    Validation.cleanFormErrors(form_programa);
+    var parametros = $(form_programa).serialize();
+    parametros += '&guardar=programa';
+
+    if($('#id').val()){
+        moduloResource.put($('#id').val(),parametros,{
+            _success: function(response){
+                //
+            },
+            _error: function(response){
+                try{
+                    var json = $.parseJSON(response.responseText);
+                    if(!json.code)
+                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                    else{
+                        MessageManager.show(json);
+                    }
+                    Validation.formValidate(json.data);
+                }catch(e){
+                    console.log(e);
+                }                       
+            }
+        });
+    }else{
+        moduloResource.post(parametros,{
+            _success: function(response){
+                //
+                $('#id').val(response.id);
+                $('#tab-link-diagnostico').attr('data-toggle','tab');
+                $('#tab-link-diagnostico').parent().removeClass('disabled');
+                $('#tab-link-indicadores').attr('data-toggle','tab');
+                $('#tab-link-indicadores').parent().removeClass('disabled');
+            },
+            _error: function(response){
+                try{
+                    var json = $.parseJSON(response.responseText);
+                    if(!json.code)
+                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                    else{
+                        MessageManager.show(json);
+                    }
+                    Validation.formValidate(json.data);
+                }catch(e){
+                    console.log(e);
+                }                       
+            }
+        });
+    }
 });
 
 $('#btn-programa-cancelar').on('click',function(){
