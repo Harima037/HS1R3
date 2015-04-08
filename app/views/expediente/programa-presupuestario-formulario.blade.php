@@ -19,7 +19,7 @@
 @stop
 
 @section('content')
-<input type="hidden" id="id" name="id" value="">
+<input type="hidden" id="id" name="id" value="{{$id}}">
 <div class="row">
     <div class="col-md-12">
         <div class="panel panel-default">
@@ -36,7 +36,7 @@
                             <a href="#diagnostico" aria-controls="diagnostico" role="tab" data-toggle="" id="tab-link-diagnostico">Diagnóstico</a>
                         </li>
                         <li role="presentation" class="disabled">
-                            <a href="#indicadores" aria-controls="indicadores" role="tab" data-toggle="" id="tab-link-indicadores">Indicadores</a>
+                            <a href="#indicadores" aria-controls="indicadores" role="tab" data-toggle="" id="tab-link-indicadores">Objetivos e Indicadores</a>
                         </li>
                     </ul>
                     <div class="tab-content">
@@ -44,7 +44,7 @@
                             <br>
                             <form id="form_programa_datos">
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-5">
                                     <div class="form-group">
                                         <label class="control-label" for="programa-presupuestario">Programa Presupuestario</label>
                                         <select class="form-control chosen-one" id="programa-presupuestario" name="programa-presupuestario">
@@ -53,6 +53,23 @@
                                                 <option value="{{$programa->clave}}">{{$programa->clave}} {{$programa->descripcion}}</option>
                                             @endforeach
                                         </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-5">
+                                    <div class="form-group">
+                                        <label class="control-label" for="unidad-responsable">Unidad Responsable</label>
+                                        <select class="form-control chosen-one" id="unidad-responsable" name="unidad-responsable">
+                                            <option value="">Selecciona una Unidad</option>
+                                            @foreach($unidades_responsables as $unidad)
+                                                <option value="{{$unidad->clave}}">{{$unidad->clave}} {{$unidad->descripcion}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <label class="control-label" for="ejercicio">Ejercicio</label>
+                                        <input type="number" class="form-control" id="ejercicio" name="ejercicio">
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
@@ -151,10 +168,12 @@
                                 <div class="panel-body">
                                     <div class="row">
                                         <div class="col-sm-12">
+                                            <form id="form_problema">
                                             <div class="form-group">
                                                 <label class="control-label" for="descripcion-problema">Árbol del Problema</label>
                                                 <textarea class="form-control" id="descripcion-problema" name="descripcion-problema" rows="5"></textarea>
                                             </div>
+                                            </form>
                                         </div>
                                         <div class="col-sm-6">
                                             <button id="btn-guardar-problema" type="button" class="btn btn-info">
@@ -204,10 +223,12 @@
                                 <div class="panel-body">
                                     <div class="row">
                                         <div class="col-sm-12">
+                                            <form id="form_objetivo">
                                             <div class="form-group">
                                                 <label class="control-label" for="descripcion-objetivo">Árbol de Objetivos</label>
                                                 <textarea class="form-control" id="descripcion-objetivo" name="descripcion-objetivo" rows="5"></textarea>
                                             </div>
+                                            </form>
                                         </div>
                                         <div class="col-sm-6">
                                             <button id="btn-guardar-objetivo" type="button" class="btn btn-info">
@@ -255,7 +276,7 @@
                         </div>
                         <div role="tabpanel" class="tab-pane" id="indicadores">
                             <br>
-                            <div class="panel panel-default datagrid" id="datagridIndicadores" data-edit-row="cargar_datos_proyecto">
+                            <div class="panel panel-default datagrid" id="datagridIndicadores" data-edit-row="editar_indicador">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-6">
                                     </div>
@@ -285,12 +306,9 @@
                                     <thead>
                                         <tr>
                                             <th><input type="checkbox" class="check-select-all-rows"></th>
-                                            <th>Clave</th>
-                                            <th>Nombre Técnico</th>
-                                            <th>Presupuesto</th>
-                                            <th style="width:100px;">Estatus</th>
-                                            <th style="text-align:center; width:85px;"><span class="glyphicon glyphicon-user"></span></th>
-                                            <th style="text-align:center; width:120px;"><span class="glyphicon glyphicon-calendar"></span></th>
+                                            <th width="100">Tipo</th>
+                                            <th>Indicador</th>
+                                            <th width="200">Unidad de Medida</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -323,13 +341,17 @@
                 <h4 class="modal-title" id="modalIndLabel">Nuevo</h4>
             </div>
             <div class="modal-body">
+                <input type="hidden" id="id-indicador" value="">
                 <div class="row">
                     <div class="col-sm-12">
-                        <select class="form-control chosen-one" id="tipo-indicador">
-                            <option value="">Selecciona una opción</option>
-                            <option value="1">Fin</option>
-                            <option value="2">Proposito</option>
-                        </select>
+                        <div class="form-group">
+                            <label for="tipo-indicador" class="control-label">Tipo de Indicador</label>
+                            <select class="form-control chosen-one" id="tipo-indicador">
+                                <option value="">Selecciona una opción</option>
+                                <option value="F">Fin</option>
+                                <option value="P">Proposito</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <br>
@@ -337,7 +359,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary btn-guardar">Ir a la caratula de captura</button>
+                <button type="button" class="btn btn-primary" id="btn-guardar-indicador">Guardar Indicador</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
@@ -350,26 +372,27 @@
                 <h4 class="modal-title" id="modalProblemaLabel">Nuevo</h4>
             </div>
             <div class="modal-body">
-                <form id="form_problema">
+                <form id="form_causa_efecto">
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label class="control-label" for="causa">Causa</label>
-                                <input type="text" class="form-control" id="causa">
+                                <textarea class="form-control" id="causa" name="causa" rows="3"></textarea>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label class="control-label" for="efecto">Efecto</label>
-                                <input type="text" class="form-control" id="efecto">
+                                <textarea class="form-control" id="efecto" name="efecto" rows="3"></textarea>
                             </div>
                         </div>
                     </div>
                 </form>
+                <input type="hidden" id="id-causa-efecto" value="">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary btn-guardar">Guardar</button>
+                <button type="button" class="btn btn-primary" id="btn-guardar-causa-efecto">Guardar</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
@@ -382,26 +405,27 @@
                 <h4 class="modal-title" id="modalObjetivoLabel">Nuevo</h4>
             </div>
             <div class="modal-body">
-                <form id="form_problema">
+                <form id="form_medio_fin">
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label class="control-label" for="medio">Medio</label>
-                                <input type="text" class="form-control" id="medio">
+                                <textarea class="form-control" id="medio" name="medio" rows="3"></textarea>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label class="control-label" for="fin">Fin</label>
-                                <input type="text" class="form-control" id="fin">
+                                <textarea class="form-control" id="fin" name="fin" rows="3"></textarea>
                             </div>
                         </div>
                     </div>
                 </form>
+                <input type="hidden" id="id-medio-fin" value="">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary btn-guardar">Guardar</button>
+                <button type="button" class="btn btn-primary" id="btn-guardar-medio-fin">Guardar</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

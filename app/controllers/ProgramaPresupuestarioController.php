@@ -9,43 +9,36 @@ class ProgramaPresupuestarioController extends \BaseController {
 	 */
 	public function index()
 	{
-		/*$datos_programa = array(
-			'clasificacion_proyecto' => 1,
-			'formulas' => Formula::all(),
-			'dimensiones' => Dimension::all(),
-			'frecuencias' => Frecuencia::all(),
-			'tipos_indicador' => TipoIndicador::all(),
-			'unidades_medida' => UnidadMedida::all()
-		);
-		$datos_programa['identificador'] = 'programa'; //El identificador se agrega al id de los elementos del formulario
-				$datos_programa['jurisdicciones'] = array('OC'=>'O.C.');
-				$datos_programa['meses'] = array( 
-					'1'=>'ENE','2'=>'FEB','3'=>'MAR', '4'=>'ABR', '5'=>'MAY', '6'=>'JUN', 
-					'7'=>'JUL','8'=>'AGO','9'=>'SEP','10'=>'OCT','11'=>'NOV','12'=>'DIC'
-				);
-		$datos['formulario_programa'] = View::make('expediente.formulario-componente',$datos_programa);*/
 		return parent::loadIndex('EXP','PROGPRESUP');
 	}
 
 	public function editar($id = NULL){
 		$datos_programa = array(
-			'clasificacion_proyecto' => 1,
-			'formulas' => Formula::all(),
-			'dimensiones' => Dimension::all(),
-			'frecuencias' => Frecuencia::all(),
-			'tipos_indicador' => TipoIndicador::all(),
-			'unidades_medida' => UnidadMedida::all()
+			'clasificacion_proyecto' 	=> 1,
+			'formulas' 					=> Formula::all(),
+			'dimensiones' 				=> Dimension::all(),
+			'frecuencias' 				=> Frecuencia::all(),
+			'tipos_indicador' 			=> TipoIndicador::all(),
+			'unidades_medida' 			=> UnidadMedida::all(),
+			'ambitos'					=> array(
+											array('clave'=>'E','descripcion'=>'Estatal'),
+											array('clave'=>'F','descripcion'=>'Federal')
+										)
 		);
 		$datos_programa['identificador'] = 'programa'; //El identificador se agrega al id de los elementos del formulario
-				$datos_programa['jurisdicciones'] = array('OC'=>'O.C.');
-				$datos_programa['meses'] = array( 
-					'1'=>'ENE','2'=>'FEB','3'=>'MAR', '4'=>'ABR', '5'=>'MAY', '6'=>'JUN', 
-					'7'=>'JUL','8'=>'AGO','9'=>'SEP','10'=>'OCT','11'=>'NOV','12'=>'DIC'
-				);
+		/*
+		$datos_programa['jurisdicciones'] = array('OC'=>'O.C.');
+		$datos_programa['meses'] = array( 
+			'1'=>'ENE','2'=>'FEB','3'=>'MAR', '4'=>'ABR', '5'=>'MAY', '6'=>'JUN', 
+			'7'=>'JUL','8'=>'AGO','9'=>'SEP','10'=>'OCT','11'=>'NOV','12'=>'DIC'
+		);
+		*/
+		$datos['id'] = $id;
 		$datos['formulario_programa'] = View::make('expediente.formulario-componente',$datos_programa);
 		$datos['odm'] = ObjetivoDesarrolloMilenio::whereNull('idPadre')->with('hijos')->get();
 		$datos['modalidades'] = Modalidad::all();
 		$datos['programas_presupuestarios'] = ProgramaPresupuestario::all();
+		$datos['unidades_responsables'] = UnidadResponsable::all();
 
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
 		$datos['usuario'] = Sentry::getUser();

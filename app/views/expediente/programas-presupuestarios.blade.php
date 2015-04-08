@@ -56,13 +56,12 @@
                 <thead>
                     <tr>
                         <th><input type="checkbox" class="check-select-all-rows"></th>
-                        <th>Clave</th>
                         <th>Programa Presupuestario</th>
-                        <th>Fecha Inicio</th>
-                        <th>Fecha Termino</th>
+                        <th style="width:120px;">Fecha Inicio</th>
+                        <th style="width:120px;">Fecha Termino</th>
                         <th style="width:100px;">Estatus</th>
                         <th style="text-align:center; width:85px;"><span class="glyphicon glyphicon-user"></span></th>
-                        <th style="text-align:center; width:120px;"><span class="glyphicon glyphicon-calendar"></span></th>
+                        <th style="text-align:center; width:100px;"><span class="glyphicon glyphicon-calendar"></span></th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -95,23 +94,6 @@
 @stop
 
 @section('modals')
-<div class="modal fade" id="modal_programa_indicador" tabindex="-1" role="dialog" aria-labelledby="modalIndLabel" aria-hidden="true" data-backdrop="static">
-    <div class="modal-dialog modal-dialog-85-screen">
-        <div class="modal-content modal-content-85-screen">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="modalIndLabel">Nuevo</h4>
-            </div>
-            <div class="modal-body">
-                Nothing!!!!
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary btn-guardar">Ir a la caratula de captura</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
 <div class="modal fade" id="modal_programa_datos" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-dialog-85-screen">
         <div class="modal-content modal-content-85-screen">

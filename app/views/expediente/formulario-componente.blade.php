@@ -75,10 +75,23 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="form-group">
-                        <label for="descripcion-obj-{{$identificador}}" class="control-label">Descripción</label>
+                        <label for="descripcion-obj-{{$identificador}}" class="control-label">Descripción del Objetivo</label>
                         <input type="text" class="form-control" id="descripcion-obj-{{$identificador}}" name="descripcion-obj-{{$identificador}}">
                     </div>
                 </div>
+            @if ($identificador == 'programa')
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label for="ambito-{{$identificador}}" class="control-label">Ambito</label>
+                        <select class="form-control chosen-one" id="ambito-{{$identificador}}" name="ambito-{{$identificador}}">
+                            <option value="">Selecciona un ambito</option>
+                            @foreach($ambitos as $ambito)
+                                <option value="{{$ambito['clave']}}">{{$ambito['clave']}} {{$ambito['descripcion']}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            @endif
                 <div class="col-sm-12">
                     <div class="form-group">
                         <label for="verificacion-{{$identificador}}" class="control-label">Medios de Verificación</label>
@@ -98,16 +111,10 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-sm-12">
                             <div class="form-group">
-                                <label for="descripcion-ind-{{$identificador}}" class="control-label">Descripción</label>
+                                <label for="descripcion-ind-{{$identificador}}" class="control-label">Descripción del Indicador</label>
                                 <input type="text" class="form-control" id="descripcion-ind-{{$identificador}}" name="descripcion-ind-{{$identificador}}">
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="interpretacion-{{$identificador}}" class="control-label">Interpretación</label>
-                                <input type="text" class="form-control" id="interpretacion-{{$identificador}}" name="interpretacion-{{$identificador}}">
                             </div>
                         </div>
                         <div class="col-sm-6">
@@ -120,6 +127,12 @@
                             <div class="form-group">
                                 <label for="denominador-ind-{{$identificador}}" class="control-label">Denominador</label>
                                 <input type="text" class="form-control" id="denominador-ind-{{$identificador}}" name="denominador-ind-{{$identificador}}">
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="interpretacion-{{$identificador}}" class="control-label">Interpretación</label>
+                                <input type="text" class="form-control" id="interpretacion-{{$identificador}}" name="interpretacion-{{$identificador}}">
                             </div>
                         </div>
                     </div>
@@ -271,25 +284,25 @@
                         <div class="col-sm-3">
                             <div class="form-group">
                                 <label class="control-label">Trim 1</label>
-                                <input type="number" class="form-control" id="trim1-{{$identificador}}" name="trim1-{{$identificador}}">
+                                <input type="number" class="form-control valor-trimestre" id="trim1-{{$identificador}}" name="trim1-{{$identificador}}">
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
                                 <label class="control-label">Trim 2</label>
-                                <input type="number" class="form-control" id="trim2-{{$identificador}}" name="trim2-{{$identificador}}">
+                                <input type="number" class="form-control valor-trimestre" id="trim2-{{$identificador}}" name="trim2-{{$identificador}}">
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
                                 <label class="control-label">Trim 3</label>
-                                <input type="number" class="form-control" id="trim3-{{$identificador}}" name="trim3-{{$identificador}}">
+                                <input type="number" class="form-control valor-trimestre" id="trim3-{{$identificador}}" name="trim3-{{$identificador}}">
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
                                 <label class="control-label">Trim 4</label>
-                                <input type="number" class="form-control" id="trim4-{{$identificador}}" name="trim4-{{$identificador}}">
+                                <input type="number" class="form-control valor-trimestre" id="trim4-{{$identificador}}" name="trim4-{{$identificador}}">
                             </div>
                         </div>
                     </div>
@@ -297,7 +310,8 @@
                 <div class="col-sm-4">
                     <div class="form-group">
                         <label class="control-label"><span class="fa fa-link"></span> Numerador</label>
-                        <span class="form-control" data-espejo-id="#numerador-{{$identificador}}"></span>
+                        <span class="form-control" id="lbl-numerador-{{$identificador}}"></span>
+                        <input type="hidden" id="numerador-{{$identificador}}" name="numerador-{{$identificador}}">
                     </div>
                 </div>
                 <div class="col-sm-4">
