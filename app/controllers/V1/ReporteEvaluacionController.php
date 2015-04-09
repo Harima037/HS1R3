@@ -8,7 +8,7 @@
 * 	Área de Informática, Dirección de Planeación y Desarrollo.
 *
 *	@copyright			Copyright 2015, Instituto de Salud.
-*	@author 			Donaldo Ríos
+*	@author 			Mario Alberto Cabrera Alfaro
 *	@package 			poa
 *	@version 			1.0
 *	@comment 			

@@ -20,14 +20,16 @@ moduloDatagrid.actualizar({
         moduloDatagrid.limpiar();
         var datos_grid = [];
         var trimestre = $('#datagridProgramas').attr('data-trim-activo');
+        var label_lock = '<span class=""><span class="fa fa-lock"></span></span>';
+        var label_miss = '<span class="text-muted"><span class="fa fa-times"></span></span>';
         for(var i in response.data){
             var item = {
                 'id':       response.data[i].id,
                 'programa': response.data[i].clave + ' ' + response.data[i].programa,
-                'trim_1':    '<span id="grid-trim-1" class=""><span class="fa fa-lock"></span></span>',
-                'trim_2':    '<span id="grid-trim-2" class=""><span class="fa fa-lock"></span></span>',
-                'trim_3':    '<span id="grid-trim-3" class=""><span class="fa fa-lock"></span></span>',
-                'trim_4':    '<span id="grid-trim-4" class=""><span class="fa fa-lock"></span></span>',
+                'trim_1':   (trimestre > 1)?label_miss:label_lock,
+                'trim_2':   (trimestre > 2)?label_miss:label_lock,
+                'trim_3':   (trimestre > 3)?label_miss:label_lock,
+                'trim_4':   (trimestre > 4)?label_miss:label_lock,
                 'estado':   '<span class="text-muted">Inactivo</span>'
             };
 
@@ -155,8 +157,7 @@ $('#btn-editar-avance').on('click',function(){
 });
 
 $('#btn-reporte').on('click',function(){
-    alert('proximamente');
-    //window.open(SERVER_HOST+'/v1/reporte-evaluacion/' +  + $('#btn-editar-avance').attr('data-id-programa'));
+    window.open(SERVER_HOST+'/v1/reporte-programa/' + $('#btn-editar-avance').attr('data-id-programa'));
 });
 
 /*             Extras               */

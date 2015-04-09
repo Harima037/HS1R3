@@ -44,7 +44,11 @@ class CuentaController extends \BaseController {
 			$recurso = Sentry::getUser();
 			$parametros = Input::all();
 			if(isset($parametros['formulario'])){
-				$recurso->mesCaptura = $parametros['mes-captura'];
+				if($parametros['mes-captura']){
+					$recurso->mesCaptura = $parametros['mes-captura'];
+				}else{
+					$recurso->mesCaptura = NULL;
+				}
 				if($recurso->save()){
 					$respuesta['http_status'] = 200;
 					$respuesta['data'] = array("data"=>$recurso->toArray());

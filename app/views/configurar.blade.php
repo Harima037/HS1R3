@@ -22,6 +22,7 @@
                     <div class="form-group">
                         <label for="mes-captura">Mes de Captura</label>
                         <select id="mes-captura" name="mes-captura" class="form-control">
+                            <option value="0" {{($usuario->mesCaptura == NULL)?'selected="selected"':''}}>Usar mes del sistema</option>
                             <option value="1" {{($usuario->mesCaptura == 1)?'selected="selected"':''}}>Enero</option>
                             <option value="2" {{($usuario->mesCaptura == 2)?'selected="selected"':''}}>Febrero</option>
                             <option value="3" {{($usuario->mesCaptura == 3)?'selected="selected"':''}}>Marzo</option>

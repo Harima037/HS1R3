@@ -5,11 +5,11 @@ class Util
 {
 	public static function obtenerMesActual(){
 		$usuario = \Sentry::getUser();
+		
 		if($usuario->mesCaptura){
 			return $usuario->mesCaptura;
-		}else{
-			return date("n");
 		}
+		
 		$mes = date('n');
 		$dia = date('j');
 		if($dia <= 10){

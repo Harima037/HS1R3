@@ -91,6 +91,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('programas-presupuestarios','V1\ProgramaPresupuestarioController');
 
 		Route::resource('reporte-evaluacion',	'V1\ReporteEvaluacionController', array('only'=>array('show')));
+		Route::resource('reporte-programa',	'V1\ReporteEvaluacionProgramaController', array('only'=>array('show')));
 	});
 });
 
