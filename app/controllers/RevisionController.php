@@ -97,6 +97,13 @@ class RevisionController extends \BaseController {
 		$datos['beneficiarios'] = View::make('revision.revision-beneficiarios-caratula');		
 		//Se Pre-carga el datagrid de los componentes
 		$datos['grid_componentes'] = View::make('revision.revision-listado-componentes');
+		
+		$datos_financiamiento = array(
+			'fuentes_financiamiento'	=> FuenteFinanciamiento::where('nivel','=',4)->get(),
+			'destino_gasto'				=> DestinoGasto::all(),
+			'subfuentes_financiamiento' => SubFuenteFinanciamiento::all()
+		);
+		$datos['grid_fuentes_financiamiento'] = View::make('revision.revision-caratula-financiamiento',$datos_financiamiento);
 
 		//Cargar el formulario para dar de alta actividades
 		$datos_componentes['identificador'] = 'actividad'; //El identificador se agrega al id de los elementos del formulario

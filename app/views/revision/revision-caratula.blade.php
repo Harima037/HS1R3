@@ -13,6 +13,7 @@
 <script src="{{ URL::to('js/dependencias/chosen.jquery.min.js') }}"></script>
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
+<script src="{{ URL::to('js/modulos/expediente/fuenteFinanciamiento.js')}}"></script>
 <script src="{{ URL::to('js/modulos/revision/revision-caratula.js')}}"></script>
 @stop
 
@@ -59,6 +60,11 @@
                         </a>
                     </li>
                     <li role="presentation">
+                        <a id="tablink-fuentes-financiamiento" href="#financiamiento" role="tab" data-toggle="tab">
+                            Financiamiento
+                        </a>
+                    </li>
+                    <li role="presentation">
                         <a id="tablink-fibap" href="#fibap" role="tab" data-toggle="tab">
                             FIBAP 
                         </a>
@@ -83,6 +89,10 @@
                     <div role="tabpanel" class="tab-pane" id="beneficiarios">
                         <br>
                         {{$beneficiarios}}
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="financiamiento">
+                        <br>
+                        {{$grid_fuentes_financiamiento}}
                     </div>
                     <div role="tabpanel" class="tab-pane" id="fibap">
                         <br>

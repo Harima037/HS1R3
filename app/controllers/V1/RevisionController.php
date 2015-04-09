@@ -5,7 +5,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception;
 use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
-	FibapDatosProyecto, Titular, ComponenteDesglose, ProyectoComentario, Accion, DistribucionPresupuesto;
+	FibapDatosProyecto, Titular, ComponenteDesglose, ProyectoComentario, Accion, DistribucionPresupuesto, ProyectoFinanciamiento;
 
 class RevisionController extends BaseController {
 	private $reglasProyecto = array(
@@ -215,6 +215,8 @@ class RevisionController extends BaseController {
 			//throw new Exception(json_encode($parametros),1);
 			if($parametros['ver'] == 'componente'){
 				$recurso = Componente::with('actividades.unidadMedida','metasMes')->find($id);
+			}elseif($parametros['ver'] == 'financiamiento'){
+				$recurso = ProyectoFinanciamiento::with('subFuentesFinanciamiento')->find($id);
 			}elseif ($parametros['ver'] == 'lista-desglose') {
 
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
@@ -286,6 +288,7 @@ class RevisionController extends BaseController {
 		}else{
 			$recurso = Proyecto::contenidoCompleto()->find($id);
 			$recurso->componentes->load('unidadMedida','dimension','tipoIndicador','metasMes','formula','frecuencia','actividades','entregable','entregableTipo','entregableAccion','accion.partidas','accion.propuestasFinanciamiento.origen','accion.distribucionPresupuesto','accion.desglosePresupuesto');
+			$recurso->load('fuentesFinanciamiento.destinoGasto','fuentesFinanciamiento.fuenteFinanciamiento','fuentesFinanciamiento.subFuentesFinanciamiento');
 			$recurso->load('comentarios');
 			
 			if($recurso->idClasificacionProyecto == 2){

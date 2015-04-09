@@ -182,7 +182,41 @@ if($('#id').val()){
 			}
 			cadenaHTML = cadenaHTML + '</table>';		
 			
+			/*fuenteFinanciamiento.init(proyectoResource,$('#id').val());
+			if(response.data.fuentes_financiamiento.length){
+				fuenteFinanciamiento.llenar_datagrid(response.data.fuentes_financiamiento);
+			}*/
+			
 			$('#tabla-beneficiarios').html(cadenaHTML);		
+			
+			
+			var financiaHTML = '';
+			
+			for(var fuente in response.data.fuentes_financiamiento)
+			{
+				financiaHTML += '<br>';
+				financiaHTML += '<div class="panel panel-default"><div class="panel-heading"><h3 class="panel-title">';				
+				financiaHTML += '<strong>Fuente de financiamiento: ';
+				financiaHTML += '</strong>'+response.data.fuentes_financiamiento[fuente].fuente_financiamiento.descripcion;	
+				financiaHTML += '<div style="text-align:right; float: right;"><strong> Destino del gasto: </strong>';
+				financiaHTML += response.data.fuentes_financiamiento[fuente].destino_gasto.descripcion;				
+				financiaHTML += '</div></h3></div><div class="panel-body">';
+				
+				financiaHTML += '<div class="col-sm-12"><strong>SubFuente de Financiamiento</strong></div>';
+				
+				for(var subfuente in response.data.fuentes_financiamiento[fuente].sub_fuentes_financiamiento)
+				{
+					var subf = response.data.fuentes_financiamiento[fuente].sub_fuentes_financiamiento[subfuente];
+					
+					financiaHTML += '<div class="col-sm-6"><strong>'+subf.clave+'</strong> '+subf.descripcion+'</div>';
+				}
+				financiaHTML += '<div class="col-sm-12"></div>';
+				
+				financiaHTML += '</div><div class="panel-footer"><button type="button" class="btn btn-default" id="financiamiento'+response.data.fuentes_financiamiento[fuente].id+'" onclick="escribirComentario(\'financiamiento'+response.data.fuentes_financiamiento[fuente].id+'\',\'Fuente de financiamiento\',\''+response.data.fuentes_financiamiento[fuente].fuente_financiamiento.descripcion+'\')" ><i class="fa fa-pencil-square-o"></i>Comentar</button></div>';
+			}
+			
+			$('#tabla-fuentesfinanciamiento').html(financiaHTML);		
+			
 			
 			if(response.data.idClasificacionProyecto==2)
 			{
@@ -600,8 +634,14 @@ if($('#id').val()){
 				
 				//console.log(response.data.comentarios[contador]['tipoComentario']);
 				if(response.data.comentarios[contador]['tipoComentario']=='1')//Tipo 1 = Proyecto
-				{
-					if(idCampo.substr(0,12)=='beneficiario')
+				{					
+					if(idCampo.substr(0,14)=='financiamiento')
+					{
+						var objetoAColorear = '#'+idCampo;
+						$(objetoAColorear).removeClass('btn-default');
+						$(objetoAColorear).addClass('btn-warning');					
+					}
+					else if(idCampo.substr(0,12)=='beneficiario')
 					{
 						var objetoAColorear = '#'+idCampo;
 						$(objetoAColorear).removeClass('btn-default');
@@ -720,6 +760,11 @@ if($('#id').val()){
 	/*inicializar_comportamiento_caratula();
 	deshabilita_paneles('');*/
 }
+
+/*function editar_fuente_financiamiento(e){
+	fuenteFinanciamiento.editar_fuente(e);
+}*/
+
 
 function construyebeneficiarios(datos){
 	//console.log(datos);
@@ -890,7 +935,9 @@ function escribirComentario(idcampo,nombrecampo,objetoconinformacion)
 	$('#idcampo').val(idcampo);
 	$('#tipocomentario').val('1');
 	
-	if(idcampo.substr(0,12) == 'beneficiario')
+	if(idcampo.substr(0,14) == 'financiamiento')
+		$('#lbl-informacioncampo').text(objetoconinformacion);
+	else if(idcampo.substr(0,12) == 'beneficiario')
 		$('#lbl-informacioncampo').text(objetoconinformacion);
 	else if(idcampo.substr(0,10) == 'documentos')
 		$('#lbl-informacioncampo').text(objetoconinformacion);
@@ -1012,7 +1059,15 @@ $('#btnGuardarComentario').on('click',function(){
 			proyectoResource.post(parametros,{
 		        _success: function(response){
 	    	        MessageManager.show({data:'Datos del comentario almacenados con éxito',type:'OK',timer:3});	
-					if($('#idcampo').val().substr(0,12)=='beneficiario')
+					
+					
+					if($('#idcampo').val().substr(0,14)=='financiamiento')
+					{
+						var objetoAColorear = '#'+objetoQueSeColorea;
+						$(objetoAColorear).removeClass('btn-default');
+						$(objetoAColorear).addClass('btn-warning');					
+					}
+					else if($('#idcampo').val().substr(0,12)=='beneficiario')
 					{
 						var objetoAColorear = '#'+objetoQueSeColorea;
 						$(objetoAColorear).removeClass('btn-default');
@@ -1129,7 +1184,13 @@ $('#btnQuitarComentario').on('click',function(){
 								if($('#idcampo').val().substr(i,1)!='|')
 									objetoADesColorear += $('#idcampo').val().substr(i,1);
 							
-							if($('#idcampo').val().substr(0,12)=='beneficiario')
+							if($('#idcampo').val().substr(0,14)=='financiamiento')
+							{
+								var objetoADesColorear = '#'+objetoADesColorear;
+								$(objetoADesColorear).removeClass('btn-warning');
+								$(objetoADesColorear).addClass('btn-default');					
+							}
+							else if($('#idcampo').val().substr(0,12)=='beneficiario')
 							{
 								objetoADesColorear = '#'+objetoADesColorear;
 								$(objetoADesColorear).removeClass('btn-warning');
