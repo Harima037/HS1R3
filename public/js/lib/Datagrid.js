@@ -299,7 +299,9 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
                 
 			}
 		}else{
-			MessageManager.show({data:"No hay datos que cargar",type:'INF',timer:3});	
+			var conteo_columnas = $(this.selector + " thead tr th").length;
+			$(this.selector + " tbody").html('<tr><td></td><td colspan="'+(conteo_columnas - 1)+'"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
+			//MessageManager.show({data:"No hay datos que cargar",type:'INF',timer:3});
 		}
 	}
 	this.actualizarFila = function(e,objJSON){		

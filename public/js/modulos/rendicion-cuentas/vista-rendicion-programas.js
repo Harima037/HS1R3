@@ -130,7 +130,7 @@ function seguimiento_metas(e){
                 acumulado += response.data['trim'+i];
             }
 
-            $('#trimestre-meta').text(response.data['trim'+trimestre].format());
+            $('#trimestre-meta').text((response.data['trim'+trimestre]+0).format());
                 
             $('#trimestre-acumulada').attr('data-valor',acumulado);
             $('#trimestre-acumulada').text(acumulado.format());

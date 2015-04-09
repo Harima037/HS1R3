@@ -40,7 +40,7 @@ moduloDatagrid.actualizar({
 
             datos_grid.push(item);
         }
-        moduloDatagrid.cargarDatos(datos_grid);                         
+        moduloDatagrid.cargarDatos(datos_grid);
         var total = parseInt(response.resultados/moduloDatagrid.rxpag); 
         var plus = parseInt(response.resultados)%moduloDatagrid.rxpag;
         if(plus>0) 

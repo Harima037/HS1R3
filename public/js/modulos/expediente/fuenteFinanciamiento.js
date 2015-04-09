@@ -152,6 +152,11 @@ context.editar_fuente = function(e){
         _success: function(response){
         	$(modal_fuente).find(".modal-title").html("Editar Fuente de Financiamiento");
 
+        	if($('#datagridFuenteFinanciamiento tr[data-id="'+response.data.id+'"]').attr('data-comentario')){
+				var comentario = $('#datagridFuenteFinanciamiento tr[data-id="'+response.data.id+'"]').attr('data-comentario');
+				MessageManager.show({data:comentario,container: modal_fuente + ' .modal-body',type:'ADV'});
+			}
+
         	$('#fuente-financiamiento').val(response.data.idFuenteFinanciamiento);
         	$('#fuente-financiamiento').chosen().change();
         	$('#destino-gasto').val(response.data.idDestinoGasto);
@@ -207,6 +212,7 @@ function reset_modal_form(form){
     $('#id-financiamiento').val('');
 	$('#fuente-financiamiento').chosen().change();
 	$('.chosen-one').trigger('chosen:updated');
+	$(modal_fuente + ' .alert').remove();
 }
 
 })(fuenteFinanciamiento);

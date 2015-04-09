@@ -90,7 +90,7 @@ function cargar_datos_programa(e){
                     'claveTipo': indicador.claveTipoIndicador,
                     'nombre': indicador.descripcionIndicador,
                     'metas': {
-                        1: indicador.trim1,
+                        1: indicador.trim1 + 0,
                         2: indicador.trim1 + indicador.trim2,
                         3: indicador.trim1 + indicador.trim2 + indicador.trim3,
                         4: indicador.trim1 + indicador.trim2 + indicador.trim3 + indicador.trim4
