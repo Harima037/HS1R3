@@ -6,9 +6,15 @@ use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
 use Programa, ProgramaArbolProblema, ProgramaArbolObjetivo, ProgramaIndicador;
 
-class ProgramaPresupuestarioController extends ProyectosController {
+class ProgramaPresupuestarioController extends BaseController {
 	private $reglasPrograma = array(
+		'unidad-responsable'		=> 'required',
+		'programa-presupuestario'	=> 'required',
+		'programa-sectorial'		=> 'required',
+		'ejercicio'					=> 'required',
 		'odm'						=> 'required',
+		'vinculacion-ped'			=> 'required',
+		'vinculacion-pnd'			=> 'required',
 		'modalidad'					=> 'required',
 		'fecha-inicio'				=> 'required',
 		'fecha-termino'				=> 'required',
@@ -17,8 +23,7 @@ class ProgramaPresupuestarioController extends ProyectosController {
 		'cuantificacion-potencial'	=> 'required',
 		'enfoque-objetivo'			=> 'required',
 		'cuantificacion-objetivo'	=> 'required',
-		'justificacion-programa'	=> 'required',
-		'programa-presupuestario'	=> 'required'
+		'justificacion-programa'	=> 'required'
 	);
 
 	private $reglasProblemaObjetivo = array(
@@ -123,7 +128,7 @@ class ProgramaPresupuestarioController extends ProyectosController {
 			}
 
 		}else{
-			$rows = Proyecto::all();
+			$rows = Programa::all();
 
 			if(count($rows) == 0){
 				$http_status = 404;
@@ -185,11 +190,43 @@ class ProgramaPresupuestarioController extends ProyectosController {
 		$parametros = Input::all();
 
 		try{
+
+			if($parametros['guardar'] != 'programa'){
+				if(isset($parametros['id-programa'])){
+					$id_programa = $parametros['id-programa'];
+				}else{
+					$id_programa = $id;
+				}
+
+				$programa = Programa::find($id_programa);
+
+				if($programa->idEstatus != 1 && $programa->idEstatus != 3){
+					switch ($programa->idEstatus) {
+						case 2:
+							$respuesta['data']['data'] = 'El programa se encuentra en proceso de revisión, por tanto no es posible editarlo';
+							break;
+						case 4:
+							$respuesta['data']['data'] = 'El programa se encuentra registrado, por tanto no es posible editarlo';
+							break;
+						case 5:
+							$respuesta['data']['data'] = 'El programa ya fue firmado, por tanto no es posible editarlo';
+							break;
+						default:
+							$respuesta['data']['data'] = 'El estatus del programa es desconocido';
+							break;
+					}
+					throw new Exception("El programa se encuentra en un estatus en el que no esta disponible para edición", 1);
+				}
+			}
+			
 			if($parametros['guardar'] == 'programa'){
 				$validacion = Validador::validar(Input::all(), $this->reglasPrograma);
 				if($validacion === TRUE){
 					$recurso = new Programa;
 
+					$recurso->claveProgramaSectorial = $parametros['programa-sectorial'];
+					$recurso->idObjetivoPED = $parametros['vinculacion-ped'];
+					$recurso->idObjetivoPND = $parametros['vinculacion-pnd'];
 					$recurso->claveProgramaPresupuestario = $parametros['programa-presupuestario'];
 					$recurso->claveUnidadResponsable = $parametros['unidad-responsable'];
 					$recurso->idOdm = $parametros['odm'];
@@ -347,11 +384,65 @@ class ProgramaPresupuestarioController extends ProyectosController {
 		
 		$parametros = Input::all();
 		try{
-			if($parametros['guardar'] == 'programa'){
+			if(isset($parametros['id-programa'])){
+				$id_programa = $parametros['id-programa'];
+			}else{
+				$id_programa = $id;
+			}
+
+			$programa = Programa::find($id_programa);
+
+			if($programa->idEstatus != 1 && $programa->idEstatus != 3){
+				switch ($programa->idEstatus) {
+					case 2:
+						$respuesta['data']['data'] = 'El programa se encuentra en proceso de revisión, por tanto no es posible editarlo';
+						break;
+					case 4:
+						$respuesta['data']['data'] = 'El programa se encuentra registrado, por tanto no es posible editarlo';
+						break;
+					case 5:
+						$respuesta['data']['data'] = 'El programa ya fue firmado, por tanto no es posible editarlo';
+						break;
+					default:
+						$respuesta['data']['data'] = 'El estatus del programa es desconocido';
+						break;
+				}
+				throw new Exception("El programa se encuentra en un estatus en el que no esta disponible para edición", 1);
+			}
+
+			if($parametros['guardar'] == 'validar-programa'){
+				$recurso = Programa::with('arbolProblema','arbolObjetivo','indicadores')->find($id);
+
+				if((count($recurso->arbolObjetivo) == 0) || ($recurso->arbolObjetivo == NULL)){
+					$respuesta['http_status'] = 500;
+					$respuesta['data']['code'] = 'S01';
+					$respuesta['data']['data'] = 'No es posible enviar el programa a revisión, ya que falta información del arbol de objetivos por capturar';
+				}elseif((count($recurso->arbolProblema) == 0) || ($recurso->arbolProblema == NULL)) {
+					$respuesta['http_status'] = 500;
+					$respuesta['data']['code'] = 'S01';
+					$respuesta['data']['data'] = 'No es posible enviar el programa a revisión, ya que falta información del arbol del problema por capturar';
+				}elseif (count($recurso->indicadores) != 2) {
+					$respuesta['http_status'] = 500;
+					$respuesta['data']['code'] = 'S01';
+					$respuesta['data']['data'] = 'No es posible enviar el programa a revisión, ya que faltan indicadores por capturar';
+				}else{
+					$recurso->idEstatus = 2;
+					if($recurso->save()){
+						$respuesta['data']['data'] = 'El Programa Presupuestario fue enviado a revisión';
+					}else{
+						$respuesta['http_status'] = 500;
+						$respuesta['data']['code'] = 'S01';
+						$respuesta['data']['data'] = 'No fue posible enviar el programa a revisión';
+					}
+				}
+			}elseif($parametros['guardar'] == 'programa'){
 				$validacion = Validador::validar(Input::all(), $this->reglasPrograma);
 				if($validacion === TRUE){
 					$recurso = Programa::find($id);
 
+					$recurso->claveProgramaSectorial = $parametros['programa-sectorial'];
+					$recurso->idObjetivoPED = $parametros['vinculacion-ped'];
+					$recurso->idObjetivoPND = $parametros['vinculacion-pnd'];
 					$recurso->claveProgramaPresupuestario = $parametros['programa-presupuestario'];
 					$recurso->claveUnidadResponsable = $parametros['unidad-responsable'];
 					$recurso->ejercicio = $parametros['ejercicio'];
@@ -532,6 +623,33 @@ class ProgramaPresupuestarioController extends ProyectosController {
 		try{
 			$parametros = Input::all();
 			$ids = $parametros['rows'];
+			
+			if(isset($parametros['eliminar'])){
+				$programas = Programa::where('id','=',$parametros['id-programa'])->get();
+			}else{
+				$programas = Programa::whereIn('id',$ids)->get();
+			}
+			
+			foreach ($programas as $programa) {
+				if($programa->idEstatus != 1 && $programa->idEstatus != 3){
+					switch ($programa->idEstatus) {
+						case 2:
+							$data['data'] = 'El programa se encuentra en proceso de revisión, por tanto no es posible editarlo';
+							break;
+						case 4:
+							$data['data'] = 'El programa se encuentra registrado, por tanto no es posible editarlo';
+							break;
+						case 5:
+							$data['data'] = 'El programa ya fue firmado, por tanto no es posible editarlo';
+							break;
+						default:
+							$data['data'] = 'El estatus del programa es desconocido';
+							break;
+					}
+					throw new Exception("El programa se encuentra en un estatus en el que no esta disponible para edición", 1);
+				}
+			}
+
 			if(isset($parametros['eliminar'])){
 				if($parametros['eliminar'] == 'causa-efecto'){
 					$rows = ProgramaArbolProblema::whereIn('id',$ids)->delete();

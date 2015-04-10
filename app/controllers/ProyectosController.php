@@ -148,7 +148,7 @@ class ProyectosController extends \BaseController {
 			'regiones' => Region::all()
 		);
 		
-		if(Sentry::getUSer()->claveUnidad){
+		if(Sentry::getUser()->claveUnidad){
 			$datos['unidades_responsables'] = UnidadResponsable::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->where('clave','=',Sentry::getUser()->claveUnidad)->get();
 		}else{
 			$datos['unidades_responsables'] = UnidadResponsable::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get();

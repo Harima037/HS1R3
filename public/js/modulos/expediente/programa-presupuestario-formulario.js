@@ -45,8 +45,11 @@ if($('#id').val()){
         _success:function(response){
             $('#programa-presupuestario').val(response.data.claveProgramaPresupuestario);
             $('#unidad-responsable').val(response.data.claveUnidadResponsable);
+            $('#programa-sectorial').val(response.data.claveProgramaSectorial);
             $('#ejercicio').val(response.data.ejercicio);
             $('#odm').val(response.data.idOdm);
+            $('#vinculacion-ped').val(response.data.idObjetivoPED);
+            $('#vinculacion-pnd').val(response.data.idObjetivoPND);
             $('#modalidad').val(response.data.idModalidad);
             $('#fecha-inicio').val(response.data.fechaInicio);
             $('#fecha-termino').val(response.data.fechaTermino);
@@ -438,6 +441,30 @@ $('#btn-guardar-indicador').on('click',function(){
                 MessageManager.show({data:'Indicador almacenado con éxito',type:'OK',timer:4});
                 indicadoresDatagrid.actualizar();
                 $(modal_indicador).modal('hide');
+            },
+            _error: function(response){
+                try{
+                    var json = $.parseJSON(response.responseText);
+                    if(!json.code)
+                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                    else{
+                        MessageManager.show(json);
+                    }
+                    Validation.formValidate(json.data);
+                }catch(e){
+                    console.log(e);
+                }                       
+            }
+        });
+    }
+});
+
+$('#btn-enviar-programa').on('click',function(){
+    if($('#id').val()){
+        var parametros = 'guardar=validar-programa';
+        moduloResource.put($('#id').val(),parametros,{
+            _success: function(response){
+                MessageManager.show({data:response.data,type:'OK',timer:6});
             },
             _error: function(response){
                 try{

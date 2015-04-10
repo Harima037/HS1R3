@@ -46,22 +46,22 @@
                             <div class="row">
                                 <div class="col-sm-5">
                                     <div class="form-group">
-                                        <label class="control-label" for="programa-presupuestario">Programa Presupuestario</label>
-                                        <select class="form-control chosen-one" id="programa-presupuestario" name="programa-presupuestario">
-                                            <option value="">Selecciona un Programa</option>
-                                            @foreach($programas_presupuestarios as $programa)
-                                                <option value="{{$programa->clave}}">{{$programa->clave}} {{$programa->descripcion}}</option>
+                                        <label class="control-label" for="unidad-responsable">Unidad Responsable</label>
+                                        <select class="form-control chosen-one" id="unidad-responsable" name="unidad-responsable">
+                                            <option value="">Selecciona una Unidad</option>
+                                            @foreach($unidades_responsables as $unidad)
+                                                <option value="{{$unidad->clave}}">{{$unidad->clave}} {{$unidad->descripcion}}</option>
                                             @endforeach
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-sm-5">
                                     <div class="form-group">
-                                        <label class="control-label" for="unidad-responsable">Unidad Responsable</label>
-                                        <select class="form-control chosen-one" id="unidad-responsable" name="unidad-responsable">
-                                            <option value="">Selecciona una Unidad</option>
-                                            @foreach($unidades_responsables as $unidad)
-                                                <option value="{{$unidad->clave}}">{{$unidad->clave}} {{$unidad->descripcion}}</option>
+                                        <label class="control-label" for="programa-sectorial">Programa Sectorial</label>
+                                        <select class="form-control chosen-one" id="programa-sectorial" name="programa-sectorial">
+                                            <option value="">Selecciona un Programa</option>
+                                            @foreach($programas_sectoriales as $programa)
+                                                <option value="{{$programa->clave}}">{{$programa->clave}} {{$programa->descripcion}}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -72,6 +72,19 @@
                                         <input type="number" class="form-control" id="ejercicio" name="ejercicio">
                                     </div>
                                 </div>
+
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" for="programa-presupuestario">Programa Presupuestario</label>
+                                        <select class="form-control chosen-one" id="programa-presupuestario" name="programa-presupuestario">
+                                            <option value="">Selecciona un Programa</option>
+                                            @foreach($programas_presupuestarios as $programa)
+                                                <option value="{{$programa->clave}}">{{$programa->clave}} {{$programa->descripcion}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label class="control-label" for="odm">ODM</label>
@@ -91,6 +104,74 @@
                                         </select>
                                     </div>
                                 </div>
+
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" for="vinculacion-ped">Vinculación al PED (Plan Estatal de Desarrollo)</label>
+                                        <select class="form-control chosen-one" id="vinculacion-ped" name="vinculacion-ped">
+                                            <option value="">Seleciona un objetivo</option>
+                                            <!-- Inicio de ejes -->
+                                            @foreach ($objetivos_ped as $eje)
+                                                @if(count($eje->hijos))
+                                                    <optgroup label="{{$eje->clave . ' ' . $eje->descripcion}}">
+                                                        <!-- Inicio de temas -->
+                                                    @foreach ($eje->hijos as $tema)
+                                                        @if(count($tema->hijos))
+                                                            <option disabled="disabled">
+                                                                {{$tema->clave . ' ' . $tema->descripcion}}
+                                                            </option>
+                                                            <!-- Inicio de politicas -->
+                                                            @foreach ($tema->hijos as $politica)
+                                                                @if(count($politica->hijos))
+                                                                    <option disabled="disabled">
+                                                                        {{$politica->clave . ' ' . $politica->descripcion}}
+                                                                    </option>
+                                                                    <!-- Inicio de objetivos -->    
+                                                                    @foreach ($politica->hijos as $objetivo)
+                                                                        <option value="{{$objetivo->id}}">
+                                                                            {{$objetivo->clave . ' ' . $objetivo->descripcion}}
+                                                                        </option>
+                                                                    @endforeach
+                                                                    <!-- Inicio de objetivos -->
+                                                                    <option data-divider="true"></option>
+                                                                @endif
+                                                            @endforeach
+                                                            <!-- Fin de politicas -->
+                                                        @endif
+                                                    @endforeach
+                                                    <!-- Fin de temas -->
+                                                    </optgroup>
+                                                @endif
+                                            @endforeach
+                                            <!-- Fin de ejes -->
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" for="vinculacion-pnd">Vinculación al PND (Plan Nacional de Desarrollo)</label>
+                                        <select class="form-control chosen-one" id="vinculacion-pnd" name="vinculacion-pnd">
+                                            <option value="">Seleciona un objetivo</option>
+                                            <!-- Inicio de ejes -->
+                                            @foreach ($objetivos_pnd as $meta)
+                                                @if(count($meta->hijos))
+                                                    <optgroup label="{{$meta->clave . ' ' . $meta->descripcion}}">
+                                                        <!-- Inicio de temas -->
+                                                    @foreach ($meta->hijos as $objetivo)
+                                                        <option value="{{$objetivo->id}}">
+                                                            {{$objetivo->clave . ' ' . $objetivo->descripcion}}
+                                                        </option>
+                                                    @endforeach
+                                                    <!-- Fin de temas -->
+                                                    </optgroup>
+                                                @endif
+                                            @endforeach
+                                            <!-- Fin de ejes -->
+                                        </select>
+                                    </div>
+                                </div>
+
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="control-label" for="modalidad">Modalidad</label>
@@ -323,6 +404,9 @@
                     <div class="col-sm-12">
                         <button type="button" class="btn btn-default" id="btn-programa-cancelar">
                             <span class="fa fa-chevron-left"></span> Regresar a la lista de Programas
+                        </button>
+                        <button type="button" class="btn btn-success" id="btn-enviar-programa">
+                            <span class="fa fa-send-o"></span> Enviar Programa a Revisión
                         </button>
                     </div>
                 </div>

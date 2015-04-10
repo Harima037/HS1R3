@@ -26,19 +26,22 @@ class ProgramaPresupuestarioController extends \BaseController {
 										)
 		);
 		$datos_programa['identificador'] = 'programa'; //El identificador se agrega al id de los elementos del formulario
-		/*
-		$datos_programa['jurisdicciones'] = array('OC'=>'O.C.');
-		$datos_programa['meses'] = array( 
-			'1'=>'ENE','2'=>'FEB','3'=>'MAR', '4'=>'ABR', '5'=>'MAY', '6'=>'JUN', 
-			'7'=>'JUL','8'=>'AGO','9'=>'SEP','10'=>'OCT','11'=>'NOV','12'=>'DIC'
-		);
-		*/
+		
 		$datos['id'] = $id;
 		$datos['formulario_programa'] = View::make('expediente.formulario-componente',$datos_programa);
 		$datos['odm'] = ObjetivoDesarrolloMilenio::whereNull('idPadre')->with('hijos')->get();
 		$datos['modalidades'] = Modalidad::all();
 		$datos['programas_presupuestarios'] = ProgramaPresupuestario::all();
-		$datos['unidades_responsables'] = UnidadResponsable::all();
+
+		if(Sentry::getUser()->claveUnidad){
+			$datos['unidades_responsables'] = UnidadResponsable::where('clave','=',Sentry::getUser()->claveUnidad)->get();
+		}else{
+			$datos['unidades_responsables'] = UnidadResponsable::all();
+		}
+
+		$datos['programas_sectoriales'] = ProgramaSectorial::all();
+		$datos['objetivos_ped'] = ObjetivoPED::whereNull('idPadre')->with('hijos')->get();
+		$datos['objetivos_pnd'] = ObjetivoPND::whereNull('idPadre')->with('hijos')->get();
 
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
 		$datos['usuario'] = Sentry::getUser();
