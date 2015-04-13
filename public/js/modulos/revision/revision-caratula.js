@@ -1173,7 +1173,7 @@ $('#btnQuitarComentario').on('click',function(){
 							
 							for(var i = 0; i < comentariosArray.length; i++)
 								if(comentariosArray[i][0]!=$('#idproyectocomentarios').val())
-									arrayTemporal.push([comentariosArray[i][0],comentariosArray[i][1],comentariosArray[i][2]]);
+									arrayTemporal.push([comentariosArray[i][0],comentariosArray[i][1],comentariosArray[i][2],comentariosArray[i][3]]);
 
 							comentariosArray.length=0;
 							comentariosArray = arrayTemporal;							
@@ -1225,6 +1225,9 @@ $('#btnQuitarComentario').on('click',function(){
 								objetoADesColorear = '#lbl-'+objetoADesColorear;
 								$(objetoADesColorear).parent().parent().removeClass('has-error has-feedback');
 							}
+							
+							$('#comentario').val('');
+							$('#idproyectocomentarios').val('');
 							$('#modalComentario').modal('hide');							
                         },
                         _error: function(jqXHR){ 
