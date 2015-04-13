@@ -47,6 +47,11 @@ if($('#id').val()){
         _success:function(response){
 			
 			$('#idEstatusPrograma').val(response.data.idEstatus);
+			
+			$('#lbl-programa-sectorial').text(response.data.claveSectorial+' '+response.data.sectorial);
+			$('#lbl-vinculacion-ped').text(response.data.objetivoPED);
+			$('#lbl-vinculacion-pnd').text(response.data.objetivoPND);
+					
             $('#lbl-programa-presupuestario').text(response.data.claveProgramaPresupuestario+' '+response.data.programaPresupuestario);
             $('#lbl-unidad-responsable').text(response.data.claveUnidadResponsable+' '+response.data.unidadResponsable);
             $('#lbl-ejercicio').text(response.data.ejercicio);

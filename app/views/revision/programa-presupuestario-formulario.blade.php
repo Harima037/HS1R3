@@ -64,23 +64,24 @@
                             <br>
                             <form id="form_programa_datos">
                             <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label class="control-label" for="lbl-programa-presupuestario">Programa Presupuestario</label>
-                                        <div class="input-group">
-						                   	<span class="input-group-btn" onclick="escribirComentario('programa-presupuestario','Programa Presupuestario','lbl-programa-presupuestario');">
-                       						<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span>
-                                            <p id="lbl-programa-presupuestario" name="lbl-programa-presupuestario" class="form-control" style="height:auto"></p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4">
+                            	
+                                <div class="col-sm-5">
                                     <div class="form-group">
                                         <label class="control-label" for="lbl-unidad-responsable">Unidad Responsable</label>
                                         <div class="input-group">
 						                   	<span class="input-group-btn" onclick="escribirComentario('unidad-responsable','Unidad Responsable','lbl-unidad-responsable');">
                        						<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span>
                                             <p id="lbl-unidad-responsable" name="lbl-unidad-responsable" class="form-control" style="height:auto"></p>
+                                        </div>                                        
+                                    </div>
+                                </div>
+                                <div class="col-sm-5">
+                                    <div class="form-group">
+                                        <label class="control-label" for="lbl-programa-sectorial">Programa Sectorial</label>
+                                        <div class="input-group">
+						                   	<span class="input-group-btn" onclick="escribirComentario('programa-sectorial','Programa Sectorial','lbl-programa-sectorial');">
+                       						<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span>
+                                            <p id="lbl-programa-sectorial" name="lbl-programa-sectorial" class="form-control" style="height:auto">&nbsp;</p>
                                         </div>                                        
                                     </div>
                                 </div>
@@ -94,6 +95,20 @@
                                         </div>
                                     </div>
                                 </div>
+                            
+                            
+                            
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" for="lbl-programa-presupuestario">Programa Presupuestario</label>
+                                        <div class="input-group">
+						                   	<span class="input-group-btn" onclick="escribirComentario('programa-presupuestario','Programa Presupuestario','lbl-programa-presupuestario');">
+                       						<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span>
+                                            <p id="lbl-programa-presupuestario" name="lbl-programa-presupuestario" class="form-control" style="height:auto"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label class="control-label" for="lbl-odm">ODM</label>
@@ -104,6 +119,30 @@
                                         </div>
                                     </div>
                                 </div>
+                                
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" for="lbl-vinculacion-ped">Vinculación al PED (Plan Estatal de Desarrollo)</label>
+                                        <div class="input-group">
+						                   	<span class="input-group-btn" onclick="escribirComentario('vinculacion-ped','Vinculación al PED (Plan Estatal de Desarrollo)','lbl-vinculacion-ped');">
+                       						<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span>
+                                            <p id="lbl-vinculacion-ped" name="lbl-vinculacion-ped" class="form-control" style="height:auto">&nbsp;</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="control-label" for="lbl-vinculacion-pnd">Vinculación al PND (Plan Nacional de Desarrollo)</label>
+                                        <div class="input-group">
+						                   	<span class="input-group-btn" onclick="escribirComentario('vinculacion-pnd','Vinculación al PND (Plan Nacional de Desarrollo)','lbl-vinculacion-pnd');">
+                       						<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span>
+                                            <p id="lbl-vinculacion-pnd" name="lbl-vinculacion-pnd" class="form-control" style="height:auto">&nbsp;</p>
+                                        </div>
+                                    </div>
+                                </div>                                
+                                
+                                
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="control-label" for="lbl-modalidad">Modalidad</label>
