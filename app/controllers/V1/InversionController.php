@@ -411,8 +411,8 @@ class InversionController extends ProyectosController {
 					//Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
 						$extras['jurisdicciones'] = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
 					}
-					
 					$respuesta['data']['extras'] = $extras;
+					$recurso['liderProyecto'] = $respuesta['data']['nombre-lider-proyecto'];
 				}
 			}elseif($parametros['guardar'] == 'componente'){
 				$parametros['clasificacion'] = 2;
@@ -656,8 +656,8 @@ class InversionController extends ProyectosController {
 							$recurso->fibap->acciones->load('propuestasFinanciamiento');
 						}
 					}
-					
 					$respuesta['data']['extras'] = $extras;
+					$recurso['liderProyecto'] = $respuesta['data']['nombre-lider-proyecto'];
 				}
 			}elseif($parametros['guardar'] == 'proyecto-beneficiario'){
 				$respuesta = parent::guardar_datos_beneficiario($parametros,$id);

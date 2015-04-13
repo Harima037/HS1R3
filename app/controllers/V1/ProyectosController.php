@@ -182,24 +182,6 @@ class ProyectosController extends BaseController {
 			
 			return Response::json($data,$http_status);
 		}
-		/*elseif(isset($parametros['proyectos_inversion'])){
-			$rows = Proyecto::getModel();
-			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
-				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto',
-				'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username')
-								->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
-								->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
-								->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
-								->leftjoin('fibap','proyectos.id','=','fibap.idProyecto')
-								->orderBy('proyectos.id','desc')
-								->where('proyectos.idClasificacionProyecto','=',DB::raw('2'))
-								->where('unidadResponsable','=',Sentry::getUser()->claveUnidad)
-								->whereNull('fibap.id')
-								->get();
-			$data = array('data'=>$rows);
-			
-			return Response::json($data,$http_status);
-		}*/
 
 		$rows = Proyecto::all();
 
@@ -554,6 +536,7 @@ class ProyectosController extends BaseController {
 					}
 					$recurso = $recurso->toArray();
 					$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
+					$recurso['liderProyecto'] = $respuesta['data']['nombre-lider-proyecto'];
 					$respuesta['data']['data'] = $recurso;
 				}
 				//Guardar Datos del Proyecto
@@ -565,7 +548,12 @@ class ProyectosController extends BaseController {
 			if($respuesta['data']['data'] == ''){
 				$respuesta['data']['data'] = 'Ocurrio un error al intentar almacenar los datos.';
 			}
-			$respuesta['data']['ex'] = $ex->getMessage();
+			if(strpos($ex->getMessage(), '{"field":') !== FALSE){
+				$respuesta['data']['code'] = 'U00';
+				$respuesta['data']['data'] = $ex->getMessage();
+			}else{
+				$respuesta['data']['ex'] = $ex->getMessage();
+			}
 			if(!isset($respuesta['data']['code'])){
 				$respuesta['data']['code'] = 'S03';
 			}
@@ -838,96 +826,29 @@ class ProyectosController extends BaseController {
 			}elseif($parametros['guardar'] == 'beneficiario'){ 
 				$respuesta = $this->guardar_datos_beneficiario($parametros,$id);
 			}elseif($parametros['guardar'] == 'proyecto'){
-				$validacion = Validador::validar(Input::all(), $this->reglasProyecto);
-				if($validacion === TRUE){
+				$respuesta = $this->guardar_datos_proyecto($parametros,$id);
+				if($respuesta['http_status'] == 200){
+					$recurso = $respuesta['data']['data'];
+					$datos_anteriores = $respuesta['data']['datos-anteriores'];
 
-					$recurso = Proyecto::find($id);
-
-					if(is_null($recurso)){
-						$respuesta['data']['data'] = 'No se ha podido encontrar el proyecto, por favor verifique que no haya sido eliminado.';
-						throw new Exception("No se pudo encontrar el proyecto que se intenta editar", 1);
-					}
-
-					$funcion_gasto = explode('.',$parametros['funciongasto']);
-
-					$recurso->idClasificacionProyecto 		= $parametros['clasificacionproyecto'];
-					$recurso->nombreTecnico 				= $parametros['nombretecnico'];
-					$recurso->idTipoProyecto 				= $parametros['tipoproyecto'];
-					$recurso->idTipoAccion 					= $parametros['tipoaccion'];
-					$recurso->unidadResponsable 			= $parametros['unidadresponsable'];
-					$recurso->finalidad 					= $funcion_gasto[0];
-					$recurso->funcion 						= $funcion_gasto[1];
-					$recurso->subFuncion 					= $funcion_gasto[2];
-					$recurso->subSubFuncion 				= $funcion_gasto[3];
-					$recurso->programaSectorial 			= $parametros['programasectorial'];
-					$recurso->programaPresupuestario 		= $parametros['programapresupuestario'];
-					$recurso->programaEspecial 				= $parametros['programaespecial'];
-					$recurso->actividadInstitucional 		= $parametros['actividadinstitucional'];
-					$recurso->proyectoEstrategico 			= $parametros['proyectoestrategico'];
-					$recurso->idObjetivoPED 				= $parametros['vinculacionped'];
-					
-					//$recurso->totalBeneficiarios 			= $parametros['totalbeneficiariosf'] + $parametros['totalbeneficiariosm'];
-					//$recurso->totalBeneficiariosF 			= $parametros['totalbeneficiariosf'];
-					//$recurso->totalBeneficiariosM 			= $parametros['totalbeneficiariosm'];
-					//$recurso->idEstatusProyecto 			= 1;
-					$recurso->idCobertura 					= $parametros['cobertura'];
-
-					if($recurso->idCobertura != $parametros['cobertura']){
-						$recurso->idCobertura 				= $parametros['cobertura'];
-					}
 					$jurisdicciones = NULL;
-					if($parametros['cobertura'] == 2){
-						if($recurso->claveMunicipio != $parametros['municipio']){
-							$recurso->claveRegion = NULL;
-							$recurso->claveMunicipio = $parametros['municipio'];
-							$jurisdicciones = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
-						}
-					}elseif($parametros['cobertura'] == 3){
-						if($recurso->claveRegion != $parametros['region']){
-							$recurso->claveMunicipio = NULL;
-							$recurso->claveRegion = $parametros['region'];
-							$jurisdicciones = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
-						}
-					}else{
-						if(!is_null($recurso->claveRegion) || !is_null($recurso->claveMunicipio)){
-							$recurso->claveMunicipio = NULL;
-							$recurso->claveRegion = NULL;
-							$jurisdicciones = Jurisdiccion::all();
-						}
+					if($recurso->idCobertura == 1 && ($datos_anteriores['claveMunicipio'] != NULL || $datos_anteriores['claveRegion'] != NULL)){
+					//Cobertura Estado => Todos las Jurisdicciones
+						$jurisdicciones = Jurisdiccion::all();
+					}elseif($recurso->idCobertura == 2 && $recurso->claveMunicipio != $datos_anteriores['claveMunicipio']){ 
+					//Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
+						$jurisdicciones = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
+					}elseif($recurso->idCobertura == 3 && $recurso->claveRegion != $datos_anteriores['claveRegion']){ 
+					//Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
+						$jurisdicciones = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
 					}
 
-					DB::transaction(function() use ($parametros, $recurso, $respuesta, $jurisdicciones){
-						if($recurso->save()){
-							if($jurisdicciones){
-								$claves = $jurisdicciones->lists('clave');
-								//throw new Exception(print_r($claves,false), 1);
-								if(count($claves) > 0){
-									$claves[] = 'OC';
-									//throw new Exception(print_r($claves,false), 1);
-									ComponenteMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
-									ActividadMetaMes::where('idProyecto',$recurso->id)->whereNotIn('claveJurisdiccion',$claves)->delete();
-									//$queries = DB::getQueryLog();
-									//$last_query = end($queries);
-									//throw new Exception(print_r($last_query,false), 1);
-								}
-							}
-						}else{
-							//No se pudieron guardar los datos del proyecto
-							$respuesta['data']['code'] = 'S01';
-							throw new Exception("Error al intentar guardar los datos del proyecto", 1);
-						}
-					});
-					
 					$recurso = $recurso->toArray();
 					if($jurisdicciones){
 						$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
 					}
-					//Proyecto guardado con éxito
-					$respuesta['data'] = array('data'=>$recurso);
-				}else{
-					//La Validación del Formulario encontro errores
-					$respuesta['http_status'] = $validacion['http_status'];
-					$respuesta['data'] = $validacion['data'];
+					$recurso['liderProyecto'] = $respuesta['data']['nombre-lider-proyecto'];
+					$respuesta['data']['data'] = $recurso;
 				}
 			//Guardar Datos del Proyecto
 			}elseif($parametros['guardar'] == 'financiamiento'){
@@ -938,7 +859,12 @@ class ProyectosController extends BaseController {
 			if($respuesta['data']['data'] == ''){
 				$respuesta['data']['data'] = 'Ocurrio un error al intentar almacenar los datos.';
 			}
-			$respuesta['data']['ex'] = $ex->getMessage();
+			if(strpos($ex->getMessage(), '{"field":') !== FALSE){
+				$respuesta['data']['code'] = 'U00';
+				$respuesta['data']['data'] = $ex->getMessage();
+			}else{
+				$respuesta['data']['ex'] = $ex->getMessage();
+			}
 			if(!isset($respuesta['data']['code'])){
 				$respuesta['data']['code'] = 'S03';
 			}
@@ -1168,6 +1094,14 @@ class ProyectosController extends BaseController {
 			
 			$funcion_gasto = explode('.',$parametros['funciongasto']);
 
+			if(Sentry::hasAccess('EXP.PROYECTOS.S')){
+				if($parametros['numeroproyectoestrategico'] > 0){
+					$recurso->numeroProyectoEstrategico = $parametros['numeroproyectoestrategico'];
+				}else{
+					$recurso->numeroProyectoEstrategico = NULL;
+				}
+			}
+
 			$recurso->idClasificacionProyecto 		= $parametros['clasificacionproyecto'];
 			$recurso->ejercicio						= $parametros['ejercicio'];
 			$recurso->idTipoAccion 					= $parametros['tipoaccion'];
@@ -1180,12 +1114,15 @@ class ProyectosController extends BaseController {
 			$recurso->programaEspecial 				= $parametros['programaespecial'];
 			$recurso->actividadInstitucional 		= $parametros['actividadinstitucional'];
 			$recurso->proyectoEstrategico 			= $parametros['proyectoestrategico'];
-			$recurso->idEstatusProyecto 			= 1;
 			$recurso->idTipoProyecto 				= $parametros['tipoproyecto'];
 			$recurso->nombreTecnico 				= $parametros['nombretecnico'];
 			$recurso->idObjetivoPED 				= $parametros['vinculacionped'];
 			$recurso->programaPresupuestario 		= $parametros['programapresupuestario'];
 			
+			if($recurso->idEstatusProyecto == NULL){
+				$recurso->idEstatusProyecto 		= 1;
+			}
+
 			$nuevas_jurisdicciones = NULL;
 
 			if($es_editar){
@@ -1220,22 +1157,28 @@ class ProyectosController extends BaseController {
 				}
 			}
 
-			if(!$es_editar){
-				//$titulares = Titular::whereIn('claveUnidad',array('00','01', Sentry::getUser()->claveUnidad))->get();
+			if(Sentry::getUser()->claveUnidad){
+				$titulares = Titular::whereIn('claveUnidad',array('00','01',Sentry::getUser()->claveUnidad))->get();
+			}else{
 				$titulares = Titular::whereIn('claveUnidad',array('00','01',$parametros['unidadresponsable']))->get();
-				foreach ($titulares as $titular) {
-					if($titular->claveUnidad == '00'){ //Dirección General
-						$recurso->idJefeInmediato 				= $titular->id;
-					}elseif ($titular->claveUnidad == '01') { //Dirección de Planeación y Desarrollo
-						$recurso->idJefePlaneacion 				= $titular->id;
-			  			$recurso->idCoordinadorGrupoEstrategico = $titular->id;
-						if($recurso->idLiderProyecto == NULL){
-							$recurso->idLiderProyecto = $titular->id;
-						}
-					}else{
+			}
+
+			foreach ($titulares as $titular) {
+				if($titular->claveUnidad == '00'){ //Dirección General
+					$recurso->idJefeInmediato 				= $titular->id;
+				}elseif ($titular->claveUnidad == '01') { //Dirección de Planeación y Desarrollo
+					$recurso->idJefePlaneacion 				= $titular->id;
+		  			$recurso->idCoordinadorGrupoEstrategico = $titular->id;
+					if($recurso->idLiderProyecto == NULL){
 						$recurso->idLiderProyecto = $titular->id;
 					}
+				}else{
+					$recurso->idLiderProyecto = $titular->id;
+					$respuesta['data']['nombre-lider-proyecto'] = $titular->nombre;
 				}
+			}
+
+			if(!$es_editar){
 				$recurso->totalBeneficiarios = 0;
 				$recurso->totalBeneficiariosF = 0;
 				$recurso->totalBeneficiariosM = 0;
@@ -1320,6 +1263,21 @@ class ProyectosController extends BaseController {
 			$recurso = array();
 			$nuevo_beneficiario = 0;
 			$viejo_beneficiario = 0;
+
+			$suma_zona_f = $parametros['urbanaf'] + $parametros['ruralf'];
+			$suma_zona_m = $parametros['urbanam'] + $parametros['ruralm'];
+			$suma_poblacion_f = $parametros['mestizaf'] + $parametros['indigenaf'] + $parametros['inmigrantef'] + $parametros['otrosf'];
+			$suma_poblacion_m = $parametros['mestizam'] + $parametros['indigenam'] + $parametros['inmigrantem'] + $parametros['otrosm'];
+			$suma_marginacion_f = $parametros['muyaltaf'] + $parametros['altaf'] + $parametros['mediaf'] + $parametros['bajaf'] + $parametros['muybajaf'];
+			$suma_marginacion_m = $parametros['muyaltam'] + $parametros['altam'] + $parametros['mediam'] + $parametros['bajam'] + $parametros['muybajam'];
+
+			if($parametros['totalbeneficiariosf'] != $suma_zona_f || $parametros['totalbeneficiariosf'] != $suma_poblacion_f || $parametros['totalbeneficiariosf'] != $suma_marginacion_f){
+				throw new Exception('{"field":"totalbeneficiariosf","error":"Hay totales capturados en el desglose para este beneficiario que no concuerda con este total."}', 1);
+			}
+
+			if($parametros['totalbeneficiariosm'] != $suma_zona_m || $parametros['totalbeneficiariosm'] != $suma_poblacion_m || $parametros['totalbeneficiariosm'] != $suma_marginacion_m){
+				throw new Exception('{"field":"totalbeneficiariosm","error":"Hay totales capturados en el desglose para este beneficiario que no concuerda con este total."}', 1);
+			}			
 
 			if($id){
 				$es_editar = TRUE;

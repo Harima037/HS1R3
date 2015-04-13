@@ -19,6 +19,7 @@ var moduloDatagrid = new Datagrid("#datagridModulo",moduloResource);
 moduloDatagrid.init();
 moduloDatagrid.actualizar();
 
+$('.chosen-one').chosen({width:'100%'});
 
 $('#modalModulo').on('shown.bs.modal', function () {
     $('#modalModulo').find('input').eq(0).focus();
@@ -52,7 +53,7 @@ function editar (e){
                         $('#formModulo #email').val(response.data.email);
                         $('#formModulo #telefono').val(response.data.telefono);
                         $('#formModulo #rol').val(response.data.roles);
-                        
+                        $('#formModulo #rol').trigger('chosen:updated');
                         permisos_individuales = response.data.permissions;
                         
 
@@ -197,6 +198,7 @@ function resetModalModuloForm(){
     $('#formModulo #id').val("");
     permisos_individuales = {};
     $('#formModulo #pnlPermissions').html('<tr><td>Aún no hay permisos individuales asignados.</td></tr>');
+    $('#formModulo #rol').trigger('chosen:updated');
 }
 
 // Funciones de permisos

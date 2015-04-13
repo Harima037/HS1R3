@@ -359,9 +359,6 @@ $('#btn-proyecto-guardar').on('click',function(){
 	        _success: function(response){
 	            MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:3});
 	            if(response.extras){
-	            	/*if(response.extras.municipios){
-	            		fibapAcciones.cargar_municipios(response.extras.municipios);
-	            	}*/
 	            	if(response.extras.jurisdicciones){
 	            		fibapAcciones.actualizar_metas_mes(response.extras.jurisdicciones);
 	            		fibapAcciones.cargar_jurisdicciones(response.extras.jurisdicciones);
@@ -376,6 +373,14 @@ $('#btn-proyecto-guardar').on('click',function(){
 							fibapAcciones.llenar_datagrid(response.data.fibap.acciones);
 						}
 	            	}
+	            }
+	            $('#lbl-lider-proyecto').text(response.data.liderProyecto);
+	            var no_proyecto = ("000" + (response.data.numeroProyectoEstrategico || 0)).slice(-3);
+	            $(form_caratula + ' #no_proyecto_estrategico').text(no_proyecto);
+	            if($('input#numeroproyectoestrategico').length){
+	            	$(form_caratula + ' #numeroproyectoestrategico').val(response.data.numeroProyectoEstrategico);
+	            }else{
+	            	$(form_caratula + ' #numeroproyectoestrategico').text(no_proyecto);
 	            }
 	        },
 	        _error: function(response){
@@ -397,6 +402,16 @@ $('#btn-proyecto-guardar').on('click',function(){
 	        _success: function(response){
 	            MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:3});
 	            $(form_caratula + ' #id').val(response.data.id);
+	            
+	            $('#lbl-lider-proyecto').text(response.data.liderProyecto);
+	            var no_proyecto = ("000" + (response.data.numeroProyectoEstrategico || 0)).slice(-3);
+	            $(form_caratula + ' #no_proyecto_estrategico').text(no_proyecto);
+	            if($('input#numeroproyectoestrategico').length){
+	            	$(form_caratula + ' #numeroproyectoestrategico').val(response.data.numeroProyectoEstrategico);
+	            }else{
+	            	$(form_caratula + ' #numeroproyectoestrategico').text(no_proyecto);
+	            }
+
 	            caratulaBeneficiario.init(response.data.id,proyectoResource);
 				cambiar_icono_tabs('#tab-link-caratula','fa-check-square-o');
 	            $('#tab-link-datos-fibap').attr('data-toggle','tab');

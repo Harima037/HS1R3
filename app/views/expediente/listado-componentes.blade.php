@@ -10,10 +10,10 @@
                         <div class="btn-toolbar pull-right" >
                             @section('panel-botones')
                                 <div class="btn-group" style="margin:5px">
-                                    <button type="button" class="btn btn-success btn-agregar-componente">
-                                        <span class="glyphicon glyphicon-plus"></span> Agregar componente
+                                    <button type="button" class="btn btn-info btn-agregar-componente">
+                                        <span class="glyphicon glyphicon-plus-sign"></span> Agregar Componente
                                     </button>
-                                    <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                                    <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
                                         <span class="caret"></span>
                                     </button>
                                     <ul class="dropdown-menu pull-right" role="menu">

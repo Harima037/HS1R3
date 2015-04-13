@@ -72,42 +72,37 @@ if($('#id').val()){
             $('#no_proyecto_estrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
 
             $('#unidadresponsable').val(response.data.datos_unidad_responsable.clave);
-            $('#unidadresponsable').trigger('chosen:updated');
             $('#funciongasto').val(response.data.datos_sub_sub_funcion.clave);
-            $('#funciongasto').trigger('chosen:updated');
             $('#programasectorial').val(response.data.datos_programa_sectorial.clave);
-            $('#programasectorial').trigger('chosen:updated');
             $('#programapresupuestario').val(response.data.datos_programa_presupuestario.clave);
-            $('#programapresupuestario').trigger('chosen:updated');
             $('#programaespecial').val(response.data.datos_programa_especial.clave);
-            $('#programaespecial').trigger('chosen:updated');
             $('#actividadinstitucional').val(response.data.datos_actividad_institucional.clave);
-            $('#actividadinstitucional').trigger('chosen:updated');
             $('#proyectoestrategico').val(response.data.datos_proyecto_estrategico.clave);
-            $('#proyectoestrategico').trigger('chosen:updated');
-            $('#numeroproyectoestrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
+
+            if($('input#numeroproyectoestrategico').length){
+            	$('#numeroproyectoestrategico').val(response.data.numeroProyectoEstrategico);
+            }else{
+            	$('#numeroproyectoestrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
+            }
 
             $('#cobertura').val(response.data.cobertura.id);
-            $('#cobertura').trigger('chosen:updated');
             $('#cobertura').chosen().change();
 
             deshabilita_paneles($('#cobertura').val());
 
             if(response.data.claveMunicipio){
 				$('#municipio').val(response.data.claveMunicipio);
-            	$('#municipio').trigger('chosen:updated');
             }
 
             if(response.data.claveRegion){
             	$('#region').val(response.data.claveRegion);
-            	$('#region').trigger('chosen:updated');
             }
 
             $('#tipoaccion').val(response.data.tipo_accion.id);
-            $('#tipoaccion').trigger('chosen:updated');
 
             $('#vinculacionped').val(response.data.objetivo_ped.id);
-            $('#vinculacionped').trigger('chosen:updated');
+
+            $(form_caratula + ' .chosen-one').trigger('chosen:updated');
 
             actualizar_grid_beneficiarios(response.data.beneficiarios);
 
@@ -157,16 +152,20 @@ function inicializar_comportamiento_caratula(){
 	$('#denominador-actividad').on('keyup',function(){
 		ejecutar_formula('actividad');
 	});
-	$('.benef-totales').on('keyup',function(){
+	$('.benef-totales').on('keyup',function(){ $(this).change() });
+	$('.benef-totales').on('change',function(){
 		if($(this).attr('id') == 'totalbeneficiariosf'){
-			var totalm = parseInt($('#totalbeneficiariosm').val());
-			$('#totalbeneficiarios').text(totalm + parseInt($(this).val()));
+			var totalm = parseInt($('#totalbeneficiariosm').val()) || 0;
+			var total = totalm + (parseInt($(this).val()) || 0);
+			$('#totalbeneficiarios').text(total.format());
 		}
 		if($(this).attr('id') == 'totalbeneficiariosm'){
-			var totalf = parseInt($('#totalbeneficiariosf').val());
-			$('#totalbeneficiarios').text(totalf + parseInt($(this).val()));
+			var totalf = parseInt($('#totalbeneficiariosf').val()) || 0;
+			var total = totalf + (parseInt($(this).val()) || 0);
+			$('#totalbeneficiarios').text(total.format());
 		}
 	});
+	$('.fem,.masc').on('keyup',function(){ $(this).change(); });
 	$('.sub-total-zona').on('change',function(){
 		if($(this).hasClass('fem')){
 			sumar_totales('.sub-total-zona.fem','total-zona-f','totalbeneficiariosf','Los subtotales de Zona no concuerdan.');
@@ -487,7 +486,21 @@ $('#btn-beneficiario-guardar').on('click',function(){
 				MessageManager.show({data:'Datos de los beneficiarios almacenados con éxito',type:'OK',timer:3});
 	            $(modal_beneficiario).modal('hide');
 				actualizar_grid_beneficiarios(response.data);
-			}
+			},
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                	json.container = modal_actividad + ' .modal-body';
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
 		});
 	}else{
 		proyectoResource.post(parametros,{
@@ -495,7 +508,21 @@ $('#btn-beneficiario-guardar').on('click',function(){
 				MessageManager.show({data:'Datos de los beneficiarios almacenados con éxito',type:'OK',timer:3});
 	            $(modal_beneficiario).modal('hide');
 				actualizar_grid_beneficiarios(response.data);
-			}
+			},
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                	json.container = modal_actividad + ' .modal-body';
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
 		});
 	}
 });
@@ -563,29 +590,37 @@ $('#btn-actividad-guardar').on('click',function(){
 });
 
 $('#btn-enviar-proyecto').on('click',function(){
-	Validation.cleanFormErrors(form_caratula);
-	//var parametros = $(form_caratula).serialize();
-	parametros = 'guardar=validar-proyecto';
-
 	if($('#id').val()){
-		proyectoResource.put($('#id').val(),parametros,{
-	        _success: function(response){
-	            MessageManager.show({data:response.data,type:'OK',timer:6});
-	        },
-	        _error: function(response){
-	            try{
-	                var json = $.parseJSON(response.responseText);
-	                if(!json.code)
-	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-	                else{
-	                    MessageManager.show(json);
-	                }
-	                Validation.formValidate(json.data);
-	            }catch(e){
-	                console.log(e);
-	            }                       
-	        }
-	    });
+		Validation.cleanFormErrors(form_caratula);
+		var parametros = 'guardar=validar-proyecto';
+
+		Confirm.show({
+				titulo:"Enviar proyecto a Validación",
+				mensaje: "¿Estás seguro que deseas enviar este proyecto para su validación? <br><b>IMPORTANTE:</b> Mientras el proyecto este en validación no se podra editar ningun elemente del mismo.",
+				si: '<span class="fa fa-send"></span> Enviar',
+				no: 'Cancelar',
+				callback: function(){
+					proyectoResource.put($('#id').val(),parametros,{
+				        _success: function(response){
+				            MessageManager.show({data:response.data,type:'OK',timer:6});
+				            bloquear_controles();
+				        },
+				        _error: function(response){
+				            try{
+				                var json = $.parseJSON(response.responseText);
+				                if(!json.code)
+				                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+				                else{
+				                    MessageManager.show(json);
+				                }
+				                Validation.formValidate(json.data);
+				            }catch(e){
+				                console.log(e);
+				            }                       
+				        }
+				    });
+				}
+		});
 	}
 });
 
@@ -607,6 +642,14 @@ $('#btn-proyecto-guardar').on('click',function(){
 	            	actualizar_tabla_metas('actividad',response.data.jurisdicciones);
             		actualizar_tabla_metas('componente',response.data.jurisdicciones);
 	            }
+	            $('#lbl-lider-proyecto').text(response.data.liderProyecto);
+	            var no_proyecto = ("000" + (response.data.numeroProyectoEstrategico || 0)).slice(-3);
+	            $(form_caratula + ' #no_proyecto_estrategico').text(no_proyecto);
+	            if($('input#numeroproyectoestrategico').length){
+	            	$(form_caratula + ' #numeroproyectoestrategico').val(response.data.numeroProyectoEstrategico);
+	            }else{
+	            	$(form_caratula + ' #numeroproyectoestrategico').text(no_proyecto);
+	            }
 	        },
 	        _error: function(response){
 	            try{
@@ -627,8 +670,14 @@ $('#btn-proyecto-guardar').on('click',function(){
 	        _success: function(response){
 	            MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:3});
 	            $(form_caratula + ' #id').val(response.data.id);
-	            $(form_caratula + ' #no_proyecto_estrategico').text("000");
-	            $(form_caratula + ' #numeroproyectoestrategico').text("000");
+	            var no_proyecto = ("000" + (response.data.numeroProyectoEstrategico || 0)).slice(-3);
+	            $(form_caratula + ' #no_proyecto_estrategico').text(no_proyecto);
+
+	            if($('input#numeroproyectoestrategico').length){
+	            	$(form_caratula + ' #numeroproyectoestrategico').val(response.data.numeroProyectoEstrategico);
+	            }else{
+	            	$(form_caratula + ' #numeroproyectoestrategico').text(no_proyecto);
+	            }
 
 	            fuenteFinanciamiento.init(proyectoResource,$('#id').val());
 
@@ -640,6 +689,8 @@ $('#btn-proyecto-guardar').on('click',function(){
 
 	            actualizar_tabla_metas('actividad',response.data.jurisdicciones);
             	actualizar_tabla_metas('componente',response.data.jurisdicciones);
+
+            	$('#lbl-lider-proyecto').text(response.data.liderProyecto);
 
 	            $('#tablink-componentes').attr('data-toggle','tab');
 				$('#tablink-componentes').parent().removeClass('disabled');
@@ -1193,7 +1244,7 @@ function sumar_totales(tipo,campo_suma,campo_total,mensaje){
 	$(tipo).each(function(){
 		sub_total += parseInt($(this).val().replace(',','')) || 0;
 	});
-	$('#'+campo_suma).text(sub_total);
+	$('#'+campo_suma).text(sub_total.format());
 	if(parseInt($('#'+campo_total).val()) != sub_total){
 		Validation.printFieldsErrors(campo_suma,mensaje);
 	}else{
@@ -1349,3 +1400,14 @@ function habilita_opciones(selector,habilitar_id,default_id){
 		$(selector).trigger("chosen:updated");
 	}
 }
+
+/**
+ * Number.prototype.format(n, x)
+ * 
+ * @param integer n: length of decimal
+ * @param integer x: length of sections
+ */
+Number.prototype.format = function(n, x) {
+    var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\.' : '$') + ')';
+    return this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+};

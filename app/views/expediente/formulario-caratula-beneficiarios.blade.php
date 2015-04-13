@@ -9,10 +9,10 @@
                     <div class="col-lg-6">
                         <div class="btn-toolbar pull-right" >
                             <div class="btn-group" style="margin:5px">
-                                <button type="button" class="btn btn-primary btn-agregar-beneficiario">
+                                <button type="button" class="btn btn-info btn-agregar-beneficiario">
                                     <span class="glyphicon glyphicon-plus-sign"></span> Agregar Beneficiario
                                 </button>
-                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
                                     <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu pull-right" role="menu">
