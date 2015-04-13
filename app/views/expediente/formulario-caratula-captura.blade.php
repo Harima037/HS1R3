@@ -191,7 +191,11 @@
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label class="control-label" for="numeroproyectoestrategico">Número de Proyecto Estratégico</label>
-                            <p class="form-control-static" id="numeroproyectoestrategico">000</p>
+                            @if(isset($capturar_numero))
+                                <input type="number" class="form-control" name="numeroproyectoestrategico" id="numeroproyectoestrategico" min="0">
+                            @else
+                                <p class="form-control-static" id="numeroproyectoestrategico">000</p>
+                            @endif
                         </div>
                     </div>
                 </div>

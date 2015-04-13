@@ -12,7 +12,7 @@
 =====================================*/
 
 var catalogoPermisosResource = new RESTfulRequests(SERVER_HOST+'/v1/permisos');
-var icons = {'C':'fa fa-plus','R':'fa fa-eye','U':'fa fa-pencil','D':'fa fa-trash-o'};
+var icons = {'C':'fa fa-plus','R':'fa fa-eye','U':'fa fa-pencil','D':'fa fa-trash-o','S':'fa fa-sliders'};
 
 
 $(document).ready(function(){

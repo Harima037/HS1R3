@@ -2,8 +2,14 @@
 
 @section('title-page') {{ $sys_mod_activo->nombre }} @stop
 
+@section('css')
+@parent
+<link href="{{ URL::to('css/chosen.bootstrap.min.css') }}" rel="stylesheet" type="text/css" media="screen">
+@stop
+
 @section('js')
 @parent
+<script src="{{ URL::to('js/dependencias/chosen.jquery.min.js') }}"></script>
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
 <script src="{{ URL::to('js/modulos/administrador/usuarios.js')}}"></script>
@@ -146,7 +152,7 @@
                                     <div class="col-sm-12">
                                         <div class="form-group">
                                             <label for="unidad" class="control-label">Unidad Asignada</label>
-                                            {{Form::select('unidad',array(''=>'Selecciona una unidad') + $unidades_responsables->lists('descripcion','clave'),0,array('class'=>'form-control','id'=>'unidad'))}}
+                                            {{Form::select('unidad',array(''=>'Todas las Unidades') + $unidades_responsables->lists('descripcion','clave'),0,array('class'=>'form-control','id'=>'unidad'))}}
                                         </div>
                                     </div>
                                 </div>
@@ -206,10 +212,8 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <label for="rol" class="control-label">Rol</label>
-                                                
-                                                <select class="form-control" multiple="multiple" onchange="cleanPermissionPanel()" name="rol[]" id="rol">
+                                                <select class="form-control chosen-one" multiple onchange="cleanPermissionPanel()" name="rol[]" id="rol" data-placeholder="Selecciona los roles a asignar al usuario">
                                                     @if($sys_roles)
-                                                    <!--option value=''>Seleccione un rol</option-->
                                                         @foreach($sys_roles as $item)
                                                             <option value="{{ $item->id }}">{{ $item->name }}</option>
                                                         @endforeach
@@ -217,7 +221,7 @@
                                                     <option value=''>No hay roles creados</option>
                                                     @endif
                                                 </select>
-                                                <p class="help-block">Para seleccionar multiples roles de usuario: Presione la tecla <kbd>Ctrl</kbd> al momento de hacer click sobre un rol.</p>
+                                                <p class="help-block">Se pueden seleccionar mas de un rol para el usuario.</p>
                                             </div>
                                         </div>
                                         <div class="col-sm-12">

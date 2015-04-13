@@ -37,6 +37,14 @@ class Util
 		$trimestre = ceil($mes_actual/3);
 		return $trimestre;
 	}
+	public static function obtenerDescripcionMes($mes = NULL){
+		if(!$mes){
+			$mes = date('n');
+		}
+		$meses = array(1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril', 5 => 'Mayo', 6 => 'Junio', 
+					   7 => 'Julio', 8 => 'Agosto', 9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre');
+		return $meses[$mes];
+	}
 	public static function transformarFecha($fecha)
 	{
 		$fecha= explode("-",$fecha);

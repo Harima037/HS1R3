@@ -85,7 +85,7 @@ class InversionController extends ProyectosController {
 		$datos_acciones['formulario_componente'] = View::make('expediente.formulario-inversion-componente',$datos_acciones_formulario);
 		
 		$datos['formulario_acciones'] = View::make('expediente.formulario-caratula-acciones',$datos_acciones);
-
+		
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
 		$datos['sys_activo'] = SysGrupoModulo::findByKey('EXP');
 		$datos['sys_mod_activo'] = SysModulo::findByKey('INVERSION');

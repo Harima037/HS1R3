@@ -41,7 +41,7 @@ class ProyectosController extends \BaseController {
 		);
 
 		//Se Pre-carga formulario general de la caratula
-		$datos['formulario'] = View::make('expediente.formulario-caratula-captura',$datos);
+		//$datos['formulario'] = View::make('expediente.formulario-caratula-captura',$datos);
 		//Se Pre-carga el datagrid de los componentes
 		$datos['grid_componentes'] = View::make('expediente.listado-componentes');
 
@@ -167,6 +167,10 @@ class ProyectosController extends \BaseController {
 		);
 		$datos_benef['formulario_beneficiarios'] = View::make('expediente.formulario-beneficiario',$datos_beneficiarios);
 		$datos['grid_beneficiarios'] = View::make('expediente.formulario-caratula-beneficiarios',$datos_benef);
+
+		if(Sentry::hasAccess('EXP.PROYECTOS.S')){
+			$datos['capturar_numero'] = true;
+		}
 
 		//Se Pre-carga formulario general de la caratula
 		$datos['formulario'] = View::make('expediente.formulario-caratula-captura',$datos);

@@ -76,7 +76,7 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="form-group">
-                        <label for="descripcion-obj-{{$identificador}}" class="control-label">Descripción</label>
+                        <label for="descripcion-obj-{{$identificador}}" class="control-label">Descripción del Objetivo</label>
                         <input type="text" class="form-control" id="descripcion-obj-{{$identificador}}" name="descripcion-obj-{{$identificador}}">
                     </div>
                 </div>
@@ -99,16 +99,10 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-sm-12">
                             <div class="form-group">
-                                <label for="descripcion-ind-{{$identificador}}" class="control-label">Descripción</label>
+                                <label for="descripcion-ind-{{$identificador}}" class="control-label">Descripción del Indicador</label>
                                 <input type="text" class="form-control" id="descripcion-ind-{{$identificador}}" name="descripcion-ind-{{$identificador}}">
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label for="interpretacion-{{$identificador}}" class="control-label">Interpretación</label>
-                                <input type="text" class="form-control" id="interpretacion-{{$identificador}}" name="interpretacion-{{$identificador}}">
                             </div>
                         </div>
                         <div class="col-sm-6">
@@ -121,6 +115,12 @@
                             <div class="form-group">
                                 <label for="denominador-ind-{{$identificador}}" class="control-label">Denominador</label>
                                 <input type="text" class="form-control" id="denominador-ind-{{$identificador}}" name="denominador-ind-{{$identificador}}">
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="interpretacion-{{$identificador}}" class="control-label">Interpretación</label>
+                                <input type="text" class="form-control" id="interpretacion-{{$identificador}}" name="interpretacion-{{$identificador}}">
                             </div>
                         </div>
                     </div>

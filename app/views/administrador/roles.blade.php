@@ -140,7 +140,7 @@
                                         <div class="clearfix"></div>
                                     </div>
                                     <table class="table table-striped table-hover table-condensed" style="display:none;">
-                                        <thead><tr><th>Usuario</th><th>Nombre(s)</th></tr></thead>
+                                        <thead><tr><th>Usuario</th><th>Nombre completo</th></tr></thead>
                                         <tbody></tbody>
                                     </table>
                                 </div>

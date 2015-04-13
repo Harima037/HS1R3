@@ -40,9 +40,13 @@ context.llenar_datos = function(datos){
     $('#programaespecial').val(datos.programaEspecial);
     $('#actividadinstitucional').val(datos.actividadInstitucional);
     $('#proyectoestrategico').val(datos.proyectoEstrategico);
-
     $('#no_proyecto_estrategico').text(("000" + datos.numeroProyectoEstrategico).slice(-3));
-	$('#numeroproyectoestrategico').text(("000" + datos.numeroProyectoEstrategico).slice(-3));
+
+    if($('input#numeroproyectoestrategico').length){
+    	$('#numeroproyectoestrategico').val(datos.numeroProyectoEstrategico);
+    }else{
+    	$('#numeroproyectoestrategico').text(("000" + datos.numeroProyectoEstrategico).slice(-3));
+    }
 
     $('#cobertura').val(datos.idCobertura);
     

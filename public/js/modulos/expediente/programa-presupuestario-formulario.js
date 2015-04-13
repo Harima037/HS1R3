@@ -77,6 +77,12 @@ if($('#id').val()){
             objetivosDatagrid.actualizar();
             indicadoresDatagrid.actualizar();
 
+            if(response.data.idEstatus != 1 && response.data.idEstatus != 3){
+                bloquear_controles();
+            }else if(response.data.idEstatus == 3){
+                //mostrar_comentarios(response.data.comentarios);
+            }
+
             $('#tab-link-diagnostico').attr('data-toggle','tab');
             $('#tab-link-diagnostico').parent().removeClass('disabled');
             $('#tab-link-indicadores').attr('data-toggle','tab');
@@ -644,6 +650,16 @@ function reset_modal_form(formulario){
     }else if(formulario == form_medio_fin){
         $('#id-medio-fin').val('');
     }
+}
+
+function bloquear_controles(){
+    $('input,textarea,select').each(function(){
+        $(this).prop('disabled',true);
+        $('label[for="' + $(this).attr('id') + '"]').prepend('<span class="fa fa-lock"></span> ');
+        if($(this).hasClass('chosen-one')){
+            $(this).trigger('chosen:updated');
+        }
+    });
 }
 
 /**

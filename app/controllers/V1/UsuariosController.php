@@ -50,10 +50,16 @@ class UsuariosController extends \BaseController {
 			
 				$rows = Sentry::getUserProvider()->createModel();
 
+				if(!Sentry::getUser()->isSuperUser()){
+					$rows = $rows->where('permissions','!=','{"superuser":1}');
+				}
+
 				if(isset($parametros['buscar'])){
 					if($parametros['buscar']){
-						$rows = $rows->where('username','like','%'.$parametros['buscar'].'%')
-								->orwhere(DB::raw('CONCAT_WS(" ",nombres,apellidoPaterno,apellidoMaterno)'),'like','%'.$parametros['buscar'].'%');
+						$rows = $rows->where(function($query) use ($parametros){
+									$query->where('username','like','%'.$parametros['buscar'].'%')
+										->orwhere(DB::raw('CONCAT_WS(" ",nombres,apellidoPaterno,apellidoMaterno)'),'like','%'.$parametros['buscar'].'%');
+								});
 					}
 					$total = $rows->count();
 				}else{

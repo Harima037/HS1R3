@@ -76,6 +76,10 @@ $('#modalRol').on('shown.bs.modal', function () {
     $('#modalRol').find('input').eq(0).focus();
 });
 
+$('#modalRol').on('hide.bs.modal', function () {
+    resetModalRolForm();
+});
+
 $('#btnRolAgregar').on('click', function () {
     $('#modalRol').find(".modal-title").html("Nuevo Rol");    
     $('#modalRol').modal('show');
@@ -208,8 +212,8 @@ function buildUsuariosPanel(usuarios){
 
     for(i in usuarios){
         html_usuarios += '<tr><td>'+usuarios[i].username+'</td>';
-        html_usuarios += '<td>'+usuarios[i].first_name+'</td>';
-        html_usuarios += '<td>'+usuarios[i].last_name+'</td></tr>';
+        html_usuarios += '<td>'+usuarios[i].nombres + ' ' + usuarios[i].apellidoPaterno + ' ' + usuarios[i].apellidoMaterno +'</td>';
+        html_usuarios += '</tr>';
     }
 
     if(html_usuarios != ''){

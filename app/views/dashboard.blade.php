@@ -12,24 +12,65 @@
 
 @section('content')
 <div class="row">
-	<div class="col-md-6">
+	<div class="col-md-8">
 		<div class="panel panel-default datagrid">
 		    <div class="panel-heading"> <h1>Bienvenido</h1></div>
-	        
 	        <div class="list-group">
-			    <a class="list-group-item" href="#" ><h4><span class="glyphicon glyphicon-file"></span> Reporte General</h4></a>			    
-			    
-			</div>  
+	        	<div class="list-group-item">
+	        		<h4>Unidad Responsable: <small>{{$unidad_responsable}}</small></h4>
+	        	</div>
+			</div>
 		</div>
 	</div>
-	<div class="col-md-6">
-		<div class="panel panel-default datagrid">
-		    <div class="panel-heading"> <h4>Panel A</h4></div>
-	        <ul class="list-group">
-			    <li class="list-group-item">Inicio: <h4 class="pull-right" style="margin:0px; padding:0px"><span class="label label-default " id="inicio-periodo"></span> </h4></li>
-			    <li class="list-group-item">Fin: <h4 class="pull-right" style="margin:0px; padding:0px"><span class="label label-default " id="fin-periodo"></span> </h4></li>
-				<li class="list-group-item">Ejercicio: <h4 class="pull-right" style="margin:0px; padding:0px"><span class="label label-default " id="ejercicioActivo"></span> </h4></li>			    			    
-			</ul>  
+	<div class="col-md-4">
+		<div class="panel panel-default">
+			<div class="panel-heading"><b>Mes Actual:</b> {{$mes}}</div>
+			<table class="table table-condensed">
+				<tr>
+					<th>Avance MetasXMes</th>
+					<td>
+						<span class="{{($mes_activo)?'text-success':'text-muted'}}">
+							<span class="fa {{($mes_activo)?'fa fa-check-circle':'fa fa-clock-o'}} fa-2x"></span>
+						</span>
+					</td>
+				</tr>
+				<tr>
+					<th>Avance MetasXTrimestre</th>
+					<td>
+						<span class="{{($mes_trimestre == 3)?'text-success':'text-muted'}}">
+							<span class="fa {{($mes_trimestre == 3)?'fa fa-check-circle':'fa fa-clock-o'}} fa-2x"></span>
+						</span>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<div class="col-md-4">
+		<div class="panel panel-default">
+		    <div class="panel-heading"><h4><span class="fa fa-file"></span> Proyectos Capturados</h4></div>
+		    @foreach ($clasificaciones as $clasificacion => $descripcion)
+		    	<table class="table table-hover table-striped">
+			    	<thead>
+			    		<tr>
+			    			<th colspan="2">{{$descripcion}}</th>
+			    		</tr>
+			    	</thead>
+			    	<tbody>
+			    		@foreach ($proyectos[$clasificacion] as $proyecto)
+			    			<tr>
+			    				<td>{{$proyecto['estatus']}}</td>
+			    				<td><span>{{$proyecto['conteo']}}</span></td>
+			    			</tr>
+			    		@endforeach
+			    	</tbody>
+			    	<tfoot>
+			    		<tr>
+			    			<th>Total</th>
+			    			<th>{{$total_proyectos[$clasificacion]}}</th>
+			    		</tr>
+			    	</tfoot>
+			    </table>
+		    @endforeach
 		</div>
 	</div>
 </div>  
