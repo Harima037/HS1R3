@@ -464,7 +464,6 @@
                                     <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateHeader">
                                         <tr>
                                             <td valign="top" class="headerContent">
-                                            	
                                             	<img src="<?php echo $message->embed('img/banner-email.png'); ?>" style="max-width:600px;" id="headerImage" mc:label="header_image" mc:edit="header_image" mc:allowdesigner mc:allowtext />
                                             </td>
                                         </tr>
@@ -479,7 +478,7 @@
                                         <tr>
                                             <td valign="top" class="bodyContent" mc:edit="body_content">
                                                 <h1>Recuperar Contraseña</h1>
-                                                <h3>Estimado(a) {{$usuario->first_name}}, se ha solicitado la recuperación de su contraseña, si no fue usted quién realizó esta solicitud, simplemente haga caso omiso de este mensaje.</h3>
+                                                <h3>Estimado(a) {{$usuario->nombres}}, se ha solicitado la recuperación de su contraseña, si no fue usted quién realizó esta solicitud, simplemente haga caso omiso de este mensaje.</h3>
                                                 <h3>Para recuperar su contraseña, haga click sobre el siguiente vinculo:</h3>
                                                 <br />
                                                 <a href="{{ URL::to('cambiar-contrasena', array($token)) }}">Click aqui para cambiar tu contraseña</a>

@@ -19,40 +19,45 @@ class AutenticacionController extends Controller {
 	public function login(){
 		$error = '';
 		$info = '';
-
+		$usuario = '';
 		if (Sentry::check()) {
 			return Redirect::to('/');
 		}
 
 		if(Input::all()){
-
+			$usuario = Input::get('usuario');
+			$parametros = Input::all();
 			try{
-				if($User = Sentry::authenticate(array('username'=>Input::get('usuario'),
-													  'password'=>Input::get('password')),false)){
-					return Redirect::intended('/');
-				}elseif(Input::has('username') || Input::has('email')){
+				if(isset($parametros['recuperar-contrasena'])){
 					$rows = Sentry::getUserProvider()->createModel();
-					if(Input::get('username')){
-						$rows = $rows->where('username','=',Input::get('username'));
+					if($parametros['username']){
+						$rows = $rows->where('username','=',$parametros['username']);
 					}
-					if(Input::get('email')){
-						$rows = $rows->where('email','=',Input::get('email'));
+					if($parametros['email']){
+						$rows = $rows->where('email','=',$parametros['email']);
 					}
+
 					$User = $rows->get();
+
 					if(count($User) == 1){
 						$User = Sentry::findUserByID($User[0]->id);
 					}else{
 						$User = null;
 					}
-					if ($User) {
+
+					if($User) {
 						$data['usuario'] = $User;
 						$data['token'] = $User->getResetPasswordCode();
 						Mail::send('emails.auth.reset_pass', $data, function($message) use ($User){
-							$message->to($User->email,$User->first_name)->subject('Recuperar Contraseña');
+							$message->to($User->email,$User->nombres)->subject('Recuperar Contraseña');
 						});
 						$info = 'Se ha enviado un correo electrónico a ['.$User->email.'] con los pasos a seguir para recuperar su contraseña.';
 					}else{
 						$error = 'No se encontraron los datos del usuario.';
+					}
+				}else{
+					if($User = Sentry::authenticate(array('username'=>$parametros['usuario'],'password'=>$parametros['password']),false)){
+						return Redirect::intended('/');
 					}
 				}
 			}catch (\Cartalyst\Sentry\Users\LoginRequiredException $e) {
@@ -69,10 +74,11 @@ class AutenticacionController extends Controller {
 				$error = 'El usuario está suspendido.';
 			}catch (\Cartalyst\Sentry\Throttling\UserBannedException $e){
 				$error = 'El usuario está bloqueado.';
+			}catch (\Exception $e){
+				$error = 'Ocurrio un error al intentar recuperar la contraseña.';
 			}
 		}
 
-		$usuario = Input::get('usuario');
 		return View::make('login')->with(array('error'=>$error,'info'=>$info,'usuario'=>$usuario));
 	}
 
@@ -99,6 +105,6 @@ class AutenticacionController extends Controller {
 		}catch (\Cartalyst\Sentry\Throttling\UserBannedException $e){
 			$error = 'El usuario está bloqueado.';
 		}
-		return View::make('login')->with(array('error'=>$error,'info'=>''));
+		return View::make('login')->with(array('error'=>$error,'info'=>'','usuario'=>''));
 	}
 }

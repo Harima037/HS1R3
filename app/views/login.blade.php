@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
     <link href="{{ URL::to('bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" media="screen">
+    <link href="{{ URL::to('css/font-awesome-4.3.0/css/font-awesome.min.css') }}" rel="stylesheet" media="screen">
     <link href="{{ URL::to('css/login.css') }}" rel="stylesheet" media="screen">
 </head>
 <body>
@@ -22,13 +23,13 @@
         <input type="text" name="usuario" class="form-control" placeholder="Usuario" value="{{$usuario}}" autofocus>
         <input type="password"  name="password" class="form-control" placeholder="Contraseña">
         <!--<label class="checkbox"><input type="checkbox" value="remember-me"> Remember me</label>-->
-        <button class="btn btn-lg btn-danger btn-block" type="submit">Entrar</button>
+        <button class="btn btn-lg btn-danger btn-block" type="submit"><span class="fa fa-power-off"></span> Entrar</button>
        
         <br>
         <div  style="text-align:center;"> 
             <!--a href="#"><span class="glyphicon glyphicon-lock"></span> Olvidé mi contraseña.</a-->
-            <button class="btn-link" data-toggle="modal" data-target=".login-forgotpass-modal-sm">
-                <span class="glyphicon glyphicon-lock"></span> Olvidé mi contraseña.
+            <button type="button" class="btn-link" data-toggle="modal" data-target=".login-forgotpass-modal-sm">
+                <span class="fa fa-lock"></span> Olvidé mi contraseña.
             </button><br><br>
         </div>
     </form>
@@ -40,21 +41,33 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 class="modal-title" id="loginModalLabel">Olvidé mi contraseña</h4>
                 </div>
+                <form class="form-vertical" role="form" method="post">
                 <div class="modal-body">
-                    <form class="form-inline" role="form" method="post">
-                        <p class="help-block">Por favor proporcione su nombre de usuario o dirección de correo. Se le enviará un correo electrónico con los pasos a seguir para recuperar su contraseña.</p>
-                        <div class="form-group">
+                    <p class="help-block">Por favor proporcione su nombre de usuario o la dirección de correo electronico con el que está dado de alta en el sistema. Se le enviará un correo electrónico con los pasos a seguir para recuperar su contraseña.</p>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon"><span class="fa fa-user"></span></span>
                             <input type="text" name="username" class="form-control" placeholder="Usuario">
                         </div>
-                         o 
-                        <div class="form-group">
-                            <input type="email" name="email" class="form-control" placeholder="Email">
+                    </div>
+                    <div class="form-group">
+                        <span class="center-block"> o </span>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-addon"><span class="fa fa-envelope"></span></span>
+                            <input type="email" name="email" class="form-control" placeholder="Correo Electronico">
                         </div>
-                        <button type="submit" class="btn btn-primary">
-                            Recuperar Contraseña
-                        </button>
-                    </form>
+                    </div>
+                    <input type="hidden" name="recuperar-contrasena" value="1">
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" data-loading-text='Enviando'>
+                        <span class="fa fa-send"></span> Enviar
+                    </button>
+                </div>
+                </form>
             </div>
         </div>
     </div>
