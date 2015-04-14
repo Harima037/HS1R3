@@ -23,11 +23,11 @@
 		</div>
 	</div>
 	<div class="col-md-4">
-		<div class="panel panel-default">
-			<div class="panel-heading"><b>Mes Actual:</b> {{$mes}}</div>
+		<div class="panel panel-primary">
+			<div class="panel-heading"><b>Mes Actual:</b> {{$mes}} <span class="pull-right">{{date('Y')}}</span></div>
 			<table class="table table-condensed">
 				<tr>
-					<th>Avance MetasXMes</th>
+					<td>Captura de avances por mes de Proyectos Institucionales y de Inversión</td>
 					<td>
 						<span class="{{($mes_activo)?'text-success':'text-muted'}}">
 							<span class="fa {{($mes_activo)?'fa fa-check-circle':'fa fa-clock-o'}} fa-2x"></span>
@@ -35,7 +35,7 @@
 					</td>
 				</tr>
 				<tr>
-					<th>Avance MetasXTrimestre</th>
+					<td>Captura de avances por trimestre de Programas Presupuestarios</td>
 					<td>
 						<span class="{{($mes_trimestre == 3)?'text-success':'text-muted'}}">
 							<span class="fa {{($mes_trimestre == 3)?'fa fa-check-circle':'fa fa-clock-o'}} fa-2x"></span>
@@ -45,6 +45,7 @@
 			</table>
 		</div>
 	</div>
+	<div class="col-md-8"></div>
 	<div class="col-md-4">
 		<div class="panel panel-default">
 		    <div class="panel-heading"><h4><span class="fa fa-file"></span> Proyectos Capturados</h4></div>
