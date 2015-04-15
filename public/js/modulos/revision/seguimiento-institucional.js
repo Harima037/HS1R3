@@ -12,6 +12,7 @@
 =====================================*/
 
 // Inicialización General para casi cualquier módulo
+
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/segui-proyectos-inst');
 var moduloDatagrid = new Datagrid("#datagridProyectos",moduloResource,{ formatogrid:true, pagina: 1, clasificacionProyecto: 1});
 moduloDatagrid.init();
@@ -162,9 +163,12 @@ function cargar_datos_proyecto(e){
                 }
                 $('#total-trim-'+i).text(suma);
             }
-
+			$('#btn-firmar').hide();
+			
+			if(response.data.evaluacion_meses[0].idEstatus == "4")
+				$('#btn-firmar').show();
+			
             $('#btn-comentar-avance').attr('data-id-proyecto',e);
-
             $('#modalDatosSeguimiento').modal('show');
         }
     });
@@ -173,6 +177,43 @@ function cargar_datos_proyecto(e){
 //rend-cuenta-inst-editar
 $('#btn-comentar-avance').on('click',function(){
     window.location.href = SERVER_HOST+'/revision/comentar-avance/' + $('#btn-comentar-avance').attr('data-id-proyecto');
+});
+
+
+$('#btn-firmar').on('click',function(){
+	
+	console.log($('#btn-comentar-avance').attr('data-id-proyecto'));
+	
+	Confirm.show({
+		titulo:"¿Poner el programa en el estatus de firma?",
+		mensaje: "¿Estás seguro que desea poner el estatus de firma? Una vez hecho esto, el programa ya no es modificable, y se entiende que se aprobó y firmó.",
+		callback: function(){
+			var parametros = 'actualizarproyecto=firmar';					
+			
+			moduloResource.put($('#btn-comentar-avance').attr('data-id-proyecto'),parametros,{
+						_success: function(response){
+							window.location = "../revision/segui-proyectos-inst";
+							MessageManager.show({data:'El programa ha sido ha sido puesto en el estatus de firma',type:'OK',timer:3});					
+						},
+						_error: function(response){
+							try{
+								var json = $.parseJSON(response.responseText);
+								if(!json.code)
+									MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+								else{
+									json.container = modal_actividad + ' .modal-body';
+									MessageManager.show(json);
+								}
+								Validation.formValidate(json.data);
+							}catch(e){
+								console.log(e);
+							}
+						}
+					});
+				}
+		});
+	
+    
 });
 
 /*

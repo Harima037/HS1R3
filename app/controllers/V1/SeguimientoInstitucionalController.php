@@ -155,14 +155,18 @@ class SeguimientoInstitucionalController extends BaseController {
 		$http_status = 200;
 		$data = array();
 		$parametros = Input::all();
+		
+		$mes_actual = Util::obtenerMesActual();
 
 		if(isset($parametros['mostrar'])){
 			if($parametros['mostrar'] == 'datos-proyecto-avance'){
-				$recurso = Proyecto::with('datosFuncion','datosSubFuncion','datosProgramaPresupuestario','componentes.metasMesAgrupado'
-					,'componentes.registroAvance','componentes.actividades.metasMesAgrupado','componentes.actividades.registroAvance')->find($id);
+				$recurso = Proyecto::with(array('datosFuncion','datosSubFuncion','datosProgramaPresupuestario','componentes.metasMesAgrupado'
+					,'componentes.registroAvance','componentes.actividades.metasMesAgrupado','componentes.actividades.registroAvance','evaluacionMeses'=>function($query) use ($mes_actual){
+						$query->where('mes','=',$mes_actual);
+						}))->find($id);
 			}elseif ($parametros['mostrar'] == 'datos-municipio-avance') {
 				//$id = idComponente y $parametros['clave-municipio'] y $parametros['nivel'] = 'componente'
-				$mes_actual = Util::obtenerMesActual();
+				
 				if($parametros['nivel'] == 'componente'){
 					$recurso = ComponenteDesglose::listarDatos()->where('claveMunicipio','=',$parametros['clave-municipio'])
 													->where('idComponente','=',$id);
@@ -173,7 +177,6 @@ class SeguimientoInstitucionalController extends BaseController {
 					$query->where('mes','<=',$mes_actual);
 				}))->get();
 			}elseif($parametros['mostrar'] == 'datos-metas-avance'){
-				$mes_actual = Util::obtenerMesActual();
 				if($parametros['nivel'] == 'componente'){
 					$recurso = Componente::getModel();
 				}else{
@@ -196,7 +199,6 @@ class SeguimientoInstitucionalController extends BaseController {
 					//throw new Exception(print_r(end($queries),true), 1);
 				}
 			}elseif($parametros['mostrar'] == 'datos-metas-avance'){
-				$mes_actual = Util::obtenerMesActual();
 				if($parametros['nivel'] == 'componente'){
 					$recurso = Componente::getModel()->with(array('comentarios'));
 				}else{
@@ -319,7 +321,7 @@ class SeguimientoInstitucionalController extends BaseController {
 					$recurso = EvaluacionProyectoMes::where('idProyecto','=',$id)
 								->where('mes','=',$mes_actual)
 								->where('anio','=',date("Y"))
-								->update(array('idEstatus' => '5'));
+								->update(array('idEstatus' => '4'));
 				}
 			}
 			else if($parametros['actualizarproyecto']=="regresar") //Poner estatus 3 (Regreso a corrección)
@@ -344,17 +346,27 @@ class SeguimientoInstitucionalController extends BaseController {
 					$respuesta['data'] = array("data"=>"Debe escribir al menos un comentario, para poder regresar el proyecto a corrección.",'code'=>'U06');
 				}
 			}
-			/*else if($parametros['actualizarproyecto']=="firmar") //Poner estatus 5 (Enviar a firma)
+			else if($parametros['actualizarproyecto']=="firmar") //Poner estatus 5 (Enviar a firma)
 			{
-				$recurso = Proyecto::find($id);
-				if(is_null($recurso)){
-					$respuesta['http_status'] = 404;
-					$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
-				}else{
-					$recurso->idEstatusProyecto = 5;
-					$recurso->save();
+				$validar = DB::table('evaluacionComentarios')
+                    ->where('idProyecto', '=', $id)
+					->where('mes','=',$mes_actual)
+					->whereNull('borradoAl')
+					->select('evaluacionComentarios.id')->get();
+				
+				if(count($validar)>0) //Existen comentarios, no se puede aprobar
+				{
+					$respuesta['http_status'] = 500;
+					$respuesta['data'] = array("data"=>"Debe eliminar todos los comentarios para poder firmar el avance.",'code'=>'U06');
 				}
-			}*/
+				else
+				{
+					$recurso = EvaluacionProyectoMes::where('idProyecto','=',$id)
+								->where('mes','=',$mes_actual)
+								->where('anio','=',date("Y"))
+								->update(array('idEstatus' => '5'));
+				}
+			}
 			
 		}
 		else
