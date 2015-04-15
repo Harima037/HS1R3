@@ -179,6 +179,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
+                	<button type="button" class="btn btn-success pull-left" id="btn-firmar">
+                        <span class="fa fa-pencil"></span> Firmar Avance Mensual
+                    </button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                     <button type="button" class="btn btn-primary" id="btn-comentar-avance">Comentar Avances</button>
                 </div>
