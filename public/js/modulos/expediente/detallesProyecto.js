@@ -89,9 +89,28 @@ context.mostrar_datos = function(datos){
 
     $('#proyecto-tab-panel-list a:first').tab('show');
 
+    /*
     $('#btn-exportar-excel').off('click');
     $('#btn-exportar-excel').on('click',function(){
         window.open(SERVER_HOST+'/v1/reporteProyecto/'+datos.id);
+    });
+    */
+
+    /*if(datos.idEstatusProyecto < 4){
+        $('#panel-btns-reporte').addClass('hidden');
+    }else{
+        $('#panel-btns-reporte').removeClass('hidden');
+    }*/
+
+    $('#btn-reporte-caratula-proyecto').off('click');
+    $('#btn-reporte-caratula-proyecto').on('click',function(){
+        var parametros = datos.id + '|' + 'caratula';
+        window.open(SERVER_HOST+'/v1/reporteProyecto/'+parametros);
+    });
+    $('#btn-reporte-fibap').off('click');
+    $('#btn-reporte-fibap').on('click',function(){
+        var parametros = datos.id + '|' + 'fibap';
+        window.open(SERVER_HOST+'/v1/reporteProyecto/'+parametros);
     });
 
     $('#btn-editar-proyecto').attr('data-id-proyecto',datos.id);

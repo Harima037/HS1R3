@@ -51,11 +51,81 @@ class Proyecto extends BaseModel
 		return $this->finalidad . '.' . $this->funcion . '.' . $this->subFuncion . '.' . $this->subSubFuncion;
 	}
 
+	public function scopeContenidoReporte($query){
+		return $query->with('componentesCompletoDescripcion.metasMes','beneficiariosDescripcion')
+					->join('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','proyectos.unidadResponsable')
+					->join('catalogoFuncionesGasto AS finalidad','finalidad.clave','=','proyectos.finalidad')
+					->join('catalogoFuncionesGasto AS funcion','funcion.clave','=',DB::raw('concat_ws(".",proyectos.finalidad,proyectos.funcion)'))
+					->join('catalogoFuncionesGasto AS subFuncion','subFuncion.clave','=',DB::raw('concat_ws(".",proyectos.finalidad,proyectos.funcion,proyectos.subFuncion)'))
+					->join('catalogoFuncionesGasto AS subSubFuncion','subSubFuncion.clave','=',DB::raw('concat_ws(".",proyectos.finalidad,proyectos.funcion,proyectos.subFuncion,proyectos.subSubFuncion)'))
+					->join('catalogoProgramasSectoriales AS programaSectorial','programaSectorial.clave','=','proyectos.programaSectorial')
+					->join('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','proyectos.programaPresupuestario')
+					->join('catalogoProgramasEspeciales AS programaEspecial','programaEspecial.clave','=','proyectos.programaEspecial')
+					->join('catalogoActividades AS actividadInstitucional','actividadInstitucional.clave','=','proyectos.actividadInstitucional')
+					->join('catalogoProyectosEstrategicos AS proyectoEstrategico','proyectoEstrategico.clave','=','proyectos.proyectoEstrategico')
+					->join('catalogoObjetivosPED AS objetivoPED','objetivoPED.id','=','proyectos.idObjetivoPED')
+
+					->join('catalogoObjetivosPED AS ejeRector','ejeRector.clave','=',DB::raw('SUBSTRING(objetivoPED.clave,1,4)'))
+					->join('catalogoObjetivosPED AS politicaPublica','politicaPublica.clave','=',DB::raw('SUBSTRING(objetivoPED.clave,1,6)'))
+
+					->join('catalogoTiposProyectos AS tipoProyecto','tipoProyecto.id','=','proyectos.idTipoProyecto')
+					->join('catalogoCoberturas AS cobertura','cobertura.id','=','proyectos.idCobertura')
+					->join('catalogoTiposAcciones AS tipoAccion','tipoAccion.id','=','proyectos.idTipoAccion')
+					->join('titulares AS liderProyecto','liderProyecto.id','=','proyectos.idLiderProyecto')
+					->join('titulares AS jefeInmediato','jefeInmediato.id','=','proyectos.idJefeInmediato')
+					->join('titulares AS jefePlaneacion','jefePlaneacion.id','=','proyectos.idJefePlaneacion')
+					->join('titulares AS coordinadorGrupoEstrategico','coordinadorGrupoEstrategico.id','=','proyectos.idCoordinadorGrupoEstrategico')
+					->select('proyectos.*',
+
+						DB::raw('concat_ws(" ",unidadResponsable.clave,unidadResponsable.descripcion) AS unidadResponsableDescripcion'),
+						DB::raw('concat_ws(" ",finalidad.clave,finalidad.descripcion) AS finalidadDescripcion'),
+						DB::raw('concat_ws(" ",funcion.clave,funcion.descripcion) AS funcionDescripcion'),
+						DB::raw('concat_ws(" ",subFuncion.clave,subFuncion.descripcion) AS subFuncionDescripcion'),
+						DB::raw('concat_ws(" ",subSubFuncion.clave,subSubFuncion.descripcion) AS subSubFuncionDescripcion'),
+						DB::raw('concat_ws(" ",programaSectorial.clave,programaSectorial.descripcion) AS programaSectorialDescripcion'),
+						DB::raw('concat_ws(" ",programaPresupuestario.clave,programaPresupuestario.descripcion) AS programaPresupuestarioDescripcion'),
+						DB::raw('concat_ws(" ",objetivoPED.clave,objetivoPED.descripcion) AS objetivoPEDDescripcion'),
+						DB::raw('concat_ws(" ",ejeRector.clave,ejeRector.descripcion) AS ejeRectorDescripcion'),
+						DB::raw('concat_ws(" ",politicaPublica.clave,politicaPublica.descripcion) AS politicaPublicaDescripcion'),
+						DB::raw('concat_ws(" ",programaEspecial.clave,programaEspecial.descripcion) AS programaEspecialDescripcion'),
+						DB::raw('concat_ws(" ",proyectoEstrategico.clave,proyectoEstrategico.descripcion) AS proyectoEstrategicoDescripcion'),
+						DB::raw('concat_ws(" ",actividadInstitucional.clave,actividadInstitucional.descripcion) AS actividadInstitucionalDescripcion'),
+						DB::raw('concat_ws(" ",tipoAccion.clave,tipoAccion.descripcion) AS tipoAccionDescripcion'),
+						DB::raw('concat_ws(" ",tipoProyecto.clave,tipoProyecto.descripcion) AS tipoProyectoDescripcion'),
+						DB::raw('concat_ws(" ",cobertura.clave,cobertura.descripcion) AS coberturaDescripcion'),
+
+						'liderProyecto.nombre AS liderProyecto',
+						'jefeInmediato.nombre AS jefeInmediato',
+						'jefePlaneacion.nombre AS jefePlaneacion',
+						'coordinadorGrupoEstrategico.nombre AS coordinadorGrupoEstrategico');
+
+	}
+
 	public function scopeContenidoCompleto($query){
 		return $query->with('componentes','beneficiarios','municipio','region','clasificacionProyecto','tipoProyecto','cobertura','tipoAccion',
 			'datosUnidadResponsable','datosFinalidad','datosFuncion','datosSubFuncion','datosSubSubFuncion','datosProgramaSectorial',
 			'datosProgramaPresupuestario','datosProgramaEspecial','datosActividadInstitucional','datosProyectoEstrategico',
 			'objetivoPed','estatusProyecto','jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico');
+	}
+
+	public function beneficiarios(){
+		return $this->hasMany('Beneficiario','idProyecto')->with('tipoBeneficiario')->orderBy('id');
+	}
+
+	public function beneficiariosDescripcion(){
+		return $this->hasMany('Beneficiario','idProyecto')->conDescripcion()->orderBy('id');
+	}
+
+	public function componentes(){
+		return $this->hasMany('Componente','idProyecto')->with('usuario');
+	}
+
+	public function componentesCompletoDescripcion(){
+		return $this->hasMany('Componente','idProyecto')->conDescripcion()->with('desgloseCompleto','actividadesDescripcion.metasMes');
+	}
+
+	public function componentesDescripcion(){
+		return $this->hasMany('Componente','idProyecto')->conDescripcion()->with('actividadesDescripcion.metasMes');
 	}
 
 	public function registroAvance(){
@@ -86,16 +156,8 @@ class Proyecto extends BaseModel
 		return $this->belongsTo('Titular','idCoordinadorGrupoEstrategico')->withTrashed();
 	}
 
-	public function componentes(){
-		return $this->hasMany('Componente','idProyecto')->with('usuario');
-	}
-
 	public function actividades(){
 		return $this->hasMany('Actividad','idProyecto')->with('usuario');
-	}
-	
-	public function beneficiarios(){
-		return $this->hasMany('Beneficiario','idProyecto')->with('tipoBeneficiario')->orderBy('id');
 	}
 
 	public function municipio(){

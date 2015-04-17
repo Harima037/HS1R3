@@ -11,6 +11,17 @@ class Actividad extends BaseModel
 		return $query->with('formula','dimension','frecuencia','tipoIndicador','unidadMedida');
 	}
 
+	public function scopeConDescripcion($query){
+		return $query->join('catalogoFormulas AS formula','formula.id','=','componenteActividades.idFormula')
+					->join('catalogoDimensionesIndicador AS dimension','dimension.id','=','componenteActividades.idDimensionIndicador')
+					->join('catalogoFrecuenciasIndicador AS frecuencia','frecuencia.id','=','componenteActividades.idFrecuenciaIndicador')
+					->join('catalogoTiposIndicadores AS tipoIndicador','tipoIndicador.id','=','componenteActividades.idTipoIndicador')
+					->join('catalogoUnidadesMedida AS unidadMedida','unidadMedida.id','=','componenteActividades.idUnidadMedida')
+    				->select('componenteActividades.*','formula.descripcion AS formula','dimension.descripcion AS dimension',
+    					'frecuencia.descripcion AS frecuencia','tipoIndicador.descripcion AS tipoIndicador',
+    					'unidadMedida.descripcion AS unidadMedida');
+	}
+
 	public function registroAvance(){
     	return $this->hasMany('RegistroAvanceMetas','idNivel')->where('nivel','=',2);
     }

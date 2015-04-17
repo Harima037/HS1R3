@@ -37,9 +37,9 @@
 		<tr><td colspan="18"></td></tr>
 		<tr><td colspan="18" align="center" style="background-color:#CCCCCC;"><strong>ALINEACIÓN AL PED</strong></td></tr>
 		<tr><td colspan="18"></td></tr>
-		<tr><td colspan="18"><strong>Eje rector:</strong></td></tr>
-		<tr><td colspan="18"><strong>Política pública:</strong></td></tr>
-		<tr><td colspan="18"><strong>Objetivo:</strong> {{$data['objetivo_ped']->descripcion}}</td></tr>
+		<tr><td colspan="18"><strong>Eje rector:</strong> {{$data['ejeRectorDescripcion']}}</td></tr>
+		<tr><td colspan="18"><strong>Política pública:</strong> {{$data['politicaPublicaDescripcion']}}</td></tr>
+		<tr><td colspan="18"><strong>Objetivo:</strong> {{$data['objetivoPEDDescripcion']}}</td></tr>
 		<tr><td colspan="18"></td></tr>
 		<tr><td colspan="18" align="center" style="background-color:#CCCCCC;"><strong>ALINEACIÓN A LOS OBJETIVOS DE DESARROLLO DEL MILENIO</strong></td></tr>
 		<tr>

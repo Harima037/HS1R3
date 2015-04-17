@@ -1098,7 +1098,13 @@ class ProyectosController extends BaseController {
 				if($parametros['numeroproyectoestrategico'] > 0){
 					$recurso->numeroProyectoEstrategico = $parametros['numeroproyectoestrategico'];
 				}else{
-					$recurso->numeroProyectoEstrategico = NULL;
+					$recurso->numeroProyectoEstrategico = 0;
+				}
+			}
+
+			if($es_editar && $recurso->numeroProyectoEstrategico > 0){
+				if($recurso->unidadResponsable != $parametros['unidadresponsable'] || $recurso->finalidad != $funcion_gasto[0] || $recurso->funcion != $funcion_gasto[1] || $recurso->subFuncion != $funcion_gasto[2] || $recurso->subSubFuncion != $funcion_gasto[3] || $recurso->programaSectorial != $parametros['programasectorial'] || $recurso->programaEspecial != $parametros['programaespecial'] || $recurso->actividadInstitucional != $parametros['actividadinstitucional'] || $recurso->proyectoEstrategico != $parametros['proyectoestrategico'] || $recurso->programaPresupuestario != $parametros['programapresupuestario']){
+					$recurso->numeroProyectoEstrategico = 0;
 				}
 			}
 

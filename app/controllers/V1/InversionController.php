@@ -657,7 +657,9 @@ class InversionController extends ProyectosController {
 						}
 					}
 					$respuesta['data']['extras'] = $extras;
-					$recurso['liderProyecto'] = $respuesta['data']['nombre-lider-proyecto'];
+					if(isset($respuesta['data']['nombre-lider-proyecto'])){
+						$recurso['liderProyecto'] = $respuesta['data']['nombre-lider-proyecto'];
+					}
 				}
 			}elseif($parametros['guardar'] == 'proyecto-beneficiario'){
 				$respuesta = parent::guardar_datos_beneficiario($parametros,$id);

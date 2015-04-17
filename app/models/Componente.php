@@ -12,6 +12,21 @@ class Componente extends BaseModel
 							'entregableTipo','entregableAccion','desgloseCompleto');
 	}
 
+	public function scopeConDescripcion($query){
+		return $query->join('catalogoFormulas AS formula','formula.id','=','proyectoComponentes.idFormula')
+					->join('catalogoDimensionesIndicador AS dimension','dimension.id','=','proyectoComponentes.idDimensionIndicador')
+					->join('catalogoFrecuenciasIndicador AS frecuencia','frecuencia.id','=','proyectoComponentes.idFrecuenciaIndicador')
+					->join('catalogoTiposIndicadores AS tipoIndicador','tipoIndicador.id','=','proyectoComponentes.idTipoIndicador')
+					->join('catalogoUnidadesMedida AS unidadMedida','unidadMedida.id','=','proyectoComponentes.idUnidadMedida')
+					->leftjoin('catalogoEntregables AS entregable','entregable.id','=','proyectoComponentes.idEntregable')
+    				->leftjoin('catalogoEntregablesTipos AS entregableTipo','entregableTipo.id','=','proyectoComponentes.idEntregableTipo')
+    				->leftjoin('catalogoEntregablesAcciones AS entregableAccion','entregableAccion.id','=','proyectoComponentes.idEntregableAccion')
+    				->select('proyectoComponentes.*','formula.descripcion AS formula','dimension.descripcion AS dimension',
+    					'frecuencia.descripcion AS frecuencia','tipoIndicador.descripcion AS tipoIndicador',
+    					'unidadMedida.descripcion AS unidadMedida','entregable.descripcion AS entregable',
+    					'entregableTipo.descripcion AS entregableTipo','entregableAccion.descripcion AS entregableAccion');
+	}
+
 	public function scopeMostrarDatos($query){
     	$query->select('proyectoComponentes.id','proyectoComponentes.idEntregable','idEntregableTipo', 
     					'idEntregableAccion','idUnidadMedida','indicador','entregable.descripcion AS entregable',
@@ -53,6 +68,10 @@ class Componente extends BaseModel
 
 	public function actividades(){
 		return $this->hasMany('Actividad','idComponente')->with('usuario');
+	}
+
+	public function actividadesDescripcion(){
+		return $this->hasMany('Actividad','idComponente')->conDescripcion();
 	}
 
 	public function metasMes(){

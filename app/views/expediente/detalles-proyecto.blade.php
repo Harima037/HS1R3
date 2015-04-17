@@ -320,11 +320,20 @@
                         </div>
                     </div>
                 </div>
-                <div>
+                <div id="panel-btns-reporte">
                     <br>
-                    <button type="button" class="btn btn-success" id="btn-exportar-excel">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            <span class="fa fa-file"></span> Imprimir Reporte <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#" id="btn-reporte-caratula-proyecto">Caratula Proyecto</a></li>
+                            <li><a href="#" id="btn-reporte-fibap">FIBAP</a></li>
+                        </ul>
+                    </div>
+                    <!--button type="button" class="btn btn-success" id="btn-exportar-excel">
                         <span class="fa fa-file-excel-o"></span> Imprimir Reporte
-                    </button>
+                    </button-->
                 </div>
             </div>
             <div class="modal-footer">
