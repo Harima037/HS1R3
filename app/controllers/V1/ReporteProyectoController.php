@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, View;
-use Excel, Proyecto, FIBAP, ComponenteMetaMes, ActividadMetaMes;
+use Excel,PDF, Proyecto, FIBAP, ComponenteMetaMes, ActividadMetaMes;
 
 class ReporteProyectoController extends BaseController {
 
@@ -31,42 +31,71 @@ class ReporteProyectoController extends BaseController {
 	 */
 	public function show($id)
 	{
-		
-		$idProyecto = $id;
-		
-		$recurso = Proyecto::contenidoCompleto()->find($idProyecto);
-		
+		$parametros = explode('|',$id);
+		$idProyecto = $parametros[0];
+		//$idProyecto = $id;
+
+		$recurso = Proyecto::contenidoReporte()->find($idProyecto);
 		//Datos para la hoja Programa Inversion
-		$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion','desgloseCompleto'));
-		foreach ($recurso->componentes as $key => $componente) {
-			$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
+		//var_dump($recurso->toArray());die();
+		
+		$componentesMetasJuris = array();
+		$componentesMetasMes = array();
+		$actividadesMetasJuris = array();
+		$actividadesMetasMes = array();
+
+		foreach ($recurso->componentesCompletoDescripcion as $componente) {
+			$componentesMetasJuris[$componente->id] = array(
+				'OC' => 0, '01' => 0, '02' => 0, '03' => 0, '04' => 0, '05' => 0, '06' => 0, '07' => 0, '08' => 0, '09' => 0,
+				 '10' => 0, 'estatal' => 0
+			);
+
+			$componentesMetasMes[$componente->id] = array(
+				1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0, 7 => 0, 8 => 0, 9 => 0, 10 => 0, 11 => 0, 12 => 0, 'estatal' => 0
+			);
+
+			foreach ($componente->metasMes as $metas_mes) {
+				$componentesMetasJuris[$componente->id][$metas_mes->claveJurisdiccion] += $metas_mes->meta;
+				$componentesMetasJuris[$componente->id]['estatal'] += $metas_mes->meta;
+
+				$componentesMetasMes[$componente->id][$metas_mes->mes] += $metas_mes->meta;
+				$componentesMetasMes[$componente->id]['estatal'] += $metas_mes->meta;
+			}
+
+			foreach ($componente->actividadesDescripcion as $actividad) {
+				$actividadesMetasJuris[$actividad->id] = array(
+					'OC' => 0, '01' => 0, '02' => 0, '03' => 0, '04' => 0, '05' => 0, '06' => 0, '07' => 0, '08' => 0, '09' => 0,
+					 '10' => 0, 'estatal' => 0
+				);
+
+				$actividadesMetasMes[$actividad->id] = array(
+					1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0, 7 => 0, 8 => 0, 9 => 0, 10 => 0, 11 => 0, 12 => 0, 'estatal' => 0
+				);
+
+				foreach ($actividad->metasMes as $metas_mes) {
+					$actividadesMetasJuris[$actividad->id][$metas_mes->claveJurisdiccion] += $metas_mes->meta;
+					$actividadesMetasJuris[$actividad->id]['estatal'] += $metas_mes->meta;
+
+					$actividadesMetasMes[$actividad->id][$metas_mes->mes] += $metas_mes->meta;
+					$actividadesMetasMes[$actividad->id]['estatal'] += $metas_mes->meta;
+				}
+			}
 		}
+
 		//Datos para la hoja Metas por Jurisdicción
-		$componentesMetasJuris = ComponenteMetaMes::select('idComponente', 'claveJurisdiccion', DB::raw('sum(meta) as sumeta'))
-												->where('idProyecto',$idProyecto)->groupBy('claveJurisdiccion','idComponente')->get();
-
-		$actividadesMetasJuris = ActividadMetaMes::select('idActividad', 'claveJurisdiccion', DB::raw('sum(meta) as sumeta'))
-												->where('idProyecto',$idProyecto)->groupBy('claveJurisdiccion','idActividad')->get();
-
 	 	$recurso['componentesMetasJuris'] = $componentesMetasJuris;
 	 	$recurso['actividadesMetasJuris'] = $actividadesMetasJuris;
 
 	 	//Datos para la hoja Metas Por Mes
-	 	$componentesMetasMes = ComponenteMetaMes::select('idComponente', 'mes', DB::raw('sum(meta) as sumeta'))
-												->where('idProyecto',$idProyecto)->groupBy('mes','idComponente')->get();
-
-		$actividadesMetasMes = ActividadMetaMes::select('idActividad', 'mes', DB::raw('sum(meta) as sumeta'))
-												->where('idProyecto',$idProyecto)->groupBy('mes','idActividad')->get();
-
 		$recurso['componentesMetasMes'] = $componentesMetasMes;
 	 	$recurso['actividadesMetasMes'] = $actividadesMetasMes;
 
 	 	//Arreglamos el arreglo de beneficiarios
 	 	$beneficiarios = array();
-	 	foreach ($recurso['beneficiarios'] as $key => $beneficiario) {
+	 	foreach ($recurso['beneficiariosDescripcion'] as $key => $beneficiario) {
 	 		if(!isset($beneficiarios[$beneficiario->idTipoBeneficiario])){
 				$beneficiarios[$beneficiario->idTipoBeneficiario] = array(
-						'tipo' => $beneficiario->tipo_beneficiario->descripcion,
+						'tipo' => $beneficiario->tipoBeneficiario,
 						'total' => $beneficiario->total,
 						'desglose' => array('f'=>array(),'m'=>array())
 					);
@@ -101,7 +130,13 @@ class ReporteProyectoController extends BaseController {
 	 		$recurso['fibap'] = $fibap->toArray();
 	 	}
 	 	
-		$data = array("data"=> $recurso);
+	 	if(isset($parametros[1])){
+	 		$reporte = $parametros[1];
+	 	}else{
+	 		$reporte = 'caratula';
+	 	}
+
+		$data = array('data' => $recurso, 'reporte' => $reporte);
 
 		//var_dump($recurso->toArray());die();
 
@@ -110,6 +145,25 @@ class ReporteProyectoController extends BaseController {
 		$nombreArchivo = ($recurso->idClasificacionProyecto== 2) ? 'Carátula Proyecto Inversión' : 'Carátula Proyecto Institucional';
 		$nombreArchivo.=' - '.$recurso->ClavePresupuestaria;
 
+		//$pdf = PDF::loadView('expediente.excel.caratula',$data)->setPaper('LEGAL')->setOrientation('landscape')->setWarnings(false);
+		$pdf = PDF::loadView('expediente.excel.caratula-completa',$data);
+
+		if($reporte == 'caratula'){
+			$pdf->setPaper('LEGAL')->setOrientation('landscape')->setWarnings(false);
+		}elseif($reporte == 'fibap'){
+			$pdf->setPaper('LETTER')->setOrientation('portrait')->setWarnings(false);
+		}
+		
+		return $pdf->stream($nombreArchivo.'pdf');
+
+		//return $pdf->download($nombreArchivo.'.pdf');
+		/*
+		Excel::create('archivo_prueba',function($excel) use ($data){
+			$excel->sheet('Programa Institucional',function($sheet){
+				$sheet->loadView('expediente.excel.caratula');
+			});
+		})->export('xls');
+		return;
 		Excel::create($nombreArchivo, function($excel) use ($data){
 
 			if($data['data']->idClasificacionProyecto == 1){
@@ -375,11 +429,9 @@ class ReporteProyectoController extends BaseController {
 			    		$fila++;
 			    	}
 			    });
-
 		    }
-
 		})->export('xls');
-
+		*/
 	}
 
 }
