@@ -75,6 +75,10 @@ class Proyecto extends BaseModel
 					->join('titulares AS jefeInmediato','jefeInmediato.id','=','proyectos.idJefeInmediato')
 					->join('titulares AS jefePlaneacion','jefePlaneacion.id','=','proyectos.idJefePlaneacion')
 					->join('titulares AS coordinadorGrupoEstrategico','coordinadorGrupoEstrategico.id','=','proyectos.idCoordinadorGrupoEstrategico')
+
+					->leftjoin('vistaMunicipios AS municipio','municipio.clave','=','proyectos.claveMunicipio')
+					->leftjoin('vistaRegiones AS region','region.region','=','proyectos.claveRegion')
+
 					->select('proyectos.*',
 
 						DB::raw('concat_ws(" ",unidadResponsable.clave,unidadResponsable.descripcion) AS unidadResponsableDescripcion'),
@@ -93,6 +97,10 @@ class Proyecto extends BaseModel
 						DB::raw('concat_ws(" ",tipoAccion.clave,tipoAccion.descripcion) AS tipoAccionDescripcion'),
 						DB::raw('concat_ws(" ",tipoProyecto.clave,tipoProyecto.descripcion) AS tipoProyectoDescripcion'),
 						DB::raw('concat_ws(" ",cobertura.clave,cobertura.descripcion) AS coberturaDescripcion'),
+
+						'cobertura.clave AS claveCobertura',
+
+						'municipio.nombre AS municipioDescripcion', 'region.nombre AS regionDescripcion',
 
 						'liderProyecto.nombre AS liderProyecto',
 						'jefeInmediato.nombre AS jefeInmediato',

@@ -847,7 +847,9 @@ class ProyectosController extends BaseController {
 					if($jurisdicciones){
 						$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
 					}
-					$recurso['liderProyecto'] = $respuesta['data']['nombre-lider-proyecto'];
+					if(isset($respuesta['data']['nombre-lider-proyecto'])){
+						$recurso['liderProyecto'] = $respuesta['data']['nombre-lider-proyecto'];
+					}
 					$respuesta['data']['data'] = $recurso;
 				}
 			//Guardar Datos del Proyecto
@@ -1177,6 +1179,7 @@ class ProyectosController extends BaseController {
 		  			$recurso->idCoordinadorGrupoEstrategico = $titular->id;
 					if($recurso->idLiderProyecto == NULL){
 						$recurso->idLiderProyecto = $titular->id;
+						$respuesta['data']['nombre-lider-proyecto'] = $titular->nombre;
 					}
 				}else{
 					$recurso->idLiderProyecto = $titular->id;

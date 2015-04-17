@@ -99,6 +99,10 @@ class ProgramaPresupuestarioController extends BaseController {
 				if(Sentry::getUser()->claveProgramaPresupuestario){
 					$rows = $rows->where('claveProgramaPresupuestario','=',Sentry::getUser()->claveProgramaPresupuestario);
 				}
+
+				if(Sentry::getUser()->claveUnidad){
+					$rows = $rows->where('claveUnidadResponsable','=',Sentry::getUser()->claveUnidad);
+				}
 				
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				

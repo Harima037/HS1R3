@@ -1,11 +1,11 @@
 <table class="tabla" width="100%">
 	<tr>
 		<td rowspan="4" class="imagen izquierda">
-			<img src="{{ URL::to('img/EscudoGobiernoChiapas.png') }}">
+			<img src="{{ URL::to('img/EscudoGobiernoChiapas.png') }}" width="150">
 		</td>
 		<td class="titulo" nowrap="nowrap">Secretaría de Planeación, Gestión Pública y Programa de Gobierno</td>
 		<td rowspan="4" class="imagen derecha">
-			<img src="{{ URL::to('img/Marca.png') }}">
+			<img src="{{ URL::to('img/Marca.png') }}" width="150">
 		</td>
 	</tr>
 	<tr>
@@ -30,23 +30,27 @@
 		<td colspan="6" class="dato"><strong>Subcomité:</strong> {{$data['fibap']['subcomite']}}</td>
 		<td colspan="7" class="dato"><strong>Grupo de trabajo:</strong> {{$data['fibap']['grupoTrabajo']}}</td>
 	</tr>
-	<tr><td colspan="18" class="dato"><strong>Programa presupuestario:</strong> {{ $data['datosProgramaPresupuestario']->clave.' '.$data['datosProgramaPresupuestario']->descripcion }}</td></tr>
+	<tr>
+		<td colspan="18" class="dato"><strong>Programa presupuestario:</strong> {{ $data['programaPresupuestarioDescripcion'] }}</td>
+	</tr>
 	<tr><td colspan="18" class="dato"><strong>Proyecto:</strong> {{ $data['nombreTecnico'] }}</td></tr>
 	<?php
 	$cobertura = '';
-	switch ($data['cobertura']->clave) {
+	switch ($data['claveCobertura']) {
 		case 'M':
-			$cobertura = $data['municipio']->nombre;
+			$cobertura = $data['municipioDescripcion'];
 			break;
 		case 'R':
-			$cobertura = $data['region']->descripcion;
+			$cobertura = $data['regionDescripcion'];
 			break;
 		default:
 			$cobertura = 'Chiapas';
 			break;
 	}
 	?>
-	<tr><td colspan="18" class="dato"><strong>Cobertura\municipio:</strong> {{$cobertura}}</td></tr>
+	<tr>
+		<td colspan="18" class="dato"><strong>Cobertura\municipio:</strong> {{$data['coberturaDescripcion']}} \ {{$cobertura}}</td>
+	</tr>
 
 	<tr><td colspan="18" height="5"></td></tr>
 
@@ -62,22 +66,22 @@
 
 	<tr><td colspan="18" align="center" class="encabezado"><strong>ALINEACIÓN A LOS OBJETIVOS DE DESARROLLO DEL MILENIO</strong></td></tr>
 	<tr>
-		<td colspan="5"><strong>Alineación específica:</strong></td>
-		<td colspan="5"></td>
+		<td colspan="8"><strong>Alineación específica:</strong></td>
+		<td colspan="2"></td>
 		<td colspan="8"><strong>Alineación general:</strong></td>
 	</tr>
 	<tr>
-		<td colspan="5" class="dato">{{$data['fibap']['alineacionEspecifica']}}</td>
-		<td colspan="5"></td>
+		<td colspan="8" class="dato">{{$data['fibap']['alineacionEspecifica']}}</td>
+		<td colspan="2"></td>
 		<td colspan="8" class="dato">{{$data['fibap']['alineacionGeneral']}}</td>
 	</tr>
 	<tr><td colspan="18" height="5"></td></tr>
 </table>
 <table class="tabla" width="100%">
 	<tr>
-		<td colspan="13" align="center" class="encabezado"><strong>DOCUMENTACIÓN DE SOPORTE</strong></td>
+		<td width="55%" colspan="13" class="encabezado texto-centro"><strong>DOCUMENTACIÓN DE SOPORTE</strong></td>
 		<td></td>
-		<td colspan="4" align="center" class="encabezado"><strong>BENEFICIARIOS</strong></td>
+		<td width="30%" colspan="4" class="encabezado texto-centro"><strong>BENEFICIARIOS</strong></td>
 	</tr>
 	<tr>
 		<td colspan="2">Estudio de impacto ambiental</td>
@@ -143,7 +147,7 @@
 			@endif
 		</td>
 		<td></td>
-		<td colspan="3">Estudio de riesgi emitido por IPC</td>
+		<td colspan="3">Estudio de riesgo emitido por IPC</td>
 		<td class="dato">
 			@if(in_array(10, array_fetch($data['fibap']['documentos'],'id')))
 				X
@@ -151,9 +155,9 @@
 		</td>
 		<td></td>
 		<td class="dato">$data['tipoBeneficiario']->descripcion</td>
-		<td class="dato">{{ $data['totalBeneficiarios'] }}</td>
-		<td class="dato">{{ $data['totalBeneficiariosF'] }}</td>
-		<td class="dato">{{ $data['totalBeneficiariosM'] }}</td>
+		<td class="dato">{{ number_format($data['totalBeneficiarios']) }}</td>
+		<td class="dato">{{ number_format($data['totalBeneficiariosF']) }}</td>
+		<td class="dato">{{ number_format($data['totalBeneficiariosM']) }}</td>
 	</tr>
 	<tr>
 		<td colspan="2">Principal normatividad (ROP, manual de procedimientos, manual de operación)</td>
@@ -178,6 +182,8 @@
 		</td>
 		<td colspan="5"></td>
 	</tr>
+</table>
+<table class="tabla" width="100%">
 	<tr><td colspan="18" height="5"></td></tr>
 	<tr>
 		<td colspan="9" align="center" class="encabezado">ANTECEDENTES FINANCIEROS</td>
@@ -199,9 +205,9 @@
 	<tr>
 		<td class="dato">{{$antecedente['anio']}}</td>
 		<td></td>
-		<td colspan="3" class="dato">{{$antecedente['autorizado']}}</td>
+		<td colspan="3" class="dato">{{number_format($antecedente['autorizado'])}}</td>
 		<td></td>
-		<td class="dato">{{$antecedente['ejercido']}}</td>
+		<td class="dato">{{number_format($antecedente['ejercido'])}}</td>
 		<td></td>
 		<td class="dato">{{$antecedente['porcentaje']}}</td>
 		<td></td>
@@ -219,21 +225,26 @@
 		<td colspan="7" align="center" class="encabezado">RESULTADOS ESPERADOS</td>
 	</tr>
 	<tr>
-		<td colspan="9" rowspan="2" class="dato">{{$data['fibap']['resultadosObtenidos']}}</td>
+		<td colspan="9" class="dato">{{$data['fibap']['resultadosObtenidos']}}</td>
 		<td></td>
 		<td></td>
-		<td colspan="7" rowspan="2" class="dato">{{$data['fibap']['resultadosEsperados']}}</td>
+		<td colspan="7" class="dato">{{$data['fibap']['resultadosEsperados']}}</td>
 	</tr>
-	<tr>
-		<td></td>
-		<td></td>
-	</tr>
+
+	<tr><td colspan="18" height="5"></td></tr>
+
 	<tr><td colspan="18" align="center" class="encabezado"><strong>JUSTIFICACIÓN DEL PROYECTO</strong></td></tr>
-	<tr><td colspan="18" rowspan="2" class="dato">{{$data['fibap']['justificacionProyecto']}}</td></tr>
-	<tr></tr>
+	<tr><td colspan="18" class="dato">{{$data['fibap']['justificacionProyecto']}}</td></tr>
+
 	<tr><td colspan="18" align="center" class="encabezado"><strong>DESCRIPCIÓN DEL PROYECTO</strong></td></tr>
-	<tr><td colspan="18" class="dato">Objetivo del proyecto: {{$data['fibap']['objetivoProyecto']}}</td></tr>
-	<tr><td colspan="18" align="center" class="encabezado"><strong>PRESUPUESTO REQUERIDO Y PROPUESTA DE FINANCIAMIENTO</strong></td></tr>
+	<tr><td colspan="18" class="dato">{{$data['fibap']['descripcionProyecto']}}</td></tr>
+
+	<tr><td colspan="18" align="center" class="encabezado"><strong>OBJETIVO DEL PROYECTO</strong></td></tr>
+	<tr><td colspan="18" class="dato">{{$data['fibap']['objetivoProyecto']}}</td></tr>
+
+	<tr>
+		<td colspan="18" align="center" class="encabezado"><strong>PRESUPUESTO REQUERIDO Y PROPUESTA DE FINANCIAMIENTO</strong></td>
+	</tr>
 
 	<tr><td colspan="18" height="5"></td></tr>
 
@@ -291,7 +302,7 @@
 		<td>Federal:</td>
 		<td colspan="4" class="dato">
 			@if(($valor = array_search('3', array_fetch($data['fibap']['propuestas_financiamiento'],'idOrigenFinanciamiento')))!== false)
-				{{ $data['fibap']['propuestas_financiamiento'][$valor]['cantidad'] }}
+				{{ number_format($data['fibap']['propuestas_financiamiento'][$valor]['cantidad']) }}
 			@else
 				0
 			@endif
@@ -299,7 +310,7 @@
 		<td colspan="3">Otros:</td>
 		<td colspan="3" class="dato">
 			@if(($valor = array_search('6', array_fetch($data['fibap']['propuestas_financiamiento'],'idOrigenFinanciamiento')))!== false)
-				{{ $data['fibap']['propuestas_financiamiento'][$valor]['cantidad'] }}
+				{{ number_format($data['fibap']['propuestas_financiamiento'][$valor]['cantidad']) }}
 			@else
 				0
 			@endif

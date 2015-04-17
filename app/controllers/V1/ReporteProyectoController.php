@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, View;
-use Excel,PDF, Proyecto, FIBAP, ComponenteMetaMes, ActividadMetaMes;
+use Excel,PDF, Proyecto, FIBAP, ComponenteMetaMes, ActividadMetaMes,DocumentoSoporte;
 
 class ReporteProyectoController extends BaseController {
 
@@ -34,6 +34,8 @@ class ReporteProyectoController extends BaseController {
 		$parametros = explode('|',$id);
 		$idProyecto = $parametros[0];
 		//$idProyecto = $id;
+
+		//return Response::json(Proyecto::contenidoReporte()->find($idProyecto),500);
 
 		$recurso = Proyecto::contenidoReporte()->find($idProyecto);
 		//Datos para la hoja Programa Inversion
@@ -127,6 +129,21 @@ class ReporteProyectoController extends BaseController {
 	 		$fibap = FIBAP::contenidoCompleto()->where('idProyecto',$idProyecto)->first();
 	 		$fibap->distribucion_presupuesto_agrupado->load(array('ObjetoGasto'));
 
+	 		$documentos = DocumentoSoporte::all();
+	 		$documentos_soporte = array();
+	 		foreach ($documentos as $documento) {
+	 			$documentos_soporte[$documento->id] = array(
+	 				'descripcion' => $documento->descripcion,
+	 				'seleccionado' => FALSE
+	 			);
+	 		}
+
+	 		foreach ($fibap->documentos as $documento) {
+	 			$documentos_soporte[$documento->id]['seleccionado'] = TRUE;
+	 		}
+
+	 		$fibap['documentos_soporte'] = $documentos_soporte;
+
 	 		$recurso['fibap'] = $fibap->toArray();
 	 	}
 	 	
@@ -138,6 +155,7 @@ class ReporteProyectoController extends BaseController {
 
 		$data = array('data' => $recurso, 'reporte' => $reporte);
 
+		//return Response::json($recurso,500);
 		//var_dump($recurso->toArray());die();
 
 		//return View::make('expediente.excel.fibap')->with($data);
