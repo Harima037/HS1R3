@@ -13,11 +13,11 @@ class Componente extends BaseModel
 	}
 
 	public function scopeConDescripcion($query){
-		return $query->join('catalogoFormulas AS formula','formula.id','=','proyectoComponentes.idFormula')
-					->join('catalogoDimensionesIndicador AS dimension','dimension.id','=','proyectoComponentes.idDimensionIndicador')
-					->join('catalogoFrecuenciasIndicador AS frecuencia','frecuencia.id','=','proyectoComponentes.idFrecuenciaIndicador')
-					->join('catalogoTiposIndicadores AS tipoIndicador','tipoIndicador.id','=','proyectoComponentes.idTipoIndicador')
-					->join('catalogoUnidadesMedida AS unidadMedida','unidadMedida.id','=','proyectoComponentes.idUnidadMedida')
+		return $query->leftjoin('catalogoFormulas AS formula','formula.id','=','proyectoComponentes.idFormula')
+					->leftjoin('catalogoDimensionesIndicador AS dimension','dimension.id','=','proyectoComponentes.idDimensionIndicador')
+					->leftjoin('catalogoFrecuenciasIndicador AS frecuencia','frecuencia.id','=','proyectoComponentes.idFrecuenciaIndicador')
+					->leftjoin('catalogoTiposIndicadores AS tipoIndicador','tipoIndicador.id','=','proyectoComponentes.idTipoIndicador')
+					->leftjoin('catalogoUnidadesMedida AS unidadMedida','unidadMedida.id','=','proyectoComponentes.idUnidadMedida')
 					->leftjoin('catalogoEntregables AS entregable','entregable.id','=','proyectoComponentes.idEntregable')
     				->leftjoin('catalogoEntregablesTipos AS entregableTipo','entregableTipo.id','=','proyectoComponentes.idEntregableTipo')
     				->leftjoin('catalogoEntregablesAcciones AS entregableAccion','entregableAccion.id','=','proyectoComponentes.idEntregableAccion')

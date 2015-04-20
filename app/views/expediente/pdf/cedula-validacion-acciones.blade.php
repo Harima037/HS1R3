@@ -74,13 +74,19 @@
 		<td class="dato">COBERT/MPIO:</td>
 		<td colspan="2" class="dato">{{$data['coberturaDescripcion']}} \ {{$cobertura}}</td>
 		<td colspan="2" class="dato">LOCALIDAD:</td>
-		<td class="dato">{{'VARIOS'}}</td>
+		<td class="dato">
+			@if(count($data['fibap']['distribucion_localidad'][$accion->id]) > 1)
+				Varios
+			@else
+				{{$data['fibap']['distribucion_localidad'][$accion->id][0]['localidad']}}
+			@endif
+		</td>
 		<td class="dato">TIPO:</td>
 		<td class="dato">{{$data['tipoProyectoDescripcion']}}</td>
 	</tr>
 	<tr>
 		<td class="dato">MODALIDAD:</td>
-		<td class="dato">{{'Administracion'}}</td>
+		<td class="dato">{{$accion->modalidadAccion}}</td>
 		<td class="dato">PERIODO DE EJECUCIÓN:</td>
 		<td colspan="3" class="dato">{{$data['fibap']['periodoEjecucionInicio']}} al {{$data['fibap']['periodoEjecucionFinal']}}</td>
 		<td colspan="2"></td>
@@ -95,8 +101,8 @@
 			@if($origen['indice'] % 2 == 1)
 			<tr>
 			@endif
-				<td class="dato">{{$origen['descripcion']}}:</td>
-				<td class="dato">{{number_format($origen['monto'])}}</td>
+				<td class="dato" width="100">{{$origen['descripcion']}}:</td>
+				<td class="dato">$ {{number_format($origen['monto'])}}</td>
 			@if($origen['indice'] % 2 == 0)
 			</tr>
 			@endif
@@ -104,7 +110,7 @@
 			<tr>
 				<td colspan="2"></td>
 				<td class="dato">COSTO TOTAL:</td>
-				<td class="dato">{{number_format($data['fibap']['origenes_total'][$accion->id])}}</td>
+				<td class="dato">$ {{number_format($data['fibap']['origenes_total'][$accion->id])}}</td>
 			</tr>
 		</table>
 	</div>
@@ -155,17 +161,17 @@
 	<tr>
 		<td class="dato-metas">{{$distribucion['partida']}}</td>
 		<td class="dato-metas">{{$distribucion['descripcion']}}</td>
-		<td class="dato-metas">{{number_format($distribucion['total'])}}</td>
+		<td class="dato-metas">$ {{number_format($distribucion['total'])}}</td>
 		@for($i = 1 ; $i <= 12 ; $i++)
-		<td class="dato-metas">{{(isset($distribucion['desglose'][$i]))?number_format($distribucion['desglose'][$i]):'0'}}</td>
+		<td class="dato-metas">$ {{(isset($distribucion['desglose'][$i]))?number_format($distribucion['desglose'][$i]):'0'}}</td>
 		@endfor
 	</tr>
 	@endforeach
 	<tr>
 		<td class="dato-metas">TOTALES:</td><td class="dato-metas"></td>
-		<td class="dato-metas">{{number_format($data['fibap']['distribucion_partidas_totales'][$accion->id]['total'])}}</td>
+		<td class="dato-metas">$ {{number_format($data['fibap']['distribucion_partidas_totales'][$accion->id]['total'])}}</td>
 		@for($i = 1 ; $i <= 12 ; $i++)
-		<td class="dato-metas">{{(isset($data['fibap']['distribucion_partidas_totales'][$accion->id]['desglose'][$i]))?number_format($data['fibap']['distribucion_partidas_totales'][$accion->id]['desglose'][$i]):'0'}}</td>
+		<td class="dato-metas">$ {{number_format($data['fibap']['distribucion_partidas_totales'][$accion->id]['desglose'][$i])}}</td>
 		@endfor
 	</tr>
 </table>
@@ -189,20 +195,28 @@
 		<td class="encabezado-metas texto-centro">Cantidad</td>
 		<td class="encabezado-metas texto-centro">% MUJ.</td>
 	</tr>
+	@foreach($data['fibap']['distribucion_beneficiarios'][$accion->id] as $index => $beneficiario)
 	<tr>
-		<td class="dato-metas">{{$accion->entregable}}</td>
-		<td class="dato-metas">{{($accion->entregableTipo)?$accion->entregableTipo:'N/A'}}</td>
-		<td class="dato-metas">{{$accion->indicador}}</td>
-		<td class="dato-metas">{{$accion->unidadMedida}}</td>
-		<td class="dato-metas">{{number_format($accion->valorNumerador)}}</td>
-		<td class="dato-metas">{{number_format($accion->numeroTrim1)}}</td>
-		<td class="dato-metas">{{number_format($accion->numeroTrim2)}}</td>
-		<td class="dato-metas">{{number_format($accion->numeroTrim3)}}</td>
-		<td class="dato-metas">{{number_format($accion->numeroTrim4)}}</td>
-		<td class="dato-metas"></td>
-		<td class="dato-metas"></td>
-		<td class="dato-metas"></td>
+		@if($index == 0)
+			<td class="dato-metas">{{$accion->entregable}}</td>
+			<td class="dato-metas">{{($accion->entregableTipo)?$accion->entregableTipo:'N/A'}}</td>
+			<td class="dato-metas">{{$accion->indicador}}</td>
+			<td class="dato-metas">{{$accion->unidadMedida}}</td>
+			<td class="dato-metas">{{number_format($accion->valorNumerador)}}</td>
+			<td class="dato-metas">{{number_format($accion->numeroTrim1)}}</td>
+			<td class="dato-metas">{{number_format($accion->numeroTrim2)}}</td>
+			<td class="dato-metas">{{number_format($accion->numeroTrim3)}}</td>
+			<td class="dato-metas">{{number_format($accion->numeroTrim4)}}</td>
+		@else
+			<td class="dato-metas"></td><td class="dato-metas"></td><td class="dato-metas"></td>
+			<td class="dato-metas"></td><td class="dato-metas"></td><td class="dato-metas"></td>
+			<td class="dato-metas"></td><td class="dato-metas"></td><td class="dato-metas"></td>
+		@endif
+		<td class="dato-metas">{{$beneficiario['descripcion']}}</td>
+		<td class="dato-metas">{{number_format($beneficiario['total'])}}</td>
+		<td class="dato-metas">{{round(($beneficiario['totalF']/$beneficiario['total'])*100,2)}} %</td>
 	</tr>
+	@endforeach
 </table>
 
 <table class="tabla" width="100%">
@@ -227,22 +241,35 @@
 		<td class="encabezado-metas texto-centro">CANTIDAD</td>
 		<td class="encabezado-metas texto-centro">% MUJ.</td>
 	</tr>
-	@foreach($data['fibap']['distribucion_localidad'][$accion->id] as $distribucion)
+	<!--foreach($data['fibap']['distribucion_localidad'][$accion->id] as $distribucion)-->
+	@for($i = 0; $i < $data['fibap']['total_lineas_desglose'][$accion->id] ; $i++)
 	<tr>
-		<td class="dato-metas">{{$distribucion['municipio']}}</td>
-		<td class="dato-metas">{{$distribucion['localidad']}}</td>
-		<td class="dato-metas">$ {{number_format($distribucion['monto'])}}</td>
-		<td class="dato-metas">{{$distribucion['unidad']}}</td>
-		<td class="dato-metas">{{$distribucion['cantidad']}}</td>
-		<td class="dato-metas">{{$distribucion['metas'][1]}}</td>
-		<td class="dato-metas">{{$distribucion['metas'][2]}}</td>
-		<td class="dato-metas">{{$distribucion['metas'][3]}}</td>
-		<td class="dato-metas">{{$distribucion['metas'][4]}}</td>
-		<td class="dato-metas"></td>
-		<td class="dato-metas"></td>
-		<td class="dato-metas"></td>
+		@if(isset($data['fibap']['distribucion_localidad'][$accion->id][$i]))
+			<td class="dato-metas">{{$data['fibap']['distribucion_localidad'][$accion->id][$i]['municipio']}}</td>
+			<td class="dato-metas">{{$data['fibap']['distribucion_localidad'][$accion->id][$i]['localidad']}}</td>
+			<td class="dato-metas">$ {{number_format($data['fibap']['distribucion_localidad'][$accion->id][$i]['monto'])}}</td>
+			<td class="dato-metas">{{$data['fibap']['distribucion_localidad'][$accion->id][$i]['unidad']}}</td>
+			<td class="dato-metas">{{number_format($data['fibap']['distribucion_localidad'][$accion->id][$i]['cantidad'])}}</td>
+			<td class="dato-metas">{{number_format($data['fibap']['distribucion_localidad'][$accion->id][$i]['metas'][1])}}</td>
+			<td class="dato-metas">{{number_format($data['fibap']['distribucion_localidad'][$accion->id][$i]['metas'][2])}}</td>
+			<td class="dato-metas">{{number_format($data['fibap']['distribucion_localidad'][$accion->id][$i]['metas'][3])}}</td>
+			<td class="dato-metas">{{number_format($data['fibap']['distribucion_localidad'][$accion->id][$i]['metas'][4])}}</td>
+		@else
+			<td class="dato-metas"></td><td class="dato-metas"></td><td class="dato-metas"></td>
+			<td class="dato-metas"></td><td class="dato-metas"></td><td class="dato-metas"></td>
+			<td class="dato-metas"></td><td class="dato-metas"></td><td class="dato-metas"></td>
+		@endif
+
+		@if(isset($data['fibap']['distribucion_beneficiarios'][$accion->id][$i]))
+			<td class="dato-metas">{{$data['fibap']['distribucion_beneficiarios'][$accion->id][$i]['descripcion']}}</td>
+			<td class="dato-metas">{{number_format($data['fibap']['distribucion_beneficiarios'][$accion->id][$i]['total'])}}</td>
+			<td class="dato-metas">{{round(($data['fibap']['distribucion_beneficiarios'][$accion->id][$i]['totalF']/$data['fibap']['distribucion_beneficiarios'][$accion->id][$i]['total'])*100,2)}} %</td>
+		@else
+			<td class="dato-metas"></td><td class="dato-metas"></td><td class="dato-metas"></td>
+		@endif
 	</tr>
-	@endforeach
+	@endfor
+	<!--endforeach-->
 </table>
 
 <table class="tabla" width="100%">

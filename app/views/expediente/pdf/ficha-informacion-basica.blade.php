@@ -157,11 +157,11 @@
 	<tr>
 		<td class="dato">{{$antecedente['anio']}}</td>
 		<td></td>
-		<td colspan="3" class="dato">{{number_format($antecedente['autorizado'])}}</td>
+		<td colspan="3" class="dato">$ {{number_format($antecedente['autorizado'])}}</td>
 		<td></td>
-		<td class="dato">{{number_format($antecedente['ejercido'])}}</td>
+		<td class="dato">$ {{number_format($antecedente['ejercido'])}}</td>
 		<td></td>
-		<td class="dato">{{$antecedente['porcentaje']}}</td>
+		<td class="dato">{{$antecedente['porcentaje']}} %</td>
 		<td></td>
 		<td></td>
 		<td colspan="7" class="dato">{{$antecedente['fechaCorte']}}</td>
@@ -203,11 +203,11 @@
 
 	<tr>
 		<td nowrap="nowrap">Presupuesto requerido:</td>
-		<td colspan="3" class="dato">{{number_format($data['fibap']['presupuestoRequerido'])}}</td>
+		<td colspan="3" class="dato">$ {{number_format($data['fibap']['presupuestoRequerido'])}}</td>
 		<td></td>
 		<td></td>
 		<td  width="60">Estatal:</td>
-		<td colspan="4" class="dato" width="60">
+		<td colspan="4" class="dato" width="60">$ 
 			@if(($valor = array_search('1', array_fetch($data['fibap']['propuestas_financiamiento'],'idOrigenFinanciamiento')))!== false)
 				{{ number_format($data['fibap']['propuestas_financiamiento'][$valor]['cantidad']) }}
 			@else
@@ -216,7 +216,7 @@
 		</td>
 		<td></td>
 		<td colspan="3" width="60">Beneficiarios:</td>
-		<td colspan="3" class="dato"  width="60">
+		<td colspan="3" class="dato"  width="60">$ 
 			@if(($valor = array_search('4', array_fetch($data['fibap']['propuestas_financiamiento'],'idOrigenFinanciamiento')))!== false)
 				{{ number_format($data['fibap']['propuestas_financiamiento'][$valor]['cantidad']) }}
 			@else
@@ -230,7 +230,7 @@
 		<td></td>
 		<td>Origen:</td>
 		<td>Municipal:</td>
-		<td colspan="4" class="dato">
+		<td colspan="4" class="dato">$ 
 			@if(($valor = array_search('2', array_fetch($data['fibap']['propuestas_financiamiento'],'idOrigenFinanciamiento')))!== false)
 				{{ number_format($data['fibap']['propuestas_financiamiento'][$valor]['cantidad']) }}
 			@else
@@ -239,7 +239,7 @@
 		</td>
 		<td></td>
 		<td colspan="3">Crédito:</td>
-		<td colspan="3" class="dato">
+		<td colspan="3" class="dato">$ 
 			@if(($valor = array_search('5', array_fetch($data['fibap']['propuestas_financiamiento'],'idOrigenFinanciamiento')))!== false)
 				{{ number_format($data['fibap']['propuestas_financiamiento'][$valor]['cantidad']) }}
 			@else
@@ -255,7 +255,7 @@
 		<td></td>
 		<td></td>
 		<td>Federal:</td>
-		<td colspan="4" class="dato">
+		<td colspan="4" class="dato">$ 
 			@if(($valor = array_search('3', array_fetch($data['fibap']['propuestas_financiamiento'],'idOrigenFinanciamiento')))!== false)
 				{{ number_format($data['fibap']['propuestas_financiamiento'][$valor]['cantidad']) }}
 			@else
@@ -264,7 +264,7 @@
 		</td>
 		<td></td>
 		<td colspan="3">Otros:</td>
-		<td colspan="3" class="dato">
+		<td colspan="3" class="dato">$ 
 			@if(($valor = array_search('6', array_fetch($data['fibap']['propuestas_financiamiento'],'idOrigenFinanciamiento')))!== false)
 				{{ number_format($data['fibap']['propuestas_financiamiento'][$valor]['cantidad']) }}
 			@else
@@ -294,9 +294,9 @@
 		<td colspan="5" class="dato">{{$distribucion['objeto_gasto']['clave']}}</td>
 		<td></td>
 		<td colspan="5" class="dato">{{$distribucion['objeto_gasto']['descripcion']}}</td>
-		<td colspan="4" class="dato">{{number_format($distribucion['cantidad'])}}</td>
+		<td colspan="4" class="dato">$ {{number_format($distribucion['cantidad'])}}</td>
 		<td></td>
-		<td class="dato">{{ number_format( $distribucion['cantidad']/$data['fibap']['presupuestoRequerido'] * 100, 2 ) }}</td>
+		<td class="dato">{{ number_format( $distribucion['cantidad']/$data['fibap']['presupuestoRequerido'] * 100, 2 ) }} %</td>
 		<td></td>
 	</tr>
 	@endforeach

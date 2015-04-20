@@ -8,30 +8,51 @@ class Programa extends BaseModel
 	protected $table = "programa";
 
 	public function scopeContenidoDetalle($query){
-		$query->select('programa.*','programaPresupuestal.descripcion as programaPresupuestario','unidadResponsable.descripcion AS unidadResponsable','ODM.clave AS claveODM','ODM.descripcion AS ODM','Modalidad.clave AS claveModalidad', 'Modalidad.descripcion AS Modalidad', 'Sectorial.clave AS claveSectorial', 'Sectorial.descripcion AS sectorial', 'objetivosPED.descripcion AS objetivoPED', 'objetivosPND.descripcion AS objetivoPND')
-		      ->join('catalogoProgramasPresupuestales AS programaPresupuestal','programaPresupuestal.clave','=','programa.claveProgramaPresupuestario')
-			  ->join('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','programa.claveUnidadResponsable')
-			  ->join('catalogoODM as ODM','ODM.id','=','programa.idOdm')
-			  ->join('catalogoModalidad as Modalidad','Modalidad.id','=','programa.idModalidad')
-			  ->join('catalogoProgramasSectoriales as Sectorial','Sectorial.clave','=','programa.claveProgramaSectorial')
-			  ->join('catalogoObjetivosPED as objetivosPED','objetivosPED.id','=','programa.idObjetivoPED')
-			  ->join('catalogoObjetivosPND as objetivosPND','objetivosPND.id','=','programa.idObjetivoPND');
+		$query->select('programa.*',
+			DB::raw('concat_ws(" ",programaPresupuestal.clave,programaPresupuestal.descripcion) as programaPresupuestarioDescripcion'),
+			DB::raw('concat_ws(" ",programa.claveUnidadResponsable,unidadResponsable.descripcion) AS unidadResponsable'),
+			DB::raw('concat_ws(" ",ODM.clave,ODM.descripcion) AS ODM'),
+			'modalidad.clave AS claveModalidad', 'modalidad.descripcion AS modalidad', 
+			DB::raw('concat_ws(" ",sectorial.clave,sectorial.descripcion) AS programaSectorial'),
+			DB::raw('concat_ws(" ",objetivosPED.clave,objetivosPED.descripcion) AS objetivoPED'),
+
+			DB::raw('concat_ws(" ",eje.clave,eje.descripcion) AS eje'),
+			DB::raw('concat_ws(" ",tema.clave,tema.descripcion) AS tema'),
+			DB::raw('concat_ws(" ",politicaPublica.clave,politicaPublica.descripcion) AS politicaPublica'),
+
+			DB::raw('concat_ws(" ",objetivosPND.clave,objetivosPND.descripcion) AS objetivoPND'),
+			'titular.nombre AS liderPrograma','titular.email AS liderCorreo','titular.telefono AS liderTelefono')
+				->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestal','programaPresupuestal.clave','=','programa.claveProgramaPresupuestario')
+				->leftjoin('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','programa.claveUnidadResponsable')
+				->leftjoin('catalogoODM as ODM','ODM.id','=','programa.idOdm')
+				->leftjoin('catalogoModalidad as modalidad','modalidad.id','=','programa.idModalidad')
+				->leftjoin('catalogoProgramasSectoriales as sectorial','sectorial.clave','=','programa.claveProgramaSectorial')
+				->leftjoin('catalogoObjetivosPED as objetivosPED','objetivosPED.id','=','programa.idObjetivoPED')
+				->leftjoin('catalogoObjetivosPED AS eje','eje.clave','=',DB::raw('SUBSTRING(objetivosPED.clave,1,2)'))
+				->leftjoin('catalogoObjetivosPED AS tema','tema.clave','=',DB::raw('SUBSTRING(objetivosPED.clave,1,4)'))
+				->leftjoin('catalogoObjetivosPED AS politicaPublica','politicaPublica.clave','=',DB::raw('SUBSTRING(objetivosPED.clave,1,6)'))
+				->leftjoin('catalogoObjetivosPND as objetivosPND','objetivosPND.id','=','programa.idObjetivoPND')
+				->leftjoin('titulares As titular','titular.id','=','programa.idLiderPrograma');
 	}
 
 	public function programaPresupuestario(){
 		return $this->belongsTo('ProgramaPresupuestario','claveProgramaPresupuestario','clave');
 	}
 
-	public function arbolProblema(){
+	public function arbolProblemas(){
 		return $this->hasMany('ProgramaArbolProblema','idPrograma');
 	}
 
-	public function arbolObjetivo(){
+	public function arbolObjetivos(){
 		return $this->hasMany('ProgramaArbolObjetivo','idPrograma');
 	}
 
 	public function indicadores(){
 		return $this->hasMany('ProgramaIndicador','idPrograma');
+	}
+
+	public function indicadoresDescripcion(){
+		return $this->hasMany('ProgramaIndicador','idPrograma')->contenidoDetalle();
 	}
 
 	public function registroAvance(){

@@ -79,27 +79,32 @@
 
 	@if($reporte == 'caratula')
 
-		{{View::make('expediente.excel.caratula',array('data'=>$data))}}
+		@if($data['programaPresupuestarioAsignado'])
+			{{View::make('expediente.pdf.programa-presupuestario',array('data'=>$data))}}
+			<div style="page-break-after:always;"></div>
+		@endif
+
+		{{View::make('expediente.pdf.caratula',array('data'=>$data))}}
 
 		<div style="page-break-after:always;"></div>
 
-		{{View::make('expediente.excel.anexo-metas-jurisdiccion',array('data'=>$data))}}
+		{{View::make('expediente.pdf.anexo-metas-jurisdiccion',array('data'=>$data))}}
 
 		<div style="page-break-after:always;"></div>
 
-		{{View::make('expediente.excel.anexo-metas-mes',array('data'=>$data))}}
+		{{View::make('expediente.pdf.anexo-metas-mes',array('data'=>$data))}}
 
 	@endif
 
 	@if($reporte == 'fibap')
 
-		{{View::make('expediente.excel.ficha-informacion-basica',array('data'=>$data))}}
+		{{View::make('expediente.pdf.ficha-informacion-basica',array('data'=>$data))}}
 
 	@endif
 
 	@if($reporte == 'cedula')
 
-		{{View::make('expediente.excel.cedula-validacion-acciones',array('data'=>$data))}}
+		{{View::make('expediente.pdf.cedula-validacion-acciones',array('data'=>$data))}}
 
 	@endif
 

@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, View;
-use Excel,PDF, Proyecto, FIBAP, ComponenteMetaMes, ActividadMetaMes,DocumentoSoporte,OrigenFinanciamiento;
+use Excel,PDF, Proyecto, FIBAP, ComponenteMetaMes, ActividadMetaMes,DocumentoSoporte,OrigenFinanciamiento, Programa;
 
 class ReporteProyectoController extends BaseController {
 
@@ -31,6 +31,8 @@ class ReporteProyectoController extends BaseController {
 	 */
 	public function show($id)
 	{
+		try{
+
 		$parametros = explode('|',$id);
 		$idProyecto = $parametros[0];
 
@@ -86,6 +88,22 @@ class ReporteProyectoController extends BaseController {
 					}
 				}
 			}
+
+			if($recurso->idClasificacionProyecto == 1){
+				$programa = Programa::with('arbolProblemas','arbolObjetivos','indicadoresDescripcion')->contenidoDetalle()->where('claveProgramaPresupuestario','=',$recurso->programaPresupuestario)
+									->whereIn('idEstatus',array(4,5))->first();
+				//$queries = DB::getQueryLog();
+				//$data['query'] = print_r(end($queries),true);
+				//return Response::json(end($queries),500);
+				if($programa){
+					$recurso['programaPresupuestarioAsignado'] = $programa;
+				}else{
+					$recurso['programaPresupuestarioAsignado'] = FALSE;
+				}
+			}else{
+				$recurso['programaPresupuestarioAsignado'] = FALSE;
+			}
+
 			//Datos para la hoja Metas por Jurisdicción
 		 	$recurso['componentesMetasJuris'] = $componentesMetasJuris;
 		 	$recurso['actividadesMetasJuris'] = $actividadesMetasJuris;
@@ -155,6 +173,7 @@ class ReporteProyectoController extends BaseController {
 	 			$distribucion_partidas_totales = array();
 	 			$distribucion_beneficiarios = array();
 	 			$distribucion_localidad = array();
+	 			$total_lineas_desglose = array();
 	 			foreach ($fibap->accionesCompletasDescripcion as $accion) {
 	 				$origenes_financiamiento[$accion->id] = array();
 	 				$origenes_total[$accion->id] = 0;
@@ -172,8 +191,6 @@ class ReporteProyectoController extends BaseController {
 		 				$origenes_financiamiento[$accion->id][$propuesta->idOrigenFinanciamiento]['monto'] = $propuesta->cantidad;
 		 				$origenes_total[$accion->id] += $propuesta->cantidad;
 		 			}
-
-
 
 	 				if(!isset($distribucion_partidas[$accion->id])){
 	 					$distribucion_partidas[$accion->id] = array();
@@ -198,8 +215,22 @@ class ReporteProyectoController extends BaseController {
 		 			}
 		 			if(!isset($distribucion_localidad[$accion->id])){
 		 				$distribucion_localidad[$accion->id] = array();
+		 				$distribucion_beneficiarios[$accion->id] = array();
+		 				$beneficiarios_acumulado = array();
 		 			}
 		 			foreach ($accion->desglosePresupuestoCompleto as $desglose) {
+		 				foreach ($desglose->beneficiariosDescripcion as $beneficiario) {
+		 					if(!isset($beneficiarios_acumulado[$beneficiario->idTipoBeneficiario])){
+		 						$beneficiarios_acumulado[$beneficiario->idTipoBeneficiario] = array(
+		 							'descripcion' => $beneficiario->tipoBeneficiario,
+		 							'totalF' => 0,
+		 							'total' => 0
+		 						);
+		 					}
+		 					$beneficiarios_acumulado[$beneficiario->idTipoBeneficiario]['totalF'] += $beneficiario->totalF;
+		 					$beneficiarios_acumulado[$beneficiario->idTipoBeneficiario]['total'] += ($beneficiario->totalM + $beneficiario->totalF);
+		 				}
+
 		 				$metas = array( 1 => 0, 2 => 0, 3 => 0, 4 => 0 );
 		 				foreach ($desglose->metasMes as $meta_mes) {
 		 					$trimestre = ceil($meta_mes->mes / 3);
@@ -214,9 +245,21 @@ class ReporteProyectoController extends BaseController {
 		 					'metas' => $metas
 		 				);
 		 			}
+		 			foreach ($beneficiarios_acumulado as $beneficiario) {
+		 				$distribucion_beneficiarios[$accion->id][] = $beneficiario;
+		 			}
+
+		 			if(count($distribucion_localidad[$accion->id]) > count($distribucion_beneficiarios[$accion->id])){
+		 				$total_lineas_desglose[$accion->id] = count($distribucion_localidad[$accion->id]);
+		 			}else{
+		 				$total_lineas_desglose[$accion->id] = count($distribucion_beneficiarios[$accion->id]);
+		 			}
 	 			}
+
+	 			$fibap['total_lineas_desglose'] = $total_lineas_desglose;
 	 			$fibap['origenes_financiamiento'] = $origenes_financiamiento;
 				$fibap['origenes_total'] = $origenes_total;
+				$fibap['distribucion_beneficiarios'] = $distribucion_beneficiarios;
 	 			$fibap['distribucion_localidad'] = $distribucion_localidad;
 	 			$fibap['distribucion_partidas'] = $distribucion_partidas;
 	 			$fibap['distribucion_partidas_totales'] = $distribucion_partidas_totales;
@@ -238,8 +281,8 @@ class ReporteProyectoController extends BaseController {
 		$nombreArchivo.=' - '.$recurso->ClavePresupuestaria;
 
 		//$pdf = PDF::loadView('expediente.excel.caratula',$data)->setPaper('LEGAL')->setOrientation('landscape')->setWarnings(false);
-		$pdf = PDF::loadView('expediente.excel.caratula-completa',$data);
-
+		
+		$pdf = PDF::loadView('expediente.pdf.caratula-completa',$data);
 		if($reporte == 'caratula' || $reporte == 'cedula'){
 			$pdf->setPaper('LEGAL')->setOrientation('landscape')->setWarnings(false);
 		}elseif($reporte == 'fibap'){
@@ -247,6 +290,12 @@ class ReporteProyectoController extends BaseController {
 		}
 		
 		return $pdf->stream($nombreArchivo.'pdf');
+
+
+		}catch(\Exception $e){
+			return Response::json($e,500);
+		}
+		
 
 		//return $pdf->download($nombreArchivo.'.pdf');
 		/*

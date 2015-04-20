@@ -12,11 +12,11 @@ class Actividad extends BaseModel
 	}
 
 	public function scopeConDescripcion($query){
-		return $query->join('catalogoFormulas AS formula','formula.id','=','componenteActividades.idFormula')
-					->join('catalogoDimensionesIndicador AS dimension','dimension.id','=','componenteActividades.idDimensionIndicador')
-					->join('catalogoFrecuenciasIndicador AS frecuencia','frecuencia.id','=','componenteActividades.idFrecuenciaIndicador')
-					->join('catalogoTiposIndicadores AS tipoIndicador','tipoIndicador.id','=','componenteActividades.idTipoIndicador')
-					->join('catalogoUnidadesMedida AS unidadMedida','unidadMedida.id','=','componenteActividades.idUnidadMedida')
+		return $query->leftjoin('catalogoFormulas AS formula','formula.id','=','componenteActividades.idFormula')
+					->leftjoin('catalogoDimensionesIndicador AS dimension','dimension.id','=','componenteActividades.idDimensionIndicador')
+					->leftjoin('catalogoFrecuenciasIndicador AS frecuencia','frecuencia.id','=','componenteActividades.idFrecuenciaIndicador')
+					->leftjoin('catalogoTiposIndicadores AS tipoIndicador','tipoIndicador.id','=','componenteActividades.idTipoIndicador')
+					->leftjoin('catalogoUnidadesMedida AS unidadMedida','unidadMedida.id','=','componenteActividades.idUnidadMedida')
     				->select('componenteActividades.*','formula.descripcion AS formula','dimension.descripcion AS dimension',
     					'frecuencia.descripcion AS frecuencia','tipoIndicador.descripcion AS tipoIndicador',
     					'unidadMedida.descripcion AS unidadMedida');

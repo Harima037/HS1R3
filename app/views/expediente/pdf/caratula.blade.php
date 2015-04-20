@@ -459,8 +459,8 @@
 </table>
 @endforeach <!--Actividades-->
 @endforeach	<!--Componentes-->
-
-<table class="table" width="100%">
+<table class="tabla" width="100%"><tr><td></td></tr></table>
+<table class="tabla" width="100%" style="page-break-inside: avoid;">
 	<tr><td height="15" colspan="5"></td></tr>
 	<tr>
 		<td width="10%"></td>

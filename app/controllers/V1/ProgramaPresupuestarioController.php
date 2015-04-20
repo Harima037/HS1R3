@@ -4,7 +4,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
-use Programa, ProgramaArbolProblema, ProgramaArbolObjetivo, ProgramaIndicador;
+use Programa, ProgramaArbolProblema, ProgramaArbolObjetivo, ProgramaIndicador,Titular;
 
 class ProgramaPresupuestarioController extends BaseController {
 	private $reglasPrograma = array(
@@ -246,6 +246,9 @@ class ProgramaPresupuestarioController extends BaseController {
 					$recurso->cuantificacionEnfoqueObjetivo = $parametros['cuantificacion-objetivo'];
 					$recurso->justificacionPrograma = $parametros['justificacion-programa'];
 
+					$titular = Titular::where('claveUnidad','=',$parametros['unidad-responsable'])->first();
+					$recurso->idLiderPrograma = $titular->id;
+
 					if($recurso->save()){
 						$respuesta['data'] = $recurso;
 					}else{
@@ -460,6 +463,9 @@ class ProgramaPresupuestarioController extends BaseController {
 					$recurso->cuantificacionEnfoquePotencial = $parametros['cuantificacion-potencial'];
 					$recurso->cuantificacionEnfoqueObjetivo = $parametros['cuantificacion-objetivo'];
 					$recurso->justificacionPrograma = $parametros['justificacion-programa'];
+
+					$titular = Titular::where('claveUnidad','=',$parametros['unidad-responsable'])->first();
+					$recurso->idLiderPrograma = $titular->id;
 
 					if($recurso->save()){
 						$respuesta['data'] = $recurso;
