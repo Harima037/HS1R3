@@ -9,9 +9,11 @@
             margin-right: 0.6em;
             margin-bottom: 0.3em;
         }
-
+        .misma-linea{
+        	display: inline-block;
+        }
 		.cuerpo{
-			font-size: 10pt;
+			font-size: 8pt;
 			font-family: Arial, Calibri;
 		}
 		.encabezado{
@@ -41,6 +43,15 @@
 		}
 		.texto-centro{
 			text-align: center;
+		}
+		.texto-derecha{
+			text-align: right;
+		}
+		.texto-izquierda{
+			text-align: left;
+		}
+		.texto-medio{
+			vertical-align: middle;
 		}
 		.firma{
 			border-bottom:1px solid #000000;
@@ -83,6 +94,12 @@
 	@if($reporte == 'fibap')
 
 		{{View::make('expediente.excel.ficha-informacion-basica',array('data'=>$data))}}
+
+	@endif
+
+	@if($reporte == 'cedula')
+
+		{{View::make('expediente.excel.cedula-validacion-acciones',array('data'=>$data))}}
 
 	@endif
 

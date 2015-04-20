@@ -10,4 +10,9 @@ class DesgloseBeneficiario extends BaseModel
 	public function tipoBeneficiario(){
 		return $this->belongsTo('TipoBeneficiario','idTipoBeneficiario');
 	}
+
+	public function scopeConDescripcion($query){
+		return $query->select('desgloseBeneficiarios.*','tipoBeneficiario.descripcion AS tipoBeneficiario')
+				->join('catalogoTiposBeneficiarios AS tipoBeneficiario','tipoBeneficiario.id','=','desgloseBeneficiarios.idTipoBeneficiario');
+	}
 }

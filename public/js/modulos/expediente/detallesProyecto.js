@@ -107,9 +107,16 @@ context.mostrar_datos = function(datos){
         var parametros = datos.id + '|' + 'caratula';
         window.open(SERVER_HOST+'/v1/reporteProyecto/'+parametros);
     });
+
     $('#btn-reporte-fibap').off('click');
     $('#btn-reporte-fibap').on('click',function(){
         var parametros = datos.id + '|' + 'fibap';
+        window.open(SERVER_HOST+'/v1/reporteProyecto/'+parametros);
+    });
+
+    $('#btn-cedula-validacion').off('click');
+    $('#btn-cedula-validacion').on('click',function(){
+        var parametros = datos.id + '|' + 'cedula';
         window.open(SERVER_HOST+'/v1/reporteProyecto/'+parametros);
     });
 

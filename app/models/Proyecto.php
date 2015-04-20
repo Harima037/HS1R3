@@ -52,8 +52,7 @@ class Proyecto extends BaseModel
 	}
 
 	public function scopeContenidoReporte($query){
-		return $query->with('componentesCompletoDescripcion.metasMes','beneficiariosDescripcion')
-					->join('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','proyectos.unidadResponsable')
+		return $query->join('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','proyectos.unidadResponsable')
 					->join('catalogoFuncionesGasto AS finalidad','finalidad.clave','=','proyectos.finalidad')
 					->join('catalogoFuncionesGasto AS funcion','funcion.clave','=',DB::raw('concat_ws(".",proyectos.finalidad,proyectos.funcion)'))
 					->join('catalogoFuncionesGasto AS subFuncion','subFuncion.clave','=',DB::raw('concat_ws(".",proyectos.finalidad,proyectos.funcion,proyectos.subFuncion)'))
@@ -131,7 +130,7 @@ class Proyecto extends BaseModel
 	public function componentesCompletoDescripcion(){
 		return $this->hasMany('Componente','idProyecto')->conDescripcion()->with('desgloseCompleto','actividadesDescripcion.metasMes');
 	}
-
+	
 	public function componentesDescripcion(){
 		return $this->hasMany('Componente','idProyecto')->conDescripcion()->with('actividadesDescripcion.metasMes');
 	}

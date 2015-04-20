@@ -329,6 +329,7 @@
                         <ul class="dropdown-menu" role="menu">
                             <li><a href="#" id="btn-reporte-caratula-proyecto">Caratula Proyecto</a></li>
                             <li><a href="#" id="btn-reporte-fibap">FIBAP</a></li>
+                            <li><a href="#" id="btn-cedula-validacion">Cedula de Validación</a></li>
                         </ul>
                     </div>
                     <!--button type="button" class="btn btn-success" id="btn-exportar-excel">

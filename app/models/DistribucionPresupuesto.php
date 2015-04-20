@@ -29,8 +29,8 @@ class DistribucionPresupuesto extends BaseModel
 
     public function scopeAgruparMesCompleto($query){
         $query->select('fibapDistribucionPresupuesto.id','idFibap','idAccion','mes',
-            'idObjetoGasto','objetosGasto.descripcion AS objetoGasto'
-            ,DB::raw('sum(cantidad) AS cantidad'))
+            'idObjetoGasto','objetosGasto.descripcion AS objetoGastoDescripcion','objetosGasto.clave AS partida',
+            DB::raw('sum(cantidad) AS cantidad'))
                 ->leftjoin('catalogoObjetosGasto AS objetosGasto','objetosGasto.id','=','idObjetoGasto')
                 ->groupBy('idObjetoGasto','mes');
     }

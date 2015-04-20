@@ -77,112 +77,64 @@
 	</tr>
 	<tr><td colspan="18" height="5"></td></tr>
 </table>
-<table class="tabla" width="100%">
-	<tr>
-		<td width="55%" colspan="13" class="encabezado texto-centro"><strong>DOCUMENTACIÓN DE SOPORTE</strong></td>
-		<td></td>
-		<td width="30%" colspan="4" class="encabezado texto-centro"><strong>BENEFICIARIOS</strong></td>
-	</tr>
-	<tr>
-		<td colspan="2">Estudio de impacto ambiental</td>
-		<td class="dato">
-			@if(in_array(1, array_fetch($data['fibap']['documentos'],'id')))
-				X
+<div>
+	<div style="width:53%; display:inline-block;">
+		<table class="tabla" width="100%">
+			<tr>
+				<th colspan="8" class="encabezado texto-centro">DOCUMENTACIÓN DE SOPORTE</th>
+			</tr>
+			@for ($i = 0; $i < count($data['fibap']['documentos_soporte'])  ; $i++)
+				@if($i == 0)
+				<tr>
+				@endif
+					<td>{{$data['fibap']['documentos_soporte'][$i]['descripcion']}}</td>
+					<td class="dato-metas">{{($data['fibap']['documentos_soporte'][$i]['seleccionado'])?'X':''}}</td>
+					@if((($i + 1) % 3) != 0)
+					<td></td>
+					@endif
+				@if((($i+1) % 3) === 0)
+				</tr>
+				@endif
+				{{( $i < count($data['fibap']['documentos_soporte']) && (($i+1) % 3) === 0 )?'<tr>':''}}
+			@endfor
+			<!-- Para complementar las tr que queden sin cerrar -->
+			@if(count($data['fibap']['documentos_soporte']) % 3 !== 0)
+				@for($i = (count($data['fibap']['documentos_soporte']) % 3) + 1 ; $i <= 3 ; $i++)
+					<td></td>
+					<td></td>
+					@if($i < 3)
+					<td></td>
+					@endif
+				@endfor
+				{{'</tr>'}}
 			@endif
-		</td>
-		<td></td>
-		<td colspan="3">Convenio o acuerdo</td>
-		<td class="dato">
-			@if(in_array(5, array_fetch($data['fibap']['documentos'],'id')))
-				X
-			@endif
-		</td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td class="dato-metas texto-centro" rowspan="2" valign="middle">Tipo</td>
-		<td class="dato-metas texto-centro" rowspan="2" valign="middle">Cantidad total</td>
-		<td class="dato-metas texto-centro" colspan="2">GENERO</td>
-	</tr>
-	<tr>
-		<td colspan="2">Aceptación de la comunidad</td>
-		<td class="dato">
-			@if(in_array(2, array_fetch($data['fibap']['documentos'],'id')))
-				X
-			@endif
-		</td>
-		<td></td>
-		<td colspan="3">Factibilidad de uso de suelo</td>
-		<td class="dato">
-			@if(in_array(6, array_fetch($data['fibap']['documentos'],'id')))
-				X
-			@endif
-		</td>
-		<td></td>
-		<td colspan="3">Acta de validación sectorial</td>
-		<td class="dato">
-			@if(in_array(9, array_fetch($data['fibap']['documentos'],'id')))
-				X
-			@endif
-		</td>
-		<td></td>
-		<td class="dato-metas">Femenino</td>
-		<td class="dato-metas">Masculino</td>
-	</tr>
-	<tr>
-		<td colspan="2">Estudio técnico y economico</td>
-		<td class="dato">
-			@if(in_array(3, array_fetch($data['fibap']['documentos'],'id')))
-				X
-			@endif
-		</td>
-		<td></td>
-		<td colspan="3">Proyecto ejecutivo</td>
-		<td class="dato">
-			@if(in_array(7, array_fetch($data['fibap']['documentos'],'id')))
-				X
-			@endif
-		</td>
-		<td></td>
-		<td colspan="3">Estudio de riesgo emitido por IPC</td>
-		<td class="dato">
-			@if(in_array(10, array_fetch($data['fibap']['documentos'],'id')))
-				X
-			@endif
-		</td>
-		<td></td>
-		<td class="dato">$data['tipoBeneficiario']->descripcion</td>
-		<td class="dato">{{ number_format($data['totalBeneficiarios']) }}</td>
-		<td class="dato">{{ number_format($data['totalBeneficiariosF']) }}</td>
-		<td class="dato">{{ number_format($data['totalBeneficiariosM']) }}</td>
-	</tr>
-	<tr>
-		<td colspan="2">Principal normatividad (ROP, manual de procedimientos, manual de operación)</td>
-		<td class="dato">
-			@if(in_array(4, array_fetch($data['fibap']['documentos'],'id')))
-				X
-			@endif
-		</td>
-		<td></td>
-		<td colspan="3">Certificado de propiedad del terreno</td>
-		<td class="dato">
-			@if(in_array(8, array_fetch($data['fibap']['documentos'],'id')))
-				X
-			@endif
-		</td>
-		<td></td>
-		<td colspan="3">Acta de validación de COPLADER y CPR.</td>
-		<td class="dato">
-			@if(in_array(11, array_fetch($data['fibap']['documentos'],'id')))
-				X
-			@endif
-		</td>
-		<td colspan="5"></td>
-	</tr>
-</table>
+		</table>
+	</div>
+	<div style="width:45%; position:absolute; right:0;">
+		<table class="tabla" width="100%">
+			<tr>
+				<th colspan="4" class="encabezado texto-centro">BENEFICIARIOS</th>
+			</tr>
+			<tr>
+				<td class="dato-metas texto-centro" rowspan="2" valign="middle">Tipo</td>
+				<td class="dato-metas texto-centro" rowspan="2" valign="middle">Cantidad total</td>
+				<td class="dato-metas texto-centro" colspan="2">GENERO</td>
+			</tr>
+			<tr>
+				<td class="dato-metas">Femenino</td>
+				<td class="dato-metas">Masculino</td>
+			</tr>
+			@foreach ($data['beneficiarios'] as $key => $beneficiario)
+			<tr>
+				<td class="dato" valign="middle">{{ $beneficiario['tipo'] }}</td>
+				<td class="dato" valign="middle">{{ number_format($beneficiario['total']) }}</td>
+				<td class="dato">{{ (isset($beneficiario['desglose']['f']['total']))? number_format($beneficiario['desglose']['f']['total']) : 0 }}</td>
+				<td class="dato">{{ (isset($beneficiario['desglose']['m']['total']))? number_format($beneficiario['desglose']['m']['total']) : 0 }}</td>
+			</tr>	
+			@endforeach
+		</table>
+	</div>
+</div>
 <table class="tabla" width="100%">
 	<tr><td colspan="18" height="5"></td></tr>
 	<tr>
@@ -215,22 +167,23 @@
 		<td colspan="7" class="dato">{{$antecedente['fechaCorte']}}</td>
 	</tr>
 	@endforeach
-	
+</table>
+<table class="tabla" width="100%">
 	<tr><td colspan="18" height="5"></td></tr>
-
-	<tr>
+	<tr width="50%">
 		<td colspan="9" align="center" class="encabezado">RESULTADOS OBTENIDOS</td>
 		<td></td>
 		<td></td>
 		<td colspan="7" align="center" class="encabezado">RESULTADOS ESPERADOS</td>
 	</tr>
-	<tr>
+	<tr width="50%">
 		<td colspan="9" class="dato">{{$data['fibap']['resultadosObtenidos']}}</td>
 		<td></td>
 		<td></td>
 		<td colspan="7" class="dato">{{$data['fibap']['resultadosEsperados']}}</td>
 	</tr>
-
+</table>
+<table class="tabla" width="100%">
 	<tr><td colspan="18" height="5"></td></tr>
 
 	<tr><td colspan="18" align="center" class="encabezado"><strong>JUSTIFICACIÓN DEL PROYECTO</strong></td></tr>
@@ -249,30 +202,32 @@
 	<tr><td colspan="18" height="5"></td></tr>
 
 	<tr>
-		<td colspan="2">Presupuesto requerido:</td>
+		<td nowrap="nowrap">Presupuesto requerido:</td>
 		<td colspan="3" class="dato">{{number_format($data['fibap']['presupuestoRequerido'])}}</td>
 		<td></td>
-		<td>Estatal:</td>
-		<td colspan="4" class="dato">
+		<td></td>
+		<td  width="60">Estatal:</td>
+		<td colspan="4" class="dato" width="60">
 			@if(($valor = array_search('1', array_fetch($data['fibap']['propuestas_financiamiento'],'idOrigenFinanciamiento')))!== false)
 				{{ number_format($data['fibap']['propuestas_financiamiento'][$valor]['cantidad']) }}
 			@else
 				0
 			@endif
 		</td>
-		<td colspan="3">Beneficiarios:</td>
-		<td colspan="3" class="dato">
+		<td></td>
+		<td colspan="3" width="60">Beneficiarios:</td>
+		<td colspan="3" class="dato"  width="60">
 			@if(($valor = array_search('4', array_fetch($data['fibap']['propuestas_financiamiento'],'idOrigenFinanciamiento')))!== false)
 				{{ number_format($data['fibap']['propuestas_financiamiento'][$valor]['cantidad']) }}
 			@else
 				0
 			@endif
 		</td>
-		<td></td>
 	</tr>
 	<tr>
-		<td colspan="2">Periodo de ejecución:</td>
-		<td colspan="3" class="dato"></td>
+		<td nowrap="nowrap">Periodo de ejecución:</td>
+		<td colspan="3" class="dato">{{$data['fibap']['periodoEjecucionInicio']}} al {{$data['fibap']['periodoEjecucionFinal']}}</td>
+		<td></td>
 		<td>Origen:</td>
 		<td>Municipal:</td>
 		<td colspan="4" class="dato">
@@ -282,6 +237,7 @@
 				0
 			@endif
 		</td>
+		<td></td>
 		<td colspan="3">Crédito:</td>
 		<td colspan="3" class="dato">
 			@if(($valor = array_search('5', array_fetch($data['fibap']['propuestas_financiamiento'],'idOrigenFinanciamiento')))!== false)
@@ -290,7 +246,6 @@
 				0
 			@endif
 		</td>
-		<td></td>
 	</tr>
 	<tr>
 		<td></td>
@@ -307,6 +262,7 @@
 				0
 			@endif
 		</td>
+		<td></td>
 		<td colspan="3">Otros:</td>
 		<td colspan="3" class="dato">
 			@if(($valor = array_search('6', array_fetch($data['fibap']['propuestas_financiamiento'],'idOrigenFinanciamiento')))!== false)
@@ -315,9 +271,9 @@
 				0
 			@endif
 		</td>
-		<td></td>
 	</tr>
-
+</table>
+<table class="tabla" width="100%">
 	<tr><td colspan="18" height="5"></td></tr>
 
 	<tr><td colspan="18" align="center" class="encabezado"><strong>DISTRIBUCIÓN DEL PRESUPUESTO ESTATAL</strong></td></tr>

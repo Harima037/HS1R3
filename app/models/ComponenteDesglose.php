@@ -19,6 +19,10 @@ class ComponenteDesglose extends BaseModel
 		return $this->hasMany('DesgloseBeneficiario','idComponenteDesglose');
 	}
 
+	public function beneficiariosDescripcion(){
+		return $this->hasMany('DesgloseBeneficiario','idComponenteDesglose')->conDescripcion();
+	}
+
 	public function scopeListarMunicipios($query){
 		$query->select('componenteDesglose.id','componenteDesglose.idComponente','componenteDesglose.idAccion','componenteDesglose.claveJurisdiccion','municipio.*')
                 ->leftjoin('vistaMunicipios AS municipio','municipio.clave','=','componenteDesglose.claveMunicipio')
