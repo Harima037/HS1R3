@@ -103,6 +103,7 @@ class ProgramaPresupuestarioController extends BaseController {
 									->leftjoin('catalogoCoberturas','catalogoCoberturas.id','=','proyectos.idCobertura')
 									->where('proyectos.ejercicio','=',$programa->ejercicio)
 									->where('proyectos.programaPresupuestario','=',$programa->claveProgramaPresupuestario)
+									->where('proyectos.idClasificacionProyecto','=',1)
 									->whereNull('proyectos.idPrograma')
 									->get();
 				}
