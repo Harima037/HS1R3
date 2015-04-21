@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, View;
-use Excel,PDF, Proyecto, FIBAP, ComponenteMetaMes, ActividadMetaMes,DocumentoSoporte,OrigenFinanciamiento, Programa;
+use Excel,PDF, Proyecto, FIBAP, ComponenteMetaMes, ActividadMetaMes,DocumentoSoporte,OrigenFinanciamiento, Programa,ComponenteDesglose;
 
 class ReporteProyectoController extends BaseController {
 
@@ -90,12 +90,10 @@ class ReporteProyectoController extends BaseController {
 			}
 
 			if($recurso->idClasificacionProyecto == 1){
-				$programa = Programa::with('arbolProblemas','arbolObjetivos','indicadoresDescripcion')->contenidoDetalle()->where('claveProgramaPresupuestario','=',$recurso->programaPresupuestario)
-									->whereIn('idEstatus',array(4,5))->first();
-				//$queries = DB::getQueryLog();
-				//$data['query'] = print_r(end($queries),true);
-				//return Response::json(end($queries),500);
-				if($programa){
+				if($recurso->idPrograma){
+					$programa = Programa::with('arbolProblemas','arbolObjetivos','indicadoresDescripcion')
+										->contenidoDetalle()
+										->find($recurso->idPrograma);
 					$recurso['programaPresupuestarioAsignado'] = $programa;
 				}else{
 					$recurso['programaPresupuestarioAsignado'] = FALSE;
@@ -218,7 +216,14 @@ class ReporteProyectoController extends BaseController {
 		 				$distribucion_beneficiarios[$accion->id] = array();
 		 				$beneficiarios_acumulado = array();
 		 			}
-		 			foreach ($accion->desglosePresupuestoCompleto as $desglose) {
+
+		 			$desglose_completo = ComponenteDesglose::listarDatos()
+		 													->where('idComponente','=',$accion->idComponente)
+		 													->with('metasMes','beneficiariosDescripcion')->get();
+		 			//return Response::json($desglose_completo,500);
+
+		 			//foreach ($accion->desglosePresupuestoCompleto as $desglose) {
+		 			foreach ($desglose_completo as $desglose) {
 		 				foreach ($desglose->beneficiariosDescripcion as $beneficiario) {
 		 					if(!isset($beneficiarios_acumulado[$beneficiario->idTipoBeneficiario])){
 		 						$beneficiarios_acumulado[$beneficiario->idTipoBeneficiario] = array(
@@ -238,7 +243,7 @@ class ReporteProyectoController extends BaseController {
 		 				}
 		 				$distribucion_localidad[$accion->id][] = array(
 		 					'municipio' => $desglose->municipio,
-		 					'localidad' => $desglose->localidad,
+		 					'localidad' => $desglose->claveLocalidad .' '. $desglose->localidad,
 		 					'monto' => $desglose->presupuesto,
 		 					'unidad' => $accion->unidadMedida,
 		 					'cantidad' => $metas[1] + $metas[2] + $metas[3] + $metas[4] ,

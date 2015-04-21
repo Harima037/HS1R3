@@ -56,30 +56,6 @@ class ProyectosController extends BaseController {
 		'urbanam' 					=> 'required|integer|min:0'
 	);
 	
-	/*private $reglasAccionBase = array(
-		'denominador-ind-' 	=> 'required',
-		'descripcion-ind-' 	=> 'required',
-		'descripcion-obj-' 	=> 'required',
-		'dimension-' 		=> 'required',
-		'formula-' 			=> 'required',
-		'frecuencia-' 		=> 'required',
-		'interpretacion-' 	=> 'required',
-		'numerador-ind-' 	=> 'required',
-		'supuestos-' 		=> 'required',
-		'tipo-ind-' 		=> 'required',
-		'anio-base-' 		=> 'integer|min:0',
-		'linea-base-' 		=> 'numeric|min:0',
-		'unidad-medida-' 	=> 'required',
-		'verificacion-' 	=> 'required'
-		//'trim1-componente' 				=> 'numeric',
-		//'trim2-componente' 				=> 'numeric',
-		//'trim3-componente' 				=> 'numeric',
-		//'trim4-componente' 				=> 'numeric',
-		//'denominador-componente' 		=> 'required_if:formula-componente,1,2,3,4,5,6|numeric|min:0',
-		//'numerador-componente' 			=> 'required|numeric|min:1',
-		//'meta-componente' 				=> 'required|numeric|min:0',
-	);*/
-
 	private $reglasComponente = array(
 		//'denominador-ind-componente' 	=> 'required',
 		'descripcion-ind-componente' 	=> 'required',
@@ -140,7 +116,6 @@ class ProyectosController extends BaseController {
 	 */
 	public function index()
 	{
-		//
 		$http_status = 200;
 		$data = array();
 
@@ -149,7 +124,7 @@ class ProyectosController extends BaseController {
 
 			$rows = Proyecto::getModel();
 			$rows = $rows->where('idClasificacionProyecto','=',1)
-						->whereIn('idEstatusProyecto',[1,2,3,4]);
+						->whereIn('idEstatusProyecto',[1,2,3,4,5]);
 
 			if(Sentry::getUser()->claveUnidad){
 				$rows = $rows->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
@@ -363,10 +338,6 @@ class ProyectosController extends BaseController {
 					if($parametros['tipo-ind-actividad']){
 						$actividad->idTipoIndicador 		= $parametros['tipo-ind-actividad'];
 					}
-					/*$actividad->idFormula 				= $parametros['formula-actividad'];
-					$actividad->idDimensionIndicador 	= $parametros['dimension-actividad'];
-					$actividad->idFrecuenciaIndicador 	= $parametros['frecuencia-actividad'];
-					$actividad->idTipoIndicador			= $parametros['tipo-ind-actividad'];*/
 					$actividad->idUnidadMedida 			= $parametros['unidad-medida-actividad'];
 					$actividad->metaIndicador 			= $parametros['meta-actividad'];
 					$actividad->numeroTrim1 			= ($parametros['trim1-actividad'])?$parametros['trim1-actividad']:NULL;
@@ -654,10 +625,6 @@ class ProyectosController extends BaseController {
 					if($parametros['tipo-ind-actividad']){
 						$recurso->idTipoIndicador 		= $parametros['tipo-ind-actividad'];
 					}
-					/*$recurso->idFormula 				= 	$parametros['formula-actividad'];
-					$recurso->idDimensionIndicador 		= 	$parametros['dimension-actividad'];
-					$recurso->idFrecuenciaIndicador 	= 	$parametros['frecuencia-actividad'];
-					$recurso->idTipoIndicador 			= 	$parametros['tipo-ind-actividad'];*/
 					$recurso->idUnidadMedida 			= 	$parametros['unidad-medida-actividad'];
 					$recurso->metaIndicador 			= 	$parametros['meta-actividad'];
 					$recurso->numeroTrim1 				= 	($parametros['trim1-actividad'])?$parametros['trim1-actividad']:NULL;
@@ -750,10 +717,6 @@ class ProyectosController extends BaseController {
 					if($parametros['tipo-ind-componente']){
 						$recurso->idTipoIndicador 		= $parametros['tipo-ind-componente'];
 					}
-					/*$recurso->idFormula 				= 	$parametros['formula-componente'];
-					$recurso->idDimensionIndicador 		= 	$parametros['dimension-componente'];
-					$recurso->idFrecuenciaIndicador 	= 	$parametros['frecuencia-componente'];
-					$recurso->idTipoIndicador 			= 	$parametros['tipo-ind-componente'];*/
 					$recurso->idUnidadMedida 			= 	$parametros['unidad-medida-componente'];
 					$recurso->metaIndicador 			= 	$parametros['meta-componente'];
 					$recurso->numeroTrim1 				= 	($parametros['trim1-componente'])?$parametros['trim1-componente']:NULL;

@@ -100,7 +100,7 @@ class InversionController extends ProyectosController {
 			}else{
 				$rows = Proyecto::getModel();
 				$rows = $rows->where('idClasificacionProyecto','=',2)
-							->whereIn('idEstatusProyecto',[1,2,3,4]);
+							->whereIn('idEstatusProyecto',[1,2,3,4,5]);
 
 				if(Sentry::getUser()->claveUnidad){
 					$rows = $rows->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
@@ -200,6 +200,12 @@ class InversionController extends ProyectosController {
 
 			if(isset($parametros['mostrar'])){
 				if($parametros['mostrar'] == 'detalles-proyecto'){
+					/*$data['extra'] = Proyecto::contenidoReporte()
+										->with('componentesCompletoDescripcion.metasMes','beneficiariosDescripcion')
+										->find($id);
+					$queries = count(DB::getQueryLog());
+					$data['total_queries_reporte'] = $queries;
+					*/
 					$recurso = Proyecto::contenidoCompleto()->find($id);
 					if($recurso){
 						$recurso->load('fibap');
@@ -212,6 +218,8 @@ class InversionController extends ProyectosController {
 							$recurso->componentes[$key]->actividades->load('formula','dimension','frecuencia','tipoIndicador','unidadMedida');
 						}
 					}
+					/*$queries = count(DB::getQueryLog()) - $queries;
+					$data['total_queries'] = $queries;*/
 				}elseif($parametros['mostrar'] == 'editar-proyecto'){
 					$recurso = Proyecto::with('jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico',
 										'fibap.documentos','beneficiarios.tipoBeneficiario',
@@ -1270,8 +1278,6 @@ class InversionController extends ProyectosController {
 				$clave_municipio = $parametros['municipio-accion'];
 				//La clave de la localidad se envia concatenada con la clave del municipio municipio|localidad
 				$clave_localidad = $parametros['localidad-accion'];
-				//$clave_localidad = explode('|',$parametros['localidad-accion']);
-				//$clave_localidad = $clave_localidad[1];
 			}else{
 				$clave_municipio = '0';
 				$clave_localidad = '0';
@@ -1539,8 +1545,6 @@ class InversionController extends ProyectosController {
 				}
 				
 			}
-			//$respuesta['data']['data'] = json_encode($componente_metas_mes);
-			//throw new Exception(json_encode($componente_metas_mes_capturados), 1);
 			
 			$desglose->idAccion = $accion->id;
 			$desglose->claveJurisdiccion = $clave_jurisdiccion;
@@ -1609,11 +1613,7 @@ class InversionController extends ProyectosController {
 				}else{
 					$partidas_anteriores = array();
 				}
-
-				/*if($partidas_formulario[0] == $partidas_formulario[1]){ //ciclo
-					throw new Exception('{"field":"objeto-gasto-presupuesto","error":"Las partidas no deben ser iguales"}', 1);
-				}*/
-
+				
 				//Sacamos las diferencias de las partidas seleccionadas y las ya capturadas
 				$partidas['nuevas'] = array_diff($partidas_formulario, $partidas_anteriores);
 				$partidas['borrar'] = array_diff($partidas_anteriores, $partidas_formulario);
