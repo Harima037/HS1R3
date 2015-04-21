@@ -258,4 +258,8 @@ class Proyecto extends BaseModel
 	public function fuentesFinanciamiento(){
         return $this->hasMany('ProyectoFinanciamiento','idProyecto');
     }
+
+    public function programa(){
+    	return $this->hasOne('Programa','id','idPrograma');
+    }
 }

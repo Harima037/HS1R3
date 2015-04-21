@@ -66,4 +66,8 @@ class Programa extends BaseModel
 	public function comentario(){
 		return $this->hasMany('ProgramaComentario','idPrograma');
 	}
+
+	public function proyectos(){
+		return $this->hasMany('Proyecto','idPrograma');
+	}
 }

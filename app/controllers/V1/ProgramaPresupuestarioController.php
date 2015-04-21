@@ -4,7 +4,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
-use Programa, ProgramaArbolProblema, ProgramaArbolObjetivo, ProgramaIndicador,Titular;
+use Programa, ProgramaArbolProblema, ProgramaArbolObjetivo, ProgramaIndicador,Titular,Proyecto;
 
 class ProgramaPresupuestarioController extends BaseController {
 	private $reglasPrograma = array(
@@ -87,10 +87,24 @@ class ProgramaPresupuestarioController extends BaseController {
 					$rows = ProgramaArbolProblema::select('id','causa','efecto')->where('idPrograma','=',$id)->get();
 				}elseif($parametros['listar'] == 'objetivos'){
 					$rows = ProgramaArbolObjetivo::select('id','medio','fin')->where('idPrograma','=',$id)->get();
-				}elseif($parametros['listar'] == 'indicadores') {
+				}elseif($parametros['listar'] == 'indicadores'){
 					$rows = ProgramaIndicador::select('programaIndicador.id','claveTipoIndicador','descripcionIndicador as indicador','unidadMedida.descripcion')
 											->join('catalogoUnidadesMedida AS unidadMedida','unidadMedida.id','=','programaIndicador.idUnidadMedida')
 											->where('idPrograma','=',$id)->get();
+				}elseif($parametros['listar'] == 'proyectos'){
+					$rows = Proyecto::select('proyectos.*','sentryUsers.username','catalogoCoberturas.descripcion AS coberturaDescripcion')
+									->leftjoin('sentryUsers','sentryUsers.id','=','proyectos.actualizadoPor')
+									->leftjoin('catalogoCoberturas','catalogoCoberturas.id','=','proyectos.idCobertura')
+									->where('proyectos.idPrograma','=',$id)->get();
+				}elseif($parametros['listar'] == 'buscar-proyecto'){
+					$programa = Programa::find($id);
+					$rows = Proyecto::select('proyectos.*','sentryUsers.username','catalogoCoberturas.descripcion AS coberturaDescripcion')
+									->leftjoin('sentryUsers','sentryUsers.id','=','proyectos.actualizadoPor')
+									->leftjoin('catalogoCoberturas','catalogoCoberturas.id','=','proyectos.idCobertura')
+									->where('proyectos.ejercicio','=',$programa->ejercicio)
+									->where('proyectos.programaPresupuestario','=',$programa->claveProgramaPresupuestario)
+									->whereNull('proyectos.idPrograma')
+									->get();
 				}
 				$total = count($rows);
 			}else{
@@ -502,6 +516,20 @@ class ProgramaPresupuestarioController extends BaseController {
 					$respuesta['http_status'] = $validacion['http_status'];
 					$respuesta['data'] = $validacion['data'];
 				}
+			}elseif($parametros['guardar'] == 'asignar-proyectos') {
+				//$validacion = Validador::validar(Input::all(), $this->reglasProblemaObjetivo);
+				if(isset($parametros['proyectos'])){
+					$proyectos = $parametros['proyectos'];
+					if(Proyecto::whereIn('id',$proyectos)->update(array('idPrograma'=>$id))){
+						$respuesta['data'] = array('data'=>count($proyectos) . ' Proyectos asignados');
+					}else{
+						$respuesta['http_status'] = 500;
+						$respuesta['data'] = array('data'=>'Error al intentar asignar el(los) proyecto(s)','code'=>'S01');
+					}
+				}else{
+					$respuesta['data'] = array('data'=>'No hay proyectos seleccionados','code'=>'S01');
+					throw new Exception("No hay proyectos seleccionados", 1);
+				}
 			}elseif($parametros['guardar'] == 'causa-efecto'){
 				$validacion = Validador::validar(Input::all(), $this->reglasCausaEfecto);
 				if($validacion === TRUE){
@@ -667,6 +695,8 @@ class ProgramaPresupuestarioController extends BaseController {
 					$rows = ProgramaArbolObjetivo::whereIn('id',$ids)->delete();
 				}elseif($parametros['eliminar'] == 'indicador') {
 					$rows = ProgramaIndicador::whereIn('id',$ids)->delete();
+				}elseif($parametros['eliminar'] == 'proyecto'){
+					$rows = Proyecto::whereIn('id',$ids)->update(array('idPrograma'=>null));
 				}
 			}else{
 				$rows = DB::transaction(function() use ($ids){

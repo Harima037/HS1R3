@@ -17,10 +17,12 @@ var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/programas-presupuestar
 var indicadoresDatagrid;
 var problemasDatagrid;
 var objetivosDatagrid;
+var proyectosDatagrid;
 
 var modal_indicador = '#modal_programa_indicador';
 var modal_problema = '#modal_problema';
 var modal_objetivo = '#modal_objetivo';
+var modal_proyecto = '#modal_proyecto';
 
 var form_programa = '#form_programa_datos';
 var form_indicador = '#form_programa';
@@ -28,6 +30,7 @@ var form_problema = '#form_problema';
 var form_objetivo = '#form_objetivo';
 var form_causa_efecto = '#form_causa_efecto';
 var form_medio_fin = '#form_medio_fin';
+var form_proyectos = '#form_proyectos';
 
 $('.chosen-one').chosen({width:'100%'});
 
@@ -66,16 +69,23 @@ if($('#id').val()){
             problemasDatagrid = new Datagrid("#datagridProblemas",moduloResource,{'listar':'problemas','id-programa':$('#id').val()});
             objetivosDatagrid = new Datagrid("#datagridObjetivos",moduloResource,{'listar':'objetivos','id-programa':$('#id').val()});
             indicadoresDatagrid = new Datagrid("#datagridIndicadores",moduloResource,{'listar':'indicadores','id-programa':$('#id').val()});
+            proyectosDatagrid = new Datagrid('#datagridProyectos',moduloResource,{'listar':'proyectos','id-programa':$('#id').val()});
 
             problemasDatagrid.init();
             objetivosDatagrid.init();
             indicadoresDatagrid.init();
+            proyectosDatagrid.init();
 
             resetear_borrar();
 
             problemasDatagrid.actualizar();
             objetivosDatagrid.actualizar();
             indicadoresDatagrid.actualizar();
+            proyectosDatagrid.actualizar({
+                _success: function(response){
+                    actualizar_lista_proyectos(response);
+                }
+            });
 
             if(response.data.idEstatus != 1 && response.data.idEstatus != 3){
                 bloquear_controles();
@@ -87,6 +97,8 @@ if($('#id').val()){
             $('#tab-link-diagnostico').parent().removeClass('disabled');
             $('#tab-link-indicadores').attr('data-toggle','tab');
             $('#tab-link-indicadores').parent().removeClass('disabled');
+            $('#tab-link-proyectos').attr('data-toggle','tab');
+            $('#tab-link-proyectos').parent().removeClass('disabled');
             $('.chosen-one').trigger('chosen:updated');
         }
     });
@@ -105,6 +117,10 @@ $(modal_objetivo).on('hide.bs.modal',function(e){
     reset_modal_form(form_medio_fin);
 });
 
+$(modal_proyecto).on('hide.bs.modal',function(e){
+    reset_modal_form(form_proyectos);
+});
+
 /****************************************************************** Funciones de datagrids ********************************************************************/
 $('#datagridIndicadores .btn-datagrid-agregar').on('click', function () {
     $(modal_indicador).find(".modal-title").html("Nuevo Indicador");
@@ -119,6 +135,54 @@ $('#datagridProblemas .btn-datagrid-agregar').on('click', function () {
 $('#datagridObjetivos .btn-datagrid-agregar').on('click', function () {
     $(modal_objetivo).find(".modal-title").html("Nuevo Medio/Fin");
     $(modal_objetivo).modal('show');
+});
+
+$(form_proyectos + ' .check-select-all-rows').on('change',function(){
+    var checado = $(this).prop('checked');
+    $(form_proyectos + ' input[type="checkbox"]').prop('checked',checado);
+});
+
+$('#datagridProyectos .btn-datagrid-agregar').on('click', function () {
+    $(modal_proyecto).find(".modal-title").html("Agregar Proyecto");
+    var parametros = {'formatogrid':true,'listar':'buscar-proyecto','id-programa':$('#id').val()};
+    moduloResource.get(null,parametros,{
+        _success: function(response){
+            var rows = '';
+            for(var i in response.data){
+                rows += '<tr>';
+                rows += '<td><input type="checkbox" name="proyectos[]" value="'+response.data[i].id+'"></td>';
+                rows += '<td>'+response.data[i].ClavePresupuestaria+'</td>';
+                rows += '<td>'+response.data[i].nombreTecnico+'</td>';
+                rows += '<td>'+response.data[i].coberturaDescripcion+'</td>';
+                rows += '<td>'+response.data[i].username+'</td>';
+                rows += '</tr>';
+            }
+            if(rows.length){
+                $('#tabla-proyectos-encontrados tbody').html(rows);
+            }else{
+                $('#tabla-proyectos-encontrados tbody').html('<tr><td colspan="5"><span class="fa fa-info-sign"></span> No hay datos</td></tr>');
+            }
+        },
+        _error: function(response){
+            try{
+                var json = $.parseJSON(response.responseText);
+                if(json.resultados === 0){
+                    if(json.resultados == '0'){
+                        $('#tabla-proyectos-encontrados tbody').html('<tr><td colspan="5"><span class="fa fa-info-circle"></span> No hay datos</td></tr>');
+                    }
+                }else{
+                    if(!json.code)
+                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                    else{
+                        MessageManager.show(json);
+                    }
+                }
+            }catch(e){
+                console.log(e);
+            }                       
+        }
+    });
+    $(modal_proyecto).modal('show');
 });
 
 function editar_problema(e){
@@ -150,6 +214,8 @@ function editar_objetivo(e){
         }
     });
 }
+
+function ver_proyecto(e){}
 
 function editar_indicador(e){
     var parametros = {'mostrar':'editar-indicador'};
@@ -227,20 +293,29 @@ $('#btn-programa-guardar').on('click',function(){
                 $('#tab-link-diagnostico').parent().removeClass('disabled');
                 $('#tab-link-indicadores').attr('data-toggle','tab');
                 $('#tab-link-indicadores').parent().removeClass('disabled');
+                $('#tab-link-proyectos').attr('data-toggle','tab');
+                $('#tab-link-proyectos').parent().removeClass('disabled');
 
-                problemasDatagrid = new Datagrid("#datagridProblemas",moduloResource,{'listar':'problemas','id-programa':$('#id').val()});
-                objetivosDatagrid = new Datagrid("#datagridObjetivos",moduloResource,{'listar':'objetivos','id-programa':$('#id').val()});
+                problemasDatagrid   = new Datagrid("#datagridProblemas",  moduloResource,{'listar':'problemas',  'id-programa':$('#id').val()});
+                objetivosDatagrid   = new Datagrid("#datagridObjetivos",  moduloResource,{'listar':'objetivos',  'id-programa':$('#id').val()});
                 indicadoresDatagrid = new Datagrid("#datagridIndicadores",moduloResource,{'listar':'indicadores','id-programa':$('#id').val()});
+                proyectosDatagrid   = new Datagrid('#datagridProyectos',  moduloResource,{'listar':'proyectos',  'id-programa':$('#id').val()});
 
                 problemasDatagrid.init();
                 objetivosDatagrid.init();
                 indicadoresDatagrid.init();
+                proyectosDatagrid.init();
 
                 resetear_borrar();
 
                 problemasDatagrid.cargarDatos([]);
                 objetivosDatagrid.cargarDatos([]);
                 indicadoresDatagrid.cargarDatos([]);
+                proyectosDatagrid.actualizar({
+                    _success: function(response){
+                        actualizar_lista_proyectos(response);
+                    }
+                });
             },
             _error: function(response){
                 try{
@@ -345,6 +420,34 @@ $('#btn-guardar-objetivo').on('click',function(){
         moduloResource.put($('#id').val(),parametros,{
             _success: function(response){
                 MessageManager.show({data:'Datos del árbol del objetivo almacenados con éxito',type:'OK',timer:4});
+            },
+            _error: function(response){
+                try{
+                    var json = $.parseJSON(response.responseText);
+                    if(!json.code)
+                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                    else{
+                        MessageManager.show(json);
+                    }
+                    Validation.formValidate(json.data);
+                }catch(e){
+                    console.log(e);
+                }                       
+            }
+        });
+    }
+});
+
+$('#btn-agregar-proyecto').on('click',function(){
+    var parametros = $(form_proyectos).serialize();
+    parametros += '&guardar=asignar-proyectos';
+
+    if($('#id').val()){
+        moduloResource.put($('#id').val(),parametros,{
+            _success: function(response){
+                MessageManager.show({data:'Proyectos asginados correctamente',type:'OK',timer:4});
+                proyectosDatagrid.actualizar();
+                $(modal_proyecto).modal('hide');
             },
             _error: function(response){
                 try{
@@ -574,6 +677,47 @@ function resetear_borrar(){
             });
         }else{ MessageManager.show({data:'No has seleccionado ningún registro.',type:'ADV',timer:3}); }
     });
+
+    $("#datagridProyectos .btn-delete-rows").unbind('click');
+    $("#datagridProyectos .btn-delete-rows").on('click',function(e){
+        e.preventDefault();
+        var rows = [];
+        $('#datagridProyectos').find("tbody").find("input[type=checkbox]:checked").each(function () { rows.push($(this).parent().parent().data("id")); });
+        var contador = rows.length;
+
+        if(contador>0){
+            Confirm.show({
+                    titulo:"Quitar Proyecto",
+                    mensaje: "¿Estás seguro que deseas quitar el(los) proyecto(s) seleccionado(s)?",
+                    callback: function(){
+                        moduloResource.delete(rows,{'rows':rows, 'eliminar':'proyecto', 'id-programa':$('#id').val()},{
+                            _success: function(response){ 
+                                proyectosDatagrid.actualizar();
+                                MessageManager.show({data:'Proyecto(s) removido(s) con éxito.',timer:3});
+                            },
+                            _error: function(jqXHR){  MessageManager.show(jqXHR.responseJSON); }
+                        });
+                    }
+            });
+        }else{ MessageManager.show({data:'No has seleccionado ningún registro.',type:'ADV',timer:3}); }
+    });
+}
+
+function actualizar_lista_proyectos(response){
+    proyectosDatagrid.limpiar();
+    var datos_grid = [];
+    for(var i in response.data){
+        var item = {};
+
+        item.id = response.data[i].id;
+        item.clave = response.data[i].ClavePresupuestaria;
+        item.nombre_tecnico = response.data[i].nombreTecnico;
+        item.cobertura = response.data[i].coberturaDescripcion;
+        item.usuario = response.data[i].username;
+
+        datos_grid.push(item);
+    }
+    proyectosDatagrid.cargarDatos(datos_grid);
 }
 
 function sumar_trimestres(){
