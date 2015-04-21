@@ -40,7 +40,7 @@ class FIBAP extends BaseModel
 
     public function accionesCompletasDescripcion(){
         return $this->hasMany('Accion','idFibap')->completoConDescripcion()
-                ->with('propuestasFinanciamiento','distribucionPresupustoPartidaDescripcion','desglosePresupuestoCompleto');
+                ->with('propuestasFinanciamiento','distribucionPresupustoPartidaDescripcion'); //'desglosePresupuestoCompleto'
     }
 
     public function proyectoCompleto(){

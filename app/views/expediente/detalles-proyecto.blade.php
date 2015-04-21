@@ -140,28 +140,28 @@
                         <div role="tabpanel" class="tab-pane" id="tab-beneficiarios">
                             <br>
                             <div id="datos-beneficiarios" style="overflow-x:auto;">
-                                <table id='tabla_beneficiarios' class="table table-stripped table-condensed table-bordered table-hover">
+                                <table id='tabla_beneficiarios' class="table table-stripped table-condensed table-bordered">
                                     <thead>
                                         <tr>
-                                            <th nowrap="nowrap" rowspan="2">Descripción de Beneficiario</th>
-                                            <th colspan="2" rowspan="2">Total</th>
-                                            <th rowspan="2">Genero</th>
+                                            <!--th nowrap="nowrap" rowspan="2">Descripción de Beneficiario</th-->
+                                            <th rowspan="2"></th>
                                             <th colspan="2">Zona</th>
-                                            <th colspan="4">Población</th>
-                                            <th colspan="5">Marginación</th>
+                                            <th colspan="4" class="bg-info">Población</th>
+                                            <th colspan="5" class="bg-success">Marginación</th>
+                                            <th rowspan="2">Total</th>
                                         </tr>
                                         <tr>
                                             <th>Urbana</th>
                                             <th>Rural</th>
-                                            <th>Mestiza</th>
-                                            <th>Indigena</th>
-                                            <th>Inmigrante</th>
-                                            <th>Otros</th>
-                                            <th nowrap="nowrap">Muy alta</th>
-                                            <th>Alta</th>
-                                            <th>Media</th>
-                                            <th>Baja</th>
-                                            <th nowrap="nowrap">Muy baja</th>
+                                            <th class="bg-info">Mestiza</th>
+                                            <th class="bg-info">Indigena</th>
+                                            <th class="bg-info">Inmigrante</th>
+                                            <th class="bg-info">Otros</th>
+                                            <th nowrap="nowrap" class="bg-success">Muy alta</th>
+                                            <th class="bg-success">Alta</th>
+                                            <th class="bg-success">Media</th>
+                                            <th class="bg-success">Baja</th>
+                                            <th nowrap="nowrap" class="bg-success">Muy baja</th>
                                         </tr>
                                     </thead>
                                     <tbody>
