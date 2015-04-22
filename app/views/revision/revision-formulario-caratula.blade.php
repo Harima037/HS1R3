@@ -4,26 +4,26 @@
             <div class="form-group">
             	<div class="form-group">
         	        <label class="control-label">Lider del Proyecto</label>
-    	            <p id="lbl-lider-proyecto" class="form-control-static" style="height:auto">{{$firmas['LiderProyecto']->nombre}}</p>
+    	            <p id="lbl-lider-proyecto" class="form-control-static" style="height:auto"></p>
 	            </div>
             </div>
         </div>
         <div class="col-sm-6">
             <div class="form-group">
                 <label class="control-label">Jefe Inmediato al Lider</label>
-                <p id="lbl-jefe-inmediato" class="form-control-static" style="height:auto">{{$firmas['JefeInmediato']->nombre}}</p>
+                <p id="lbl-jefe-inmediato" class="form-control-static" style="height:auto"></p>
             </div>
         </div>
         <div class="col-sm-6">
             <div class="form-group">
                 <label class="control-label">Jefe de Planeación</label>
-                <p id="lbl-jefe-planeacion" class="form-control-static" style="height:auto">{{$firmas['JefePlaneacion']->nombre}}</p>
+                <p id="lbl-jefe-planeacion" class="form-control-static" style="height:auto"></p>
             </div>
         </div>
         <div class="col-sm-6">
             <div class="form-group">
                 <label class="control-label">Coordinador del Grupo Estratégico</label>
-                <p id="lbl-coordinador-grupo" class="form-control-static" style="height:auto">{{$firmas['CoordinadorGrupo']->nombre}}</p>
+                <p id="lbl-coordinador-grupo" class="form-control-static" style="height:auto"></p>
             </div>
         </div>
     </div>
@@ -237,27 +237,9 @@
                  
             </div>
         </div>
-        
-        
-        
-        <!--<div class="col-sm-4">
-            <div class="form-group">
-                <label class="control-label" for="lbl-tipobeneficiario">Tipo de Beneficiario</label>
-                <p id="lbl-tipobeneficiario" class="form-control"></p> 
-            </div>
-        </div>-->
-
-        
     </div>
     <input type="hidden" id="id" name="id" value="{{{ $id or '' }}}">
     <input type="hidden" id="id-fibap" name="id-fibap" value="{{{ $fibap_id or '' }}}">
     <input type="hidden" id="clasificacionproyecto" name="clasificacionproyecto" value="{{$clasificacion_proyecto_id}}">
     <input type="hidden" id="tipoproyecto" name="tipoproyecto" value="{{$tipo_proyecto_id}}">
-    <div class="row">
-        <div class="col-sm-12">
-            <!--<button type="button" class="btn btn-primary pull-right" id="btn-proyecto-guardar">
-                <span class="fa fa-save"></span> Guardar cambios
-            </button>-->
-        </div>
-    </div>
 </form>

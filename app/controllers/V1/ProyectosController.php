@@ -1,4 +1,18 @@
 <?php
+/* 
+*	POA
+*	Programa Operativo Anual
+*
+*	PHP version 5.5.3
+*
+* 	Área de Informática, Dirección de Planeación y Desarrollo.
+*
+*	@copyright			Copyright 2015, Instituto de Salud.
+*	@author 			Donaldo Ríos, Mario Alberto Cabrera Alfaro
+*	@package 			poa
+*	@version 			1.0
+*	@comment 			
+*/
 
 namespace V1;
 
@@ -140,12 +154,12 @@ class ProyectosController extends BaseController {
 			}
 			
 			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
-				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
+				'nombreTecnico','catalogoCoberturas.descripcion AS coberturaDescripcion','proyectos.idEstatusProyecto',
 				'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
 								->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
-								->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
+								->join('catalogoCoberturas','catalogoCoberturas.id','=','proyectos.idCobertura')
 								->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
-								->orderBy('id', 'desc')
+								->orderBy('modificadoAl', 'desc')
 								->skip(($parametros['pagina']-1)*10)->take(10)
 								->get();
 			$data = array('resultados'=>$total,'data'=>$rows);

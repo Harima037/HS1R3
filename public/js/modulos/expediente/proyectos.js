@@ -37,7 +37,7 @@ moduloDatagrid.actualizar({
             item.id = response.data[i].id;
             item.clave = response.data[i].clavePresup;
             item.nombre_tecnico = response.data[i].nombreTecnico;
-            item.tipo_proyecto = response.data[i].clasificacionProyecto;
+            item.cobertura = response.data[i].coberturaDescripcion;
             item.estatus = '<span class="label ' + clase_label + '">' + response.data[i].estatusProyecto + '</span>';
             item.usuario = response.data[i].username;
             item.fecha_modificado = response.data[i].modificadoAl.substring(0,11);

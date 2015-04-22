@@ -26,7 +26,7 @@ class RendicionProgramaController extends BaseController {
 		if(isset($parametros['formatogrid'])){
 			if(isset($parametros['grid'])){
 				if($parametros['grid'] == 'rendicion-indicadores'){
-					$rows = ProgramaIndicador::with('registroAvance')->where('idPrograma','=',$parametros['idPrograma'])->get();
+					$rows = ProgramaIndicador::with('registroAvance.comentarios')->where('idPrograma','=',$parametros['idPrograma'])->get();
 					//$rows->componentes->load('registroAvance');
 					$total = count($rows);
 				}
@@ -114,7 +114,7 @@ class RendicionProgramaController extends BaseController {
 				$trimestre_actual = Util::obtenerTrimestre();
 				$recurso = ProgramaIndicador::with(array('registroAvance'=>function($query) use ($trimestre_actual){
 					$query->where('trimestre','<=',$trimestre_actual);
-				}))->join('catalogoUnidadesMedida AS unidadMedida','unidadMedida.id','=','programaIndicador.idUnidadMedida')
+				},'registroAvance.comentarios'))->join('catalogoUnidadesMedida AS unidadMedida','unidadMedida.id','=','programaIndicador.idUnidadMedida')
 				->select('programaIndicador.*','unidadMedida.descripcion AS unidadMedida')
 				->find($id);
 			}

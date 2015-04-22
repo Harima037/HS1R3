@@ -145,6 +145,17 @@ function seguimiento_metas(e){
                         $('#id-avance').val(avance.id);
                         $('#analisis-resultados').val(avance.analisisResultados);
                         $('#justificacion-acumulada').val(avance.justificacionAcumulada);
+
+                        if(avance.comentarios.length){
+                            for(var i in avance.comentarios){
+                                var comentario = avance.comentarios[i];
+                                var id_campo = comentario.idCampo;
+                                var observacion = comentario.comentario;
+                                $('#'+id_campo).parent('.form-group').addClass('has-warning');
+                                $('#'+id_campo).after('<p class="texto-comentario help-block"><span class="fa fa-warning"></span> '+observacion+'</p>');
+                            }
+                        }
+
                     }else{
                         avance_acumulado += avance.avance;
                     }
@@ -162,7 +173,7 @@ function seguimiento_metas(e){
             if(parseFloat($('#trimestre-total').attr('data-valor')) > 0){
                 $('#avance-trimestre').change();
             }
-
+            
             $('#modalEditarAvance').modal('show');
         }
     });
@@ -232,10 +243,8 @@ $('#modalEditarAvance').on('hide.bs.modal',function(e){
     $('#trimestre-porcentaje').attr('data-estado-avance','');
     $('#trimestre-porcentaje').text('0%');
     $('#id-avance').val('');
-/*
     $('#form_avance .texto-comentario').remove();
     $('#form_avance .has-warning').removeClass('has-warning');
-*/
     Validation.cleanFormErrors('#form_avance');
 });
 
@@ -249,6 +258,7 @@ function llenar_grid_indicadores(response){
         var item = {};
 
         item.id = indicador.id;
+
         if(indicador.claveTipoIndicador == 'F'){
             item.nivel = 'Fin';
         }else{
@@ -269,6 +279,9 @@ function llenar_grid_indicadores(response){
                     item.avances_mes += avance.avance;
                     if(avance.justificacion){
                         item.justificacion += '<span class="fa fa-align-left"></span>';
+                    }
+                    if(avance.comentarios.length){
+                        item.nivel = '<span class="text-warning fa fa-warning"></span> ' + item.nivel;
                     }
                 }
             }

@@ -707,64 +707,7 @@ if($('#id').val()){
 			actualizar_grid_componentes(response.data.componentes);*/
         }
     });
-}else if($('#id-fibap').val()){
-	/*var parametros = {ver:'datos-fibap'};
-	proyectoResource.get($('#id-fibap').val(),parametros,{
-		_success:function(response){
-			inicializar_comportamiento_caratula();
-			
-			//.addClass('control-bloqueado');
-			$('#nombretecnico').addClass('control-bloqueado');
-			$('#vinculacionped').addClass('control-bloqueado');
-			$('#programapresupuestario').addClass('control-bloqueado');
-			$('#cobertura').addClass('control-bloqueado');
-			if(response.data.claveMunicipio){
-				$('#municipio').addClass('control-bloqueado');
-			}
-			if(response.data.claveRegion){
-				$('#region').addClass('control-bloqueado');
-			}
-			$('#tipobeneficiario').addClass('control-bloqueado');
-			$('#totalbeneficiariosf').addClass('control-bloqueado');
-			$('#totalbeneficiariosm').addClass('control-bloqueado');
-
-			$('#nombretecnico').val(response.data.nombreTecnico);
-			$('#vinculacionped').val(response.data.idObjetivoPED);
-			$('#vinculacionped').trigger('chosen:updated');
-			$('#programa_presupuestario').text(response.data.programaPresupuestario);
-			$('#programapresupuestario').val(response.data.programaPresupuestario);
-            $('#programapresupuestario').trigger('chosen:updated');
-			$('#cobertura').val(response.data.idCobertura);
-			$('#cobertura').trigger('chosen:updated');
-			$('#cobertura').chosen().change();
-			deshabilita_paneles($('#cobertura').val());
-			if(response.data.claveMunicipio){
-				$('#municipio').val(response.data.claveMunicipio);
-				$('#municipio').trigger('chosen:updated');
-			}
-			if(response.data.claveRegion){
-				$('#region').val(response.data.claveRegion);
-				$('#region').trigger('chosen:updated');
-			}
-			$('#tipobeneficiario').val(response.data.idTipoBeneficiario);
-			$('#tipobeneficiario').trigger('chosen:updated');
-			$('#totalbeneficiarios').text(response.data.totalBeneficiarios);
-			$('#totalbeneficiariosf').val(response.data.totalBeneficiariosF);
-			$('#totalbeneficiariosm').val(response.data.totalBeneficiariosM);
-
-			bloquear_controles();
-			$('.chosen-one.control-bloqueado').trigger('chosen:updated');
-		}
-	});*/
-}else{
-	/*inicializar_comportamiento_caratula();
-	deshabilita_paneles('');*/
 }
-
-/*function editar_fuente_financiamiento(e){
-	fuenteFinanciamiento.editar_fuente(e);
-}*/
-
 
 function construyebeneficiarios(datos){
 	//console.log(datos);

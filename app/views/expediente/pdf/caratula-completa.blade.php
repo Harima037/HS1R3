@@ -18,7 +18,7 @@
 		}
 		.encabezado{
 			padding:2px;
-			background-color: #CCCCCC;
+			background-color: #EEEEEE;
 			font-weight: bold;
 			border: 1px solid #000000;
 			border-collapse: collapse;

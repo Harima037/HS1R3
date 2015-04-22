@@ -27,7 +27,6 @@ class SeguimientoProgramaController extends BaseController {
 	public function index(){
 		$http_status = 200;
 		$data = array();
-
 		$parametros = Input::all();
 		if(isset($parametros['formatogrid'])){
 			if(isset($parametros['grid'])){

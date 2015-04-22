@@ -85,6 +85,14 @@
 <table class="table" width="100%">
 	<tr><td height="15" colspan="5"></td></tr>
 	<tr>
+		<td></td>
+		<th class="texto-centro">Responsable del Programa.</th>
+		<td></td>
+		<th class="texto-centro">Director.</th>
+		<td></td>
+	</tr>
+	<tr><td height="15" colspan="5"></td></tr>
+	<tr>
 		<td width="10%"></td>
 		<td width="25%" class="texto-centro firma">{{ $data['liderProyecto'] }}</td>
 		<td width="30%"></td>
@@ -93,9 +101,9 @@
 	</tr>
 	<tr>
 		<td></td>
-		<th class="texto-centro">Responsable del Programa.</th>
+		<th class="texto-centro">{{ $data['liderProyectoCargo'] }}</th>
 		<td></td>
-		<th class="texto-centro">Director.</th>
+		<th class="texto-centro">{{ $data['jefeInmediatoCargo'] }}</th>
 		<td></td>
 	</tr>
 	<tr><td height="15" colspan="5"></td></tr>

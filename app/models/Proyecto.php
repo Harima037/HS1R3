@@ -104,7 +104,13 @@ class Proyecto extends BaseModel
 						'liderProyecto.nombre AS liderProyecto',
 						'jefeInmediato.nombre AS jefeInmediato',
 						'jefePlaneacion.nombre AS jefePlaneacion',
-						'coordinadorGrupoEstrategico.nombre AS coordinadorGrupoEstrategico');
+						'coordinadorGrupoEstrategico.nombre AS coordinadorGrupoEstrategico',
+						'liderProyecto.cargo AS liderProyectoCargo',
+						'jefeInmediato.cargo AS jefeInmediatoCargo',
+						'jefePlaneacion.cargo AS jefePlaneacionCargo',
+						'coordinadorGrupoEstrategico.cargo AS coordinadorGrupoEstrategicoCargo'
+						
+						);
 
 	}
 
