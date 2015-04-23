@@ -41,19 +41,21 @@ moduloDatagrid.actualizar({
             }
 
             if(response.data[i].evaluacion_meses.length){
-                if(response.data[i].evaluacion_meses[0].idEstatus == 2){
+                if(response.data[i].evaluacion_meses[0].idEstatus == 1){
+                    item.estado = '<span class="label label-info">En Trámite</span>';
+                }else if(response.data[i].evaluacion_meses[0].idEstatus == 2){
                     item.estado = '<span class="label label-warning">En Revisión</span>';
                 }else if(response.data[i].evaluacion_meses[0].idEstatus == 3){
                     item.estado = '<span class="label label-danger">En Correción</span>';
                 }else if(response.data[i].evaluacion_meses[0].idEstatus == 4){
-                    item.estado = '<span class="label label-info">Registrado</span>';
+                    item.estado = '<span class="label label-primary">Registrado</span>';
                 }else if(response.data[i].evaluacion_meses[0].idEstatus == 5){
-                    item.estado = '<span class="label label-primary">Firmado</span>';
+                    item.estado = '<span class="label label-success">Firmado</span>';
                 }
-            }else if(mes_activo != 0)
-                item.estado = '<span class="label label-success">En Trámite</span>';
-            else{
+            }else{ //if(mes_activo != 0)
                 item.estado = '<span class="text-muted">Inactivo</span>';
+                //item.estado = '<span class="label label-success">En Trámite</span>';
+            //else{
             }
             
             for(var j in response.data[i].registro_avance){

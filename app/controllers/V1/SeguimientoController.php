@@ -261,6 +261,15 @@ class SeguimientoController extends BaseController {
 					}
 					throw new Exception("El proyecto se encuentra en un estatus en el que no esta disponible para edición", 1);
 				}
+			}else{
+				if(!$seguimiento_mes){
+					$seguimiento_mes = new EvaluacionProyectoMes;
+					$seguimiento_mes->idEstatus = 1;
+					$seguimiento_mes->mes = $mes_actual;
+					$seguimiento_mes->anio = date('Y');
+					$seguimiento_mes->idProyecto = $parametros['id-proyecto'];
+					$seguimiento_mes->save();
+				}
 			}
 
 			if($parametros['guardar'] == 'avance-metas'){
@@ -371,13 +380,13 @@ class SeguimientoController extends BaseController {
 				}
 
 				$seguimiento_mes = EvaluacionProyectoMes::where('idProyecto','=',$id)->where('mes','=',$mes_actual)->first();
-				if(!$seguimiento_mes){
+				/*if(!$seguimiento_mes){
 					$seguimiento_mes = new EvaluacionProyectoMes;
 					$seguimiento_mes->idEstatus = 1;
 					$seguimiento_mes->mes = $mes_actual;
 					$seguimiento_mes->anio = date('Y');
 					$seguimiento_mes->idProyecto = $id;
-				}
+				}*/
 
 				if($seguimiento_mes->idEstatus == 1 || $seguimiento_mes->idEstatus == 3){
 					$seguimiento_mes->idEstatus = 2;

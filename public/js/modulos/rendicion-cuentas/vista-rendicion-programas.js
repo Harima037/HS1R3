@@ -19,24 +19,32 @@ $('#btn-programa-cancelar').on('click',function(){
 });
 
 $('#btn-enviar-programa').on('click',function(){
-    parametros = 'guardar=validar-avance';
+    var parametros = 'guardar=validar-avance';
 
-    moduloResource.put($('#id').val(),parametros,{
-        _success: function(response){
-            MessageManager.show({data:response.data,type:'OK',timer:6});
-        },
-        _error: function(response){
-            try{
-                var json = $.parseJSON(response.responseText);
-                if(!json.code)
-                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-                else{
-                    MessageManager.show(json);
+    Confirm.show({
+        titulo:"Enviar avance a Validación",
+        mensaje: "¿Estás seguro que deseas enviar este avance para su validación? <br><b>IMPORTANTE:</b> Mientras el programa este en validación no se podra editar.",
+        si: '<span class="fa fa-send"></span> Enviar',
+        no: 'Cancelar',
+        callback: function(){
+            moduloResource.put($('#id').val(),parametros,{
+                _success: function(response){
+                    MessageManager.show({data:response.data,type:'OK',timer:6});
+                },
+                _error: function(response){
+                    try{
+                        var json = $.parseJSON(response.responseText);
+                        if(!json.code)
+                            MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                        else{
+                            MessageManager.show(json);
+                        }
+                        Validation.formValidate(json.data);
+                    }catch(e){
+                        console.log(e);
+                    }                       
                 }
-                Validation.formValidate(json.data);
-            }catch(e){
-                console.log(e);
-            }                       
+            });
         }
     });
 });
