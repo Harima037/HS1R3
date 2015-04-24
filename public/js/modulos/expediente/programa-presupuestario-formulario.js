@@ -14,6 +14,8 @@
 // Inicialización General para casi cualquier módulo
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/programas-presupuestarios');
 
+var comentariosIndicadores = {};
+
 var indicadoresDatagrid;
 var problemasDatagrid;
 var objetivosDatagrid;
@@ -90,7 +92,7 @@ if($('#id').val()){
             if(response.data.idEstatus != 1 && response.data.idEstatus != 3){
                 bloquear_controles();
             }else if(response.data.idEstatus == 3){
-                //mostrar_comentarios(response.data.comentarios);
+                mostrar_comentarios(response.data.comentario);
             }
 
             $('#tab-link-diagnostico').attr('data-toggle','tab');
@@ -252,6 +254,10 @@ function editar_indicador(e){
 
             $(form_indicador + ' .chosen-one').trigger('chosen:updated');
             $('#tipo-indicador').trigger('chosen:updated');
+
+            if(comentariosIndicadores[response.data.claveTipoIndicador]){
+                mostrar_comentarios(comentariosIndicadores[response.data.claveTipoIndicador]);
+            }
 
             $(modal_indicador).find(".modal-title").html("Editar Indicador");
             $(modal_indicador).modal('show');
@@ -789,6 +795,8 @@ function reset_modal_form(formulario){
         $('#tipo-indicador').trigger('chosen:updated');
         $('#lbl-numerador-programa').text('');
         $('#lbl-meta-programa').text('');
+        $(formulario+' .texto-comentario').remove();
+        $(formulario+' .has-warning').removeClass('has-warning');
     }else if(formulario == form_causa_efecto){
         $('#id-causa-efecto').val('');
     }else if(formulario == form_medio_fin){
@@ -804,6 +812,49 @@ function bloquear_controles(){
             $(this).trigger('chosen:updated');
         }
     });
+}
+
+function mostrar_comentarios(datos){
+    for(var i in datos){
+        var id_campo = datos[i].idCampo;
+        var observacion = datos[i].observacion;
+        if(datos[i].tipoComentario == 1){
+            if(id_campo.indexOf("-F") > -1 || id_campo.indexOf("-P") > -1){
+                if(id_campo.indexOf("-F") > -1){
+                    var tipo_indicador = 'F';
+                }else{
+                    var tipo_indicador = 'P';
+                }
+                var index_tipo = id_campo.indexOf(tipo_indicador);
+                var nuevo_id = id_campo.substring(0,index_tipo) + 'programa';
+
+                if(!comentariosIndicadores[tipo_indicador]){
+                    comentariosIndicadores[tipo_indicador] = [];
+                }
+
+                comentariosIndicadores[tipo_indicador].push({
+                    'idCampo': nuevo_id,
+                    'observacion': observacion,
+                    'tipoComentario': 1
+                });
+
+            }else if(id_campo == 'arbolproblema' || id_campo == 'arbolobjetivo'){
+                if(id_campo == 'arbolproblema'){
+                    $('#datagridProblemas table').before(' <p class="texto-comentario has-warning help-block"><span class="fa fa-warning"></span> '+observacion+'</p>');
+                }else{
+                    $('#datagridObjetivos table').before(' <p class="texto-comentario has-warning help-block"><span class="fa fa-warning"></span> '+observacion+'</p>');
+                }
+            }else{
+                $('#'+id_campo).parent('.form-group').addClass('has-warning');
+                $('#'+id_campo).append('<p class="texto-comentario has-warning help-block"> '+observacion+'</p>');
+                //var texto_lbl = $('label[for="' + id_campo + '"]').text();
+                //$('label[for="' + id_campo + '"]').html('<span class="programa-comentario" data-placement="auto top" data-toggle="popover" data-trigger="click" data-content="'+observacion+'">'+texto_lbl+'</span>');
+                //$('label[for="' + id_campo + '"]').prepend('<span class="fa fa-warning"></span> ');
+            }
+            
+        }
+    }
+    $('.proyecto-comentario').popover();
 }
 
 /**

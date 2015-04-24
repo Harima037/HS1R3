@@ -189,7 +189,7 @@ class ProgramaPresupuestarioController extends BaseController {
 
 		if($parametros){
 			if($parametros['mostrar'] == 'editar-programa'){
-				$recurso = Programa::find($id);
+				$recurso = Programa::with('comentario')->find($id);
 			}elseif($parametros['mostrar'] == 'editar-causa-efecto'){
 				$recurso = ProgramaArbolProblema::find($id);
 			}elseif($parametros['mostrar'] == 'editar-medio-fin'){
@@ -300,7 +300,7 @@ class ProgramaPresupuestarioController extends BaseController {
 					$recurso->causa = $parametros['causa'];
 					$recurso->efecto = $parametros['efecto'];
 
-					if($programa->arbolProblema()->save($recurso)){
+					if($programa->arbolProblemas()->save($recurso)){
 						$respuesta['data'] = $recurso;
 					}else{
 						$respuesta['http_status'] = 500;
@@ -321,7 +321,7 @@ class ProgramaPresupuestarioController extends BaseController {
 					$recurso->medio = $parametros['medio'];
 					$recurso->fin = $parametros['fin'];
 
-					if($programa->arbolObjetivo()->save($recurso)){
+					if($programa->arbolObjetivos()->save($recurso)){
 						$respuesta['data'] = $recurso;
 					}else{
 						$respuesta['http_status'] = 500;
@@ -448,13 +448,13 @@ class ProgramaPresupuestarioController extends BaseController {
 			}
 
 			if($parametros['guardar'] == 'validar-programa'){
-				$recurso = Programa::with('arbolProblema','arbolObjetivo','indicadores')->find($id);
+				$recurso = Programa::with('arbolProblemas','arbolObjetivos','indicadores')->find($id);
 
-				if((count($recurso->arbolObjetivo) == 0) || ($recurso->arbolObjetivo == NULL)){
+				if((count($recurso->arbolObjetivos) == 0) || ($recurso->arbolObjetivo == NULL)){
 					$respuesta['http_status'] = 500;
 					$respuesta['data']['code'] = 'S01';
 					$respuesta['data']['data'] = 'No es posible enviar el programa a revisión, ya que falta información del arbol de objetivos por capturar';
-				}elseif((count($recurso->arbolProblema) == 0) || ($recurso->arbolProblema == NULL)) {
+				}elseif((count($recurso->arbolProblemas) == 0) || ($recurso->arbolProblema == NULL)) {
 					$respuesta['http_status'] = 500;
 					$respuesta['data']['code'] = 'S01';
 					$respuesta['data']['data'] = 'No es posible enviar el programa a revisión, ya que falta información del arbol del problema por capturar';
