@@ -84,8 +84,8 @@
         </div>
         <div class="col-sm-7">
             <div class="form-group">
-                <label class="control-label">Periodo de Ejecución</label>
-                <div class="input-group">
+                <label for="periodoejecucion" class="control-label">Periodo de Ejecución</label>
+                <div class="input-group" id="periodoejecucion">
                     <span class="input-group-addon">
                         Del
                     </span>
@@ -102,7 +102,7 @@
         <div class="col-sm-12">
             <div class="panel panel-primary">
                 <div class="panel-heading"><b>Documentación de soporte</b></div>
-                <div class="panel-body">
+                <div class="panel-body" id="listado_documentos">
                     <div class="row">
                     @foreach ($documentos_soporte as $documento)
                         <div class="col-sm-4">

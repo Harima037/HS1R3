@@ -256,6 +256,14 @@ class ProgramaPresupuestarioController extends BaseController {
 			if($parametros['guardar'] == 'programa'){
 				$validacion = Validador::validar(Input::all(), $this->reglasPrograma);
 				if($validacion === TRUE){
+					$programa = Programa::where('ejercicio','=',$parametros['ejercicio'])
+										->where('claveProgramaPresupuestario','=',$parametros['programa-presupuestario'])->get();
+
+					if(count($programa)){
+						$respuesta['data']['data'] = 'Este programa presupuestario ya se encentra capturado';
+						throw new Exception("programa encontrado", 1);
+					}
+
 					$recurso = new Programa;
 
 					$recurso->claveProgramaSectorial = $parametros['programa-sectorial'];

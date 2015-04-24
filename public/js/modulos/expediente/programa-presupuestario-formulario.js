@@ -80,20 +80,34 @@ if($('#id').val()){
 
             resetear_borrar();
 
-            problemasDatagrid.actualizar();
-            objetivosDatagrid.actualizar();
-            indicadoresDatagrid.actualizar();
-            proyectosDatagrid.actualizar({
-                _success: function(response){
-                    actualizar_lista_proyectos(response);
-                }
-            });
-
             if(response.data.idEstatus != 1 && response.data.idEstatus != 3){
                 bloquear_controles();
             }else if(response.data.idEstatus == 3){
                 mostrar_comentarios(response.data.comentario);
             }
+
+            problemasDatagrid.actualizar();
+            objetivosDatagrid.actualizar();
+            indicadoresDatagrid.actualizar({
+                _success: function(response){
+                    for(var i in response.data){
+                        if(response.data[i].claveTipoIndicador == 'F'){
+                            var tipo_descripcion = 'Fin';
+                        }else{
+                            var tipo_descripcion = 'Proposito';
+                        }
+                        if(comentariosIndicadores[response.data[i].claveTipoIndicador]){
+                            response.data[i].claveTipoIndicador = '<span class="text-warning fa fa-warning"></span> ' + tipo_descripcion;
+                        }
+                    }
+                    indicadoresDatagrid.cargarDatos(response.data);
+                }
+            });
+            proyectosDatagrid.actualizar({
+                _success: function(response){
+                    actualizar_lista_proyectos(response);
+                }
+            });
 
             $('#tab-link-diagnostico').attr('data-toggle','tab');
             $('#tab-link-diagnostico').parent().removeClass('disabled');
@@ -316,7 +330,18 @@ $('#btn-programa-guardar').on('click',function(){
 
                 problemasDatagrid.cargarDatos([]);
                 objetivosDatagrid.cargarDatos([]);
-                indicadoresDatagrid.cargarDatos([]);
+                indicadoresDatagrid.actualizar({
+                    _success: function(response){
+                        for(var i in response.data){
+                            if(response.data[i].claveTipoIndicador == 'F'){
+                                response.data[i].claveTipoIndicador = 'Fin';
+                            }else{
+                                response.data[i].claveTipoIndicador = 'Proposito';
+                            }
+                        }
+                        indicadoresDatagrid.cargarDatos(response.data);
+                    }
+                });
                 proyectosDatagrid.actualizar({
                     _success: function(response){
                         actualizar_lista_proyectos(response);
@@ -840,16 +865,19 @@ function mostrar_comentarios(datos){
 
             }else if(id_campo == 'arbolproblema' || id_campo == 'arbolobjetivo'){
                 if(id_campo == 'arbolproblema'){
-                    $('#datagridProblemas table').before(' <p class="texto-comentario has-warning help-block"><span class="fa fa-warning"></span> '+observacion+'</p>');
+                    $('#datagridProblemas table').parent('.panel').addClass('has-warning');
+                    $('#datagridProblemas table').before(' <p class="texto-comentario help-block"> <span class="fa fa-warning"></span> '+observacion+'</p>');
                 }else{
-                    $('#datagridObjetivos table').before(' <p class="texto-comentario has-warning help-block"><span class="fa fa-warning"></span> '+observacion+'</p>');
+                    $('#datagridObjetivos table').parent('.panel').addClass('has-warning');
+                    $('#datagridObjetivos table').before(' <p class="texto-comentario help-block"> <span class="fa fa-warning"></span> '+observacion+'</p>');
                 }
             }else{
+                $('label[for="' + id_campo + '"]').prepend('<span class="fa fa-warning texto-comentario"></span> ');
                 $('#'+id_campo).parent('.form-group').addClass('has-warning');
-                $('#'+id_campo).append('<p class="texto-comentario has-warning help-block"> '+observacion+'</p>');
+                $('#'+id_campo).parent('.form-group').append('<p class="texto-comentario has-warning help-block"> '+observacion+'</p>');
                 //var texto_lbl = $('label[for="' + id_campo + '"]').text();
                 //$('label[for="' + id_campo + '"]').html('<span class="programa-comentario" data-placement="auto top" data-toggle="popover" data-trigger="click" data-content="'+observacion+'">'+texto_lbl+'</span>');
-                //$('label[for="' + id_campo + '"]').prepend('<span class="fa fa-warning"></span> ');
+                //
             }
             
         }

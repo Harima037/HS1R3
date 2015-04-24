@@ -170,5 +170,177 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+
+<div class="modal fade" id="modal-presupuesto" tabindex="-1" role="dialog" aria-labelledby="modalPresupLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-85-screen">
+        <div class="modal-content modal-content-85-screen">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="modalPresupLabel">Detalle del Presupuesto</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-presupuesto">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="jurisdiccion-accion" class="label-control">Jurisdicción</label>
+                                <input type="text" id="jurisdiccion-accion" name="jurisdiccion-accion" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="municipio-accion" class="label-control">Municipio</label>
+                                <input type="text" id="municipio-accion" name="municipio-accion" class="form-control" >
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="localidad-accion" class="label-control">Localidad</label>
+                                <input type="text" id="localidad-accion" name="localidad-accion" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <table id="tabla_beneficiarios" class="table table-condensed table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Tipo Beneficiario</th>
+                                            <th width="20%"><span class="fa fa-female"></span> Femenino</th>
+                                            <th width="20%"><span class="fa fa-male"></span> Masculino</th>
+                                            <th width="20%">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="3"></td>
+                                            <td>
+                                                <span class="form-control" id="total-beneficiarios-lbl">0</span>
+                                                <input type="hidden" id="total-beneficiarios" name="total-beneficiarios">
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label">Calenderización</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div role="tabpanel">
+                        <!-- Nav tabs -->
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active">
+                                <a href="#calendarizado-presupuesto" aria-controls="calendarizado-presupuesto" role="tab" data-toggle="tab">
+                                    <span class="fa fa-usd"></span> Presupuesto
+                                </a>
+                            </li>
+                            <li role="presentation">
+                                <a href="#calendarizado-metas" aria-controls="calendarizado-metas" role="tab" data-toggle="tab">
+                                    <span class="fa fa-table"></span> Metas
+                                </a>
+                            </li>
+                        </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane active" id="calendarizado-presupuesto">
+                                <br>
+                                <div class="row">
+                                   <!-- pARTE 1 -->
+                                   <div class="col-sm-12">
+                                    <div id="calendario-partidas" name="calendario-partidas"></div>                                
+                                   </div>
+                                    <div class="clearfix"></div>
+                                    <div class="col-sm-5">
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <span class="input-group-addon">
+                                                    <span class="fa fa-link"></span> Total
+                                                </span>
+                                                <span class="form-control" id="cantidad-presupuesto-lbl">0</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="calendarizado-metas">
+                                <br>
+                                <div class="row">
+                                    <div class="col-sm-8">
+                                        <div class="form-group">
+                                            <label class="control-label">
+                                                Indicador
+                                            </label>
+                                            <p class="form-control-static" id="indicador_texto">
+                                                Descripción del Indicador
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label class="control-label">
+                                                Unidad de Medida
+                                            </label>
+                                            <p class="form-control-static" id="unidad_medida_texto">
+                                                Descripción de la unidad de medida
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="row">                                        
+                                        <!-- pARTE 2 -->
+                                           <div class="col-sm-12">
+                                               <div id="calendario-metas" name="calendario-metas"></div>                                
+                                          </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <div class="row">
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label class="control-label"><span class="fa fa-link"></span> Trim 1</label>
+                                                    <span class="form-control" id="trim1-lbl">0</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label class="control-label"><span class="fa fa-link"></span> Trim 2</label>
+                                                    <span class="form-control" id="trim2-lbl">0</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label class="control-label"><span class="fa fa-link"></span> Trim 3</label>
+                                                    <span class="form-control" id="trim3-lbl">0</span>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label class="control-label"><span class="fa fa-link"></span> Trim 4</label>
+                                                    <span class="form-control" id="trim4-lbl">0</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <label><span class="fa fa-link"></span> Total</label>
+                                            <span class="form-control" id="cantidad-meta-lbl">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 @parent
 @stop

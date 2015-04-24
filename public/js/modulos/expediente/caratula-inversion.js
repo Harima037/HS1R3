@@ -105,17 +105,16 @@ if($('#id').val()){
 				$('#tab-link-acciones-fibap').parent().removeClass('disabled');
 			}
 
+			fuenteFinanciamiento.init(proyectoResource,$('#id').val());
+			if(response.data.fuentes_financiamiento.length){
+				fuenteFinanciamiento.llenar_datagrid(response.data.fuentes_financiamiento);
+				cambiar_icono_tabs('#tablink-fuentes-financiamiento','fa-check-square-o');
+			}
 
 			if(response.data.idEstatusProyecto != 1 && response.data.idEstatusProyecto != 3){
 				bloquear_controles();
 			}else if(response.data.idEstatusProyecto == 3){
 				mostrar_comentarios(response.data.comentarios);
-			}
-
-			fuenteFinanciamiento.init(proyectoResource,$('#id').val());
-			if(response.data.fuentes_financiamiento.length){
-				fuenteFinanciamiento.llenar_datagrid(response.data.fuentes_financiamiento);
-				cambiar_icono_tabs('#tablink-fuentes-financiamiento','fa-check-square-o');
 			}
             /*
             actualizar_tabla_metas('actividad',response.data.jurisdicciones);
@@ -193,24 +192,33 @@ $('#btn-enviar-proyecto').on('click',function(){
 	parametros = 'guardar=validar-proyecto';
 
 	if($('#id').val()){
-		proyectoResource.put($('#id').val(),parametros,{
-	        _success: function(response){
-	            MessageManager.show({data:response.data,type:'OK',timer:6});
-	        },
-	        _error: function(response){
-	            try{
-	                var json = $.parseJSON(response.responseText);
-	                if(!json.code)
-	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-	                else{
-	                    MessageManager.show(json);
-	                }
-	                Validation.formValidate(json.data);
-	            }catch(e){
-	                console.log(e);
-	            }                       
-	        }
-	    });
+		Confirm.show({
+			titulo:"Enviar proyecto a Validación",
+			mensaje: "¿Estás seguro que deseas enviar este proyecto para su validación? <br><b>IMPORTANTE:</b> Mientras el proyecto este en validación no se podra editar ningún elemento del mismo.",
+			si: '<span class="fa fa-send"></span> Enviar',
+			no: 'Cancelar',
+			callback: function(){
+				proyectoResource.put($('#id').val(),parametros,{
+			        _success: function(response){
+			            MessageManager.show({data:response.data,type:'OK',timer:6});
+			            bloquear_controles();
+			        },
+			        _error: function(response){
+			            try{
+			                var json = $.parseJSON(response.responseText);
+			                if(!json.code)
+			                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+			                else{
+			                    MessageManager.show(json);
+			                }
+			                Validation.formValidate(json.data);
+			            }catch(e){
+			                console.log(e);
+			            }                       
+			        }
+			    });
+			}
+		});
 	}
 });
 
@@ -751,12 +759,18 @@ function mostrar_comentarios(datos){
 		
 		id_campo = id_campo.split('|');
 		id_campo = id_campo[0];
-
+		
 		if(id_campo.substring(0,12) == 'beneficiario'){
-			console.log(id_campo.substring(12));
 			$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"]').addClass('text-warning');
 			$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"] td:eq(1)').prepend('<span class="fa fa-warning"></span> ');
 			$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"]').attr('data-comentario',observacion);
+		}else if(id_campo.substring(0,14) == 'financiamiento'){
+			$('#datagridFuenteFinanciamiento tr[data-id="'+id_campo.substring(14)+'"]').addClass('text-warning');
+			$('#datagridFuenteFinanciamiento tr[data-id="'+id_campo.substring(14)+'"] td:eq(1)').prepend('<span class="fa fa-warning"></span> ');
+			$('#datagridFuenteFinanciamiento tr[data-id="'+id_campo.substring(14)+'"]').attr('data-comentario',observacion);
+		}else if(id_campo.substring(0,10) == 'documentos'){
+			$('#listado_documentos').parent('.panel').addClass('has-warning');
+			$('#listado_documentos').prepend('<p class="help-block">'+observacion+'</p>')
 		}else{
 			if($('#'+id_campo).length){
 				$('#'+id_campo).parent('.form-group').addClass('has-warning');

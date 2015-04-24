@@ -283,25 +283,25 @@
                     <div class="row">
                         <div class="col-sm-3">
                             <div class="form-group">
-                                <label class="control-label">Trim 1</label>
+                                <label for="trim1-{{$identificador}}" class="control-label">Trim 1</label>
                                 <input type="number" class="form-control valor-trimestre" id="trim1-{{$identificador}}" name="trim1-{{$identificador}}">
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
-                                <label class="control-label">Trim 2</label>
+                                <label for="trim2-{{$identificador}}" class="control-label">Trim 2</label>
                                 <input type="number" class="form-control valor-trimestre" id="trim2-{{$identificador}}" name="trim2-{{$identificador}}">
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
-                                <label class="control-label">Trim 3</label>
+                                <label for="trim3-{{$identificador}}" class="control-label">Trim 3</label>
                                 <input type="number" class="form-control valor-trimestre" id="trim3-{{$identificador}}" name="trim3-{{$identificador}}">
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="form-group">
-                                <label class="control-label">Trim 4</label>
+                                <label for="trim4-{{$identificador}}" class="control-label">Trim 4</label>
                                 <input type="number" class="form-control valor-trimestre" id="trim4-{{$identificador}}" name="trim4-{{$identificador}}">
                             </div>
                         </div>
@@ -309,7 +309,7 @@
                 </div>
                 <div class="col-sm-4">
                     <div class="form-group">
-                        <label class="control-label"><span class="fa fa-link"></span> Numerador</label>
+                        <label for="numerador-{{$identificador}}" class="control-label"><span class="fa fa-link"></span> Numerador</label>
                         <span class="form-control" id="lbl-numerador-{{$identificador}}"></span>
                         <input type="hidden" id="numerador-{{$identificador}}" name="numerador-{{$identificador}}">
                     </div>
@@ -322,7 +322,7 @@
                 </div>
                 <div class="col-sm-4">
                     <div class="form-group">
-                        <label class="control-label"><span class="fa fa-link"></span> Meta</label>
+                        <label for="meta-{{$identificador}}" class="control-label"><span class="fa fa-link"></span> Meta</label>
                         <span class="form-control" id="lbl-meta-{{$identificador}}"></span>
                         <input type="hidden" id="meta-{{$identificador}}" name="meta-{{$identificador}}">
                     </div>
