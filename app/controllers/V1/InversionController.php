@@ -1416,6 +1416,15 @@ class InversionController extends ProyectosController {
 				$beneficiarios_m = $desglose->beneficiarios->lists('totalM','idTipoBeneficiario');
 				
 				foreach ($parametros['beneficiarios'] as $tipo_beneficiario => $desglose_sexo) {
+					if(!isset($beneficiarios_f[$tipo_beneficiario])){
+						$beneficiarios_f[$tipo_beneficiario] = 0;
+					}
+					if(!isset($beneficiarios_m[$tipo_beneficiario])){
+						$beneficiarios_m[$tipo_beneficiario] = 0;
+					}
+				}
+
+				foreach ($parametros['beneficiarios'] as $tipo_beneficiario => $desglose_sexo) {
 					if($beneficiarios_f[$tipo_beneficiario] != $desglose_sexo['f'] || $beneficiarios_m[$tipo_beneficiario] != $desglose_sexo['m']){
 						$editar_beneficiarios = TRUE;
 					}
@@ -1462,6 +1471,9 @@ class InversionController extends ProyectosController {
 						$suma_benef[$tipo_beneficiario]['m'] += $desglose_sexo['m'];
 						$suma_total['f'] += $desglose_sexo['f'];
 						$suma_total['m'] += $desglose_sexo['m'];
+					}else{
+						$suma_benef[$tipo_beneficiario]['f'] = 0;
+						$suma_benef[$tipo_beneficiario]['m'] = 0;
 					}
 				}
 

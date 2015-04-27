@@ -13,6 +13,12 @@
 // Declaracion de variables
 var proyectoResource = new RESTfulRequests(SERVER_HOST+'/v1/inversion');
 
+var comentarios = {
+	componentes: {},
+	actividades: {},
+	desgloses: {}
+};
+
 var form_caratula = '#form_caratula';
 var form_fibap = '#form-fibap-datos';
 var form_fibap_antecentes = '#form-fibap-antecedentes';
@@ -70,8 +76,21 @@ if($('#id').val()){
 				cambiar_icono_tabs('#tab-link-caratula-beneficiarios','fa-check-square-o');
 			}
 
+			fuenteFinanciamiento.init(proyectoResource,$('#id').val());
+			if(response.data.fuentes_financiamiento.length){
+				fuenteFinanciamiento.llenar_datagrid(response.data.fuentes_financiamiento);
+				cambiar_icono_tabs('#tablink-fuentes-financiamiento','fa-check-square-o');
+			}
+
+			if(response.data.idEstatusProyecto != 1 && response.data.idEstatusProyecto != 3){
+				bloquear_controles();
+			}else if(response.data.idEstatusProyecto == 3){
+				mostrar_comentarios(response.data.comentarios);
+			}
+
 			if(response.data.fibap){
 				fibapAcciones.init(response.data.fibap.id,proyectoResource);
+				fibapAcciones.mostrarComentarios(comentarios);
 
 				caratulaFibap.llenar_datos(response.data.fibap);
 				cambiar_icono_tabs('#tab-link-datos-fibap','fa-check-square-o');
@@ -104,22 +123,6 @@ if($('#id').val()){
 				$('#tab-link-acciones-fibap').attr('data-toggle','tab');
 				$('#tab-link-acciones-fibap').parent().removeClass('disabled');
 			}
-
-			fuenteFinanciamiento.init(proyectoResource,$('#id').val());
-			if(response.data.fuentes_financiamiento.length){
-				fuenteFinanciamiento.llenar_datagrid(response.data.fuentes_financiamiento);
-				cambiar_icono_tabs('#tablink-fuentes-financiamiento','fa-check-square-o');
-			}
-
-			if(response.data.idEstatusProyecto != 1 && response.data.idEstatusProyecto != 3){
-				bloquear_controles();
-			}else if(response.data.idEstatusProyecto == 3){
-				mostrar_comentarios(response.data.comentarios);
-			}
-            /*
-            actualizar_tabla_metas('actividad',response.data.jurisdicciones);
-            actualizar_tabla_metas('componente',response.data.jurisdicciones);
-            */
         }
     });
 }
@@ -756,29 +759,68 @@ function mostrar_comentarios(datos){
 	for(var i in datos){
 		var id_campo = datos[i].idCampo;
 		var observacion = datos[i].observacion;
+		var tipo_comentario = datos[i].tipoComentario;
 		
-		id_campo = id_campo.split('|');
-		id_campo = id_campo[0];
-		
-		if(id_campo.substring(0,12) == 'beneficiario'){
-			$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"]').addClass('text-warning');
-			$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"] td:eq(1)').prepend('<span class="fa fa-warning"></span> ');
-			$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"]').attr('data-comentario',observacion);
-		}else if(id_campo.substring(0,14) == 'financiamiento'){
-			$('#datagridFuenteFinanciamiento tr[data-id="'+id_campo.substring(14)+'"]').addClass('text-warning');
-			$('#datagridFuenteFinanciamiento tr[data-id="'+id_campo.substring(14)+'"] td:eq(1)').prepend('<span class="fa fa-warning"></span> ');
-			$('#datagridFuenteFinanciamiento tr[data-id="'+id_campo.substring(14)+'"]').attr('data-comentario',observacion);
-		}else if(id_campo.substring(0,10) == 'documentos'){
-			$('#listado_documentos').parent('.panel').addClass('has-warning');
-			$('#listado_documentos').prepend('<p class="help-block">'+observacion+'</p>')
+		if(tipo_comentario == 1){
+			if(id_campo.substring(0,12) == 'beneficiario'){
+				$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"]').addClass('text-warning');
+				$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"] td:eq(1)').prepend('<span class="fa fa-warning"></span> ');
+				$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"]').attr('data-comentario',observacion);
+			}else if(id_campo.substring(0,14) == 'financiamiento'){
+				$('#datagridFuenteFinanciamiento tr[data-id="'+id_campo.substring(14)+'"]').addClass('text-warning');
+				$('#datagridFuenteFinanciamiento tr[data-id="'+id_campo.substring(14)+'"] td:eq(1)').prepend('<span class="fa fa-warning"></span> ');
+				$('#datagridFuenteFinanciamiento tr[data-id="'+id_campo.substring(14)+'"]').attr('data-comentario',observacion);
+			}else if(id_campo.substring(0,10) == 'documentos'){
+				$('#listado_documentos').parent('.panel').addClass('has-warning');
+				$('#listado_documentos').prepend('<p class="help-block proyecto-comentario">'+observacion+'</p>');
+			}else if(id_campo.substring(0,12) == 'antecedentes'){
+				//$('#datagridAntecedentes table').parent().addClass('has-warning');
+				$('#datagridAntecedentes table').after('<div class="alert alert-warning"><span class="fa fa-warning"></span> '+observacion+'</div>');
+			}else{
+				if($('#'+id_campo).length){
+					$('#'+id_campo).parent('.form-group').addClass('has-warning');
+					var texto_lbl = $('label[for="' + id_campo + '"]').text();
+					$('label[for="' + id_campo + '"]').html('<span class="proyecto-comentario" data-placement="auto top" data-toggle="popover" data-trigger="click" data-content="'+observacion+'">'+texto_lbl+'</span>');
+					$('label[for="' + id_campo + '"]').prepend('<span class="fa fa-warning"></span> ');
+				}
+			}
 		}else{
-			if($('#'+id_campo).length){
-				$('#'+id_campo).parent('.form-group').addClass('has-warning');
-				var texto_lbl = $('label[for="' + id_campo + '"]').text();
-				$('label[for="' + id_campo + '"]').html('<span class="proyecto-comentario" data-placement="auto top" data-toggle="popover" data-trigger="click" data-content="'+observacion+'">'+texto_lbl+'</span>');
-				$('label[for="' + id_campo + '"]').prepend('<span class="fa fa-warning"></span> ');
-				$('.proyecto-comentario').popover();
+			id_campo = id_campo.split('|'); // El id campo viene en dos o mas partes: field | id - extra_data
+			//
+
+			var comentario = {};
+
+			if(id_campo[0] == 'desglose'){
+				var id_desglose = id_campo[1].split('-'); //ids en desglose son idComponente - idDesglose
+				comentarios.desgloses[id_desglose[1]] = {
+					tipoComentario: 1,
+					idCampo: id_campo[0],
+					observacion: observacion
+				};
+			}else{
+				if(tipo_comentario == 2){
+					if(!comentarios.componentes[id_campo[1]]){
+						comentarios.componentes[id_campo[1]] = [];
+					}
+					comentario.tipoComentario = 1;
+					if(id_campo[0].indexOf('entregable') > -1){
+						comentario.idCampo = id_campo[0];
+					}else{
+						comentario.idCampo = id_campo[0] + '-componente';
+					}
+					comentario.observacion = observacion;
+					comentarios.componentes[id_campo[1]].push(comentario);
+				}else if(tipo_comentario == 3){
+					if(!comentarios.actividades[id_campo[1]]){
+						comentarios.actividades[id_campo[1]] = [];
+					}
+					comentario.tipoComentario = 1;
+					comentario.idCampo = id_campo[0] + '-actividad';
+					comentario.observacion = observacion;
+					comentarios.actividades[id_campo[1]].push(comentario);
+				}
 			}
 		}
 	}
+	$('.proyecto-comentario').popover();
 }

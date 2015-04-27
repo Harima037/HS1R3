@@ -24,6 +24,8 @@ actividadDatagrid.init();
 desgloseComponenteDatagrid.init();
 beneficiarioDatagrid.init();
 
+var comentarios = { componentes:{}, actividades:{} };
+
 var modal_componente = '#modalComponente';
 var modal_actividad = '#modalActividad';
 var modal_beneficiario = '#modalBeneficiario';
@@ -116,8 +118,6 @@ if($('#id').val()){
 			$('#tablink-fuentes-financiamiento').attr('data-toggle','tab');
 			$('#tablink-fuentes-financiamiento').parent().removeClass('disabled');
 
-			actualizar_grid_componentes(response.data.componentes);
-
 			fuenteFinanciamiento.init(proyectoResource,$('#id').val());
 			if(response.data.fuentes_financiamiento.length){
 				fuenteFinanciamiento.llenar_datagrid(response.data.fuentes_financiamiento);
@@ -128,6 +128,8 @@ if($('#id').val()){
 			}else if(response.data.idEstatusProyecto == 3){
 				mostrar_comentarios(response.data.comentarios);
 			}
+
+			actualizar_grid_componentes(response.data.componentes);
         }
     });
 }else{
@@ -247,6 +249,10 @@ function editar_componente(e){
 			$(tab_id).tab('show');
 
 			actualizar_grid_actividades(response.data.actividades);
+
+			if(comentarios.componentes[response.data.id]){
+				mostrar_comentarios_alt(comentarios.componentes[response.data.id]);
+			}
 
 			if(response.data.idEntregable){
 				busqueda_rapida_desglose(e,{});
@@ -459,6 +465,10 @@ function editar_actividad(e){
 			actualizar_metas('actividad',response.data.metas_mes);
 
 			var tab_id = cargar_formulario_componente_actividad('actividad',response.data);
+
+			if(comentarios.actividades[response.data.id]){
+				mostrar_comentarios_alt(comentarios.actividades[response.data.id]);
+			}
 
 			$(tab_id).tab('show');
 
@@ -1104,6 +1114,10 @@ function actualizar_grid_actividades(datos){
 		actividad.creadoPor = datos[indx].usuario.username;
 		actividad.creadoAl = datos[indx].creadoAl.substring(0,11);
 
+		if(comentarios.actividades[datos[indx].id]){
+			actividad.indicador = '<span class="text-warning fa fa-warning"></span> ' + actividad.indicador;
+		}
+
 		actividades.push(actividad);
 	}
 
@@ -1128,6 +1142,10 @@ function actualizar_grid_componentes(datos){
 		componente.unidad_medida = datos[indx].unidad_medida.descripcion;
 		componente.creadoPor = datos[indx].usuario.username;
 		componente.creadoAl = datos[indx].creadoAl.substring(0,11);
+
+		if(comentarios.componentes[datos[indx].id]){
+			componente.indicador = '<span class="text-warning fa fa-warning"></span> ' + componente.indicador;
+		}
 
 		componentes.push(componente);
 	}
@@ -1188,6 +1206,9 @@ function reset_modal_form(formulario){
     $(formulario + ' input[type="hidden"]').change();
     
     $(formulario + ' .chosen-one').trigger('chosen:updated');
+    $(formulario + ' .texto-comentario').remove();
+    $(formulario + ' .has-warning').removeClass('has-warning');
+
     Validation.cleanFormErrors(formulario);
     if(formulario == form_componente){
     	$(form_componente + ' .metas-mes').attr('data-meta-id','');
@@ -1356,12 +1377,29 @@ function bloquear_controles(){
 	});
 }
 
+function mostrar_comentarios_alt(datos){
+	for(var i in datos){
+        var id_campo = datos[i].idCampo;
+        var observacion = datos[i].observacion;
+        var tipo_comentario = datos[i].tipoComentario;
+        
+        if(tipo_comentario == 1){
+        	if($('#'+id_campo).length){
+                $('label[for="' + id_campo + '"]').prepend('<span class="fa fa-warning texto-comentario"></span> ');
+                $('#'+id_campo).parent('.form-group').addClass('has-warning');
+                $('#'+id_campo).parent('.form-group').append('<p class="texto-comentario has-warning help-block"> '+observacion+'</p>');
+            }
+        }
+    }
+}
+
 function mostrar_comentarios(datos){
 	for(var i in datos){
 		var id_campo = datos[i].idCampo;
 		var observacion = datos[i].observacion;
+		var tipo_comentario = datos[i].tipoComentario;
 		
-		if(datos[i].tipoComentario == 1){
+		if(tipo_comentario == 1){
 			if(id_campo.substring(0,12) == 'beneficiario'){
 				$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"]').addClass('text-warning');
 				$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"] td:eq(1)').prepend('<span class="fa fa-warning"></span> ');
@@ -1377,8 +1415,27 @@ function mostrar_comentarios(datos){
 				$('label[for="' + id_campo + '"]').prepend('<span class="fa fa-warning"></span> ');
 				$('.proyecto-comentario').popover();
 			}
+		}else{
+			id_campo = id_campo.split('|'); // El id campo viene en dos o mas partes: field | id - extra_data
+			var comentario = {};
+			if(tipo_comentario == 2){
+				if(!comentarios.componentes[id_campo[1]]){
+					comentarios.componentes[id_campo[1]] = [];
+				}
+				comentario.tipoComentario = 1;
+				comentario.idCampo = id_campo[0] + '-componente';
+				comentario.observacion = observacion;
+				comentarios.componentes[id_campo[1]].push(comentario);
+			}else if(tipo_comentario == 3){
+				if(!comentarios.actividades[id_campo[1]]){
+					comentarios.actividades[id_campo[1]] = [];
+				}
+				comentario.tipoComentario = 1;
+				comentario.idCampo = id_campo[0] + '-actividad';
+				comentario.observacion = observacion;
+				comentarios.actividades[id_campo[1]].push(comentario);
+			}
 		}
-		
 	}
 }
 

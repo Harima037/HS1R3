@@ -602,22 +602,32 @@ $('#btn-guardar-indicador').on('click',function(){
 $('#btn-enviar-programa').on('click',function(){
     if($('#id').val()){
         var parametros = 'guardar=validar-programa';
-        moduloResource.put($('#id').val(),parametros,{
-            _success: function(response){
-                MessageManager.show({data:response.data,type:'OK',timer:6});
-            },
-            _error: function(response){
-                try{
-                    var json = $.parseJSON(response.responseText);
-                    if(!json.code)
-                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-                    else{
-                        MessageManager.show(json);
+
+        Confirm.show({
+            titulo:"Enviar programa a Validación",
+            mensaje: "¿Estás seguro que deseas enviar este programa para su validación? <br><b>IMPORTANTE:</b> Mientras el programa este en validación no se podra editar ningún elemento del mismo.",
+            si: '<span class="fa fa-send"></span> Enviar',
+            no: 'Cancelar',
+            callback: function(){
+                moduloResource.put($('#id').val(),parametros,{
+                    _success: function(response){
+                        MessageManager.show({data:response.data,type:'OK',timer:6});
+                        bloquear_controles();
+                    },
+                    _error: function(response){
+                        try{
+                            var json = $.parseJSON(response.responseText);
+                            if(!json.code)
+                                MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                            else{
+                                MessageManager.show(json);
+                            }
+                            Validation.formValidate(json.data);
+                        }catch(e){
+                            console.log(e);
+                        }                       
                     }
-                    Validation.formValidate(json.data);
-                }catch(e){
-                    console.log(e);
-                }                       
+                });
             }
         });
     }
