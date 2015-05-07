@@ -138,13 +138,15 @@
 			<td class="texto-medio texto-centro">
 			@if($avances_mes['componentes'][$componente['id']]['meta_programada'] > 0)
 				{{
-				round(
+				floatval(
+				number_format(
 					(
 						$avances_mes['componentes'][$componente['id']]['avance_acumulado']/
 						$avances_mes['componentes'][$componente['id']]['meta_programada']
 					)
 					*100
 				,2)
+				)
 				}}
 			@else
 				100
@@ -166,13 +168,15 @@
 			<td class="texto-medio texto-centro">
 			@if($avances_mes['actividades'][$actividad['id']]['meta_programada'] > 0)
 				{{
-				round(
+				floatval(
+				number_format(
 					(
 						$avances_mes['actividades'][$actividad['id']]['avance_acumulado']/
 						$avances_mes['actividades'][$actividad['id']]['meta_programada']
 					)
 					*100
 				,2)
+				)
 				}}
 			@else
 				100
@@ -244,13 +248,15 @@
 			<td class="subtitulo-tabla">
 			@if($avances_mes['componentes'][$componente['id']]['meta_programada'] > 0)
 				{{
-				round(
+				floatval(
+				number_format(
 					(
 						$avances_mes['componentes'][$componente['id']]['avance_acumulado']/
 						$avances_mes['componentes'][$componente['id']]['meta_programada']
 					)
 					*100
 				,2)
+				)
 				}}
 			@else
 				100
@@ -271,13 +277,15 @@
 					<td>
 					@if($jurisdicciones_mes['componentes'][$componente['id']][$clave]['meta_programada'] > 0)
 						{{
-						round(
+						floatval(
+						number_format(
 							(
 								$jurisdicciones_mes['componentes'][$componente['id']][$clave]['avance_acumulado']/
 								$jurisdicciones_mes['componentes'][$componente['id']][$clave]['meta_programada']
 							)
 							*100
 						,2)
+						)
 						}}
 					@else
 						100
@@ -304,13 +312,15 @@
 							<td>
 								@if($desglose['meta_programada'] > 0)
 								{{
-								round(
+								floatval(
+								number_format(
 									(
 										$desglose['avance_acumulado']/
 										$desglose['meta_programada']
 									)
 									*100
 								,2)
+								)
 								}}
 							@else
 								100
@@ -333,13 +343,15 @@
 				<td class="subtitulo-tabla">
 				@if($avances_mes['actividades'][$actividad['id']]['meta_programada'] > 0)
 					{{
-					round(
+					floatval(
+					number_format(
 						(
 							$avances_mes['actividades'][$actividad['id']]['avance_acumulado']/
 							$avances_mes['actividades'][$actividad['id']]['meta_programada']
 						)
 						*100
 					,2)
+					)
 					}}
 				@else
 					100
@@ -360,13 +372,17 @@
 						<td>
 						@if($jurisdicciones_mes['actividades'][$actividad['id']][$clave]['meta_programada'] > 0)
 							{{
-							round(
+							floatval(
+							number_format(
 								(
-									$jurisdicciones_mes['actividades'][$actividad['id']][$clave]['avance_acumulado']/
-									$jurisdicciones_mes['actividades'][$actividad['id']][$clave]['meta_programada']
+									(
+										$jurisdicciones_mes['actividades'][$actividad['id']][$clave]['avance_acumulado']/
+										$jurisdicciones_mes['actividades'][$actividad['id']][$clave]['meta_programada']
+									)
+									*100
 								)
-								*100
 							,2)
+							)
 							}}
 						@else
 							100
