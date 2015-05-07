@@ -148,7 +148,7 @@ class ProgramaPresupuestarioController extends BaseController {
 							->join('sentryUsers','sentryUsers.id','=','programa.actualizadoPor')
 							->join('catalogoProgramasPresupuestales','catalogoProgramasPresupuestales.clave','=','programa.claveProgramaPresupuestario')
 							->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','programa.idEstatus')
-							->where('programa.idEstatus','<',5)
+							//->where('programa.idEstatus','<',5)
 							->orderBy('id', 'desc')
 							->skip(($parametros['pagina']-1)*10)->take(10)
 							->get();

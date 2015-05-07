@@ -70,6 +70,10 @@ class ProyectosController extends BaseController {
 		'urbanam' 					=> 'required|integer|min:0'
 	);
 	
+	private $reglasFuenteInformacion = array(
+		'fuente-informacion'	=> 'required'
+	);
+
 	private $reglasComponente = array(
 		//'denominador-ind-componente' 	=> 'required',
 		'descripcion-ind-componente' 	=> 'required',
@@ -832,6 +836,8 @@ class ProyectosController extends BaseController {
 			//Guardar Datos del Proyecto
 			}elseif($parametros['guardar'] == 'financiamiento'){
 				$respuesta = $this->guardar_datos_financiamiento($parametros,$id);
+			}elseif($parametros['guardar'] == 'fuenteinformacion'){
+				$respuesta = $this->guardar_fuente_informacion($parametros,$id);
 			}
 		}catch(\Exception $ex){
 			$respuesta['http_status'] = 500;
@@ -995,6 +1001,33 @@ class ProyectosController extends BaseController {
 		}
 
 		return Response::json($data,$http_status);
+	}
+
+	public function guardar_fuente_informacion($parametros, $id){
+		$respuesta['http_status'] = 200;
+		$respuesta['data'] = array();
+
+		$validacion = Validador::validar(Input::all(), $this->reglasFuenteInformacion);
+
+		if($validacion === TRUE){
+			$recurso = Proyecto::find($id);
+
+			if($recurso){
+				$recurso->fuenteInformacion = $parametros['fuente-informacion'];
+
+				if(!$recurso->save()){
+					$respuesta['http_status'] = 500;
+					$respuesta['data'] = array('data'=>'Ocurrió un error al intentar guardar los datos','code'=>'S01');
+				}
+			}else{
+				$respuesta['http_status'] = 404;
+				$respuesta['data'] = array('data'=>'No se encontro el proyecto','code'=>'S01');
+			}
+		}else{
+			$respuesta['http_status'] = $validacion['http_status'];
+			$respuesta['data'] = $validacion['data'];
+		}
+		return $respuesta;
 	}
 
 	public function guardar_datos_financiamiento($parametros, $id = NULL){

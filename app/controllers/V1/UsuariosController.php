@@ -51,14 +51,17 @@ class UsuariosController extends \BaseController {
 				$rows = Sentry::getUserProvider()->createModel();
 
 				if(!Sentry::getUser()->isSuperUser()){
-					$rows = $rows->where('permissions','!=','{"superuser":1}');
+					$rows = $rows->where(function($query){
+						$query->where('permissions','!=','{"superuser":1}')
+								->orWhereNull('permissions');
+					});
 				}
 
 				if(isset($parametros['buscar'])){
 					if($parametros['buscar']){
 						$rows = $rows->where(function($query) use ($parametros){
 									$query->where('username','like','%'.$parametros['buscar'].'%')
-										->orwhere(DB::raw('CONCAT_WS(" ",nombres,apellidoPaterno,apellidoMaterno)'),'like','%'.$parametros['buscar'].'%');
+										->orWhere(DB::raw('CONCAT_WS(" ",nombres,apellidoPaterno,apellidoMaterno)'),'like','%'.$parametros['buscar'].'%');
 								});
 					}
 					$total = $rows->count();
@@ -152,38 +155,41 @@ class UsuariosController extends \BaseController {
 		$data = array();
 
 		try{
-
 			$recurso = Sentry::findUserById($id);
-
-			$user_roles = array();
-			$roles = $recurso->getGroups();
-				
-			if(count($roles) > 0){
-				foreach ($roles as $rol) {
-					$user_roles[] = $rol->id;
+			if($recurso){
+				$user_roles = array();
+				$roles = $recurso->getGroups();
+					
+				if(count($roles) > 0){
+					foreach ($roles as $rol) {
+						$user_roles[] = $rol->id;
+					}
 				}
-			}
-			$data = array("data"=>$recurso->toArray());
-			$data['data']['roles'] = $user_roles;
+				$data = array("data"=>$recurso->toArray());
+				$data['data']['roles'] = $user_roles;
 
-			$permisos = $data['data']['permissions'];
-		
-			if(!isset($permisos['superuser'])){
-				$modulos = array();
+				$permisos = $data['data']['permissions'];
+			
+				if(!isset($permisos['superuser'])){
+					$modulos = array();
 
-				foreach ($permisos as $key =>$value) {
-					$key_data = explode('.', $key);
-					if(isset($key_data[2]))
-						$modulos[$key_data[0]][$key_data[1]][$key_data[2]] = $value;
+					foreach ($permisos as $key =>$value) {
+						$key_data = explode('.', $key);
+						if(isset($key_data[2]))
+							$modulos[$key_data[0]][$key_data[1]][$key_data[2]] = $value;
+					}
+					$data['data']['permissions'] = $modulos;
 				}
-				$data['data']['permissions'] = $modulos;
+			}else{
+				$respuesta['http_status'] = 404;
+				$respuesta['data'] = array("data"=>"No se ha podido encontrar al usuario.",'code'=>'S01');
 			}
 		}catch(\Cartalyst\Sentry\Users\UserNotFoundException $e){
     		$respuesta['http_status'] = 404;
 			$respuesta['data'] = array("data"=>"El usuario no existe o ha sido eliminado.",'code'=>'U06');
 		}catch(\Exception $e){
 			$respuesta['http_status'] = 500;
-			$respuesta['data'] = array("data"=>'','code'=>'S03');
+			$respuesta['data'] = array("data"=>'Error al obtener los datos','code'=>'S03');
 		}
 		return Response::json($data,$http_status);
 	}

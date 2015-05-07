@@ -186,7 +186,7 @@
 		@endforeach
 		<tr>
 			<td class="nota-titulo">Fuente de información:</td>
-			<td class="nota-contenido" colspan="3"></td>
+			<td class="nota-contenido" colspan="3">{{$proyecto['fuenteInformacion']}}</td>
 		</tr>
 		<tr><td colspan="10"></td></tr>
 
@@ -217,7 +217,7 @@
 			<td></td>
 			<td colspan="2" align="center">Cargo</td>
 			<td colspan="2"></td>
-			<td colspan="4" align="center">Cargo</td>
+			<td colspan="4" align="center">{{ $proyecto['cargoLiderProyecto'] }}</td>
 			<td></td>
 		</tr>
 

@@ -40,7 +40,11 @@ class RendicionProgramaController extends BaseController {
 
 				$rows = Programa::getModel();
 				$rows = $rows->where('idEstatus','=',5);
-							//->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
+
+				$usuario = Sentry::getUser();
+				if($usuario->claveUnidad){
+					$rows = $rows->where('claveUnidadResponsable','=',$usuario->claveUnidad);
+				}
 				
 				$rows = $rows->with(array('registroAvance'=>function($query){
 					$query->select('id','idPrograma','trimestre',DB::raw('sum(justificacion) AS justificacion'),
@@ -70,7 +74,7 @@ class RendicionProgramaController extends BaseController {
 			return Response::json($data,$http_status);
 		}
 		
-		$rows = Proyecto::all();
+		$rows = Programa::all();
 
 		if(count($rows) == 0){
 			$http_status = 404;

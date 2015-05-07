@@ -72,6 +72,24 @@
                     <div role="tabpanel" class="tab-pane" id="componentes">
                         <br>
                         {{$grid_componentes}}
+                        <br>
+                        <form id="form_fuente_informacion">
+                            <div class="row">
+                                <div class="col-sm-10">
+                                    <div class="form-group">
+                                        <label class="control-label" for="fuente-informacion">Fuente de Información</label>
+                                        <input type="text" class="form-control" name="fuente-informacion" id="fuente-informacion">
+                                    </div>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="form-group">
+                                        <button type="button" class="btn btn-primary" id="btn-fuente-informacion-guardar">
+                                            Guardar Fuente<br> de Información
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

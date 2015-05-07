@@ -171,7 +171,7 @@
 			<td></td>
 			<td colspan="2" align="center">Cargo</td>
 			<td></td>
-			<td colspan="3" align="center">Cargo</td>
+			<td colspan="3" align="center">{{ $programa['cargoLiderPrograma'] }}</td>
 			<td></td>
 		</tr>
 	</table>

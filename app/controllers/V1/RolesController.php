@@ -125,6 +125,9 @@ class RolesController extends \BaseController {
 		}catch (\Cartalyst\Sentry\Groups\GroupNotFoundException $e){
 			$http_status = 404;
 			$data = array("data"=>"Rol no encontrado.",'code'=>'U06');
+		}catch(\Exception $ex){
+			$http_status = 500;
+			$data = array('data'=>'Error al tratar de obtener los datos del recurso','code'=>'U01');
 		}
 		return Response::json($data,$http_status);
 	}

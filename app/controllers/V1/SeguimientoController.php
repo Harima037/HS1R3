@@ -95,10 +95,14 @@ class SeguimientoController extends BaseController {
 
 				$rows = Proyecto::getModel();
 				$rows = $rows->where('idEstatusProyecto','=',5)
-							->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto'])
-							->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
+							->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto']);
 							//->where('idClasificacionProyecto','=',$)
 				//$rows = $rows->with('registroAvance');
+				$usuario = Sentry::getUser();
+				if($usuario->claveUnidad){
+					$rows = $rows->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
+				}
+
 				$rows = $rows->with(array('registroAvance'=>function($query){
 					$query->select('id','idProyecto','mes',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'),DB::raw('count(idNivel) as registros'))->groupBy('idProyecto','mes');
 				},'evaluacionMeses'=>function($query) use ($mes_actual){

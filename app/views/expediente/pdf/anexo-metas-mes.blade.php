@@ -77,7 +77,7 @@
 	<tr><td colspan="16" height="10"></td></tr>
 
 	<tr>
-		<td colspan="16"><b>FUENTE DE INFORMACIÓN:</b></td>
+		<td colspan="16"><b>FUENTE DE INFORMACIÓN:</b> {{$data['fuenteInformacion']}}</td>
 	</tr>
 	
 	<tr><td colspan="16" height="10"></td></tr>	

@@ -35,8 +35,10 @@ class ReporteEvaluacionProgramaController extends BaseController {
 
 		$recurso = Programa::with(array('indicadores.registroAvance'=>function($query) use ($trimestre_actual){
 			$query->where('trimestre','<=',$trimestre_actual);
-		}))->select('programa.*','programaPresupuestal.descripcion as programaPresupuestario')
+		}))->select('programa.*','programaPresupuestal.descripcion as programaPresupuestario','titulares.nombre as liderPrograma',
+					'titulares.cargo as cargoLiderPrograma')
 		->join('catalogoProgramasPresupuestales AS programaPresupuestal','programaPresupuestal.clave','=','programa.claveProgramaPresupuestario')
+		->join('titulares','titulares.id','=','programa.idLiderPrograma')
 		->find($id);
 
 		Excel::create($nombreArchivo, function($excel) use ($recurso, $trimestre_actual){
@@ -46,7 +48,8 @@ class ReporteEvaluacionProgramaController extends BaseController {
 			$datos['programa'] = array(
 				'ejercicio' => $recurso->ejercicio,
 				'nombre' => $recurso->programaPresupuestario,
-				'liderPrograma' => 'Lidel del programa presupuestario'
+				'liderPrograma' => $recurso->liderPrograma,
+				'cargoLiderPrograma' => $recurso->cargoLiderPrograma
 			);
 
 			$datos['indicadores'] = array();

@@ -39,6 +39,7 @@ var form_caratula = '#form_caratula';
 var form_componente = '#form_componente';
 var form_actividad = '#form_actividad';
 var form_beneficiario = '#form_beneficiario';
+var form_fuente_informacion = '#form_fuente_informacion';
 
 $('.chosen-one').chosen({width:'100%'});
 
@@ -117,6 +118,8 @@ if($('#id').val()){
 			$('#tablink-beneficiarios').parent().removeClass('disabled');
 			$('#tablink-fuentes-financiamiento').attr('data-toggle','tab');
 			$('#tablink-fuentes-financiamiento').parent().removeClass('disabled');
+
+			$('#fuente-informacion').val(response.data.fuenteInformacion);
 
 			fuenteFinanciamiento.init(proyectoResource,$('#id').val());
 			if(response.data.fuentes_financiamiento.length){
@@ -338,27 +341,27 @@ function busqueda_rapida_desglose(id_componente,parametros){
 
 function cargar_formulario_componente_actividad(identificador,datos){
 	var errores_metas = false;
-	if($('#trim1-'+identificador).val() != datos.numeroTrim1 && datos.numeroTrim1 != null){
+	if($('#trim1-'+identificador).val() != parseFloat(datos.numeroTrim1) && datos.numeroTrim1 != null){
 		Validation.printFieldsErrors('trim1-'+identificador,'Valor anterior de '+datos.numeroTrim1+'.');
 		errores_metas = true;
 	}
-	if($('#trim2-'+identificador).val() != datos.numeroTrim2 && datos.numeroTrim2 != null){
+	if($('#trim2-'+identificador).val() != parseFloat(datos.numeroTrim2) && datos.numeroTrim2 != null){
 		Validation.printFieldsErrors('trim2-'+identificador,'Valor anterior de '+datos.numeroTrim2+'.');
 		errores_metas = true;
 	}
-	if($('#trim3-'+identificador).val() != datos.numeroTrim3 && datos.numeroTrim3 != null){
+	if($('#trim3-'+identificador).val() != parseFloat(datos.numeroTrim3) && datos.numeroTrim3 != null){
 		Validation.printFieldsErrors('trim3-'+identificador,'Valor anterior de '+datos.numeroTrim3+'.');
 		errores_metas = true;
 	}
-	if($('#trim4-'+identificador).val() != datos.numeroTrim4 && datos.numeroTrim4 != null){
+	if($('#trim4-'+identificador).val() != parseFloat(datos.numeroTrim4) && datos.numeroTrim4 != null){
 		Validation.printFieldsErrors('trim4-'+identificador,'Valor anterior de '+datos.numeroTrim4+'.');
 		errores_metas = true;
 	}
-	if($('#numerador-'+identificador).val() != datos.valorNumerador && datos.valorNumerador != null){
+	if($('#numerador-'+identificador).val() != parseFloat(datos.valorNumerador) && datos.valorNumerador != null){
 		Validation.printFieldsErrors('numerador-'+identificador,'Valor anterior de '+datos.valorNumerador+'.');
 		errores_metas = true;
 	}
-	if($('#meta-'+identificador).val() != datos.metaIndicador && datos.metaIndicador != null){
+	if($('#meta-'+identificador).val() != parseFloat(datos.metaIndicador) && datos.metaIndicador != null){
 		Validation.printFieldsErrors('meta-'+identificador,'Valor anterior de '+datos.metaIndicador+'.');
 		errores_metas = true;
 	}
@@ -631,6 +634,34 @@ $('#btn-enviar-proyecto').on('click',function(){
 				    });
 				}
 		});
+	}
+});
+
+$('#btn-fuente-informacion-guardar').on('click',function(){
+	Validation.cleanFormErrors(form_fuente_informacion);
+
+	var parametros = $(form_fuente_informacion).serialize();
+	parametros = parametros + '&guardar=fuenteinformacion&id-proyecto='+$('#id').val();
+
+	if($('#id').val()){
+		proyectoResource.put($('#id').val(),parametros,{
+	        _success: function(response){
+	            MessageManager.show({data:'Datos almacenados con éxito',type:'OK',timer:3});
+	        },
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
+	    });
 	}
 });
 
@@ -1039,26 +1070,31 @@ function deshabilita_paneles(id){
 }
 
 function actualizar_tabla_metas(identificador,jurisdicciones){
-	var tabla_id = '#tabla-'+identificador+'-metas-mes';
-	var meses = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+	var meses = [];
+	meses[1] = ['ENE','FEB','MAR'];
+	meses[2] = ['ABR','MAY','JUN'];
+	meses[3] = ['JUL','AGO','SEP'];
+	meses[4] = ['OCT','NOV','DIC'];
 
-	var html = '';
-	var indx,idx;
 	var llaves = Object.keys(jurisdicciones).sort(); //Se ordenan las llaves
 
-	for(var index in llaves){
-		indx = llaves[index];
-		html += '<tr>';
-		html += '<th>'+jurisdicciones[indx]+'</th>';
-		for(idx in meses){
-			id_mes = parseInt(idx) + 1;
-			html += '<td><input id="mes-'+identificador+'-'+indx+'-'+id_mes+'" name="mes-'+identificador+'['+indx+']['+id_mes+']" type="number" class="form-control input-sm metas-mes" data-meta-mes="'+id_mes+'" data-meta-jurisdiccion="'+indx+'" data-meta-identificador="'+identificador+'" data-meta-id=""></td>';
+	for (var i = 1; i <= 4; i++) {
+		var html = '';
+		var indx,idx;
+		var tabla_id = '#tabla-'+identificador+'-metas-mes-'+i;
+		for(var index in llaves){
+			indx = llaves[index];
+			html += '<tr>';
+			html += '<th>'+jurisdicciones[indx]+'</th>';
+			for(idx in meses[i]){
+				id_mes = parseInt(((i-1)*3)+parseInt(idx)) + 1;
+				html += '<td><input id="mes-'+identificador+'-'+indx+'-'+id_mes+'" name="mes-'+identificador+'['+indx+']['+id_mes+']" type="number" class="form-control input-sm metas-mes" data-meta-mes="'+id_mes+'" data-meta-jurisdiccion="'+indx+'" data-meta-identificador="'+identificador+'" data-meta-id="" min="0"></td>';
+			}
+			html += '</tr>';
 		}
-		html += '</tr>';
+		$(tabla_id + ' tbody').empty();
+		$(tabla_id + ' tbody').html(html);
 	}
-
-	$(tabla_id + ' tbody').empty();
-	$(tabla_id + ' tbody').html(html);
 	actualizar_eventos_metas();
 }
 
@@ -1274,8 +1310,8 @@ function sumar_totales(tipo,campo_suma,campo_total,mensaje){
 }
 
 function ejecutar_formula(identificador){	
-	var numerador = parseInt($('#numerador-'+identificador).val()) || 0;
-	var denominador = parseInt($('#denominador-'+identificador).val()) || 1;
+	var numerador = parseFloat($('#numerador-'+identificador).val()) || 0;
+	var denominador = parseFloat($('#denominador-'+identificador).val()) || 1;
 	var total;
 	var id_formula = $('#formula-'+identificador).val();
 	switch(id_formula){
@@ -1311,6 +1347,9 @@ function ejecutar_formula(identificador){
 			total = '';
 			break;
 	}
+	if(total != ''){
+		total = parseFloat(total.toFixed(2));
+	}
 	$('#meta-'+identificador).val(total).change();
 }
 
@@ -1340,19 +1379,20 @@ function actualizar_eventos_metas(){
 
 		for(var i = mes_inicio; i <= mes_fin; i++) {
 			$('.metas-mes[data-meta-mes="' + i + '"][data-meta-identificador="' + identificador + '"]').each(function(){
-				suma += parseInt($(this).val()) || 0;
+				suma += parseFloat($(this).val()) || 0;
 			});
 		}
+		suma = parseFloat(suma.toFixed(2));
 		
 		$('#trim'+trimestre+'-'+identificador).val(suma).change();
 
-		var trim1 = parseInt($('#trim1-'+identificador).val()) || 0;
-		var trim2 = parseInt($('#trim2-'+identificador).val()) || 0;
-		var trim3 = parseInt($('#trim3-'+identificador).val()) || 0;
-		var trim4 = parseInt($('#trim4-'+identificador).val()) || 0;
+		var trim1 = parseFloat($('#trim1-'+identificador).val()) || 0;
+		var trim2 = parseFloat($('#trim2-'+identificador).val()) || 0;
+		var trim3 = parseFloat($('#trim3-'+identificador).val()) || 0;
+		var trim4 = parseFloat($('#trim4-'+identificador).val()) || 0;
 
 		suma = trim1 + trim2 + trim3 + trim4;
-
+		suma = suma.toFixed(2);
 		$('#numerador-'+identificador).val(suma).change();
 		ejecutar_formula(identificador);
 	});

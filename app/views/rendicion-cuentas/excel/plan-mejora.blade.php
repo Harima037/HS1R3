@@ -245,7 +245,7 @@
 			<td></td>
 			<td colspan="4" align="center">Cargo</td>
 			<td></td>
-			<td colspan="4" align="center">Cargo</td>
+			<td colspan="4" align="center">{{ $proyecto['cargoLiderProyecto'] }}</td>
 			<td></td>
 			<td></td>
 		</tr>

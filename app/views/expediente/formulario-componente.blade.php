@@ -202,28 +202,54 @@
             <div class="row">
                 @if($identificador != 'programa')
                 <div class="col-sm-12">
-                    <table id="tabla-{{$identificador}}-metas-mes" class="table table-condensed table-hover table-striped">
-                        <thead>
-                            <tr>
-                                <th>Mes</th>
-                                @foreach ($meses as $clave => $mes)
-                                    <th>{{$mes}}</th>
-                                @endforeach
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($jurisdicciones as $llave => $jurisdiccion)
-                                <tr>
-                                    <th>{{$jurisdiccion}}</th>
-                                    @foreach ($meses as $clave => $mes)
-                                        <td>
-                                            <input id="mes-{{$identificador}}-{{$llave}}-{{$clave}}" name="mes-{{$identificador}}[{{$llave}}][{{$clave}}]" type="number" class="form-control input-sm metas-mes" data-meta-mes="{{$clave}}" data-meta-jurisdiccion="{{$llave}}" data-meta-identificador="{{$identificador}}" data-meta-id="">
-                                        </td>
-                                    @endforeach
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div role="tabpanel">
+                    <!-- Nav tabs -->
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active">
+                                <a href="#panel-{{$identificador}}-trim-1" aria-controls="panel-{{$identificador}}-trim-1" role="tab" data-toggle="tab">Trim 1</a>
+                            </li>
+                            <li role="presentation">
+                                <a href="#panel-{{$identificador}}-trim-2" aria-controls="panel-{{$identificador}}-trim-2" role="tab" data-toggle="tab">Trim 2</a>
+                            </li>
+                            <li role="presentation">
+                                <a href="#panel-{{$identificador}}-trim-3" aria-controls="panel-{{$identificador}}-trim-3" role="tab" data-toggle="tab">Trim 3</a>
+                            </li>
+                            <li role="presentation">
+                                <a href="#panel-{{$identificador}}-trim-4" aria-controls="panel-{{$identificador}}-trim-4" role="tab" data-toggle="tab">Trim 4</a>
+                            </li>
+                        </ul>
+                    <!-- Tab panes -->
+                        <div class="tab-content">
+                            @for ($i = 1; $i <= 4 ; $i++)
+                            <div role="tabpanel" class="tab-pane {{($i == 1)?'active':''}}" id="panel-{{$identificador}}-trim-{{$i}}">
+                                <table id="tabla-{{$identificador}}-metas-mes-{{$i}}" class="table table-condensed table-hover table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Jurisdicción</th>
+                                            @foreach ($meses as $clave => $mes)
+                                            @if(ceil($clave/3) == $i)
+                                                <th>{{$mes}}</th>
+                                            @endif
+                                            @endforeach
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($jurisdicciones as $llave => $jurisdiccion)
+                                            <tr>
+                                                <th>{{$jurisdiccion}}</th>
+                                                @for($clave = 1 ; $clave <= 3 ; $clave++)
+                                                    <td>
+                                                        <input id="mes-{{$identificador}}-{{$llave}}-{{$clave}}" name="mes-{{$identificador}}[{{$llave}}][{{$clave}}]" type="number" class="form-control input-sm metas-mes" data-meta-mes="{{$clave}}" data-meta-jurisdiccion="{{$llave}}" data-meta-identificador="{{$identificador}}" data-meta-id="" min="0">
+                                                    </td>
+                                                @endfor
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            @endfor
+                        </div>
+                    </div>
                 </div>
                 <div class="col-sm-6 bg-info">
                     <div class="row">
