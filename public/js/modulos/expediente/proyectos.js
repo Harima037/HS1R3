@@ -150,7 +150,13 @@ function llenar_tabla_beneficiarios(datos){
                 id: datos[i].idTipoBeneficiario,
                 tipo: datos[i].tipo_beneficiario.descripcion,
                 total: 0,
-                desglose: {'f':{},'m':{}}
+                desglose: {'f':{
+                    sexo:0,total:0,urbana:0,rural:0,mestiza:0,indigena:0,inmigrante:0,
+                    otros:0,muyAlta:0,alta:0,media:0,baja:0,muyBaja:0
+                },'m':{
+                    sexo:0,total:0,urbana:0,rural:0,mestiza:0,indigena:0,inmigrante:0,
+                    otros:0,muyAlta:0,alta:0,media:0,baja:0,muyBaja:0
+                }}
             };
         }
         beneficiarios[datos[i].idTipoBeneficiario].total += datos[i].total;

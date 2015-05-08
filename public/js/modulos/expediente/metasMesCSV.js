@@ -39,6 +39,7 @@ function upload(evt) {
         var data = null;
         var file = evt.target.files[0];
         var reader = new FileReader();
+        var texto_resultado = '';
         reader.readAsText(file);
         reader.onload = function(event) {
             var csvData = event.target.result;
@@ -47,14 +48,20 @@ function upload(evt) {
             	for(var i in data){
             		var element = data[i];
             		for(var j in meses){
-            			$('#mes-'+identificador+'-'+element['JURISDICCION']+'-'+meses[j]).val(element[j]);
+                        var value = parseFloat(element[j]);
+                        value = +value.toFixed(2);
+            			$('#mes-'+identificador+'-'+element['JURISDICCION']+'-'+meses[j]).val(value);
             		}
             	}
-              	console.log('Imported -' + data.length + '- rows successfully!');
+                texto_resultado += '<span class="alert text-success">Se importaron satisfactoriamente ' + data.length + ' lineas del archivo.</span>';
             } else {
-                console.log('No data to import!');
+                texto_resultado += '<span class="alert text-danger">Ocurrió un error al intentar importar el archivo';
             }
-            console.log(data);
+            $('#mes-'+identificador+'-OC-1').change();
+            $('#mes-'+identificador+'-OC-4').change();
+            $('#mes-'+identificador+'-OC-7').change();
+            $('#mes-'+identificador+'-OC-10').change();
+            $('#mensajes-'+identificador+'-importar-csv').html(texto_resultado);
         };
         reader.onerror = function() {
             alert('Unable to read ' + file.fileName);

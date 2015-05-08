@@ -219,7 +219,7 @@
                             </li>
                             <li role="presentation" class="pull-right">
                                 <a href="#panel-{{$identificador}}-csv" aria-controls="panel-{{$identificador}}-csv" role="tab" data-toggle="tab">
-                                    <span class="fa fa-upload"></span> Subir archivo
+                                    <span class="fa fa-upload"></span> Importar archivo
                                 </a>
                             </li>
                         </ul>
@@ -257,12 +257,34 @@
                                 <br>
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        <div id="dvImportSegments" class="fileupload ">
+                                        <div id="panel-importar-csv" class="fileupload ">
                                             <fieldset>
-                                                <legend>Subir Archivo CSV</legend>
+                                                <legend>Importar Archivo CSV</legend>
+                                                <span class="help-block">
+                                                    Puede importar un archivo en formato csv para llenar los campos en la programación de metas. Se debe tener en cuenta lo siguiente:
+                                                    <ul>
+                                                        <li>
+                                                            La primer linea del archivo debe contener siempre el siguiente encabezado
+                                                            <ul>
+                                                                <li>JURISDICCION,ENE,FEB,MAR,ABR,MAY,JUN,JUL,AGO,SEP,OCT,NOV,DIC</li>
+                                                            </ul>
+                                                        </li>
+                                                        <li>
+                                                            Las lineas siguientes deben contener los datos a capturar, una linea por cada jurisdicción, con el orden establecido por el encabezado.
+                                                        </li>
+                                                        <li>
+                                                            El primer elemento de cada linea (JURISDICCION), debe ser la clave de dicha jurisicción desde la 01 (para la jurisdicción 1) hasta la 10, colocando OC en caso de tratarse de la Oficina Central.
+                                                        </li>
+                                                        <li>
+                                                            Cada valor debe ir separado con una coma, los valores numericos deben consistir de un máximo de 10 números enteros y en caso de ser necesario hasta 2 números decimales, llenando con 0 en donde no se requiera un valor, de forma que cada linea debe contener el mismo numero de elementos.
+                                                        </li>
+                                                    </ul>
+                                                </span>
                                                 <input type="file" id="archivo-{{$identificador}}-csv" accept=".csv"  data-identificador="{{$identificador}}"/>
                                             </fieldset>
                                         </div>
+                                    </div>
+                                    <div id="mensajes-{{$identificador}}-importar-csv" class="col-sm-12">
                                     </div>
                                 </div>
                                 <br>

@@ -34,8 +34,8 @@
                     <tr>
                         <th><input type="checkbox" class="check-select-all-rows"></th>
                         <th>Tipo Beneficiario</th>
-                        <th>Total Masculino</th>
                         <th>Total Femenino</th>
+                        <th>Total Masculino</th>
                         <th>Total</th>
                     </tr>
                 </thead>
