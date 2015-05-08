@@ -90,10 +90,10 @@ function cargar_datos_programa(e){
                     'claveTipo': indicador.claveTipoIndicador,
                     'nombre': indicador.descripcionIndicador,
                     'metas': {
-                        1: indicador.trim1 + 0,
-                        2: indicador.trim1 + indicador.trim2,
-                        3: indicador.trim1 + indicador.trim2 + indicador.trim3,
-                        4: indicador.trim1 + indicador.trim2 + indicador.trim3 + indicador.trim4
+                        1: parseFloat(indicador.trim1) + 0,
+                        2: parseFloat(indicador.trim1) + parseFloat(indicador.trim2),
+                        3: parseFloat(indicador.trim1) + parseFloat(indicador.trim2) + parseFloat(indicador.trim3),
+                        4: parseFloat(indicador.trim1) + parseFloat(indicador.trim2) + parseFloat(indicador.trim3) + parseFloat(indicador.trim4)
                     },
                     'avances': {
                         1:0,
@@ -106,7 +106,7 @@ function cargar_datos_programa(e){
                 if(indicador.registro_avance.length){
                     for(var j in indicador.registro_avance){
                         var avance = indicador.registro_avance[j];
-                        datos_programa[indicador.id]['avances'][avance.trimestre] = avance.avance;
+                        datos_programa[indicador.id]['avances'][avance.trimestre] = +parseFloat(avance.avance).toFixed(2);
                     }
                 }
             }
@@ -125,8 +125,8 @@ function cargar_datos_programa(e){
                     html_tbody += '<td class="avance-acumulado" data-avance="'+indicador['avances'][i]+'">'+indicador['avances'][i]+'</td>';
                     html_tbody += '</tr>';
 
-                    total_acumulado += indicador['metas'][i];
-                    total_avance += indicador['avances'][i];
+                    total_acumulado += parseFloat(indicador['metas'][i]);
+                    total_avance += parseFloat(indicador['avances'][i]);
                 }
                 $('#avance-trim-'+i+' > tbody').empty();
                 $('#avance-trim-'+i+' > tbody').append(html_tbody);
