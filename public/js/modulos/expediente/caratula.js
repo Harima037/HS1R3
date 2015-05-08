@@ -24,6 +24,8 @@ actividadDatagrid.init();
 desgloseComponenteDatagrid.init();
 beneficiarioDatagrid.init();
 
+metasMesCSV.init();
+
 var comentarios = { componentes:{}, actividades:{} };
 
 var modal_componente = '#modalComponente';

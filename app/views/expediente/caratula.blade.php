@@ -11,9 +11,11 @@
 @section('js')
 @parent
 <script src="{{ URL::to('js/dependencias/chosen.jquery.min.js') }}"></script>
+<script src="{{ URL::to('js/dependencias/jquery.csv-0.71.min.js') }}"></script>
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
 <script src="{{ URL::to('js/modulos/expediente/fuenteFinanciamiento.js')}}"></script>
+<script src="{{ URL::to('js/modulos/expediente/metasMesCSV.js')}}"></script>
 <script src="{{ URL::to('js/modulos/expediente/caratula.js')}}"></script>
 @stop
 

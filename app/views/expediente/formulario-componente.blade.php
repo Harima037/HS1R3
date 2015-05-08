@@ -217,6 +217,11 @@
                             <li role="presentation">
                                 <a href="#panel-{{$identificador}}-trim-4" aria-controls="panel-{{$identificador}}-trim-4" role="tab" data-toggle="tab">Trim 4</a>
                             </li>
+                            <li role="presentation" class="pull-right">
+                                <a href="#panel-{{$identificador}}-csv" aria-controls="panel-{{$identificador}}-csv" role="tab" data-toggle="tab">
+                                    <span class="fa fa-upload"></span> Subir archivo
+                                </a>
+                            </li>
                         </ul>
                     <!-- Tab panes -->
                         <div class="tab-content">
@@ -248,6 +253,20 @@
                                 </table>
                             </div>
                             @endfor
+                            <div role="tabpanel" class="tab-pane" id="panel-{{$identificador}}-csv">
+                                <br>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div id="dvImportSegments" class="fileupload ">
+                                            <fieldset>
+                                                <legend>Subir Archivo CSV</legend>
+                                                <input type="file" id="archivo-{{$identificador}}-csv" accept=".csv"  data-identificador="{{$identificador}}"/>
+                                            </fieldset>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                            </div>
                         </div>
                     </div>
                 </div>
