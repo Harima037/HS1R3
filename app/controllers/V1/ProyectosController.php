@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception;
 use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
-	FibapDatosProyecto, Titular, ComponenteDesglose, Accion, PropuestaFinanciamiento, DistribucionPresupuesto, DesgloseMetasMes, 
+	FibapDatosProyecto, Titular, Directorio, ComponenteDesglose, Accion, PropuestaFinanciamiento, DistribucionPresupuesto, DesgloseMetasMes, 
 	DesgloseBeneficiario, ProyectoFinanciamiento, ProyectoFinanciamientoSubFuente;
 
 class ProyectosController extends BaseController {
@@ -265,6 +265,7 @@ class ProyectosController extends BaseController {
 			}elseif($recurso->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
 				$jurisdicciones = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
 			}
+			$responsables = Directorio::responsablesActivos($recurso->unidadResponsable)->get();
 		}
 
 		if(is_null($recurso)){
@@ -274,6 +275,7 @@ class ProyectosController extends BaseController {
 			$recurso = $recurso->toArray();
 			if(!$parametros){
 				$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
+				$recurso['responsables'] = $responsables;
 			}
 			$data["data"] = $recurso;
 		}
@@ -523,9 +525,12 @@ class ProyectosController extends BaseController {
 					}elseif($recurso->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
 						$jurisdicciones = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
 					}
+					$responsables = Directorio::responsablesActivos($recurso->unidadResponsable)->get();
 					$recurso = $recurso->toArray();
 					$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
+					$recurso['responsables'] = $responsables;
 					$recurso['liderProyecto'] = $respuesta['data']['nombre-lider-proyecto'];
+					$recurso['liderProyectoCargo'] = $respuesta['data']['cargo-lider-proyecto'];
 					$respuesta['data']['data'] = $recurso;
 				}
 				//Guardar Datos del Proyecto
@@ -823,6 +828,9 @@ class ProyectosController extends BaseController {
 					//Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
 						$jurisdicciones = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
 					}
+					if(isset($respuesta['data']['nombre-lider-proyecto'])){
+						$responsables = Directorio::responsablesActivos($recurso->unidadResponsable)->get();
+					}
 
 					$recurso = $recurso->toArray();
 					if($jurisdicciones){
@@ -830,6 +838,8 @@ class ProyectosController extends BaseController {
 					}
 					if(isset($respuesta['data']['nombre-lider-proyecto'])){
 						$recurso['liderProyecto'] = $respuesta['data']['nombre-lider-proyecto'];
+						$recurso['liderProyectoCargo'] = $respuesta['data']['cargo-lider-proyecto'];
+						$recurso['responsables'] = $responsables;
 					}
 					$respuesta['data']['data'] = $recurso;
 				}
@@ -1014,6 +1024,7 @@ class ProyectosController extends BaseController {
 
 			if($recurso){
 				$recurso->fuenteInformacion = $parametros['fuente-informacion'];
+				$recurso->idResponsable = $parametros['responsable'];
 
 				if(!$recurso->save()){
 					$respuesta['http_status'] = 500;
@@ -1120,10 +1131,14 @@ class ProyectosController extends BaseController {
 				}
 			}
 
+			if($es_editar && ($recurso->unidadResponsable != $parametros['unidadresponsable'])){
+				$recurso->idResponsable = NULL;
+			}
+
+			$recurso->unidadResponsable 			= $parametros['unidadresponsable'];
 			$recurso->idClasificacionProyecto 		= $parametros['clasificacionproyecto'];
 			$recurso->ejercicio						= $parametros['ejercicio'];
 			$recurso->idTipoAccion 					= $parametros['tipoaccion'];
-			$recurso->unidadResponsable 			= $parametros['unidadresponsable'];
 			$recurso->finalidad 					= $funcion_gasto[0];
 			$recurso->funcion 						= $funcion_gasto[1];
 			$recurso->subFuncion 					= $funcion_gasto[2];
@@ -1176,9 +1191,11 @@ class ProyectosController extends BaseController {
 			}
 
 			if(Sentry::getUser()->claveUnidad){
-				$titulares = Titular::whereIn('claveUnidad',array('00','01',Sentry::getUser()->claveUnidad))->get();
+				//$titulares = Titular::whereIn('claveUnidad',array('00','01',Sentry::getUser()->claveUnidad))->get();
+				$titulares = Directorio::titularesActivos(array('00','01', Sentry::getUser()->claveUnidad))->get();
 			}else{
-				$titulares = Titular::whereIn('claveUnidad',array('00','01',$parametros['unidadresponsable']))->get();
+				//$titulares = Titular::whereIn('claveUnidad',array('00','01',$parametros['unidadresponsable']))->get();
+				$titulares = Directorio::titularesActivos(array('00','01', $parametros['unidadresponsable']))->get();
 			}
 
 			foreach ($titulares as $titular) {
@@ -1187,13 +1204,16 @@ class ProyectosController extends BaseController {
 				}elseif ($titular->claveUnidad == '01') { //Dirección de Planeación y Desarrollo
 					$recurso->idJefePlaneacion 				= $titular->id;
 		  			$recurso->idCoordinadorGrupoEstrategico = $titular->id;
-					if($recurso->idLiderProyecto == NULL){
+					//if($recurso->idLiderProyecto == NULL){
+		  			if(count($titulares) == 2){
 						$recurso->idLiderProyecto = $titular->id;
 						$respuesta['data']['nombre-lider-proyecto'] = $titular->nombre;
+						$respuesta['data']['cargo-lider-proyecto'] = $titular->cargo;
 					}
 				}else{
 					$recurso->idLiderProyecto = $titular->id;
 					$respuesta['data']['nombre-lider-proyecto'] = $titular->nombre;
+					$respuesta['data']['cargo-lider-proyecto'] = $titular->cargo;
 				}
 			}
 

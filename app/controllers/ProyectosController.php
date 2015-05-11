@@ -99,7 +99,9 @@ class ProyectosController extends \BaseController {
 	public function catalogos_caratula($parametros){
 		//
 		//Obtener los titulares para firmas: de las unidades de Planeacion y Desarrollo, Direccion General y Director de la Unidad Responsable
-		$titulares = Titular::whereIn('claveUnidad',array('00','01', Sentry::getUser()->claveUnidad))->get();
+		//$titulares = Titular::whereIn('claveUnidad',array('00','01', Sentry::getUser()->claveUnidad))->get();
+		$titulares = Directorio::titularesActivos(array('00','01', Sentry::getUser()->claveUnidad))->get();
+		
 		$firmas = array(
 				'LiderProyecto' 	=> NULL,
 				'JefeInmediato' 	=> NULL,

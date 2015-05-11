@@ -463,6 +463,14 @@
 <table class="tabla" width="100%" style="page-break-inside: avoid;">
 	<tr><td height="15" colspan="5"></td></tr>
 	<tr>
+		<td></td>
+		<th class="texto-centro">Jefe Inmediato Superior al Lider del Proyecto.</th>
+		<td></td>
+		<th class="texto-centro">Lider del proyecto.</th>
+		<td></td>
+	</tr>
+	<tr><td height="15" colspan="5"></td></tr>
+	<tr>
 		<td width="10%"></td>
 		<td width="25%" class="texto-centro firma">{{ $data['jefeInmediato'] }}</td>
 		<td width="30%"></td>
@@ -471,9 +479,17 @@
 	</tr>
 	<tr>
 		<td></td>
-		<th class="texto-centro">Jefe Inmediato Superior al Lider del Proyecto.</th>
+		<th class="texto-centro">{{ $data['jefeInmediatoCargo'] }}</th>
 		<td></td>
-		<th class="texto-centro">Lider del proyecto.</th>
+		<th class="texto-centro">{{ $data['liderProyectoCargo'] }}</th>
+		<td></td>
+	</tr>
+	<tr><td height="15" colspan="5"></td></tr>
+	<tr>
+		<td></td>
+		<th class="texto-centro">Coordinador General del Grupo Estratégico.</th>
+		<td></td>
+		<th class="texto-centro">Responsable de la Unida de Planeación u Homólogo.</th>
 		<td></td>
 	</tr>
 	<tr><td height="15" colspan="5"></td></tr>
@@ -486,9 +502,9 @@
 	</tr>
 	<tr>
 		<td></td>
-		<th class="texto-centro">Coordinador General del Grupo Estratégico.</th>
+		<th class="texto-centro">{{ $data['coordinadorGrupoEstrategicoCargo'] }}</th>
 		<td></td>
-		<th class="texto-centro">Responsable de la Unida de Planeación u Homólogo.</th>
+		<th class="texto-centro">{{ $data['jefePlaneacionCargo'] }}</th>
 		<td></td>
 	</tr>
 </table>

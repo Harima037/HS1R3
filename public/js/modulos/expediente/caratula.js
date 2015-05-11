@@ -56,10 +56,10 @@ if($('#id').val()){
         _success: function(response){
         	inicializar_comportamiento_caratula();
 
-        	$('#lbl-lider-proyecto').text(response.data.lider_proyecto.nombre);
-			$('#lbl-jefe-inmediato').text(response.data.jefe_inmediato.nombre);
-			$('#lbl-jefe-planeacion').text(response.data.jefe_planeacion.nombre);
-			$('#lbl-coordinador-grupo').text(response.data.coordinador_grupo_estrategico.nombre);
+        	$('#lbl-lider-proyecto').html(response.data.lider_proyecto.nombre + '<br><small class="text-muted">'+response.data.lider_proyecto.cargo+'</small>');
+			$('#lbl-jefe-inmediato').html(response.data.jefe_inmediato.nombre + '<br><small class="text-muted">'+response.data.jefe_inmediato.cargo+'</small>');
+			$('#lbl-jefe-planeacion').html(response.data.jefe_planeacion.nombre + '<br><small class="text-muted">'+response.data.jefe_planeacion.cargo+'</small>');
+			$('#lbl-coordinador-grupo').html(response.data.coordinador_grupo_estrategico.nombre + '<br><small class="text-muted">'+response.data.coordinador_grupo_estrategico.cargo+'</small>');
 
             $('#nombretecnico').val(response.data.nombreTecnico);
             $('#ejercicio').val(response.data.ejercicio);
@@ -122,7 +122,11 @@ if($('#id').val()){
 			$('#tablink-fuentes-financiamiento').parent().removeClass('disabled');
 
 			$('#fuente-informacion').val(response.data.fuenteInformacion);
-
+			llenar_responsables(response.data.responsables);
+			$('#responsable').val(response.data.idResponsable);
+			$('#responsable').change();
+			$('#responsable').trigger('chosen:updated');
+			
 			fuenteFinanciamiento.init(proyectoResource,$('#id').val());
 			if(response.data.fuentes_financiamiento.length){
 				fuenteFinanciamiento.llenar_datagrid(response.data.fuentes_financiamiento);
@@ -142,7 +146,27 @@ if($('#id').val()){
 	deshabilita_paneles('');
 }
 
+function llenar_responsables(datos){
+	var html = '<option value="">Selecciona un responsable</option>';
+	for(var i in datos){
+		var responsable = datos[i];
+		html += '<option value="'+responsable.id+'" data-cargo="'+responsable.cargo+'">';
+		html += responsable.nombre;
+		html += '</option>';
+	}
+	$('#responsable').html(html);
+}
+
 function inicializar_comportamiento_caratula(){
+	$('#responsable').on('change',function(){
+		if($(this).val()){
+			var cargo = $('#responsable option:selected').attr('data-cargo');
+			$('#ayuda-responsable').text(cargo);
+		}else{
+			$('#ayuda-responsable').text('');
+		}
+	});
+
 	$('#entregable').on('change',function(){
 		habilita_opciones('#tipo-entregable',$(this).val(),'NA');
 		habilita_opciones('#accion-entregable',$(this).val());
@@ -685,7 +709,16 @@ $('#btn-proyecto-guardar').on('click',function(){
 	            	actualizar_tabla_metas('actividad',response.data.jurisdicciones);
             		actualizar_tabla_metas('componente',response.data.jurisdicciones);
 	            }
-	            $('#lbl-lider-proyecto').text(response.data.liderProyecto);
+	            //$('#lbl-lider-proyecto').text(response.data.liderProyecto);
+	            $('#lbl-lider-proyecto').html(response.data.liderProyecto + '<br><small class="text-muted">'+response.data.liderProyectoCargo+'</small>');
+
+	            if(response.data.responsables){
+	            	llenar_responsables(response.data.responsables);
+					$('#responsable').val(response.data.idResponsable);
+					$('#responsable').change();
+					$('#responsable').trigger('chosen:updated');
+	            }
+
 	            var no_proyecto = ("000" + (response.data.numeroProyectoEstrategico || 0)).slice(-3);
 	            $(form_caratula + ' #no_proyecto_estrategico').text(no_proyecto);
 	            if($('input#numeroproyectoestrategico').length){
@@ -733,7 +766,13 @@ $('#btn-proyecto-guardar').on('click',function(){
 	            actualizar_tabla_metas('actividad',response.data.jurisdicciones);
             	actualizar_tabla_metas('componente',response.data.jurisdicciones);
 
-            	$('#lbl-lider-proyecto').text(response.data.liderProyecto);
+            	if(response.data.responsables){
+	            	llenar_responsables(response.data.responsables);
+					$('#responsable').trigger('chosen:updated');
+	            }
+
+            	//$('#lbl-lider-proyecto').text(response.data.liderProyecto);
+            	$('#lbl-lider-proyecto').html(response.data.liderProyecto + '<br><small class="text-muted">'+response.data.liderProyectoCargo+'</small>');
 
 	            $('#tablink-componentes').attr('data-toggle','tab');
 				$('#tablink-componentes').parent().removeClass('disabled');

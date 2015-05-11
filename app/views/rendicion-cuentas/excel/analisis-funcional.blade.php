@@ -187,11 +187,11 @@
 			<td colspan="3" class="texto-centro">___________________________________________________</td>
 		</tr>
 		<tr class="negrita" height="20">
-			<td colspan="3" align="center">Nombre</td>
+			<td colspan="3" align="center">{{ $proyecto['responsableInformacion'] }}</td>
 			<td colspan="3" align="center">{{ $proyecto['liderProyecto'] }}</td>
 		</tr>
 		<tr class="negrita" height="20">
-			<td colspan="3" align="center">Cargo</td>
+			<td colspan="3" align="center">{{ $proyecto['cargoResponsableInformacion'] }}</td>
 			<td colspan="3" align="center">{{ $proyecto['cargoLiderProyecto'] }}</td>
 		</tr>
 

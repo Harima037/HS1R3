@@ -32,7 +32,8 @@ class Programa extends BaseModel
 				->leftjoin('catalogoObjetivosPED AS tema','tema.clave','=',DB::raw('SUBSTRING(objetivosPED.clave,1,4)'))
 				->leftjoin('catalogoObjetivosPED AS politicaPublica','politicaPublica.clave','=',DB::raw('SUBSTRING(objetivosPED.clave,1,6)'))
 				->leftjoin('catalogoObjetivosPND as objetivosPND','objetivosPND.id','=','programa.idObjetivoPND')
-				->leftjoin('titulares As titular','titular.id','=','programa.idLiderPrograma');
+				//->leftjoin('titulares As titular','titular.id','=','programa.idLiderPrograma')
+				->leftjoin('vistaDirectorio As titular','titular.id','=','programa.idLiderPrograma');
 	}
 
 	public function programaPresupuestario(){

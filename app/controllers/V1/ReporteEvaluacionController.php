@@ -31,7 +31,7 @@ class ReporteEvaluacionController extends BaseController {
 	 */
 	public function show($id){
 		$mes_actual = Util::obtenerMesActual();
-		$recurso = Proyecto::with(array('liderProyecto','beneficiarios.tipoBeneficiario','datosProgramaPresupuestario','datosFuncion',
+		$recurso = Proyecto::with(array('liderProyecto','responsableInformacion','beneficiarios.tipoBeneficiario','datosProgramaPresupuestario','datosFuncion',
 			'datosSubFuncion','objetivoPedCompleto','fuentesFinanciamiento.fuenteFinanciamiento','fuentesFinanciamiento.subFuentesFinanciamiento',
 		'componentes.registroAvance'=>function($query) use ($mes_actual){
 			$query->where('mes','<=',$mes_actual)->orderBy('mes','ASC');
@@ -316,6 +316,8 @@ class ReporteEvaluacionController extends BaseController {
 					'ClavePresupuestaria' => $data['recurso']->ClavePresupuestaria,
 					'liderProyecto' => $data['recurso']->liderProyecto->nombre,
 					'cargoLiderProyecto' => $data['recurso']->liderProyecto->cargo,
+					'responsableInformacion' => $data['recurso']->responsableInformacion->nombre,
+					'cargoResponsableInformacion' => $data['recurso']->responsableInformacion->cargo,
 					'fuenteInformacion' => $data['recurso']->fuenteInformacion
 				);
 

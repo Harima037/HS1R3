@@ -70,10 +70,11 @@ class Proyecto extends BaseModel
 					->leftjoin('catalogoTiposProyectos AS tipoProyecto','tipoProyecto.id','=','proyectos.idTipoProyecto')
 					->leftjoin('catalogoCoberturas AS cobertura','cobertura.id','=','proyectos.idCobertura')
 					->leftjoin('catalogoTiposAcciones AS tipoAccion','tipoAccion.id','=','proyectos.idTipoAccion')
-					->leftjoin('titulares AS liderProyecto','liderProyecto.id','=','proyectos.idLiderProyecto')
-					->leftjoin('titulares AS jefeInmediato','jefeInmediato.id','=','proyectos.idJefeInmediato')
-					->leftjoin('titulares AS jefePlaneacion','jefePlaneacion.id','=','proyectos.idJefePlaneacion')
-					->leftjoin('titulares AS coordinadorGrupoEstrategico','coordinadorGrupoEstrategico.id','=','proyectos.idCoordinadorGrupoEstrategico')
+					->leftjoin('vistaDirectorio AS liderProyecto','liderProyecto.id','=','proyectos.idLiderProyecto')
+					->leftjoin('vistaDirectorio AS jefeInmediato','jefeInmediato.id','=','proyectos.idJefeInmediato')
+					->leftjoin('vistaDirectorio AS jefePlaneacion','jefePlaneacion.id','=','proyectos.idJefePlaneacion')
+					->leftjoin('vistaDirectorio AS coordinadorGrupoEstrategico','coordinadorGrupoEstrategico.id','=','proyectos.idCoordinadorGrupoEstrategico')
+					->leftjoin('vistaDirectorio AS responsableInformacion','responsableInformacion.id','=','proyectos.idResponsable')
 
 					->leftjoin('vistaMunicipios AS municipio','municipio.clave','=','proyectos.claveMunicipio')
 					->leftjoin('vistaRegiones AS region','region.region','=','proyectos.claveRegion')
@@ -105,10 +106,13 @@ class Proyecto extends BaseModel
 						'jefeInmediato.nombre AS jefeInmediato',
 						'jefePlaneacion.nombre AS jefePlaneacion',
 						'coordinadorGrupoEstrategico.nombre AS coordinadorGrupoEstrategico',
+						'responsableInformacion.nombre AS responsableInformacion',
 						'liderProyecto.cargo AS liderProyectoCargo',
 						'jefeInmediato.cargo AS jefeInmediatoCargo',
 						'jefePlaneacion.cargo AS jefePlaneacionCargo',
-						'coordinadorGrupoEstrategico.cargo AS coordinadorGrupoEstrategicoCargo'
+						'coordinadorGrupoEstrategico.cargo AS coordinadorGrupoEstrategicoCargo',
+						'responsableInformacion.cargo AS responsableInformacionCargo'
+
 						
 						);
 
@@ -154,19 +158,27 @@ class Proyecto extends BaseModel
     }
 
 	public function jefeInmediato(){
-		return $this->belongsTo('Titular','idJefeInmediato')->withTrashed();
+		//return $this->belongsTo('Titular','idJefeInmediato')->withTrashed();
+		return $this->belongsTo('Directorio','idJefeInmediato')->withTrashed();
 	}
 
 	public function liderProyecto(){
-		return $this->belongsTo('Titular','idLiderProyecto')->withTrashed();
+		//return $this->belongsTo('Titular','idLiderProyecto')->withTrashed();
+		return $this->belongsTo('Directorio','idLiderProyecto')->withTrashed();
 	}
 
 	public function jefePlaneacion(){
-		return $this->belongsTo('Titular','idJefePlaneacion')->withTrashed();
+		//return $this->belongsTo('Titular','idJefePlaneacion')->withTrashed();
+		return $this->belongsTo('Directorio','idJefePlaneacion')->withTrashed();
 	}
 
 	public function coordinadorGrupoEstrategico(){
-		return $this->belongsTo('Titular','idCoordinadorGrupoEstrategico')->withTrashed();
+		//return $this->belongsTo('Titular','idCoordinadorGrupoEstrategico')->withTrashed();
+		return $this->belongsTo('Directorio','idCoordinadorGrupoEstrategico')->withTrashed();
+	}
+
+	public function responsableInformacion(){
+		return $this->belongsTo('Directorio','idResponsable')->withTrashed();
 	}
 
 	public function actividades(){
