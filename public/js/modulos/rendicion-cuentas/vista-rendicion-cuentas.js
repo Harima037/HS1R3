@@ -184,6 +184,7 @@ function seguimiento_metas(e){
                 dato_meta = +dato_meta.toFixed(2);
 
                 $('#avance_'+dato.claveJurisdiccion).attr('data-meta-programada',dato_meta);
+                
                 $(row + ' > td.meta-del-mes').text(dato_meta);
                 $(row + ' > td.meta-del-mes').attr('data-meta-mes',dato_meta);
                 total_programado_mes += dato_meta;

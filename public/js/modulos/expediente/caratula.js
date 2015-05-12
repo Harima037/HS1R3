@@ -64,25 +64,25 @@ if($('#id').val()){
             $('#nombretecnico').val(response.data.nombreTecnico);
             $('#ejercicio').val(response.data.ejercicio);
 
-			$('#unidad_responsable').text(response.data.datos_unidad_responsable.clave);
-            $('#finalidad').text(response.data.datos_finalidad.clave.slice(-1));
-            $('#funcion').text(response.data.datos_funcion.clave.slice(-1));
-            $('#subfuncion').text(response.data.datos_sub_funcion.clave.slice(-1));
-            $('#subsubfuncion').text(response.data.datos_sub_sub_funcion.clave.slice(-1));
-            $('#programa_sectorial').text(response.data.datos_programa_sectorial.clave );
-            $('#programa_presupuestario').text(response.data.datos_programa_presupuestario.clave );
-            $('#programa_especial').text(response.data.datos_programa_especial.clave );
-            $('#actividad_institucional').text(response.data.datos_actividad_institucional.clave );
-            $('#proyecto_estrategico').text(response.data.datos_proyecto_estrategico.clave);
+			$('#unidad_responsable').text(response.data.unidadResponsable);
+            $('#finalidad').text(response.data.finalidad);
+            $('#funcion').text(response.data.funcion);
+            $('#subfuncion').text(response.data.subFuncion);
+            $('#subsubfuncion').text(response.data.subSubFuncion);
+            $('#programa_sectorial').text(response.data.programaSectorial);
+            $('#programa_presupuestario').text(response.data.programaPresupuestario);
+            $('#programa_especial').text(response.data.programaEspecial);
+            $('#actividad_institucional').text(response.data.actividadInstitucional);
+            $('#proyecto_estrategico').text(response.data.proyectoEstrategico);
             $('#no_proyecto_estrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
-
-            $('#unidadresponsable').val(response.data.datos_unidad_responsable.clave);
-            $('#funciongasto').val(response.data.datos_sub_sub_funcion.clave);
-            $('#programasectorial').val(response.data.datos_programa_sectorial.clave);
-            $('#programapresupuestario').val(response.data.datos_programa_presupuestario.clave);
-            $('#programaespecial').val(response.data.datos_programa_especial.clave);
-            $('#actividadinstitucional').val(response.data.datos_actividad_institucional.clave);
-            $('#proyectoestrategico').val(response.data.datos_proyecto_estrategico.clave);
+            
+            $('#unidadresponsable').val(response.data.unidadResponsable);
+            $('#funciongasto').val(response.data.finalidad+ '.' + response.data.funcion+ '.' + response.data.subFuncion+ '.' + response.data.subSubFuncion);
+            $('#programasectorial').val(response.data.programaSectorial);
+            $('#programapresupuestario').val(response.data.programaPresupuestario);
+            $('#programaespecial').val(response.data.programaEspecial);
+            $('#actividadinstitucional').val(response.data.actividadInstitucional);
+            $('#proyectoestrategico').val(response.data.proyectoEstrategico);
 
             if($('input#numeroproyectoestrategico').length){
             	$('#numeroproyectoestrategico').val(response.data.numeroProyectoEstrategico);
@@ -90,7 +90,7 @@ if($('#id').val()){
             	$('#numeroproyectoestrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
             }
 
-            $('#cobertura').val(response.data.cobertura.id);
+            $('#cobertura').val(response.data.idCobertura);
             $('#cobertura').chosen().change();
 
             deshabilita_paneles($('#cobertura').val());
@@ -103,9 +103,9 @@ if($('#id').val()){
             	$('#region').val(response.data.claveRegion);
             }
 
-            $('#tipoaccion').val(response.data.tipo_accion.id);
+            $('#tipoaccion').val(response.data.idTipoAccion);
 
-            $('#vinculacionped').val(response.data.objetivo_ped.id);
+            $('#vinculacionped').val(response.data.idObjetivoPED);
 
             $(form_caratula + ' .chosen-one').trigger('chosen:updated');
 

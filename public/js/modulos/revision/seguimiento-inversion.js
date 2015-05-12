@@ -45,12 +45,11 @@ moduloDatagrid.actualizar({
 
             for(var j in response.data[i].registro_avance){
                 var avance = response.data[i].registro_avance[j];
+                var clase_icono = (avance.mes == mes_activo)?'fa-unlock':'fa-circle';
                 if(parseInt(avance.planMejora) > 0){
-                    var clase_icono = (avance.mes == mes_activo)?'fa-unlock':'fa-circle';
-                    item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class="text-danger"><span class="fa '+clase_icono+'"></span></span>';
+                    item['mes_'+avance.mes] = '<span id="grid-mes-'+avance.mes+'" class="text-danger"><span class="fa '+clase_icono+'"></span></span>';
                 }else{
-                    var clase_icono = (avance.mes == mes_activo)?'fa-unlock':'fa-circle';
-                    item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class="text-success"><span class="fa '+clase_icono+'"></span></span>';
+                    item['mes_'+avance.mes] = '<span id="grid-mes-'+avance.mes+'" class="text-success"><span class="fa '+clase_icono+'"></span></span>';
                 }
             }
             datos_grid.push(item);
@@ -120,10 +119,10 @@ function cargar_datos_proyecto(e){
                     }else{
                         var colo_texto = 'text-primary';
                     }
-                    var celda = '<span class="'+colo_texto+'">'+avance.avanceMes+'</span>';
+                    var celda = '<span class="'+colo_texto+'">'+parseFloat(avance.avanceMes)+'</span>';
                     $('#avance-trim-'+trimestre+' > tbody > tr[data-nivel="1"][data-id="'+componente.id+'"] > td[data-trim-mes="'+mes_del_trimestre+'"]').html(celda);
-                    sumatoria_componente[trimestre] += avance.avanceMes;
-                    total_trimestres[trimestre][avance.mes] = (parseFloat(total_trimestres[trimestre][avance.mes]) || 0) + avance.avanceMes;
+                    sumatoria_componente[trimestre] += parseFloat(avance.avanceMes);
+                    total_trimestres[trimestre][avance.mes] = (parseFloat(total_trimestres[trimestre][avance.mes]) || 0) + parseFloat(avance.avanceMes);
                 }
                 for(var j in sumatoria_componente){
                     $('#avance-trim-'+j+' > tbody > tr[data-nivel="1"][data-id="'+componente.id+'"] > td[data-total-id="'+componente.id+'"]').html(sumatoria_componente[j]);
@@ -141,10 +140,10 @@ function cargar_datos_proyecto(e){
                         }else{
                             var colo_texto = 'text-primary';
                         }
-                        var celda = '<span class="'+colo_texto+'">'+avance.avanceMes+'</span>';
+                        var celda = '<span class="'+colo_texto+'">'+parseFloat(avance.avanceMes)+'</span>';
                         $('#avance-trim-'+trimestre+' > tbody > tr[data-nivel="2"][data-id="'+actividad.id+'"] > td[data-trim-mes="'+mes_del_trimestre+'"]').html(celda);
-                        sumatoria_actividad[trimestre] += avance.avanceMes;
-                        total_trimestres[trimestre][avance.mes] = (parseFloat(total_trimestres[trimestre][avance.mes]) || 0) + avance.avanceMes;
+                        sumatoria_actividad[trimestre] += parseFloat(avance.avanceMes);
+                        total_trimestres[trimestre][avance.mes] = (parseFloat(total_trimestres[trimestre][avance.mes]) || 0) + parseFloat(avance.avanceMes);
                     }
                     for(var j in sumatoria_actividad){
                         $('#avance-trim-'+j+' > tbody > tr[data-nivel="2"][data-id="'+actividad.id+'"] > td[data-total-id="'+actividad.id+'"]').html(sumatoria_actividad[j]);

@@ -253,8 +253,12 @@ class ProyectosController extends BaseController {
 				$recurso = $recurso[0];
 			}
 		}else{
-			$recurso = Proyecto::contenidoCompleto()->find($id);
-			$recurso->load('fuentesFinanciamiento.destinoGasto','fuentesFinanciamiento.fuenteFinanciamiento','fuentesFinanciamiento.subFuentesFinanciamiento');
+			$recurso = Proyecto::with('componentes','beneficiarios','clasificacionProyecto','tipoProyecto','estatusProyecto',
+									'jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico',
+									'fuentesFinanciamiento.destinoGasto','fuentesFinanciamiento.fuenteFinanciamiento',
+									'fuentesFinanciamiento.subFuentesFinanciamiento')
+								->find($id);
+
 			$recurso->componentes->load('unidadMedida');
 			if($recurso->idEstatusProyecto == 3){
 				$recurso->load('comentarios');
