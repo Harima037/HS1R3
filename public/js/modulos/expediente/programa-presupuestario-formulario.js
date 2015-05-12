@@ -33,6 +33,7 @@ var form_objetivo = '#form_objetivo';
 var form_causa_efecto = '#form_causa_efecto';
 var form_medio_fin = '#form_medio_fin';
 var form_proyectos = '#form_proyectos';
+var form_fuente_informacion = '#form_fuente_informacion';
 
 $('.chosen-one').chosen({width:'100%'});
 
@@ -68,10 +69,25 @@ if($('#id').val()){
             $('#descripcion-problema').val(response.data.arbolProblema);
             $('#descripcion-objetivo').val(response.data.arbolObjetivo);
 
-            problemasDatagrid = new Datagrid("#datagridProblemas",moduloResource,{'listar':'problemas','id-programa':$('#id').val()});
-            objetivosDatagrid = new Datagrid("#datagridObjetivos",moduloResource,{'listar':'objetivos','id-programa':$('#id').val()});
+            $('#responsable').on('change',function(){
+                if($(this).val()){
+                    var cargo = $('#responsable option:selected').attr('data-cargo');
+                    $('#ayuda-responsable').text(cargo);
+                }else{
+                    $('#ayuda-responsable').text('');
+                }
+            });
+
+            $('#fuente-informacion').val(response.data.fuenteInformacion);
+            llenar_responsables(response.data.responsables);
+            $('#responsable').val(response.data.idResponsable);
+            $('#responsable').change();
+            $('#responsable').trigger('chosen:updated');
+
+            problemasDatagrid   = new Datagrid("#datagridProblemas",moduloResource,{'listar':'problemas','id-programa':$('#id').val()});
+            objetivosDatagrid   = new Datagrid("#datagridObjetivos",moduloResource,{'listar':'objetivos','id-programa':$('#id').val()});
             indicadoresDatagrid = new Datagrid("#datagridIndicadores",moduloResource,{'listar':'indicadores','id-programa':$('#id').val()});
-            proyectosDatagrid = new Datagrid('#datagridProyectos',moduloResource,{'listar':'proyectos','id-programa':$('#id').val()});
+            proyectosDatagrid   = new Datagrid('#datagridProyectos',moduloResource,{'listar':'proyectos','id-programa':$('#id').val()});
 
             problemasDatagrid.init();
             objetivosDatagrid.init();
@@ -103,6 +119,7 @@ if($('#id').val()){
                     indicadoresDatagrid.cargarDatos(response.data);
                 }
             });
+
             proyectosDatagrid.actualizar({
                 _success: function(response){
                     actualizar_lista_proyectos(response);
@@ -280,6 +297,33 @@ function editar_indicador(e){
 }
 
 /****************************************************************** Funciones de Botones ********************************************************************/
+$('#btn-fuente-informacion-guardar').on('click',function(){
+    Validation.cleanFormErrors(form_fuente_informacion);
+
+    var parametros = $(form_fuente_informacion).serialize();
+    parametros = parametros + '&guardar=datos-programacion-programa';
+
+    if($('#id').val()){
+        moduloResource.put($('#id').val(),parametros,{
+            _success: function(response){
+                MessageManager.show({data:'Datos almacenados con éxito',type:'OK',timer:3});
+            },
+            _error: function(response){
+                try{
+                    var json = $.parseJSON(response.responseText);
+                    if(!json.code)
+                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                    else{
+                        MessageManager.show(json);
+                    }
+                    Validation.formValidate(json.data);
+                }catch(e){
+                    console.log(e);
+                }                       
+            }
+        });
+    }
+});
 $('#btn-programa-guardar').on('click',function(){
     Validation.cleanFormErrors(form_programa);
     var parametros = $(form_programa).serialize();
@@ -289,6 +333,12 @@ $('#btn-programa-guardar').on('click',function(){
         moduloResource.put($('#id').val(),parametros,{
             _success: function(response){
                 MessageManager.show({data:'Datos del programa almacenados con éxito',type:'OK',timer:4});
+                if(response.data.responsables){
+                    llenar_responsables(response.data.responsables);
+                    $('#responsable').val('');
+                    $('#responsable').change();
+                    $('#responsable').trigger('chosen:updated');
+                }
             },
             _error: function(response){
                 try{
@@ -308,13 +358,20 @@ $('#btn-programa-guardar').on('click',function(){
         moduloResource.post(parametros,{
             _success: function(response){
                 MessageManager.show({data:'Datos del programa almacenados con éxito',type:'OK',timer:4});
-                $('#id').val(response.id);
+                $('#id').val(response.data.id);
                 $('#tab-link-diagnostico').attr('data-toggle','tab');
                 $('#tab-link-diagnostico').parent().removeClass('disabled');
                 $('#tab-link-indicadores').attr('data-toggle','tab');
                 $('#tab-link-indicadores').parent().removeClass('disabled');
                 $('#tab-link-proyectos').attr('data-toggle','tab');
                 $('#tab-link-proyectos').parent().removeClass('disabled');
+
+                if(response.data.responsables){
+                    llenar_responsables(response.data.responsables);
+                    $('#responsable').val(response.data.idResponsable);
+                    $('#responsable').change();
+                    $('#responsable').trigger('chosen:updated');
+                }
 
                 problemasDatagrid   = new Datagrid("#datagridProblemas",  moduloResource,{'listar':'problemas',  'id-programa':$('#id').val()});
                 objetivosDatagrid   = new Datagrid("#datagridObjetivos",  moduloResource,{'listar':'objetivos',  'id-programa':$('#id').val()});
@@ -742,6 +799,17 @@ function resetear_borrar(){
             });
         }else{ MessageManager.show({data:'No has seleccionado ningún registro.',type:'ADV',timer:3}); }
     });
+}
+
+function llenar_responsables(datos){
+    var html = '<option value="">Selecciona un responsable</option>';
+    for(var i in datos){
+        var responsable = datos[i];
+        html += '<option value="'+responsable.id+'" data-cargo="'+responsable.cargo+'">';
+        html += responsable.nombre;
+        html += '</option>';
+    }
+    $('#responsable').html(html);
 }
 
 function actualizar_lista_proyectos(response){

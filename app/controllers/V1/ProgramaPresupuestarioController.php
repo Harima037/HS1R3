@@ -41,6 +41,11 @@ class ProgramaPresupuestarioController extends BaseController {
 		'justificacion-programa'	=> 'required'
 	);
 
+	private $reglasFuenteInformacion = array(
+		'fuente-informacion'	=> 'required',
+		'responsable'			=> 'required'
+	);
+
 	private $reglasProblemaObjetivo = array(
 		'descripcion-problema'	=> 'sometimes|required',
 		'descripcion-objetivo'	=> 'sometimes|required'
@@ -190,6 +195,9 @@ class ProgramaPresupuestarioController extends BaseController {
 		if($parametros){
 			if($parametros['mostrar'] == 'editar-programa'){
 				$recurso = Programa::with('comentario')->find($id);
+				if($recurso){
+					$recurso['responsables'] = Directorio::responsablesActivos($recurso->claveUnidadResponsable)->get();
+				}
 			}elseif($parametros['mostrar'] == 'editar-causa-efecto'){
 				$recurso = ProgramaArbolProblema::find($id);
 			}elseif($parametros['mostrar'] == 'editar-medio-fin'){
@@ -289,7 +297,8 @@ class ProgramaPresupuestarioController extends BaseController {
 					$recurso->idLiderPrograma = $titular->id;
 
 					if($recurso->save()){
-						$respuesta['data'] = $recurso;
+						$recurso['responsables'] = Directorio::responsablesActivos($recurso->claveUnidadResponsable)->get();
+						$respuesta['data'] = array('data'=>$recurso);
 					}else{
 						$respuesta['http_status'] = 500;
 						$respuesta['data'] = array('data'=>'Error al intentar guardar el programa','code'=>'S01');
@@ -486,6 +495,12 @@ class ProgramaPresupuestarioController extends BaseController {
 				if($validacion === TRUE){
 					$recurso = Programa::find($id);
 
+					if($recurso->claveUnidadResponsable != $parametros['unidad-responsable']){
+						$actualizar_responsables = true;
+					}else{
+						$actualizar_responsables = false;
+					}
+
 					$recurso->claveProgramaSectorial = $parametros['programa-sectorial'];
 					$recurso->idObjetivoPED = $parametros['vinculacion-ped'];
 					$recurso->idObjetivoPND = $parametros['vinculacion-pnd'];
@@ -504,17 +519,41 @@ class ProgramaPresupuestarioController extends BaseController {
 					$recurso->justificacionPrograma = $parametros['justificacion-programa'];
 
 					//$titular = Titular::where('claveUnidad','=',$parametros['unidad-responsable'])->first();
-					$titular = Directorio::titularesActivos($parametros['unidad-responsable'])->first();
+					$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
 					$recurso->idLiderPrograma = $titular->id;
 
 					if($recurso->save()){
-						$respuesta['data'] = $recurso;
+						if($actualizar_responsables){
+							$recurso['responsables'] = Directorio::responsablesActivos($recurso->claveUnidadResponsable)->get();
+						}
+						$respuesta['data'] = array('data'=>$recurso);
 					}else{
 						$respuesta['http_status'] = 500;
 						$respuesta['data'] = array('data'=>'Error al intentar guardar el programa','code'=>'S01');
 					}
 				}else{
 					//La Validación del Formulario encontro errores
+					$respuesta['http_status'] = $validacion['http_status'];
+					$respuesta['data'] = $validacion['data'];
+				}
+			}elseif ($parametros['guardar'] == 'datos-programacion-programa') {
+				$validacion = Validador::validar(Input::all(), $this->reglasFuenteInformacion);
+				if($validacion === TRUE){
+					$recurso = Programa::find($id);
+
+					if($recurso){
+						$recurso->fuenteInformacion = $parametros['fuente-informacion'];
+						$recurso->idResponsable = $parametros['responsable'];
+
+						if(!$recurso->save()){
+							$respuesta['http_status'] = 500;
+							$respuesta['data'] = array('data'=>'Ocurrió un error al intentar guardar los datos','code'=>'S01');
+						}
+					}else{
+						$respuesta['http_status'] = 404;
+						$respuesta['data'] = array('data'=>'No se encontro el proyecto','code'=>'S01');
+					}
+				}else{
 					$respuesta['http_status'] = $validacion['http_status'];
 					$respuesta['data'] = $validacion['data'];
 				}

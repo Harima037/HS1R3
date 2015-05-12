@@ -212,14 +212,14 @@
 		</tr>
 		<tr class="negrita" height="20">
 			<td></td>
-			<td colspan="2" align="center">Nombre</td>
+			<td colspan="2" align="center">{{ $proyecto['responsableInformacion'] }}</td>
 			<td colspan="2"></td>
 			<td colspan="4" align="center">{{ $proyecto['liderProyecto'] }}</td>
 			<td></td>
 		</tr>
 		<tr class="negrita" height="20">
 			<td></td>
-			<td colspan="2" align="center">Cargo</td>
+			<td colspan="2" align="center">{{ $proyecto['cargoResponsableInformacion'] }}</td>
 			<td colspan="2"></td>
 			<td colspan="4" align="center">{{ $proyecto['cargoLiderProyecto'] }}</td>
 			<td></td>

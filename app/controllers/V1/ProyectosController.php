@@ -71,7 +71,8 @@ class ProyectosController extends BaseController {
 	);
 	
 	private $reglasFuenteInformacion = array(
-		'fuente-informacion'	=> 'required'
+		'fuente-informacion'	=> 'required',
+		'responsable'			=> 'required'
 	);
 
 	private $reglasComponente = array(

@@ -28,6 +28,8 @@ moduloDatagrid.actualizar({
                 clase_label = 'label-danger';
             }else if(response.data[i].idEstatus == 4){
                 clase_label = 'label-primary';
+            }else if(response.data[i].idEstatus == 5){
+                clase_label = 'label-success';
             }
 
             item.id = response.data[i].id;

@@ -249,7 +249,7 @@
 			<td></td>
 			<td></td>
 			<td></td>
-			<td colspan="4" align="center">Nombre</td>
+			<td colspan="4" align="center">{{ $proyecto['responsableInformacion'] }}</td>
 			<td></td>
 			<td colspan="5" align="center">{{ $proyecto['liderProyecto'] }}</td>
 			<td></td>
@@ -259,7 +259,7 @@
 			<td></td>
 			<td></td>
 			<td></td>
-			<td colspan="4" align="center">Cargo</td>
+			<td colspan="4" align="center">{{ $proyecto['cargoResponsableInformacion'] }}</td>
 			<td></td>
 			<td colspan="5" align="center">{{ $proyecto['cargoLiderProyecto'] }}</td>
 			<td></td>

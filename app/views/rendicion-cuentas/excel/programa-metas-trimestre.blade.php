@@ -136,7 +136,7 @@
 		@endforeach
 		<tr>
 			<td class="nota-titulo">Fuente de información:</td>
-			<td class="nota-contenido" colspan="3"></td>
+			<td class="nota-contenido" colspan="3">{{$programa['fuenteInformacion']}}</td>
 			<td></td>
 			<td></td>
 			<td></td>
@@ -162,14 +162,14 @@
 		</tr>
 		<tr class="negrita" height="20">
 			<td></td>
-			<td colspan="2" align="center">Nombre</td>
+			<td colspan="2" align="center">{{ $programa['responsableInformacion'] }}</td>
 			<td></td>
 			<td colspan="3" align="center">{{ $programa['liderPrograma'] }}</td>
 			<td></td>
 		</tr>
 		<tr class="negrita" height="20">
 			<td></td>
-			<td colspan="2" align="center">Cargo</td>
+			<td colspan="2" align="center">{{ $programa['cargoResponsableInformacion'] }}</td>
 			<td></td>
 			<td colspan="3" align="center">{{ $programa['cargoLiderPrograma'] }}</td>
 			<td></td>
