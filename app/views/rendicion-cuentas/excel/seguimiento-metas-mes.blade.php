@@ -131,6 +131,7 @@
 		<tr height="50" class="tabla-datos">
 			<td class="texto-medio">Componente {{$index+1}}</td>
 			<td class="texto-medio">{{$componente['indicador']}}</td>
+			@if(isset($avances_mes['componentes'][$componente['id']]))
 			<td class="texto-medio texto-centro">{{$avances_mes['componentes'][$componente['id']]['meta_programada']}}</td>
 			<td class="texto-medio texto-centro"></td>
 			<td class="texto-medio texto-centro">{{$avances_mes['componentes'][$componente['id']]['avance_mes']}}</td>
@@ -155,12 +156,23 @@
 			<td class="texto-medio texto-centro"></td>
 			<td class="texto-medio">{{$avances_mes['componentes'][$componente['id']]['analisis_resultados']}}</td>
 			<td class="texto-medio">{{$avances_mes['componentes'][$componente['id']]['justificacion_acumulada']}}</td>
+			@else
+			<td class="texto-medio texto-centro">0</td>
+			<td class="texto-medio texto-centro"></td>
+			<td class="texto-medio texto-centro">0</td>
+			<td class="texto-medio texto-centro">0</td>
+			<td class="texto-medio texto-centro">0%</td>
+			<td class="texto-medio texto-centro"></td>
+			<td class="texto-medio"></td>
+			<td class="texto-medio"></td>
+			@endif
 		</tr>
 
 		@foreach($componente['actividades'] as $indice => $actividad)
 		<tr height="50" class="tabla-datos">
 			<td class="texto-medio">Actividad {{$index+1}}.{{$indice+1}}</td>
 			<td class="texto-medio">{{$actividad['indicador']}}</td>
+			@if(isset($avances_mes['actividades'][$actividad['id']]))
 			<td class="texto-medio texto-centro">{{$avances_mes['actividades'][$actividad['id']]['meta_programada']}}</td>
 			<td class="texto-medio texto-centro"></td>
 			<td class="texto-medio texto-centro">{{$avances_mes['actividades'][$actividad['id']]['avance_mes']}}</td>
@@ -185,6 +197,16 @@
 			<td class="texto-medio texto-centro"></td>
 			<td class="texto-medio">{{$avances_mes['actividades'][$actividad['id']]['analisis_resultados']}}</td>
 			<td class="texto-medio">{{$avances_mes['actividades'][$actividad['id']]['justificacion_acumulada']}}</td>
+			@else
+			<td class="texto-medio texto-centro">0</td>
+			<td class="texto-medio texto-centro"></td>
+			<td class="texto-medio texto-centro">0</td>
+			<td class="texto-medio texto-centro">0</td>
+			<td class="texto-medio texto-centro">0%</td>
+			<td class="texto-medio texto-centro"></td>
+			<td class="texto-medio"></td>
+			<td class="texto-medio"></td>
+			@endif
 		</tr>
 		@endforeach
 		@endforeach
@@ -241,6 +263,7 @@
 		<tr height="20" class="tabla-datos">
 			<td class="subtitulo-tabla">Componente {{$index+1}}</td>
 			<td class="subtitulo-tabla">{{$componente['indicador']}}</td>
+			@if(isset($avances_mes['componentes'][$componente['id']]))
 			<td class="subtitulo-tabla">{{$avances_mes['componentes'][$componente['id']]['meta_programada']}}</td>
 			<td class="subtitulo-tabla"></td>
 			<td class="subtitulo-tabla">{{$avances_mes['componentes'][$componente['id']]['avance_mes']}}</td>
@@ -261,7 +284,14 @@
 			@else
 				100
 			@endif
-			 %</td>
+			%</td>
+			@else
+			<td class="subtitulo-tabla">0</td>
+			<td class="subtitulo-tabla"></td>
+			<td class="subtitulo-tabla">0</td>
+			<td class="subtitulo-tabla">0</td>
+			<td class="subtitulo-tabla">0%</td>
+			@endif
 			<td class="subtitulo-tabla"></td>
 		</tr>
 
@@ -336,6 +366,7 @@
 			<tr height="20" class="tabla-datos">
 				<td class="subtitulo-tabla">Actividad {{$index+1}}.{{$indice+1}}</td>
 				<td class="subtitulo-tabla">{{$actividad['indicador']}}</td>
+				@if(isset($avances_mes['actividades'][$actividad['id']]))
 				<td class="subtitulo-tabla">{{$avances_mes['actividades'][$actividad['id']]['meta_programada']}}</td>
 				<td class="subtitulo-tabla"></td>
 				<td class="subtitulo-tabla">{{$avances_mes['actividades'][$actividad['id']]['avance_mes']}}</td>
@@ -357,6 +388,13 @@
 					100
 				@endif
 				 %</td>
+				@else
+				<td class="subtitulo-tabla">0</td>
+				<td class="subtitulo-tabla"></td>
+				<td class="subtitulo-tabla">0</td>
+				<td class="subtitulo-tabla">0</td>
+				<td class="subtitulo-tabla">0%</td>
+				@endif
 				<td class="subtitulo-tabla"></td>
 			</tr>
 

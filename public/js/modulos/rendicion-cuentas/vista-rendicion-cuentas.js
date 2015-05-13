@@ -661,11 +661,90 @@ function llenar_grid_acciones(response){
     if(plus>0) 
         total++;
     accionesDatagrid.paginacion(total);
+
+    ///**   Datos del responsable de la información    **///
+    if(response.data.responsables){
+        var datos = response.data.responsables;
+        var html = '<option value="">Selecciona un responsable</option>';
+        for(var i in datos){
+            var responsable = datos[i];
+            html += '<option value="'+responsable.id+'" data-cargo="'+responsable.cargo+'">';
+            html += responsable.nombre;
+            html += '</option>';
+        }
+        $('#responsable').html(html);
+        
+        $('#responsable').off('change');
+        $('#responsable').on('change',function(){
+            if($(this).val()){
+                var cargo = $('#responsable option:selected').attr('data-cargo');
+                $('#ayuda-responsable').text(cargo);
+            }else{
+                $('#ayuda-responsable').text('');
+            }
+        });
+        
+        $('#fuente-informacion').val(response.data.fuenteInformacion);
+        $('#responsable').val(response.data.idResponsable);
+        $('#responsable').trigger('chosen:updated');
+
+        if(response.data.fuenteInformacion && response.data.idResponsable){
+            $('#form_fuente_informacion input,textarea,select').each(function(){
+                $(this).prop('disabled',true);
+                $('label[for="' + $(this).attr('id') + '"]').prepend('<span class="fa fa-lock"></span> ');
+                if($(this).hasClass('chosen-one')){
+                    $(this).trigger('chosen:updated');
+                }
+            });
+        }
+    }
 }
 /********************************************************************************************************************************
         Fin: Seguimiento de Metas
 *********************************************************************************************************************************/
 
+/********************************************************************************************************************************
+        Inicio: Información de la programación de metas (Fuente de la Información y Responsable de la Información)
+*********************************************************************************************************************************/
+
+$('#btn-fuente-informacion-guardar').on('click',function(){
+    Validation.cleanFormErrors('#form_fuente_informacion');
+
+    var parametros = $('#form_fuente_informacion').serialize();
+    parametros = parametros + '&guardar=datos-informacion&id-proyecto='+$('#id').val();
+
+    if($('#id').val()){
+        moduloResource.put($('#id').val(),parametros,{
+            _success: function(response){
+                MessageManager.show({data:'Datos almacenados con éxito',type:'OK',timer:3});
+                $('#form_fuente_informacion input,textarea,select').each(function(){
+                    $(this).prop('disabled',true);
+                    $('label[for="' + $(this).attr('id') + '"]').prepend('<span class="fa fa-lock"></span> ');
+                    if($(this).hasClass('chosen-one')){
+                        $(this).trigger('chosen:updated');
+                    }
+                });
+            },
+            _error: function(response){
+                try{
+                    var json = $.parseJSON(response.responseText);
+                    if(!json.code)
+                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                    else{
+                        MessageManager.show(json);
+                    }
+                    Validation.formValidate(json.data);
+                }catch(e){
+                    console.log(e);
+                }                       
+            }
+        });
+    }
+});
+
+/********************************************************************************************************************************
+        Fin: Información de la programación de metas (Fuente de la Información y Responsable de la Información)
+*********************************************************************************************************************************/
 
 /********************************************************************************************************************************
         Inicio: Seguimiento de Beneficiarios

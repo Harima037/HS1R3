@@ -20,7 +20,7 @@ use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
 use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionProyectoMes,
-	EvaluacionPlanMejora,ComponenteDesglose,DesgloseMetasMes;
+	EvaluacionPlanMejora,ComponenteDesglose,DesgloseMetasMes,Directorio;
 
 class SeguimientoController extends BaseController {
 	private $reglasBeneficiarios = array(
@@ -65,6 +65,11 @@ class SeguimientoController extends BaseController {
 		'fecha-notificacion'			=> 'required|date'
 	);
 
+	private $reglasFuenteInformacion = array(
+		'fuente-informacion'	=> 'required',
+		'responsable'			=> 'required'
+	);
+
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -82,6 +87,7 @@ class SeguimientoController extends BaseController {
 					$rows = Proyecto::with('componentes.comentarios','componentes.registroAvance','componentes.actividades.comentarios','componentes.actividades.registroAvance')
 									->find($parametros['idProyecto']);
 					//$rows->componentes->load('registroAvance');
+					$rows['responsables'] = Directorio::responsablesActivos($rows->unidadResponsable)->get();
 					$total = count($rows);
 				}elseif($parametros['grid'] == 'rendicion-beneficiarios'){
 					$rows = Beneficiario::with(array('registroAvance'=>function($query){
@@ -352,17 +358,52 @@ class SeguimientoController extends BaseController {
 			$mes_actual = Util::obtenerMesActual();
 
 			if($parametros['guardar'] == 'validar-seguimiento'){
-				$recurso = Proyecto::with(array('actividades','componentes','registroAvance'=>function($query) use ($mes_actual){
+				$recurso = Proyecto::with(array(
+					'actividades.metasMes'=>function($query)use($mes_actual){
+						$query->where('mes','=',$mes_actual);
+					},'actividades.registroAvance'=>function($query)use($mes_actual){
+						$query->where('mes','=',$mes_actual);
+					},'componentes.metasMes'=>function($query)use($mes_actual){
+						$query->where('mes','=',$mes_actual);
+					},'componentes.registroAvance'=>function($query)use($mes_actual){
+						$query->where('mes','=',$mes_actual);
+					}
+				))->find($id);
+
+				/*
+				,'registroAvance'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
-				}))->find($id);
+				}
+				*/
 
-				$elementos = count($recurso->componentes);
-				$elementos += count($recurso->actividades);
-				$registro_elementos = count($recurso->registroAvance);
+				$elementos_programados = 0;
+				$elementos_capturados = 0;
 
-				if($elementos != $registro_elementos){
+				foreach ($recurso->componentes as $componente) {
+					if(count($componente->metasMes)){
+						$elementos_programados++;
+					}
+					if(count($componente->registroAvance)){
+						$elementos_capturados++;
+					}
+				}
+				foreach ($recurso->actividades as $actividad) {
+					if(count($actividad->metasMes)){
+						$elementos_programados++;
+					}
+					if(count($actividad->registroAvance)){
+						$elementos_capturados++;
+					}
+				}
+
+				//$elementos = count($recurso->componentes);
+				//$elementos += count($recurso->actividades);
+				//$registro_elementos = count($recurso->registroAvance);
+
+				//if($elementos != $registro_elementos){
+				if($elementos_programados != $elementos_capturados){
 					$respuesta['data']['data']='No se ha podido enviar el proyecto a revisión ya que hacen falta avances por capturar';
-					throw new Exception('Se han capturado el avance en '.$registro_elementos.' de '.$elementos.' elementos.', 1);
+					throw new Exception('Se han capturado el avance en '.$elementos_capturados.' de '.$elementos_programados.' elementos.', 1);
 				}
 
 				if(($mes_actual % 3) == 0){
@@ -462,6 +503,26 @@ class SeguimientoController extends BaseController {
 						$respuesta['http_status'] = $validacion['http_status'];
 						$respuesta['data'] = $validacion['data'];
 					}
+				}
+			}elseif($parametros['guardar'] == 'datos-informacion'){
+				$validacion = Validador::validar(Input::all(), $this->reglasFuenteInformacion);
+				if($validacion === TRUE){
+					$recurso = Proyecto::find($id);
+					if($recurso){
+						$recurso->fuenteInformacion = $parametros['fuente-informacion'];
+						$recurso->idResponsable = $parametros['responsable'];
+
+						if(!$recurso->save()){
+							$respuesta['http_status'] = 500;
+							$respuesta['data'] = array('data'=>'Ocurrió un error al intentar guardar los datos','code'=>'S01');
+						}
+					}else{
+						$respuesta['http_status'] = 404;
+						$respuesta['data'] = array('data'=>'No se encontro el proyecto','code'=>'S01');
+					}
+				}else{
+					$respuesta['http_status'] = $validacion['http_status'];
+					$respuesta['data'] = $validacion['data'];
 				}
 			}
 		}catch(\Exception $ex){
