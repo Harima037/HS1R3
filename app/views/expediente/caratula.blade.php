@@ -97,9 +97,6 @@
                                                 <span id="ayuda-responsable" class="help-block"></span>
                                             </div>
                                         </div>
-                                        <div class="col-sm-12">
-                                            
-                                        </div>
                                     </div>
                                 </form>
                             </div>
