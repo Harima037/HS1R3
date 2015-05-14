@@ -162,7 +162,7 @@ function seguimiento_metas(e){
                 total_programado += parseFloat(dato_meta || 0);
                 
                 $(row + ' > td.meta-programada').attr('data-meta',dato_meta);
-                $(row + ' > td.meta-programada').text(dato_meta);
+                $(row + ' > td.meta-programada').text(dato_meta.format(2));
 
                 var dato_avance = parseFloat(dato.avance) || 0;
 
@@ -185,7 +185,7 @@ function seguimiento_metas(e){
 
                 $('#avance_'+dato.claveJurisdiccion).attr('data-meta-programada',dato_meta);
                 
-                $(row + ' > td.meta-del-mes').text(dato_meta);
+                $(row + ' > td.meta-del-mes').text(dato_meta.format(2));
                 $(row + ' > td.meta-del-mes').attr('data-meta-mes',dato_meta);
                 total_programado_mes += dato_meta;
 
@@ -218,10 +218,10 @@ function seguimiento_metas(e){
             }
 
             //var total_porcentaje_acumulado = parseFloat((((total_acumulado + total_avance) * 100) / total_programado).toFixed(2)) || 0;
-            $('#total-meta-programada').text(total_programado.format());
+            $('#total-meta-programada').text(total_programado.format(2));
             $('#total-meta-programada').attr('data-total-programado',total_programado);
-            $('#total-meta-mes').text(total_programado_mes.format());
-            $('#total-avance-mes').text(total_avance.format());
+            $('#total-meta-mes').text(total_programado_mes.format(2));
+            $('#total-avance-mes').text(total_avance.format(2));
             $('#total-avance-acumulado').text(total_acumulado.format(2));
             //$('#total-porcentaje').text(total_porcentaje_acumulado+'% ');
             $('.avance-mes').change();
@@ -457,7 +457,7 @@ $('.avance-mes').on('change',function(){
     //Actualiza la columna de porcentaje acumulado
     var acumulado = parseFloat($(row +' > td.avance-acumulado').attr('data-acumulado')) || 0;
     acumulado += avance;
-    $(row +' > td.avance-total').text(acumulado);
+    $(row +' > td.avance-total').text(acumulado.format(2));
     $(row +' > td.avance-total').attr('data-avance-total',acumulado);
 
     var total_programado = $(row +' > td.meta-programada').attr('data-meta');
@@ -466,13 +466,13 @@ $('.avance-mes').on('change',function(){
         $(row +' > td.avance-mes').html('<small class="text-success">0%</small>');
     }else{
         if(total_programado > 0){
-            var avance_mes = parseFloat(((acumulado * 100) / total_programado).toFixed(2))||0;
+            var avance_mes = ((acumulado * 100) / total_programado);
         }else if(acumulado > 0){
             var avance_mes = 100;
         }else{
             var avance_mes = 0;
         }
-
+        avance_mes = +avance_mes.toFixed(2);
         if(avance_mes > 110){
             $(row +' > td.avance-mes').html('<small class="text-danger"><span class="fa fa-arrow-up"></span> '+avance_mes+'%</small>');
         }else if(avance_mes < 90){
@@ -686,6 +686,7 @@ function llenar_grid_acciones(response){
         
         $('#fuente-informacion').val(response.data.fuenteInformacion);
         $('#responsable').val(response.data.idResponsable);
+        $('#responsable').change();
         $('#responsable').trigger('chosen:updated');
 
         if(response.data.fuenteInformacion && response.data.idResponsable){

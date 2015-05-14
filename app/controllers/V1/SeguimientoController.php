@@ -842,11 +842,17 @@ class SeguimientoController extends BaseController {
 			}else{
 				$registro_avance->justificacionAcumulada = $parametros['justificacion-acumulada'];
 			}
-			$registro_avance->planMejora = 1;
+			if($mes_actual != 12){
+				$registro_avance->planMejora = 1;
+			}else{
+				$registro_avance->planMejora = 0;
+			}
 		}else{
 			$registro_avance->justificacionAcumulada = 'El avance se encuentra dentro de los parametros establecidos';
 			$registro_avance->planMejora = 0;
 		}
+
+
 
 		if(trim($parametros['analisis-resultados']) == ''){
 			$faltan_campos[] = json_encode(array('field'=>'analisis-resultados','error'=>'Este campo es requerido.'));
