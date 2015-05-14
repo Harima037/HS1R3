@@ -689,13 +689,15 @@ function llenar_grid_acciones(response){
         $('#responsable').trigger('chosen:updated');
 
         if(response.data.fuenteInformacion && response.data.idResponsable){
-            $('#form_fuente_informacion input,textarea,select').each(function(){
-                $(this).prop('disabled',true);
-                $('label[for="' + $(this).attr('id') + '"]').prepend('<span class="fa fa-lock"></span> ');
-                if($(this).hasClass('chosen-one')){
-                    $(this).trigger('chosen:updated');
-                }
-            });
+            if(!$('#fuente-informacion').prop('disabled') && !$('#responsable').prop('disabled')){
+                $('#fuente-informacion,#responsable').each(function(){
+                    $(this).prop('disabled',true);
+                    $('label[for="' + $(this).attr('id') + '"]').prepend('<span class="fa fa-lock"></span> ');
+                    if($(this).hasClass('chosen-one')){
+                        $(this).trigger('chosen:updated');
+                    }
+                });
+            }
         }
     }
 }

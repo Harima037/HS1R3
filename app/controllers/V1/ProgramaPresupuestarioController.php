@@ -293,7 +293,7 @@ class ProgramaPresupuestarioController extends BaseController {
 					$recurso->justificacionPrograma = $parametros['justificacion-programa'];
 
 					//$titular = Titular::where('claveUnidad','=',$parametros['unidad-responsable'])->first();
-					$titular = Directorio::titularesActivos($parametros['unidad-responsable'])->first();
+					$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
 					$recurso->idLiderPrograma = $titular->id;
 
 					if($recurso->save()){

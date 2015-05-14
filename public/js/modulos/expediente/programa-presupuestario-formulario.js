@@ -106,6 +106,7 @@ if($('#id').val()){
             objetivosDatagrid.actualizar();
             indicadoresDatagrid.actualizar({
                 _success: function(response){
+                    indicadoresDatagrid.limpiar();
                     for(var i in response.data){
                         if(response.data[i].claveTipoIndicador == 'F'){
                             var tipo_descripcion = 'Fin';
@@ -389,6 +390,7 @@ $('#btn-programa-guardar').on('click',function(){
                 objetivosDatagrid.cargarDatos([]);
                 indicadoresDatagrid.actualizar({
                     _success: function(response){
+                        indicadoresDatagrid.limpiar();
                         for(var i in response.data){
                             if(response.data[i].claveTipoIndicador == 'F'){
                                 response.data[i].claveTipoIndicador = 'Fin';
