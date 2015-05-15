@@ -24,8 +24,8 @@ class Directorio extends BaseModel
 	public function scopeResponsablesActivos($query,$clave_unidad = NULL){
 		$query = $query->whereNull('fechaFin')->where('nivel','!=',1)
 				->join('catalogoUnidadesResponsables AS unidad',function($join){
-					$join->on('unidad.idArea','=','vistaDirectorio.idArea')
-						->orOn('unidad.idArea','=','vistaDirectorio.idAreaDepende');
+					$join->on('vistaDirectorio.mascara','like',DB::raw('concat("%",unidad.idArea,"%")'))
+						->orOn('unidad.idArea','=','vistaDirectorio.idArea');
 				})
 				->select('vistaDirectorio.*');
 		if($clave_unidad){

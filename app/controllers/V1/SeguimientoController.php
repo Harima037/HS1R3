@@ -88,6 +88,7 @@ class SeguimientoController extends BaseController {
 									->find($parametros['idProyecto']);
 					//$rows->componentes->load('registroAvance');
 					$rows['responsables'] = Directorio::responsablesActivos($rows->unidadResponsable)->get();
+					
 					$total = count($rows);
 				}elseif($parametros['grid'] == 'rendicion-beneficiarios'){
 					$rows = Beneficiario::with(array('registroAvance'=>function($query){
@@ -382,17 +383,17 @@ class SeguimientoController extends BaseController {
 				foreach ($recurso->componentes as $componente) {
 					if(count($componente->metasMes)){
 						$elementos_programados++;
-					}
-					if(count($componente->registroAvance)){
-						$elementos_capturados++;
+						if(count($componente->registroAvance)){
+							$elementos_capturados++;
+						}
 					}
 				}
 				foreach ($recurso->actividades as $actividad) {
 					if(count($actividad->metasMes)){
 						$elementos_programados++;
-					}
-					if(count($actividad->registroAvance)){
-						$elementos_capturados++;
+						if(count($actividad->registroAvance)){
+							$elementos_capturados++;
+						}
 					}
 				}
 
