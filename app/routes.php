@@ -30,6 +30,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('usuarios', array('uses' => 'UsuariosController@index'));
 		Route::get('roles', array('uses' => 'RolesController@index'));
 		Route::post('usuarios', array('uses' => 'UsuariosController@validar'));
+		Route::get('config-seg-metas',array('uses' => 'ConfigurarSeguimientoController@index'));
 	});
 
 	Route::group(array('prefix'=>'expediente'), function(){
@@ -80,6 +81,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('roles',			'V1\RolesController');
 		Route::resource('permisos',			'V1\PermisosController');
 		Route::resource('cuenta',			'V1\CuentaController');
+		Route::resource('config-seg-metas', 'V1\ConfigurarSeguimientoController', array('only' => array('store')));
 		
 		Route::resource('proyectos',		'V1\ProyectosController');
 		Route::resource('inversion',		'V1\InversionController');

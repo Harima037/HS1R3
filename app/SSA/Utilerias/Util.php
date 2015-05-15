@@ -1,22 +1,34 @@
 <?php
 namespace SSA\Utilerias;
 
+use SysConfiguracionVariable;
+
 class Util 
 {
 	public static function obtenerMesActual(){
 		$usuario = \Sentry::getUser();
 		
-		if($usuario->mesCaptura){
-			return $usuario->mesCaptura;
-		}
-		
-		$mes = date('n');
-		$dia = date('j');
-		if($dia <= 10){
-			$mes = $mes - 1;
+		$variables = SysConfiguracionVariable::obtenerVariables(array('dias-captura','mes-captura'))->lists('valor','variable');
+
+		if($variables['mes-captura']){
+			$mes = $variables['mes-captura'];
+		}elseif($usuario->mesCaptura){
+			$mes = $usuario->mesCaptura;
 		}else{
-			$mes = 0;
+			if($variables['dias-captura']){
+				$dias_validos = intval($variables['dias-captura']);
+			}else{
+				$dias_validos = 10;
+			}
+			$mes = date('n');
+			$dia = date('j');
+			if($dia <= $dias_validos){
+				$mes = $mes - 1;
+			}else{
+				$mes = 0;
+			}
 		}
+
 		return $mes;
 	}
 	public static function obtenerMesTrimestre(){

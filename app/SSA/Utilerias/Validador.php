@@ -22,6 +22,7 @@ class Validador
 			'active_url'		=> '{"field":":attribute","error":"El enlace no es válido."}',
 			'image' 			=> '{"field":":attribute","error":"El archivo debe ser una imagen."}',
 			'min'				=> '{"field":":attribute","error":"Este campo debe tener un valor mayor o igual a :min"}',
+			'max'				=> '{"field":":attribute","error":"Este campo debe tener un valor menor o igual a :max"}',
 			'digits_between'	=> '{"field":":attribute","error":"Este campo debe ser ser de :min a :max caracteres de largo."}'
 		);
 	
