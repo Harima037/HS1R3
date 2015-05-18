@@ -9,9 +9,16 @@ class UsuariosController extends \BaseController {
 	 */
 	public function index()
 	{
+		if(Sentry::getUser()->idDepartamento){
+			$departamentos = SysDepartamento::where('id','=',Sentry::getUser()->idDepartamento)
+											->orWhere('id','=',3)->get();
+		}else{
+			$departamentos = SysDepartamento::all();
+		}
 		$catalogos = array(
 				'sys_roles'=>Sentry::findAllGroups(),
-				'unidades_responsables'=>UnidadResponsable::all()
+				'unidades_responsables'=>UnidadResponsable::all(),
+				'departamentos'=>$departamentos
 			);
 		return parent::loadIndex('ADMIN','USUARIOS',$catalogos);
 	}

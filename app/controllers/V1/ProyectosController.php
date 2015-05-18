@@ -146,7 +146,8 @@ class ProyectosController extends BaseController {
 						->whereIn('idEstatusProyecto',[1,2,3,4,5]);
 
 			if(Sentry::getUser()->claveUnidad){
-				$rows = $rows->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
+				$unidades = explode('|',Sentry::getUser()->claveUnidad);
+				$rows = $rows->whereIn('unidadResponsable',$unidades);
 			}
 			
 			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
@@ -1195,13 +1196,16 @@ class ProyectosController extends BaseController {
 				}
 			}
 
-			if(Sentry::getUser()->claveUnidad){
+			/*if(Sentry::getUser()->claveUnidad){
 				//$titulares = Titular::whereIn('claveUnidad',array('00','01',Sentry::getUser()->claveUnidad))->get();
+				if(Sentry::getUser()->claveUnidad){
+					$unidades = explode('|',Sentry::getUser()->claveUnidad);
+				}
 				$titulares = Directorio::titularesActivos(array('00','01', Sentry::getUser()->claveUnidad))->get();
-			}else{
+			}else{*/
 				//$titulares = Titular::whereIn('claveUnidad',array('00','01',$parametros['unidadresponsable']))->get();
 				$titulares = Directorio::titularesActivos(array('00','01', $parametros['unidadresponsable']))->get();
-			}
+			//}
 
 			foreach ($titulares as $titular) {
 				if($titular->claveUnidad == '00'){ //Dirección General

@@ -73,6 +73,9 @@ class RevisionController extends BaseController {
 			
 			return Response::json($data,$http_status);
 		}elseif(isset($parametros['proyectos_inversion'])){
+			if(Sentry::getUser()->claveUnidad){
+				$unidades = explode('|',Sentry::getUser()->claveUnidad);
+			}
 			$rows = Proyecto::getModel();
 			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto',
@@ -83,7 +86,7 @@ class RevisionController extends BaseController {
 								->leftjoin('fibap','proyectos.id','=','fibap.idProyecto')
 								->orderBy('proyectos.id','desc')
 								->wherein('proyectos.idClasificacionProyecto',array(2, 4))
-								->where('unidadResponsable','=',Sentry::getUser()->claveUnidad)
+								->whereIn('unidadResponsable',$unidades)
 								->whereNull('fibap.id')
 								->get();
 			$data = array('data'=>$rows);

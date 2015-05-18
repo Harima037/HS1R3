@@ -100,7 +100,7 @@ class ProyectosController extends \BaseController {
 		//
 		//Obtener los titulares para firmas: de las unidades de Planeacion y Desarrollo, Direccion General y Director de la Unidad Responsable
 		//$titulares = Titular::whereIn('claveUnidad',array('00','01', Sentry::getUser()->claveUnidad))->get();
-		$titulares = Directorio::titularesActivos(array('00','01', Sentry::getUser()->claveUnidad))->get();
+		$titulares = Directorio::titularesActivos(array('00','01'))->get();
 		
 		$firmas = array(
 				'LiderProyecto' 	=> NULL,
@@ -151,7 +151,8 @@ class ProyectosController extends \BaseController {
 		);
 		
 		if(Sentry::getUser()->claveUnidad){
-			$datos['unidades_responsables'] = UnidadResponsable::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->where('clave','=',Sentry::getUser()->claveUnidad)->get();
+			$unidades = explode('|',Sentry::getUser()->claveUnidad);
+			$datos['unidades_responsables'] = UnidadResponsable::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->whereIn('clave',$unidades)->get();
 		}else{
 			$datos['unidades_responsables'] = UnidadResponsable::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get();
 		}

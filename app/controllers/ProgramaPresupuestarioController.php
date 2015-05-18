@@ -34,7 +34,8 @@ class ProgramaPresupuestarioController extends \BaseController {
 		$datos['programas_presupuestarios'] = ProgramaPresupuestario::all();
 
 		if(Sentry::getUser()->claveUnidad){
-			$datos['unidades_responsables'] = UnidadResponsable::where('clave','=',Sentry::getUser()->claveUnidad)->get();
+			$unidades = explode('|',Sentry::getUser()->claveUnidad);
+			$datos['unidades_responsables'] = UnidadResponsable::whereIn('clave',$unidades)->get();
 		}else{
 			$datos['unidades_responsables'] = UnidadResponsable::all();
 		}

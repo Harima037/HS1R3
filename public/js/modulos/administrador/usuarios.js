@@ -38,54 +38,58 @@ function editar (e){
     $('#modalModulo .nav-tabs a:first').tab('show');
 
     moduloResource.get(e,null,{
-                    _success: function(response){
+        _success: function(response){
 
-                        //$('#formModulo').data('bootstrapValidator').enableFieldValidators('password',false);
-                        //$('#formModulo').data('bootstrapValidator').enableFieldValidators('password_confirm',false);
+            //$('#formModulo').data('bootstrapValidator').enableFieldValidators('password',false);
+            //$('#formModulo').data('bootstrapValidator').enableFieldValidators('password_confirm',false);
 
-                        $('#formModulo #id').val(response.data.id);
-                        $('#formModulo #username').val(response.data.username);
-                        $('#formModulo #nombres').val(response.data.nombres);
-                        $('#formModulo #apellido-paterno').val(response.data.apellidoPaterno);
-                        $('#formModulo #apellido-materno').val(response.data.apellidoMaterno);
-                        $('#formModulo #unidad').val(response.data.claveUnidad);
-                        $('#formModulo #cargo').val(response.data.cargo);
-                        $('#formModulo #email').val(response.data.email);
-                        $('#formModulo #telefono').val(response.data.telefono);
-                        $('#formModulo #rol').val(response.data.roles);
-                        $('#formModulo #rol').trigger('chosen:updated');
-                        permisos_individuales = response.data.permissions;
-                        
+            $('#formModulo #id').val(response.data.id);
+            $('#formModulo #username').val(response.data.username);
+            $('#formModulo #nombres').val(response.data.nombres);
+            $('#formModulo #apellido-paterno').val(response.data.apellidoPaterno);
+            $('#formModulo #apellido-materno').val(response.data.apellidoMaterno);
+            $('#formModulo #cargo').val(response.data.cargo);
+            $('#formModulo #departamento').val(response.data.idDepartamento);
+            $('#formModulo #email').val(response.data.email);
+            $('#formModulo #telefono').val(response.data.telefono);
+            $('#formModulo #rol').val(response.data.roles);
+            permisos_individuales = response.data.permissions;
+            
+            if(response.data.claveUnidad){
+                var unidades = response.data.claveUnidad.split('|');
+                $('#formModulo #unidad').val(unidades);
+            }
 
-                        if(response.data.permissions.superuser){
-                            $("#btn-cargar-cat-permisos").hide();
-                            $("#btn-limpiar-permisos").hide();
-                            $("#nav-tab-seguridad").hide();
-                            $("#tab-seguridad").attr("style",'display:none');
-                        }else{
-                            var parametros =  {}                        
-                            parametros.user_id = $('#formModulo #id').val();
-                            parametros.roles = $('#formModulo #rol').val();
-                            
-                            catalogoPermisosResource.get(null,parametros,{
-                                _success: function(response){                       
-                                        response.data.user= permisos_individuales;
-                                        cargarCatalogoPermisos(response);
-                                        permisos_individuales = parsePermisos();
-                                        buildPermissionPanel(permisos_individuales);
+            if(response.data.permissions.superuser){
+                $("#btn-cargar-cat-permisos").hide();
+                $("#btn-limpiar-permisos").hide();
+                $("#nav-tab-seguridad").hide();
+                $("#tab-seguridad").attr("style",'display:none');
+            }else{
+                var parametros =  {}                        
+                parametros.user_id = $('#formModulo #id').val();
+                parametros.roles = $('#formModulo #rol').val();
+                
+                catalogoPermisosResource.get(null,parametros,{
+                    _success: function(response){                       
+                            response.data.user= permisos_individuales;
+                            cargarCatalogoPermisos(response);
+                            permisos_individuales = parsePermisos();
+                            buildPermissionPanel(permisos_individuales);
 
-                                    }
-                            },"Cargando permisos");
-
-                            $("#btn-cargar-cat-permisos").show();
-                            $("#btn-limpiar-permisos").show();
-                            $("#nav-tab-seguridad").show();
-                            $("#tab-seguridad").attr("style",'');
                         }
+                },"Cargando permisos");
 
-                        $('#modalModulo').find(".modal-title").html("Editar Usuario");
-                        $('#modalModulo').modal('show');  
-                    }
+                $("#btn-cargar-cat-permisos").show();
+                $("#btn-limpiar-permisos").show();
+                $("#nav-tab-seguridad").show();
+                $("#tab-seguridad").attr("style",'');
+                $('#formModulo .chosen-one').trigger('chosen:updated');
+            }
+
+            $('#modalModulo').find(".modal-title").html("Editar Usuario");
+            $('#modalModulo').modal('show');  
+        }
     },"Cargando datos");
 }
 function submitModulo(){
@@ -148,9 +152,13 @@ function submitModulo(){
 // Configuración General para cualquier módulo
 
 $('#modalModulo').on('shown.bs.modal', function () {
-     $('#modalModulo .nav-tabs a:first').tab('show');
+    $('#modalModulo .nav-tabs a:first').tab('show');
     $('#modalModulo').find('input').eq(0).focus();
    
+});
+
+$('#modalModulo').on('hidden.bs.modal',function(){
+    resetModalModuloForm();
 });
 
 $('#btnModuloAgregar').on('click', function () {
@@ -198,7 +206,7 @@ function resetModalModuloForm(){
     $('#formModulo #id').val("");
     permisos_individuales = {};
     $('#formModulo #pnlPermissions').html('<tr><td>Aún no hay permisos individuales asignados.</td></tr>');
-    $('#formModulo #rol').trigger('chosen:updated');
+    $('#formModulo .chosen-one').trigger('chosen:updated');
 }
 
 // Funciones de permisos

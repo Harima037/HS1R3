@@ -107,7 +107,8 @@ class SeguimientoController extends BaseController {
 				//$rows = $rows->with('registroAvance');
 				$usuario = Sentry::getUser();
 				if($usuario->claveUnidad){
-					$rows = $rows->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
+					$unidades = explode('|',$usuario->claveUnidad);
+					$rows = $rows->whereIn('unidadResponsable',$unidades);
 				}
 
 				$rows = $rows->with(array('registroAvance'=>function($query){

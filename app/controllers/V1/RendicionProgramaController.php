@@ -42,8 +42,10 @@ class RendicionProgramaController extends BaseController {
 				$rows = $rows->where('idEstatus','=',5);
 
 				$usuario = Sentry::getUser();
+
 				if($usuario->claveUnidad){
-					$rows = $rows->where('claveUnidadResponsable','=',$usuario->claveUnidad);
+					$unidades = explode('|',$usuario->claveUnidad);
+					$rows = $rows->whereIn('claveUnidadResponsable',$unidades);
 				}
 				
 				$rows = $rows->with(array('registroAvance'=>function($query){

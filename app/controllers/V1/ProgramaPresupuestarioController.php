@@ -136,7 +136,8 @@ class ProgramaPresupuestarioController extends BaseController {
 				}
 
 				if(Sentry::getUser()->claveUnidad){
-					$rows = $rows->where('claveUnidadResponsable','=',Sentry::getUser()->claveUnidad);
+					$unidades = explode('|',Sentry::getUser()->claveUnidad);
+					$rows = $rows->whereIn('claveUnidadResponsable',$unidades);
 				}
 				
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }

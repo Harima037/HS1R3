@@ -57,6 +57,13 @@ class UsuariosController extends \BaseController {
 					});
 				}
 
+				if(Sentry::getUser()->idDepartamento){
+					$rows = $rows->where(function($query){
+								$query->where('idDepartamento','=',Sentry::getUser()->idDepartamento)
+									  ->orWhere('idDepartamento','=',3);
+							});
+				}
+
 				if(isset($parametros['buscar'])){
 					if($parametros['buscar']){
 						$rows = $rows->where(function($query) use ($parametros){
@@ -219,13 +226,20 @@ class UsuariosController extends \BaseController {
 				if(Input::get('permissions')){
 		    		$permissions = Input::get('permissions');
 		    	}
+		    	
+		    	if(Input::get('unidad')){
+		    		$unidades = implode('|',Input::get('unidad'));
+		    	}else{
+		    		$unidades = NULL;
+		    	}
 
 		    	$new_user = array(
 		    		'username' => Input::get('username'),
 					'nombres' => Input::get('nombres'),
 					'apellidoPaterno' => Input::get('apellido-paterno'),
 					'apellidoMaterno' => Input::get('apellido-materno'),
-					'claveUnidad' => Input::get('unidad'),
+					'claveUnidad' => $unidades,
+					'idDepartamento' => Input::get('departamento'),
 					'cargo' => Input::get('cargo'),
 					'telefono' => Input::get('telefono'),
 					'email' => Input::get('email'),
@@ -312,10 +326,17 @@ class UsuariosController extends \BaseController {
 
 			$valid_result = Validador::validar(Input::all(), $this->reglas);
 			if($valid_result === true){
+				if(Input::get('unidad')){
+		    		$unidades = implode('|',Input::get('unidad'));
+		    	}else{
+		    		$unidades = NULL;
+		    	}
+
 				$recurso->nombres	= Input::get('nombres');
 				$recurso->apellidoPaterno		= Input::get('apellido-paterno');
 				$recurso->apellidoMaterno		= Input::get('apellido-materno');
-				$recurso->claveUnidad			= (Input::get('unidad'))?Input::get('unidad'):NULL;
+				$recurso->claveUnidad			= $unidades;
+				$recurso->idDepartamento		= Input::get('departamento');
 				$recurso->cargo					= (Input::get('cargo'))?Input::get('cargo'):NULL;
 				$recurso->telefono				= (Input::get('telefono'))?Input::get('telefono'):NULL;
 

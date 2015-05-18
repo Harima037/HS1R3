@@ -141,18 +141,34 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-12">
+                                    <div class="col-sm-8">
                                         <div class="form-group">
                                             <label for="cargo" class="control-label">Cargo</label>
                                             <input type="text" class="form-control" id="cargo" name="cargo" maxlength="255"/>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label for="cargo" class="control-label">Departamento</label>
+                                            <select class="form-control" id="departamento" name="departamento">
+                                                @if($departamentos)
+                                                    <option value="">Ninguno</option>
+                                                    @foreach($departamentos as $item)
+                                                        <option value="{{ $item->id }}">{{ $item->descripcion }}</option>
+                                                    @endforeach
+                                                @else
+                                                <option value=''>No hay departamentos creados</option>
+                                                @endif
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <label for="unidad" class="control-label">Unidad Asignada</label>
-                                            {{Form::select('unidad',array(''=>'Todas las Unidades') + $unidades_responsables->lists('descripcion','clave'),0,array('class'=>'form-control','id'=>'unidad'))}}
+                                            <label for="unidad" class="control-label ">Unidad Asignada</label>
+                                            {{Form::select('unidad[]',$unidades_responsables->lists('descripcion','clave'),0,array('class'=>'form-control chosen-one','id'=>'unidad','multiple'=>'multiple','data-placeholder'=>'Selecciona las unidades a asignar'))}}
+                                            <p class="help-block">Si no selecciona ninguna unidad, el usuario tendrá acceso a todas las unidades disponibles.</p>
                                         </div>
                                     </div>
                                 </div>
