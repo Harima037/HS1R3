@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, View;
-use Excel,PDF, Proyecto, FIBAP, ComponenteMetaMes, ActividadMetaMes,DocumentoSoporte,OrigenFinanciamiento, Programa,ComponenteDesglose;
+use Excel,PDF, Proyecto, FIBAP, ComponenteMetaMes, ActividadMetaMes,DocumentoSoporte,OrigenFinanciamiento, Programa,ComponenteDesglose,Jurisdiccion;
 
 class ReporteProyectoController extends BaseController {
 
@@ -53,37 +53,51 @@ class ReporteProyectoController extends BaseController {
 		//Datos para la hoja Programa Inversion
 		//var_dump($recurso->toArray());die();
 		if($reporte == 'caratula'){
-			$componentesMetasJuris = array();
-			$componentesMetasMes = array();
-			$actividadesMetasJuris = array();
-			$actividadesMetasMes = array();
+			$componentesMetasCompleto = array();
+			$actividadesMetasCompleto = array();
+
 			foreach ($recurso->componentesCompletoDescripcion as $componente) {
-				$componentesMetasJuris[$componente->id] = array(
-					'OC' => 0, '01' => 0, '02' => 0, '03' => 0, '04' => 0, '05' => 0, '06' => 0, '07' => 0, '08' => 0, '09' => 0,
-					 '10' => 0, 'estatal' => 0
-				);
-				$componentesMetasMes[$componente->id] = array(
-					1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0, 7 => 0, 8 => 0, 9 => 0, 10 => 0, 11 => 0, 12 => 0, 'estatal' => 0
+				$componentesMetasCompleto[$componente->id] = array(
+					'totales'=>array('total' => 0),
+					'jurisdicciones'=>array()
 				);
 				foreach ($componente->metasMes as $metas_mes) {
-					$componentesMetasJuris[$componente->id][$metas_mes->claveJurisdiccion] += $metas_mes->meta;
-					$componentesMetasJuris[$componente->id]['estatal'] += $metas_mes->meta;
-					$componentesMetasMes[$componente->id][$metas_mes->mes] += $metas_mes->meta;
-					$componentesMetasMes[$componente->id]['estatal'] += $metas_mes->meta;
+					if(!isset($componentesMetasCompleto[$componente->id]['totales'][$metas_mes->mes])){
+						$componentesMetasCompleto[$componente->id]['totales'][$metas_mes->mes] = 0;
+					}
+					$componentesMetasCompleto[$componente->id]['totales'][$metas_mes->mes] += $metas_mes->meta;
+					$componentesMetasCompleto[$componente->id]['totales']['total'] += $metas_mes->meta;
+
+					if(!isset($componentesMetasCompleto[$componente->id]['jurisdicciones'][$metas_mes->claveJurisdiccion])){
+						$componentesMetasCompleto[$componente->id]['jurisdicciones'][$metas_mes->claveJurisdiccion] = array(
+							'total' => 0,
+							'meses' => array()
+						);
+					}
+					$componentesMetasCompleto[$componente->id]['jurisdicciones'][$metas_mes->claveJurisdiccion]['total'] += $metas_mes->meta;
+					$componentesMetasCompleto[$componente->id]['jurisdicciones'][$metas_mes->claveJurisdiccion]['meses'][$metas_mes->mes] = $metas_mes->meta;
+
 				}
 				foreach ($componente->actividadesDescripcion as $actividad) {
-					$actividadesMetasJuris[$actividad->id] = array(
-						'OC' => 0, '01' => 0, '02' => 0, '03' => 0, '04' => 0, '05' => 0, '06' => 0, '07' => 0, '08' => 0, '09' => 0,
-						 '10' => 0, 'estatal' => 0
-					);
-					$actividadesMetasMes[$actividad->id] = array(
-						1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0, 6 => 0, 7 => 0, 8 => 0, 9 => 0, 10 => 0, 11 => 0, 12 => 0, 'estatal' => 0
+					$actividadesMetasCompleto[$actividad->id] = array(
+						'totales'=>array('total' => 0),
+						'jurisdicciones'=>array()
 					);
 					foreach ($actividad->metasMes as $metas_mes) {
-						$actividadesMetasJuris[$actividad->id][$metas_mes->claveJurisdiccion] += $metas_mes->meta;
-						$actividadesMetasJuris[$actividad->id]['estatal'] += $metas_mes->meta;
-						$actividadesMetasMes[$actividad->id][$metas_mes->mes] += $metas_mes->meta;
-						$actividadesMetasMes[$actividad->id]['estatal'] += $metas_mes->meta;
+						if(!isset($actividadesMetasCompleto[$actividad->id]['totales'][$metas_mes->mes])){
+							$actividadesMetasCompleto[$actividad->id]['totales'][$metas_mes->mes] = 0;
+						}
+						$actividadesMetasCompleto[$actividad->id]['totales'][$metas_mes->mes] += $metas_mes->meta;
+						$actividadesMetasCompleto[$actividad->id]['totales']['total'] += $metas_mes->meta;
+
+						if(!isset($actividadesMetasCompleto[$actividad->id]['jurisdicciones'][$metas_mes->claveJurisdiccion])){
+							$actividadesMetasCompleto[$actividad->id]['jurisdicciones'][$metas_mes->claveJurisdiccion] = array(
+								'total' => 0,
+								'meses' => array()
+							);
+						}
+						$actividadesMetasCompleto[$actividad->id]['jurisdicciones'][$metas_mes->claveJurisdiccion]['total'] += $metas_mes->meta;
+						$actividadesMetasCompleto[$actividad->id]['jurisdicciones'][$metas_mes->claveJurisdiccion]['meses'][$metas_mes->mes] = $metas_mes->meta;
 					}
 				}
 			}
@@ -101,12 +115,9 @@ class ReporteProyectoController extends BaseController {
 				$recurso['programaPresupuestarioAsignado'] = FALSE;
 			}
 
-			//Datos para la hoja Metas por Jurisdicción
-		 	$recurso['componentesMetasJuris'] = $componentesMetasJuris;
-		 	$recurso['actividadesMetasJuris'] = $actividadesMetasJuris;
-		 	//Datos para la hoja Metas Por Mes
-			$recurso['componentesMetasMes'] = $componentesMetasMes;
-		 	$recurso['actividadesMetasMes'] = $actividadesMetasMes;
+			$recurso['jurisdicciones'] = Jurisdiccion::all()->lists('nombre','clave');
+			$recurso['componentesMetasCompleto'] = $componentesMetasCompleto;
+		 	$recurso['actividadesMetasCompleto'] = $actividadesMetasCompleto;
 		}
 	 	//Arreglamos el arreglo de beneficiarios
 	 	if($reporte == 'caratula' || $reporte == 'fibap'){

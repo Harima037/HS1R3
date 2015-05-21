@@ -456,6 +456,10 @@
 		<td colspan="2" class="encabezado">AÑO LÍNEA BASE:</td>
 		<td colspan="2" class="dato">{{ $actividad->anioBase }}</td>
 	</tr>
+	<tr>
+		<td class="encabezado">INDICADOR DEL COMPONENTE</td>
+		<td colspan="14" class="dato">{{ $componente->indicador }}</td>
+	</tr>
 </table>
 @endforeach <!--Actividades-->
 @endforeach	<!--Componentes-->

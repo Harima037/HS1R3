@@ -73,6 +73,17 @@
 		.imagen.derecha{
 			text-align: right;
 		}
+
+		.encabezado-tabla{
+			font-family: Arial;
+			font-weight: bold;
+			text-align: center;
+			vertical-align: middle;
+			color: #FFFFFF;
+			background-color: #0070C0;
+			border:1px solid #000000;
+			border-collapse: collapse;
+		}
 	</style>
 </head>
 <body class="cuerpo">
@@ -88,11 +99,7 @@
 
 		<div style="page-break-after:always;"></div>
 
-		{{View::make('expediente.pdf.anexo-metas-jurisdiccion',array('data'=>$data))}}
-
-		<div style="page-break-after:always;"></div>
-
-		{{View::make('expediente.pdf.anexo-metas-mes',array('data'=>$data))}}
+		{{View::make('expediente.pdf.anexo-programacion-metas',array('data'=>$data))}}
 
 	@endif
 
