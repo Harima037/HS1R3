@@ -36,7 +36,7 @@ class Proyecto extends BaseModel
     }
 
 	public function getClavePresupuestariaAttribute(){
-		return $this->unidadResponsable . $this->finalidad . $this->funcion . $this->subfuncion . $this->subsubfuncion . $this->programaSectorial . $this->programaPresupuestario . $this->programaEspecial . $this->actividadInstitucional . $this->proyectoEstrategico . str_pad($this->numeroProyectoEstrategico, 3,'0',STR_PAD_LEFT);
+		return $this->unidadResponsable . $this->finalidad . $this->funcion . $this->subFuncion . $this->subSubFuncion . $this->programaSectorial . $this->programaPresupuestario . $this->programaEspecial . $this->actividadInstitucional . $this->proyectoEstrategico . str_pad($this->numeroProyectoEstrategico, 3,'0',STR_PAD_LEFT);
 	}
 
 	public function getClaveFuncionAttribute(){

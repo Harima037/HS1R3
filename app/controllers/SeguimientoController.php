@@ -33,6 +33,7 @@ class SeguimientoController extends BaseController {
 				)
 		);
 		$datos['mes_avance'] = Util::obtenerMesActual();
+		$datos['mes_actual'] = date('n');
 		$datos['trimestre_avance'] = Util::obtenerTrimestre();
 		return parent::loadIndex('RENDCUENTA','RENDINST',$datos);
 	}
@@ -62,6 +63,7 @@ class SeguimientoController extends BaseController {
 				)
 		);
 		$datos['mes_avance'] = Util::obtenerMesActual();
+		$datos['mes_actual'] = date('n');
 		$datos['trimestre_avance'] = Util::obtenerTrimestre();
 		return parent::loadIndex('RENDCUENTA','RENDINV',$datos);
 	}
