@@ -375,10 +375,12 @@ if($('#id').val()){
 					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<td><strong>' + juris + '</strong></td>';
 					for(var cuentaMeses in response.data.componentes[cuentaComponentes].metas_mes)										
 					{
+						console.log(juris);
 						if(juris == response.data.componentes[cuentaComponentes].metas_mes[cuentaMeses].claveJurisdiccion)
 						{
 							var valorTrim = Math.ceil(parseFloat(response.data.componentes[cuentaComponentes].metas_mes[cuentaMeses].mes)/3) ;
 							trim[valorTrim] = trim[valorTrim] + parseFloat(response.data.componentes[cuentaComponentes].metas_mes[cuentaMeses].meta);								
+							//console.log(response.data.componentes[cuentaComponentes].metas_mes[cuentaMeses].meta);
 							mes[response.data.componentes[cuentaComponentes].metas_mes[cuentaMeses].mes] = '<td>'+response.data.componentes[cuentaComponentes].metas_mes[cuentaMeses].meta+'</td>';
 						}
 					}
@@ -539,9 +541,9 @@ if($('#id').val()){
 						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-2"><div class="form-group"><label class="control-label" for="lbl-aniobaseactividad'+idActividad+'">Año base</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'aniobaseactividad|'+idActividad+'\',\'Año base\',\'lbl-aniobaseactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-aniobaseactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].anioBase+'</p></div></div></div>';
 
 						if(response.data.componentes[cuentaComponentes].actividades[indiceActividad].formula == null){
-							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-formulaactividad'+idActividad+'">Fórmula</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'formulaactividad|'+idActividad+'\',\'Fórmula\',\'lbl-formulaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-formula'+idActividad+'" class="form-control" style="height:auto"></p></div></div></div>';
+							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-formulaactividad'+idActividad+'">Fórmula</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'formulaactividad|'+idActividad+'\',\'Fórmula\',\'lbl-formulaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-formulaactividad'+idActividad+'" class="form-control" style="height:auto"></p></div></div></div>';
 						}else{
-							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-formulaactividad'+idActividad+'">Fórmula</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'formulaactividad|'+idActividad+'\',\'Fórmula\',\'lbl-formulaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-formula'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].formula.descripcion+'</p></div></div></div>';
+							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-formulaactividad'+idActividad+'">Fórmula</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'formulaactividad|'+idActividad+'\',\'Fórmula\',\'lbl-formulaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-formulaactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].formula.descripcion+'</p></div></div></div>';
 						}
 
 						if(response.data.componentes[cuentaComponentes].actividades[indiceActividad].frecuencia == null){

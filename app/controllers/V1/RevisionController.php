@@ -236,7 +236,7 @@ class RevisionController extends BaseController {
 		}else{
 			$recurso = $recurso->toArray();
 			if(!$parametros){
-				$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
+				$recurso['jurisdicciones'] = array('OC'=>'OC') + $jurisdicciones->lists('clave','clave');
 			}
 			$data["data"] = $recurso;
 		}
