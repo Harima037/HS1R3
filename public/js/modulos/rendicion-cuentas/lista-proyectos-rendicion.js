@@ -16,15 +16,19 @@ moduloDatagrid.actualizar({
     _success: function(response){
         moduloDatagrid.limpiar();
         var datos_grid = [];
-        var mes_activo = $('#datagridProyectos > table').attr('data-mes-activo');
+        var mes_activo = parseInt($('#datagridProyectos').attr('data-mes-activo'));
+        var mes_actual = parseInt($('#datagridProyectos').attr('data-mes-actual'));
+
+        var trimestre = $('#datagridProyectos').attr('data-trim-activo');
+
         for(var i in response.data){
             var item = {};
 
-            var mes_activo = $('#datagridProyectos').attr('data-mes-activo'); 
-            var trimestre = $('#datagridProyectos').attr('data-trim-activo');
+            //var mes_activo = $('#datagridProyectos').attr('data-mes-activo'); 
+            
             var mes_inicia = ((trimestre - 1) * 3) + 1;
             var meses = [1,2,3,4,5,6,7,8,9,10,11,12];
-
+            var estado_actual = 0;
 
             item.id = response.data[i].id;
             item.clave = response.data[i].clavePresup;
@@ -33,7 +37,7 @@ moduloDatagrid.actualizar({
             for(var j in meses){
                 if(meses[j] == mes_activo){
                     item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class=""><span class="fa fa-unlock"></span></span>';
-                }else if(meses[j] < mes_activo){
+                }else if(meses[j] < mes_actual){
                     item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class="text-muted"><span class="fa fa-times"></span></span>';
                 }else{
                     item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class=""><span class="fa fa-lock"></span></span>';
@@ -45,22 +49,24 @@ moduloDatagrid.actualizar({
                     item.estado = '<span class="label label-info">En Trámite</span>';
                 }else if(response.data[i].evaluacion_meses[0].idEstatus == 2){
                     item.estado = '<span class="label label-warning">En Revisión</span>';
+                    estado_actual = 1;
                 }else if(response.data[i].evaluacion_meses[0].idEstatus == 3){
                     item.estado = '<span class="label label-danger">En Correción</span>';
                 }else if(response.data[i].evaluacion_meses[0].idEstatus == 4){
                     item.estado = '<span class="label label-primary">Registrado</span>';
+                    estado_actual = 1;
                 }else if(response.data[i].evaluacion_meses[0].idEstatus == 5){
                     item.estado = '<span class="label label-success">Firmado</span>';
+                    estado_actual = 1;
                 }
-            }else{ //if(mes_activo != 0)
+            }else{
                 item.estado = '<span class="text-muted">Inactivo</span>';
-                //item.estado = '<span class="label label-success">En Trámite</span>';
-            //else{
+                estado_actual = 0;
             }
             
             for(var j in response.data[i].registro_avance){
                 var avance = response.data[i].registro_avance[j];
-                var clase_icono = (avance.mes == mes_activo)?'fa-unlock':'fa-circle';
+                var clase_icono = (avance.mes != mes_activo)?'fa-circle':(estado_actual != 0)?'fa-lock':'fa-unlock';
                 if(parseInt(avance.planMejora) > 0){
                     item['mes_'+avance.mes] = '<span id="grid-mes-'+avance.mes+'" class="text-danger"><span class="fa '+clase_icono+'"></span></span>';
                 }else{
