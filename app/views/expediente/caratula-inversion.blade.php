@@ -95,6 +95,38 @@
                     <div role="tabpanel" class="tab-pane" id="acciones-fibap">
                         <br>
                         {{$formulario_acciones}}
+                        <br>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Información de la Programación de Metas por Mes/Jurisdicción
+                            </div>
+                            <div class="panel-body">
+                                <form id="form_fuente_informacion">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label" for="fuente-informacion">Fuente de Información</label>
+                                                <input type="text" class="form-control" name="fuente-informacion" id="fuente-informacion">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label" for="responsable">Responsable</label>
+                                                <select class="form-control chosen-one" name="responsable" id="responsable">
+                                                    <option value="">Selecciona un responsable</option>
+                                                </select>
+                                                <span id="ayuda-responsable" class="help-block"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="panel-footer">
+                                <button type="button" class="btn btn-primary" id="btn-fuente-informacion-guardar">
+                                    <span class="fa fa-save"></span> Guardar Información
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

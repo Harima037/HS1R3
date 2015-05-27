@@ -146,6 +146,13 @@ input[readonly] {
           margin: 0;
 }
 
+tbody.scrollContent {
+  display: block;
+  max-height: 300px;
+  overflow: auto;
+  width: 100%
+}
+
 .typeahead { width: 100%;left:0px !important;   }
 ul.typeahead li a {  white-space: nowrap; overflow: hidden !important; text-overflow: ellipsis; }
 

@@ -331,8 +331,8 @@
 					                		</tr>
 				                		</thead>
 				                	</table>
-				                	<div style="max-height:300px; overflow-x:auto;">
-				                		<table class="table table-condensed table-bordered tabla-avance-localidades">
+				                	<div style="max-height:300px; overflow-y:auto;">
+				                		<table class="table table-condensed table-bordered tabla-avance-localidades" style="margin-bottom:0;">
 				                			<thead>
 					                			<tr>
 					                				<th rowspan="2">Localidad</th>

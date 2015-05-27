@@ -38,7 +38,7 @@ moduloDatagrid.actualizar({
             item.clave = response.data[i].clavePresup;
             item.nombre_tecnico = response.data[i].nombreTecnico;
             var presupuesto = response.data[i].presupuestoRequerido || 0;
-            item.presupuesto = '$ ' + presupuesto.format();
+            item.presupuesto = '$ ' + parseFloat(presupuesto).format(2);
             item.estatus = '<span class="label ' + clase_label + '">' + response.data[i].estatusProyecto + '</span>';
             item.usuario = response.data[i].username;
             item.fecha_modificado = response.data[i].modificadoAl.substring(0,11);

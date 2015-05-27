@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception;
 use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
-	FibapDatosProyecto, Titular, Directorio, ComponenteDesglose, Accion, PropuestaFinanciamiento, DistribucionPresupuesto, DesgloseMetasMes, 
+	FibapDatosProyecto, Directorio, ComponenteDesglose, Accion, PropuestaFinanciamiento, DistribucionPresupuesto, DesgloseMetasMes, 
 	DesgloseBeneficiario, ProyectoFinanciamiento, ProyectoFinanciamientoSubFuente;
 
 class ProyectosController extends BaseController {
@@ -1141,7 +1141,7 @@ class ProyectosController extends BaseController {
 				$recurso->idResponsable = NULL;
 			}
 
-			$recurso->unidadResponsable 			= $parametros['unidadresponsable'];
+			//$recurso->unidadResponsable 			= $parametros['unidadresponsable'];
 			$recurso->idClasificacionProyecto 		= $parametros['clasificacionproyecto'];
 			$recurso->ejercicio						= $parametros['ejercicio'];
 			$recurso->idTipoAccion 					= $parametros['tipoaccion'];
@@ -1196,35 +1196,28 @@ class ProyectosController extends BaseController {
 				}
 			}
 
-			/*if(Sentry::getUser()->claveUnidad){
-				//$titulares = Titular::whereIn('claveUnidad',array('00','01',Sentry::getUser()->claveUnidad))->get();
-				if(Sentry::getUser()->claveUnidad){
-					$unidades = explode('|',Sentry::getUser()->claveUnidad);
-				}
-				$titulares = Directorio::titularesActivos(array('00','01', Sentry::getUser()->claveUnidad))->get();
-			}else{*/
-				//$titulares = Titular::whereIn('claveUnidad',array('00','01',$parametros['unidadresponsable']))->get();
+			if($recurso->unidadResponsable != $parametros['unidadresponsable']){
 				$titulares = Directorio::titularesActivos(array('00','01', $parametros['unidadresponsable']))->get();
-			//}
-
-			foreach ($titulares as $titular) {
-				if($titular->claveUnidad == '00'){ //Dirección General
-					$recurso->idJefeInmediato 				= $titular->id;
-				}elseif ($titular->claveUnidad == '01') { //Dirección de Planeación y Desarrollo
-					$recurso->idJefePlaneacion 				= $titular->id;
-		  			$recurso->idCoordinadorGrupoEstrategico = $titular->id;
-					//if($recurso->idLiderProyecto == NULL){
-		  			if(count($titulares) == 2){
+				foreach ($titulares as $titular) {
+					if($titular->claveUnidad == '00'){ //Dirección General
+						$recurso->idJefeInmediato 				= $titular->id;
+					}elseif ($titular->claveUnidad == '01') { //Dirección de Planeación y Desarrollo
+						$recurso->idJefePlaneacion 				= $titular->id;
+			  			$recurso->idCoordinadorGrupoEstrategico = $titular->id;
+						//if($recurso->idLiderProyecto == NULL){
+			  			if(count($titulares) == 2){
+							$recurso->idLiderProyecto = $titular->id;
+							$respuesta['data']['nombre-lider-proyecto'] = $titular->nombre;
+							$respuesta['data']['cargo-lider-proyecto'] = $titular->cargo;
+						}
+					}else{
 						$recurso->idLiderProyecto = $titular->id;
 						$respuesta['data']['nombre-lider-proyecto'] = $titular->nombre;
 						$respuesta['data']['cargo-lider-proyecto'] = $titular->cargo;
 					}
-				}else{
-					$recurso->idLiderProyecto = $titular->id;
-					$respuesta['data']['nombre-lider-proyecto'] = $titular->nombre;
-					$respuesta['data']['cargo-lider-proyecto'] = $titular->cargo;
 				}
 			}
+			$recurso->unidadResponsable = $parametros['unidadresponsable'];
 
 			if(!$es_editar){
 				$recurso->totalBeneficiarios = 0;
@@ -1530,7 +1523,7 @@ class ProyectosController extends BaseController {
 		if($parametros['clasificacion'] == 2 && $selector == 'componente'){
 			$reglasAccion['entregable'] 			= 'required';
 			$reglasAccion['tipo-entregable'] 		= 'required';
-			$reglasAccion['accion-entregable'] 	= 'required';
+			$reglasAccion['accion-entregable'] 		= 'required';
 		}
 		
 		/*if(isset($parametros['datos_presupuesto'])){
@@ -1585,6 +1578,14 @@ class ProyectosController extends BaseController {
 				}
 
 				if($guardado){
+					if($parametros['clasificacion'] == 2 && $selector == 'componente' && !$es_editar){
+						$accion = new Accion;
+						$accion->idComponente = $recurso->id;
+						$accion->idFibap = $parametros['id-fibap'];
+						$accion->presupuestoRequerido = 0;
+						$accion->save();
+					}
+
 					if(isset($parametros['mes-'.$selector])){
 						$jurisdicciones = $parametros['mes-'.$selector]; //Arreglo que contiene los datos [jurisdiccion][mes] = valor
 

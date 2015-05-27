@@ -49,7 +49,7 @@ context.cargar_jurisdicciones = function(datos){
 }*/
 
 context.actualizar_total_presupuesto = function(presupuesto){
-    $('#total-presupuesto-requerido').text('$ ' + presupuesto.format());
+    $('#total-presupuesto-requerido').text('$ ' + parseFloat(presupuesto).format(2));
     $('#total-presupuesto-requerido').attr('data-valor',presupuesto);
 
     var distribuido = $('#total-presupuesto-distribuido').attr('data-valor');
@@ -140,17 +140,17 @@ context.init = function(id,resource){
             var j = 12;
         }
         for(i; i <= j ; i++){
-            suma += parseInt($('.meta-mes[data-meta-mes="' + i + '"]').val()) || 0;
+            suma += parseFloat($('.meta-mes[data-meta-mes="' + i + '"]').val()) || 0;
         }
         $('#trim'+trimestre).val(suma);
-        $('#trim'+trimestre+'-lbl').text(suma.format());
+        $('#trim'+trimestre+'-lbl').text(suma.format(2));
         
         suma = 0;
         for(var i = 1 ; i <= 4 ; i++){
-            suma += parseInt($('#trim'+i).val()) || 0;
+            suma += parseFloat($('#trim'+i).val()) || 0;
         }
         $('#cantidad-meta').val(suma);
-        $('#cantidad-meta-lbl').text(suma.format());
+        $('#cantidad-meta-lbl').text(suma.format(2));
     });
     actualizar_eventos_metas();
 
@@ -160,7 +160,7 @@ context.init = function(id,resource){
             sumatoria += parseFloat($(this).val()) || 0;
         });
         $('#accion-presupuesto-requerido').val(sumatoria);
-        $('#accion-presupuesto-requerido-lbl').text(sumatoria.format());
+        $('#accion-presupuesto-requerido-lbl').text('$ ' + sumatoria.format(2));
     });
 
     $('.accion-origen-financiamiento').on('keyup',function(){ $(this).change(); });
@@ -249,7 +249,7 @@ context.init = function(id,resource){
                     var html_options = '<option value="">Selecciona una Localidad</option>';
                     for(var i in response.data){
                         var localidad = response.data[i];
-                        html_options += '<option value="'+localidad.clave+'">'+localidad.nombre+'</option>';
+                        html_options += '<option value="'+localidad.clave+'">'+localidad.clave+' '+localidad.nombre+'</option>';
                     }
                     $('#localidad-accion').html(html_options);
                     if($('#localidad-accion').hasClass('chosen-one')){
@@ -475,7 +475,7 @@ context.mostrar_datos = function(datos){
     $('#tablink-componente-actividades').parent().removeClass('disabled');
 
     $('#accion-presupuesto-requerido').val(datos.presupuestoRequerido);
-    $('#accion-presupuesto-requerido-lbl').text(datos.presupuestoRequerido.format());
+    $('#accion-presupuesto-requerido-lbl').text('$ ' + parseFloat(datos.presupuestoRequerido).format(2));
     for(var indx in datos.propuestas_financiamiento){
         var origen = datos.propuestas_financiamiento[indx];
         $('#accion-origen-'+origen.idOrigenFinanciamiento).val(origen.cantidad);
@@ -493,9 +493,9 @@ context.mostrar_datos = function(datos){
             var meta = datos.componente.metas_mes[i];
 
             trimestre = Math.ceil(meta.mes/3);
-            suma_trimestre[trimestre] += meta.meta;
-            suma += meta.meta;
-            $('#mes-componente-' + meta.claveJurisdiccion + '-' + meta.mes).val(meta.meta);
+            suma_trimestre[trimestre] += parseFloat(meta.meta);
+            suma += parseFloat(meta.meta);
+            $('#mes-componente-' + meta.claveJurisdiccion + '-' + meta.mes).val(parseFloat(meta.meta));
             $('#mes-componente-' + meta.claveJurisdiccion + '-' + meta.mes).attr('data-meta-id',meta.id);
         }
         for(var i in suma_trimestre){
@@ -656,6 +656,39 @@ context.habilitar_meses = function(fechaInicio,fechaFinal){
     habilitar_meses_captura(fechaInicio, fechaFinal);
 };
 
+context.init_responsables = function(){
+    $('#responsable').on('change',function(){
+        if($(this).val()){
+            var cargo = $('#responsable option:selected').attr('data-cargo');
+            $('#ayuda-responsable').text(cargo);
+        }else{
+            $('#ayuda-responsable').text('');
+        }
+    });
+}
+
+context.mostrar_datos_informacion = function(datos){
+    $('#fuente-informacion').val(datos.fuenteInformacion);
+    $('#responsable').val(datos.idResponsable);
+    $('#responsable').change();
+    $('#responsable').trigger('chosen:updated');
+};
+
+context.llenar_select_responsables = function(datos){
+    var html = '<option value="">Selecciona un responsable</option>';
+    for(var i in datos){
+        var responsable = datos[i];
+        html += '<option value="'+responsable.id+'" data-cargo="'+responsable.cargo+'">';
+        html += responsable.nombre;
+        html += '</option>';
+    }
+    $('#responsable').html(html);
+    $('#responsable').val('');
+    $('#responsable').change();
+    if($('#responsable').hasClass('chosen-one')){
+        $('#responsable').trigger('chosen:updated');
+    }
+}
 /***********************************************************************************************
                     Funciones Privadas
 ************************************************************************************************/
@@ -682,7 +715,7 @@ function llenar_datagrid_distribucion(id_componente,total_presupuesto){
                     presupuesto.id = datos[indx].id;
 
                     if(datos[indx].claveJurisdiccion != 'OC'){
-                        presupuesto.localidad = datos[indx].localidad;
+                        presupuesto.localidad = datos[indx].claveLocalidad + ' - ' + datos[indx].localidad;
                         presupuesto.municipio = datos[indx].municipio;
                         presupuesto.jurisdiccion = datos[indx].jurisdiccion;
                     }else{
@@ -691,7 +724,7 @@ function llenar_datagrid_distribucion(id_componente,total_presupuesto){
                         presupuesto.jurisdiccion = 'OFICINA CENTRAL';
                     }
                     
-                    presupuesto.monto = '$ ' + datos[indx].presupuesto.format();
+                    presupuesto.monto = '$ ' + parseFloat(datos[indx].presupuesto).format(2);
 
                     if(comentarios.desgloses[presupuesto.id]){
                         presupuesto.localidad = '<span class="text-warning fa fa-warning"></span> ' + presupuesto.localidad;
@@ -761,7 +794,7 @@ function llenar_datagrid_acciones(datos){
         accion.tipo = datos[indx].datos_componente_detalle.entregableTipo || 'N / A';
         accion.accion = datos[indx].datos_componente_detalle.entregableAccion;
         accion.modalidad = 'pendiente';//datos[indx].cantidad;
-        accion.presupuesto = '$ ' + parseFloat(presupuesto.toFixed(2)).format();
+        accion.presupuesto = '$ ' + parseFloat(presupuesto).format(2);
         accion.boton = '<span class="btn-link text-info boton-detalle" onClick="fibapAcciones.mostrar_detalles(' + datos[indx].id + ')"><span class="fa fa-plus-square-o"></span></span>'
 
 
@@ -776,14 +809,14 @@ function llenar_datagrid_acciones(datos){
             if(!sumas_origenes[origen.idOrigenFinanciamiento]){
                 sumas_origenes[origen.idOrigenFinanciamiento] = 0;
             }
-            sumas_origenes[origen.idOrigenFinanciamiento] += origen.cantidad;
+            sumas_origenes[origen.idOrigenFinanciamiento] += parseFloat(origen.cantidad);
         }
     }
     
     $('.totales-financiamiento').each(function(){
         var id_origen = $(this).data('total-origen-id');
         if(sumas_origenes[id_origen]){
-            $(this).text('$ ' + sumas_origenes[id_origen].format());
+            $(this).text('$ ' + sumas_origenes[id_origen].format(2));
         }else{
             $(this).text('$ 0.00');
         }
@@ -839,17 +872,17 @@ function llenar_tabla_distribucion(datos){
         distribucion += '<tr>';
         distribucion += '<td>' + datos[indx].objeto_gasto.clave + '</td>';
         distribucion += '<td>' + datos[indx].objeto_gasto.descripcion + '</td>';
-        distribucion += '<td>$ ' + datos[indx].cantidad.format() + '</td>';
+        distribucion += '<td>$ ' + parseFloat(datos[indx].cantidad).format(2) + '</td>';
         distribucion += '<td>' + parseFloat(porcentaje.toFixed(2)) + ' %</td>';
         distribucion += '</tr>';
 
-        suma_distribuido += datos[indx].cantidad;
+        suma_distribuido += parseFloat(datos[indx].cantidad);
     }
 
     total_porcentaje = ((suma_distribuido * 100) / parseFloat(total_presup)) || 0;
 
     $('#total-presupuesto-distribuido').attr('data-valor',suma_distribuido);
-    $('#total-presupuesto-distribuido').text('$ ' + suma_distribuido.format());
+    $('#total-presupuesto-distribuido').text('$ ' + suma_distribuido.format(2));
     
     if(suma_distribuido == 0){
         actualiza_porcentaje('#porcentaje_completo',0);
@@ -917,7 +950,7 @@ function llenar_select_municipios(datos){
         if(datos[i].localidades.length){
             for(var j in datos[i].localidades){
                 var localidad = datos[i].localidades[j];
-                html_localidades += '<option value="'+localidad.clave+'">'+localidad.nombre+'</option>';
+                html_localidades += '<option value="'+localidad.clave+'">'+localidad.clave+' '+localidad.nombre+'</option>';
             }
         }
     }
@@ -1037,7 +1070,7 @@ function actualizar_claves_presupuesto(datos){
             sumatoria += parseFloat($(this).val()) || 0;
         });
         $('#cantidad-presupuesto').val(sumatoria);
-        $('#cantidad-presupuesto-lbl').text(sumatoria.format());
+        $('#cantidad-presupuesto-lbl').text(sumatoria.format(2));
     });
     habilitar_meses_presupuesto(ejecucion_fecha_inicio, ejecucion_fecha_fin);
 }
@@ -1120,8 +1153,8 @@ function actualizar_eventos_metas(identificador){
 }
 
 function ejecutar_formula(identificador){   
-    var numerador = parseInt($('#numerador-'+identificador).val()) || 0;
-    var denominador = parseInt($('#denominador-'+identificador).val()) || 1;
+    var numerador = parseFloat($('#numerador-'+identificador).val()) || 0;
+    var denominador = parseFloat($('#denominador-'+identificador).val()) || 1;
     var total;
     var id_formula = $('#formula-'+identificador).val();
     if(id_formula){
@@ -1159,7 +1192,7 @@ function ejecutar_formula(identificador){
                 break;
         }
         $('#meta-'+identificador).val(total);
-        $('#meta-'+identificador+'-lbl').text(total.format());
+        $('#meta-'+identificador+'-lbl').text(total.format(2));
     }else{
         $('#meta-'+identificador).val('');
         $('#meta-'+identificador+'-lbl').text('');

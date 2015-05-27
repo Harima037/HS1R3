@@ -213,15 +213,15 @@ function llenar_datos_fibap(fibap){
         var porcentaje = (fibap.antecedentes_financieros[i].ejercido * 100) / fibap.antecedentes_financieros[i].autorizado;
         html_antecedentes += '<tr>';
         html_antecedentes += '<td>' + fibap.antecedentes_financieros[i].anio + '</td>';
-        html_antecedentes += '<td>' + fibap.antecedentes_financieros[i].autorizado.format() + '</td>';
-        html_antecedentes += '<td>' + fibap.antecedentes_financieros[i].ejercido.format() + '</td>';
+        html_antecedentes += '<td>' + parseFloat(fibap.antecedentes_financieros[i].autorizado).format(2) + '</td>';
+        html_antecedentes += '<td>' + parseFloat(fibap.antecedentes_financieros[i].ejercido).format(2) + '</td>';
         html_antecedentes += '<td>' + parseFloat(porcentaje.toFixed(2)) + '% </td>';
         html_antecedentes += '<td>' + fibap.antecedentes_financieros[i].fechaCorte + '</td>';
         html_antecedentes += '</tr>';
     }
     $('#tabla-antecedentes > tbody').html(html_antecedentes);
 
-    var presupuesto_requerido = fibap.presupuestoRequerido || 0;
+    var presupuesto_requerido = parseFloat(fibap.presupuestoRequerido) || 0;
 
     var html_distribucion = '';
     for(var i in fibap.distribucion_presupuesto_agrupado){
@@ -230,7 +230,7 @@ function llenar_datos_fibap(fibap){
         html_distribucion += '<tr>';
         html_distribucion += '<td>' + presupuesto.objeto_gasto.clave + '</td>';
         html_distribucion += '<td>' + presupuesto.objeto_gasto.descripcion + '</td>';
-        html_distribucion += '<td>' + presupuesto.cantidad.format() + '</td>';
+        html_distribucion += '<td>' + parseFloat(presupuesto.cantidad).format(2) + '</td>';
         html_distribucion += '<td>' + parseFloat(porcentaje.toFixed(2)) + '% </td>';
         html_distribucion += '</tr>';
     }
@@ -239,10 +239,10 @@ function llenar_datos_fibap(fibap){
     $('.valores-origenes').text('0');
 
     for(var i in fibap.propuestas_financiamiento){
-        $('#lbl-origen-'+fibap.propuestas_financiamiento[i].idOrigenFinanciamiento).text(fibap.propuestas_financiamiento[i].cantidad.format());
+        $('#lbl-origen-'+fibap.propuestas_financiamiento[i].idOrigenFinanciamiento).text(parseFloat(fibap.propuestas_financiamiento[i].cantidad).format(2));
     }
         
-    $('#lbl-presupuesto-requerido').text(presupuesto_requerido.format());
+    $('#lbl-presupuesto-requerido').text(presupuesto_requerido.format(2));
     var html_list = '';
     for(var indx in fibap.documentos){
         html_list += '<div class="col-sm-4"><span class="fa fa-file-o"></span> '+fibap.documentos[indx].descripcion+'</div>';

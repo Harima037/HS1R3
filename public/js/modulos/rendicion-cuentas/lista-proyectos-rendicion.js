@@ -273,9 +273,21 @@ $('#btn-editar-avance').on('click',function(){
     window.location.href = SERVER_HOST+'/rendicion-cuentas/editar-avance/' + $('#btn-editar-avance').attr('data-id-proyecto');
 });
 
-$('#btn-reporte').on('click',function(){
-    window.open(SERVER_HOST+'/v1/reporte-evaluacion/' +  + $('#btn-editar-avance').attr('data-id-proyecto'));
+$('#btn-reporte-general').off('click');
+$('#btn-reporte-general').on('click',function(){
+    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '|general';
+    window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
 });
+
+$('#btn-reporte-analisis').off('click');
+$('#btn-reporte-analisis').on('click',function(){
+    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '|analisis';
+    window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
+});
+/*
+$('#btn-reporte').on('click',function(){
+    window.open(SERVER_HOST+'/v1/reporte-evaluacion/' + );
+});*/
 
 /*             Extras               */
 /**

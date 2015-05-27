@@ -213,9 +213,19 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success pull-left" id="btn-reporte">
-                        <span class="fa fa-file-excel-o"></span> Imprimir Reporte
-                    </button>
+                    <div id="btn-reporte" class="pull-left">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <span class="fa fa-file"></span> Imprimir Reporte <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="#" id="btn-reporte-general">Reporte Seguimiento</a></li>
+                                @if(($mes_avance % 3) == 0)
+                                <li><a href="#" id="btn-reporte-analisis">Analisis Funcional</a></li>
+                                @endif
+                            </ul>
+                        </div>
+                    </div>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-primary" id="btn-editar-avance">
                         <span class="fa fa-pencil"></span> Capturar Avance

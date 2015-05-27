@@ -395,12 +395,14 @@ function buscar_localidades(jurisdiccion,municipio){
                     var datos_acumulado = {meta:0, avance:0}
                 }
                 var avance_anterior = datos_acumulado.avance - (datos_meta.avance || 0); 
-                html_rows += '<tr data-clave-localidad="'+dato.claveLocalidad+'"><td>' + dato.localidad + '</td>' +
+                html_rows += '<tr data-clave-localidad="'+dato.claveLocalidad+'">'+
+                                '<td>' + dato.claveLocalidad + ' - ' + dato.localidad + '</td>' +
                                 '<td class="localidad-metas-acumuladas bg-success" data-metas-acumuladas="'+datos_acumulado.meta+'">'+datos_acumulado.meta.format(2)+'</td>' + 
                                 '<td class="localidad-meta-mes" data-meta-mes="'+datos_meta.meta+'">'+datos_meta.meta.format(2)+'</td>' +
                                 '<td><div class="form-group" style="margin:0;"><input name="localidad-avance-mes['+dato.claveLocalidad+']" id="localidad_avance_mes_'+dato.claveLocalidad+'" type="number" class="form-control localidad-avance" value="'+datos_meta.avance+'" data-localidad="'+dato.claveLocalidad+'" data-jurisdiccion="'+jurisdiccion+'"></div></td>' + 
                                 '<td class="localidad-avance-acumulado" data-avance-acumulado="'+avance_anterior+'">'+avance_anterior.format(2)+'</td>' +
-                                '<td class="localidad-total-avance bg-info" data-avance-total="'+datos_acumulado.avance+'">'+datos_acumulado.avance.format(2)+'</td></tr>';
+                                '<td class="localidad-total-avance bg-info" data-avance-total="'+datos_acumulado.avance+'">'+datos_acumulado.avance.format(2)+'</td>'+
+                                '</tr>';
                 suma_metas += datos_acumulado.meta;
                 suma_avances += datos_acumulado.avance;
             }

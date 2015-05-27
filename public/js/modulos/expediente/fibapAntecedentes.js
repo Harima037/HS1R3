@@ -99,9 +99,9 @@ function llenar_datagrid_antecedentes(datos){
 
 		antecedente.id = datos[indx].id;
 		antecedente.anio = datos[indx].anio;
-		antecedente.autorizado = datos[indx].autorizado;
-		antecedente.ejercido = datos[indx].ejercido;
-		antecedente.porcentaje = parseFloat(datos[indx].porcentaje.toFixed(2));
+		antecedente.autorizado = '$ ' + parseFloat(datos[indx].autorizado).format(2);
+		antecedente.ejercido = '$ ' + parseFloat(datos[indx].ejercido).format(2);
+		antecedente.porcentaje = +parseFloat(datos[indx].porcentaje).toFixed(2);
 		antecedente.fechaCorte = datos[indx].fechaCorte;
 
 		antecedentes.push(antecedente);

@@ -88,6 +88,12 @@ if($('#id').val()){
 				mostrar_comentarios(response.data.comentarios);
 			}
 
+			if(response.extras.responsables){
+				fibapAcciones.init_responsables();
+				fibapAcciones.llenar_select_responsables(response.extras.responsables);
+				fibapAcciones.mostrar_datos_informacion(response.data);
+			}
+
 			if(response.data.fibap){
 				fibapAcciones.init(response.data.fibap.id,proyectoResource);
 				fibapAcciones.mostrarComentarios(comentarios);
@@ -359,6 +365,34 @@ function guardar_datos_componente(cerrar,selector){
 	}
 }
 
+$('#btn-fuente-informacion-guardar').on('click',function(){
+	Validation.cleanFormErrors('#form_fuente_informacion');
+
+	var parametros = $('#form_fuente_informacion').serialize();
+	parametros = parametros + '&guardar=fuenteinformacion';
+
+	if($('#id').val()){
+		proyectoResource.put($('#id').val(),parametros,{
+	        _success: function(response){
+	            MessageManager.show({data:'Datos almacenados con éxito',type:'OK',timer:3});
+	        },
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
+	    });
+	}
+});
+
 $('#btn-proyecto-guardar').on('click',function(){
 	caratulaProyecto.limpiar_errores();
 
@@ -383,6 +417,10 @@ $('#btn-proyecto-guardar').on('click',function(){
 							cambiar_icono_tabs('#tab-link-acciones-fibap','fa-check-square-o');
 							fibapAcciones.llenar_datagrid(response.data.fibap.acciones);
 						}
+	            	}
+
+	            	if(response.extras.responsables){
+	            		fibapAcciones.llenar_select_responsables(response.extras.responsables);
 	            	}
 	            }
 	            $('#lbl-lider-proyecto').text(response.data.liderProyecto);
@@ -432,13 +470,14 @@ $('#btn-proyecto-guardar').on('click',function(){
 				$('#tablink-fuentes-financiamiento').attr('data-toggle','tab');
 				$('#tablink-fuentes-financiamiento').parent().removeClass('disabled');
 				if(response.extras){
-					/*if(response.extras.municipios){
-	            		fibapAcciones.cargar_municipios(response.extras.municipios);
-	            	}*/
 					if(response.extras.jurisdicciones){
 						fibapAcciones.actualizar_metas_mes(response.extras.jurisdicciones);
 						fibapAcciones.cargar_jurisdicciones(response.extras.jurisdicciones);
 					}
+					if(response.extras.responsables){
+	            		fibapAcciones.init_responsables();
+	            		fibapAcciones.llenar_select_responsables(response.extras.responsables);
+	            	}
 				}
 				fuenteFinanciamiento.init(proyectoResource,$('#id').val());
 	        },
