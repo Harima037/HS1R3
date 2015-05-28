@@ -107,7 +107,7 @@ function cargar_datos_proyecto(e){
                 html_tbody += '<td data-trim-mes="1">-</td>';
                 html_tbody += '<td data-trim-mes="2">-</td>';
                 html_tbody += '<td data-trim-mes="3">-</td>';
-                html_tbody += '<td data-total-id="'+componente.id+'">0</td>';
+                html_tbody += '<td class="bg-success" data-total-id="'+componente.id+'">0</td>';
                 html_tbody += '</tr>';
                 for(var j in componente.actividades){
                     contador_actividad++;
@@ -118,7 +118,7 @@ function cargar_datos_proyecto(e){
                     html_tbody += '<td data-trim-mes="1">-</td>';
                     html_tbody += '<td data-trim-mes="2">-</td>';
                     html_tbody += '<td data-trim-mes="3">-</td>';
-                    html_tbody += '<td data-total-id="'+actividad.id+'">0</td>';
+                    html_tbody += '<td class="bg-success" data-total-id="'+actividad.id+'">0</td>';
                     html_tbody += '</tr>';
                 }
             }
@@ -146,6 +146,9 @@ function cargar_datos_proyecto(e){
                     total_trimestres[trimestre][avance.mes] = (parseFloat(total_trimestres[trimestre][avance.mes]) || 0) + parseFloat(avance.avanceMes);
                 }
                 for(var j in sumatoria_componente){
+                    if(j > 1){
+                        sumatoria_componente[j] = sumatoria_componente[j] + sumatoria_componente[j-1];
+                    }
                     $('#avance-trim-'+j+' > tbody > tr[data-nivel="1"][data-id="'+componente.id+'"] > td[data-total-id="'+componente.id+'"]').html(sumatoria_componente[j]);
                 }
                 for(var k in componente.actividades){
@@ -167,12 +170,15 @@ function cargar_datos_proyecto(e){
                         total_trimestres[trimestre][avance.mes] = (parseFloat(total_trimestres[trimestre][avance.mes]) || 0) + parseFloat(avance.avanceMes);
                     }
                     for(var j in sumatoria_actividad){
+                        if(j > 1){
+                            sumatoria_actividad[j] = sumatoria_actividad[j] + sumatoria_actividad[j-1];
+                        }
                         $('#avance-trim-'+j+' > tbody > tr[data-nivel="2"][data-id="'+actividad.id+'"] > td[data-total-id="'+actividad.id+'"]').html(sumatoria_actividad[j]);
                     }
                 }
             }
 
-            for(var i in total_trimestres){
+            /*for(var i in total_trimestres){
                 // i = trimestre
                 var meses = total_trimestres[i];
                 var suma = 0;
@@ -181,7 +187,7 @@ function cargar_datos_proyecto(e){
                     suma += meses[j];
                 }
                 $('#total-trim-'+i).text(suma);
-            }
+            }*/
 
             if(response.data.beneficiarios.length){
                 var beneficiarios = response.data.beneficiarios;

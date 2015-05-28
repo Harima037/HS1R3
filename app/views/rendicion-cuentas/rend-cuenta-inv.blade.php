@@ -159,19 +159,10 @@
                                                         <th>{{$meses[$trim][0]['mes']}}</th>
                                                         <th>{{$meses[$trim][1]['mes']}}</th>
                                                         <th>{{$meses[$trim][2]['mes']}}</th>
-                                                        <th>Totales</th>
+                                                        <th class="bg-success">Totales</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody></tbody>
-                                                <tfoot>
-                                                    <tr class="bg-success">
-                                                        <th colspan="2">Totales</th>
-                                                        <th id="total-mes-{{$meses[$trim][0]['clave']}}">0</th>
-                                                        <th id="total-mes-{{$meses[$trim][1]['clave']}}">0</th>
-                                                        <th id="total-mes-{{$meses[$trim][2]['clave']}}">0</th>
-                                                        <th id="total-trim-{{$trim}}">0</th>
-                                                    </tr>
-                                                </tfoot>
                                             </table>
                                         </div>
                                         <div role="tabpanel" class="tab-pane" id="panel-beneficiarios-trim-{{$trim}}">

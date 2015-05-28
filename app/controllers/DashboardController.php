@@ -25,11 +25,12 @@ class DashboardController extends \BaseController {
 			$datos['unidad_responsable'] = 'Unidad responsable no establecida';
 		}
 
-		$conteo_proyectos = Proyecto::select('idClasificacionProyecto','idEstatusProyecto',DB::raw('count(proyectos.id) AS conteoProyecto'),'estatusProyecto.descripcion AS estatusProyecto')
-									->join('catalogoEstatusProyectos AS estatusProyecto','estatusProyecto.id','=','proyectos.idEstatusProyecto')
-									->groupBy('idClasificacionProyecto','idEstatusProyecto');
+		$conteo_proyectos = Proyecto::select('idClasificacionProyecto',DB::raw('count(proyectos.id) AS conteoProyecto'))
+									->where('idEstatusProyecto','=',5)
+									->groupBy('idClasificacionProyecto');
 		if($datos['usuario']->claveUnidad){
-			$conteo_proyectos = $conteo_proyectos->where('unidadResponsable','=',$datos['usuario']->claveUnidad);
+			$unidades = explode('|',$datos['usuario']->claveUnidad);
+			$conteo_proyectos = $conteo_proyectos->whereIn('unidadResponsable',$unidades);
 		}
 
 		$conteo_proyectos = $conteo_proyectos->get();
@@ -39,26 +40,37 @@ class DashboardController extends \BaseController {
 		$mes = Util::obtenerMesActual();
 		$mes_trimestre = Util::obtenerMesTrimestre();
 
-		$datos['mes'] = Util::obtenerDescripcionMes($mes);
+		if($mes){
+			$datos['mes'] = Util::obtenerDescripcionMes($mes);
+		}else{
+			$datos['mes'] = 'No disponible';
+		}
 		$datos['mes_activo'] = $mes;
 		$datos['mes_trimestre'] = $mes_trimestre;
 		$datos['clasificaciones'] = array(1=>'Institucionales',2=>'Inversión');
-		$proyectos = array();
+		
 		$total_proyectos = array(1=>0, 2=>0);
-
-		for ($i = 1; $i <= 2 ; $i++) { 
-			foreach ($lista_estatus as $estatus) {
-				$proyectos[$i][$estatus->id] = array('estatus' => $estatus->descripcion, 'conteo' => 0);
-			}
-		}
-
+		
 		foreach ($conteo_proyectos as $proyecto) {
-			$proyectos[$proyecto->idClasificacionProyecto][$proyecto->idEstatusProyecto]['conteo'] = $proyecto->conteoProyecto;
 			$total_proyectos[$proyecto->idClasificacionProyecto] += $proyecto->conteoProyecto;
 		}
 
-		$datos['proyectos'] = $proyectos;
 		$datos['total_proyectos'] = $total_proyectos;
+
+		$permisos = array();
+		$grupos = array(
+				'RENDCUENTA.RENDINST.R','RENDCUENTA.RENDINV.R','RENDCUENTA.RENDPROG.R','RENDCUENTA.RENDFASSA.R'
+			);
+		if(Sentry::hasAnyAccess($grupos)){
+			foreach ($grupos as $grupo) {
+				if(Sentry::hasAccess($grupo)){
+					$grupo = explode('.',$grupo);
+					$permisos[$grupo[1]] = 1;
+				}
+			}
+		}
+
+		$datos['permisos'] = $permisos;
 
 		return View::make($uri)->with($datos);
 	}
