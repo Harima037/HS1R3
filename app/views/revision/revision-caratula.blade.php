@@ -77,6 +77,12 @@
                             Componentes 
                         </a>
                     </li>
+                    <li role="presentation">
+                        <a id="tablink-componentes" href="#datos-informacion" role="tab" data-toggle="tab" class="pull-right">
+                            <span class="fa fa-info-circle"></span> Información 
+                        </a>
+                    </li>
+                    
                 </ul>
 
                 <div class="tab-content">
@@ -111,6 +117,54 @@
                             </div>
                         </div>
                     </div>
+                    
+                    
+                    <div role="tabpanel" class="tab-pane" id="datos-informacion">
+                        <br>
+                        
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                Información de la Programación de Metas por Mes/Jurisdicción
+                            </div>
+                            <div class="panel-body">
+                                <form id="form_fuente_informacion">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label" for="fuente-informacion">Fuente de Información</label>
+                                                <div class="input-group">
+                                                	<span class="input-group-btn" onclick="escribirComentario('fuente-informacion','Fuente de Información','lbl-fuente-informacion');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span>
+                                                    <p id="lbl-fuente-informacion" class="form-control" style="height:auto">&nbsp;</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                            	<div class="form-group">
+    	                                            <label class="control-label" for="responsable">Responsable</label>
+                                                    <div class="input-group">
+    	                                            	<span class="input-group-btn" onclick="escribirComentario('responsable','Responsable','lbl-responsable');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span>
+         	                                           <p id="lbl-responsable" class="form-control" style="height:auto">&nbsp;</p>                                                     </div>
+                                                    <span id="ayuda-responsable" class="help-block"></span>
+	                                            </div>
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="panel-footer">
+                                
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+                    
+                    
+                    
                 </div>
             </div>
             <div class="panel-footer">
