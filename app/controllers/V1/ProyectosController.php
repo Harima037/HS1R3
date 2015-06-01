@@ -145,8 +145,17 @@ class ProyectosController extends BaseController {
 			$rows = $rows->where('idClasificacionProyecto','=',1)
 						->whereIn('idEstatusProyecto',[1,2,3,4,5]);
 
-			if(Sentry::getUser()->claveUnidad){
-				$unidades = explode('|',Sentry::getUser()->claveUnidad);
+			$usuario = Sentry::getUser();
+
+			if($usuario->proyectosAsignados){
+				if($usuario->proyectosAsignados->proyectos){
+					$proyectos = explode('|',$usuario->proyectosAsignados->proyectos);
+					$rows = $rows->whereIn('proyectos.id',$proyectos);
+				}
+			}
+
+			if($usuario->claveUnidad){
+				$unidades = explode('|',$usuario->claveUnidad);
 				$rows = $rows->whereIn('unidadResponsable',$unidades);
 			}
 			
@@ -176,17 +185,38 @@ class ProyectosController extends BaseController {
 			}
 			
 			return Response::json($data,$http_status);
-		}
+		}elseif(isset($parametros['typeahead'])){
+			$rows = Proyecto::getModel();
 
-		$rows = Proyecto::all();
+			if(isset($parametros['buscar'])){				
+				$rows = $rows->where(function($query)use($parametros){
+						$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
+							->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
+					});
+			}
 
-		if(count($rows) == 0){
-			$http_status = 404;
-			$data = array("data"=>"No hay datos",'code'=>'W00');
+			if(isset($parametros['unidades'])){
+				$unidades = explode(',',$parametros['unidades']);
+				$rows = $rows->whereIn('proyectos.unidadResponsable',$unidades);
+			}
+
+			$rows = $rows->contenidoSuggester()->get();
+
+			if(count($rows)<=0){
+	          $data = array('resultados'=>0,"data"=>array());
+	        }else{
+	          $data = array('resultados'=>count($rows),'data'=>$rows);
+	        }
 		}else{
-			$data = array("data"=>$rows->toArray());
-		}
+			$rows = Proyecto::all();
 
+			if(count($rows) == 0){
+				$http_status = 404;
+				$data = array("data"=>"No hay datos",'code'=>'W00');
+			}else{
+				$data = array("data"=>$rows->toArray());
+			}
+		}
 		return Response::json($data,$http_status);
 	}
 

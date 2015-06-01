@@ -17,7 +17,10 @@
 		    <div class="panel-heading"> <h1>Bienvenido <br><small>{{ $usuario->nombreCompleto() }}</small></h1></div>
 	        <div class="list-group">
 	        	<div class="list-group-item">
-	        		<h4>Unidad Responsable: <small>{{$unidad_responsable}}</small></h4>
+	        		<h4>
+	        			Unidades Responsables Asignadas: <br><br>
+	        			<span class="text-muted">{{$unidad_responsable}}</span>
+	        		</h4>
 	        	</div>
 			</div>
 		</div>

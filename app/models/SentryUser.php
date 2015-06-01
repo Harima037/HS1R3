@@ -17,4 +17,8 @@ class SentryUser extends SentryModel {
     public function nombreCompleto(){
     	return $this->nombres.' '.$this->apellidoPaterno.' '.$this->apellidoMaterno;
     }
+
+    public function proyectosAsignados(){
+        return $this->hasOne('UsuarioProyecto','idSentryUser');
+    }
 }

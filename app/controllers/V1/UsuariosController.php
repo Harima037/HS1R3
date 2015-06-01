@@ -18,7 +18,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use Illuminate\Database\QueryException, \Exception;
 use BaseController, Input, Response, DB, Sentry;
-use User, Hash;
+use User, Hash, UsuarioProyecto, Proyecto;
 
 class UsuariosController extends \BaseController {
 	private $reglas = array(
@@ -172,7 +172,19 @@ class UsuariosController extends \BaseController {
 						$user_roles[] = $rol->id;
 					}
 				}
-				$data = array("data"=>$recurso->toArray());
+
+				$recurso->load('proyectosAsignados');
+
+				if($recurso->proyectosAsignados){
+					$ejercicio = date('Y');
+					if($recurso->proyectosAsignados->ejercicio == $ejercicio){
+						$id_proyectos = explode('|',$recurso->proyectosAsignados->proyectos);
+						$proyectos = Proyecto::contenidoSuggester()->whereIn('proyectos.id',$id_proyectos)->get();
+						$recurso['proyectos'] = $proyectos;
+					}
+				}
+
+				$data = array("data"=>$recurso);
 				$data['data']['roles'] = $user_roles;
 
 				$permisos = $data['data']['permissions'];
@@ -188,15 +200,15 @@ class UsuariosController extends \BaseController {
 					$data['data']['permissions'] = $modulos;
 				}
 			}else{
-				$respuesta['http_status'] = 404;
-				$respuesta['data'] = array("data"=>"No se ha podido encontrar al usuario.",'code'=>'S01');
+				$http_status = 404;
+				$data = array("data"=>"No se ha podido encontrar al usuario.",'code'=>'S01');
 			}
 		}catch(\Cartalyst\Sentry\Users\UserNotFoundException $e){
-    		$respuesta['http_status'] = 404;
-			$respuesta['data'] = array("data"=>"El usuario no existe o ha sido eliminado.",'code'=>'U06');
+    		$http_status = 404;
+			$data = array("data"=>"El usuario no existe o ha sido eliminado.",'code'=>'U06');
 		}catch(\Exception $e){
-			$respuesta['http_status'] = 500;
-			$respuesta['data'] = array("data"=>'Error al obtener los datos','code'=>'S03');
+			$http_status = 500;
+			$data = array("data"=>'Error al obtener los datos','code'=>'S03','ex'=>$e->getMessage());
 		}
 		return Response::json($data,$http_status);
 	}
@@ -261,6 +273,13 @@ class UsuariosController extends \BaseController {
 					}
 				}
 				
+				if(count(Input::get('proyectos'))){
+					$proyectos_asignados = new UsuarioProyecto;
+					$proyectos_asignados->ejercicio = date('Y');
+					$proyectos_asignados->proyectos = implode('|',Input::get('proyectos'));
+					$recurso->proyectosAsignados()->save($proyectos_asignados);
+				}
+
 				$respuesta['http_status'] = 200;
 				$respuesta['data'] = array("data"=>$recurso->toArray());
 			}catch (\Cartalyst\Sentry\Users\LoginRequiredException $e){
@@ -398,6 +417,26 @@ class UsuariosController extends \BaseController {
 				    $recurso->permissions = $user_permission;
 				}
 
+				$recurso->load('proyectosAsignados');
+				$proyectos_asignados = NULL;
+				if($recurso->proyectosAsignados){
+					$proyectos_asignados = $recurso->proyectosAsignados;
+					if(count(Input::get('proyectos'))){
+						$proyectos_asignados->proyectos = implode('|',Input::get('proyectos'));
+					}else{
+						$proyectos_asignados->proyectos = NULL;
+					}
+				}else{
+					if(count(Input::get('proyectos'))){
+						$proyectos_asignados = new UsuarioProyecto;
+						$proyectos_asignados->ejercicio = date('Y');
+						$proyectos_asignados->proyectos = implode('|',Input::get('proyectos'));
+					}
+				}
+				if($proyectos_asignados){
+					$recurso->proyectosAsignados()->save($proyectos_asignados);
+				}
+				
 				if($recurso->save()){
 					$respuesta['http_status'] = 200;
 					$respuesta['data'] = array("data"=>$recurso->toArray());
