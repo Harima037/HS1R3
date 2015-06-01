@@ -69,6 +69,10 @@ if($('#id').val()){
             $('#descripcion-problema').val(response.data.arbolProblema);
             $('#descripcion-objetivo').val(response.data.arbolObjetivo);
 			
+            $('#lbl-fuente-informacion').text(response.data.fuenteInformacion);			
+			$('#lbl-responsable').text(response.data.nombreResponsable);			
+			$('#ayuda-responsable').html(response.data.cargoResponsable);
+			
 			$('#descripcion-problema').attr('disabled', 'disabled');
 			$('#descripcion-objetivo').attr('disabled', 'disabled');
 			

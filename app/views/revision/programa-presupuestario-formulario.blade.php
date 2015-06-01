@@ -58,13 +58,15 @@
                         <li role="presentation" class="disabled">
                             <a href="#indicadores" aria-controls="indicadores" role="tab" data-toggle="" id="tab-link-indicadores">Objetivos e Indicadores</a>
                         </li>
+                        <li role="presentation">
+                            <a href="#datos-informacion" aria-controls="datos-informacion" role="tab" data-toggle="tab" id="tab-link-datos-informacion">Información</a>
+                        </li>
                     </ul>
                     <div class="tab-content">
                         <div role="tabpanel" class="tab-pane active" id="panel-programa-presupuestario">
                             <br>
                             <form id="form_programa_datos">
-                            <div class="row">
-                            	
+                            <div class="row">                            	
                                 <div class="col-sm-5">
                                     <div class="form-group">
                                         <label class="control-label" for="lbl-unidad-responsable">Unidad Responsable</label>
@@ -95,9 +97,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            
-                            
-                            
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label class="control-label" for="lbl-programa-presupuestario">Programa Presupuestario</label>
@@ -107,8 +106,7 @@
                                             <p id="lbl-programa-presupuestario" name="lbl-programa-presupuestario" class="form-control" style="height:auto"></p>
                                         </div>
                                     </div>
-                                </div>
-                                
+                                </div>                                
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label class="control-label" for="lbl-odm">ODM</label>
@@ -119,7 +117,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label class="control-label" for="lbl-vinculacion-ped">Vinculación al PED (Plan Estatal de Desarrollo)</label>
@@ -130,7 +127,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label class="control-label" for="lbl-vinculacion-pnd">Vinculación al PND (Plan Nacional de Desarrollo)</label>
@@ -140,9 +136,7 @@
                                             <p id="lbl-vinculacion-pnd" name="lbl-vinculacion-pnd" class="form-control" style="height:auto">&nbsp;</p>
                                         </div>
                                     </div>
-                                </div>                                
-                                
-                                
+                                </div> 
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label class="control-label" for="lbl-modalidad">Modalidad</label>
@@ -270,7 +264,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                
                                 <table class="table table-striped table-hover" id="tablaCausasEfectos" name="tablaCausasEfectos">
                                     <thead>
                                         <tr>
@@ -283,7 +276,6 @@
                                     </tbody>
                                 </table>
                             </div>
-                            
                             <div class="panel panel-primary" id="datagridObjetivos">
                                 <div class="panel-body">
                                     <div class="row">
@@ -381,7 +373,6 @@
                                     			    </div>
                                                 </div>
                                             </div>
-                                            
                                             <div class="col-sm-12 bg-info">
                                             <strong><span class="fa fa-line-chart"></span> Indicador</strong>
                                             </div>
@@ -455,11 +446,9 @@
                                     			    </div>
                                                 </div>
                                             </div>
-                                            
                                             <div class="col-sm-12 bg-info">
                                             <strong><span class="fa fa-table"></span> Metas</strong>
                                             </div>
-                                                                                        
                                             <div class="col-sm-2">
 												<div class="form-group">
 											    	<label for="lbl-linea-base-F" class="control-label">Línea Base</label>
@@ -499,8 +488,7 @@
                         			                    <p id="lbl-frecuencia-F" name="lbl-frecuencia-F" class="form-control" style="height:auto">&nbsp;</p>
                                     			    </div>
                                                 </div>
-                                            </div>
-                                            
+                                            </div>                                            
                                             <div class="col-sm-3"><div class="form-group">
 											    	<label for="lbl-trim1-F" class="control-label">Trim 1</label>
                                                     <div class="input-group">
@@ -533,7 +521,6 @@
                         			                    <p id="lbl-trim4-F" name="lbl-trim4-F" class="form-control" style="height:auto">&nbsp;</p>
                                     			    </div> 
                                             </div></div>
-
                                             <div class="col-sm-4"><div class="form-group">
 											    	<label for="lbl-numerador-F" class="control-label">Numerador</label>
                                                     <div class="input-group">
@@ -558,7 +545,6 @@
                         			                    <p id="lbl-meta-F" name="lbl-meta-F" class="form-control" style="height:auto">&nbsp;</p>
                                     			    </div> 
                                             </div></div>
-
 										</div>
                                     </div> 
                                     <div role="tabpanel" class="tab-pane" id="panel-proposito">
@@ -785,15 +771,55 @@
                                     			    </div> 
                                             </div></div>
 
-										</div>
-                                    </div>
-                                </div>
-                            </div>
-                                    
-                                    
-                                    
-                            
-                        </div>
+										</div> <!--ROW-->
+                                    </div> <!--Panel Proposito-->
+                                </div> <!--Tab-Content-->
+                            </div> <!--TabPanel-->
+                        </div> <!--TabPanel Indicadores-->
+                        
+                        
+                        <div role="tabpanel" class="tab-pane" id="datos-informacion">
+	                        <br>
+                        
+    	                    <div class="panel panel-default">
+        	                    <div class="panel-heading">
+            	                    Información de la Programación de Metas por Trimestre
+                	            </div>
+                    	        <div class="panel-body">
+	                                <form id="form_fuente_informacion">
+    	                                <div class="row">
+        	                                <div class="col-sm-6">
+            	                                <div class="form-group">
+                	                                <label class="control-label" for="fuente-informacion">Fuente de Información</label>
+                    	                            <div class="input-group">
+                        	                        	<span class="input-group-btn" onclick="escribirComentario('fuente-informacion','Fuente de Información','lbl-fuente-informacion');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span>
+                            	                        <p id="lbl-fuente-informacion" class="form-control" style="height:auto">&nbsp;</p>
+                                	                </div>
+                                    	        </div>
+                                        	</div>
+	                                        <div class="col-sm-6">
+    	                                        <div class="form-group">
+        	                                    	<div class="form-group">
+    	    	                                        <label class="control-label" for="responsable">Responsable</label>
+                	                                    <div class="input-group">
+    	            	                                	<span class="input-group-btn" onclick="escribirComentario('responsable','Responsable','lbl-responsable');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span>
+															<p id="lbl-responsable" class="form-control" style="height:auto">&nbsp;</p>    	                                                 </div>
+        	                                            <span id="ayuda-responsable" class="help-block"></span>
+	        	                                    </div>
+	                                            </div>
+	                                        </div>                                            
+	                                    </div>
+	                                </form>
+	                            </div>
+                                <div class="panel-footer">
+                                                                
+	                            </div>
+    	                   	</div>
+    	                </div>
+                        
+                        
+                        
+                        
                     </div>
                 </div>
             </div>

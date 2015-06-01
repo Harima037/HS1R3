@@ -21,7 +21,7 @@ class Programa extends BaseModel
 			DB::raw('concat_ws(" ",politicaPublica.clave,politicaPublica.descripcion) AS politicaPublica'),
 
 			DB::raw('concat_ws(" ",objetivosPND.clave,objetivosPND.descripcion) AS objetivoPND'),
-			'titular.nombre AS liderPrograma','titular.email AS liderCorreo','titular.telefono AS liderTelefono')
+			'titular.nombre AS liderPrograma','titular.email AS liderCorreo','titular.telefono AS liderTelefono', 'responsable.nombre AS nombreResponsable', 'responsable.cargo AS cargoResponsable')
 				->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestal','programaPresupuestal.clave','=','programa.claveProgramaPresupuestario')
 				->leftjoin('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','programa.claveUnidadResponsable')
 				->leftjoin('catalogoODM as ODM','ODM.id','=','programa.idOdm')
@@ -33,7 +33,9 @@ class Programa extends BaseModel
 				->leftjoin('catalogoObjetivosPED AS politicaPublica','politicaPublica.clave','=',DB::raw('SUBSTRING(objetivosPED.clave,1,6)'))
 				->leftjoin('catalogoObjetivosPND as objetivosPND','objetivosPND.id','=','programa.idObjetivoPND')
 				//->leftjoin('titulares As titular','titular.id','=','programa.idLiderPrograma')
-				->leftjoin('vistaDirectorio As titular','titular.id','=','programa.idLiderPrograma');
+				->leftjoin('vistaDirectorio As titular','titular.id','=','programa.idLiderPrograma')
+				->leftjoin('vistaDirectorio As responsable','responsable.id','=','programa.idResponsable');
+				
 	}
 
 	public function programaPresupuestario(){
