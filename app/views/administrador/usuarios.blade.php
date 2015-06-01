@@ -5,11 +5,14 @@
 @section('css')
 @parent
 <link href="{{ URL::to('css/chosen.bootstrap.min.css') }}" rel="stylesheet" type="text/css" media="screen">
+<link href="{{ URL::to('css/typeahead.css') }}" rel="stylesheet" media="screen">
 @stop
 
 @section('js')
 @parent
 <script src="{{ URL::to('js/dependencias/chosen.jquery.min.js') }}"></script>
+<script src="{{ URL::to('js/dependencias/typeahead.bundle.min.js') }}"></script>
+<script src="{{ URL::to('js/dependencias/handlebars-v1.3.0.js') }}"></script>
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
 <script src="{{ URL::to('js/modulos/administrador/usuarios.js')}}"></script>
@@ -112,8 +115,21 @@
 
                     <form action="" id="formModulo">
                         <ul class="nav nav-tabs" role="tablist">
-                            <li><a href="#tab-datos" role="tab" data-toggle="tab">Datos</a></li>
-                            <li><a href="#tab-seguridad" id="nav-tab-seguridad" role="tab" data-toggle="tab"><i class="fa fa-shield"></i> Seguridad</a></li>
+                            <li>
+                                <a href="#tab-datos" role="tab" data-toggle="tab">
+                                    <span class="fa fa-user"></span> Datos
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#tab-seguridad" id="nav-tab-seguridad" role="tab" data-toggle="tab">
+                                    <span class="fa fa-shield"></span> Seguridad
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#tab-proyectos" role="tab" data-toggle="tab">
+                                    <span class="fa fa-file"></span> Proyectos
+                                </a>
+                            </li>
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane active" id="tab-datos">
@@ -262,6 +278,37 @@
                                             </div>
                                         </div>
                                     </div>
+                            </div>
+
+                            <div class="tab-pane" id="tab-proyectos">
+                                <br>
+                                <label class="control-label">
+                                    <span class="fa fa-search"></span> Buscar Proyecto
+                                </label>
+                                <span id="estatus-busqueda-proyecto" class="pull-right"></span>
+                                <input type="text" class="form-control" id="buscar-proyecto" autocomplete="off">
+                                <table id="tabla-lista-proyectos" class="table table-hover table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th>Clave</th>
+                                            <th>Nombre Técnico</th>
+                                            <th width="55">Quitar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr id="tr-proyectos-vacio">
+                                            <td colspan="3"><span class="fa fa-info-circle"></span> No hay proyectos asignados</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div>
+                                    <span class="pull-right">
+                                        <span class="badge" id="conteo-proyectos-seleccionados">0</span> Proyecto(s) seleccionados
+                                    </span>
+                                </div>
+                                <button type="button" class="btn btn-danger" id="btn-limpiar-proyectos">
+                                    <span class="fa fa-trash"></span> Quitar todos
+                                </button>
                             </div>
                         </div>      
                         <input type="hidden" id="id" name="id">

@@ -51,6 +51,16 @@ class Proyecto extends BaseModel
 		return $this->finalidad . '.' . $this->funcion . '.' . $this->subFuncion . '.' . $this->subSubFuncion;
 	}
 
+	public function scopeContenidoSuggester($query){
+		return $query->select('proyectos.id','nombreTecnico','catalogoEstatusProyectos.descripcion AS estatusProyectoDescripcion',
+				'proyectos.idEstatusProyecto','catalogoUnidadesResponsables.descripcion AS unidadResponsableDescripcion',
+				'unidadResponsable','finalidad','funcion','subfuncion','subsubfuncion','programaSectorial','programaPresupuestario',
+				'programaEspecial','actividadInstitucional','proyectoEstrategico','numeroProyectoEstrategico','idClasificacionProyecto')
+				->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
+				->join('catalogoUnidadesResponsables','catalogoUnidadesResponsables.clave','=','proyectos.unidadResponsable')
+				->orderBy('proyectos.nombreTecnico','asc');
+	}
+
 	public function scopeContenidoReporte($query){
 		return $query->leftjoin('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','proyectos.unidadResponsable')
 					->leftjoin('catalogoFuncionesGasto AS finalidad','finalidad.clave','=','proyectos.finalidad')

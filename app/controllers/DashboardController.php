@@ -18,16 +18,29 @@ class DashboardController extends \BaseController {
 		$datos['usuario'] = Sentry::getUser();
 		$datos['sys_mod_activo'] = null;
 
-		$unidad_responsable = UnidadResponsable::where('clave','=',$datos['usuario']->claveUnidad)->first();
-		if($unidad_responsable){
-			$datos['unidad_responsable'] = $unidad_responsable->clave . ' ' . $unidad_responsable->descripcion;
+		if($datos['usuario']->claveUnidad){
+			$unidades = explode('|',$datos['usuario']->claveUnidad);
+			$unidad_responsable = UnidadResponsable::whereIn('clave',$unidades)->get();
+			$unidades_seleccionadas = array();
+			foreach ($unidad_responsable as $unidad) {
+				 $unidades_seleccionadas[] = $unidad->clave . ' ' . $unidad->descripcion;
+			}
+			$datos['unidad_responsable'] = implode('<br>',$unidades_seleccionadas);
 		}else{
-			$datos['unidad_responsable'] = 'Unidad responsable no establecida';
+			$datos['unidad_responsable'] = 'Asignado a todas las Unidades';
 		}
 
 		$conteo_proyectos = Proyecto::select('idClasificacionProyecto',DB::raw('count(proyectos.id) AS conteoProyecto'))
 									->where('idEstatusProyecto','=',5)
 									->groupBy('idClasificacionProyecto');
+		//
+		if($datos['usuario']->proyectosAsignados){
+			if($datos['usuario']->proyectosAsignados->proyectos){
+				$proyectos = explode('|',$datos['usuario']->proyectosAsignados->proyectos);
+				$conteo_proyectos = $conteo_proyectos->whereIn('proyectos.id',$proyectos);
+			}
+		}
+
 		if($datos['usuario']->claveUnidad){
 			$unidades = explode('|',$datos['usuario']->claveUnidad);
 			$conteo_proyectos = $conteo_proyectos->whereIn('unidadResponsable',$unidades);

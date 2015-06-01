@@ -45,8 +45,8 @@
                     <h4 class="modal-title" id="modalAcercaDeLabel">Acerca de...</h4>
                 </div>
                 <div class="modal-body">
-                    <h2>POA 1.0</h2>
-                    <p>Plataforma de administración del POA</p>
+                    <h2>SIRE 1.0</h2>
+                    <p>Sitema de Integración, Rendición de cuentas y Evaluación</p>
                     <p><small> <strong>Instituto de Salud</strong> Tuxtla Gutiérrez, 2014 &copy;. Desarrollado por: Área de Informática</small></p>
                 </div>
                 <div class="modal-footer">

@@ -49,7 +49,7 @@
                 <i class="fa fa-th-large fa-lg"></i>
             </button> 
             <a class="navbar-brand" href="{{ URL::to('/') }}">
-                <img src="{{ URL::to('img/imgApple/icono_57x57.png') }}" alt="" height="30px" style="border-radius:5px;"> POA
+                <img src="{{ URL::to('img/imgApple/icono_57x57.png') }}" alt="" height="30px" style="border-radius:5px;"> SIRE
             </a>
         </div>
         @if(isset($usuario))
