@@ -666,9 +666,9 @@ class SeguimientoController extends BaseController {
 		$clave_jurisdiccion = $accion->desglose[0]->claveJurisdiccion;
 
 		foreach ($accion->desglose as $desglose) {
-			if($parametros['localidad-avance-mes'][$desglose->claveLocalidad] == ''){
+			/*if($parametros['localidad-avance-mes'][$desglose->claveLocalidad] == ''){
 				$faltan_campos[] = json_encode(array('field'=>'localidad_avance_mes_'.$desglose->claveLocalidad,'error'=>'Este campo es requerido'));
-			}else{
+			}else{*/
 				if(count($desglose->metasMes)){
 					if($desglose->metasMes[0]->avance){
 						$avance_anterior += $desglose->metasMes[0]->avance;
@@ -684,7 +684,7 @@ class SeguimientoController extends BaseController {
 					$guardar_metas_localidades[] = $nueva_meta;
 				}
 				$avance_total += $parametros['localidad-avance-mes'][$desglose->claveLocalidad];
-			}
+			//}
 		}
 
 		if(count($faltan_campos)){
@@ -797,7 +797,9 @@ class SeguimientoController extends BaseController {
 		if(!$tiene_desglose){
 			foreach ($accion_metas->metasMes as $metas) {
 				if($parametros['avance'][$metas->claveJurisdiccion] == ''){
-					$faltan_campos[] = json_encode(array('field'=>'avance_'.$metas->claveJurisdiccion,'error'=>'Este campo es requerido'));
+					$faltan_campos[] = json_encode(array('field'=>'avance_'.$metas->claveJurisdiccion,'error'=>'Este campo es requerido.'));
+				}elseif($parametros['avance'][$metas->claveJurisdiccion] < 0){
+					$faltan_campos[] = json_encode(array('field'=>'avance_'.$metas->claveJurisdiccion,'error'=>'El valor no puede ser negativo.'));
 				}else{
 					if($metas->avance){
 						$avance_acumulado -= $metas->avance;
@@ -826,6 +828,8 @@ class SeguimientoController extends BaseController {
 					$meta->idProyecto = $accion_metas->idProyecto;
 					$guardar_metas[] = $meta;
 					$total_avance += $parametros['avance'][$jurisdiccion];
+				}elseif($parametros['avance'][$jurisdiccion] < 0){
+					$faltan_campos[] = json_encode(array('field'=>'avance_'.$jurisdiccion,'error'=>'El valor no puede ser negativo.'));
 				}
 			}
 			$registro_avance->avanceMes = $total_avance;
@@ -858,7 +862,7 @@ class SeguimientoController extends BaseController {
 				$registro_avance->planMejora = 0;
 			}
 		}else{
-			$registro_avance->justificacionAcumulada = 'El avance se encuentra dentro de los parametros establecidos';
+			$registro_avance->justificacionAcumulada = 'El avance se encuentra dentro de lo programado';
 			$registro_avance->planMejora = 0;
 		}
 

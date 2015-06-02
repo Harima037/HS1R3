@@ -274,17 +274,17 @@
 								<table id="tabla-avances-metas" class="table table-condensed table-bordered">
 			                		<thead>
 			                			<tr>
-			                				<th rowspan="2">Jurisdicción</th>
-				                			<th colspan="2" class="bg-success">Meta Programada</th>
-				                			<th colspan="3" class="bg-info">Avance</th>
-				                			<th rowspan="2" width="90">Porcentaje Acumulado</th>
+			                				<th rowspan="2" class="text-center">Jurisdicción</th>
+				                			<th colspan="2" class="bg-success text-center">Meta Programada</th>
+				                			<th colspan="3" class="bg-info text-center">Avance</th>
+				                			<th rowspan="2" width="90" class="text-center">Porcentaje Acumulado</th>
 			                			</tr>
 			                			<tr>
-			                				<th class="bg-success">Acumulada</th>
-			                				<th class="bg-success" nowrap="nowrap">Mes actual</th>
-			                				<th class="bg-info" nowrap="nowrap">Mes actual</th>
-			                				<th class="bg-info">Acumulado</th>
-			                				<th class="bg-info">Total</th>
+			                				<th class="bg-success text-center">Acumulada</th>
+			                				<th class="bg-success text-center" nowrap="nowrap">Mes actual</th>
+			                				<th class="bg-info text-center" nowrap="nowrap">Mes actual</th>
+			                				<th class="bg-info text-center">Acumulado</th>
+			                				<th class="bg-info text-center">Total</th>
 			                			</tr>
 			                		</thead>
 			                		<tbody>
@@ -297,7 +297,7 @@
 			                				<td class="meta-del-mes" data-meta-mes="0">0</td>
 			                				<td>
 			                					<div class="form-group" style="margin-bottom:0;">
-			                						<input type="number" class="form-control avance-mes" name="avance[{{$clave}}]" id="avance_{{$clave}}" data-jurisdiccion="{{$clave}}" data-meta-programada="">
+			                						<input type="number" class="form-control avance-mes" name="avance[{{$clave}}]" id="avance_{{$clave}}" data-jurisdiccion="{{$clave}}" data-meta-programada="" min="0">
 			                					</div>
 			                				</td>
 			                				<td class="avance-acumulado" data-acumulado="0">0</td>
@@ -367,6 +367,34 @@
 							<div role="tabpanel" class="tab-pane" id="panel-justificacion">
 								<br>
 								<div class="row">
+									<div class="col-sm-12">
+										<table id="tabla-avances-metas" class="table table-condensed table-bordered">
+					                		<thead>
+					                			<tr>
+					                				<th rowspan="2" class="text-center">Jurisdicción</th>
+						                			<th colspan="2" class="bg-success text-center">Meta Programada</th>
+						                			<th colspan="3" class="bg-info text-center">Avance</th>
+						                			<th rowspan="2" width="90" class="text-center">Porcentaje Acumulado</th>
+					                			</tr>
+					                			<tr>
+					                				<th class="bg-success text-center">Acumulada</th>
+					                				<th class="bg-success text-center" nowrap="nowrap">Mes actual</th>
+					                				<th class="bg-info text-center" nowrap="nowrap">Mes actual</th>
+					                				<th class="bg-info text-center">Acumulado</th>
+					                				<th class="bg-info text-center">Total</th>
+					                			</tr>
+					                		</thead>
+											<tfoot>
+					                			<th>Totales</th>
+					                			<th class="bg-success" id="total-meta-programada-analisis">0</th>
+					                			<th id="total-meta-mes-analisis">0</th>
+					                			<th id="total-avance-mes-analisis">0</th>
+					                			<th id="total-avance-acumulado-analisis">0</th>
+					                			<th class="bg-info" id="total-avance-total-analisis">0</th>
+					                			<th id="total-porcentaje-analisis">0%</th>
+					                		</tfoot>
+					                	</table>
+									</div>
 									<div class="col-sm-12">
 										<div class="form-group">
 											<label class="control-label" for="analisis-resultados">Analisis de Resultados Acumulado</label>

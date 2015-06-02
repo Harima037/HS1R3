@@ -219,10 +219,14 @@ function seguimiento_metas(e){
 
             //var total_porcentaje_acumulado = parseFloat((((total_acumulado + total_avance) * 100) / total_programado).toFixed(2)) || 0;
             $('#total-meta-programada').text(total_programado.format(2));
+            $('#total-meta-programada-analisis').text(total_programado.format(2));
             $('#total-meta-programada').attr('data-total-programado',total_programado);
             $('#total-meta-mes').text(total_programado_mes.format(2));
+            $('#total-meta-mes-analisis').text(total_programado_mes.format(2));
             $('#total-avance-mes').text(total_avance.format(2));
+            $('#total-avance-mes-analisis').text(total_avance.format(2));
             $('#total-avance-acumulado').text(total_acumulado.format(2));
+            $('#total-avance-acumulado-analisis').text(total_acumulado.format(2));
             //$('#total-porcentaje').text(total_porcentaje_acumulado+'% ');
             $('.avance-mes').change();
 
@@ -492,6 +496,7 @@ $('.avance-mes').on('change',function(){
     });
     suma = +suma.toFixed(2);
     $('#total-avance-mes').text(suma.format(2));
+    $('#total-avance-mes-analisis').text(suma.format(2));
 
     var suma = 0;
     $('.avance-total').each(function(){
@@ -500,6 +505,7 @@ $('.avance-mes').on('change',function(){
     suma = +suma.toFixed(2);
     $('#total-avance-total').attr('data-total-avance',suma);
     $('#total-avance-total').text(suma.format(2));
+    $('#total-avance-total-analisis').text(suma.format(2));
 
     total_programado = parseFloat($('#total-meta-programada').attr('data-total-programado'));
     total_acumulado = parseFloat($('#total-avance-total').attr('data-total-avance'));
@@ -534,10 +540,11 @@ $('.avance-mes').on('change',function(){
     }
 
     $('#total-porcentaje').html(total_porcentaje_acumulado);
+    $('#total-porcentaje-analisis').html(total_porcentaje_acumulado);
 
     if($('#total-porcentaje').attr('data-estado-avance')){
         $('#justificacion-acumulada').attr('disabled',false);
-        if($('#justificacion-acumulada').val() == 'El avance se encuentra dentro de los parametros establecidos'){
+        if($('#justificacion-acumulada').val() == 'El avance se encuentra dentro de lo programado'){
             $('#justificacion-acumulada').val('');
         }
         $('#tab-link-plan-mejora').attr('data-toggle','tab');
