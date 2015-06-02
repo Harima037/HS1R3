@@ -93,23 +93,17 @@
                             @for($trim = 1 ; $trim <= 4 ; $trim++)
                             <div role="tabpanel" class="tab-pane {{($trim == 1)?'active':''}}" id="panel-trim-{{$trim}}">
                                 <br>
-                                <table id="avance-trim-{{$trim}}" class="table table-hover table-condensed table-stripped tabla-avance-trim">
+                                <table id="avance-trim-{{$trim}}" class="table table-condensed tabla-avance-trim">
                                     <thead>
                                         <tr>
                                             <th>Nivel</th>
                                             <th>Indicador</th>
                                             <th>Meta Programada</th>
                                             <th>Avance del Trimestre</th>
+                                            <th class="bg-success">Avance Acumulado</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
-                                    <tfoot>
-                                        <tr class="bg-success">
-                                            <th colspan="2">Totales</th>
-                                            <th id="total-programado-trim-{{$trim}}">0</th>
-                                            <th id="total-avance-trim-{{$trim}}">0</th>
-                                        </tr>
-                                    </tfoot>
                                 </table>
                             </div>
                             @endfor

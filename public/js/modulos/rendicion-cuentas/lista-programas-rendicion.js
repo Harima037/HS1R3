@@ -110,28 +110,28 @@ function cargar_datos_programa(e){
                     }
                 }
             }
-
+            var total_avance_acumulado = {};
             for(var i = 1; i <= 4; i++){
                 var html_tbody = '';
-                var total_acumulado = 0;
-                var total_avance = 0;
                 for(var j in datos_programa){
                     var indicador = datos_programa[j];
+
+                    if(!total_avance_acumulado[j]){
+                        total_avance_acumulado[j] = 0;
+                    }
+
+                    total_avance_acumulado[j] += indicador['avances'][i];
 
                     html_tbody += '<tr data-clave="'+indicador['claveTipo']+'" data-id="'+indicador['id']+'">';
                     html_tbody += '<td>'+indicador['claveTipo']+'</td>'
                     html_tbody += '<td>'+indicador['nombre']+'</td>'
-                    html_tbody += '<td class="meta-acumulada" data-meta="'+indicador['metas'][i]+'">'+indicador['metas'][i]+'</td>';
-                    html_tbody += '<td class="avance-acumulado" data-avance="'+indicador['avances'][i]+'">'+indicador['avances'][i]+'</td>';
+                    html_tbody += '<td class="meta-acumulada" data-meta="'+indicador['metas'][i]+'">'+indicador['metas'][i].format(2)+'</td>';
+                    html_tbody += '<td class="avance-acumulado" data-avance="'+indicador['avances'][i]+'">'+indicador['avances'][i].format(2)+'</td>';
+                    html_tbody += '<td class="bg-success">'+total_avance_acumulado[j].format(2)+'</td>';
                     html_tbody += '</tr>';
-
-                    total_acumulado += parseFloat(indicador['metas'][i]);
-                    total_avance += parseFloat(indicador['avances'][i]);
                 }
                 $('#avance-trim-'+i+' > tbody').empty();
                 $('#avance-trim-'+i+' > tbody').append(html_tbody);
-                $('#total-programado-trim-'+i).text(total_acumulado.format());
-                $('#total-avance-trim-'+i).text(total_avance.format());
             };
 
             $('#btn-editar-avance').attr('data-id-programa',e);
