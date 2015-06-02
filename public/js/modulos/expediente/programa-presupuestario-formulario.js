@@ -270,14 +270,14 @@ function editar_indicador(e){
             $('#frecuencia-programa').val(response.data.idFrecuenciaIndicador);
             $('#tipo-ind-programa').val(response.data.idTipoIndicador);
             $('#unidad-medida-programa').val(response.data.idUnidadMedida);
-            $('#lbl-meta-programa').text(parseFloat(response.data.metaIndicador).format());
+            $('#lbl-meta-programa').text(parseFloat(response.data.metaIndicador).format(2));
             $('#meta-programa').val(response.data.metaIndicador);
             $('#trim1-programa').val(response.data.trim1);
             $('#trim2-programa').val(response.data.trim2);
             $('#trim3-programa').val(response.data.trim3);
             $('#trim4-programa').val(response.data.trim4);
             $('#numerador-programa').val(response.data.valorNumerador);
-            $('#lbl-numerador-programa').text(parseFloat(response.data.valorNumerador).format());
+            $('#lbl-numerador-programa').text(parseFloat(response.data.valorNumerador).format(2));
             $('#denominador-programa').val(response.data.valorDenominador);
             $('#linea-base-programa').val(response.data.lineaBase);
             $('#anio-base-programa').val(response.data.anioBase);
@@ -834,10 +834,10 @@ function actualizar_lista_proyectos(response){
 function sumar_trimestres(){
     var suma = 0;
     $(form_indicador + ' .valor-trimestre').each(function(){
-        suma += parseFloat($(this).val().replace(',','')) || 0;
+        suma += parseFloat($(this).val()) || 0;
     });
     $('#numerador-programa').val(suma);
-    $('#lbl-numerador-programa').text(suma.format());
+    $('#lbl-numerador-programa').text(suma.format(2));
     ejecutar_formula();
 }
 

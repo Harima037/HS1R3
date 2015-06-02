@@ -100,10 +100,10 @@ function cargar_datos_programa(e){
                     'claveTipo': indicador.claveTipoIndicador,
                     'nombre': indicador.descripcionIndicador,
                     'metas': {
-                        1: indicador.trim1 + 0,
-                        2: indicador.trim1 + indicador.trim2,
-                        3: indicador.trim1 + indicador.trim2 + indicador.trim3,
-                        4: indicador.trim1 + indicador.trim2 + indicador.trim3 + indicador.trim4
+                        1: parseFloat(indicador.trim1) + 0,
+                        2: parseFloat(indicador.trim1) + parseFloat(indicador.trim2),
+                        3: parseFloat(indicador.trim1) + parseFloat(indicador.trim2) + parseFloat(indicador.trim3),
+                        4: parseFloat(indicador.trim1) + parseFloat(indicador.trim2) + parseFloat(indicador.trim3) + parseFloat(indicador.trim4)
                     },
                     'avances': {
                         1:0,
@@ -116,7 +116,7 @@ function cargar_datos_programa(e){
                 if(indicador.registro_avance.length){
                     for(var j in indicador.registro_avance){
                         var avance = indicador.registro_avance[j];
-                        datos_programa[indicador.id]['avances'][avance.trimestre] = avance.avance;
+                        datos_programa[indicador.id]['avances'][avance.trimestre] = parseFloat(avance.avance);
                     }
                 }
             }
@@ -140,8 +140,8 @@ function cargar_datos_programa(e){
                 }
                 $('#avance-trim-'+i+' > tbody').empty();
                 $('#avance-trim-'+i+' > tbody').append(html_tbody);
-                $('#total-programado-trim-'+i).text(total_acumulado.format());
-                $('#total-avance-trim-'+i).text(total_avance.format());
+                $('#total-programado-trim-'+i).text(total_acumulado.format(2));
+                $('#total-avance-trim-'+i).text(total_avance.format(2));
             };
 
             $('#btn-editar-avance').attr('data-id-programa',e);

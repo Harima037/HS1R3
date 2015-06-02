@@ -26,7 +26,8 @@ class ProgramaPresupuestarioController extends BaseController {
 		'unidad-responsable'		=> 'required',
 		'programa-presupuestario'	=> 'required',
 		'programa-sectorial'		=> 'required',
-		'ejercicio'					=> 'required',
+		'ejercicio'					=> 'required'
+		/*
 		'odm'						=> 'required',
 		'vinculacion-ped'			=> 'required',
 		'vinculacion-pnd'			=> 'required',
@@ -38,7 +39,7 @@ class ProgramaPresupuestarioController extends BaseController {
 		'cuantificacion-potencial'	=> 'required',
 		'enfoque-objetivo'			=> 'required',
 		'cuantificacion-objetivo'	=> 'required',
-		'justificacion-programa'	=> 'required'
+		'justificacion-programa'	=> 'required'*/
 	);
 
 	private $reglasFuenteInformacion = array(
@@ -63,28 +64,28 @@ class ProgramaPresupuestarioController extends BaseController {
 
 	private $reglasIndicador = array(
 		'tipo-indicador'			=> 'required',
-		'ambito-programa'			=> 'required',
-		'denominador-ind-programa' 	=> 'required',
+		//'ambito-programa'			=> 'required',
+		//'denominador-ind-programa' 	=> 'required',
 		'descripcion-ind-programa' 	=> 'required',
-		'descripcion-obj-programa' 	=> 'required',
-		'dimension-programa' 		=> 'required',
-		'formula-programa' 			=> 'required',
-		'frecuencia-programa' 		=> 'required',
-		'interpretacion-programa' 	=> 'required',
-		'numerador-ind-programa' 	=> 'required',
-		'supuestos-programa' 		=> 'required',
-		'tipo-ind-programa' 		=> 'required',
+		//'descripcion-obj-programa' 	=> 'required',
+		//'dimension-programa' 		=> 'required',
+		//'formula-programa' 			=> 'required',
+		//'frecuencia-programa' 		=> 'required',
+		//'interpretacion-programa' 	=> 'required',
+		//'numerador-ind-programa' 	=> 'required',
+		//'supuestos-programa' 		=> 'required',
+		//'tipo-ind-programa' 		=> 'required',
 		'anio-base-programa' 		=> 'integer|min:0',
 		'linea-base-programa' 		=> 'numeric|min:0',
 		'unidad-medida-programa' 	=> 'required',
-		'verificacion-programa' 	=> 'required',
+		//'verificacion-programa' 	=> 'required',
 		'trim1-programa' 			=> 'numeric',
 		'trim2-programa' 			=> 'numeric',
 		'trim3-programa' 			=> 'numeric',
 		'trim4-programa' 			=> 'numeric',
-		'denominador-programa' 		=> 'required_if:formula-programa,1,2,3,4,5,6|numeric|min:0',
+		//'denominador-programa' 		=> 'required_if:formula-programa,1,2,3,4,5,6|numeric|min:0',
 		'numerador-programa' 		=> 'required|numeric|min:1',
-		'meta-programa' 			=> 'required|numeric|min:0'
+		//'meta-programa' 			=> 'required|numeric|min:0'
 	);
 
 	/**
@@ -275,24 +276,25 @@ class ProgramaPresupuestarioController extends BaseController {
 
 					$recurso = new Programa;
 
-					$recurso->claveProgramaSectorial = $parametros['programa-sectorial'];
-					$recurso->idObjetivoPED = $parametros['vinculacion-ped'];
-					$recurso->idObjetivoPND = $parametros['vinculacion-pnd'];
-					$recurso->claveProgramaPresupuestario = $parametros['programa-presupuestario'];
 					$recurso->claveUnidadResponsable = $parametros['unidad-responsable'];
-					$recurso->idOdm = $parametros['odm'];
-					$recurso->idModalidad = $parametros['modalidad'];
-					$recurso->idEstatus = 1;
+					$recurso->claveProgramaSectorial = $parametros['programa-sectorial'];
+					$recurso->claveProgramaPresupuestario = $parametros['programa-presupuestario'];
 					$recurso->ejercicio = $parametros['ejercicio'];
-					$recurso->fechaInicio = $parametros['fecha-inicio'];
-					$recurso->fechaTermino = $parametros['fecha-termino'];
-					$recurso->resultadosEsperados = $parametros['resultados-esperados'];
-					$recurso->areaEnfoquePotencial = $parametros['enfoque-potencial'];
-					$recurso->areaEnfoqueObjetivo = $parametros['enfoque-objetivo'];
-					$recurso->cuantificacionEnfoquePotencial = $parametros['cuantificacion-potencial'];
-					$recurso->cuantificacionEnfoqueObjetivo = $parametros['cuantificacion-objetivo'];
-					$recurso->justificacionPrograma = $parametros['justificacion-programa'];
+					$recurso->idEstatus = 1;
 
+					$recurso->idObjetivoPED = ($parametros['vinculacion-ped'])?$parametros['vinculacion-ped']:NULL;
+					$recurso->idObjetivoPND = ($parametros['vinculacion-pnd'])?$parametros['vinculacion-pnd']:NULL;
+					$recurso->idOdm = ($parametros['odm'])?$parametros['odm']:NULL;
+					$recurso->idModalidad = ($parametros['modalidad'])?$parametros['modalidad']:NULL;
+					$recurso->fechaInicio = ($parametros['fecha-inicio'])?$parametros['fecha-inicio']:NULL;
+					$recurso->fechaTermino = ($parametros['fecha-termino'])?$parametros['fecha-termino']:NULL;
+					$recurso->resultadosEsperados = ($parametros['resultados-esperados'])?$parametros['resultados-esperados']:NULL;
+					$recurso->areaEnfoquePotencial = ($parametros['enfoque-potencial'])?$parametros['enfoque-potencial']:NULL;
+					$recurso->areaEnfoqueObjetivo = ($parametros['enfoque-objetivo'])?$parametros['enfoque-objetivo']:NULL;
+					$recurso->cuantificacionEnfoquePotencial = ($parametros['cuantificacion-potencial'])?$parametros['cuantificacion-potencial']:NULL;
+					$recurso->cuantificacionEnfoqueObjetivo = ($parametros['cuantificacion-objetivo'])?$parametros['cuantificacion-objetivo']:NULL;
+					$recurso->justificacionPrograma = ($parametros['justificacion-programa'])?$parametros['justificacion-programa']:NULL;
+					
 					//$titular = Titular::where('claveUnidad','=',$parametros['unidad-responsable'])->first();
 					$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
 					$recurso->idLiderPrograma = $titular->id;
@@ -469,15 +471,16 @@ class ProgramaPresupuestarioController extends BaseController {
 			if($parametros['guardar'] == 'validar-programa'){
 				$recurso = Programa::with('arbolProblemas','arbolObjetivos','indicadores')->find($id);
 
-				if((count($recurso->arbolObjetivos) == 0) || ($recurso->arbolObjetivo == NULL)){
+				/*if((count($recurso->arbolObjetivos) == 0) || ($recurso->arbolObjetivo == NULL)){
 					$respuesta['http_status'] = 500;
 					$respuesta['data']['code'] = 'S01';
 					$respuesta['data']['data'] = 'No es posible enviar el programa a revisión, ya que falta información del arbol de objetivos por capturar';
 				}elseif((count($recurso->arbolProblemas) == 0) || ($recurso->arbolProblema == NULL)) {
 					$respuesta['http_status'] = 500;
 					$respuesta['data']['code'] = 'S01';
-					$respuesta['data']['data'] = 'No es posible enviar el programa a revisión, ya que falta información del arbol del problema por capturar';
-				}elseif (count($recurso->indicadores) != 2) {
+					$respuesta['data']['data'] = 'No es posible enviar el programa a revisión, ya que falta información del arbol del problema por capturar';*/
+				//}else
+				if (count($recurso->indicadores) != 2) {
 					$respuesta['http_status'] = 500;
 					$respuesta['data']['code'] = 'S01';
 					$respuesta['data']['data'] = 'No es posible enviar el programa a revisión, ya que faltan indicadores por capturar';
@@ -502,22 +505,32 @@ class ProgramaPresupuestarioController extends BaseController {
 						$actualizar_responsables = false;
 					}
 
-					$recurso->claveProgramaSectorial = $parametros['programa-sectorial'];
-					$recurso->idObjetivoPED = $parametros['vinculacion-ped'];
-					$recurso->idObjetivoPND = $parametros['vinculacion-pnd'];
-					$recurso->claveProgramaPresupuestario = $parametros['programa-presupuestario'];
+					if($recurso->claveProgramaPresupuestario != $parametros['programa-presupuestario'] || $recurso->ejercicio != $parametros['ejercicio']){
+						$programa = Programa::where('ejercicio','=',$parametros['ejercicio'])
+										->where('claveProgramaPresupuestario','=',$parametros['programa-presupuestario'])->get();
+						if(count($programa)){
+							$respuesta['data']['data'] = 'Este programa presupuestario ya se encentra capturado';
+							throw new Exception("programa encontrado", 1);
+						}
+					}
+					
 					$recurso->claveUnidadResponsable = $parametros['unidad-responsable'];
+					$recurso->claveProgramaSectorial = $parametros['programa-sectorial'];
+					$recurso->claveProgramaPresupuestario = $parametros['programa-presupuestario'];
 					$recurso->ejercicio = $parametros['ejercicio'];
-					$recurso->idOdm = $parametros['odm'];
-					$recurso->idModalidad = $parametros['modalidad'];
-					$recurso->fechaInicio = $parametros['fecha-inicio'];
-					$recurso->fechaTermino = $parametros['fecha-termino'];
-					$recurso->resultadosEsperados = $parametros['resultados-esperados'];
-					$recurso->areaEnfoquePotencial = $parametros['enfoque-potencial'];
-					$recurso->areaEnfoqueObjetivo = $parametros['enfoque-objetivo'];
-					$recurso->cuantificacionEnfoquePotencial = $parametros['cuantificacion-potencial'];
-					$recurso->cuantificacionEnfoqueObjetivo = $parametros['cuantificacion-objetivo'];
-					$recurso->justificacionPrograma = $parametros['justificacion-programa'];
+
+					$recurso->idObjetivoPED = ($parametros['vinculacion-ped'])?$parametros['vinculacion-ped']:NULL;
+					$recurso->idObjetivoPND = ($parametros['vinculacion-pnd'])?$parametros['vinculacion-pnd']:NULL;
+					$recurso->idOdm = ($parametros['odm'])?$parametros['odm']:NULL;
+					$recurso->idModalidad = ($parametros['modalidad'])?$parametros['modalidad']:NULL;
+					$recurso->fechaInicio = ($parametros['fecha-inicio'])?$parametros['fecha-inicio']:NULL;
+					$recurso->fechaTermino = ($parametros['fecha-termino'])?$parametros['fecha-termino']:NULL;
+					$recurso->resultadosEsperados = ($parametros['resultados-esperados'])?$parametros['resultados-esperados']:NULL;
+					$recurso->areaEnfoquePotencial = ($parametros['enfoque-potencial'])?$parametros['enfoque-potencial']:NULL;
+					$recurso->areaEnfoqueObjetivo = ($parametros['enfoque-objetivo'])?$parametros['enfoque-objetivo']:NULL;
+					$recurso->cuantificacionEnfoquePotencial = ($parametros['cuantificacion-potencial'])?$parametros['cuantificacion-potencial']:NULL;
+					$recurso->cuantificacionEnfoqueObjetivo = ($parametros['cuantificacion-objetivo'])?$parametros['cuantificacion-objetivo']:NULL;
+					$recurso->justificacionPrograma = ($parametros['justificacion-programa'])?$parametros['justificacion-programa']:NULL;
 
 					//$titular = Titular::where('claveUnidad','=',$parametros['unidad-responsable'])->first();
 					$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();

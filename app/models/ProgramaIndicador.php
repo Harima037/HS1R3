@@ -10,11 +10,11 @@ class ProgramaIndicador extends BaseModel
 	public function scopeContenidoDetalle($query){
 		$query->select('programaIndicador.*','dimensiones.descripcion as dimensionIndicador','tipos.descripcion as tipoIndicador',
 			'unidades.descripcion AS unidadMedida','formulas.descripcion AS formula','frecuencias.descripcion as frecuencia')
-		      ->join('catalogoDimensionesIndicador AS dimensiones','programaIndicador.idDimensionIndicador','=','dimensiones.id')
-			  ->join('catalogoTiposIndicadores AS tipos','tipos.id','=','programaIndicador.idTipoIndicador')
-			  ->join('catalogoUnidadesMedida as unidades','unidades.id','=','programaIndicador.idUnidadMedida')
-			  ->join('catalogoFormulas as formulas','formulas.id','=','programaIndicador.idFormula')
-			  ->join('catalogoFrecuenciasIndicador as frecuencias','frecuencias.id','=','programaIndicador.idFrecuenciaIndicador');
+		      ->leftjoin('catalogoDimensionesIndicador AS dimensiones','programaIndicador.idDimensionIndicador','=','dimensiones.id')
+			  ->leftjoin('catalogoTiposIndicadores AS tipos','tipos.id','=','programaIndicador.idTipoIndicador')
+			  ->leftjoin('catalogoUnidadesMedida as unidades','unidades.id','=','programaIndicador.idUnidadMedida')
+			  ->leftjoin('catalogoFormulas as formulas','formulas.id','=','programaIndicador.idFormula')
+			  ->leftjoin('catalogoFrecuenciasIndicador as frecuencias','frecuencias.id','=','programaIndicador.idFrecuenciaIndicador');
 	}
 
 	public function registroAvance(){
