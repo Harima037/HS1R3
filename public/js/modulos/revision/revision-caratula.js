@@ -182,11 +182,6 @@ if($('#id').val()){
 			}
 			cadenaHTML = cadenaHTML + '</table>';		
 			
-			/*fuenteFinanciamiento.init(proyectoResource,$('#id').val());
-			if(response.data.fuentes_financiamiento.length){
-				fuenteFinanciamiento.llenar_datagrid(response.data.fuentes_financiamiento);
-			}*/
-			
 			$('#tabla-beneficiarios').html(cadenaHTML);		
 			
 			
@@ -287,17 +282,13 @@ if($('#id').val()){
 				$('#tablink-antecedentes').hide();
 			}
 			
-			
-			
 			var TabComponente = [];
 			var contadorDeTabs = 1;
 			
 			for(var cuentaComponentes in response.data.componentes)
 			{
-				var idComponente = response.data.componentes[cuentaComponentes].id;
-				
-				TabComponente[contadorDeTabs] = '<div class="col-sm-12">';
-				
+				var idComponente = response.data.componentes[cuentaComponentes].id;				
+				TabComponente[contadorDeTabs] = '<div class="col-sm-12">';				
 				/*COMIENZA SECCIÓN DE OBJETIVOS*/
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<br><div class="col-sm-12 bg-info"><span class="fa fa-crosshairs"></span> <strong>Objetivo</strong></div>';
 				if(response.data.idClasificacionProyecto==2)
@@ -316,7 +307,6 @@ if($('#id').val()){
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-mediosverificacion'+idComponente+'">Medios de verificación</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'verificacion|'+idComponente+'\',\'Medios de verificación\',\'lbl-verificacion'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-verificacion'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].mediosVerificacion+'</p></div></div></div>';
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-supuestos'+idComponente+'">Supuestos</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'supuestos|'+idComponente+'\',\'Supuestos\',\'lbl-supuestos'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-supuestos'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].supuestos+'</p></div></div></div>';
 				/*TERMINA SECCIÓN DE OBJETIVOS*/
-
 				/*COMIENZA SECCIÓN DE INDICADOR*/				
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12 bg-info"><span class="fa fa-line-chart"></span> <strong>Indicador</strong></div>';	
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-indicador'+idComponente+'">Descripción</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'descripcion-ind|'+idComponente+'\',\'Descripción\',\'lbl-descripcion-ind'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-descripcion-ind'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].indicador+'</p></div></div></div>';				
@@ -325,19 +315,18 @@ if($('#id').val()){
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-denominador-ind'+idComponente+'">Denominador</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'denominador-ind|'+idComponente+'\',\'Denominador\',\'lbl-denominador-ind'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-denominador-ind'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].denominador+'</p></div></div></div>';
 				
 				if(response.data.componentes[cuentaComponentes].dimension == null){
-					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-dimension'+idComponente+'">Dimensión</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'dimension|'+idComponente+'\',\'Dimensión\',\'lbl-dimension'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-dimension'+idComponente+'" class="form-control" style="height:auto"></p></div></div></div>';
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-dimension'+idComponente+'">Dimensión</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'dimension|'+idComponente+'\',\'Dimensión\',\'lbl-dimension'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-dimension'+idComponente+'" class="form-control" style="height:auto">&nbsp;</p></div></div></div>';
 				}else{
 					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-dimension'+idComponente+'">Dimensión</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'dimension|'+idComponente+'\',\'Dimensión\',\'lbl-dimension'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-dimension'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].dimension.descripcion+'</p></div></div></div>';
 				}
 				if(response.data.componentes[cuentaComponentes].tipo_indicador == null){
-					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-tipo-ind'+idComponente+'">Tipo</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'tipo-ind|'+idComponente+'\',\'Tipo\',\'lbl-tipo-ind'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-tipo-ind'+idComponente+'" class="form-control" style="height:auto"></p></div></div></div>';
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-tipo-ind'+idComponente+'">Tipo</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'tipo-ind|'+idComponente+'\',\'Tipo\',\'lbl-tipo-ind'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-tipo-ind'+idComponente+'" class="form-control" style="height:auto">&nbsp;</p></div></div></div>';
 				}else{
 					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-tipo-ind'+idComponente+'">Tipo</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'tipo-ind|'+idComponente+'\',\'Tipo\',\'lbl-tipo-ind'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-tipo-ind'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].tipo_indicador.descripcion+'</p></div></div></div>';
 				}
 				
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-5"><div class="form-group"><label class="control-label" for="lbl-unidad-medida'+idComponente+'">Unidad de medida</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'unidad-medida|'+idComponente+'\',\'Unidad de medida\',\'lbl-unidad-medida'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-unidad-medida'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].unidad_medida.descripcion+'</p></div></div></div>';
-				/*TERMINA SECCIÓN DE INDICADOR*/
-				
+				/*TERMINA SECCIÓN DE INDICADOR*/				
 				/*COMIENZA SECCIÓN DE METAS*/				
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12 bg-info"><span class="fa fa-table"></span> <strong> Metas</strong></div>';	
 			
@@ -345,17 +334,16 @@ if($('#id').val()){
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-2"><div class="form-group"><label class="control-label" for="lbl-anio-base'+idComponente+'">Año base</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'anio-base|'+idComponente+'\',\'Año base\',\'lbl-anio-base'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-anio-base'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].anioBase+'</p></div></div></div>';
 
 				if(response.data.componentes[cuentaComponentes].formula == null){
-					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-formula'+idComponente+'">Fórmula</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'formula|'+idComponente+'\',\'Fórmula\',\'lbl-formula'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-formula'+idComponente+'" class="form-control" style="height:auto"></p></div></div></div>';
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-formula'+idComponente+'">Fórmula</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'formula|'+idComponente+'\',\'Fórmula\',\'lbl-formula'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-formula'+idComponente+'" class="form-control" style="height:auto">&nbsp;</p></div></div></div>';
 				}else{
 					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-formula'+idComponente+'">Fórmula</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'formula|'+idComponente+'\',\'Fórmula\',\'lbl-formula'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-formula'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].formula.descripcion+'</p></div></div></div>';
 				}
 				
 				if(response.data.componentes[cuentaComponentes].frecuencia == null){
-					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-frecuencia'+idComponente+'">Frecuencia</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'frecuencia|'+idComponente+'\',\'Frecuencia\',\'lbl-frecuencia'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-frecuencia'+idComponente+'" class="form-control" style="height:auto"></p></div></div></div>';
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-frecuencia'+idComponente+'">Frecuencia</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'frecuencia|'+idComponente+'\',\'Frecuencia\',\'lbl-frecuencia'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-frecuencia'+idComponente+'" class="form-control" style="height:auto">&nbsp;</p></div></div></div>';
 				}else{
 					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-frecuencia'+idComponente+'">Frecuencia</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'frecuencia|'+idComponente+'\',\'Frecuencia\',\'lbl-frecuencia'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-frecuencia'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].frecuencia.descripcion+'</p></div></div></div>';
-				}
-				
+				}				
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12">';
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<table width=100% class="table table-bordered table-condensed"><tr>';
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<th>Mes</th><th>ENE</th><th>FEB</th><th>MAR</th><th>ABR</th><th>MAY</th><th>JUN</th><th>JUL</th><th>AGO</th><th>SEP</th><th>OCT</th><th>NOV</th><th>DIC</th></tr>';
@@ -401,10 +389,8 @@ if($('#id').val()){
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-valordenominador'+idComponente+'">Denominador</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'valordenominador|'+idComponente+'\',\'Denominador\',\'lbl-valordenominador'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-valordenominador'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].valorDenominador+'</p></div></div></div>';
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-metaindicador'+idComponente+'">Meta</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'metaindicador|'+idComponente+'\',\'Meta\',\'lbl-metaindicador'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-metaindicador'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].metaIndicador+'</p></div></div></div>';
 				
-				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '</div>';
-				
-				/*TERMINA SECCIÓN DE METAS*/				
-				
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '</div>';				
+				/*TERMINA SECCIÓN DE METAS*/
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"><p>&nbsp;</p></div>';
 				/*COMIENZA SECCIÓN DE PRESUPUESTO*/
 				if(response.data.idClasificacionProyecto==2)
@@ -483,11 +469,9 @@ if($('#id').val()){
 					presupuestoHTML = presupuestoHTML + '</tbody></table>';
 					
 					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + presupuestoHTML;
-				}
-				
+				}				
 				/*TERMINA SECCIÓN DE PRESUPUESTO*/
-				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"><p>&nbsp;</p></div>';
-								
+				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"><p>&nbsp;</p></div>';								
 				/*COMIENZA SECCIÓN DE ACTIVIDADES*/				
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12 bg-info"><span class="fa fa-thumb-tack"></span> <strong> Actividades</strong></div><br>';
 				var PanelDeActividades = [];
@@ -502,12 +486,9 @@ if($('#id').val()){
 						
 						PanelDeActividades[contadorDeActividades] = '<div class="col-sm-12">';
 						/*COMIENZA SECCIÓN DE OBJETIVOS*/
-						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<br><div class="col-sm-12 bg-info"><span class="fa fa-crosshairs"></span> <strong>Objetivo</strong></div>';
-						
-						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-descripcion-objactividad'+idActividad+'">Descripción</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'descripcion-obj|'+idActividad+'\',\'Descripción\',\'lbl-descripcion-objactividad'+idActividad+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-descripcion-objactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].objetivo+'</p></div></div></div>';		
-						
-						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-verificacionactividad'+idActividad+'">Medios de verificación</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'verificacion|'+idActividad+'\',\'Medios de Verificación\',\'lbl-verificacionactividad'+idActividad+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-verificacionactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].mediosVerificacion+'</p></div></div></div>';				
-						
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<br><div class="col-sm-12 bg-info"><span class="fa fa-crosshairs"></span> <strong>Objetivo</strong></div>';						
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-descripcion-objactividad'+idActividad+'">Descripción</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'descripcion-obj|'+idActividad+'\',\'Descripción\',\'lbl-descripcion-objactividad'+idActividad+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-descripcion-objactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].objetivo+'</p></div></div></div>';								
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-verificacionactividad'+idActividad+'">Medios de verificación</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'verificacion|'+idActividad+'\',\'Medios de Verificación\',\'lbl-verificacionactividad'+idActividad+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-verificacionactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].mediosVerificacion+'</p></div></div></div>';									
 						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-supuestosactividad'+idActividad+'">Supuestos</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'supuestos|'+idActividad+'\',\'Supuestos\',\'lbl-supuestosactividad'+idActividad+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-supuestosactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].supuestos+'</p></div></div></div>';
 						/*TERMINA SECCIÓN DE OBJETIVOS*/
 						/*COMIENZA SECCIÓN DE INDICADOR*/						
@@ -516,42 +497,36 @@ if($('#id').val()){
 						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-interpretacionactividad'+idActividad+'">Interpretación</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'interpretacion|'+idActividad+'\',\'Interpretación\',\'lbl-interpretacionactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-interpretacionactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].interpretacion+'</p></div></div></div>';						
 						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-numerador-indactividad'+idActividad+'">Numerador</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'numerador-ind|'+idActividad+'\',\'Numerador\',\'lbl-numerador-indactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-numerador-indactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].numerador+'</p></div></div></div>';
 						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-6"><div class="form-group"><label class="control-label" for="lbl-denominador-indactividad'+idActividad+'">Denominador</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'denominador-ind|'+idActividad+'\',\'Denominador\',\'lbl-denominador-indactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-denominador-indactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].denominador+'</p></div></div></div>';
-
 						if(response.data.componentes[cuentaComponentes].actividades[indiceActividad].dimension == null){
-							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-dimensionactividad'+idActividad+'">Dimensión</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'dimension|'+idActividad+'\',\'Dimensión\',\'lbl-dimensionactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-dimensionactividad'+idActividad+'" class="form-control" style="height:auto"></p></div></div></div>';
+							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-dimensionactividad'+idActividad+'">Dimensión</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'dimension|'+idActividad+'\',\'Dimensión\',\'lbl-dimensionactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-dimensionactividad'+idActividad+'" class="form-control" style="height:auto">&nbsp;</p></div></div></div>';
 						}else{
 							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-dimensionactividad'+idActividad+'">Dimensión</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'dimension|'+idActividad+'\',\'Dimensión\',\'lbl-dimensionactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-dimensionactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].dimension.descripcion+'</p></div></div></div>';
 						}
-
 						if(response.data.componentes[cuentaComponentes].actividades[indiceActividad].tipo_indicador == null){
-							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-tipo-indactividad'+idActividad+'">Tipo</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'tipo-ind|'+idActividad+'\',\'Tipo\',\'lbl-tipo-indactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-tipo-indactividad'+idActividad+'" class="form-control" style="height:auto"></p></div></div></div>';
+							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-tipo-indactividad'+idActividad+'">Tipo</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'tipo-ind|'+idActividad+'\',\'Tipo\',\'lbl-tipo-indactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-tipo-indactividad'+idActividad+'" class="form-control" style="height:auto">&nbsp;</p></div></div></div>';
 						}else{
 							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-tipo-indactividad'+idActividad+'">Tipo</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'tipo-ind|'+idActividad+'\',\'Tipo\',\'lbl-tipo-indactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-tipo-indactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].tipo_indicador.descripcion+'</p></div></div></div>';
 						}
 						if(response.data.componentes[cuentaComponentes].actividades[indiceActividad].unidad_medida == null){
-							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-5"><div class="form-group"><label class="control-label" for="lbl-unidad-medidaactividad'+idActividad+'">Unidad de medida</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'unidad-medida|'+idActividad+'\',\'Unidad de medida\',\'lbl-unidad-medidaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-unidad-medidaactividad'+idActividad+'" class="form-control" style="height:auto"></p></div></div></div>';
+							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-5"><div class="form-group"><label class="control-label" for="lbl-unidad-medidaactividad'+idActividad+'">Unidad de medida</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'unidad-medida|'+idActividad+'\',\'Unidad de medida\',\'lbl-unidad-medidaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-unidad-medidaactividad'+idActividad+'" class="form-control" style="height:auto">&nbsp;</p></div></div></div>';
 						}else{
 							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-5"><div class="form-group"><label class="control-label" for="lbl-unidad-medidaactividad'+idActividad+'">Unidad de medida</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'unidad-medida|'+idActividad+'\',\'Unidad de medida\',\'lbl-unidad-medidaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-unidad-medidaactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].unidad_medida.descripcion+'</p></div></div></div>';
 						}
 						/*TERMINA SECCIÓN DE INDICADOR*/
 						/*COMIENZA SECCIÓN DE METAS*/
-						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-12 bg-info"><span class="fa fa-table"></span> <strong> Metas</strong></div>';
-						
+						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-12 bg-info"><span class="fa fa-table"></span> <strong> Metas</strong></div>';						
 						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-2"><div class="form-group"><label class="control-label" for="lbl-linea-baseactividad'+idActividad+'">Línea base</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'linea-base|'+idActividad+'\',\'Línea base\',\'lbl-linea-baseactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-linea-baseactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].lineaBase+'</p></div></div></div>';
 						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-2"><div class="form-group"><label class="control-label" for="lbl-anio-baseactividad'+idActividad+'">Año base</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'anio-base|'+idActividad+'\',\'Año base\',\'lbl-anio-baseactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-anio-baseactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].anioBase+'</p></div></div></div>';
-
 						if(response.data.componentes[cuentaComponentes].actividades[indiceActividad].formula == null){
-							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-formulaactividad'+idActividad+'">Fórmula</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'formula|'+idActividad+'\',\'Fórmula\',\'lbl-formulaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-formulaactividad'+idActividad+'" class="form-control" style="height:auto"></p></div></div></div>';
+							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-formulaactividad'+idActividad+'">Fórmula</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'formula|'+idActividad+'\',\'Fórmula\',\'lbl-formulaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-formulaactividad'+idActividad+'" class="form-control" style="height:auto">&nbsp;</p></div></div></div>';
 						}else{
 							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-formulaactividad'+idActividad+'">Fórmula</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'formula|'+idActividad+'\',\'Fórmula\',\'lbl-formulaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-formulaactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].formula.descripcion+'</p></div></div></div>';
 						}
-
 						if(response.data.componentes[cuentaComponentes].actividades[indiceActividad].frecuencia == null){
 							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-frecuenciaactividad'+idActividad+'">Frecuencia</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'frecuencia|'+idActividad+'\',\'Frecuencia\',\'lbl-frecuenciaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-frecuenciaactividad'+idActividad+'" class="form-control" style="height:auto"></p></div></div></div>';
 						}else{
 							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-frecuenciaactividad'+idActividad+'">Frecuencia</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'frecuencia|'+idActividad+'\',\'Frecuencia\',\'lbl-frecuenciaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-frecuenciaactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].frecuencia.descripcion+'</p></div></div></div>';
-						}
-						
+						}						
 						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-12">';
 						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<table width=100% class="table table-bordered table-condensed"><tr>';
 						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<th>Mes</th><th>ENE</th><th>FEB</th><th>MAR</th><th>ABR</th><th>MAY</th><th>JUN</th><th>JUL</th><th>AGO</th><th>SEP</th><th>OCT</th><th>NOV</th><th>DIC</th></tr>';
@@ -567,7 +542,6 @@ if($('#id').val()){
 							mes['4'] = '<td>0</td>';mes['5'] = '<td>0</td>';mes['6'] = '<td>0</td>';
 							mes['7'] = '<td>0</td>';mes['8'] = '<td>0</td>';mes['9'] = '<td>0</td>';
 							mes['10'] = '<td>0</td>';mes['11'] = '<td>0</td>';mes['12'] = '<td>0</td>';
-
 							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<tr>';
 							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<td><strong>' + juris + '</strong></td>';
 							for(var cuentaMeses in response.data.componentes[cuentaComponentes].actividades[indiceActividad].metas_mes)
@@ -601,14 +575,13 @@ if($('#id').val()){
 					}
 					actividades = '<br><div role="tabpanel">';
 					actividades = actividades + '<ul class="nav nav-tabs" role="tablist">';		
-					var numeroDeActividad = 1;			
-					
+					var numeroDeActividad = 1;
 					for(var i=0; i<cuantasActividades;i++)
 					{
 						actividades = actividades + '<li role="presentation" ';
-						if(i===0)
+						if(i==0)
 							actividades = actividades + 'class="active"';
-						actividades = actividades + '><a href="#TabDeActividad'+numeroDeActividad+'" aria-controls="home" role="tab" data-toggle="tab">Actividad '+numeroDeActividad+'</a></li>';
+						actividades = actividades + '><a href="#TabDeActividad'+contadorDeTabs+'-'+numeroDeActividad+'" aria-controls="home" role="tab" data-toggle="tab">Actividad '+numeroDeActividad+'</a></li>';
 						numeroDeActividad++;
 					}
 					actividades = actividades + '</ul>';
@@ -618,8 +591,8 @@ if($('#id').val()){
 					for(var j=0; j<cuantasActividades;j++)
 					{
 						actividades = actividades + '<div role="tabpanel" class="tab-pane';
-							if(j===0) actividades = actividades + ' active';
-						actividades = actividades + '" id="TabDeActividad'+numeroDeActividad+'">';
+							if(j==0) actividades = actividades + ' active';
+						actividades = actividades + '" id="TabDeActividad'+contadorDeTabs+'-'+numeroDeActividad+'">';
 						actividades = actividades + PanelDeActividades[numeroDeActividad];
 						actividades = actividades + '</div>';
 						numeroDeActividad++;
