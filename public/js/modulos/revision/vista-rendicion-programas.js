@@ -123,7 +123,7 @@ function seguimiento_metas(e){
 
             $('#indicador').text(response.data.descripcionIndicador);
             $('#unidad-medida').text(response.data.unidadMedida);
-            $('#meta-total').text(response.data.valorNumerador.format());
+            $('#meta-total').text(parseFloat(response.data.valorNumerador).format(2));
             $('#id-indicador').val(response.data.id);
 
             var trimestre = $('#trimestre').val();
@@ -132,10 +132,10 @@ function seguimiento_metas(e){
                 acumulado += response.data['trim'+i];
             }
 
-            $('#trimestre-meta').text((response.data['trim'+trimestre]+0).format());
+            $('#trimestre-meta').text(parseFloat(response.data['trim'+trimestre]+0).format(2));
                 
             $('#trimestre-acumulada').attr('data-valor',acumulado);
-            $('#trimestre-acumulada').text(acumulado.format());
+            $('#trimestre-acumulada').text(parseFloat(acumulado).format(2));
 
             var avance_trimestre = null;
             var avance_acumulado = 0;
@@ -143,7 +143,7 @@ function seguimiento_metas(e){
                 for(var i in response.data.registro_avance){
                     var avance = response.data.registro_avance[i];
                     if(avance.trimestre == trimestre){
-                        avance_trimestre = avance.avance;
+                        avance_trimestre = parseFloat(avance.avance);
                         $('#id-avance').val(avance.id);
 						$('#lbl-analisis-resultados').text(avance.analisisResultados);
 						$('#lbl-justificacion-acumulada').text(avance.justificacionAcumulada);
@@ -162,7 +162,7 @@ function seguimiento_metas(e){
 							comentariosArray.push([comen['id'],comen['idCampo'],comen['comentario']]);
 						}
                     }else{
-                        avance_acumulado += avance.avance;
+                        avance_acumulado += parseFloat(avance.avance);
                     }
                 }
             }
