@@ -17,20 +17,22 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use Illuminate\Database\QueryException, \Exception;
-use BaseController, Input, Response, DB, Sentry, IndicadorFASSA,Directorio;
+use BaseController, Input, Response, DB, Sentry, IndicadorFASSA, IndicadorFASSAMeta,Directorio;
 
 class IndicadorFassaController extends \BaseController {
 
 	private $reglas = array(
-			'nivel-indicador'			=> 'required',
-			'indicador'					=> 'required',
-			'tipo-formula'				=> 'required',
-			'formula'					=> 'required',
-			'fuente-informacion'		=> 'required',
-			'numerador'					=> 'required',
-			'denominador'				=> 'required',
-			'unidad-responsable'		=> 'required',
-			'responsable-informacion'	=> 'required'
+			'nivel-indicador'			=> 'sometimes|required',
+			'indicador'					=> 'sometimes|required',
+			'tipo-formula'				=> 'sometimes|required',
+			'formula'					=> 'sometimes|required',
+			'fuente-informacion'		=> 'sometimes|required',
+
+			'ejercicio'					=> 'sometimes|required',
+			'numerador'					=> 'sometimes|required',
+			'denominador'				=> 'sometimes|required',
+			'unidad-responsable'		=> 'sometimes|required',
+			'responsable-informacion'	=> 'sometimes|required'
 		);
 
 	/**
@@ -68,12 +70,12 @@ class IndicadorFassaController extends \BaseController {
 							->get();
 				//
 				$data = array('resultados'=>$total,'data'=>$rows);
+				$respuesta['data'] = $data;
 
 				if($total<=0){
 					$respuesta['http_status'] = 404;
 					$respuesta['data'] = array('resultados'=>$total,"data"=>"No hay datos",'code'=>'W00');
 				}
-				$respuesta['data'] = $data;
 			}elseif(isset($parametros['cargar-responsables'])){
 				$responsables = Directorio::responsablesActivos($parametros['unidad-responsable'])->get();
 				$respuesta['data'] = array('data'=>$responsables);
@@ -106,11 +108,15 @@ class IndicadorFassaController extends \BaseController {
 		$data = array();
 
 		try{
-			$recurso = IndicadorFASSA::find($id);
+			$recurso = IndicadorFASSA::with('metasDetalle')->find($id);
 			if($recurso){
-				$responsables = Directorio::responsablesActivos($recurso->claveUnidadResponsable)->get();
-				$recurso['responsables'] = $responsables;
-				$data = array("data"=>$recurso);
+				foreach ($recurso->metasDetalle as $index => $meta) {
+					if($meta->idEstatus < 4){
+						$responsables = Directorio::responsablesActivos($meta->claveUnidadResponsable)->get();
+						$recurso->metasDetalle[$index]['responsables'] = $responsables;
+					}
+				}
+				$data['data'] = $recurso;
 			}else{
 				$http_status = 404;
 				$data = array("data"=>"No se ha podido encontrar el recurso solicitado.",'code'=>'S01');
@@ -143,10 +149,16 @@ class IndicadorFassaController extends \BaseController {
 				$recurso->claveTipoFormula 			= $parametros['tipo-formula'];
 				$recurso->formula 					= $parametros['formula'];
 				$recurso->fuenteInformacion 		= $parametros['fuente-informacion'];
-				$recurso->numerador 				= $parametros['numerador'];
-				$recurso->denominador 				= $parametros['denominador'];
-				$recurso->claveUnidadResponsable 	= $parametros['unidad-responsable'];
-				$recurso->idResponsableInformacion	= $parametros['responsable-informacion'];
+				$recurso->idEstatus					= 1;
+
+				$recurso_meta = new IndicadorFASSAMeta;
+
+				$recurso_meta->ejercicio				= $parametros['ejercicio'];
+				$recurso_meta->numerador 				= $parametros['numerador'];
+				$recurso_meta->denominador 				= $parametros['denominador'];
+				$recurso_meta->claveUnidadResponsable 	= $parametros['unidad-responsable'];
+				$recurso_meta->idResponsableInformacion	= $parametros['responsable-informacion'];
+				$recurso_meta->idEstatus				= 1;
 
 				$numerador = $parametros['numerador'];
 				$denominador = $parametros['denominador'];
@@ -155,18 +167,26 @@ class IndicadorFassaController extends \BaseController {
 				}else{
 					$porcentaje = floatval(($numerador * 100)/$denominador);
 				}
-				$recurso->porcentaje = $porcentaje;
+				$recurso_meta->porcentaje = $porcentaje;
 
 				$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
-				$recurso->idLiderPrograma = $titular->id;
+				$recurso_meta->idLiderPrograma = $titular->id;
 
-				if($recurso->save()){
-					$respuesta['http_status'] = 200;
-					$respuesta['data'] = array("data"=>$recurso->toArray());
-				}else{
-					$respuesta['http_status'] = 500;
-					$respuesta['data'] = array("data"=>'Ocurrio un error al intentar guardar la informacion','code'=>'S01');
-				}
+				$respuesta = DB::transaction(function() use ($recurso,$recurso_meta){
+					$respuesta_transaction = array();
+
+					if($recurso->save()){
+						$recurso->metas()->save($recurso_meta);
+						$respuesta_transaction['http_status'] = 200;
+						$recurso['meta'] = $recurso_meta;
+						$respuesta_transaction['data'] = array("data"=>$recurso);
+					}else{
+						$respuesta_transaction['http_status'] = 500;
+						$respuesta_transaction['data'] = array("data"=>'Ocurrio un error al intentar guardar la informacion','code'=>'S01');
+					}
+					return $respuesta_transaction;
+				});
+				
 			}catch(\Exception $e){
 				$respuesta['http_status'] = 500;
 				$respuesta['data'] = array("data"=>$e->getMessage(),'code'=>'S03');
@@ -192,37 +212,92 @@ class IndicadorFassaController extends \BaseController {
 
 				$recurso = IndicadorFASSA::find($id);
 
-				if($parametros['unidad-responsable'] != $recurso->claveUnidadResponsable){
-					$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
-					$recurso->idLiderPrograma = $titular->id;
-				}
+				$checar_ejercicio = FALSE;
 
-				$recurso->claveNivel 				= $parametros['nivel-indicador'];
-				$recurso->indicador 				= $parametros['indicador'];
-				$recurso->claveTipoFormula 			= $parametros['tipo-formula'];
-				$recurso->formula 					= $parametros['formula'];
-				$recurso->fuenteInformacion 		= $parametros['fuente-informacion'];
-				$recurso->numerador 				= $parametros['numerador'];
-				$recurso->denominador 				= $parametros['denominador'];
-				$recurso->claveUnidadResponsable 	= $parametros['unidad-responsable'];
-				$recurso->idResponsableInformacion	= $parametros['responsable-informacion'];
-
-				$numerador = $parametros['numerador'];
-				$denominador = $parametros['denominador'];
-				if($parametros['tipo-formula'] == 'T'){
-					$porcentaje = floatval(($numerador * 100000)/$denominador);
+				if($parametros['id-meta']){
+					$recurso_meta = IndicadorFASSAMeta::find($parametros['id-meta']);
+					if(isset($parametros['ejercicio'])){
+						if($recurso_meta->ejercicio != $parametros['ejercicio']){
+							$checar_ejercicio = TRUE;
+						}
+					}
 				}else{
-					$porcentaje = floatval(($numerador * 100)/$denominador);
+					$recurso_meta = new IndicadorFASSAMeta;
+					$recurso_meta->idEstatus = 1;
+					$checar_ejercicio = TRUE;
 				}
-				$recurso->porcentaje = $porcentaje;
 
-				if($recurso->save()){
-					$respuesta['http_status'] = 200;
-					$respuesta['data'] = array("data"=>$recurso->toArray());
-				}else{
-					$respuesta['http_status'] = 500;
-					$respuesta['data'] = array("data"=>'No se pudieron guardar los cambios.','code'=>'S03');
+				if(($recurso->idEstatus == 2 || $recurso->idEstatus == 4) && ($recurso_meta->idEstatus == 2 || $recurso_meta->idEstatus == 4)){
+					throw new Exception("Ninguno de los elementos esta disponible para edición", 1);
 				}
+
+				if($checar_ejercicio){
+					$ejercicios_capturados = IndicadorFASSAMeta::where('idIndicadorFASSA','=',$recurso->id)
+																->where('ejercicio','=',$parametros['ejercicio'])->count();
+					if($ejercicios_capturados){
+						throw new Exception('Ya se capturo la meta para el ejercicio especificado.', 1);
+					}
+				}
+
+				if($recurso->idEstatus == 1 || $recurso->idEstatus == 3){
+					$recurso->claveNivel 				= $parametros['nivel-indicador'];
+					$recurso->indicador 				= $parametros['indicador'];
+					$recurso->claveTipoFormula 			= $parametros['tipo-formula'];
+					$recurso->formula 					= $parametros['formula'];
+					$recurso->fuenteInformacion 		= $parametros['fuente-informacion'];
+
+					
+				}
+				
+				$tipo_formula = $recurso->claveTipoFormula;
+				
+				if($recurso_meta->idEstatus == 1 || $recurso_meta->idEstatus == 3){
+					if($parametros['unidad-responsable'] != $recurso_meta->claveUnidadResponsable){
+						$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
+						$recurso_meta->idLiderPrograma = $titular->id;
+					}
+
+					$recurso_meta->ejercicio				= $parametros['ejercicio'];
+					$recurso_meta->numerador 				= $parametros['numerador'];
+					$recurso_meta->denominador 				= $parametros['denominador'];
+					$recurso_meta->claveUnidadResponsable 	= $parametros['unidad-responsable'];
+					$recurso_meta->idResponsableInformacion	= $parametros['responsable-informacion'];
+
+					$numerador = $parametros['numerador'];
+					$denominador = $parametros['denominador'];
+					if($tipo_formula == 'T'){
+						$porcentaje = floatval(($numerador * 100000)/$denominador);
+					}else{
+						$porcentaje = floatval(($numerador * 100)/$denominador);
+					}
+					$recurso_meta->porcentaje = $porcentaje;
+				}
+				
+				$respuesta = DB::transaction(function() use ($recurso,$recurso_meta){
+					$respuesta_transaction = array();
+
+					if($recurso->idEstatus == 1 || $recurso->idEstatus == 3){
+						if(!$recurso->save()){
+							$respuesta_transaction['http_status'] = 500;
+							$respuesta_transaction['data'] = array("data"=>'Ocurrio un error al intentar guardar la información del indicador','code'=>'S01');
+						}
+					}
+
+					if($recurso_meta->idEstatus == 1 || $recurso_meta->idEstatus == 3){
+						if(!$recurso->metas()->save($recurso_meta)){
+							$respuesta_transaction['http_status'] = 500;
+							$respuesta_transaction['data'] = array("data"=>'Ocurrio un error al intentar guardar la información de las metas','code'=>'S01');
+						}
+					}
+
+					if(!isset($respuesta_transaction['http_status'])){
+						$respuesta_transaction['http_status'] = 200;
+						$recurso['meta'] = $recurso_meta;
+						$respuesta_transaction['data'] = array("data"=>$recurso);
+					}
+
+					return $respuesta_transaction;
+				});
 			}else{
 				$respuesta['http_status'] = $valid_result['http_status'];
 				$respuesta['data'] = $valid_result['data'];

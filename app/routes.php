@@ -68,6 +68,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('rend-cuenta-inst',array('uses'=>'SeguimientoController@indexInstitucional'));
 		Route::get('rend-cuenta-inv',array('uses'=>'SeguimientoController@indexInversion'));
 		Route::get('rend-cuenta-prog',array('uses'=>'RendicionProgramaController@index'));
+		Route::get('rend-cuenta-fassa',array('uses'=>'RendicionFassaController@index'));
 
 		Route::get('editar-avance/{id}',array('uses'=>'SeguimientoController@rendicionCuentas'));
 		Route::get('avance-programa/{id}',array('uses'=>'RendicionProgramaController@editarAvance'));
@@ -93,6 +94,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('rend-cuenta-inst', 	'V1\SeguimientoController');
 		Route::resource('rend-cuenta-inv', 		'V1\SeguimientoController');
 		Route::resource('rend-cuenta-prog', 	'V1\RendicionProgramaController');
+		Route::resource('rend-cuenta-fassa',	'V1\RendicionFassaController');
 
 		Route::resource('revision-proyectos',	'V1\RevisionController');
 		Route::resource('segui-proyectos-inst', 'V1\SeguimientoInstitucionalController');

@@ -105,7 +105,7 @@
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label class="control-label" for="nivel-indicador">Nivel</label>
-                                <select class="form-control" id="nivel-indicador" name="nivel-indicador">
+                                <select class="form-control informacion-indicador" id="nivel-indicador" name="nivel-indicador">
                                     <option value="">Selecciona un nivel</option>
                                     @foreach($niveles as $clave => $nivel)
                                     <option value="{{$clave}}">{{$nivel}}</option>
@@ -116,7 +116,7 @@
                         <div class="col-sm-8">
                             <div class="form-group">
                                 <label class="control-label" for="indicador">Indicador</label>
-                                <input type="text" class="form-control" id="indicador" name="indicador">
+                                <input type="text" class="form-control informacion-indicador" id="indicador" name="indicador">
                             </div>
                         </div>
                     </div>
@@ -124,7 +124,7 @@
                         <div class="col-sm-4">
                             <div class="form-group">
                                 <label class="control-label" for="tipo-formula">Tipo de Fórmula</label>
-                                <select class="form-control" id="tipo-formula" name="tipo-formula">
+                                <select class="form-control informacion-indicador" id="tipo-formula" name="tipo-formula">
                                     <option value="">Selecciona un tipo de formula</option>
                                     @foreach($tipos_formulas as $clave => $tipo)
                                     <option value="{{$clave}}">{{$tipo}}</option>
@@ -135,7 +135,7 @@
                         <div class="col-sm-8">
                             <div class="form-group">
                                 <label class="control-label" for="formula">Fórmula</label>
-                                <input type="text" class="form-control" id="formula" name="formula">
+                                <input type="text" class="form-control informacion-indicador" id="formula" name="formula">
                             </div>
                         </div>
                     </div>
@@ -143,48 +143,67 @@
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <label class="control-label" for="fuente-informacion">Fuente de Información</label>
-                                <textarea class="form-control" id="fuente-informacion" name="fuente-informacion" rows="3"></textarea>
+                                <textarea class="form-control informacion-indicador" id="fuente-informacion" name="fuente-informacion" rows="3"></textarea>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <div class="form-group">
-                                <label class="control-label" for="numerador">Numerador</label>
-                                <input type="number" class="form-control" id="numerador" name="numerador">
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="form-group">
-                                <label class="control-label" for="denominador">Denominador</label>
-                                <input type="number" class="form-control" id="denominador" name="denominador">
-                            </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="form-group">
-                                <label class="control-label" for="porcentaje">Porcentaje</label>
-                                <p class="form-control-static" id="porcentaje">%</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label class="control-label" for="unidad-responsable">Unidad Responsable</label>
-                                <select class="form-control" id="unidad-responsable" name="unidad-responsable">
-                                    <option value="">Selecciona una unidad</option>
-                                    @foreach($unidades as $unidad)
-                                    <option value="{{$unidad->clave}}">{{$unidad->descripcion}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label class="control-label" for="responsable-informacion">Responsable de la Información</label>
-                                <select class="form-control" id="responsable-informacion" name="responsable-informacion">
-                                    <option value="">Selecciona una unidad</option>
-                                </select>
+                    <div role="tabpanel">
+                        <ul class="nav nav-tabs" role="tablist" id="tab-lista-ejercicios">
+                            <li role="presentation">
+                                <a href="#formulario-meta" aria-controls="formulario-meta" role="tab" data-toggle="tab">Meta</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="tab-lista-metas">
+                            <div role="tabpanel" class="tab-pane" id="formulario-meta">
+                                <br>
+                                <div class="row">
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label class="control-label" for="ejercicio">Ejercicio</label>
+                                            <input type="number" class="form-control informacion-meta" id="ejercicio" name="ejercicio">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label class="control-label" for="numerador">Numerador</label>
+                                            <input type="number" class="form-control informacion-meta" id="numerador" name="numerador">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label class="control-label" for="denominador">Denominador</label>
+                                            <input type="number" class="form-control informacion-meta" id="denominador" name="denominador">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label class="control-label" for="porcentaje">Porcentaje</label>
+                                            <p class="form-control-static" id="porcentaje">%</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="unidad-responsable">Unidad Responsable</label>
+                                            <select class="form-control informacion-meta" id="unidad-responsable" name="unidad-responsable">
+                                                <option value="">Selecciona una unidad</option>
+                                                @foreach($unidades as $unidad)
+                                                <option value="{{$unidad->clave}}">{{$unidad->descripcion}}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="responsable-informacion">Responsable de la Información</label>
+                                            <select class="form-control informacion-meta" id="responsable-informacion" name="responsable-informacion">
+                                                <option value="">Selecciona una unidad</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="id-meta" name="id-meta">
                             </div>
                         </div>
                     </div>
