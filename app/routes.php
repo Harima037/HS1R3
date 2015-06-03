@@ -45,6 +45,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 
 		Route::get('programas-presupuestarios',array('uses'=>'ProgramaPresupuestarioController@index'));
 		Route::get('editar-programa/{id?}',array('uses'=>'ProgramaPresupuestarioController@editar'));
+
+		Route::get('indicadores-fassa',array('uses'=>'IndicadorFassaController@index'));
 	});
 	
 	Route::group(array('prefix'=>'revision'), function(){
@@ -100,6 +102,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('seguimiento-programas', 'V1\SeguimientoProgramaController');
 
 		Route::resource('programas-presupuestarios','V1\ProgramaPresupuestarioController');
+
+		Route::resource('indicadores-fassa','V1\IndicadorFassaController');
 
 		Route::resource('reporte-evaluacion',	'V1\ReporteEvaluacionController', array('only'=>array('show')));
 		Route::resource('reporte-programa',	'V1\ReporteEvaluacionProgramaController', array('only'=>array('show')));
