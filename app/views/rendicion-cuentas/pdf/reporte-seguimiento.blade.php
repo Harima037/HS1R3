@@ -118,14 +118,14 @@
 <body class="cuerpo">
 	@if($tipo_reporte == 'analisis')
 		{{View::make('rendicion-cuentas.pdf.analisis-funcional',$datos)}}
-	@else
+	@elseif($tipo_reporte == 'seg-metas')
 		{{View::make('rendicion-cuentas.pdf.seguimiento-metas-mes',$datos)}}
-		@if($reporte == 'trimestre')
-			<div style="page-break-after:always;"></div>
-			{{View::make('rendicion-cuentas.pdf.seguimiento-beneficiarios',$datos)}}
-			<div style="page-break-after:always;"></div>
-			{{View::make('rendicion-cuentas.pdf.plan-mejora',$datos)}}
-		@endif
+	@elseif($tipo_reporte == 'seg-beneficiarios')
+		{{View::make('rendicion-cuentas.pdf.seguimiento-beneficiarios',$datos)}}
+	@elseif($tipo_reporte == 'plan-mejora')
+		{{View::make('rendicion-cuentas.pdf.plan-mejora',$datos)}}
+	@else
+		<h1 class="text-danger"><span class="fa fa-danger"></span> Reporte no valido</h1>
 	@endif
 </body>
 </html>

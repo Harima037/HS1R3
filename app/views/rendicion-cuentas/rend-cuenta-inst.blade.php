@@ -210,9 +210,28 @@
                                 <span class="fa fa-file"></span> Imprimir Reporte <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu" role="menu">
-                                <li><a href="#" id="btn-reporte-general">Reporte Seguimiento</a></li>
+                                <li>
+                                    <a href="#" id="btn-reporte-general">
+                                        <span class="fa fa-file-pdf-o"></span> Seguimiento de Metas
+                                    </a>
+                                </li>
                                 @if(($mes_avance % 3) == 0)
-                                <li><a href="#" id="btn-reporte-analisis">Analisis Funcional</a></li>
+                                <li>
+                                    <a href="#" id="btn-reporte-beneficiarios">
+                                        <span class="fa fa-file-pdf-o"></span> Seguimiento de Beneficiarios
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" id="btn-reporte-plan-mejora">
+                                        <span class="fa fa-file-pdf-o"></span> Plan de Acción de Mejora
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="#" id="btn-reporte-analisis">
+                                        <span class="fa fa-file-pdf-o"></span> Cuenta Pública
+                                    </a>
+                                </li>
                                 @endif
                             </ul>
                         </div>

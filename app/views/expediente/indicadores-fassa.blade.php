@@ -150,37 +150,15 @@
                     <div role="tabpanel">
                         <ul class="nav nav-tabs" role="tablist" id="tab-lista-ejercicios">
                             <li role="presentation">
-                                <a href="#formulario-meta" aria-controls="formulario-meta" role="tab" data-toggle="tab">Meta</a>
+                                <a href="#formulario-meta" aria-controls="formulario-meta" role="tab" data-toggle="tab">
+                                    {{$ejercicio}}
+                                </a>
                             </li>
                         </ul>
                         <div class="tab-content" id="tab-lista-metas">
                             <div role="tabpanel" class="tab-pane" id="formulario-meta">
                                 <br>
-                                <div class="row">
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
-                                            <label class="control-label" for="ejercicio">Ejercicio</label>
-                                            <input type="number" class="form-control informacion-meta" id="ejercicio" name="ejercicio">
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="control-label" for="numerador">Numerador</label>
-                                            <input type="number" class="form-control informacion-meta" id="numerador" name="numerador">
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label class="control-label" for="denominador">Denominador</label>
-                                            <input type="number" class="form-control informacion-meta" id="denominador" name="denominador">
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-2">
-                                        <div class="form-group">
-                                            <label class="control-label" for="porcentaje">Porcentaje</label>
-                                            <p class="form-control-static" id="porcentaje">%</p>
-                                        </div>
-                                    </div>
+                                <div id="lbl-estatus" class="row">
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-6">
@@ -200,6 +178,26 @@
                                             <select class="form-control informacion-meta" id="responsable-informacion" name="responsable-informacion">
                                                 <option value="">Selecciona una unidad</option>
                                             </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label class="control-label"><span class="fa fa-lock"></span> Numerador</label>
+                                            <span class="form-control" id="numerador" disabled></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label class="control-label"><span class="fa fa-lock"></span> Denominador</label>
+                                            <span class="form-control" id="denominador" disabled></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label class="control-label" for="porcentaje"><span class="fa fa-lock"></span> Porcentaje</label>
+                                            <span class="form-control" id="porcentaje" disabled>%</span>
                                         </div>
                                     </div>
                                 </div>

@@ -2,11 +2,11 @@
 <table>
 	<tr>
 		<td rowspan="4" class="imagen izquierda">
-			<img src="{{ URL::to('img/LogoFederal.png') }}" width="100">
+			<img src="{{ URL::to('img/LogoFederal.png') }}" width="150">
 		</td>
 		<td height="20" class="titulo3" align="center">GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS</td>
 		<td rowspan="4" class="imagen derecha">
-			<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="100">
+			<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="150">
 		</td>
 	</tr>
 	<tr>

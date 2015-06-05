@@ -98,14 +98,14 @@ Route::group(array('before'=>'auth.sentry'), function(){
 
 		Route::resource('revision-proyectos',	'V1\RevisionController');
 		Route::resource('segui-proyectos-inst', 'V1\SeguimientoInstitucionalController');
-		Route::resource('segui-proyectos-inv', 'V1\SeguimientoInstitucionalController');
+		Route::resource('segui-proyectos-inv',  'V1\SeguimientoInstitucionalController');
 		
-		Route::resource('revision-programas',	'V1\RevisionProgramaController');
+		Route::resource('revision-programas',	 'V1\RevisionProgramaController');
 		Route::resource('seguimiento-programas', 'V1\SeguimientoProgramaController');
 
 		Route::resource('programas-presupuestarios','V1\ProgramaPresupuestarioController');
 
-		Route::resource('indicadores-fassa','V1\IndicadorFassaController');
+		Route::resource('indicadores-fassa',	'V1\IndicadorFassaController');
 
 		Route::resource('reporte-evaluacion',	'V1\ReporteEvaluacionController', array('only'=>array('show')));
 		Route::resource('reporte-programa',	'V1\ReporteEvaluacionProgramaController', array('only'=>array('show')));

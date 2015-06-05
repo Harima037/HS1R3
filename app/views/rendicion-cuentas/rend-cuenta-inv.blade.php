@@ -204,9 +204,38 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success pull-left" id="btn-reporte">
-                        <span class="fa fa-file-excel-o"></span> Imprimir Reporte
-                    </button>
+                    <div id="btn-reporte" class="pull-left">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <span class="fa fa-file"></span> Imprimir Reporte <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a href="#" id="btn-reporte-general">
+                                        <span class="fa fa-file-pdf-o"></span> Seguimiento de Metas
+                                    </a>
+                                </li>
+                                @if(($mes_avance % 3) == 0)
+                                <li>
+                                    <a href="#" id="btn-reporte-beneficiarios">
+                                        <span class="fa fa-file-pdf-o"></span> Seguimiento de Beneficiarios
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" id="btn-reporte-plan-mejora">
+                                        <span class="fa fa-file-pdf-o"></span> Plan de Acción de Mejora
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="#" id="btn-reporte-analisis">
+                                        <span class="fa fa-file-pdf-o"></span> Cuenta Pública
+                                    </a>
+                                </li>
+                                @endif
+                            </ul>
+                        </div>
+                    </div>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-primary" id="btn-editar-avance">
                         <span class="fa fa-pencil"></span> Capturar Avance

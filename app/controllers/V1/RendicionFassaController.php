@@ -19,20 +19,12 @@ use SSA\Utilerias\Validador;
 use Illuminate\Database\QueryException, \Exception;
 use BaseController, Input, Response, DB, Sentry, IndicadorFASSA, IndicadorFASSAMeta,Directorio;
 
-class IndicadorFassaController extends \BaseController {
+class RendicionFassaController extends \BaseController {
 
 	private $reglas = array(
-			'nivel-indicador'			=> 'sometimes|required',
-			'indicador'					=> 'sometimes|required',
-			'tipo-formula'				=> 'sometimes|required',
-			'formula'					=> 'sometimes|required',
-			'fuente-informacion'		=> 'sometimes|required',
-
-			//'ejercicio'					=> 'sometimes|required',
-			//'numerador'					=> 'sometimes|required',
-			//'denominador'				=> 'sometimes|required',
-			'unidad-responsable'		=> 'sometimes|required',
-			'responsable-informacion'	=> 'sometimes|required'
+			'ejercicio'					=> 'sometimes|required',
+			'numerador'					=> 'sometimes|required',
+			'denominador'				=> 'sometimes|required'
 		);
 
 	/**
@@ -48,8 +40,11 @@ class IndicadorFassaController extends \BaseController {
 		try{
 			if(isset($parametros['formatogrid'])){
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
-			
-				$rows = IndicadorFASSA::getModel();
+				
+				$ejercicio_actual = date('Y');
+				//$rows = IndicadorFASSA::getModel();
+				$rows = IndicadorFASSAMeta::getModel();
+				$rows = $rows->indicadoresEjercicio()->where('ejercicio','=',$ejercicio_actual);
 
 				if(isset($parametros['buscar'])){
 					if($parametros['buscar']){
@@ -63,9 +58,8 @@ class IndicadorFassaController extends \BaseController {
 					$total = $rows->count();
 				}
 
-				$rows = $rows->select('indicadorFASSA.id','indicadorFASSA.indicador','indicadorFASSA.claveNivel','sentryUsers.username','indicadorFASSA.modificadoAl')
-							->orderBy('id', 'desc')
-							->leftjoin('sentryUsers','indicadorFASSA.actualizadoPor','=','sentryUsers.id')
+				$rows = $rows->orderBy('id', 'desc')
+							->leftjoin('sentryUsers','indicadorFASSAMeta.actualizadoPor','=','sentryUsers.id')
 							->skip(($parametros['pagina']-1)*10)->take(10)
 							->get();
 				//
@@ -76,9 +70,6 @@ class IndicadorFassaController extends \BaseController {
 					$respuesta['http_status'] = 404;
 					$respuesta['data'] = array('resultados'=>$total,"data"=>"No hay datos",'code'=>'W00');
 				}
-			}elseif(isset($parametros['cargar-responsables'])){
-				$responsables = Directorio::responsablesActivos($parametros['unidad-responsable'])->get();
-				$respuesta['data'] = array('data'=>$responsables);
 			}else{
 				$rows = IndicadorFASSA::all();
 				if(count($rows) == 0){

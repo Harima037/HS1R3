@@ -281,7 +281,17 @@ $('#btn-editar-avance').on('click',function(){
 
 $('#btn-reporte-general').off('click');
 $('#btn-reporte-general').on('click',function(){
-    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '|general';
+    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '|seg-metas';
+    window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
+});
+$('#btn-reporte-beneficiarios').off('click');
+$('#btn-reporte-beneficiarios').on('click',function(){
+    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '|seg-beneficiarios';
+    window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
+});
+$('#btn-reporte-plan-mejora').off('click');
+$('#btn-reporte-plan-mejora').on('click',function(){
+    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '|plan-mejora';
     window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
 });
 

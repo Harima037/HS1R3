@@ -1,17 +1,17 @@
 /*=====================================
 
     # Nombre:
-        indicadores-fassa.js
+        lista-fassa-rendicion.js
 
     # Módulos:
-        expediente/indicadores-fassa
+        rend-cuenta-fassa/rend-cuenta-fassa
 
     # Descripción:
-        Funciones para captura de indicadores de FASSA
+        Funciones para captura de la rendicion de cuentas de los indicadores del FASSA
 
 =====================================*/
 
-var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/indicadores-fassa');
+var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/rend-cuenta-fassa');
 var moduloDatagrid = new Datagrid("#datagridIndicadores",moduloResource,{ formatogrid:true, pagina: 1});
 
 moduloDatagrid.init();
@@ -168,141 +168,6 @@ function editar(e){
             
             $('#id').val(response.data.id);
             $('#modalIndicador').modal('show');
-        }
-    });
-}
-
-$('#tipo-formula').on('change',function(){
-    $('#numerador').change();
-});
-
-$('#denominador,#numerador').on('keyup',function(){
-    $(this).change();
-});
-
-$('#denominador,#numerador').on('change',function(){
-    if($('#tipo-formula').val()){
-        var numerador = parseFloat($('#numerador').val()) || 0;
-        var denominador = parseFloat($('#denominador').val()) || 1;
-        var porcentaje = '';
-        if($('#tipo-formula').val() == 'T'){
-            porcentaje = parseFloat((numerador * 100000)/denominador);
-            //porcentaje = parseFloat((numerador/denominador) * 100000);
-        }else{
-            porcentaje = parseFloat((numerador * 100)/denominador);
-            //porcentaje = parseFloat((numerador/denominador) * 100);
-        }
-        $('#porcentaje').text(porcentaje.format(2) + ' %');
-    }else{
-        $('#porcentaje').text('%');
-    }
-});
-
-$('#modalIndicador').on('shown.bs.modal', function () {
-    $('#modalIndicador').find('input').eq(0).focus();
-     $('#tab-lista-ejercicios a:last').tab('show');
-});
-
-$('#modalIndicador').on('hidden.bs.modal',function(){
-    $('#form_indicador_fassa').get(0).reset();
-    $('#form_indicador_fassa #id').val("");
-    $('#form_indicador_fassa #id-meta').val("");
-    $('#form_indicador_fassa .borrable').remove();
-    $('#unidad-responsable').change();
-    $('#form_indicador_fassa .seguro-edicion').remove();
-    $('#form_indicador_fassa .form-control').prop('disabled',false);
-    $('#porcentaje').text('%');
-    $('#numerador').text('');
-    $('#denominador').text('');
-    $('#lbl-estatus').empty();
-    Validation.cleanFormErrors('#form_indicador_fassa');
-});
-
-$('#btn-agregar-indicador').on('click', function () {
-    $('#modalIndicador').find(".modal-title").html("Nuevo Indicador");
-    $('#modalIndicador').modal('show');
-});
-
-$('#unidad-responsable').on('change',function(){
-    if($(this).val()){
-        var parametros = {'cargar-responsables':1,'unidad-responsable':$(this).val()};
-        moduloResource.get(null,parametros,{
-            _success: function(response){
-                $('#responsable-informacion').empty();
-                var html_opciones = '<option value="">Selecciona un responsable</option>';
-                for(var i in response.data){
-                    html_opciones += '<option value="'+response.data[i].id+'">'+response.data[i].nombre+'</option>';
-                }
-                $('#responsable-informacion').html(html_opciones);
-            }
-        });
-    }else{
-        $('#responsable-informacion').empty();
-        var html_opciones = '<option value="">Selecciona una unidad</option>';
-        $('#responsable-informacion').html(html_opciones);
-    }
-});
-
-$('#btn-guardar-indicador').on('click',function(e){
-    e.preventDefault();
-    Validation.cleanFormErrors('#form_indicador_fassa');
-
-    var parametros = $("#form_indicador_fassa").serialize();
-    if($('#id').val()){
-        moduloResource.put($('#id').val(), parametros,{
-            _success: function(response){
-                moduloDatagrid.actualizar();
-                if($('#id-meta').val() == ""){
-                    $('#id-meta').val(response.data.meta.id);
-                }
-                MessageManager.show({data:'Elemento actualizado con éxito',timer:4});
-            },
-            _error: function(response){
-                try{
-                    var json = $.parseJSON(response.responseText);
-                    if(!json.code)
-                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-                    else{
-                        MessageManager.show(json);
-                    }
-                    Validation.formValidate(json.data);
-                }catch(e){
-                    console.log(e);
-                }                       
-            }
-        },'Guardando');
-    }else{
-        moduloResource.post(parametros,{
-            _success: function(response){
-                moduloDatagrid.actualizar();
-                $('#id').val(response.data.id);
-                $('#id-meta').val(response.data.meta.id);
-                MessageManager.show({data:'Elemento creado con éxito',timer:4});
-            },
-            _error: function(response){
-                try{
-                    var json = $.parseJSON(response.responseText);
-                    if(!json.code)
-                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-                    else{
-                        MessageManager.show(json);
-                    }
-                    Validation.formValidate(json.data);
-                }catch(e){
-                    console.log(e);
-                }                       
-            }
-        },'Guardando');
-    }
-});
-
-function bloquear_controles(identificador){
-    //'input,textarea,select'
-    $(identificador).each(function(){
-        $(this).prop('disabled',true);
-        $('label[for="' + $(this).attr('id') + '"]').prepend('<span class="seguro-edicion fa fa-lock"></span> ');
-        if($(this).hasClass('chosen-one')){
-            $(this).trigger('chosen:updated');
         }
     });
 }
