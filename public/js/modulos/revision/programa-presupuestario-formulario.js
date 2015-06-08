@@ -142,6 +142,9 @@ if($('#id').val()){
 					}
 				}
 			});
+			
+			var alMenosUnElementoBorraron = 0;
+			var elementosBorradosHTML = '';
 
 			for(var i in response.data.comentario)
 			{
@@ -149,28 +152,63 @@ if($('#id').val()){
 				
 				var NombreIdCampo = comen['idCampo'];
 				var idCampo = '';
+				var nombreDelCampo = '';
+				var objetoAColorear = '';
 				
 				for(var i=0; i<NombreIdCampo.length; i++)
 					if(NombreIdCampo.substr(i,1)!='|')
 						idCampo += NombreIdCampo.substr(i,1);
-						
+					else 
+						nombreDelCampo = idCampo;
 
 				if(comen['tipoComentario']=='1')//Tipo 1 = Programa
 				{					
 					if(idCampo.substr(0,5)=='arbol')
 					{
-						var objetoAColorear = '#btn'+idCampo;
+						objetoAColorear = '#btn'+idCampo;
 						$(objetoAColorear).removeClass('btn-default');
 						$(objetoAColorear).addClass('btn-warning');					
 					}					
 					else
 					{
-						var objetoAColorear = '#lbl-'+idCampo;
+						objetoAColorear = '#lbl-'+idCampo;
 						$(objetoAColorear).parent().parent().addClass('has-error has-feedback');
 					}
 					comentariosArray.push([comen['id'],comen['idCampo'], comen['observacion'],'1']);
 				}
+				
+				if ( $(objetoAColorear).length ) { // hacer algo aquí si el elemento existe
+					objetoAColorear = '';
+				}
+				else
+				{
+					alMenosUnElementoBorraron++;
+					elementosBorradosHTML += '<div class="row" id="borrados'+alMenosUnElementoBorraron+'"><div class="col-sm-2">';
+					elementosBorradosHTML += 'Datos de programa</div><div class="col-sm-2">'+nombreDelCampo+'</div>';
+					
+					elementosBorradosHTML += '<div class="col-sm-6">'+comen['observacion']+'</div>';
+                   	elementosBorradosHTML += '<div class="col-sm-2"><button type="button" class="btn btn-danger" onclick="elementoBorrado(\''+comen['id']+'\', \''+nombreDelCampo+'\', \''+comen['observacion']+'\', \'borrados'+alMenosUnElementoBorraron+'\');"><i class="fa fa-trash-o"></i> Eliminar</button></div>';
+					elementosBorradosHTML += '</div>';
+				}
+				
 			}
+			
+			if(alMenosUnElementoBorraron>0)
+			{
+				var insertarHTML = '<div class="row"><div class="col-sm-2"><strong>Comentario de:</strong></div>';
+				insertarHTML += '<div class="col-sm-2"><strong>Campo</strong></div>';
+				insertarHTML += '<div class="col-sm-6"><strong>Observación</strong></div>';
+				insertarHTML += '<div class="col-sm-2"><strong>Descartar comentario</strong></div></div>';
+
+				insertarHTML += elementosBorradosHTML;
+
+				$('#elementos-borrados').html(insertarHTML);
+			}		
+			else
+			{
+				$('#mensajes-sin-duenio').addClass('hidden');
+			}
+			
 			
 			if(response.data.idEstatus != 4)
 				$('#btnFirmarPrograma').hide();
@@ -185,6 +223,35 @@ if($('#id').val()){
 }
 
 /****************************************************************** Funciones de modales ********************************************************************/
+
+function elementoBorrado(id, campo, observacion, fila){
+	
+	Confirm.show({
+			titulo:"Eliminar comentario del campo "+campo,
+			mensaje: "¿Estás seguro de eliminar el comentario seleccionado?: "+observacion,
+				callback: function(){
+					moduloResource.delete(id,null,{
+                        _success: function(response){ 
+                        	MessageManager.show({data:'Comentario eliminado con éxito.',type:'ADV',timer:3});
+							var arrayTemporal = [];							
+							for(var i = 0; i < comentariosArray.length; i++)
+								if(comentariosArray[i][0]!=id)
+									arrayTemporal.push([comentariosArray[i][0],comentariosArray[i][1],comentariosArray[i][2],comentariosArray[i][3]]);
+							comentariosArray.length=0;
+							comentariosArray = arrayTemporal;
+							$('#'+fila).addClass('hidden');
+                        },
+                        _error: function(jqXHR){ 
+                        	MessageManager.show(jqXHR.responseJSON);
+                        }
+        			});
+				}
+		});
+	
+	
+}
+
+
 function escribirComentario(idcampo,nombrecampo,objetoconinformacion)
 {	
 	$('#modalComentario').find(".modal-title").html("<i class=\"fa fa-pencil-square-o\"></i> Escribir comentario");    

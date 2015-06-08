@@ -69,7 +69,7 @@ class SeguimientoInstitucionalController extends BaseController {
 
 			if(isset($parametros['grid'])){
 				if($parametros['grid'] == 'rendicion-acciones'){
-					$rows = Proyecto::with('componentes.actividades.registroAvance')->find($parametros['idProyecto']);
+					$rows = Proyecto::with('componentes.actividades.registroAvance','responsableInformacion')->find($parametros['idProyecto']);
 					$rows->componentes->load('registroAvance');
 					$total = count($rows);
 				}elseif($parametros['grid'] == 'rendicion-beneficiarios'){

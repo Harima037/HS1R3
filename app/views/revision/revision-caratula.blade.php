@@ -44,8 +44,6 @@
                         </ul>
                     </div>
                 </div>
-                        
-                        
                 <ul class="nav nav-tabs" role="tablist">
                     <li role="presentation" class="active">
                         <a id="tablink-caratula" href="#caratula-captura" role="tab" data-toggle="tab">
@@ -84,7 +82,6 @@
                     </li>
                     
                 </ul>
-
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" id="caratula-captura">
                         <br>
@@ -157,15 +154,22 @@
                                 
                             </div>
                         </div>
-                        
-                    </div>
+                    </div>   
                     
-                    
-                    
-                    
-                    
-                    
+                                     
                 </div>
+                
+                <div class="panel-body" id="mensajes-sin-duenio">
+	                <div class="panel panel-warning">
+						<div class="panel-heading">
+        	            	Mensajes anteriores de elementos que fueron borrados (verificar que se hayan atendido para descartarlos).
+            	        </div>
+                	    <div class="panel-body">
+                    	    <div id="elementos-borrados"></div>
+						</div>
+    	            </div>
+                </div>
+                
             </div>
             <div class="panel-footer">
                 <div class="row">
