@@ -19,9 +19,11 @@ class IndicadorFASSAMeta extends BaseModel
 
 	public function scopeIndicadoresEjercicio($query){
 		return $query->select('indicadorFASSAMeta.*','indicadorFASSA.claveNivel','indicadorFASSA.indicador',
-					'estatus.descripcion AS estatus')
+					'estatus.descripcion AS estatus','unidad.descripcion AS unidadResponsable')
 					->join('indicadorFASSA','indicadorFASSA.id','=','indicadorFASSAMeta.idIndicadorFASSA')
-					->leftjoin('catalogoEstatusProyectos AS estatus','estatus.id','=','indicadorFASSAMeta.idEstatus');
+					->leftjoin('catalogoEstatusProyectos AS estatus','estatus.id','=','indicadorFASSAMeta.idEstatus')
+					->leftjoin('catalogoUnidadesResponsables AS unidad','unidad.clave','=','indicadorFASSAMeta.claveUnidadResponsable');
+
 	}
 
 	public function scopeIndicadorMetaDetalle($query){

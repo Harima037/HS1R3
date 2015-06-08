@@ -41,9 +41,9 @@
                     <tr>
                         <th><input type="checkbox" class="check-select-all-rows"></th>
                         <th>Indicador</th>
+                        <th style="width:250px;">Unidad Responsable</th>
                         <th style="width:120px;">Nivel</th>
-                        <th style="text-align:center; width:85px;"><span class="glyphicon glyphicon-user"></span></th>
-                        <th style="text-align:center; width:120px;"><span class="glyphicon glyphicon-calendar"></span></th>
+                        <th style="width:100px;">Estatus</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -83,85 +83,113 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title" id="modalLabel">Nuevo</h4>
             </div>
+            <input type="hidden" id="tipo-formula">
             <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label class="control-label" for="indicador">Indicador</label>
+                        <p class="help-block" id="indicador"></p>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="control-label" for="formula">Formula</label>
+                        <p class="help-block" id="formula"></p>
+                    </div>
+                    <!--div class="col-sm-12">
+                        <label class="control-label" for="fuente-informacion">Fuente de Información</label>
+                        <p class="help-block" id="fuente-informacion" ></p>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label" for="lider-programa">Lider del Programa</label>
+                            <p class="help-block" id="lider-programa"></p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="control-label" for="responsable-informacion">Responsable de la Información</label>
+                            <p class="help-block" id="responsable-informacion"></p>
+                        </div>
+                    </div-->
+                </div>
                 <form id="form_indicador_fassa">
-                    <div class="row">
-                        <div class="col-sm-4">
+                    <div class="row well well-sm">
+                        <div class="col-sm-2">
                             <div class="form-group">
-                                <label class="control-label" for="nivel-indicador">Nivel</label>
-                                <span class="form-control" id="nivel-indicador"></span>
-                            </div>
-                        </div>
-                        <div class="col-sm-8">
-                            <div class="form-group">
-                                <label class="control-label" for="indicador">Indicador</label>
-                                <input type="text" class="form-control informacion-indicador" id="indicador" name="indicador">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <div class="form-group">
-                                <label class="control-label" for="tipo-formula">Tipo de Fórmula</label>
-                                <span class="form-control" id="tipo-formula"></span>
-                            </div>
-                        </div>
-                        <div class="col-sm-8">
-                            <div class="form-group">
-                                <label class="control-label" for="formula">Fórmula</label>
-                                <input type="text" class="form-control informacion-indicador" id="formula" name="formula">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <div class="form-group">
-                                <label class="control-label" for="fuente-informacion">Fuente de Información</label>
-                                <textarea class="form-control informacion-indicador" id="fuente-informacion" name="fuente-informacion" rows="3"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label class="control-label" for="unidad-responsable">Unidad Responsable</label>
-                                <span class="form-control" id="unidad-responsable"></span>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label class="control-label" for="responsable-informacion">Responsable de la Información</label>
-                                <span class="form-control" id="responsable-informacion"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <div class="form-group">
-                                <label class="control-label"><span class="fa fa-lock"></span> Numerador</label>
-                                <span class="form-control" id="numerador" disabled></span>
+                                <p class="form-control-static">
+                                    <b><big>Programación</big></b>
+                                </p>
+                                <div id="estatus-programacion"></div>
                             </div>
                         </div>
                         <div class="col-sm-4">
                             <div class="form-group">
-                                <label class="control-label"><span class="fa fa-lock"></span> Denominador</label>
-                                <span class="form-control" id="denominador" disabled></span>
+                                <label class="control-label" for="numerador">Numerador</label>
+                                <input type="number" min="0" class="form-control informacion-meta" id="numerador" name="numerador">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label" for="denominador">Denominador</label>
+                                <input type="number" min="0" class="form-control informacion-meta" id="denominador" name="denominador">
                             </div>
                         </div>
                         <div class="col-sm-2">
                             <div class="form-group">
-                                <label class="control-label" for="porcentaje"><span class="fa fa-lock"></span> Porcentaje</label>
-                                <span class="form-control" id="porcentaje" disabled>%</span>
+                                <label class="control-label" for="porcentaje">Porcentaje</label>
+                                <span class="form-control" id="porcentaje">%</span>
                             </div>
                         </div>
                     </div>
-                    <input type="hidden" id="id-meta" name="id-meta">
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <p class="form-control-static">
+                                    <b><big>Avance</big></b>
+                                </p>
+                                <div id="estatus-avance"></div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label" for="avance-numerador">Numerador</label>
+                                <input type="number" min="0" class="form-control informacion-avance" id="avance-numerador" name="avance-numerador">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label" for="avance-denominador">Denominador</label>
+                                <input type="number" min="0" class="form-control informacion-avance" id="avance-denominador" name="avance-denominador">
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label class="control-label" for="porcentaje">Porcentaje</label>
+                                <span class="form-control" id="porcentaje">%</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label" for="analisis-resultados">Analisis de Resultados Acumulado</label>
+                                <textarea class="form-control informacion-avance" id="analisis-resultados" name="analisis-resultados" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label class="control-label" for="justificacion">Justificación Acumulada</label>
+                                <textarea class="form-control informacion-avance" id="justificacion" name="justificacion" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="id-avance" name="id-avance">
                     <input type="hidden" id="id" name="id">
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btn-guardar-indicador">Guardar</button>
+                <button type="button" class="btn btn-primary" id="btn-guardar-indicador"><span class="fa fa-save"></span> Guardar</button>
+                <button type="button" class="btn btn-success" id="btn-guardar-validar-indicador">
+                    <span class="fa fa-send-o"></span> Guardar y Enviar a Validar
+                </button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
