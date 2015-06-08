@@ -776,8 +776,6 @@
                                 </div> <!--Tab-Content-->
                             </div> <!--TabPanel-->
                         </div> <!--TabPanel Indicadores-->
-                        
-                        
                         <div role="tabpanel" class="tab-pane" id="datos-informacion">
 	                        <br>
                         
@@ -816,12 +814,20 @@
 	                            </div>
     	                   	</div>
     	                </div>
-                        
-                        
-                        
-                        
                     </div>
                 </div>
+                
+                <div class="panel-body" id="mensajes-sin-duenio">
+	                <div class="panel panel-warning">
+						<div class="panel-heading">
+        	            	Mensajes anteriores de elementos que fueron borrados (verificar que se hayan atendido para descartarlos).
+            	        </div>
+                	    <div class="panel-body">
+                    	    <div id="elementos-borrados"></div>
+						</div>
+    	            </div>
+                </div>
+                
             </div>
             <div class="panel-footer">
                 <div class="row">

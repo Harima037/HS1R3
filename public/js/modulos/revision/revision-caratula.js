@@ -648,12 +648,15 @@ if($('#id').val()){
 				$('#ayuda-responsable').html(response.data.responsable_informacion.cargo);
 			}
 			
-			
+			var alMenosUnElementoBorraron = 0;
+			var elementosBorradosHTML = '';
 			
 			for(var contador in response.data.comentarios)
 			{
 				var NombreIdCampo = response.data.comentarios[contador]['idCampo'];
 				var idCampo = '';
+				var elementoExistente = 0;
+				var objetoAColorear = '';
 				
 				for(var i=0; i<NombreIdCampo.length; i++)
 					if(NombreIdCampo.substr(i,1)!='|')
@@ -661,83 +664,138 @@ if($('#id').val()){
 					else
 						if(response.data.comentarios[contador]['tipoComentario']=='3')
 							idCampo += 'actividad';
-
-				
-				//console.log(response.data.comentarios[contador]['tipoComentario']);
+							
 				if(response.data.comentarios[contador]['tipoComentario']=='1')//Tipo 1 = Proyecto
 				{					
 					if(idCampo.substr(0,14)=='financiamiento')
 					{
-						var objetoAColorear = '#'+idCampo;
+						objetoAColorear = '#'+idCampo;
 						$(objetoAColorear).removeClass('btn-default');
-						$(objetoAColorear).addClass('btn-warning');					
+						$(objetoAColorear).addClass('btn-warning');
 					}
 					else if(idCampo.substr(0,12)=='beneficiario')
 					{
-						var objetoAColorear = '#'+idCampo;
+						objetoAColorear = '#'+idCampo;
 						$(objetoAColorear).removeClass('btn-default');
-						$(objetoAColorear).addClass('btn-warning');					
+						$(objetoAColorear).addClass('btn-warning');	
 					}
 					else if(idCampo.substr(0,10)=='documentos')
 					{
-						var objetoAColorear = '#'+idCampo;
+						objetoAColorear = '#'+idCampo;
 						$(objetoAColorear).removeClass('btn-default');
 						$(objetoAColorear).addClass('btn-warning');
 					}
 					else if(idCampo.substr(0,12)=='antecedentes')
 					{
-						var objetoAColorear = '#'+idCampo;
+						objetoAColorear = '#'+idCampo;
 						$(objetoAColorear).removeClass('btn-default');
 						$(objetoAColorear).addClass('btn-warning');
 					}
 					else
 					{
-						var objetoAColorear = '#lbl-'+idCampo;
+						objetoAColorear = '#lbl-'+idCampo;
 						$(objetoAColorear).parent().parent().addClass('has-error has-feedback');
-					}
+					}					
 					comentariosArray.push([response.data.comentarios[contador]['id'],response.data.comentarios[contador]['idCampo'], response.data.comentarios[contador]['observacion'],'1']);
 				}
 				else if(response.data.comentarios[contador]['tipoComentario']=='2')//Tipo 2 = Componente
 				{
 					if(idCampo.substr(0,8)=='partidas')
 					{
-						var objetoAColorear = '#'+idCampo;
+						objetoAColorear = '#'+idCampo;
 						$(objetoAColorear).removeClass('btn-default');
 						$(objetoAColorear).addClass('btn-warning');					
 					}
-					if(idCampo.substr(0,8)=='desglose')
+					else if(idCampo.substr(0,8)=='desglose')
 					{
-						var objetoAColorear = '#'+idCampo;
+						objetoAColorear = '#'+idCampo;
 						$(objetoAColorear).removeClass('btn-default');
 						$(objetoAColorear).addClass('btn-warning');					
-					}
-					
+					}					
 					else
 					{
-						var objetoAColorear = '#lbl-'+idCampo;
+						objetoAColorear = '#lbl-'+idCampo;
 						$(objetoAColorear).parent().parent().addClass('has-error has-feedback');
 					}
 					comentariosArray.push([response.data.comentarios[contador]['id'],response.data.comentarios[contador]['idCampo'], response.data.comentarios[contador]['observacion'],'2']);
-					//console.log(objetoAColorear);
 				}
 				else if(response.data.comentarios[contador]['tipoComentario']=='3')//Tipo 3 = Actividad de Componente
 				{
-					//
-					var objetoAColorear = '#lbl-'+idCampo;
+					objetoAColorear = '#lbl-'+idCampo;
 					$(objetoAColorear).parent().parent().addClass('has-error has-feedback');
 					comentariosArray.push([response.data.comentarios[contador]['id'],response.data.comentarios[contador]['idCampo'], response.data.comentarios[contador]['observacion'],'3']);
-					//console.log(objetoAColorear);
 				}
-			}			
+				
+				if ( $(objetoAColorear).length ) { // hacer algo aquí si el elemento existe
+					objetoAColorear = '';
+				}
+				else
+				{
+					alMenosUnElementoBorraron++;
+					elementosBorradosHTML += '<div class="row" id="borrados'+alMenosUnElementoBorraron+'"><div class="col-sm-2">';
+					if(response.data.comentarios[contador]['tipoComentario']=='1')
+						elementosBorradosHTML += 'Datos de proyecto</div><div class="col-sm-2">'+idCampo+'</div>';
+					else if(response.data.comentarios[contador]['tipoComentario']=='2')
+						elementosBorradosHTML += 'Componente eliminado</div><div class="col-sm-2">'+idCampo+'</div>';
+					else if(response.data.comentarios[contador]['tipoComentario']=='3')
+						elementosBorradosHTML += 'Actividad eliminada</div><div class="col-sm-2">'+idCampo+'</div>';
+					
+					elementosBorradosHTML += '<div class="col-sm-6">'+response.data.comentarios[contador]['observacion']+'</div>';
+                   	elementosBorradosHTML += '<div class="col-sm-2"><button type="button" class="btn btn-danger" onclick="elementoBorrado(\''+response.data.comentarios[contador]['id']+'\', \''+idCampo+'\', \''+response.data.comentarios[contador]['observacion']+'\', \'borrados'+alMenosUnElementoBorraron+'\');"><i class="fa fa-trash-o"></i> Eliminar</button></div>';
+					elementosBorradosHTML += '</div>';
+				}
+			}	
+			
+			if(alMenosUnElementoBorraron>0)
+			{
+				var insertarHTML = '<div class="row"><div class="col-sm-2"><strong>Comentario de:</strong></div>';
+				insertarHTML += '<div class="col-sm-2"><strong>Campo</strong></div>';
+				insertarHTML += '<div class="col-sm-6"><strong>Observación</strong></div>';
+				insertarHTML += '<div class="col-sm-2"><strong>Descartar comentario</strong></div></div>';
+
+				insertarHTML += elementosBorradosHTML;
+
+				$('#elementos-borrados').html(insertarHTML);
+			}		
+			else
+			{
+				$('#mensajes-sin-duenio').addClass('hidden');
+			}
+			
+
 			            
-            /*cargar_totales();
-            actualizar_tabla_metas('actividad',response.data.jurisdicciones);
-            actualizar_tabla_metas('componente',response.data.jurisdicciones);
-            $('#tablink-componentes').attr('data-toggle','tab');
-			$('#tablink-componentes').parent().removeClass('disabled');
-			actualizar_grid_componentes(response.data.componentes);*/
+            
         }
     });
+}
+
+function elementoBorrado(id, campo, observacion, fila){
+	
+	Confirm.show({
+			titulo:"Eliminar comentario del campo "+campo,
+			mensaje: "¿Estás seguro de eliminar el comentario seleccionado?: "+observacion,
+				callback: function(){
+					proyectoResource.delete(id,null,{
+                        _success: function(response){ 
+                        	MessageManager.show({data:'Comentario eliminado con éxito.',type:'ADV',timer:3});
+
+							var arrayTemporal = [];
+							
+							for(var i = 0; i < comentariosArray.length; i++)
+								if(comentariosArray[i][0]!=id)
+									arrayTemporal.push([comentariosArray[i][0],comentariosArray[i][1],comentariosArray[i][2],comentariosArray[i][3]]);
+							comentariosArray.length=0;
+							comentariosArray = arrayTemporal;
+							$('#'+fila).addClass('hidden');
+                        },
+                        _error: function(jqXHR){ 
+                        	MessageManager.show(jqXHR.responseJSON);
+                        }
+        			});
+				}
+		});
+	
+	
 }
 
 function construyebeneficiarios(datos){

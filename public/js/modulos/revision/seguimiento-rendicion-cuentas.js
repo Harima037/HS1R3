@@ -554,6 +554,18 @@ function llenar_grid_acciones(response){
     accionesDatagrid.limpiar();
     var datos_grid = [];
     var contador_componente = 0;
+	
+	console.log(response.data);
+	
+	if(response.data.fuenteInformacion)
+		$('#lbl-fuente-informacion').text(response.data.fuenteInformacion);
+	if(response.data.idResponsable)
+	{
+		$('#lbl-responsable').text(response.data.responsable_informacion.nombre);
+		$('#ayuda-responsable').html(response.data.responsable_informacion.cargo);		
+	}
+	
+	
     for(var i in response.data.componentes){
         var contador_actividad = 0;
         contador_componente++;
