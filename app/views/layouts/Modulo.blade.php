@@ -46,7 +46,7 @@
                 </div>
                 <div class="modal-body">
                     <h2>SIRE 1.0</h2>
-                    <p>Sitema de Integración, Rendición de cuentas y Evaluación</p>
+                    <p>Sistema de Integración, Rendición de cuentas y Evaluación</p>
                     <p><small> <strong>Instituto de Salud</strong> Tuxtla Gutiérrez, 2014 &copy;. Desarrollado por: Área de Informática</small></p>
                 </div>
                 <div class="modal-footer">
@@ -63,10 +63,10 @@
                     <h4 class="modal-title" id="modalAyudaLabel">Ayuda</h4>
                 </div>
                 <div class="modal-body">
-                    <p>Para cualquier duda o aclaración, comuníquese al Área de Informática:</p>
+                    <p>Para cualquier duda o aclaración, comuníquese al Área de Evaluación:</p>
                     <ul>
-                        <li>Vía telefónica: <a href="tel:+529616189250">961 618 9250</a> ext. 44219</li>
-                        <li>Vía e-mail: <a href="mailto:hugo.gutierrez@salud.chiapas.gob.mx">hugo.gutierrez@salud.chiapas.gob.mx</a>.</li>
+                        <li>Vía telefónica: <a href="tel:+529616189250">961 618 9250</a> ext. 44146, 44208</li>
+                        <li>Vía e-mail: <a href="mailto:tovillamijangos@hotmail.com">tovillamijangos@hotmail.com</a>.</li>
                     </ul>
                 </div>
                 <div class="modal-footer">

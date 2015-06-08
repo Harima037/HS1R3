@@ -25,16 +25,29 @@ moduloDatagrid.actualizar({
 
             item.id = response.data[i].id;
             item.indicador = response.data[i].indicador;
-            item.otro = response.data[i].unidadResponsable;
+            //item.otro = response.data[i].unidadResponsable;
 
-            var nivel = '';
-            switch(response.data[i].claveNivel){
-                case 'F': nivel = 'Fin'; break;
-                case 'P': nivel = 'Proposito'; break;
-                case 'C': nivel = 'Componente'; break;
-                case 'A': nivel = 'Actividad'; break;
+            if(response.data[i].claveFrecuencia == 'A'){
+                item.trim1 = '<div class="text-center text-muted"><span class="fa fa-minus"></span></div>';
+                item.trim2 = '<div class="text-center text-muted"><span class="fa fa-minus"></span></div>';
+                item.trim3 = '<div class="text-center text-muted"><span class="fa fa-minus"></span></div>';
+                if(response.mes_actual == 12 && (response.data[i].idEstatus == 4 || response.data[i].idEstatus == 5)){
+                    item.trim4 = '<div class="text-center"><span class="fa fa-unlock"></span></div>';
+                }else{
+                    item.trim4 = '<div class="text-center"><span class="fa fa-lock"></span></div>';
+                }
+            }else{
+                var trim_actual = response.mes_actual/3;
+                var trim_cerrado = '<div class="text-center"><span class="fa fa-lock"></span></div>';
+                var trim_abierto = '<div class="text-center"><span class="fa fa-unlock"></span></div>';
+                var trim_perdido = '<div class="text-center text-muted"><span class="fa fa-times"></span></div>';
+
+                item.trim1 = (trim_actual == 1)?trim_abierto:(trim_actual > 1)?trim_perdido:trim_cerrado;
+                item.trim2 = (trim_actual == 2)?trim_abierto:(trim_actual > 2)?trim_perdido:trim_cerrado;
+                item.trim3 = (trim_actual == 3)?trim_abierto:(trim_actual > 3)?trim_perdido:trim_cerrado;
+                item.trim4 = (trim_actual == 4)?trim_abierto:(trim_actual > 4)?trim_perdido:trim_cerrado;
             }
-            item.nivel = nivel;
+
             var clase_estatus = '';
             switch(response.data[i].idEstatus){
                 case 1: clase_estatus = 'label-info'; break;
@@ -44,7 +57,45 @@ moduloDatagrid.actualizar({
                 case 5: clase_estatus = 'label-success'; break;
                 default: clase_estatus = 'label-default'; break;
             }
-            item.mas = '<span class="label '+clase_estatus+'">'+response.data[i].estatus+'</span>';
+            item.metas = '<span class="label '+clase_estatus+'">'+response.data[i].estatus+'</span>';
+            item.avance = '<span class="text-muted">Inactivo</span>';
+
+            if(response.data[i].registro_avance.length){
+                for(var j in response.data[i].registro_avance){
+                    var avance = response.data[i].registro_avance[j];
+                    var clase_desempenio = '';
+                    var clase_candado = '';
+                    var clase_estatus = '';
+
+                    if(avance.justificacion){
+                        clase_desempenio = 'text-danger';
+                    }else{
+                        clase_desempenio = 'text-success';
+                    }
+
+                    if(response.mes_actual == avance.mes){
+                        if(avance.idEstatus == 2 || avance.idEstatus == 4 || avance.idEstatus == 5){
+                            clase_candado = 'fa-lock';
+                        }else{
+                            clase_candado = 'fa-unlock';
+                        }
+
+                        switch(avance.idEstatus){
+                            case 1: clase_estatus = 'label-info'; break;
+                            case 2: clase_estatus = 'label-warning'; break;
+                            case 3: clase_estatus = 'label-danger'; break;
+                            case 4: clase_estatus = 'label-primary'; break;
+                            case 5: clase_estatus = 'label-success'; break;
+                        }
+                        item.avance = '<span class="label '+clase_estatus+'">'+avance.estatus+'</span>';
+                    }else{
+                        clase_candado = 'fa-circle';
+                    }
+
+                    var trim = parseInt(avance.mes/3);
+                    item['trim'+trim] = '<div class="text-center '+clase_desempenio+'"><span class="fa '+clase_candado+'"></span></div>';
+                }
+            }
 
             datos_grid.push(item);
         }
@@ -75,12 +126,11 @@ moduloDatagrid.actualizar({
 $('#denominador,#numerador').on('keyup',function(){
     $(this).change();
 });
-
 $('#denominador,#numerador').on('change',function(){
+    var porcentaje = 0;
     if($('#tipo-formula').val()){
         var numerador = parseFloat($('#numerador').val()) || 0;
         var denominador = parseFloat($('#denominador').val()) || 1;
-        var porcentaje = '';
         if($('#tipo-formula').val() == 'T'){
             porcentaje = parseFloat((numerador * 100000)/denominador);
         }else{
@@ -90,17 +140,54 @@ $('#denominador,#numerador').on('change',function(){
     }else{
         $('#porcentaje').text('%');
     }
+    $('#porcentaje').attr('data-valor',porcentaje);
+});
+
+$('#avance-denominador,#avance-numerador').on('keyup',function(){
+    $(this).change();
+});
+$('#avance-denominador,#avance-numerador').on('change',function(){
+    var porcentaje_avance = 0;
+    if($('#tipo-formula').val()){
+        var numerador = parseFloat($('#avance-numerador').val()) || 0;
+        var denominador = parseFloat($('#avance-denominador').val()) || 1;
+        if($('#tipo-formula').val() == 'T'){
+            porcentaje_avance = parseFloat((numerador * 100000)/denominador);
+        }else{
+            porcentaje_avance = parseFloat((numerador * 100)/denominador);
+        }
+        $('#avance-porcentaje').text(porcentaje_avance.format(2) + ' %');
+    }else{
+        $('#avance-porcentaje').text('%');
+    }
+    $('#avance-porcentaje').attr('data-valor',porcentaje_avance);
+
+    var porcentaje_total = 0;
+    if(porcentaje_avance){
+        var porcentaje_meta = parseFloat($('#porcentaje').attr('data-valor'));
+        porcentaje_total = (porcentaje_avance / porcentaje_meta)*100;
+        $('#porcentaje-total').text(porcentaje_total.format(2) + ' %')
+    }else{
+        $('#porcentaje-total').text('%');
+    }
+    actualizar_porcentaje(porcentaje_total);
 });
 
 $('#modalIndicador').on('hidden.bs.modal',function(){
     $('#form_indicador_fassa').get(0).reset();
     $('#form_indicador_fassa #id').val("");
-    $('#form_indicador_fassa #id-meta').val("");
+    $('#form_indicador_fassa #id-avance').val("");
     $('#form_indicador_fassa .seguro-edicion').remove();
     $('#form_indicador_fassa .form-control').prop('disabled',false);
     $('#estatus-programacion').empty();
     $('#estatus-avance').empty();
     $('#porcentaje').text('%');
+    $('#porcentaje').attr('data-valor','');
+    $('#avance-porcentaje').text('%');
+    $('#avance-porcentaje').attr('data-valor','');
+    $('#porcentaje-total').text('%');
+    $('#porcentaje-total').attr('data-valor','');
+    $('#justificacion').prop('disabled',true);
     Validation.cleanFormErrors('#form_indicador_fassa');
 });
 
@@ -124,7 +211,8 @@ function editar(e){
             $('#numerador').val(parseFloat(response.data.numerador));
             $('#denominador').val(parseFloat(response.data.denominador));
             if(response.data.porcentaje){
-                $('#porcentaje').text(parseFloat(response.data.porcentaje).format(2) + ' %');            
+                $('#porcentaje').text(parseFloat(response.data.porcentaje).format(2) + ' %');
+                $('#porcentaje').attr('data-valor',response.data.porcentaje);
             }
             /*
             var responsable_informacion = '<big>' + response.data.nombreResponsableInformacion + '</big><br><small>'+response.data.cargoResponsableInformacion+'</small>';
@@ -148,14 +236,48 @@ function editar(e){
                 bloquear_controles('.informacion-meta');
             }
 
-            if(response.data.registroAvance){
-                //
-            }else{
-                var label_html = '<div class="text-center label-default"><span class="label"><big>Inactivo</big></span></div>';
-                $('#estatus-avance').html(label_html);
+            var puede_editar_avance = false;
+            if(response.data.claveFrecuencia == 'A' && response.data.mes_actual == 12 && (response.data.idEstatus == 4 || response.data.idEstatus == 5)){
+                puede_editar_avance = true;
+            }else if(response.data.claveFrecuencia == 'T' && (response.data.mes_actual%3) == 0){
+                puede_editar_avance = true;
             }
 
-            bloquear_controles('.informacion-avance');
+            label_html = '<div class="text-center text-muted"><big>Inactivo</big></div>';
+            if(!puede_editar_avance){
+                bloquear_controles('.informacion-avance');
+            }else{
+                if(response.data.registro_avance.length){
+                    for(var i in response.data.registro_avance){
+                        var avance = response.data.registro_avance[i];
+                        if(avance.mes == response.data.mes_actual){
+                            $('#avance-denominador').val(avance.denominador);
+                            $('#avance-numerador').val(avance.numerador);
+                            $('#avance-porcentaje').text(parseFloat(avance.porcentaje).format(2) + ' %');
+                            $('#analisis-resultados').val(avance.analisisResultados);
+                            $('#justificacion').val(avance.justificacionAcumulada);
+                            var porcentaje_total = (avance.porcentaje/response.data.porcentaje)*100;
+                            actualizar_porcentaje(porcentaje_total);
+
+                            label_class = '';
+                            switch(avance.idEstatus){
+                                case 1: label_class = 'label-info'; break;
+                                case 2: label_class = 'label-warning'; break;
+                                case 3: label_class = 'label-danger'; break;
+                                case 4: label_class = 'label-primary'; break;
+                                case 5: label_class = 'label-success'; break;
+                            }
+                            label_html = '<div class="text-center '+label_class+'"><span class="label"><big>'+avance.estatus+'</big></span></div>';
+                            $('#id-avance').val(avance.id);
+
+                            if(avance.idEstatus == 2 || avance.idEstatus == 4 || avance.idEstatus == 5){
+                                bloquear_controles('.informacion-avance');
+                            }
+                        }
+                    }
+                }
+            }
+            $('#estatus-avance').html(label_html);
 
             $('#id').val(response.data.id);
             $('#modalIndicador').modal('show');
@@ -178,15 +300,19 @@ function guardar_indicador(validar){
 
     var parametros = $("#form_indicador_fassa").serialize();
 
+    if(validar){
+        parametros += '&validar=1';
+    }
+
     moduloResource.put($('#id').val(), parametros,{
         _success: function(response){
             moduloDatagrid.actualizar();
             if(validar){
-                console.log('Enviado a Validar...');
+                MessageManager.show({data:'Los datos fueron enviados para su validación',timer:4,type:'OK'});
             }else{
                 MessageManager.show({data:'Elemento actualizado con éxito',timer:4});
-                $('#modalIndicador').modal('hide');
             }
+            $('#modalIndicador').modal('hide');
         },
         _error: function(response){
             try{
@@ -202,6 +328,20 @@ function guardar_indicador(validar){
             }                       
         }
     },'Guardando');
+}
+
+function actualizar_porcentaje(porcentaje_total){
+    $('#porcentaje-total').attr('data-valor',porcentaje_total);
+    if(porcentaje_total < 90){
+        $('#porcentaje-total').html('<span class="text-danger"><span class="fa fa-arrow-down"></span> ' + porcentaje_total.format(2) + ' %</span>');
+        $('#justificacion').prop('disabled',false);
+    }else if(porcentaje_total > 110){
+        $('#porcentaje-total').html('<span class="text-danger"><span class="fa fa-arrow-up"></span> ' + porcentaje_total.format(2) + ' %</span>');
+        $('#justificacion').prop('disabled',false);
+    }else{
+        $('#porcentaje-total').html('<span class="text-success">' + porcentaje_total.format(2) + ' %</span>');
+        $('#justificacion').prop('disabled',true);
+    }
 }
 
 function bloquear_controles(identificador){

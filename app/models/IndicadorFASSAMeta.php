@@ -41,4 +41,8 @@ class IndicadorFASSAMeta extends BaseModel
 	public function indicador(){
 		return $this->belongsTo('IndicadorFASSA','idIndicadorFASSA');
 	}
+
+	public function registroAvance(){
+		return $this->hasMany('RegistroAvanceIndicadorFASSA','idIndicadorFASSAMeta')->conDetalle()->orderBy('mes');
+	}
 }

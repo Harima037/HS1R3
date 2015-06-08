@@ -41,9 +41,12 @@
                     <tr>
                         <th><input type="checkbox" class="check-select-all-rows"></th>
                         <th>Indicador</th>
-                        <th style="width:250px;">Unidad Responsable</th>
-                        <th style="width:120px;">Nivel</th>
-                        <th style="width:100px;">Estatus</th>
+                        <th class="text-center" style="width:60px;">Trim 1</th>
+                        <th class="text-center" style="width:60px;">Trim 2</th>
+                        <th class="text-center" style="width:60px;">Trim 3</th>
+                        <th class="text-center" style="width:60px;">Trim 4</th>
+                        <th style="width:100px;">Metas</th>
+                        <th style="width:100px;">Avance</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -84,7 +87,7 @@
                 <h4 class="modal-title" id="modalLabel">Nuevo</h4>
             </div>
             <input type="hidden" id="tipo-formula">
-            <div class="modal-body">
+            <div class="modal-body" style="padding-bottom:0;">
                 <div class="row">
                     <div class="col-sm-6">
                         <label class="control-label" for="indicador">Indicador</label>
@@ -112,12 +115,10 @@
                     </div-->
                 </div>
                 <form id="form_indicador_fassa">
-                    <div class="row well well-sm">
+                    <div class="row">
                         <div class="col-sm-2">
                             <div class="form-group">
-                                <p class="form-control-static">
-                                    <b><big>Programación</big></b>
-                                </p>
+                                <label class="control-label">Programación</label>
                                 <div id="estatus-programacion"></div>
                             </div>
                         </div>
@@ -140,22 +141,20 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row" style="background-color:#E4E4E4; padding-top:15px;">
                         <div class="col-sm-2">
                             <div class="form-group">
-                                <p class="form-control-static">
-                                    <b><big>Avance</big></b>
-                                </p>
+                                <label class="control-label">Avance</label>
                                 <div id="estatus-avance"></div>
                             </div>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-3">
                             <div class="form-group">
                                 <label class="control-label" for="avance-numerador">Numerador</label>
                                 <input type="number" min="0" class="form-control informacion-avance" id="avance-numerador" name="avance-numerador">
                             </div>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-3">
                             <div class="form-group">
                                 <label class="control-label" for="avance-denominador">Denominador</label>
                                 <input type="number" min="0" class="form-control informacion-avance" id="avance-denominador" name="avance-denominador">
@@ -163,8 +162,14 @@
                         </div>
                         <div class="col-sm-2">
                             <div class="form-group">
-                                <label class="control-label" for="porcentaje">Porcentaje</label>
-                                <span class="form-control" id="porcentaje">%</span>
+                                <label class="control-label" for="avance-porcentaje">Porcentaje</label>
+                                <span class="form-control" id="avance-porcentaje">%</span>
+                            </div>
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label class="control-label" for="porcentaje-total">Desempeño</label>
+                                <div class="form-control-static" id="porcentaje-total">%</div>
                             </div>
                         </div>
                         <div class="col-sm-6">
@@ -176,7 +181,7 @@
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <label class="control-label" for="justificacion">Justificación Acumulada</label>
-                                <textarea class="form-control informacion-avance" id="justificacion" name="justificacion" rows="3"></textarea>
+                                <textarea class="form-control informacion-avance" id="justificacion" name="justificacion" rows="3" disabled></textarea>
                             </div>
                         </div>
                     </div>

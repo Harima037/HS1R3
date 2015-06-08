@@ -86,9 +86,9 @@ function editar(e){
                     if(meta.ejercicio == response.data.ejercicio_actual){
                         //$('#ejercicio').val(meta.ejercicio);
 
-                        $('#numerador').text(parseFloat(meta.numerador).format(2));
-                        $('#denominador').text(parseFloat(meta.denominador).format(2));
-                        $('#porcentaje').text(parseFloat(meta.porcentaje).format(2) + ' %');
+                        $('#numerador').text((parseFloat(meta.numerador) || 0).format(2));
+                        $('#denominador').text((parseFloat(meta.denominador) || 0).format(2));
+                        $('#porcentaje').text((parseFloat(meta.porcentaje) || 0).format(2) + ' %');
 
                         $('#unidad-responsable').val(meta.claveUnidadResponsable);
                         $('#responsable-informacion').empty();
@@ -256,6 +256,7 @@ $('#btn-guardar-indicador').on('click',function(e){
                     $('#id-meta').val(response.data.meta.id);
                 }
                 MessageManager.show({data:'Elemento actualizado con éxito',timer:4});
+                $('#modalIndicador').modal('hide');
             },
             _error: function(response){
                 try{
@@ -278,6 +279,7 @@ $('#btn-guardar-indicador').on('click',function(e){
                 $('#id').val(response.data.id);
                 $('#id-meta').val(response.data.meta.id);
                 MessageManager.show({data:'Elemento creado con éxito',timer:4});
+                $('#modalIndicador').modal('hide');
             },
             _error: function(response){
                 try{

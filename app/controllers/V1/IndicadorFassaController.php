@@ -155,6 +155,7 @@ class IndicadorFassaController extends \BaseController {
 
 				$recurso_meta = new IndicadorFASSAMeta;
 				$recurso_meta->ejercicio				= date('Y');
+				$recurso_meta->claveFrecuencia			= 'A';
 				$recurso_meta->claveUnidadResponsable 	= $parametros['unidad-responsable'];
 				$recurso_meta->idResponsableInformacion	= $parametros['responsable-informacion'];
 				$recurso_meta->idEstatus				= 1;
@@ -214,7 +215,7 @@ class IndicadorFassaController extends \BaseController {
 
 				$recurso = IndicadorFASSA::find($id);
 
-				$checar_ejercicio = FALSE;
+				//$checar_ejercicio = FALSE;
 
 				if($parametros['id-meta']){
 					$recurso_meta = IndicadorFASSAMeta::find($parametros['id-meta']);
@@ -222,20 +223,21 @@ class IndicadorFassaController extends \BaseController {
 					$recurso_meta = new IndicadorFASSAMeta;
 					$recurso_meta->idEstatus = 1;
 					$recurso_meta->ejercicio = date('Y');
-					$checar_ejercicio = TRUE;
+					$recurso_meta->claveFrecuencia = 'A';
+					//$checar_ejercicio = TRUE;
 				}
 
 				/*if(($recurso->idEstatus == 2 || $recurso->idEstatus == 4) && ($recurso_meta->idEstatus == 2 || $recurso_meta->idEstatus == 4)){
 					throw new Exception("Ninguno de los elementos esta disponible para edición", 1);
 				}*/
 
-				if($checar_ejercicio){
+				/*if($checar_ejercicio){
 					$ejercicios_capturados = IndicadorFASSAMeta::where('idIndicadorFASSA','=',$recurso->id)
 																->where('ejercicio','=',$recurso_meta->ejercicio)->count();
 					if($ejercicios_capturados){
 						throw new Exception('Ya se capturo la meta para el ejercicio especificado.', 1);
 					}
-				}
+				}*/
 
 				$recurso->claveNivel 				= $parametros['nivel-indicador'];
 				$recurso->indicador 				= $parametros['indicador'];
