@@ -74,6 +74,10 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('avance-programa/{id}',array('uses'=>'RendicionProgramaController@editarAvance'));
 	});
 
+	Route::group(array('prefix'=>'cargar'),function(){
+		Route::get('reporte-ep-01',array('uses'=>'EP01Controller@index'));
+	});
+
 	Route::group(array('prefix'=>"v1"),function(){
 		Route::get('/', function()
 		{

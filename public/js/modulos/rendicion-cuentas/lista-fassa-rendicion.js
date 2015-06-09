@@ -251,10 +251,9 @@ function editar(e){
                     for(var i in response.data.registro_avance){
                         var avance = response.data.registro_avance[i];
                         if(avance.mes == response.data.mes_actual){
-                            $('#avance-denominador').val(avance.denominador);
-                            $('#avance-numerador').val(avance.numerador);
+                            $('#avance-denominador').val(parseFloat(avance.denominador));
+                            $('#avance-numerador').val(parseFloat(avance.numerador));
                             $('#avance-porcentaje').text(parseFloat(avance.porcentaje).format(2) + ' %');
-                            $('#analisis-resultados').val(avance.analisisResultados);
                             $('#justificacion').val(avance.justificacionAcumulada);
                             var porcentaje_total = (avance.porcentaje/response.data.porcentaje)*100;
                             actualizar_porcentaje(porcentaje_total);

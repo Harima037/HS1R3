@@ -97,22 +97,6 @@
                         <label class="control-label" for="formula">Formula</label>
                         <p class="help-block" id="formula"></p>
                     </div>
-                    <!--div class="col-sm-12">
-                        <label class="control-label" for="fuente-informacion">Fuente de Información</label>
-                        <p class="help-block" id="fuente-informacion" ></p>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label class="control-label" for="lider-programa">Lider del Programa</label>
-                            <p class="help-block" id="lider-programa"></p>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label class="control-label" for="responsable-informacion">Responsable de la Información</label>
-                            <p class="help-block" id="responsable-informacion"></p>
-                        </div>
-                    </div-->
                 </div>
                 <form id="form_indicador_fassa">
                     <div class="row">
@@ -172,13 +156,7 @@
                                 <div class="form-control-static" id="porcentaje-total">%</div>
                             </div>
                         </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label class="control-label" for="analisis-resultados">Analisis de Resultados Acumulado</label>
-                                <textarea class="form-control informacion-avance" id="analisis-resultados" name="analisis-resultados" rows="3"></textarea>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
+                        <div class="col-sm-12">
                             <div class="form-group">
                                 <label class="control-label" for="justificacion">Justificación Acumulada</label>
                                 <textarea class="form-control informacion-avance" id="justificacion" name="justificacion" rows="3" disabled></textarea>

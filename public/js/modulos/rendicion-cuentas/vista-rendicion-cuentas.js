@@ -65,17 +65,44 @@ accionesDatagrid.init();
 accionesDatagrid.actualizar({ _success: function(response){ llenar_grid_acciones(response); } });
 
 $('#btn-guardar-avance').on('click',function(){
+    Validation.cleanFormErrors('#form_avance');
+
+    var campos_faltantes = 0;
+    $('input.avance-mes').each(function(){
+        if($(this).attr('data-meta-programada')){
+            if($(this).val() == ''){
+                campos_faltantes++;
+                Validation.printFieldsErrors($(this).attr('id'),'Este campo es requierido');
+            }else if(parseFloat($(this).val()) < 0){
+                campos_faltantes++;
+                Validation.printFieldsErrors($(this).attr('id'),'El valor no puede ser negativo');
+            }
+        }
+    });
+    if(campos_faltantes){
+        //MessageManager.show({data:'Faltan metas por capturar.',container:'#modalEditarAvance .modal-body',type:'ADV'});
+        $('#tabs-seguimiento-metas a:first').tab('show');
+        return;
+    }
+
+    if($('#analisis-resultados').val().trim() == ''){
+        MessageManager.show({data:'Es necesario capturar el analisis en base al avance del mes.',container:'#modalEditarAvance .modal-body',type:'ADV'});
+        Validation.printFieldsErrors('analisis-resultados','Este campo es requierido');
+        $('#tab-link-justificacion').tab('show');
+        return;
+    }
+
     if($('#total-porcentaje').attr('data-estado-avance')){
-        if(($('#analisis-resultados').val().trim() == '') || ($('#justificacion-acumulada').val().trim() == '')){
+        if($('#justificacion-acumulada').val().trim() == ''){
             MessageManager.show({data:'Es necesario capturar una justificacion en base al porcentaje de avance del mes.',container:'#modalEditarAvance .modal-body',type:'ADV'});
+            Validation.printFieldsErrors('justificacion-acumulada','Este campo es requierido');
             $('#tab-link-justificacion').tab('show');
             return;
         }
     }
+
     var parametros = $('#form_avance').serialize();
     parametros += '&guardar=avance-metas&id-proyecto='+$('#id').val();
-
-    Validation.cleanFormErrors('#form_avance');
 
     if($('#id-avance').val()){
         moduloResource.put($('#id-avance').val(),parametros,{
@@ -729,7 +756,7 @@ $('#btn-fuente-informacion-guardar').on('click',function(){
         moduloResource.put($('#id').val(),parametros,{
             _success: function(response){
                 MessageManager.show({data:'Datos almacenados con éxito',type:'OK',timer:3});
-                $('#form_fuente_informacion input,textarea,select').each(function(){
+                $('#fuente-informacion,#responsable').each(function(){
                     $(this).prop('disabled',true);
                     $('label[for="' + $(this).attr('id') + '"]').prepend('<span class="fa fa-lock"></span> ');
                     if($(this).hasClass('chosen-one')){

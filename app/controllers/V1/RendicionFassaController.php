@@ -25,8 +25,7 @@ class RendicionFassaController extends \BaseController {
 			'numerador'					=> 'sometimes|required|min:0',
 			'denominador'				=> 'sometimes|required|min:0',
 			'avance-numerador'			=> 'sometimes|required|min:0',
-			'avance-denominador'		=> 'sometimes|required|min:0',
-			'analisis-resultados'		=> 'sometimes|required'
+			'avance-denominador'		=> 'sometimes|required|min:0'
 		);
 
 	/**
@@ -187,10 +186,18 @@ class RendicionFassaController extends \BaseController {
 					if($recurso_avance->idEstatus == 1 || $recurso_avance->idEstatus == 3){
 						$recurso_avance->numerador 			= $parametros['avance-numerador'];
 						$recurso_avance->denominador 		= $parametros['avance-denominador'];
-						$recurso_avance->analisisResultados = $parametros['analisis-resultados'];
 
 						$numerador 		= $parametros['avance-numerador'];
 						$denominador 	= $parametros['avance-denominador'];
+
+						if($numerador < 0){
+							throw new Exception('{"field":"avance-numerador","error":"El valor no puede ser negativo."}', 1);
+						}
+
+						if($denominador < 0){
+							throw new Exception('{"field":"avance-denominador","error":"El valor no puede ser negativo."}', 1);
+						}
+
 						if($tipo_formula == 'T'){
 							$porcentaje = floatval(($numerador * 100000)/$denominador);
 						}else{

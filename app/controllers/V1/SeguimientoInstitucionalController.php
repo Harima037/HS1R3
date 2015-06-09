@@ -90,6 +90,29 @@ class SeguimientoInstitucionalController extends BaseController {
 				$rows = $rows->with(array('registroAvance'=>function($query){
 					$query->select('id','idProyecto','mes',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'),DB::raw('count(idNivel) as registros'))->groupBy('idProyecto','mes');
 				}));
+
+				$rows = $rows->wherein('evaluacionProyectoMes.idEstatus', array(2, 4));
+
+				$rows = $rows->join('evaluacionProyectoMes', function($join) use($mes_actual)
+									{
+											$join->on('proyectos.id', '=', 'evaluacionProyectoMes.idProyecto')
+											->where('evaluacionProyectoMes.mes', '=', $mes_actual)
+											->where('evaluacionProyectoMes.anio', '=', date('Y'));
+									});
+
+				$usuario = Sentry::getUser();
+				if($usuario->proyectosAsignados){
+					if($usuario->proyectosAsignados->proyectos){
+						$proyectos = explode('|',$usuario->proyectosAsignados->proyectos);
+						$rows = $rows->whereIn('proyectos.id',$proyectos);
+					}
+				}
+
+				if($usuario->claveUnidad){
+					$unidades = explode('|',$usuario->claveUnidad);
+					$rows = $rows->whereIn('unidadResponsable',$unidades);
+				}
+
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				
 				if(isset($parametros['buscar'])){				
@@ -99,23 +122,12 @@ class SeguimientoInstitucionalController extends BaseController {
 					$total = $rows->count();						
 				}
 				
-				$rows = $rows -> wherein('evaluacionProyectoMes.idEstatus', array(2, 4));
-				
 				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
 					'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
 									->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
 									->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')									
 									->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
-									
-									
-									->join('evaluacionProyectoMes', function($join) use($mes_actual)
-										{
-											$join->on('proyectos.id', '=', 'evaluacionProyectoMes.idProyecto')
-											->where('evaluacionProyectoMes.mes', '=', $mes_actual)
-											->where('evaluacionProyectoMes.anio', '=', date('Y'));
-									})
-									
 									//->join('evaluacionProyectoMes','evaluacionProyectoMes.idProyecto','=','proyectos.id')
 									->orderBy('id', 'desc')
 									->skip(($parametros['pagina']-1)*10)->take(10)
