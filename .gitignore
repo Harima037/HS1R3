@@ -13,4 +13,4 @@ app/storage/logs/*
 app/storage/meta/*
 app/storage/sessions/*
 app/storage/views/*
-## app/storage/archivoscsv/*
+app/storage/archivoscsv/*
