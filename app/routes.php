@@ -111,8 +111,10 @@ Route::group(array('before'=>'auth.sentry'), function(){
 
 		Route::resource('indicadores-fassa',	'V1\IndicadorFassaController');
 
-		Route::resource('reporte-evaluacion',	'V1\ReporteEvaluacionController', array('only'=>array('show')));
-		Route::resource('reporte-programa',	'V1\ReporteEvaluacionProgramaController', array('only'=>array('show')));
+		Route::resource('reporte-evaluacion',	'V1\ReporteEvaluacionController', 			array('only'=>array('show')));
+		Route::resource('reporte-programa',		'V1\ReporteEvaluacionProgramaController', 	array('only'=>array('show')));
+
+		Route::resource('reporte-ep-01',	'V1\EP01Controller');
 	});
 });
 

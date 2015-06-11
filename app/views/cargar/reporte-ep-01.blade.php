@@ -15,7 +15,7 @@
 @section('content')
 <div class="row">
     <div class="col-md-12">
-        <div class="panel panel-default datagrid" id="datagridIndicadores" data-edit-row="editar">
+        <div class="panel panel-default datagrid" id="datagridCarga" data-edit-row="editar">
             <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> {{ $sys_mod_activo->nombre }}</h4></div>
             <div class="panel-body">
                 <div class="row">
@@ -31,7 +31,7 @@
                         <div class="btn-toolbar pull-right" >
                             @section('panel-botones')
                                 <div class="btn-group" style="margin:5px">
-                                    <button type="button" class="btn btn-success" id="btn-agregar-indicador">
+                                    <button type="button" class="btn btn-success" id="btn-cargar-achivo">
                                         <span class="fa fa-upload"></span> Cargar Archivo EP01
                                     </button>
                                     <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
@@ -56,8 +56,9 @@
                 <thead>
                     <tr>
                         <th><input type="checkbox" class="check-select-all-rows"></th>
-                        <th>Indicador</th>
-                        <th style="width:120px;">Nivel</th>
+                        <th>Ejercicio</th>
+                        <th>Mes</th>
+                        <th>Total de Resgistros</th>
                         <th style="text-align:center; width:85px;"><span class="glyphicon glyphicon-user"></span></th>
                         <th style="text-align:center; width:120px;"><span class="glyphicon glyphicon-calendar"></span></th>
                     </tr>
@@ -92,7 +93,7 @@
 @stop
 
 @section('modals')
-<div class="modal fade" id="modalIndicador" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" data-backdrop="static">
+<div class="modal fade" id="modalCargar" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-dialog-85-screen">
         <div class="modal-content modal-content-85-screen">
             <div class="modal-header">
@@ -100,13 +101,66 @@
                 <h4 class="modal-title" id="modalLabel">Nuevo</h4>
             </div>
             <div class="modal-body">
-                <form id="form_indicador_fassa">
+                <form id="form_carga">
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label class="control-label" for="ejercicio">Ejercicio</label>
+                                <input type="number" id="ejercicio" name="ejercicio" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label class="control-label" for="mes">Mes</label>
+                                <select id="mes" name="mes" class="form-control">
+                                    <option value="">Selecciona un mes</option>
+                                    <option value="1">Enero</option>
+                                    <option value="2">Febrero</option>
+                                    <option value="3">Marzo</option>
+                                    <option value="4">Abril</option>
+                                    <option value="5">Mayo</option>
+                                    <option value="6">Junio</option>
+                                    <option value="7">Julio</option>
+                                    <option value="8">Agosto</option>
+                                    <option value="9">Septiembre</option>
+                                    <option value="10">Octubre</option>
+                                    <option value="11">Noviembre</option>
+                                    <option value="12">Diciembre</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-7">
+                            <div class="form-group">
+                                <label class="control-label" for="archivo">Archivo</label>
+                                <input type="file" id="archivo" name="archivo" accept=".csv" class="form-control">
+                                <label>
+                                    <input type="checkbox" id="tiene-encabezado" name="tiene-encabezado" value="1"> El archivo tiene encabezado
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <table id="tabla-conteo-totales" class="table table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th>Total de Registros</th>
+                                <th>Presupuesto Aprobado</th>
+                                <th>Presupuesto Modificado</th>
+                                <th>Presupuesto Liberado</th>
+                                <th>Presupuesto Por Liberar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>0</td><td>$ 0.00</td><td>$ 0.00</td><td>$ 0.00</td><td>$ 0.00</td></tr>
+                        </tbody>
+                    </table>
                     <input type="hidden" id="id" name="id">
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btn-guardar-indicador">Guardar</button>
+                <button type="button" class="btn btn-primary" id="btn-subir-archivo">
+                    <span class="fa fa-save"></span> Guardar
+                </button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
