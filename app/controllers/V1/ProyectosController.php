@@ -20,7 +20,7 @@ use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception;
 use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
 	FibapDatosProyecto, Directorio, ComponenteDesglose, Accion, PropuestaFinanciamiento, DistribucionPresupuesto, DesgloseMetasMes, 
-	DesgloseBeneficiario, ProyectoFinanciamiento, ProyectoFinanciamientoSubFuente;
+	DesgloseBeneficiario, ProyectoFinanciamiento, ProyectoFinanciamientoSubFuente,SentryUser;
 
 class ProyectosController extends BaseController {
 	private $reglasProyecto = array(
@@ -195,11 +195,34 @@ class ProyectosController extends BaseController {
 					});
 			}
 
+			$rows = $rows->where('proyectos.idEstatusProyecto','=',5);
+
 			if(isset($parametros['unidades'])){
 				$unidades = explode(',',$parametros['unidades']);
 				$rows = $rows->whereIn('proyectos.unidadResponsable',$unidades);
 			}
 
+			if(isset($parametros['departamento'])){
+				if(isset($parametros['usuario'])){
+					$id_usuario = $parametros['usuario'];
+				}else{
+					$id_usuario = 0;
+				}
+				$usuarios = SentryUser::usuariosProyectos()->where('idDepartamento','=',$parametros['departamento'])
+										->where('ejercicio','=',intval(date('Y')))->where('sentryUsers.id','<>',$id_usuario)->get();
+				$proyectos_asignados = array();
+				foreach ($usuarios as $usuario) {
+					if($usuario->proyectos){
+						$proyectos_asignados[] = $usuario->proyectos;
+					}
+				}
+				$proyectos_asignados = explode('|',implode('|',$proyectos_asignados));
+
+				$rows = $rows->whereNotIn('proyectos.id',$proyectos_asignados);
+			}
+			//var_dump($proyectos_asignados);die;
+			//throw new Exception("Error:: " + print_r($proyectos_asignados,true), 1);
+			
 			$rows = $rows->contenidoSuggester()->get();
 
 			if(count($rows)<=0){

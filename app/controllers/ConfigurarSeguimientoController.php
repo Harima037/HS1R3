@@ -10,7 +10,7 @@ class ConfigurarSeguimientoController extends \BaseController {
 	public function index()
 	{
 		$catalogos = array(
-				'variables'=>SysConfiguracionVariable::obtenerVariables(array('mes-captura','dias-captura'))
+				'variables'=>SysConfiguracionVariable::obtenerVariables(array('mes-captura','dias-captura','poblacion-total'))
 			);
 		return parent::loadIndex('ADMIN','CONFSEGMET',$catalogos);
 	}

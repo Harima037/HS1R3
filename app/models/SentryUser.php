@@ -21,4 +21,9 @@ class SentryUser extends SentryModel {
     public function proyectosAsignados(){
         return $this->hasOne('UsuarioProyecto','idSentryUser');
     }
+
+    public function scopeUsuariosProyectos($query){
+        return $query->select('sentryUsers.id','sentryUsers.idDepartamento','usuariosProyectos.proyectos','usuariosProyectos.ejercicio')
+                    ->leftjoin('usuariosProyectos','usuariosProyectos.idSentryUser','=','sentryUsers.id');
+    }
 }

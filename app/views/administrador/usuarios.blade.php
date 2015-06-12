@@ -41,8 +41,8 @@
                     <div class="col-lg-6">
                         <div class="btn-toolbar pull-right" >
                             <div class="btn-group" style="margin:5px">
-                                <button type="button" id="btnModuloBloquear" class="btn btn-warning">
-                                    <span class="glyphicon glyphicon-ban-circle"></span> Bloquear / Desbloquear
+                                <button type="button" id="btnReporteUsuarios" class="btn btn-info">
+                                    <span class="fa fa-file-excel-o"></span> Reporte de usuarios
                                 </button>
                             </div>
                             <div class="btn-group" style="margin:5px">
@@ -50,9 +50,22 @@
                                 <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"><span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu pull-right" role="menu">
-                                    <li><a href="#" class="btn-edit-rows"><span class="glyphicon glyphicon-edit"></span> Editar</a></li>
+                                    <li>
+                                        <a href="#" id="btnModuloBloquear">
+                                            <span class="glyphicon glyphicon-ban-circle"></span> Bloquear / Desbloquear
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="btn-edit-rows">
+                                            <span class="glyphicon glyphicon-edit"></span> Editar
+                                        </a>
+                                    </li>
                                     <li class="divider"></li>
-                                    <li><a href="#" class="btn-delete-rows"><span class="glyphicon glyphicon-remove"></span> Eliminar</a></li>
+                                    <li>
+                                        <a href="#" class="btn-delete-rows">
+                                            <span class="glyphicon glyphicon-remove"></span> Eliminar
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -103,225 +116,280 @@
 
 
 @section('modals')
+<div class="modal fade" id="modalModulo" tabindex="-1" role="dialog" aria-labelledby="modalModuloLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-75-screen">
+        <div class="modal-content modal-content-75-screen">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="modalModuloLabel">Nuevo</h4>
+            </div>
+            <div class="modal-body">
 
-    <div class="modal fade" id="modalModulo" tabindex="-1" role="dialog" aria-labelledby="modalModuloLabel" aria-hidden="true" data-backdrop="static">
-        <div class="modal-dialog modal-dialog-75-screen">
-            <div class="modal-content modal-content-75-screen">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="modalModuloLabel">Nuevo</h4>
-                </div>
-                <div class="modal-body">
-
-                    <form action="" id="formModulo">
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li>
-                                <a href="#tab-datos" role="tab" data-toggle="tab">
-                                    <span class="fa fa-user"></span> Datos
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#tab-seguridad" id="nav-tab-seguridad" role="tab" data-toggle="tab">
-                                    <span class="fa fa-shield"></span> Seguridad
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#tab-proyectos" role="tab" data-toggle="tab">
-                                    <span class="fa fa-file"></span> Proyectos
-                                </a>
-                            </li>
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane active" id="tab-datos">
-                                <br>
-                                <div class="row">
+                <form action="" id="formModulo">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li>
+                            <a href="#tab-datos" role="tab" data-toggle="tab">
+                                <span class="fa fa-user"></span> Datos
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#tab-seguridad" id="nav-tab-seguridad" role="tab" data-toggle="tab">
+                                <span class="fa fa-shield"></span> Seguridad
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#tab-proyectos" role="tab" data-toggle="tab">
+                                <span class="fa fa-file"></span> Proyectos
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab-datos">
+                            <br>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="nombres" class="control-label">Nombre(s)</label>
+                                        <input type="text" class="form-control" id="nombres" name="nombres" maxlength="255"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="apellido-paterno" class="control-label">Apellido Paterno</label>
+                                        <input type="text" class="form-control" id="apellido-paterno" name="apellido-paterno" maxlength="255"/>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <label for="apellido-materno" class="control-label">Apellido Materno</label>
+                                        <input type="text" class="form-control" id="apellido-materno" name="apellido-materno" maxlength="255"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <div class="form-group">
+                                        <label for="cargo" class="control-label">Cargo</label>
+                                        <input type="text" class="form-control" id="cargo" name="cargo" maxlength="255"/>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <label for="departamento" class="control-label">Departamento</label>
+                                        <select class="form-control" id="departamento" name="departamento">
+                                            @if($departamentos)
+                                                <option value="">Ninguno</option>
+                                                @foreach($departamentos as $item)
+                                                    <option value="{{ $item->id }}">{{ $item->descripcion }}</option>
+                                                @endforeach
+                                            @else
+                                            <option value=''>No hay departamentos creados</option>
+                                            @endif
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="unidad" class="control-label ">Unidad Asignada</label>
+                                        {{Form::select('unidad[]',$unidades_responsables->lists('descripcion','clave'),0,array('class'=>'form-control chosen-one','id'=>'unidad','multiple'=>'multiple','data-placeholder'=>'Selecciona las unidades a asignar'))}}
+                                        <p class="help-block">Si no selecciona ninguna unidad, el usuario tendrá acceso a todas las unidades disponibles.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12"><label class="control-label">Información de Contacto</label></div>
+                                <div class="col-sm-7">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+                                            <input type="email" class="form-control" id="email" name="email" placeholder="e-mail" maxlength="255">
+                                        </div> 
+                                    </div>
+                                </div>
+                                <div class="col-sm-5">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-phone"></i></span>
+                                            <input type="telefono" class="form-control" id="telefono" name="telefono" placeholder="Teléfono" maxlength="255">
+                                        </div> 
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="username" class="control-label"><span class="fa fa-keyboard-o"></span> Datos de acceso</label>
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                            <input type="text" class="form-control" id="username" name="username" placeholder="Nombre de usuario" maxlength="25"/>
+                                        </div> 
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                            <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" maxlength="12">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <div class="input-group">
+                                            <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                                            <input type="password" class="form-control" id="password_confirm" name="password_confirm" placeholder="Confirmar Contraseña" maxlength="12" data-match="#password">
+                                        </div> 
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="tab-pane" id="tab-seguridad">
+                            <br>
+                            <div class="row">
                                     <div class="col-sm-12">
                                         <div class="form-group">
-                                            <label for="nombres" class="control-label">Nombre(s)</label>
-                                            <input type="text" class="form-control" id="nombres" name="nombres" maxlength="255"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="form-group">
-                                            <label for="apellido-paterno" class="control-label">Apellido Paterno</label>
-                                            <input type="text" class="form-control" id="apellido-paterno" name="apellido-paterno" maxlength="255"/>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="form-group">
-                                            <label for="apellido-materno" class="control-label">Apellido Materno</label>
-                                            <input type="text" class="form-control" id="apellido-materno" name="apellido-materno" maxlength="255"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-8">
-                                        <div class="form-group">
-                                            <label for="cargo" class="control-label">Cargo</label>
-                                            <input type="text" class="form-control" id="cargo" name="cargo" maxlength="255"/>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
-                                            <label for="cargo" class="control-label">Departamento</label>
-                                            <select class="form-control" id="departamento" name="departamento">
-                                                @if($departamentos)
-                                                    <option value="">Ninguno</option>
-                                                    @foreach($departamentos as $item)
-                                                        <option value="{{ $item->id }}">{{ $item->descripcion }}</option>
+                                            <label for="rol" class="control-label">Rol</label>
+                                            <select class="form-control chosen-one" multiple onchange="cleanPermissionPanel()" name="rol[]" id="rol" data-placeholder="Selecciona los roles a asignar al usuario">
+                                                @if($sys_roles)
+                                                    @foreach($sys_roles as $item)
+                                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
                                                     @endforeach
                                                 @else
-                                                <option value=''>No hay departamentos creados</option>
+                                                <option value=''>No hay roles creados</option>
                                                 @endif
                                             </select>
+                                            <p class="help-block">Se pueden seleccionar mas de un rol para el usuario.</p>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row">
                                     <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <label for="unidad" class="control-label ">Unidad Asignada</label>
-                                            {{Form::select('unidad[]',$unidades_responsables->lists('descripcion','clave'),0,array('class'=>'form-control chosen-one','id'=>'unidad','multiple'=>'multiple','data-placeholder'=>'Selecciona las unidades a asignar'))}}
-                                            <p class="help-block">Si no selecciona ninguna unidad, el usuario tendrá acceso a todas las unidades disponibles.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-12"><label class="control-label">Información de Contacto</label></div>
-                                    <div class="col-sm-7">
-                                        <div class="form-group">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                                                <input type="email" class="form-control" id="email" name="email" placeholder="e-mail" maxlength="255">
-                                            </div> 
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-5">
-                                        <div class="form-group">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><i class="fa fa-phone"></i></span>
-                                                <input type="telefono" class="form-control" id="telefono" name="telefono" placeholder="Teléfono" maxlength="255">
-                                            </div> 
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-12">
-                                        <div class="form-group">
-                                            <label for="username" class="control-label"><span class="fa fa-keyboard-o"></span> Datos de acceso</label>
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                                                <input type="text" class="form-control" id="username" name="username" placeholder="Nombre de usuario" maxlength="25"/>
-                                            </div> 
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-sm-6">
-                                        <div class="form-group">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                                                <input type="password" class="form-control" id="password" name="password" placeholder="Contraseña" maxlength="12">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <span class="panel-title">
+                                                    Permisos individuales de usuario
+                                                    <div class="btn-group pull-right">
+                                                        <button type="button" title="Limpiar Permisos" class="btn btn-default" id="btn-limpiar-permisos">
+                                                                <span class="fa fa-trash-o"></span>
+                                                        </button>
+                                                        <button type="button" title="Personalizar Permisos" class="btn btn-warning " id="btn-cargar-cat-permisos">
+                                                            <span class="fa fa-shield"></span>
+                                                        </button>
+                                                    </div>
+                                                </span>
+                                                <div class="clearfix"></div>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <div class="form-group">
-                                            <div class="input-group">
-                                                <span class="input-group-addon"><i class="fa fa-lock"></i></span>
-                                                <input type="password" class="form-control" id="password_confirm" name="password_confirm" placeholder="Confirmar Contraseña" maxlength="12" data-match="#password">
-                                            </div> 
+                                            <table class="table" id="pnlPermissions" >                                        
+                                                <tr><td>Aún no hay permisos individuales asignados.</td></tr>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
-                                
-                            </div>
-                            <div class="tab-pane" id="tab-seguridad">
-                                <br>
-                                <div class="row">
-                                        <div class="col-sm-12">
-                                            <div class="form-group">
-                                                <label for="rol" class="control-label">Rol</label>
-                                                <select class="form-control chosen-one" multiple onchange="cleanPermissionPanel()" name="rol[]" id="rol" data-placeholder="Selecciona los roles a asignar al usuario">
-                                                    @if($sys_roles)
-                                                        @foreach($sys_roles as $item)
-                                                            <option value="{{ $item->id }}">{{ $item->name }}</option>
-                                                        @endforeach
-                                                    @else
-                                                    <option value=''>No hay roles creados</option>
-                                                    @endif
-                                                </select>
-                                                <p class="help-block">Se pueden seleccionar mas de un rol para el usuario.</p>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-12">
-                                            <div class="panel panel-default">
-                                                <div class="panel-heading">
-                                                    <span class="panel-title">
-                                                        Permisos individuales de usuario
-                                                        <div class="btn-group pull-right">
-                                                            <button type="button" title="Limpiar Permisos" class="btn btn-default" id="btn-limpiar-permisos">
-                                                                    <span class="fa fa-trash-o"></span>
-                                                            </button>
-                                                            <button type="button" title="Personalizar Permisos" class="btn btn-warning " id="btn-cargar-cat-permisos">
-                                                                <span class="fa fa-shield"></span>
-                                                            </button>
-                                                        </div>
-                                                    </span>
-                                                    <div class="clearfix"></div>
-                                                </div>
-                                                <table class="table" id="pnlPermissions" >                                        
-                                                    <tr><td>Aún no hay permisos individuales asignados.</td></tr>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                            </div>
+                        </div>
 
-                            <div class="tab-pane" id="tab-proyectos">
-                                <br>
-                                <label class="control-label">
-                                    <span class="fa fa-search"></span> Buscar Proyecto
-                                </label>
-                                <span id="estatus-busqueda-proyecto" class="pull-right"></span>
-                                <input type="text" class="form-control" id="buscar-proyecto" autocomplete="off">
-                                <table id="tabla-lista-proyectos" class="table table-hover table-condensed">
-                                    <thead>
-                                        <tr>
-                                            <th>Clave</th>
-                                            <th>Nombre Técnico</th>
-                                            <th width="55">Quitar</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr id="tr-proyectos-vacio">
-                                            <td colspan="3"><span class="fa fa-info-circle"></span> No hay proyectos asignados</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <div>
-                                    <span class="pull-right">
-                                        <span class="badge" id="conteo-proyectos-seleccionados">0</span> Proyecto(s) seleccionados
-                                    </span>
-                                </div>
-                                <button type="button" class="btn btn-danger" id="btn-limpiar-proyectos">
-                                    <span class="fa fa-trash"></span> Quitar todos
-                                </button>
+                        <div class="tab-pane" id="tab-proyectos">
+                            <br>
+                            <label class="control-label">
+                                <span class="fa fa-search"></span> Buscar Proyecto
+                            </label>
+                            <span id="estatus-busqueda-proyecto" class="pull-right"></span>
+                            <input type="text" class="form-control" id="buscar-proyecto" autocomplete="off">
+                            <table id="tabla-lista-proyectos" class="table table-hover table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>Clave</th>
+                                        <th>Nombre Técnico</th>
+                                        <th width="55">Quitar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="tr-proyectos-vacio">
+                                        <td colspan="3"><span class="fa fa-info-circle"></span> No hay proyectos asignados</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div>
+                                <span class="pull-right">
+                                    <span class="badge" id="conteo-proyectos-seleccionados">0</span> Proyecto(s) seleccionados
+                                </span>
                             </div>
-                        </div>      
-                        <input type="hidden" id="id" name="id">
-                        <!--button type="submit" class="btn btn-primary btn-guardar">Guardar</button-->
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary btn-guardar">Guardar</button>
-                </div>
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
+                            <button type="button" class="btn btn-danger" id="btn-limpiar-proyectos">
+                                <span class="fa fa-trash"></span> Quitar todos
+                            </button>
+                        </div>
+                    </div>      
+                    <input type="hidden" id="id" name="id">
+                    <!--button type="submit" class="btn btn-primary btn-guardar">Guardar</button-->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary btn-guardar">Guardar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="modalReporte" tabindex="-1" role="dialog" aria-labelledby="reporteModalLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-75-screen">
+        <div class="modal-content modal-content-75-screen">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="reporteModalLabel">Nuevo</h4>
+            </div>
+            <div class="modal-body">
+                <form id="formReporte" method="GET" target="_blank">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label for="reporte-unidad" class="control-label ">Unidad Asignada</label>
+                                {{Form::select('reporte-unidad[]',$unidades_responsables->lists('descripcion','clave'),0,array('class'=>'form-control chosen-one','id'=>'reporte-unidad','multiple'=>'multiple','data-placeholder'=>'Selecciona las unidades a asignar'))}}
+                            </div>
+                        </div>
+                        <div class="col-sm-9">
+                            <div class="form-group">
+                                <label for="reporte-rol" class="control-label">Rol</label>
+                                <select class="form-control chosen-one" multiple onchange="cleanPermissionPanel()" name="reporte-rol[]" id="reporte-rol" data-placeholder="Selecciona los roles a asignar al usuario">
+                                    @if($sys_roles)
+                                        @foreach($sys_roles as $item)
+                                            <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                        @endforeach
+                                    @else
+                                    <option value=''>No hay roles creados</option>
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <label for="reporte-departamento" class="control-label">Departamento</label>
+                                <select class="form-control" id="reporte-departamento" name="reporte-departamento">
+                                    @if($departamentos)
+                                        <option value="">Todos</option>
+                                        @foreach($departamentos as $item)
+                                            <option value="{{ $item->id }}">{{ $item->descripcion }}</option>
+                                        @endforeach
+                                    @else
+                                    <option value=''>No hay departamentos creados</option>
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="btn-imprimir-reporte">Imprimir Reporte</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 <!-- Cargar Catalogo para permisos -->
 @include('modulos-generales.catalogo-permisos')

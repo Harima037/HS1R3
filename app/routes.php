@@ -84,6 +84,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 			return "RESTful API Plataforma Base beta 1.0";
 		});
 
+		Route::resource('reporte-usuarios',	'V1\ReporteUsuarioController');
+
 		Route::resource('usuarios',			'V1\UsuariosController');
 		Route::resource('roles',			'V1\RolesController');
 		Route::resource('permisos',			'V1\PermisosController');
@@ -114,7 +116,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('reporte-evaluacion',	'V1\ReporteEvaluacionController', 			array('only'=>array('show')));
 		Route::resource('reporte-programa',		'V1\ReporteEvaluacionProgramaController', 	array('only'=>array('show')));
 
-		Route::resource('reporte-ep-01',	'V1\EP01Controller');
+		Route::resource('reporte-ep-01',		'V1\EP01Controller');
 	});
 });
 

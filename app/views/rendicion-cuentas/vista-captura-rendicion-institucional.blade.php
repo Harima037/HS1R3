@@ -262,7 +262,7 @@
 							@if($trimestre_activo)
 							<li role="presentation" class="disabled">
 								<a href="#panel-plan-mejora" aria-controls="panel-plan-mejora" role="tab" data-toggle="" id="tab-link-plan-mejora">
-									<span class="fa fa-file"></span> Plan de Mejora
+									<span class="fa fa-file"></span> Plan de Acción de Mejora
 								</a>
 							</li>
 							@endif

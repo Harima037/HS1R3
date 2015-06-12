@@ -20,7 +20,7 @@ use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
 use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionProyectoMes,
-	EvaluacionPlanMejora,ComponenteDesglose,DesgloseMetasMes,Directorio;
+	EvaluacionPlanMejora,ComponenteDesglose,DesgloseMetasMes,Directorio,SysConfiguracionVariable;
 
 class SeguimientoController extends BaseController {
 	private $reglasBeneficiarios = array(
@@ -576,6 +576,7 @@ class SeguimientoController extends BaseController {
 						->get();
 
 			$sexos_registrados = $recurso->lists('sexo');
+			$suma_total = 0;
 			foreach ($sexos_registrados as $sexo) {
 				$suma_zona		= $parametros['urbana'.$sexo] + $parametros['rural'.$sexo];
 				$suma_poblacion	= $parametros['mestiza'.$sexo] + $parametros['indigena'.$sexo] + $parametros['inmigrante'.$sexo] + $parametros['otros'.$sexo];
@@ -586,7 +587,16 @@ class SeguimientoController extends BaseController {
 					$respuesta['http_status'] = 500;
 					return $respuesta;
 				}
+				$suma_total += $suma_zona;
 			}
+
+			$variables = SysConfiguracionVariable::obtenerVariables(array('poblacion-total'))->lists('valor','variable');
+			if($suma_total > $variables['poblacion-total']){
+				$respuesta['data'] = array('data'=>array(json_encode(array('field'=>'errorbeneficiarios','error'=>'El total de beneficiarios capturados supera al total de la poblacion del estado.'))),'code'=>'U00');
+				$respuesta['http_status'] = 500;
+				return $respuesta;
+			}
+
 			//
 			//
 			$respuesta['data'] = DB::transaction(function() use ($recurso,$es_editar,$mes_actual,$parametros){

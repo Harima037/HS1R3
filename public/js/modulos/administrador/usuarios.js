@@ -19,8 +19,9 @@ var moduloDatagrid = new Datagrid("#datagridModulo",moduloResource);
 moduloDatagrid.init();
 moduloDatagrid.actualizar();
 
-$('.chosen-one').chosen({width:'100%'});
+var ids_proyectos_seleccionados = {};
 
+$('.chosen-one').chosen({width:'100%'});
 
 /*===================================*/
 // Configuración General para cualquier módulo
@@ -38,8 +39,19 @@ $('#modalModulo').on('hidden.bs.modal',function(){
     resetModalModuloForm();
 });
 
-$('#btnModuloAgregar').on('click', function () {
-    resetModalModuloForm();
+$('#modalReporte').on('hidden.bs.modal',function(){
+    resetModalReporteForm();
+});
+
+$('#btnReporteUsuarios').on('click',function(e){
+    e.preventDefault();
+    $('#modalReporte').find(".modal-title").html("Imprimir Reporte");    
+    $('#modalReporte').modal('show');
+})
+
+$('#btnModuloAgregar').on('click', function (e) {
+    e.preventDefault();
+    //resetModalModuloForm();
     $('#modalModulo').find(".modal-title").html("Nuevo Usuario");    
     $('#modalModulo').modal('show');
 });
@@ -54,7 +66,13 @@ $("#formModulo").on('submit',function(e){
     submitModulo();
 });
 
-
+$('#btn-imprimir-reporte').on('click',function(e){
+    e.preventDefault();
+    //var parametros = $("#formReporte").serialize();
+    $("#formReporte").attr('action',SERVER_HOST+'/v1/reporte-usuarios');
+    $("#formReporte").submit();
+    //window.open(SERVER_HOST+'/v1/reporte-usuarios/' + parametros);
+})
 
 /*===================================*/
 // Implementación personalizada del módulo
@@ -184,7 +202,8 @@ function submitModulo(){
 /*===================================*/
 // Funciones adicionales por módulo
 
-$('#btnModuloBloquear').on('click',function () {
+$('#btnModuloBloquear').on('click',function (e) {
+    e.preventDefault();
     row_ids = [];
     $(moduloDatagrid.selector).find("tbody").find("input[type=checkbox]:checked").each(function () {
         row_ids.push($(this).parent().parent().data("id"));
@@ -199,10 +218,14 @@ $('#btnModuloBloquear').on('click',function () {
             }
         });
     }else {
-        moduloDatagrid.alert("Seleccione al menos a un usuario.");
+        MessageManager.show({code:'W00',data:"Seleccione al menos a un usuario.",timer:5});
     }
 });
 
+function resetModalReporteForm(){
+    $('#formReporte').get(0).reset();
+    $('#formReporte .chosen-one').trigger('chosen:updated');
+}
 
 function resetModalModuloForm(){
     $('#formModulo').get(0).reset();
@@ -211,6 +234,9 @@ function resetModalModuloForm(){
     $('#formModulo #pnlPermissions').html('<tr><td>Aún no hay permisos individuales asignados.</td></tr>');
     $('#formModulo .chosen-one').trigger('chosen:updated');
     limpiar_lista_proyectos();
+    reset_busqueda();
+    proyectoTypeAhead.clearRemoteCache();
+    ids_proyectos_seleccionados = {};
 }
 
 // Funciones de permisos
@@ -333,10 +359,17 @@ var proyectoTypeAhead = new Bloodhound({
                 if($('#unidad').val()){
                     settings.url = settings.url + '&unidades='+$('#unidad').val();
                 }
+                if($('#departamento').val()){
+                    settings.url = settings.url + '&departamento='+$('#departamento').val();
+                }
+                if($('#id').val()){
+                    settings.url = settings.url + '&usuario='+$('#id').val();
+                }
                 $('#estatus-busqueda-proyecto').html('Buscando... <span class="fa fa-spinner fa-spin"></span>');
             },
             complete: function(jqXHR,textStatus){
                 $('#estatus-busqueda-proyecto').html(jqXHR.responseJSON.resultados + ' Proyectos Encontrados');
+                proyectoTypeAhead.clearRemoteCache();
             }
         }
     }
@@ -362,7 +395,9 @@ $('#buscar-proyecto').typeahead(null,{
     }
     reset_busqueda();
     proyectoTypeAhead.clearRemoteCache();
-}).on('typeahead:cursorchanged', function(object, datum){
+    ids_proyectos_seleccionados[datum.id] = 1;
+    console.log(ids_proyectos_seleccionados);
+}).on('typeahead:cursorchanged', function (object, datum){
     $('.tt-suggestion.tt-suggestion-selected').removeClass('tt-suggestion-selected');
     $('#suggest_'+datum.id).parents('.tt-suggestion').addClass('tt-suggestion-selected');
 });
@@ -375,12 +410,14 @@ function quitar_proyecto(id){
     }else{
         $('#conteo-proyectos-seleccionados').text($('#tabla-lista-proyectos tbody tr').length);
     }
+    delete ids_proyectos_seleccionados[id];
 }
 
 function limpiar_lista_proyectos(){
     $('#tabla-lista-proyectos tbody').empty();
     $('#tabla-lista-proyectos tbody').html('<tr id="tr-proyectos-vacio"><td colspan="3"><span class="fa fa-info-circle"></span> No hay proyectos asignados</td></tr>');
     $('#conteo-proyectos-seleccionados').text('0');
+    ids_proyectos_seleccionados = {};
 }
 
 function llenar_lista_proyectos(datos){
@@ -388,6 +425,7 @@ function llenar_lista_proyectos(datos){
     var proyectos = crear_objeto_proyecto(datos);
     for(var i in proyectos){
         lista_proyectos += obtener_html_tabla_proyectos(proyectos[i]);
+        ids_proyectos_seleccionados[proyectos[i].id] = 1;
     }
     if($('#tr-proyectos-vacio').length){
         $('#tr-proyectos-vacio').remove();
@@ -417,13 +455,15 @@ function obtener_template_proyecto(){
             '<table width="100%" border="0" cellpadding="0" cellspacing="0">'+
                 '<tr>'+
                     '<td class="text-{{claseEstatus}}" ><b>{{clavePresupuestaria}}</b> <small>({{clasificacion}})</small></td>'+
-                    '<td width="1"><span class="label label-{{claseEstatus}}">{{estatusProyecto}}</span></td>'+
+                    '<td width="1" class="label-{{claseEstatus}}"><span class="label">{{estatusProyecto}}</span></td>'+
                 '</tr>'+
                 '<tr>'+
                     '<td class="text-{{claseEstatus}}" colspan="2"><big>{{nombreTecnico}}</big></td>'+
                 '</tr>'+
                 '<tr>'+
-                    '<td colspan="2"><span class="text-muted"><small>{{unidadResponsable}}</small></span></td>'+
+                    '<td colspan="2"><span class="text-muted"><small>{{unidadResponsable}}</small></span>'+
+                    '<span class="pull-right"><small><span class="{{seleccionado}}"></span> {{seleccionadoLabel}}</small></span>'+
+                    '</td>'+
                 '</tr>'+
             '</table>'+
         '</div>');
@@ -440,6 +480,8 @@ function crear_objeto_proyecto(datos){
             unidadResponsable: object.unidadResponsable + ' ' + object.unidadResponsableDescripcion,
             claveUnidadResponsable: object.unidadResponsable,
             clasificacion: (object.idClasificacionProyecto == 1)?'Institucional':'Inversión',
+            seleccionado: (ids_proyectos_seleccionados[object.id])?'fa fa-check':'',
+            seleccionadoLabel: (ids_proyectos_seleccionados[object.id])?'Seleccionado':'',
             id: object.id
         };
     });

@@ -136,7 +136,7 @@ class EP01Controller extends \BaseController {
 						}
 						$ejercicio = $parametros['ejercicio'];
 						while (($data2 = fgetcsv($handle, 1000, ",")) !== FALSE) {
-							if($row >= 1 && !$ignorar_primer_linea){
+							if(!($ignorar_primer_linea && $row == 1)){
 								if(count($data2) < 30){ //Número de columnas de cada línea, para validar si todos los campos se tienen
 									$lineasConErrorEnCampos = $lineasConErrorEnCampos . $row . ", ";
 									$errorNumeroCampos = 1;
