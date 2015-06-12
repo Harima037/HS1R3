@@ -160,15 +160,6 @@ class EP01Controller extends \BaseController {
 							}
 							$respuesta['data'] = array("data"=>$errores,'code'=>'U06');
 						}else{
-							//$file = Input::file("logotipo");		
-							$destinationPath = storage_path().'/archivoscsv/';
-
-							$upload_success = Input::file('datoscsv')->move($destinationPath, $nombreArchivo.".csv");
-							$csv = $destinationPath . $nombreArchivo.".csv";
-
-							//$upload_success = Input::file('datoscsv')->move(storage_path()."\\archivoscsv\\",$nombreArchivo.".csv");
-							//$csv = storage_path()."\\archivoscsv\\" . $nombreArchivo.".csv";
-							
 							$recurso = new BitacoraCargaEP01;
 							$recurso->mes = $parametros['mes'];
 							$recurso->ejercicio = $parametros['ejercicio'];
@@ -183,7 +174,13 @@ class EP01Controller extends \BaseController {
 							}else{
 								$resultado = Validador::validar($parametros, $this->reglas);		
 								if($resultado === true){
+									$destinationPath = storage_path().'/archivoscsv/';
+
+									$upload_success = Input::file('datoscsv')->move($destinationPath, $nombreArchivo.".csv");
+									$csv = $destinationPath . $nombreArchivo.".csv";
+
 									try {
+
 										if(isset($parametros['tiene-encabezado'])){
 											$ignorar = 'IGNORE 1 LINES';
 										}else{
@@ -227,7 +224,7 @@ class EP01Controller extends \BaseController {
 											DB::raw('SUM(disponiblePresupuestarioModificado) AS disponiblePresupuestarioModificado')
 										);
 										$conteoTotales = $conteoTotales->where('idBitacoraCargaEP01','=',$idInsertado)->first();
-
+										
 										$recurso->totalRegistros = $conteoTotales->registros;
 										$recurso->presupuestoAprobado = $conteoTotales->presupuestoAprobado;
 										$recurso->modificacionNeta = $conteoTotales->modificacionNeta;
@@ -256,11 +253,11 @@ class EP01Controller extends \BaseController {
 										$respuesta['http_status'] = 500;
 										$respuesta['data'] = array("data"=>"",'ex'=>$e->getMessage(),'line'=>$e->getLine(),'code'=>'S02');
 									}
+
+									File::delete($csv);
 								}else{
 									$respuesta = $resultado;
 								}
-
-								File::delete($csv);
 							}
 						}
 					}
