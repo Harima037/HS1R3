@@ -54,6 +54,10 @@
 			border-collapse: collapse;
 			padding:1;
 		}
+		.tabla-datos td{
+			vertical-align: top;
+			padding: 5px;
+		}
 		.subtitulo-tabla{
 			font-weight: bold;
 			background-color: #DDDDDD;
@@ -74,26 +78,48 @@
 		<thead>
 			<tr>
 				<th class="encabezado-tabla">Departamento</th>
-				<th class="encabezado-tabla">Nombre</th>
-				<th class="encabezado-tabla">Cargo</th>
-				<th class="encabezado-tabla">Email</th>
-				<th class="encabezado-tabla">Telefono</th>
-				<th class="encabezado-tabla">Unidad</th>
-				<th class="encabezado-tabla">Usuario</th>
+				<th width="50" class="encabezado-tabla">Nombre</th>
+				<th width="30" class="encabezado-tabla">Cargo</th>
+				<th width="40" class="encabezado-tabla">Email</th>
+				<th width="15" class="encabezado-tabla">Telefono</th>
+				<th width="60" class="encabezado-tabla">Unidad</th>
+				<th width="13" class="encabezado-tabla">Usuario</th>
 				<th class="encabezado-tabla">Estatus</th>
+				<th width="80" class="encabezado-tabla">Roles</th>
 			</tr>
 		</thead>
 		<tbody>
 			@foreach ($datos as $item)
 				<tr>
-					<td>{{$item->departamento}}</td>
+					<td>
+					@if($item->departamento)
+						{{$item->departamento}}
+					@else
+						Sin departamento
+					@endif
+					</td>
 					<td>{{$item->nombre}}</td>
 					<td>{{$item->cargo}}</td>
 					<td>{{$item->email}}</td>
 					<td>{{$item->telefono}}</td>
-					<td>{{$item->claveUnidad}}</td>
+					<td>
+					@if($item->claveUnidad)
+						@foreach (explode('|',$item->claveUnidad) as $llave => $unidad)
+							@if($llave > 0) <br> @endif {{ $unidad }} {{ $unidades[$unidad] }}
+						@endforeach
+					@else
+						Sin unidad asignada
+					@endif
+					</td>
 					<td>{{$item->username}}</td>
 					<td>{{$item->activated}}</td>
+					<td>
+					@if(isset($roles[$item->id]))
+						@foreach ($roles[$item->id] as $llave => $rol)
+							@if($llave != 0) {{', '}} @endif {{$rol}}
+						@endforeach
+					@endif
+					</td>
 				</tr>
 			@endforeach
 		</tbody>

@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, View;
-use Excel, SentryUser,UnidadResponsable; 
+use Excel, SentryUser, SentryGroup, UnidadResponsable; 
 
 class ReporteUsuarioController extends BaseController {
 
@@ -31,6 +31,7 @@ class ReporteUsuarioController extends BaseController {
 	public function index(){
 		//
 		$parametros = Input::all();
+		$datos = array();
 
 		$rows = Sentry::getUserProvider()->createModel();
 
@@ -59,22 +60,49 @@ class ReporteUsuarioController extends BaseController {
 					}
 				});
 		}
-
-		$rows = $rows->select('sentryUsers.id','username',DB::raw('CONCAT_WS(" ",nombres,apellidoPaterno,apellidoMaterno) AS nombre'),'activated','claveUnidad','telefono','email','cargo','sysDepartamentos.descripcion AS departamento')
-						->leftjoin('sysDepartamentos','sysDepartamentos.id','=','sentryUsers.idDepartamento')
-							->orderBy('id', 'desc')
-							->get();
-		//
 		$unidades = UnidadResponsable::lists('descripcion','clave');
+		$datos['unidades'] = $unidades;
+
+		if(isset($parametros['reporte-rol'])){
+			$roles = $parametros['reporte-rol'];
+			$user_ids = DB::table('sentryUsersGroups')->whereIn('sentry_group_id',$roles)->lists('sentry_user_id');
+			$rows = $rows->whereIn('sentryUsers.id',$user_ids);
+		}
+
+		$rows = $rows->select('sentryUsers.id','username',DB::raw('CONCAT_WS(" ",nombres,apellidoPaterno,apellidoMaterno) AS nombre'),
+							'activated','claveUnidad','telefono','email','cargo','sysDepartamentos.descripcion AS departamento')
+						->leftjoin('sysDepartamentos','sysDepartamentos.id','=','sentryUsers.idDepartamento')
+						->orderBy('id', 'desc')
+						->get();
+		//
+
+		if(isset($parametros['reporte-rol'])){
+			$roles = $parametros['reporte-rol'];
+		}else{
+			$roles = DB::table('sentryUsersGroups')->whereIn('sentry_user_id',$rows->lists('id'))->lists('sentry_group_id');
+		}
+		$roles_raw = SentryGroup::whereIn('sentryGroups.id',$roles)
+								->leftjoin('sentryUsersGroups','sentryUsersGroups.sentry_group_id','=','sentryGroups.id')
+								->select('sentryGroups.name','sentryUsersGroups.sentry_user_id')
+								->get();
+		$datos['roles'] = array();
+		foreach ($roles_raw as $rol) {
+			if(!isset($datos['roles'][$rol->sentry_user_id])){
+				$datos['roles'][$rol->sentry_user_id] = array();
+			}
+			$datos['roles'][$rol->sentry_user_id][] = $rol->name;
+		}
 
 		//return View::make('administrador.excel.reporte-usuarios')->with();
 		//var_dump($rows->toArray());die;
-		$datos = array('datos'=>$rows,'unidades'=>$unidades);
-		
+		$datos['datos'] = $rows;
+		//var_dump($datos);die;
+
 		Excel::create('ListaUsuarios', function($excel) use ($datos){
 			$excel->sheet('Usuarios', function($sheet)  use ($datos){
 		        $sheet->loadView('administrador.excel.reporte-usuarios', $datos);
 		    });
+		    $excel->getActiveSheet()->getStyle('A2:I'.(count($datos['datos'])+1))->getAlignment()->setWrapText(true);
 		})->download('xls');
 	}
 

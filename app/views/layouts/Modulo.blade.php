@@ -66,7 +66,7 @@
                     <p>Para cualquier duda o aclaración, comuníquese al Área de Evaluación:</p>
                     <ul>
                         <li>Vía telefónica: <a href="tel:+529616189250">961 618 9250</a> ext. 44146, 44208</li>
-                        <li>Vía e-mail: <a href="mailto:tovillamijangos@hotmail.com">tovillamijangos@hotmail.com</a>.</li>
+                        <li>Vía e-mail: <a href="mailto:dep_evaluacion@hotmail.com">dep_evaluacion@hotmail.com</a>.</li>
                     </ul>
                 </div>
                 <div class="modal-footer">
