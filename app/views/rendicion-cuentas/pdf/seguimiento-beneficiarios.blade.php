@@ -1,11 +1,11 @@
 <table>
 	<tr>
 		<td rowspan="5" class="imagen izquierda">
-			<img src="{{ URL::to('img/LogoFederal.png') }}" width="150">
+			<img src="{{ URL::to('img/LogoFederal.png') }}" width="125">
 		</td>
 		<td height="20" class="titulo1" align="center">INSTITUTO DE SALUD</td>
 		<td rowspan="5" class="imagen derecha">
-			<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="150">
+			<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="125">
 		</td>
 	</tr>
 	<tr>
@@ -70,7 +70,7 @@
 	</tr>
 
 	<tr class="tabla-datos" height="40">
-		<td class="texto-centro texto-medio" rowspan="2">{{$beneficiario['tipoBeneficiario']}}</td>
+		<td class="texto-centro texto-medio" rowspan="3">{{$beneficiario['tipoBeneficiario']}}</td>
 		<td class="texto-centro texto-medio negrita">Femenino</td>
 		<td class="texto-centro texto-medio"> {{number_format($beneficiarios_avances[$beneficiario['id']]['f']['total'])}} </td>
 		<td class="texto-centro texto-medio"> {{number_format($beneficiarios_avances[$beneficiario['id']]['f']['urbana'])}} </td>
@@ -105,7 +105,6 @@
 	</tr>
 
 	<tr class="tabla-datos" height="40">
-		<td class="texto-centro texto-medio"></td>
 		<td class="texto-centro texto-medio negrita">Total</td>
 		<td class="texto-centro texto-medio">
 			{{

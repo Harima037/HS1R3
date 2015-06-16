@@ -1,11 +1,11 @@
 <table>
 	<tr>
 		<td rowspan="5" class="imagen izquierda">
-			<img src="{{ URL::to('img/LogoFederal.png') }}" width="150">
+			<img src="{{ URL::to('img/LogoFederal.png') }}" width="125">
 		</td>
 		<td height="20" class="titulo1" align="center">INSTITUTO DE SALUD</td>
 		<td rowspan="5" class="imagen derecha">
-			<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="150">
+			<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="125">
 		</td>
 	</tr>
 	<tr>
@@ -25,7 +25,7 @@
 	</tr>
 </table>
 
-<table>
+<table width="100%">
 
 	<tr height="90" class="texto-medio texto">
 		<td class="texto-derecha">Nombre del proyecto: </td>
@@ -51,23 +51,25 @@
 
 </table>
 
-<table>
+<table width="100%">
+	<thead>
 	<tr class="tabla-datos" height="50">
-		<td width="15" class="encabezado-tabla">NIVEL</td>
-		<td width="40" class="encabezado-tabla">INDICADOR</td>
-		<td width="15" class="encabezado-tabla">META PROGRAMADA</td>
-		<td width="15" class="encabezado-tabla">META MODIFICADA</td>
-		<td width="15" class="encabezado-tabla">AVANCES DEL MES</td>
-		<td width="15" class="encabezado-tabla">AVANCE ACUMULADO</td>
-		<td width="13" class="encabezado-tabla">% DE AVANCE ACUMULADO</td>
-		<td width="13" class="encabezado-tabla">% DE AVANCE MODIFICADO</td>
-		<td width="35" class="encabezado-tabla">ANALISIS DE RESULTADOS 	ACUMULADO</td>
-		<td width="35" class="encabezado-tabla">JUSTIFICACIÓN ACUMULADA</td>
+		<td class="encabezado-tabla">NIVEL</td>
+		<td class="encabezado-tabla">INDICADOR</td>
+		<td class="encabezado-tabla">META<br>PROGRAMADA</td>
+		<td class="encabezado-tabla">META<br>MODIFICADA</td>
+		<td class="encabezado-tabla">AVANCES DEL MES</td>
+		<td class="encabezado-tabla">AVANCE ACUMULADO</td>
+		<td class="encabezado-tabla">% DE AVANCE ACUMULADO</td>
+		<td class="encabezado-tabla">% DE AVANCE MODIFICADO</td>
+		<td class="encabezado-tabla">ANALISIS DE RESULTADOS 	ACUMULADO</td>
+		<td class="encabezado-tabla">JUSTIFICACIÓN ACUMULADA</td>
 	</tr>
-
+	</thead>
+	<tbody>
 	@foreach($componentes as $index => $componente)
 	<tr height="50" class="tabla-datos">
-		<td class="texto-medio">Componente {{$index+1}}</td>
+		<td class="texto-medio" nowrap="nowrap">Componente {{$index+1}}</td>
 		<td class="texto-medio">{{$componente['indicador']}}</td>
 		@if(isset($avances_mes['componentes'][$componente['id']]))
 		<td class="texto-medio texto-centro">{{number_format($avances_mes['componentes'][$componente['id']]['meta_programada'],2)}}</td>
@@ -148,6 +150,7 @@
 	</tr>
 	@endforeach
 	@endforeach
+	</tbody>
 </table>
 <table>
 	<tr>
@@ -191,11 +194,11 @@
 <table>
 	<tr>
 		<td rowspan="5" class="imagen izquierda">
-			<img src="{{ URL::to('img/LogoFederal.png') }}" width="150">
+			<img src="{{ URL::to('img/LogoFederal.png') }}" width="125">
 		</td>
 		<td height="20" class="titulo1" align="center">INSTITUTO DE SALUD</td>
 		<td rowspan="5" class="imagen derecha">
-			<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="150">
+			<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="125">
 		</td>
 	</tr>
 	<tr>
@@ -242,28 +245,32 @@
 </table>
 
 <table>
-	
+	<thead>
 	<tr class="tabla-datos" height="40">
-		<td class="encabezado-tabla">NIVEL</td>
-		<td class="encabezado-tabla">INDICADOR</td>
-		<td class="encabezado-tabla">META PROGRAMADA</td>
-		<td class="encabezado-tabla">META MODIFICADA</td>
-		<td class="encabezado-tabla">AVANCES DEL MES</td>
-		<td class="encabezado-tabla">AVANCE ACUMULADO</td>
-		<td class="encabezado-tabla">% DE AVANCE ACUMULADO</td>
-		<td class="encabezado-tabla">% DE AVANCE MODIFICADO</td>
+		<td width="60" class="encabezado-tabla">NIVEL</td>
+		<td width="150" class="encabezado-tabla">INDICADOR</td>
+		<td width="90" class="encabezado-tabla">META PROGRAMADA</td>
+		<td width="90" class="encabezado-tabla">META MODIFICADA</td>
+		<td width="90" class="encabezado-tabla">AVANCES DEL MES</td>
+		<td width="90" class="encabezado-tabla">AVANCE ACUMULADO</td>
+		<td width="80" class="encabezado-tabla">% DE AVANCE ACUMULADO</td>
+		<td width="80" class="encabezado-tabla">% DE AVANCE MODIFICADO</td>
 	</tr>
+	</thead>
+</table>
 
 	@foreach($componentes as $index => $componente)
+<table >
+	<thead>
 	<tr height="20" class="tabla-datos">
-		<td class="subtitulo-tabla">Componente {{$index+1}}</td>
-		<td class="subtitulo-tabla">{{$componente['indicador']}}</td>
+		<td width="60" class="subtitulo-tabla">Componente {{$index+1}}</td>
+		<td width="150" class="subtitulo-tabla">{{$componente['indicador']}}</td>
 		@if(isset($avances_mes['componentes'][$componente['id']]))
-		<td class="subtitulo-tabla">{{number_format($avances_mes['componentes'][$componente['id']]['meta_programada'],2)}}</td>
-		<td class="subtitulo-tabla"></td>
-		<td class="subtitulo-tabla">{{number_format($avances_mes['componentes'][$componente['id']]['avance_mes'],2)}}</td>
-		<td class="subtitulo-tabla">{{number_format($avances_mes['componentes'][$componente['id']]['avance_acumulado'],2)}}</td>
-		<td class="subtitulo-tabla">
+		<td width="90" class="subtitulo-tabla">{{number_format($avances_mes['componentes'][$componente['id']]['meta_programada'],2)}}</td>
+		<td width="90" class="subtitulo-tabla">&nbsp;</td>
+		<td width="90" class="subtitulo-tabla">{{number_format($avances_mes['componentes'][$componente['id']]['avance_mes'],2)}}</td>
+		<td width="90" class="subtitulo-tabla">{{number_format($avances_mes['componentes'][$componente['id']]['avance_acumulado'],2)}}</td>
+		<td width="80" class="subtitulo-tabla">
 		@if($avances_mes['componentes'][$componente['id']]['meta_programada'] > 0)
 			{{
 			floatval(
@@ -281,15 +288,16 @@
 		@endif
 		%</td>
 		@else
-		<td class="subtitulo-tabla">0</td>
-		<td class="subtitulo-tabla"></td>
-		<td class="subtitulo-tabla">0</td>
-		<td class="subtitulo-tabla">0</td>
-		<td class="subtitulo-tabla">0%</td>
+		<td width="90" class="subtitulo-tabla">0</td>
+		<td width="90" class="subtitulo-tabla"></td>
+		<td width="90" class="subtitulo-tabla">0</td>
+		<td width="90" class="subtitulo-tabla">0</td>
+		<td width="80" class="subtitulo-tabla">0%</td>
 		@endif
-		<td class="subtitulo-tabla"></td>
+		<td width="80" class="subtitulo-tabla">&nbsp;</td>
 	</tr>
-
+	</thead>
+	<tbody>
 		@foreach($jurisdicciones as $clave => $jurisdiccion)
 		<tr height="20" class="tabla-datos">
 			<td></td>
@@ -356,17 +364,21 @@
 				@endforeach
 			@endif
 		@endforeach
+	</tbody>
+</table>
 
 		@foreach($componente['actividades'] as $indice => $actividad)
+	<table >
+		<thead>
 		<tr height="20" class="tabla-datos">
-			<td class="subtitulo-tabla">Actividad {{$index+1}}.{{$indice+1}}</td>
-			<td class="subtitulo-tabla">{{$actividad['indicador']}}</td>
+			<td width="60" class="subtitulo-tabla">Actividad {{$index+1}}.{{$indice+1}}</td>
+			<td width="150" class="subtitulo-tabla">{{$actividad['indicador']}}</td>
 			@if(isset($avances_mes['actividades'][$actividad['id']]))
-			<td class="subtitulo-tabla">{{number_format($avances_mes['actividades'][$actividad['id']]['meta_programada'],2)}}</td>
-			<td class="subtitulo-tabla"></td>
-			<td class="subtitulo-tabla">{{number_format($avances_mes['actividades'][$actividad['id']]['avance_mes'],2)}}</td>
-			<td class="subtitulo-tabla">{{number_format($avances_mes['actividades'][$actividad['id']]['avance_acumulado'],2)}}</td>
-			<td class="subtitulo-tabla">
+			<td width="90" class="subtitulo-tabla">{{number_format($avances_mes['actividades'][$actividad['id']]['meta_programada'],2)}}</td>
+			<td width="90" class="subtitulo-tabla">&nbsp;</td>
+			<td width="90" class="subtitulo-tabla">{{number_format($avances_mes['actividades'][$actividad['id']]['avance_mes'],2)}}</td>
+			<td width="90" class="subtitulo-tabla">{{number_format($avances_mes['actividades'][$actividad['id']]['avance_acumulado'],2)}}</td>
+			<td width="80" class="subtitulo-tabla">
 			@if($avances_mes['actividades'][$actividad['id']]['meta_programada'] > 0)
 				{{
 				floatval(
@@ -384,15 +396,16 @@
 			@endif
 			 %</td>
 			@else
-			<td class="subtitulo-tabla">0</td>
-			<td class="subtitulo-tabla"></td>
-			<td class="subtitulo-tabla">0</td>
-			<td class="subtitulo-tabla">0</td>
-			<td class="subtitulo-tabla">0%</td>
+			<td width="90" class="subtitulo-tabla">0</td>
+			<td width="90" class="subtitulo-tabla"></td>
+			<td width="90" class="subtitulo-tabla">0</td>
+			<td width="90" class="subtitulo-tabla">0</td>
+			<td width="80" class="subtitulo-tabla">0%</td>
 			@endif
-			<td class="subtitulo-tabla"></td>
+			<td width="80" class="subtitulo-tabla">&nbsp;</td>
 		</tr>
-
+		</thead>
+		<tbody>
 			@foreach($jurisdicciones as $clave => $jurisdiccion)
 			<tr height="20" class="tabla-datos">
 				<td></td>
@@ -431,6 +444,9 @@
 				<td></td>
 			</tr>
 			@endforeach
+		</tbody>
+	</table>
 		@endforeach
+
 	@endforeach
-</table>
+	

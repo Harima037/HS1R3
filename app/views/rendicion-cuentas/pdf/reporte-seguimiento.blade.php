@@ -65,7 +65,7 @@
 		}
 		.encabezado-tabla{
 			font-family: Arial;
-			font-size: 10;
+			font-size: 8;
 			font-weight: bold;
 			text-align: center;
 			vertical-align: middle;

@@ -29,6 +29,7 @@ return array(
 	*/
 
 	'host' => 'smtp.gmail.com',
+	//'host' => 'smtp-mail.outlook.com',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -81,6 +82,7 @@ return array(
 	*/
 
 	'username' => 'tisaludchiapas@gmail.com',
+	//'username' => 'dep_evaluacion@hotmail.com',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -94,6 +96,7 @@ return array(
 	*/
 
 	'password' => '&devssa00#$',
+	//'password' => 'Progra2015',
 
 	/*
 	|--------------------------------------------------------------------------

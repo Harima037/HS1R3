@@ -18,7 +18,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
-use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
+use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime,Mail;
 use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionProyectoMes,
 	EvaluacionPlanMejora,ComponenteDesglose,DesgloseMetasMes,Directorio,SysConfiguracionVariable;
 
@@ -445,9 +445,38 @@ class SeguimientoController extends BaseController {
 
 				if($seguimiento_mes->idEstatus == 1 || $seguimiento_mes->idEstatus == 3){
 					$seguimiento_mes->idEstatus = 2;
-					$seguimiento_mes->save();
-					$respuesta['data'] = 'El Proyecto fue enviado a Revisión';
-					return $respuesta;
+					if($seguimiento_mes->save()){
+						/*
+						$id_proyecto = $recurso->id;
+						$usuario = Sentry::getUserProvider()->createModel();
+						$usuario = $usuario->where('idDepartamento','=',2)
+											->join('usuariosProyectos','usuariosProyectos.idSentryUser','=','sentryUsers.id')
+											->where(function($query)use($id_proyecto){
+												$query = $query->where('usuariosProyectos.proyectos','like',$id_proyecto.'|%')
+																->orWhere('usuariosProyectos.proyectos','like','%|'.$id_proyecto.'|%')
+																->orWhere('usuariosProyectos.proyectos','like','%|'.$id_proyecto)
+																->orWhere('usuariosProyectos.proyectos','like',$id_proyecto);
+											})
+											->select('sentryUsers.id','sentryUsers.nombres','sentryUsers.email')
+											->first();
+						if($usuario){
+							$data['usuario'] = $usuario;
+							$data['proyecto'] = $recurso;
+							$data['mes_captura'] = Util::obtenerDescripcionMes(Util::obtenerMesActual());
+
+							Mail::send('emails.rendicion-cuentas.proyecto-a-revision', $data, function($message) use ($usuario){
+								$message->to($usuario->email,$usuario->nombres)->subject('SIRE:: Seguimiento enviado a revisión');
+							});
+							$respuesta['notas'] = 'Con correo enviado';
+						}else{
+							$respuesta['notas'] = 'Sin correo enviado';
+						}
+						*/
+						$respuesta['data'] = 'El Proyecto fue enviado a Revisión';
+						return $respuesta;
+					}else{
+						throw new Exception("Hubo un error al intentar enviar el proyecto a revisión", 1);
+					}
 				}
 			}else{
 				$seguimiento_mes = EvaluacionProyectoMes::where('idProyecto','=',$parametros['id-proyecto'])

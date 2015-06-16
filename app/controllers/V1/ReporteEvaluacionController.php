@@ -362,7 +362,7 @@ class ReporteEvaluacionController extends BaseController {
 
 		$dato_reporte = array('datos'=>$datos, 'reporte' => $reporte_indicador, 'tipo_reporte' => $tipo_reporte);
 
-		$pdf = PDF::setPaper('LEGAL')->setOrientation('landscape')->setWarnings(false)->loadView('rendicion-cuentas.pdf.reporte-seguimiento',$dato_reporte);
+		$pdf = PDF::setPaper('LETTER')->setOrientation('landscape')->setWarnings(false)->loadView('rendicion-cuentas.pdf.reporte-seguimiento',$dato_reporte);
 		/*if($tipo_reporte != 'analisis'){
 			
 		}else{

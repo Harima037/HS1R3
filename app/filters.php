@@ -97,7 +97,7 @@ App::after(function($request,$response){
 Route::filter('auth.sentry', function()
 {
 	if (!Sentry::check()){
-		Session::put('loginRedirect',Request::url());
+		Session::put('loginRedirect',Request::path());
 		return Redirect::to('login');
 	}
 });

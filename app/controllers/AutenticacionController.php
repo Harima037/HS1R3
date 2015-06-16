@@ -21,7 +21,7 @@ class AutenticacionController extends Controller {
 		$info = '';
 		$usuario = '';
 		if (Sentry::check()) {
-			return Redirect::to('/');
+			return Redirect::intended('/');
 		}
 
 		if(Input::all()){
@@ -49,7 +49,7 @@ class AutenticacionController extends Controller {
 						$data['usuario'] = $User;
 						$data['token'] = $User->getResetPasswordCode();
 						Mail::send('emails.auth.reset_pass', $data, function($message) use ($User){
-							$message->to($User->email,$User->nombres)->subject('Recuperar Contraseña');
+							$message->to($User->email,$User->nombres)->subject('SIRE:: Recuperar Contraseña');
 						});
 						$info = 'Se ha enviado un correo electrónico a ['.$User->email.'] con los pasos a seguir para recuperar su contraseña.';
 					}else{
@@ -57,7 +57,9 @@ class AutenticacionController extends Controller {
 					}
 				}else{
 					if($User = Sentry::authenticate(array('username'=>$parametros['usuario'],'password'=>$parametros['password']),false)){
-						return Redirect::intended('/');
+						$redirect = Session::get('loginRedirect', '/');
+						Session::forget('loginRedirect');
+						return Redirect::intended($redirect);
 					}
 				}
 			}catch (\Cartalyst\Sentry\Users\LoginRequiredException $e) {

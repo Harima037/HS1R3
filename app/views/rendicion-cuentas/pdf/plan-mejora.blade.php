@@ -1,11 +1,11 @@
 <table>
 	<tr>
 		<td rowspan="5" class="imagen izquierda">
-			<img src="{{ URL::to('img/LogoFederal.png') }}" width="150">
+			<img src="{{ URL::to('img/LogoFederal.png') }}" width="125">
 		</td>
 		<td height="20" class="titulo1" align="center">INSTITUTO DE SALUD</td>
 		<td rowspan="5" class="imagen derecha">
-			<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="150">
+			<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="125">
 		</td>
 	</tr>
 	<tr>
@@ -38,6 +38,7 @@
 </table>
 
 <table>
+<thead>
 	<tr class="tabla-datos" height="40">
 		<th rowspan="2" class="encabezado-tabla">NIVEL</th>
 		<th rowspan="2" class="encabezado-tabla">INDICADOR</th>
@@ -52,12 +53,12 @@
 		<th rowspan="2" class="encabezado-tabla">FECHA DE NOTIFICACIÓN</th>
 		<th rowspan="2" class="encabezado-tabla">DOCUMENTACIÓN COMPROBATORIA</th>
 	</tr>
-
 	<tr class="tabla-datos" height="50">
 		<th class="encabezado-tabla">SI</th>
 		<th class="encabezado-tabla">NO</th>
 	</tr>
-
+</thead>
+<tbody>
 	@foreach($componentes as $index => $componente)
 	<tr height="90" class="tabla-datos">
 		<td class="texto-medio">Componente {{$index+1}}</td>
@@ -143,8 +144,8 @@
 	</tr>
 	@endforeach
 	@endforeach
-
 	<tr><td colspan="13" height="40"></td></tr>
+</tbody>
 </table>
 
 <table>
