@@ -70,7 +70,7 @@
 	@foreach($componentes as $index => $componente)
 	<tr height="50" class="tabla-datos">
 		<td class="texto-medio" nowrap="nowrap">Componente {{$index+1}}</td>
-		<td class="texto-medio">{{$componente['indicador']}}</td>
+		<td class="texto-medio">{{{ $componente['indicador'] }}}</td>
 		@if(isset($avances_mes['componentes'][$componente['id']]))
 		<td class="texto-medio texto-centro">{{number_format($avances_mes['componentes'][$componente['id']]['meta_programada'],2)}}</td>
 		<td class="texto-medio texto-centro"></td>
@@ -94,8 +94,8 @@
 		@endif
 		 %</td>
 		<td class="texto-medio texto-centro"></td>
-		<td class="texto-medio">{{$avances_mes['componentes'][$componente['id']]['analisis_resultados']}}</td>
-		<td class="texto-medio">{{$avances_mes['componentes'][$componente['id']]['justificacion_acumulada']}}</td>
+		<td class="texto-medio">{{{ $avances_mes['componentes'][$componente['id']]['analisis_resultados'] }}}</td>
+		<td class="texto-medio">{{{ $avances_mes['componentes'][$componente['id']]['justificacion_acumulada'] }}}</td>
 		@else
 		<td class="texto-medio texto-centro">0</td>
 		<td class="texto-medio texto-centro"></td>
@@ -111,7 +111,7 @@
 	@foreach($componente['actividades'] as $indice => $actividad)
 	<tr height="50" class="tabla-datos">
 		<td class="texto-medio">Actividad {{$index+1}}.{{$indice+1}}</td>
-		<td class="texto-medio">{{$actividad['indicador']}}</td>
+		<td class="texto-medio">{{{ $actividad['indicador'] }}}</td>
 		@if(isset($avances_mes['actividades'][$actividad['id']]))
 		<td class="texto-medio texto-centro">{{number_format($avances_mes['actividades'][$actividad['id']]['meta_programada'],2)}}</td>
 		<td class="texto-medio texto-centro"></td>
@@ -135,8 +135,8 @@
 		@endif
 		 %</td>
 		<td class="texto-medio texto-centro"></td>
-		<td class="texto-medio">{{$avances_mes['actividades'][$actividad['id']]['analisis_resultados']}}</td>
-		<td class="texto-medio">{{$avances_mes['actividades'][$actividad['id']]['justificacion_acumulada']}}</td>
+		<td class="texto-medio">{{{ $avances_mes['actividades'][$actividad['id']]['analisis_resultados'] }}}</td>
+		<td class="texto-medio">{{{ $avances_mes['actividades'][$actividad['id']]['justificacion_acumulada'] }}}</td>
 		@else
 		<td class="texto-medio texto-centro">0</td>
 		<td class="texto-medio texto-centro"></td>

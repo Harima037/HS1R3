@@ -34,8 +34,6 @@
 		<td class="texto-medio" style="padding:5px;" colspan="2">{{$proyecto['programaPresupuestario']}}</td>
 	</tr>
 
-	<tr><td colspan="6"></td></tr>
-
 	<tr class="tabla-datos" height="20">
 		<th colspan="2" class="encabezado-tabla texto-izquierda"  style="font-size:8;">FUNCIÓN:</th>
 		<th class="encabezado-tabla texto-izquierda"  style="font-size:8;">SUBFUNCIÓN:</th>
@@ -63,8 +61,6 @@
 		@endforeach
 	</tr>
 
-	<tr><td colspan="6"></td></tr>
-
 	<tr class="tabla-datos" height="20">
 		<th colspan="2" class="encabezado-tabla texto-izquierda" style="font-size:8;">CLAVE PRESUPUESTAL:</th>
 		<th colspan="4" class="encabezado-tabla texto-izquierda" style="font-size:8;">NOMBRE DEL PROYECTO:</th>
@@ -74,42 +70,34 @@
 		<td colspan="4" class="texto-medio" style="padding:5px;"> {{ $proyecto['nombreTecnico'] }} </td>
 	</tr>
 
-	<tr><td colspan="6"></td></tr>
-
 	<tr class="tabla-datos">
 		<th colspan="6" class="encabezado-tabla" style="font-size:8;">FINALIDAD DEL PROYECTO</th>
 	</tr>
-	<tr class="tabla-datos" height="50">
-		<td class="texto-medio" style="padding:5px;" colspan="6">{{$analisis_funcional->finalidadProyecto}}</td>
-	</tr>
 
-	<tr><td colspan="6"></td></tr>
+	<tr class="tabla-datos" height="50">
+		<td class="texto-medio" style="padding:5px;" colspan="6">{{{ $analisis_funcional->finalidadProyecto }}}</td>
+	</tr>
 
 	<tr class="tabla-datos">
 		<th colspan="6" class="encabezado-tabla" style="font-size:8;">ANALISIS DE RESULTADO</th>
 	</tr>
 	<tr class="tabla-datos" height="150">
-		<td class="texto-medio" style="padding:5px;" colspan="6">{{$analisis_funcional->analisisResultado}}</td>
+		<td class="texto-medio" style="padding:5px;" colspan="6">{{{ $analisis_funcional->analisisResultado }}}</td>
 	</tr>
-
-	<tr><td colspan="6"></td></tr>
 
 	<tr class="tabla-datos">
 		<th colspan="6" class="encabezado-tabla" style="font-size:8;">BENEFICIARIOS</th>
 	</tr>
 	<tr class="tabla-datos" height="50">
-		<td class="texto-medio" style="padding:5px;" colspan="6">{{$analisis_funcional->beneficiarios}}</td>
+		<td class="texto-medio" style="padding:5px;" colspan="6">{{{ $analisis_funcional->beneficiarios }}}</td>
 	</tr>
-
-	<tr><td colspan="6"></td></tr>
 
 	<tr class="tabla-datos">
 		<th colspan="6" class="encabezado-tabla" style="font-size:8;">JUSTIFICACIÓN GLOBAL DEL PROYECTO</th>
 	</tr>
 	<tr class="tabla-datos" height="150">
-		<td class="texto-medio" style="padding:5px;" colspan="6">{{$analisis_funcional->justificacionGlobal}}</td>
+		<td class="texto-medio" style="padding:5px;" colspan="6">{{{ $analisis_funcional->justificacionGlobal }}}</td>
 	</tr>
-
 	<tr><td colspan="6" height="40"></td></tr>
 </table>
 <table>

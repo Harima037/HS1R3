@@ -39,36 +39,35 @@
 		<td></td>
 		<td></td>
 	</tr>
+	<tr height="40"><td colspan="15">&nbsp;</td></tr>
 </table>
 
+@foreach($beneficiarios as $beneficiario)
 <table>
-	@foreach($beneficiarios as $beneficiario)
-	<tr height="40"><td colspan="15">&nbsp;</td></tr>
-
-	<tr class="tabla-datos" height="25">
-		<td colspan="5" style="border:none;"></td>
-		<td class="encabezado-tabla" colspan="4">POBLACIÓN</td>
-		<td class="encabezado-tabla" colspan="5">MARGINACIÓN</td>
-		<td rowspan="2" width="15" class="encabezado-tabla">POBLACIÓN ACUMULADA</td>
-		<!--td class="sin-bordes"></td-->
+<thead>
+	<tr class="tabla-datos">
+		<td rowspan="2" class="encabezado-tabla" style="font-size:7;">TIPO</td>
+		<td rowspan="2" class="encabezado-tabla" style="font-size:7;">GÉNERO</td>
+		<td rowspan="2" class="encabezado-tabla" style="font-size:7;">TOTAL</td>
+		<td rowspan="2" class="encabezado-tabla" style="font-size:7;">ZONA <br> URBANA</td>
+		<td rowspan="2" class="encabezado-tabla" style="font-size:7;">ZONA <br> RURAL</td>
+		<td class="encabezado-tabla" style="font-size:7;" colspan="4">POBLACIÓN</td>
+		<td class="encabezado-tabla" style="font-size:7;" colspan="5">MARGINACIÓN</td>
+		<td rowspan="2" class="encabezado-tabla" style="font-size:7;">POBLACIÓN<br>ACUMULADA</td>
 	</tr>
-	<tr class="tabla-datos" height="30">
-		<td width="25" class="encabezado-tabla">TIPO</td>
-		<td width="12" class="encabezado-tabla">GÉNERO</td>
-		<td width="15" class="encabezado-tabla">TOTAL</td>
-		<td width="15" class="encabezado-tabla">ZONA URBANA</td>
-		<td width="15" class="encabezado-tabla">ZONA RURAL</td>
-		<td width="15" class="encabezado-tabla">MESTIZA</td>
-		<td width="15" class="encabezado-tabla">INDÍGENA</td>
-		<td width="15" class="encabezado-tabla">INMIGRANTE</td>
-		<td width="15" class="encabezado-tabla">OTROS</td>
-		<td width="15" class="encabezado-tabla">MUY ALTA</td>
-		<td width="15" class="encabezado-tabla">ALTA</td>
-		<td width="15" class="encabezado-tabla">MEDIA</td>
-		<td width="15" class="encabezado-tabla">BAJA</td>
-		<td width="15" class="encabezado-tabla">MUY BAJA</td>
+	<tr class="tabla-datos">
+		<td class="encabezado-tabla" style="font-size:7;">MESTIZA</td>
+		<td class="encabezado-tabla" style="font-size:7;">INDÍGENA</td>
+		<td class="encabezado-tabla" style="font-size:7;">INMIGRANTE</td>
+		<td class="encabezado-tabla" style="font-size:7;">OTROS</td>
+		<td class="encabezado-tabla" style="font-size:7;">MUY ALTA</td>
+		<td class="encabezado-tabla" style="font-size:7;">ALTA</td>
+		<td class="encabezado-tabla" style="font-size:7;">MEDIA</td>
+		<td class="encabezado-tabla" style="font-size:7;">BAJA</td>
+		<td class="encabezado-tabla" style="font-size:7;">MUY BAJA</td>
 	</tr>
-
+</thead>
+<tbody>
 	<tr class="tabla-datos" height="40">
 		<td class="texto-centro texto-medio" rowspan="3">{{$beneficiario['tipoBeneficiario']}}</td>
 		<td class="texto-centro texto-medio negrita">Femenino</td>
@@ -173,49 +172,43 @@
 			}}
 		</td>
 	</tr>
-
-	<tr><td height="40" colspan="15">&nbsp;</td></tr>
-
-	<tr class="negrita" height="20">
-		<td></td>
-		<td></td>
-		<td></td>
-		<td colspan="4" align="center">RESPONSABLE DE LA INFORMACIÓN</td>
-		<td></td>
-		<td colspan="5" align="center">LIDER DEL PROYECTO</td>
-		<td></td>
-		<td></td>
-	</tr>
-	<tr height="40">
-		<td></td>
-		<td></td>
-		<td></td>
-		<td colspan="4" height="40" class="linea-firma">&nbsp;</td>
-		<td></td>
-		<td colspan="5" class="linea-firma"></td>
-		<td></td>
-		<td></td>
-	</tr>
-	<tr class="negrita" height="20">
-		<td></td>
-		<td></td>
-		<td></td>
-		<td colspan="4" align="center">{{ $proyecto['responsableInformacion'] }}</td>
-		<td></td>
-		<td colspan="5" align="center">{{ $proyecto['liderProyecto'] }}</td>
-		<td></td>
-		<td></td>
-	</tr>
-	<tr class="negrita" height="20">
-		<td></td>
-		<td></td>
-		<td></td>
-		<td colspan="4" align="center">{{ $proyecto['cargoResponsableInformacion'] }}</td>
-		<td></td>
-		<td colspan="5" align="center">{{ $proyecto['cargoLiderProyecto'] }}</td>
-		<td></td>
-		<td></td>
-	</tr>
-	@endforeach
-
+</tbody>
 </table>
+<table>
+	<tr>
+		<td colspan="5">&nbsp;</td>
+	</tr>
+	<tr class="negrita" height="20">
+		<td width="10%"></td>
+		<td align="center">RESPONSABLE DE LA INFORMACIÓN</td>
+		<td width="10%"></td>
+		<td align="center">LIDER DEL PROYECTO</td>
+		<td width="10%"></td>
+	</tr>
+	<tr>
+		<td>&nbsp;</td>
+		<td height="20" class="linea-firma"></td>
+		<td>&nbsp;</td>
+		<td class="linea-firma"></td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr class="negrita" height="20">
+		<td></td>
+		<td align="center">{{ $proyecto['responsableInformacion'] }}</td>
+		<td></td>
+		<td align="center">{{ $proyecto['liderProyecto'] }}</td>
+		<td></td>
+	</tr>
+	<tr class="negrita" height="20">
+		<td></td>
+		<td align="center">{{ $proyecto['cargoResponsableInformacion'] }}</td>
+		<td></td>
+		<td align="center">{{ $proyecto['cargoLiderProyecto'] }}</td>
+		<td></td>
+	</tr>
+	<tr>
+		<td colspan="5">&nbsp;</td>
+	</tr>
+</table>
+@endforeach
+

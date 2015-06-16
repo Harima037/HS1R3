@@ -37,32 +37,32 @@
 	<tr><td colspan="13" height="20"></td></tr>
 </table>
 
-<table>
+<table class="tabla-datos">
 <thead>
-	<tr class="tabla-datos" height="40">
-		<th rowspan="2" class="encabezado-tabla">NIVEL</th>
-		<th rowspan="2" class="encabezado-tabla">INDICADOR</th>
-		<th rowspan="2" class="encabezado-tabla">% DE AVANCE ACUMULADO</th>
-		<th rowspan="2" class="encabezado-tabla">ANÁLISIS DE RESULTADOS </th>
-		<th rowspan="2" class="encabezado-tabla">JUSTIFICACIÓN</th>
-		<th colspan="2" class="encabezado-tabla">¿REQUIERE ACCIÓN DE MEJORA?</th>
-		<th rowspan="2" class="encabezado-tabla">ACCIÓN DE MEJORA</th>
-		<th rowspan="2" class="encabezado-tabla">GRUPO DE TRABAJO</th>
-		<th rowspan="2" class="encabezado-tabla">FECHA DE INICIO</th>
-		<th rowspan="2" class="encabezado-tabla">FECHA DE TERMINO</th>
-		<th rowspan="2" class="encabezado-tabla">FECHA DE NOTIFICACIÓN</th>
-		<th rowspan="2" class="encabezado-tabla">DOCUMENTACIÓN COMPROBATORIA</th>
+	<tr>
+		<th width="60" rowspan="2" class="encabezado-tabla" style="font-size:6;">NIVEL</th>
+		<th width="79" rowspan="2" class="encabezado-tabla" style="font-size:6;">INDICADOR</th>
+		<th width="50" rowspan="2" class="encabezado-tabla" style="font-size:6;">% DE AVANCE ACUMULADO</th>
+		<th width="79" rowspan="2" class="encabezado-tabla" style="font-size:6;">ANÁLISIS DE RESULTADOS </th>
+		<th width="79" rowspan="2" class="encabezado-tabla" style="font-size:6;">JUSTIFICACIÓN</th>
+		<th width="40" colspan="2" class="encabezado-tabla" style="font-size:6;">¿REQUIERE ACCIÓN DE MEJORA?</th>
+		<th rowspan="2" class="encabezado-tabla" style="font-size:6;">ACCIÓN <br>DE MEJORA</th>
+		<th rowspan="2" class="encabezado-tabla" style="font-size:6;">GRUPO DE <br>TRABAJO</th>
+		<th rowspan="2" class="encabezado-tabla" style="font-size:6;">FECHA DE <br>INICIO</th>
+		<th rowspan="2" class="encabezado-tabla" style="font-size:6;">FECHA DE <br>TERMINO</th>
+		<th rowspan="2" class="encabezado-tabla" style="font-size:6;">FECHA DE <br>NOTIFICACIÓN</th>
+		<th rowspan="2" class="encabezado-tabla" style="font-size:6;">DOCUMENTACIÓN <br>COMPROBATORIA</th>
 	</tr>
-	<tr class="tabla-datos" height="50">
-		<th class="encabezado-tabla">SI</th>
-		<th class="encabezado-tabla">NO</th>
+	<tr>
+		<th class="encabezado-tabla" style="font-size:6;">SI</th>
+		<th class="encabezado-tabla" style="font-size:6;">NO</th>
 	</tr>
 </thead>
 <tbody>
 	@foreach($componentes as $index => $componente)
-	<tr height="90" class="tabla-datos">
-		<td class="texto-medio">Componente {{$index+1}}</td>
-		<td class="texto-medio">{{$componente['indicador']}}</td>
+	<tr>
+		<td class="texto-medio" nowrap="nowrap">Componente {{$index+1}}</td>
+		<td class="texto-medio">{{{ $componente['indicador'] }}}</td>
 		<td class="texto-medio texto-centro">
 		@if($avances_mes['componentes'][$componente['id']]['meta_programada'] > 0)
 			{{
@@ -78,33 +78,33 @@
 			100
 		@endif
 		 %</td>
-		<td class="texto-medio">{{$avances_mes['componentes'][$componente['id']]['analisis_resultados']}}</td>
-		<td class="texto-medio">{{$avances_mes['componentes'][$componente['id']]['justificacion_acumulada']}}</td>
+		<td class="texto-medio">{{{ $avances_mes['componentes'][$componente['id']]['analisis_resultados'] }}}</td>
+		<td class="texto-medio">{{{ $avances_mes['componentes'][$componente['id']]['justificacion_acumulada'] }}}</td>
 		@if(isset($planes_mejora['componentes'][$componente['id']]))
 			<td class="texto-medio texto-centro">X</td>
-			<td></td>
-			<td class="texto-medio">{{$planes_mejora['componentes'][$componente['id']]['accionMejora']}}</td>
-			<td class="texto-medio">{{$planes_mejora['componentes'][$componente['id']]['grupoTrabajo']}}</td>
-			<td class="texto-medio">{{$planes_mejora['componentes'][$componente['id']]['fechaInicio']}}</td>
-			<td class="texto-medio">{{$planes_mejora['componentes'][$componente['id']]['fechaTermino']}}</td>
-			<td class="texto-medio">{{$planes_mejora['componentes'][$componente['id']]['fechaNotificacion']}}</td>
-			<td class="texto-medio">{{$planes_mejora['componentes'][$componente['id']]['documentacionComprobatoria']}}</td>
+			<td>&nbsp;</td>
+			<td class="texto-medio">{{{ $planes_mejora['componentes'][$componente['id']]['accionMejora'] }}}</td>
+			<td class="texto-medio">{{{ $planes_mejora['componentes'][$componente['id']]['grupoTrabajo'] }}}</td>
+			<td class="texto-medio">{{{ $planes_mejora['componentes'][$componente['id']]['fechaInicio'] }}}</td>
+			<td class="texto-medio">{{{ $planes_mejora['componentes'][$componente['id']]['fechaTermino'] }}}</td>
+			<td class="texto-medio">{{{ $planes_mejora['componentes'][$componente['id']]['fechaNotificacion'] }}}</td>
+			<td class="texto-medio">{{{ $planes_mejora['componentes'][$componente['id']]['documentacionComprobatoria'] }}}</td>
 		@else
-			<td></td>
+			<td>&nbsp;</td>
 			<td class="texto-medio texto-centro">X</td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
 		@endif
 	</tr>
 
 	@foreach($componente['actividades'] as $indice => $actividad)
-	<tr height="90" class="tabla-datos">
+	<tr>
 		<td class="texto-medio">Actividad {{$index+1}}.{{$indice+1}}</td>
-		<td class="texto-medio">{{$actividad['indicador']}}</td>
+		<td class="texto-medio">{{{ $actividad['indicador'] }}}</td>
 		<td class="texto-medio texto-centro">
 		@if($avances_mes['actividades'][$actividad['id']]['meta_programada'] > 0)
 			{{
@@ -120,35 +120,35 @@
 			100
 		@endif
 		 %</td>
-		<td class="texto-medio">{{$avances_mes['actividades'][$actividad['id']]['analisis_resultados']}}</td>
-		<td class="texto-medio">{{$avances_mes['actividades'][$actividad['id']]['justificacion_acumulada']}}</td>
+		<td class="texto-medio">{{{ $avances_mes['actividades'][$actividad['id']]['analisis_resultados'] }}}</td>
+		<td class="texto-medio">{{{ $avances_mes['actividades'][$actividad['id']]['justificacion_acumulada'] }}}</td>
 		@if(isset($planes_mejora['actividades'][$actividad['id']]))
 			<td class="texto-medio texto-centro">X</td>
-			<td></td>
-			<td class="texto-medio">{{$planes_mejora['actividades'][$actividad['id']]['accionMejora']}}</td>
-			<td class="texto-medio">{{$planes_mejora['actividades'][$actividad['id']]['grupoTrabajo']}}</td>
-			<td class="texto-medio">{{$planes_mejora['actividades'][$actividad['id']]['fechaInicio']}}</td>
-			<td class="texto-medio">{{$planes_mejora['actividades'][$actividad['id']]['fechaTermino']}}</td>
-			<td class="texto-medio">{{$planes_mejora['actividades'][$actividad['id']]['fechaNotificacion']}}</td>
-			<td class="texto-medio">{{$planes_mejora['actividades'][$actividad['id']]['documentacionComprobatoria']}}</td>
+			<td>&nbsp;</td>
+			<td class="texto-medio">{{{ $planes_mejora['actividades'][$actividad['id']]['accionMejora'] }}}</td>
+			<td class="texto-medio">{{{ $planes_mejora['actividades'][$actividad['id']]['grupoTrabajo'] }}}</td>
+			<td class="texto-medio">{{{ $planes_mejora['actividades'][$actividad['id']]['fechaInicio'] }}}</td>
+			<td class="texto-medio">{{{ $planes_mejora['actividades'][$actividad['id']]['fechaTermino'] }}}</td>
+			<td class="texto-medio">{{{ $planes_mejora['actividades'][$actividad['id']]['fechaNotificacion'] }}}</td>
+			<td class="texto-medio">{{{ $planes_mejora['actividades'][$actividad['id']]['documentacionComprobatoria'] }}}</td>
 		@else
-			<td></td>
+			<td>&nbsp;</td>
 			<td class="texto-medio texto-centro">X</td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
 		@endif
 	</tr>
 	@endforeach
 	@endforeach
-	<tr><td colspan="13" height="40"></td></tr>
 </tbody>
 </table>
 
-<table>
+<table style="page-break-inside:avoid;">
+	<tr><td colspan="5" height="10">&nbsp;</td></tr>
 	<tr class="negrita" height="20">
 		<td width="10%"></td>
 		<td align="center">RESPONSABLE DE LA INFORMACIÓN</td>
@@ -157,24 +157,24 @@
 		<td width="10%"></td>
 	</tr>
 	<tr>
-		<td></td>
-		<td height="40" class="linea-firma"></td>
 		<td>&nbsp;</td>
-		<td class="linea-firma"></td>
-		<td></td>
+		<td height="20" class="linea-firma">&nbsp;</td>
+		<td>&nbsp;</td>
+		<td class="linea-firma">&nbsp;</td>
+		<td>&nbsp;</td>
 	</tr>
 	<tr class="negrita" height="20">
-		<td></td>
+		<td>&nbsp;</td>
 		<td align="center">{{ $proyecto['responsableInformacion'] }}</td>
-		<td></td>
+		<td>&nbsp;</td>
 		<td align="center">{{ $proyecto['liderProyecto'] }}</td>
-		<td></td>
+		<td>&nbsp;</td>
 	</tr>
 	<tr class="negrita" height="20">
-		<td></td>
+		<td>&nbsp;</td>
 		<td align="center">{{ $proyecto['cargoResponsableInformacion'] }}</td>
-		<td></td>
+		<td>&nbsp;</td>
 		<td align="center">{{ $proyecto['cargoLiderProyecto'] }}</td>
-		<td></td>
+		<td>&nbsp;</td>
 	</tr>
 </table>
