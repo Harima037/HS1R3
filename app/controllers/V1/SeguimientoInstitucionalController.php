@@ -244,6 +244,10 @@ class SeguimientoInstitucionalController extends BaseController {
 				}))->where('idProyecto','=',$parametros['id-proyecto'])->where('idTipoBeneficiario','=',$id)->get();
 			}elseif ($parametros['mostrar'] == 'analisis-funcional') {
 				$recurso = EvaluacionAnalisisFuncional::with('comentarios')->find($id);
+			}elseif ($parametros['mostrar'] == 'comentarios-proyecto-mes') {
+				$recurso = EvaluacionComentario::where('idProyecto','=',$id)
+											->where('mes','=',$parametros['mes'])
+											->where('tipoElemento','=','4')->get();
 			}
 		}
 

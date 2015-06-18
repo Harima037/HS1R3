@@ -64,7 +64,7 @@
                 	<div class="col-sm-12">
 	    				<div class="form-group">
 	    					<label class="control-label" for="lbl-analisis-resultado">Finalidad del proyecto </label>
-	    					<p id="lbl-finalidad" name="lbl-finalidad" rows="6" class="form-control"></p>
+	    					<p id="lbl-finalidad" name="lbl-finalidad" style="height:auto" class="form-control"></p>
                             <p align="right"><button type="button" class="btn btn-default" onclick="escribirComentario('finalidad','Finalidad del Proyecto','lbl-finalidad','4','id-analisis');"><span class="fa fa-edit"></span> Comentar Finalidad del proyecto</button></p>
 	    				</div>
 	    			</div>
@@ -73,21 +73,21 @@
 	    			<div class="col-sm-12">
 	    				<div class="form-group">
 	    					<label class="control-label" for="lbl-analisis-resultado">Analisis de Resultado </label>
-	    					<p id="lbl-analisis-resultado" name="lbl-analisis-resultado" rows="6" class="form-control"></p>
+	    					<p id="lbl-analisis-resultado" name="lbl-analisis-resultado" style="height:auto" class="form-control"></p>
                             <p align="right"><button type="button" class="btn btn-default" onclick="escribirComentario('analisis-resultado','Análisis de resultado','lbl-analisis-resultado','4','id-analisis');"><span class="fa fa-edit"></span> Comentar Analisis de Resultado</button></p>
 	    				</div>
 	    			</div>
 	    			<div class="col-sm-12">
 	    				<div class="form-group">
 	    					<label class="control-label" for="lbl-analisis-beneficiarios">Beneficiarios</label>
-	    					<p id="lbl-analisis-beneficiarios" name="lbl-analisis-beneficiarios" rows="6" class="form-control"></p>
+	    					<p id="lbl-analisis-beneficiarios" name="lbl-analisis-beneficiarios" style="height:auto" class="form-control"></p>
                             <p align="right"><button type="button" class="btn btn-default" onclick="escribirComentario('analisis-beneficiarios','Beneficiarios','lbl-analisis-beneficiarios','4','id-analisis');"><span class="fa fa-edit"></span> Comentar Beneficiarios</button></p>
 	    				</div>
 	    			</div>
 	    			<div class="col-sm-12">
 	    				<div class="form-group">
 	    					<label class="control-label" for="lbl-justificacion-global">Justificación Global del Proyecto</label>
-	    					<p id="lbl-justificacion-global" name="lbl-justificacion-global" rows="6" class="form-control"></p>
+	    					<p id="lbl-justificacion-global" name="lbl-justificacion-global" style="height:auto" class="form-control"></p>
                             <p align="right"><button type="button" class="btn btn-default" onclick="escribirComentario('justificacion-global','Justificación Global del Proyecto','lbl-justificacion-global','4','id-analisis');"><span class="fa fa-edit"></span> Comentar Justificación Global del Proyecto</button></p>
 	    				</div>
 	    			</div>
