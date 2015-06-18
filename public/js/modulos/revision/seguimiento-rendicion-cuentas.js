@@ -555,7 +555,7 @@ function llenar_grid_acciones(response){
     var datos_grid = [];
     var contador_componente = 0;
 	
-	console.log(response.data);
+	//console.log(response.data);
 	
 	if(response.data.fuenteInformacion)
 		$('#lbl-fuente-informacion').text(response.data.fuenteInformacion);
@@ -963,6 +963,38 @@ if($('#id-analisis').val()){
         }
     });
 }
+else
+{
+	//console.log($('#id').val());
+	//console.log($('#mes').val());
+	var parametros = {'mostrar':'comentarios-proyecto-mes','mes':$('#mes').val()};
+    moduloResource.get($('#id').val(),parametros,{
+        _success: function(response){
+			//console.log(response.data);            
+			for(var coment in response.data)
+			{
+				var idCampo = response.data[coment].idCampo;
+				var objetoAColorear = '#lbl-'+idCampo;
+				$(objetoAColorear).parent().parent().addClass('has-error has-feedback');				
+				comentariosArray.push([response.data[coment]['id'],response.data[coment]['idCampo'], response.data[coment]['observacion'],'4']);
+			}
+        },
+        _error: function(response){
+            try{
+                var json = $.parseJSON(response.responseText);
+                if(!json.code)
+                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                else{
+                    MessageManager.show(json);
+                }
+                Validation.formValidate(json.data);
+            }catch(e){
+                console.log(e);
+            }                       
+        }
+    });
+}
+
 $('#btn-guadar-analisis-funcional').on('click',function(){
    /* var parametros = $('#form_analisis').serialize();
     parametros += '&guardar=analisis-funcional&id-proyecto='+$('#id').val();

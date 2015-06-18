@@ -46,17 +46,19 @@ if($('#id').val()){
     moduloResource.get($('#id').val(),parametros,{
         _success:function(response){
 			
+			//console.log(response.data);
+			
 			$('#idEstatusPrograma').val(response.data.idEstatus);
 			
-			$('#lbl-programa-sectorial').text(response.data.claveSectorial+' '+response.data.sectorial);
+			$('#lbl-programa-sectorial').text(response.data.programaSectorial);
 			$('#lbl-vinculacion-ped').text(response.data.objetivoPED);
 			$('#lbl-vinculacion-pnd').text(response.data.objetivoPND);
 					
-            $('#lbl-programa-presupuestario').text(response.data.claveProgramaPresupuestario+' '+response.data.programaPresupuestario);
-            $('#lbl-unidad-responsable').text(response.data.claveUnidadResponsable+' '+response.data.unidadResponsable);
+            $('#lbl-programa-presupuestario').text(response.data.programaPresupuestarioDescripcion);
+            $('#lbl-unidad-responsable').text(response.data.unidadResponsable);
             $('#lbl-ejercicio').text(response.data.ejercicio);
-            $('#lbl-odm').text(response.data.claveODM+' '+response.data.ODM);
-            $('#lbl-modalidad').text(response.data.claveModalidad+' '+response.data.Modalidad);
+            $('#lbl-odm').text(response.data.ODM);
+            $('#lbl-modalidad').text(response.data.claveModalidad+' '+response.data.modalidad);
             $('#lbl-fecha-inicio').text(response.data.fechaInicio);
             $('#lbl-fecha-termino').text(response.data.fechaTermino);
             $('#lbl-resultados-esperados').text(response.data.resultadosEsperados);
@@ -99,6 +101,7 @@ if($('#id').val()){
 			var parametrosIndicadores = {'listar':'indicadores','id-programa':$('#id').val(),'formatogrid':'true'};
 			moduloResource.get(null,parametrosIndicadores,{
 				_success:function(response){
+					
 					var indicaHTML ='';
 					for(var i in response.data)
 					{
@@ -107,7 +110,7 @@ if($('#id').val()){
 						moduloResource.get(indicador.id,parametrosIndicador,{
 							_success:function(response){
 								var clv = response.data.claveTipoIndicador;
-								
+								console.log(response.data);
 								//OBJETIVO
 								$('#lbl-descripcion-obj-'+clv).text(response.data.descripcionObjetivo);								
 								if(response.data.claveAmbito=='E')
