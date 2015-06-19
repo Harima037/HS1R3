@@ -446,6 +446,7 @@ class SeguimientoController extends BaseController {
 				if($seguimiento_mes->idEstatus == 1 || $seguimiento_mes->idEstatus == 3){
 					$seguimiento_mes->idEstatus = 2;
 					if($seguimiento_mes->save()){
+						/*
 						$id_proyecto = $recurso->id;
 						$usuario = Sentry::getUserProvider()->createModel();
 						$usuario = $usuario->where('idDepartamento','=',2)
@@ -470,6 +471,7 @@ class SeguimientoController extends BaseController {
 						}else{
 							$respuesta['notas'] = 'Sin correo enviado';
 						}
+						*/
 						
 						$respuesta['data'] = 'El Proyecto fue enviado a Revisión';
 						return $respuesta;
