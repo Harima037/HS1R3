@@ -62,6 +62,9 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		
 		Route::get('seguimiento-programas',array('uses'=>'SeguimientoProgramaController@index'));
 		Route::get('avance-programa/{id}',array('uses'=>'SeguimientoProgramaController@editarAvance'));
+		
+		//Route::get('revision-rendicion-fassa',array('uses'=>'RevisionRendicionFassaController@index'));
+		
 	});
 
 	Route::group(array('prefix'=>'rendicion-cuentas'),function(){

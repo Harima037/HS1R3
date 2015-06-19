@@ -41,6 +41,7 @@ moduloDatagrid.actualizar({
                     item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class=""><span class="fa fa-lock"></span></span>';
                 }
             }
+						
 
             for(var j in response.data[i].registro_avance){
                 var avance = response.data[i].registro_avance[j];
