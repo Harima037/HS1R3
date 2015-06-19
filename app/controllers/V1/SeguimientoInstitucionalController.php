@@ -112,6 +112,11 @@ class SeguimientoInstitucionalController extends BaseController {
 					$unidades = explode('|',$usuario->claveUnidad);
 					$rows = $rows->whereIn('unidadResponsable',$unidades);
 				}
+				$rows = $rows->with(array('registroAvance'=>function($query){
+					$query->select('id','idProyecto','mes',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'),DB::raw('count(idNivel) as registros'))->groupBy('idProyecto','mes');
+				},'evaluacionMeses'=>function($query) use ($mes_actual){
+					$query->where('mes','=',$mes_actual);
+				}));
 
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				
@@ -128,7 +133,6 @@ class SeguimientoInstitucionalController extends BaseController {
 									->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
 									->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')									
 									->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
-									//->join('evaluacionProyectoMes','evaluacionProyectoMes.idProyecto','=','proyectos.id')
 									->orderBy('id', 'desc')
 									->skip(($parametros['pagina']-1)*10)->take(10)
 									->get();
