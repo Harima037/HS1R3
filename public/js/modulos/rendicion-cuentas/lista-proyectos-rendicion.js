@@ -140,7 +140,7 @@ function cargar_datos_proyecto(e){
                     }else{
                         var colo_texto = 'text-primary';
                     }
-                    var celda = '<span class="'+colo_texto+'">'+parseFloat(avance.avanceMes)+'</span>';
+                    var celda = '<span class="'+colo_texto+'">'+parseFloat(avance.avanceMes).format(2)+'</span>';
                     $('#avance-trim-'+trimestre+' > tbody > tr[data-nivel="1"][data-id="'+componente.id+'"] > td[data-trim-mes="'+mes_del_trimestre+'"]').html(celda);
                     sumatoria_componente[trimestre] += parseFloat(avance.avanceMes);
                     total_trimestres[trimestre][avance.mes] = (parseFloat(total_trimestres[trimestre][avance.mes]) || 0) + parseFloat(avance.avanceMes);
@@ -149,7 +149,7 @@ function cargar_datos_proyecto(e){
                     if(j > 1){
                         sumatoria_componente[j] = sumatoria_componente[j] + sumatoria_componente[j-1];
                     }
-                    $('#avance-trim-'+j+' > tbody > tr[data-nivel="1"][data-id="'+componente.id+'"] > td[data-total-id="'+componente.id+'"]').html(sumatoria_componente[j]);
+                    $('#avance-trim-'+j+' > tbody > tr[data-nivel="1"][data-id="'+componente.id+'"] > td[data-total-id="'+componente.id+'"]').html(sumatoria_componente[j].format(2));
                 }
                 for(var k in componente.actividades){
                     var actividad = componente.actividades[k];
@@ -164,7 +164,7 @@ function cargar_datos_proyecto(e){
                         }else{
                             var colo_texto = 'text-primary';
                         }
-                        var celda = '<span class="'+colo_texto+'">'+parseFloat(avance.avanceMes)+'</span>';
+                        var celda = '<span class="'+colo_texto+'">'+parseFloat(avance.avanceMes).format(2)+'</span>';
                         $('#avance-trim-'+trimestre+' > tbody > tr[data-nivel="2"][data-id="'+actividad.id+'"] > td[data-trim-mes="'+mes_del_trimestre+'"]').html(celda);
                         sumatoria_actividad[trimestre] += parseFloat(avance.avanceMes);
                         total_trimestres[trimestre][avance.mes] = (parseFloat(total_trimestres[trimestre][avance.mes]) || 0) + parseFloat(avance.avanceMes);
@@ -173,7 +173,7 @@ function cargar_datos_proyecto(e){
                         if(j > 1){
                             sumatoria_actividad[j] = sumatoria_actividad[j] + sumatoria_actividad[j-1];
                         }
-                        $('#avance-trim-'+j+' > tbody > tr[data-nivel="2"][data-id="'+actividad.id+'"] > td[data-total-id="'+actividad.id+'"]').html(sumatoria_actividad[j]);
+                        $('#avance-trim-'+j+' > tbody > tr[data-nivel="2"][data-id="'+actividad.id+'"] > td[data-total-id="'+actividad.id+'"]').html(sumatoria_actividad[j].format(2));
                     }
                 }
             }

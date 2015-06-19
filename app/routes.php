@@ -59,6 +59,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		
 		Route::get('revision-programas',array('uses'=>'RevisionProgramaController@index'));
 		Route::get('revision-ver-programa/{id?}',array('uses'=>'RevisionProgramaController@editar'));
+
+		Route::get('cuenta-publica',array('uses'=>'CuentaPublicaController@index'));
 		
 		Route::get('seguimiento-programas',array('uses'=>'SeguimientoProgramaController@index'));
 		Route::get('avance-programa/{id}',array('uses'=>'SeguimientoProgramaController@editarAvance'));
@@ -101,6 +103,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('rend-cuenta-inv', 		'V1\SeguimientoController');
 		Route::resource('rend-cuenta-prog', 	'V1\RendicionProgramaController');
 		Route::resource('rend-cuenta-fassa',	'V1\RendicionFassaController');
+
+		Route::resource('cuenta-publica',		'V1\CuentaPublicaController');
 
 		Route::resource('revision-proyectos',	'V1\RevisionController');
 		Route::resource('segui-proyectos-inst', 'V1\SeguimientoInstitucionalController');

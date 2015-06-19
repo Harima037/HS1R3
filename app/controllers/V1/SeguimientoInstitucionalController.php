@@ -393,6 +393,7 @@ class SeguimientoInstitucionalController extends BaseController {
 								//->where('anio','=',date("Y"))
 								->update(array('idEstatus' => $estatus));
 				if($recurso){
+					/*
 					$usuario = Sentry::getUserProvider()->createModel();
 					$usuario = $usuario->where('idDepartamento','=',3)
 										->join('usuariosProyectos','usuariosProyectos.idSentryUser','=','sentryUsers.id')
@@ -429,6 +430,7 @@ class SeguimientoInstitucionalController extends BaseController {
 					}else{
 						$respuesta['notas'] = 'Sin correo enviado';
 					}
+					*/
 				}else{
 					$respuesta['http_status'] = 500;
 					$respuesta['data'] = array("data"=>"Ocurrio un error al intentar validar el proyecto.",'code'=>'S01');

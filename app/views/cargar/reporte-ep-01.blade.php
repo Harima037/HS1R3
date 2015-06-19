@@ -134,7 +134,7 @@
                                 <label class="control-label" for="archivo">Archivo</label>
                                 <input type="file" id="archivo" name="archivo" accept=".csv" class="form-control">
                                 <label>
-                                    <input type="checkbox" id="tiene-encabezado" name="tiene-encabezado" value="1"> El archivo tiene encabezado
+                                    <input type="checkbox" id="tiene-encabezado" name="tiene-encabezado" value="1" checked="checked"> El archivo tiene encabezado
                                 </label>
                             </div>
                         </div>

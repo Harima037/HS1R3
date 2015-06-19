@@ -657,6 +657,8 @@ function llenar_grid_acciones(response){
                 }
             }
         }
+        item.avances_acumulados = item.avances_acumulados.format(2);
+        item.avances_mes = item.avances_mes.format(2);
         datos_grid.push(item);
 
         for(var j in componente.actividades){
@@ -688,6 +690,8 @@ function llenar_grid_acciones(response){
                     }
                 }
             }
+            item.avances_acumulados = item.avances_acumulados.format(2);
+            item.avances_mes = item.avances_mes.format(2);
             datos_grid.push(item);
         }
     }

@@ -126,149 +126,140 @@ class EP01Controller extends \BaseController {
 			if($type=="text/plain") //Si el Mime coincide con CSV
 			{
 				$row = 1;
-				if(mb_detect_encoding(file_get_contents($archivoConDatos), 'UTF-8', true))//Valida que la codificación del archivo sea UTF-8
-				{
-					if (($handle = fopen($archivoConDatos, "r")) !== FALSE) {
-						if(isset($parametros['tiene-encabezado'])){
-							$ignorar_primer_linea = true;
-						}else{
-							$ignorar_primer_linea = false;
+				if (($handle = fopen($archivoConDatos, "r")) !== FALSE) {
+					if(isset($parametros['tiene-encabezado'])){
+						$ignorar_primer_linea = true;
+					}else{
+						$ignorar_primer_linea = false;
+					}
+					$ejercicio = $parametros['ejercicio'];
+					while (($data2 = fgetcsv($handle, 1000, ",")) !== FALSE) {
+						if(!($ignorar_primer_linea && $row == 1)){
+							if(count($data2) < 30){ //Número de columnas de cada línea, para validar si todos los campos se tienen
+								$lineasConErrorEnCampos = $lineasConErrorEnCampos . $row . ", ";
+								$errorNumeroCampos = 1;
+							}
+							if($data2[16] != $ejercicio){
+								$lineasConErrorEjercicio = $lineasConErrorEjercicio . $row . ", ";
+								$errorNumeroCampos = 1;
+							}
 						}
-						$ejercicio = $parametros['ejercicio'];
-						while (($data2 = fgetcsv($handle, 1000, ",")) !== FALSE) {
-							if(!($ignorar_primer_linea && $row == 1)){
-								if(count($data2) < 30){ //Número de columnas de cada línea, para validar si todos los campos se tienen
-									$lineasConErrorEnCampos = $lineasConErrorEnCampos . $row . ", ";
-									$errorNumeroCampos = 1;
-								}
-								if($data2[16] != $ejercicio){
-									$lineasConErrorEjercicio = $lineasConErrorEjercicio . $row . ", ";
-									$errorNumeroCampos = 1;
-								}
-							}
-							$row++;
-					    }
+						$row++;
+				    }
 
-						if($errorNumeroCampos == 1){
+					if($errorNumeroCampos == 1){
+						$respuesta['http_status'] = 404;
+						$errores = '';
+						if($lineasConErrorEnCampos != ""){
+							$errores .= "Error en los datos, las lineas ".$lineasConErrorEnCampos."no están completas";
+						}
+						if($lineasConErrorEjercicio != ""){
+							$errores .= "Error en los datos, las lineas ".$lineasConErrorEjercicio."no corresponden al ejercicio proporcionado";
+						}
+						$respuesta['data'] = array("data"=>$errores,'code'=>'U06');
+					}else{
+						$recurso = new BitacoraCargaEP01;
+						$recurso->mes = $parametros['mes'];
+						$recurso->ejercicio = $parametros['ejercicio'];
+						
+						$validarEjercicioMes = BitacoraCargaEP01::getModel();
+						$validarEjercicioMes = $validarEjercicioMes->where('mes','=',$parametros['mes'])
+														 ->where('ejercicio','=',$parametros['ejercicio'])->count();
+						//
+						if($validarEjercicioMes){
 							$respuesta['http_status'] = 404;
-							$errores = '';
-							if($lineasConErrorEnCampos != ""){
-								$errores .= "Error en los datos, las lineas ".$lineasConErrorEnCampos."no están completas";
-							}
-							if($lineasConErrorEjercicio != ""){
-								$errores .= "Error en los datos, las lineas ".$lineasConErrorEjercicio."no corresponden al ejercicio proporcionado";
-							}
-							$respuesta['data'] = array("data"=>$errores,'code'=>'U06');
+							$respuesta['data'] = array("data"=>"Ya se cuenta con la carga de datos del mes y ejercicio especificados.",'code'=>'U06');
 						}else{
-							$recurso = new BitacoraCargaEP01;
-							$recurso->mes = $parametros['mes'];
-							$recurso->ejercicio = $parametros['ejercicio'];
-							
-							$validarEjercicioMes = BitacoraCargaEP01::getModel();
-							$validarEjercicioMes = $validarEjercicioMes->where('mes','=',$parametros['mes'])
-															 ->where('ejercicio','=',$parametros['ejercicio'])->count();
-							//
-							if($validarEjercicioMes){
-								$respuesta['http_status'] = 404;
-								$respuesta['data'] = array("data"=>"Ya se cuenta con la carga de datos del mes y ejercicio especificados.",'code'=>'U06');
-							}else{
-								$resultado = Validador::validar($parametros, $this->reglas);		
-								if($resultado === true){
-									$destinationPath = storage_path().'/archivoscsv/';
+							$resultado = Validador::validar($parametros, $this->reglas);		
+							if($resultado === true){
+								$destinationPath = storage_path().'/archivoscsv/';
 
-									$upload_success = Input::file('datoscsv')->move($destinationPath, $nombreArchivo.".csv");
-									$csv = $destinationPath . $nombreArchivo.".csv";
+								$upload_success = Input::file('datoscsv')->move($destinationPath, $nombreArchivo.".csv");
+								$csv = $destinationPath . $nombreArchivo.".csv";
 
-									try {
+								try {
 
-										if(isset($parametros['tiene-encabezado'])){
-											$ignorar = 'IGNORE 1 LINES';
-										}else{
-											$ignorar = '';
-										}
-
-		 								DB::connection()->getPdo()->beginTransaction();
-										$recurso->save();
-										$idInsertado = $recurso->id;
-										$query = sprintf("
-											LOAD DATA local INFILE '%s' 
-											INTO TABLE cargaDatosEP01 
-											FIELDS TERMINATED BY ',' 
-											OPTIONALLY ENCLOSED BY '\"' 
-											ESCAPED BY '\"' 
-											LINES TERMINATED BY '\\n' 
-											 ".$ignorar." 
-											(`UR`,`FI`,`FU`,`SF`,`SSF`,`PS`,`PP`,`PE`,`AI`,`PT`,`MPIO`,`OG`,`STG`,`FF`,`SFF`,`DG`,`CP`,
-											`DM`,`presupuestoAprobado`,`modificacionNeta`,`presupuestoModificado`,`presupuestoLiberado`,
-											`presupuestoPorLiberar`,`presupuestoMinistrado`,`presupuestoComprometidoModificado`,
-											`presupuestoDevengadoModificado`,`presupuestoEjercidoModificado`,`presupuestoPagadoModificado`,
-											`disponibilidadFinancieraModificada`,`disponiblePresupuestarioModificado`) 
-											set idBitacoraCargaEP01='%s', mes='%s'
-											", addslashes($csv), $idInsertado, $parametros['mes']);
-										DB::connection()->getpdo()->exec($query);
-
-										$conteoTotales = CargaDatosEP01::getModel();
-										$conteoTotales = $conteoTotales->select(
-											DB::raw('COUNT(id) AS registros'),
-											DB::raw('SUM(presupuestoAprobado) AS presupuestoAprobado'),
-											DB::raw('SUM(modificacionNeta) AS modificacionNeta'),
-											DB::raw('SUM(presupuestoModificado) AS presupuestoModificado'),
-											DB::raw('SUM(presupuestoLiberado) AS presupuestoLiberado'),
-											DB::raw('SUM(presupuestoPorLiberar) AS presupuestoPorLiberar'),
-											DB::raw('SUM(presupuestoMinistrado) AS presupuestoMinistrado'),
-											DB::raw('SUM(presupuestoComprometidoModificado) AS presupuestoComprometidoModificado'),
-											DB::raw('SUM(presupuestoDevengadoModificado) AS presupuestoDevengadoModificado'),
-											DB::raw('SUM(presupuestoEjercidoModificado) AS presupuestoEjercidoModificado'),
-											DB::raw('SUM(presupuestoPagadoModificado) AS presupuestoPagadoModificado'),
-											DB::raw('SUM(disponibilidadFinancieraModificada) AS disponibilidadFinancieraModificada'),
-											DB::raw('SUM(disponiblePresupuestarioModificado) AS disponiblePresupuestarioModificado')
-										);
-										$conteoTotales = $conteoTotales->where('idBitacoraCargaEP01','=',$idInsertado)->first();
-										
-										$recurso->totalRegistros = $conteoTotales->registros;
-										$recurso->presupuestoAprobado = $conteoTotales->presupuestoAprobado;
-										$recurso->modificacionNeta = $conteoTotales->modificacionNeta;
-										$recurso->presupuestoModificado = $conteoTotales->presupuestoModificado;
-										$recurso->presupuestoLiberado = $conteoTotales->presupuestoLiberado;
-										$recurso->presupuestoPorLiberar = $conteoTotales->presupuestoPorLiberar;
-										$recurso->presupuestoMinistrado = $conteoTotales->presupuestoMinistrado;
-										$recurso->presupuestoComprometidoModificado = $conteoTotales->presupuestoComprometidoModificado;
-										$recurso->presupuestoDevengadoModificado = $conteoTotales->presupuestoDevengadoModificado;
-										$recurso->presupuestoEjercidoModificado = $conteoTotales->presupuestoEjercidoModificado;
-										$recurso->presupuestoPagadoModificado = $conteoTotales->presupuestoPagadoModificado;
-										$recurso->disponibilidadFinancieraModificada = $conteoTotales->disponibilidadFinancieraModificada;
-										$recurso->disponiblePresupuestarioModificado = $conteoTotales->disponiblePresupuestarioModificado;
-
-										$recurso->save();
-
-										DB::connection()->getPdo()->commit();
-
-										$respuesta['data'] = array('data'=>$recurso);
-									}catch (\PDOException $e){
-										$respuesta['http_status'] = 404;
-										$respuesta['data'] = array("data"=>"Ha ocurrido un error, no se pudieron cargar los datos. Verfique su conexión a Internet.",'code'=>'U06');
-									    DB::connection()->getPdo()->rollBack();
-									    throw $e;
-									}catch(Exception $e){
-										$respuesta['http_status'] = 500;
-										$respuesta['data'] = array("data"=>"",'ex'=>$e->getMessage(),'line'=>$e->getLine(),'code'=>'S02');
+									if(isset($parametros['tiene-encabezado'])){
+										$ignorar = 'IGNORE 1 LINES';
+									}else{
+										$ignorar = '';
 									}
 
-									File::delete($csv);
-								}else{
-									$respuesta = $resultado;
+	 								DB::connection()->getPdo()->beginTransaction();
+									$recurso->save();
+									$idInsertado = $recurso->id;
+									$query = sprintf("
+										LOAD DATA local INFILE '%s' 
+										INTO TABLE cargaDatosEP01 
+										FIELDS TERMINATED BY ',' 
+										OPTIONALLY ENCLOSED BY '\"' 
+										ESCAPED BY '\"' 
+										LINES TERMINATED BY '\\n' 
+										 ".$ignorar." 
+										(`UR`,`FI`,`FU`,`SF`,`SSF`,`PS`,`PP`,`PE`,`AI`,`PT`,`MPIO`,`OG`,`STG`,`FF`,`SFF`,`DG`,`CP`,
+										`DM`,`presupuestoAprobado`,`modificacionNeta`,`presupuestoModificado`,`presupuestoLiberado`,
+										`presupuestoPorLiberar`,`presupuestoMinistrado`,`presupuestoComprometidoModificado`,
+										`presupuestoDevengadoModificado`,`presupuestoEjercidoModificado`,`presupuestoPagadoModificado`,
+										`disponibilidadFinancieraModificada`,`disponiblePresupuestarioModificado`) 
+										set idBitacoraCargaEP01='%s', mes='%s'
+										", addslashes($csv), $idInsertado, $parametros['mes']);
+									DB::connection()->getpdo()->exec($query);
+
+									$conteoTotales = CargaDatosEP01::getModel();
+									$conteoTotales = $conteoTotales->select(
+										DB::raw('COUNT(id) AS registros'),
+										DB::raw('SUM(presupuestoAprobado) AS presupuestoAprobado'),
+										DB::raw('SUM(modificacionNeta) AS modificacionNeta'),
+										DB::raw('SUM(presupuestoModificado) AS presupuestoModificado'),
+										DB::raw('SUM(presupuestoLiberado) AS presupuestoLiberado'),
+										DB::raw('SUM(presupuestoPorLiberar) AS presupuestoPorLiberar'),
+										DB::raw('SUM(presupuestoMinistrado) AS presupuestoMinistrado'),
+										DB::raw('SUM(presupuestoComprometidoModificado) AS presupuestoComprometidoModificado'),
+										DB::raw('SUM(presupuestoDevengadoModificado) AS presupuestoDevengadoModificado'),
+										DB::raw('SUM(presupuestoEjercidoModificado) AS presupuestoEjercidoModificado'),
+										DB::raw('SUM(presupuestoPagadoModificado) AS presupuestoPagadoModificado'),
+										DB::raw('SUM(disponibilidadFinancieraModificada) AS disponibilidadFinancieraModificada'),
+										DB::raw('SUM(disponiblePresupuestarioModificado) AS disponiblePresupuestarioModificado')
+									);
+									$conteoTotales = $conteoTotales->where('idBitacoraCargaEP01','=',$idInsertado)->first();
+									
+									$recurso->totalRegistros = $conteoTotales->registros;
+									$recurso->presupuestoAprobado = $conteoTotales->presupuestoAprobado;
+									$recurso->modificacionNeta = $conteoTotales->modificacionNeta;
+									$recurso->presupuestoModificado = $conteoTotales->presupuestoModificado;
+									$recurso->presupuestoLiberado = $conteoTotales->presupuestoLiberado;
+									$recurso->presupuestoPorLiberar = $conteoTotales->presupuestoPorLiberar;
+									$recurso->presupuestoMinistrado = $conteoTotales->presupuestoMinistrado;
+									$recurso->presupuestoComprometidoModificado = $conteoTotales->presupuestoComprometidoModificado;
+									$recurso->presupuestoDevengadoModificado = $conteoTotales->presupuestoDevengadoModificado;
+									$recurso->presupuestoEjercidoModificado = $conteoTotales->presupuestoEjercidoModificado;
+									$recurso->presupuestoPagadoModificado = $conteoTotales->presupuestoPagadoModificado;
+									$recurso->disponibilidadFinancieraModificada = $conteoTotales->disponibilidadFinancieraModificada;
+									$recurso->disponiblePresupuestarioModificado = $conteoTotales->disponiblePresupuestarioModificado;
+
+									$recurso->save();
+
+									DB::connection()->getPdo()->commit();
+
+									$respuesta['data'] = array('data'=>$recurso);
+								}catch (\PDOException $e){
+									$respuesta['http_status'] = 404;
+									$respuesta['data'] = array("data"=>"Ha ocurrido un error, no se pudieron cargar los datos. Verfique su conexión a Internet.",'code'=>'U06');
+								    DB::connection()->getPdo()->rollBack();
+								    throw $e;
+								}catch(Exception $e){
+									$respuesta['http_status'] = 500;
+									$respuesta['data'] = array("data"=>"",'ex'=>$e->getMessage(),'line'=>$e->getLine(),'code'=>'S02');
 								}
+
+								File::delete($csv);
+							}else{
+								$respuesta = $resultado;
 							}
 						}
 					}
-					fclose($handle);
-				}	
-				else
-				{
-					$respuesta['http_status'] = 404;
-					$respuesta['data'] = array("data"=>"Formato incorrecto. La codificación del archivo debe ser UTF-8.",'code'=>'U06');
-				}				
-			    				
+				}
+				fclose($handle);
 			}
 			else
 			{
