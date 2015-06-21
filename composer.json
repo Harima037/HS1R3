@@ -5,9 +5,10 @@
 	"license": "MIT",
 	"require": {
 		"laravel/framework": "4.2.*",
-		"barryvdh/laravel-dompdf": "dev-master",
+		"barryvdh/laravel-dompdf": "0.4.*",
 		"cartalyst/sentry":"2.1.*",
-		"maatwebsite/excel": "1.*"
+		"maatwebsite/excel": "1.*",
+		"phpoffice/phpword": "dev-master"
 	},
 	"autoload": {
 		"classmap": [

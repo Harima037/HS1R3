@@ -29,6 +29,12 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="btn-toolbar pull-right" >
+                            <button type="button" class="btn btn-info" id="btn-datos-institucionales">
+                                <span class="fa fa-building"></span> Datos Institucionales
+                            </button>
+                            <button type="button" class="btn btn-info" id="btn-reporte-cuenta-publica">
+                                <span class="fa fa-file-word-o"></span> Reporte
+                            </button>
                             <button type="button" class="btn btn-success btn-edit-rows">
                                 <span class="fa fa-pencil"></span> Cuenta Pública
                             </button>
@@ -76,6 +82,47 @@
 @stop
 
 @section('modals')
+<div class="modal fade" id="modalDatosInstitucionales" tabindex="-1" role="dialog" aria-labelledby="modalDatosLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-85-screen">
+        <div class="modal-content modal-content-85-screen">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="modalDatosLabel">Datos Institucionales</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form_datos_institucionales">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label" for="clave-institucional">Clave Institucional:</label>
+                                <input type="text" class="form-control" id="clave-institucional" name="clave-institucional"/>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label" for="mision">Misión:</label>
+                                <textarea class="form-control" id="mision" name="mision" rows="5"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label" for="vision">Visión:</label>
+                                <textarea class="form-control" id="vision" name="vision" rows="5"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-guardar-datos-institucionales">
+                    <span class="fa fa-save"></span> Guardar
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <div class="modal fade" id="modalCuentaPublica" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-dialog-85-screen">
         <div class="modal-content modal-content-85-screen">

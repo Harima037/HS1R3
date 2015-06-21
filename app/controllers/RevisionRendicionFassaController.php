@@ -1,7 +1,7 @@
 <?php
 use SSA\Utilerias\Util;
 
-class RendicionFassaController extends BaseController {
+class RevisionRendicionFassaController extends BaseController {
 	
 	public function index(){
 		$datos = array();

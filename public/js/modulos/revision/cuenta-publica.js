@@ -41,7 +41,6 @@ moduloDatagrid.actualizar({
             moduloDatagrid.limpiar();
             var colspan = $(moduloDatagrid.selector + " thead > tr th").length;
             $(moduloDatagrid.selector + " tbody").append("<tr><td colspan='"+colspan+"' style='text-align:left'><i class='fa fa-info-circle'></i> "+json.data+"</td></tr>");
-
         }else{
             json.type = 'ERR';
             MessageManager.show(json);
@@ -53,6 +52,14 @@ moduloDatagrid.actualizar({
 
 $('#btn-capturar-cuenta-publica').on('click', function () {
     $('#modalCuentaPublica').modal('show');
+});
+
+$('#btn-datos-institucionales').on('click', function () {
+    $('#modalDatosInstitucionales').modal('show');
+});
+
+$('#btn-reporte-cuenta-publica').on('click', function(){
+    window.open(SERVER_HOST+'/v1/reporte-cuenta-publica');
 });
 
 function editar(e){
@@ -72,6 +79,31 @@ function editar(e){
         }
     });
 }
+
+$('#btn-guardar-datos-institucionales').on('click',function(){
+    Validation.cleanFormErrors('#form_datos_institucionales');
+
+    var parametros = $("#form_datos_institucionales").serialize();
+
+    moduloResource.post(parametros,{
+        _success: function(response){
+            MessageManager.show({data:'Se guardaron correctamente los datos.',timer:5,type:'INF'});
+        },
+        _error: function( response ){
+            try{
+                var json = $.parseJSON(response.responseText);
+                if(!json.code)
+                    MessageManager.show({code:'S03',timer:10,data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                else{
+                    MessageManager.show(json);
+                }
+                Validation.formValidate(json.data);
+            }catch(e){
+                console.log(e);
+            }
+        }
+    });
+});
 
 $('#btn-guardar-cuenta-publica').on('click',function(){
 	Validation.cleanFormErrors('#form_cuenta_publica');

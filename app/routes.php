@@ -107,7 +107,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('rend-cuenta-prog', 	'V1\RendicionProgramaController');
 		Route::resource('rend-cuenta-fassa',	'V1\RendicionFassaController');
 
-		Route::resource('cuenta-publica',		'V1\CuentaPublicaController');
+		Route::resource('cuenta-publica',			'V1\CuentaPublicaController');
+		Route::resource('reporte-cuenta-publica',	'V1\ReporteCuentaPublicaController');
 
 		Route::resource('revision-proyectos',	'V1\RevisionController');
 		Route::resource('segui-proyectos-inst', 'V1\SeguimientoInstitucionalController');

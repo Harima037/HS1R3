@@ -4,11 +4,17 @@ namespace V1;
 
 use SSA\Utilerias\Validador, SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Exception;
-use Hash, File, EvaluacionAnalisisFuncional;
+use Hash, File, EvaluacionAnalisisFuncional, SysConfiguracionVariable;
 
 class CuentaPublicaController extends \BaseController {
 	private $reglas = array(
 		'cuenta-publica' => 'required'
+	);
+
+	private $reglasDatosInstitucionales = array(
+		'clave-institucional'	=> 'required',
+		'mision'				=> 'required',
+		'vision'				=> 'required'
 	);
 
 	/**
@@ -92,6 +98,46 @@ class CuentaPublicaController extends \BaseController {
 		}
 
 		return Response::json($data,$http_status);
+	}
+
+	/**
+	 * Store a newly created resource in storage.
+	 *
+	 * @return Response
+	 */
+	public function store()
+	{
+		$respuesta = Validador::validar(Input::all(), $this->reglasDatosInstitucionales);
+		
+		if($respuesta === true){
+			try{
+				$respuesta = array();
+				$parametros = Input::all();
+
+				$variables = SysConfiguracionVariable::obtenerVariables(array('clave-institucional','mision','vision'));
+
+				foreach ($variables as $variable) {
+					$valor = $parametros[$variable->variable];
+					if($valor){
+						$variable->valor = $valor;
+					}else{
+						$variable->valor = null;
+					}
+				}
+
+				DB::transaction(function()use($variables){
+					foreach ($variables as $variable) {
+						$variable->save();
+					}
+				});
+				$respuesta['http_status'] = 200;
+				$respuesta['data'] = array('data'=>$variables);
+			}catch(Exception $e){
+				$respuesta['http_status'] = 500;
+				$respuesta['data'] = array("data"=>$e->getMessage(),'code'=>'S03');
+			}
+		}
+		return Response::json($respuesta['data'],$respuesta['http_status']);
 	}
 
 	/**
