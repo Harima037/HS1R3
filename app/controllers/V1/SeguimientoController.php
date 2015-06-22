@@ -107,13 +107,15 @@ class SeguimientoController extends BaseController {
 				//$rows = $rows->with('registroAvance');
 				
 				$usuario = Sentry::getUser();
-				if($usuario->proyectosAsignados){
-					if($usuario->proyectosAsignados->proyectos){
-						$proyectos = explode('|',$usuario->proyectosAsignados->proyectos);
-						$rows = $rows->whereIn('proyectos.id',$proyectos);
+				
+				if($usuario->idDepartamento == 2){
+					if($usuario->filtrarProyectos){
+						$rows = $rows->where('idUsuarioValidacionSeg','=',$usuario->id);
 					}
+				}else{
+					$rows = $rows->where('idUsuarioRendCuenta','=',$usuario->id);
 				}
-
+				
 				if($usuario->claveUnidad){
 					$unidades = explode('|',$usuario->claveUnidad);
 					$rows = $rows->whereIn('unidadResponsable',$unidades);
@@ -122,8 +124,14 @@ class SeguimientoController extends BaseController {
 				$rows = $rows->with(array('registroAvance'=>function($query){
 					$query->select('id','idProyecto','mes',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'),DB::raw('count(idNivel) as registros'))->groupBy('idProyecto','mes');
 				},'evaluacionMeses'=>function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
+					if($mes_actual == 0){
+						$mes_actual = date('n') -1;
+						$query->where('mes','=',$mes_actual)->where('idEstatus','=',4);
+					}else{
+						$query->where('mes','=',$mes_actual);
+					}
 				}));
+
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				
 				if(isset($parametros['buscar'])){				
@@ -183,7 +191,12 @@ class SeguimientoController extends BaseController {
 				$mes_actual = Util::obtenerMesActual();
 				$recurso = Proyecto::with(array('datosFuncion','datosSubFuncion','datosProgramaPresupuestario','componentes.metasMesAgrupado','componentes.registroAvance','componentes.actividades.metasMesAgrupado','componentes.actividades.registroAvance','beneficiarios.registroAvance','beneficiarios.tipoBeneficiario',
 					'evaluacionMeses'=>function($query) use ($mes_actual){
-						$query->where('mes','=',$mes_actual);
+						if($mes_actual == 0){
+							$mes_actual = date('n') - 1;
+							$query->where('mes','=',$mes_actual)->where('idEstatus','=',4);
+						}else{
+							$query->where('mes','=',$mes_actual);
+						}
 					}))->find($id);
 			}elseif ($parametros['mostrar'] == 'datos-municipio-avance') {
 				//$id = idComponente y $parametros['clave-municipio'] y $parametros['nivel'] = 'componente'

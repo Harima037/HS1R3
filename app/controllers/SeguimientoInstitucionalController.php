@@ -72,7 +72,8 @@ class SeguimientoInstitucionalController extends BaseController {
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
 		$datos['usuario'] = Sentry::getUser();
 
-		$mes_actual = Util::obtenerMesActual();
+		//$mes_actual = Util::obtenerMesActual();
+		$mes_actual = date('n') - 1 ;
 		
 		if($mes_actual == 0){
 			return Response::view('errors.mes_no_disponible', array(
@@ -96,9 +97,9 @@ class SeguimientoInstitucionalController extends BaseController {
 		$meses = array(1=>'Enero',2=>'Febrero',3=>'Marzo',4=>'Abril',5=>'Mayo',6=>'Junio',
 						7=>'Julio',8=>'Agosto',9=>'Septiembre',10=>'Octubre',11=>'Noviembre',12=>'Diciembre');
 
-		$datos['mes_clave'] = Util::obtenerMesActual();
+		$datos['mes_clave'] = $mes_actual; //Util::obtenerMesActual();
 		$datos['mes'] = $meses[$datos['mes_clave']];
-		$mes_del_trimestre = Util::obtenerMesTrimestre();
+		$mes_del_trimestre = Util::obtenerMesTrimestre($mes_actual);
 		if($mes_del_trimestre == 3){
 			$datos['trimestre_activo'] = TRUE;
 		}else{

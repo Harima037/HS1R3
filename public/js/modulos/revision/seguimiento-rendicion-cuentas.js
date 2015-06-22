@@ -718,109 +718,7 @@ function seguimiento_beneficiarios(e){
         }
     });
 }
-$('#btn-beneficiario-guardar').on('click',function(){
-    /*var parametros = $('#form_beneficiario').serialize();
-    parametros += '&guardar=avance-beneficiarios&id-proyecto='+$('#id').val();
 
-    Validation.cleanFormErrors('#form_beneficiario');
-
-    var total_marginacion = [];
-    var total_poblacion = [];
-    var total_zona = [];
-
-    total_marginacion['f'] = 0;
-    $('.sub-total-marginacion.fem').each(function(){ total_marginacion['f'] += parseInt($(this).val()) || 0; });
-    total_poblacion['f'] = 0;
-    $('.sub-total-poblacion.fem').each(function(){ total_poblacion['f'] += parseInt($(this).val()) || 0; });
-    total_zona['f'] = 0;
-    $('.sub-total-zona.fem').each(function(){ total_zona['f'] += parseInt($(this).val()) || 0; });
-
-    total_marginacion['m'] = 0;
-    $('.sub-total-marginacion.masc').each(function(){ total_marginacion['m'] += parseInt($(this).val()) || 0; });
-    total_poblacion['m'] = 0;
-    $('.sub-total-poblacion.masc').each(function(){ total_poblacion['m'] += parseInt($(this).val()) || 0; });
-    total_zona['m'] = 0;
-    $('.sub-total-zona.masc').each(function(){ total_zona['m'] += parseInt($(this).val()) || 0; });
-
-    var sexos = ['f','m'];
-    for(var i in sexos){
-        if(total_marginacion[sexos[i]] != total_poblacion[sexos[i]] || total_marginacion[sexos[i]] != total_zona[sexos[i]] || total_zona[sexos[i]] != total_poblacion[sexos[i]]){
-            MessageManager.show({data:'Los totales capturados no coinciden entre si.',container:'#modalBeneficiario .modal-body',type:'ERR'});
-            return false;
-        }
-    }
-
-    var total_f = $('#total-f').attr('data-valor');
-    var total_m = $('#total-m').attr('data-valor');
-    
-    if(total_zona['f'] > total_f || total_zona['m'] > total_m){
-        Confirm.show({
-                titulo:"¿Esta seguro de guardarl los datos?",
-                mensaje: "Los totales capturados son mayores a los programados para el proyecto, ¿Desea continuar?",
-                callback: function(){
-                    guardar_datos_beneficiarios(parametros);
-                }
-        });
-    }else{
-        guardar_datos_beneficiarios(parametros);
-    }*/
-});
-
-function guardar_datos_beneficiarios(parametros){
-    /*var hay_avance = parseInt($('#hay-avance').val());
-    if(hay_avance){
-        moduloResource.put($('#id-beneficiario').val(),parametros,{
-            _success: function(response){
-                if(response.advertencia){
-                    MessageManager.show({data:response.advertencia,container:'#modalBeneficiario .modal-body',type:'ADV'});
-                }else{
-                    MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
-                    $('#modalBeneficiario').modal('hide');
-                }
-                beneficiariosDatagrid.actualizar({ _success: function(response){ llenar_grid_beneficiarios(response); } });
-            },
-            _error: function(response){
-                try{
-                    var json = $.parseJSON(response.responseText);
-                    if(!json.code)
-                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-                    else{
-                        MessageManager.show(json);
-                    }
-                    Validation.formValidate(json.data);
-                }catch(e){
-                    console.log(e);
-                }                       
-            }
-        });
-    }else{
-        moduloResource.post(parametros,{
-            _success: function(response){
-                if(response.advertencia){
-                    MessageManager.show({data:response.advertencia,container:'#modalBeneficiario .modal-body',type:'ADV'});
-                    $('#hay-avance').val(1);
-                }else{
-                    MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
-                    $('#modalBeneficiario').modal('hide');
-                }
-                beneficiariosDatagrid.actualizar({ _success: function(response){ llenar_grid_beneficiarios(response); } });
-            },
-            _error: function(response){
-                try{
-                    var json = $.parseJSON(response.responseText);
-                    if(!json.code)
-                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-                    else{
-                        MessageManager.show(json);
-                    }
-                    Validation.formValidate(json.data);
-                }catch(e){
-                    console.log(e);
-                }                       
-            }
-        });
-    }*/
-}
 $('.fem,.masc').on('keyup',function(){ $(this).change(); });
 $('.fem').on('change',function(){
     if($(this).hasClass('sub-total-zona')){
@@ -994,51 +892,6 @@ else
         }
     });
 }
-
-$('#btn-guadar-analisis-funcional').on('click',function(){
-   /* var parametros = $('#form_analisis').serialize();
-    parametros += '&guardar=analisis-funcional&id-proyecto='+$('#id').val();
-    if($('#id-analisis').val()){
-        moduloResource.put($('#id-analisis').val(),parametros,{
-            _success: function(response){
-                MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
-            },
-            _error: function(response){
-                try{
-                    var json = $.parseJSON(response.responseText);
-                    if(!json.code)
-                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-                    else{
-                        MessageManager.show(json);
-                    }
-                    Validation.formValidate(json.data);
-                }catch(e){
-                    console.log(e);
-                }                       
-            }
-        });
-    }else{
-        moduloResource.post(parametros,{
-            _success: function(response){
-                MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
-                $('#id-analisis').val(response.data.id);
-            },
-            _error: function(response){
-                try{
-                    var json = $.parseJSON(response.responseText);
-                    if(!json.code)
-                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-                    else{
-                        MessageManager.show(json);
-                    }
-                    Validation.formValidate(json.data);
-                }catch(e){
-                    console.log(e);
-                }                       
-            }
-        });
-    }*/
-});
 /********************************************************************************************************************************
         Fin: Formulario de Analisis Funcional
 *********************************************************************************************************************************/
@@ -1202,7 +1055,7 @@ $('#btnGuardarComentario').on('click',function(){
 		                if(!json.code)
 		                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
 	    	            else{
-	        	        	json.container = modal_actividad + ' .modal-body';
+	        	        	//json.container = modal_actividad + ' .modal-body';
 	            	        MessageManager.show(json);
 		                }
 		                Validation.formValidate(json.data);

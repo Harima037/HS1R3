@@ -138,6 +138,11 @@
                             </a>
                         </li>
                         <li>
+                            <a href="#tab-caratulas" role="tab" data-toggle="tab">
+                                <span class="fa fa-file"></span> Caratulas
+                            </a>
+                        </li>
+                        <li>
                             <a href="#tab-proyectos" role="tab" data-toggle="tab">
                                 <span class="fa fa-file"></span> Proyectos
                             </a>
@@ -321,6 +326,41 @@
                             <button type="button" class="btn btn-danger" id="btn-limpiar-proyectos">
                                 <span class="fa fa-trash"></span> Quitar todos
                             </button>
+                        </div>
+
+                        <div class="tab-pane" id="tab-caratulas">
+                            <br>
+                            <label class="control-label">
+                                <span class="fa fa-search"></span> Buscar Caratula
+                            </label>
+                            <span id="estatus-busqueda-caratula" class="pull-right"></span>
+                            <input type="text" class="form-control" id="buscar-caratula" autocomplete="off">
+                            <label class="check-box">
+                                <input type="checkbox" id="filtrar-caratulas" name="filtrar-caratulas"> Filtrar Caratulas en el Expediente
+                            </label>
+                            <table id="tabla-lista-caratulas" class="table table-hover table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>Clave</th>
+                                        <th>Nombre Técnico</th>
+                                        <th width="55">Quitar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="tr-caratulas-vacio">
+                                        <td colspan="3"><span class="fa fa-info-circle"></span> No hay caratulas asignados</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div>
+                                <span class="pull-right">
+                                    <span class="badge" id="conteo-caratulas-seleccionados">0</span> Caratula(s) seleccionados
+                                </span>
+                            </div>
+                            <button type="button" class="btn btn-danger" id="btn-limpiar-caratulas">
+                                <span class="fa fa-trash"></span> Quitar todos
+                            </button>
+
                         </div>
                     </div>      
                     <input type="hidden" id="id" name="id">

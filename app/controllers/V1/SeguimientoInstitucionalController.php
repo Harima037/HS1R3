@@ -81,6 +81,8 @@ class SeguimientoInstitucionalController extends BaseController {
 				}
 			}else{
 				$mes_actual = Util::obtenerMesActual();
+				//$mes_actual = date('n') - 1 ;
+
 				$rows = Proyecto::getModel();
 				$rows = $rows->where('idEstatusProyecto','=',5)
 							->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto']);
@@ -91,23 +93,33 @@ class SeguimientoInstitucionalController extends BaseController {
 					$query->select('id','idProyecto','mes',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'),DB::raw('count(idNivel) as registros'))->groupBy('idProyecto','mes');
 				}));
 
-				$rows = $rows->wherein('evaluacionProyectoMes.idEstatus', array(2, 4));
+				if($mes_actual == 0){
+					$mes_actual = date('n') - 1;
+					$rows = $rows->whereIn('evaluacionProyectoMes.idEstatus', array(4));
+				}else{
+					$rows = $rows->whereIn('evaluacionProyectoMes.idEstatus', array(2, 4));
+				}
 
-				$rows = $rows->join('evaluacionProyectoMes', function($join) use($mes_actual)
-									{
-											$join->on('proyectos.id', '=', 'evaluacionProyectoMes.idProyecto')
-											->where('evaluacionProyectoMes.mes', '=', $mes_actual)
-											->where('evaluacionProyectoMes.anio', '=', date('Y'));
-									});
+				$rows = $rows->join('evaluacionProyectoMes', function($join) use($mes_actual){
+									$join->on('proyectos.id', '=', 'evaluacionProyectoMes.idProyecto')
+									->where('evaluacionProyectoMes.mes', '=', $mes_actual)
+									->where('evaluacionProyectoMes.anio', '=', date('Y'));
+								});
+				
 
 				$usuario = Sentry::getUser();
+				
+				if($usuario->filtrarProyectos){
+					$rows = $rows->where('idUsuarioValidacionSeg','=',$usuario->id);
+				}
+				/*
 				if($usuario->proyectosAsignados){
 					if($usuario->proyectosAsignados->proyectos){
 						$proyectos = explode('|',$usuario->proyectosAsignados->proyectos);
 						$rows = $rows->whereIn('proyectos.id',$proyectos);
 					}
 				}
-
+				*/
 				if($usuario->claveUnidad){
 					$unidades = explode('|',$usuario->claveUnidad);
 					$rows = $rows->whereIn('unidadResponsable',$unidades);
@@ -172,7 +184,8 @@ class SeguimientoInstitucionalController extends BaseController {
 		$data = array();
 		$parametros = Input::all();
 		
-		$mes_actual = Util::obtenerMesActual();
+		//$mes_actual = Util::obtenerMesActual();
+		$mes_actual = date('n') - 1 ;
 
 		if(isset($parametros['mostrar'])){
 			if($parametros['mostrar'] == 'datos-proyecto-avance'){
@@ -239,6 +252,7 @@ class SeguimientoInstitucionalController extends BaseController {
 				
 			}elseif($parametros['mostrar'] == 'datos-beneficiarios-avance'){
 				$mes_actual = Util::obtenerMesActual();
+				//$mes_actual = date('n') - 1 ;
 				$recurso['acumulado'] = RegistroAvanceBeneficiario::where('idProyecto','=',$parametros['id-proyecto'])
 														->where('idTipoBeneficiario','=',$id)
 														->where('mes','<',$mes_actual)->groupBy('idTipoBeneficiario','sexo')
@@ -277,26 +291,30 @@ class SeguimientoInstitucionalController extends BaseController {
 
 		$parametros = Input::all();
 
-		$nuevoComentario = new EvaluacionComentario;
-		
-		$nuevoComentario->idProyecto = $parametros['idproyecto'];
-		$nuevoComentario->mes = Util::obtenerMesActual();		
-		$nuevoComentario->idCampo = $parametros['idcampo'];
-		$nuevoComentario->tipoElemento = $parametros['tipocomentario'];
-		$nuevoComentario->idElemento = $parametros['idelemento'];
-		$nuevoComentario->observacion = $parametros['comentario'];
+		$mes_actual = Util::obtenerMesActual();
+		if($mes_actual > 0){
+			$nuevoComentario = new EvaluacionComentario;
 
-		$Resultado = Validador::validar($parametros, $this->reglasComentario);
-		
-		if($Resultado === true)
-		{
-			$nuevoComentario->save();
-			$respuesta['data']['data'] = $nuevoComentario;
-		}
-		else
-		{
+			$nuevoComentario->idProyecto = $parametros['idproyecto'];
+			$nuevoComentario->mes = Util::obtenerMesActual();		
+			$nuevoComentario->idCampo = $parametros['idcampo'];
+			$nuevoComentario->tipoElemento = $parametros['tipocomentario'];
+			$nuevoComentario->idElemento = $parametros['idelemento'];
+			$nuevoComentario->observacion = $parametros['comentario'];
+
+			$Resultado = Validador::validar($parametros, $this->reglasComentario);
+			
+			if($Resultado === true){
+				$nuevoComentario->save();
+				$respuesta['data']['data'] = $nuevoComentario;
+			}else{
+				$respuesta['http_status'] = 500;
+				$respuesta = $Resultado;
+			}
+		}else{
 			$respuesta['http_status'] = 500;
-			$respuesta = $Resultado;
+			$respuesta['data']['data'] = 'El limite de tiempo para capturar avances a terminado, el usuario no podra corregir los errores que se le señalen, por lo tanto se ha desactivo el envio de comentarios.';
+			$respuesta['data']['code'] = 'S03';
 		}
 		
 		return Response::json($respuesta['data'],$respuesta['http_status']);
@@ -315,7 +333,8 @@ class SeguimientoInstitucionalController extends BaseController {
 		$respuesta['data'] = array("data"=>'');
 		
 		$parametros = Input::all();
-		$mes_actual = Util::obtenerMesActual();
+		//$mes_actual = Util::obtenerMesActual();
+		$mes_actual = date('n') - 1 ;
 
 		if(isset($parametros['actualizarproyecto']))
 		{

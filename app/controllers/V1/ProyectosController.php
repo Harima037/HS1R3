@@ -147,15 +147,14 @@ class ProyectosController extends BaseController {
 
 			$usuario = Sentry::getUser();
 
-			/*
-			if($usuario->proyectosAsignados){
-				if($usuario->proyectosAsignados->proyectos){
-					$proyectos = explode('|',$usuario->proyectosAsignados->proyectos);
-					$rows = $rows->whereIn('proyectos.id',$proyectos);
+			if($usuario->idDepartamento != 3){
+				if($usuario->filtrarCaratulas){
+					$rows = $rows->where('proyectos.idUsuarioCaptura','=',$usuario->id);
 				}
+			}else{
+				$rows = $rows->where('proyectos.idUsuarioCaptura','=',$usuario->id);
 			}
-			*/
-
+			
 			if($usuario->claveUnidad){
 				$unidades = explode('|',$usuario->claveUnidad);
 				$rows = $rows->whereIn('unidadResponsable',$unidades);
@@ -173,7 +172,7 @@ class ProyectosController extends BaseController {
 			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','catalogoCoberturas.descripcion AS coberturaDescripcion','proyectos.idEstatusProyecto',
 				'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
-								->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
+								->join('sentryUsers','sentryUsers.id','=','proyectos.actualizadoPor')
 								->join('catalogoCoberturas','catalogoCoberturas.id','=','proyectos.idCobertura')
 								->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
 								->orderBy('modificadoAl', 'desc')
@@ -197,11 +196,13 @@ class ProyectosController extends BaseController {
 					});
 			}
 
-			$rows = $rows->where('proyectos.idEstatusProyecto','=',5);
-
 			if(isset($parametros['unidades'])){
 				$unidades = explode(',',$parametros['unidades']);
 				$rows = $rows->whereIn('proyectos.unidadResponsable',$unidades);
+			}
+
+			if($parametros['tipo'] == 'proyecto'){
+				$rows = $rows->where('proyectos.idEstatusProyecto','=',5);
 			}
 
 			if(isset($parametros['departamento'])){
@@ -210,6 +211,27 @@ class ProyectosController extends BaseController {
 				}else{
 					$id_usuario = 0;
 				}
+
+				if($parametros['tipo'] == 'proyecto'){
+					if($parametros['departamento'] == 2){
+						$rows = $rows->where(function($query)use($id_usuario){
+							$query->whereNull('proyectos.idUsuarioValidacionSeg')
+								->orWhere('proyectos.idUsuarioValidacionSeg','=',$id_usuario);
+						});
+					}else{
+						$rows = $rows->where(function($query)use($id_usuario){
+							$query->whereNull('proyectos.idUsuarioRendCuenta')
+								->orWhere('proyectos.idUsuarioRendCuenta','=',$id_usuario);
+						});
+					}
+				}else{
+					$rows = $rows->where(function($query)use($id_usuario){
+						$query->whereNull('proyectos.idUsuarioCaptura')
+							->orWhere('proyectos.idUsuarioCaptura','=',$id_usuario);
+					});
+				}
+
+				/*
 				$usuarios = SentryUser::usuariosProyectos()->where('idDepartamento','=',$parametros['departamento'])
 										->where('ejercicio','=',intval(date('Y')))->where('sentryUsers.id','<>',$id_usuario)->get();
 				$proyectos_asignados = array();
@@ -220,7 +242,7 @@ class ProyectosController extends BaseController {
 				}
 				$proyectos_asignados = explode('|',implode('|',$proyectos_asignados));
 
-				$rows = $rows->whereNotIn('proyectos.id',$proyectos_asignados);
+				$rows = $rows->whereNotIn('proyectos.id',$proyectos_asignados);*/
 			}
 			//var_dump($proyectos_asignados);die;
 			//throw new Exception("Error:: " + print_r($proyectos_asignados,true), 1);
@@ -1176,6 +1198,11 @@ class ProyectosController extends BaseController {
 				$recurso = new Proyecto;
 			}
 			
+			if(!$es_editar){
+				$usuario = Sentry::getUser();
+				$recurso->idUsuarioCaptura = $usuario->id;
+			}
+
 			$funcion_gasto = explode('.',$parametros['funciongasto']);
 
 			if(Sentry::hasAccess('EXP.PROYECTOS.S')){

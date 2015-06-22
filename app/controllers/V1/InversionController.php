@@ -124,14 +124,15 @@ class InversionController extends ProyectosController {
 							->whereIn('idEstatusProyecto',[1,2,3,4,5]);
 
 				$usuario = Sentry::getUser();
-				/*
-				if($usuario->proyectosAsignados){
-					if($usuario->proyectosAsignados->proyectos){
-						$proyectos = explode('|',$usuario->proyectosAsignados->proyectos);
-						$rows = $rows->whereIn('proyectos.id',$proyectos);
+				
+				if($usuario->idDepartamento != 3){
+					if($usuario->filtrarCaratulas){
+						$rows = $rows->where('proyectos.idUsuarioCaptura','=',$usuario->id);
 					}
+				}else{
+					$rows = $rows->where('proyectos.idUsuarioCaptura','=',$usuario->id);
 				}
-				*/
+				
 				if($usuario->claveUnidad){
 					$unidades = explode('|',$usuario->claveUnidad);
 					$rows = $rows->whereIn('unidadResponsable',$unidades);

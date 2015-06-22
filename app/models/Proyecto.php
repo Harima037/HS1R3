@@ -52,7 +52,7 @@ class Proyecto extends BaseModel
 	}
 
 	public function scopeContenidoSuggester($query){
-		return $query->select('proyectos.id','nombreTecnico','catalogoEstatusProyectos.descripcion AS estatusProyectoDescripcion',
+		$query->select('proyectos.id','nombreTecnico','catalogoEstatusProyectos.descripcion AS estatusProyectoDescripcion',
 				'proyectos.idEstatusProyecto','catalogoUnidadesResponsables.descripcion AS unidadResponsableDescripcion',
 				'unidadResponsable','finalidad','funcion','subFuncion','subSubFuncion','programaSectorial','programaPresupuestario',
 				'programaEspecial','actividadInstitucional','proyectoEstrategico','numeroProyectoEstrategico','idClasificacionProyecto')

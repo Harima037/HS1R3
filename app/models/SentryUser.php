@@ -22,6 +22,18 @@ class SentryUser extends SentryModel {
         return $this->hasOne('UsuarioProyecto','idSentryUser');
     }
 
+    public function caratulas(){
+        return $this->hasMany('Proyecto','idUsuarioCaptura');
+    }
+
+    public function proyectos(){
+        if($this->idDepartamento == 2){
+            return $this->hasMany('Proyecto','idUsuarioValidacionSeg');
+        }else{
+            return $this->hasMany('Proyecto','idUsuarioRendCuenta');
+        }
+    }
+
     public function scopeUsuariosProyectos($query){
         return $query->select('sentryUsers.id','sentryUsers.idDepartamento','usuariosProyectos.proyectos','usuariosProyectos.ejercicio')
                     ->leftjoin('usuariosProyectos','usuariosProyectos.idSentryUser','=','sentryUsers.id');

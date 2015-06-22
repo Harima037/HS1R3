@@ -31,18 +31,27 @@ class Util
 
 		return $mes;
 	}
-	public static function obtenerMesTrimestre(){
-		$mes_actual = self::obtenerMesActual();
+	public static function obtenerMesTrimestre($mes = NULL){
+		if($mes){
+			$mes_actual = $mes;
+		}else{
+			$mes_actual = self::obtenerMesActual();
+		}
 		if($mes_actual == 0){
 			$mes_actual = date('n');
 		}
+		
 		$trimestre = ceil($mes_actual/3);
         $ajuste = ($trimestre - 1) * 3;
         $mes_del_trimestre = $mes_actual - $ajuste;
         return $mes_del_trimestre;
 	}
-	public static function obtenerTrimestre(){
-		$mes_actual = self::obtenerMesActual();
+	public static function obtenerTrimestre($mes = NULL){
+		if($mes){
+			$mes_actual = $mes;
+		}else{
+			$mes_actual = self::obtenerMesActual();
+		}
 		if($mes_actual == 0){
 			$mes_actual = date('n');
 		}

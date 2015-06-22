@@ -34,13 +34,14 @@ class RevisionController extends BaseController {
 			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 			
 			$usuario = Sentry::getUser();
+			/*
 			if($usuario->proyectosAsignados){
 				if($usuario->proyectosAsignados->proyectos){
 					$proyectos = explode('|',$usuario->proyectosAsignados->proyectos);
 					$rows = $rows->whereIn('proyectos.id',$proyectos);
 				}
 			}
-
+			*/
 			if($usuario->claveUnidad){
 				$unidades = explode('|',$usuario->claveUnidad);
 				$rows = $rows->whereIn('unidadResponsable',$unidades);

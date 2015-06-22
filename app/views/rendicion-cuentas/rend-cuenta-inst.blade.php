@@ -46,9 +46,9 @@
                         <th>Clave Presupuestaria</th>
                         <th>Nombre Técnico</th>
                         @foreach ($meses as $mes)
-                            <th width="35"><p class="texto-vertical">{{$mes[0]['abrev']}} </p></th>
-                            <th width="35"><p class="texto-vertical">{{$mes[1]['abrev']}} </p></th>
-                            <th width="35"><p class="texto-vertical">{{$mes[2]['abrev']}} </p></th>
+                            <th width="35" class="{{ ($mes[0]['clave'] == $mes_actual)?'bg-info':'' }}"><p class="texto-vertical">{{$mes[0]['abrev']}} </p></th>
+                            <th width="35" class="{{ ($mes[1]['clave'] == $mes_actual)?'bg-info':'' }}"><p class="texto-vertical">{{$mes[1]['abrev']}} </p></th>
+                            <th width="35" class="{{ ($mes[2]['clave'] == $mes_actual)?'bg-info':'' }}"><p class="texto-vertical">{{$mes[2]['abrev']}} </p></th>
                         @endforeach
                         <th width="100">Estado</th>
                     </tr>
@@ -215,7 +215,7 @@
                                         <span class="fa fa-file-pdf-o"></span> Seguimiento de Metas
                                     </a>
                                 </li>
-                                @if(($mes_avance % 3) == 0)
+                                @if(($mes_actual % 3) == 0)
                                 <li>
                                     <a href="#" id="btn-reporte-beneficiarios">
                                         <span class="fa fa-file-pdf-o"></span> Seguimiento de Beneficiarios

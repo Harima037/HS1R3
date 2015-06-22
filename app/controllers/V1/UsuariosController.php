@@ -173,16 +173,19 @@ class UsuariosController extends \BaseController {
 					}
 				}
 
-				$recurso->load('proyectosAsignados');
+				$recurso->load('caratulas');
+				$recurso->load('proyectos');
+				//$queries = DB::getQueryLog();
+				//var_dump(end($queries));die;
 
-				if($recurso->proyectosAsignados){
+				/*if($recurso->proyectosAsignados){
 					$ejercicio = date('Y');
 					if($recurso->proyectosAsignados->ejercicio == $ejercicio){
 						$id_proyectos = explode('|',$recurso->proyectosAsignados->proyectos);
 						$proyectos = Proyecto::contenidoSuggester()->whereIn('proyectos.id',$id_proyectos)->get();
 						$recurso['proyectos'] = $proyectos;
 					}
-				}
+				}*/
 
 				$data = array("data"=>$recurso);
 				$data['data']['roles'] = $user_roles;
@@ -272,12 +275,29 @@ class UsuariosController extends \BaseController {
 						$recurso->addGroup($user_group);
 					}
 				}
+
+				if(count(Input::get('caratulas'))){
+					$caratulas = Input::get('caratulas');
+					Proyecto::whereIn('id',$caratulas)
+							->whereNull('idUsuarioCaptura')
+							->update(array('idUsuarioCaptura'=>$recurso->id));
+				}
 				
 				if(count(Input::get('proyectos'))){
-					$proyectos_asignados = new UsuarioProyecto;
+					$proyectos = Input::get('proyectos');
+					if($recurso->idDepartamento == 2){
+						Proyecto::whereIn('id',$proyectos)
+								->whereNull('idUsuarioValidacionSeg')
+								->update(array('idUsuarioValidacionSeg'=>$recurso->id));
+					}else{
+						Proyecto::whereIn('id',$proyectos)
+								->whereNull('idUsuarioRendCuenta')
+								->update(array('idUsuarioRendCuenta'=>$recurso->id));
+					}
+					/*$proyectos_asignados = new UsuarioProyecto;
 					$proyectos_asignados->ejercicio = date('Y');
 					$proyectos_asignados->proyectos = implode('|',Input::get('proyectos'));
-					$recurso->proyectosAsignados()->save($proyectos_asignados);
+					$recurso->proyectosAsignados()->save($proyectos_asignados);*/
 				}
 
 				$respuesta['http_status'] = 200;
@@ -355,7 +375,6 @@ class UsuariosController extends \BaseController {
 				$recurso->apellidoPaterno		= Input::get('apellido-paterno');
 				$recurso->apellidoMaterno		= Input::get('apellido-materno');
 				$recurso->claveUnidad			= $unidades;
-				$recurso->idDepartamento		= (Input::get('departamento'))?Input::get('departamento'):NULL;
 				$recurso->cargo					= (Input::get('cargo'))?Input::get('cargo'):NULL;
 				$recurso->telefono				= (Input::get('telefono'))?Input::get('telefono'):NULL;
 
@@ -417,7 +436,52 @@ class UsuariosController extends \BaseController {
 				    $recurso->permissions = $user_permission;
 				}
 
-				$recurso->load('proyectosAsignados');
+				if($recurso->idDepartamento != Input::get('departamento')){
+					if($recurso->idDepartamento == 2){
+						Proyecto::where('idUsuarioValidacionSeg','=',$recurso->id)
+							->update(array('idUsuarioValidacionSeg'=>NULL));
+					}else{
+						Proyecto::where('idUsuarioRendCuenta','=',$recurso->id)
+							->update(array('idUsuarioRendCuenta'=>NULL));
+					}
+				}
+
+				$recurso->idDepartamento = (Input::get('departamento'))?Input::get('departamento'):NULL;
+
+				if(Input::get('filtrar-caratulas')){
+					$recurso->filtrarCaratulas = 1;
+				}else{
+					$recurso->filtrarCaratulas = NULL;
+				}
+
+				if(count(Input::get('proyectos'))){
+					$recurso->filtrarProyectos = 1;
+				}else{
+					$recurso->filtrarProyectos = NULL;
+				}
+
+				$caratulas = $recurso->caratulas()->lists('id');
+				$proyectos = $recurso->proyectos()->lists('id');
+
+				if(Input::get('caratulas')){
+					$nuevas_caratulas = Input::get('caratulas');
+				}else{
+					$nuevas_caratulas = array();
+				}
+				
+				$array_caratulas['nuevas'] = array_diff($nuevas_caratulas, $caratulas);
+				$array_caratulas['borrar'] = array_diff($caratulas, $nuevas_caratulas);
+				
+				if(Input::get('proyectos')){
+					$nuevos_proyectos = Input::get('proyectos');
+				}else{
+					$nuevos_proyectos = array();
+				}
+
+				$array_proyectos['nuevos'] = array_diff($nuevos_proyectos, $proyectos);
+				$array_proyectos['borrar'] = array_diff($proyectos, $nuevos_proyectos);
+				
+				/*$recurso->load('proyectosAsignados');
 				$proyectos_asignados = NULL;
 				if($recurso->proyectosAsignados){
 					$proyectos_asignados = $recurso->proyectosAsignados;
@@ -435,18 +499,55 @@ class UsuariosController extends \BaseController {
 				}
 				if($proyectos_asignados){
 					$recurso->proyectosAsignados()->save($proyectos_asignados);
-				}
-				
-				if($recurso->save()){
-					$respuesta['http_status'] = 200;
-					$respuesta['data'] = array("data"=>$recurso->toArray());
-				}else{
-					$respuesta['http_status'] = 500;
-					$respuesta['data'] = array("data"=>'No se pudieron guardar los cambios.','code'=>'S03');
-				}
+				}*/
+
+				$respuesta = DB::transaction(function() use ($recurso,$array_proyectos,$array_caratulas){
+					$respuesta_transac = array();
+					if($recurso->save()){
+						if(count($array_caratulas['nuevas'])){
+							Proyecto::whereIn('id',$array_caratulas['nuevas'])
+									->whereNull('idUsuarioCaptura')
+									->update(array('idUsuarioCaptura'=>$recurso->id));
+						}
+						if(count($array_caratulas['borrar'])){
+							Proyecto::whereIn('id',$array_caratulas['borrar'])
+									->where('idUsuarioCaptura','=',$recurso->id)
+									->update(array('idUsuarioCaptura'=>NULL));
+						}
+						
+						if(count($array_proyectos['nuevos'])){
+							if($recurso->idDepartamento == 2){
+								Proyecto::whereIn('id',$array_proyectos['nuevos'])
+										->whereNull('idUsuarioValidacionSeg')
+										->update(array('idUsuarioValidacionSeg'=>$recurso->id));
+							}else{
+								Proyecto::whereIn('id',$array_proyectos['nuevos'])
+										->whereNull('idUsuarioRendCuenta')
+										->update(array('idUsuarioRendCuenta'=>$recurso->id));
+							}
+						}
+						if(count($array_proyectos['borrar'])){
+							if($recurso->idDepartamento == 2){
+								Proyecto::whereIn('id',$array_proyectos['borrar'])
+										->where('idUsuarioValidacionSeg','=',$recurso->id)
+										->update(array('idUsuarioValidacionSeg'=>NULL));
+							}else{
+								Proyecto::whereIn('id',$array_proyectos['borrar'])
+										->where('idUsuarioRendCuenta','=',$recurso->id)
+										->update(array('idUsuarioRendCuenta'=>NULL));
+							}
+						}
+						$respuesta_transac['http_status'] = 200;
+						$respuesta_transac['data'] = array("data"=>$recurso->toArray());
+					}else{
+						$respuesta_transac['http_status'] = 500;
+						$respuesta_transac['data'] = array("data"=>'No se pudieron guardar los cambios.','code'=>'S03');
+					}
+					return $respuesta_transac;
+				});
 			}else{
-					$respuesta['http_status'] = $valid_result['http_status'];
-					$respuesta['data'] = $valid_result['data'];
+				$respuesta['http_status'] = $valid_result['http_status'];
+				$respuesta['data'] = $valid_result['data'];
 			}
 		}catch (\Cartalyst\Sentry\Users\UserExistsException $e){
 			$respuesta['http_status'] = 500;
@@ -459,7 +560,7 @@ class UsuariosController extends \BaseController {
 			$respuesta['data'] = array("data"=>"El rol que se quiere asignar no existe.",'code'=>'U06');
 		}catch(\Exception $e){
 			$respuesta['http_status'] = 500;
-			$respuesta['data'] = array("data"=>$e->getMessage(),'code'=>'S03');
+			$respuesta['data'] = array("data"=>$e->getMessage(),'code'=>'S03','line'=>$e->getLine());
 		}
 		
 		return Response::json($respuesta['data'],$respuesta['http_status']);

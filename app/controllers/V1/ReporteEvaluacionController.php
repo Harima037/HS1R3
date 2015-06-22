@@ -39,6 +39,11 @@ class ReporteEvaluacionController extends BaseController {
 		$id = intval($id[0]);
 
 		$mes_actual = Util::obtenerMesActual();
+
+		if($mes_actual == 0){
+			$mes_actual = date('n') - 1;
+		}
+
 		$recurso = Proyecto::with(array('liderProyecto','responsableInformacion','beneficiarios.tipoBeneficiario','datosProgramaPresupuestario','datosFuncion',
 			'datosSubFuncion','objetivoPedCompleto','fuentesFinanciamiento.fuenteFinanciamiento','fuentesFinanciamiento.subFuentesFinanciamiento',
 		'componentes.registroAvance'=>function($query) use ($mes_actual){
