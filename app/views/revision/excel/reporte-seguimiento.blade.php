@@ -81,17 +81,19 @@
 				<th class="encabezado-tabla">Clave Presupuestaria</th>
 				<th class="encabezado-tabla">Nombre Técnico</th>
 				<th class="encabezado-tabla">Dirección</th>
+				<th class="encabezado-tabla">Enlace</th>
 				<th class="encabezado-tabla">Revisor</th>
 				<th class="encabezado-tabla">Estatus Seguimiento</th>
 			</tr>
 		</thead>
 		<tbody>
 			@foreach ($datos as $row => $item)
-				<tr>
+				<tr height="15">
 					<td>{{$row+1}}</td>
 					<td>{{$item->ClavePresupuestaria}}</td>
 					<td>{{$item->nombreTecnico}}</td>
 					<td>{{$item->descripcionUnidadResponsable}}</td>
+					<td>{{$item->nombreEnlace or 'Sin Enlace'}}</td>
 					<td>{{$item->nombreRevisor or 'Sin Revisor'}}</td>
 					<td>{{$item->estatusAvance or 'Inactivo'}}</td>
 				</tr>

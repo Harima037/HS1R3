@@ -30,16 +30,14 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="btn-toolbar pull-right" >
-                            @section('panel-botones')
-                                <div class="btn-group" style="margin:5px">
-                                    <button type="button" class="btn btn-info" id="btn-reporte-seguimiento">
-                                        <span class="fa fa-file"></span> Reporte Seguimiento
-                                    </button>
-                                    <button type="button" class="btn btn-success btn-edit-rows" id="btn-detalles-proyecto">
-                                        <span class="glyphicon glyphicon-eye-open"></span> Ver Detalles del Proyecto
-                                    </button>
-                                </div>
-                            @show
+                            <div class="btn-group" style="margin:5px">
+                                <button type="button" class="btn btn-info" id="btn-reporte-seguimiento">
+                                    <span class="fa fa-file-excel-o"></span> Reporte Seguimiento
+                                </button>
+                                <button type="button" class="btn btn-success btn-edit-rows" id="btn-detalles-proyecto">
+                                    <span class="glyphicon glyphicon-eye-open"></span> Ver Detalles del Proyecto
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -51,11 +49,12 @@
                         <th>Clave</th>
                         <th>Nombre Técnico</th>
                         @foreach ($meses as $mes)
-                            <th width="35"><p class="texto-vertical">{{$mes[0]['abrev']}} </p></th>
-                            <th width="35"><p class="texto-vertical">{{$mes[1]['abrev']}} </p></th>
-                            <th width="35"><p class="texto-vertical">{{$mes[2]['abrev']}} </p></th>
+                            <th width="30"><p class="texto-vertical">{{$mes[0]['abrev']}} </p></th>
+                            <th width="30"><p class="texto-vertical">{{$mes[1]['abrev']}} </p></th>
+                            <th width="30"><p class="texto-vertical">{{$mes[2]['abrev']}} </p></th>
                         @endforeach
                         <th width="100">Estado</th>
+                        <th width="50"></th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -111,6 +110,8 @@
                                         <p class="form-control-static" id="programa-presupuestario"></p>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <label class="control-label">Función</label>
@@ -134,9 +135,44 @@
                                     <span class="fa fa-table"></span> Seguimiento de Metas
                                 </a>
                             </li>
+                            <li role="presentation" class="pull-right">
+                                <a href="#panel-informacion" aria-controls="panel-informacion" role="tab" data-toggle="tab">
+                                    <span class="fa fa-info-circle"></span> Información
+                                </a>
+                            </li>
                         </ul>
                         <div class="tab-content">
-                            <div role="tabpanel" class="active" id="panel-metas">
+                            <div role="tabpanel" class="tab-pane" id="panel-informacion">
+                                <br>
+                                <form id="form_fuente_informacion">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label" for="fuente-informacion">
+                                                    Fuente de la Información
+                                                </label>
+                                                <input type="text" class="form-control" id="fuente-informacion" name="fuente-informacion" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label" for="responsable-informacion">
+                                                    Responsable de la Información
+                                                </label>
+                                                <select class="form-control" id="responsable-informacion" name="responsable-informacion">
+                                                    <option value="">Seleccione un responsable</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <button type="button" class="btn btn-success" id="btn-guardar-informacion">
+                                                <span class="fa fa-save"></span> Guardar Información
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div role="tabpanel" class="tab-pane active" id="panel-metas">
                                 <div role="tabpanel">
                                     <!-- Nav tabs -->
                                     <ul class="nav nav-pills" role="tablist">
@@ -160,25 +196,17 @@
                                                         <th>{{$meses[$i][0]['mes']}}</th>
                                                         <th>{{$meses[$i][1]['mes']}}</th>
                                                         <th>{{$meses[$i][2]['mes']}}</th>
-                                                        <th>Totales</th>
+                                                        <th class="bg-success">Totales</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody></tbody>
-                                                <tfoot>
-                                                    <tr class="bg-success">
-                                                        <th colspan="2">Totales</th>
-                                                        <th id="total-mes-{{$meses[$i][0]['clave']}}">0</th>
-                                                        <th id="total-mes-{{$meses[$i][1]['clave']}}">0</th>
-                                                        <th id="total-mes-{{$meses[$i][2]['clave']}}">0</th>
-                                                        <th id="total-trim-{{$i}}">0</th>
-                                                    </tr>
-                                                </tfoot>
                                             </table>
                                         </div>
                                         @endfor
                                     </div>
                                 </div>
                             </div>
+                            
                         </div>
                     </div>
                 </div>

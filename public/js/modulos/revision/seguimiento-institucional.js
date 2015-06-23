@@ -65,6 +65,22 @@ moduloDatagrid.actualizar({
                 estado_actual = 0;
             }
 
+            var fuente_informacion = '';
+            if(response.data[i].fuenteInformacion){
+                fuente_informacion = 'text-primary';
+            }else{
+                fuente_informacion = 'text-muted';
+            }
+
+            var responsable_informacion = '';
+            if(response.data[i].idResponsable){
+                responsable_informacion = 'text-primary';
+            }else{
+                responsable_informacion = 'text-muted';
+            }
+
+            item.informacion = '<span class="fa fa-info-circle '+fuente_informacion+'"></span> <span class="fa fa-user '+responsable_informacion+'"></span>';
+
             for(var j in response.data[i].registro_avance){
                 var avance = response.data[i].registro_avance[j];
                 var clase_icono = (avance.mes == mes_activo)?'fa-unlock':'fa-circle';
@@ -95,6 +111,18 @@ function cargar_datos_proyecto(e){
             $('#programa-presupuestario').text(response.data.datos_programa_presupuestario.clave + ' ' + response.data.datos_programa_presupuestario.descripcion);
             $('#funcion').text(response.data.datos_funcion.clave + ' ' + response.data.datos_funcion.descripcion);
             $('#subfuncion').text(response.data.datos_sub_funcion.clave + ' ' + response.data.datos_sub_funcion.descripcion);
+
+            $('#fuente-informacion').val(response.data.fuenteInformacion);
+            if(response.data.responsables){
+                var html_rows = '<option value="">Seleccione un responsable</option>';
+                for(var i in response.data.responsables){
+                    var responsable = response.data.responsables[i];
+                    html_rows += '<option value="'+responsable.id+'">'+responsable.nombre+'</option>';
+                }
+                $('#responsable-informacion').html(html_rows);
+            }
+            $('#responsable-informacion').val(response.data.idResponsable);
+            
             var html_tbody = '';
             var contador_componente = 0;
             var contador_actividad = 0;
@@ -108,7 +136,7 @@ function cargar_datos_proyecto(e){
                 html_tbody += '<td data-trim-mes="1">-</td>';
                 html_tbody += '<td data-trim-mes="2">-</td>';
                 html_tbody += '<td data-trim-mes="3">-</td>';
-                html_tbody += '<td data-total-id="'+componente.id+'">0</td>';
+                html_tbody += '<td class="bg-success" data-total-id="'+componente.id+'">0</td>';
                 html_tbody += '</tr>';
                 for(var j in componente.actividades){
                     contador_actividad++;
@@ -119,7 +147,7 @@ function cargar_datos_proyecto(e){
                     html_tbody += '<td data-trim-mes="1">-</td>';
                     html_tbody += '<td data-trim-mes="2">-</td>';
                     html_tbody += '<td data-trim-mes="3">-</td>';
-                    html_tbody += '<td data-total-id="'+actividad.id+'">0</td>';
+                    html_tbody += '<td class="bg-success" data-total-id="'+actividad.id+'">0</td>';
                     html_tbody += '</tr>';
                 }
             }
@@ -147,7 +175,10 @@ function cargar_datos_proyecto(e){
                     total_trimestres[trimestre][avance.mes] = (parseFloat(total_trimestres[trimestre][avance.mes]) || 0) + parseFloat(avance.avanceMes);
                 }
                 for(var j in sumatoria_componente){
-                    $('#avance-trim-'+j+' > tbody > tr[data-nivel="1"][data-id="'+componente.id+'"] > td[data-total-id="'+componente.id+'"]').html(sumatoria_componente[j]);
+                    if(j > 1){
+                        sumatoria_componente[j] = sumatoria_componente[j] + sumatoria_componente[j-1];
+                    }
+                    $('#avance-trim-'+j+' > tbody > tr[data-nivel="1"][data-id="'+componente.id+'"] > td[data-total-id="'+componente.id+'"]').html(sumatoria_componente[j].format(2));
                 }
                 for(var k in componente.actividades){
                     var actividad = componente.actividades[k];
@@ -168,12 +199,15 @@ function cargar_datos_proyecto(e){
                         total_trimestres[trimestre][avance.mes] = (parseFloat(total_trimestres[trimestre][avance.mes]) || 0) + parseFloat(avance.avanceMes);
                     }
                     for(var j in sumatoria_actividad){
-                        $('#avance-trim-'+j+' > tbody > tr[data-nivel="2"][data-id="'+actividad.id+'"] > td[data-total-id="'+actividad.id+'"]').html(sumatoria_actividad[j]);
+                        if(j > 1){
+                            sumatoria_actividad[j] = sumatoria_actividad[j] + sumatoria_actividad[j-1];
+                        }
+                        $('#avance-trim-'+j+' > tbody > tr[data-nivel="2"][data-id="'+actividad.id+'"] > td[data-total-id="'+actividad.id+'"]').html(sumatoria_actividad[j].format(2));
                     }
                 }
             }
 
-            for(var i in total_trimestres){
+            /*for(var i in total_trimestres){
                 // i = trimestre
                 var meses = total_trimestres[i];
                 var suma = 0;
@@ -182,7 +216,7 @@ function cargar_datos_proyecto(e){
                     suma += meses[j];
                 }
                 $('#total-trim-'+i).text(suma);
-            }
+            }*/
 			$('#btn-firmar').hide();
 			
             if(response.data.evaluacion_meses.length){
@@ -202,10 +236,47 @@ $('#btn-comentar-avance').on('click',function(){
     window.location.href = SERVER_HOST+'/revision/comentar-avance/' + $('#btn-comentar-avance').attr('data-id-proyecto');
 });
 
+$('#btn-reporte-seguimiento').on('click',function(){
+    window.open(SERVER_HOST+'/v1/reporte-seguimiento?clasificacion-proyecto=1');
+});
+
+$('#btn-guardar-informacion').on('click',function(){
+    Validation.cleanFormErrors('#form_fuente_informacion');
+    if(($('#fuente-informacion').val().trim() == '') || (!$('#responsable-informacion').val())){
+        if($('#fuente-informacion').val().trim() == ''){
+            Validation.printFieldsErrors('fuente-informacion','Este campo es requerido');
+        }
+        if(!$('#responsable-informacion').val()){
+            Validation.printFieldsErrors('responsable-informacion','Este campo es requerido');
+        }
+        return false;
+    }
+    //
+    var parametros = $('#form_fuente_informacion').serialize();
+    parametros += '&guardar=datos-informacion';
+    moduloResource.put($('#btn-comentar-avance').attr('data-id-proyecto'),parametros,{
+        _success: function(response){
+            MessageManager.show({data:'La información fue almacenada con éxito.',type:'OK',timer:3});
+            moduloDatagrid.actualizar();
+        },
+        _error: function(response){
+            try{
+                var json = $.parseJSON(response.responseText);
+                if(!json.code)
+                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                else{
+                    //json.container = modal_actividad + ' .modal-body';
+                    MessageManager.show(json);
+                }
+                Validation.formValidate(json.data);
+            }catch(e){
+                console.log(e);
+            }
+        }
+    });
+});
 
 $('#btn-firmar').on('click',function(){
-	
-	console.log($('#btn-comentar-avance').attr('data-id-proyecto'));
 	
 	Confirm.show({
 		titulo:"¿Poner el programa en el estatus de firma?",
@@ -238,14 +309,23 @@ $('#btn-firmar').on('click',function(){
 	
     
 });
-
+$('#modalDatosSeguimiento').on('hide.bs.modal',function(e){
+    $('#form_fuente_informacion').get(0).reset();
+    Validation.cleanFormErrors('#form_fuente_informacion');
+});
 /*
 $('#modalDatosSeguimiento').on('shown.bs.modal', function () {
     $('#modalDatosSeguimiento').find('input').eq(0).focus();
 });
 */
-/*
-$('#modalDatosSeguimiento').on('hide.bs.modal',function(e){ 
-    resetModalModuloForm();
-});
-*/
+/*             Extras               */
+/**
+ * Number.prototype.format(n, x)
+ * 
+ * @param integer n: length of decimal
+ * @param integer x: length of sections
+ */
+Number.prototype.format = function(n, x) {
+    var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\.' : '$') + ')';
+    return this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+};

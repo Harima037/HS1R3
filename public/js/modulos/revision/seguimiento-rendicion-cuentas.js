@@ -31,65 +31,6 @@ var accionesDatagrid = new Datagrid("#datagridAcciones",moduloResource,{ formato
 accionesDatagrid.init();
 accionesDatagrid.actualizar({ _success: function(response){ llenar_grid_acciones(response); } });
 
-$('#btn-guardar-avance').on('click',function(){
-    /*if($('#total-porcentaje').attr('data-estado-avance')){
-        if(($('#analisis-resultados').val().trim() == '') || ($('#justificacion-acumulada').val().trim() == '')){
-            MessageManager.show({data:'Es necesario capturar una justificacion en base al porcentaje de avance del mes.',container:'#modalEditarAvance .modal-body',type:'ADV'});
-            $('#tab-link-justificacion').tab('show');
-            return;
-        }
-    }
-    var parametros = $('#form_avance').serialize();
-    parametros += '&guardar=avance-metas';
-
-    Validation.cleanFormErrors('#form_avance');
-
-    if($('#id-avance').val()){
-        moduloResource.put($('#id-avance').val(),parametros,{
-            _success: function(response){
-                MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
-                accionesDatagrid.actualizar({ _success: function(response){ llenar_grid_acciones(response); } });
-                $('#modalEditarAvance').modal('hide');
-            },
-            _error: function(response){
-                try{
-                    var json = $.parseJSON(response.responseText);
-                    if(!json.code)
-                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-                    else{
-                        MessageManager.show(json);
-                    }
-                    Validation.formValidate(json.data);
-                }catch(e){
-                    console.log(e);
-                }                       
-            }
-        });
-    }else{
-        moduloResource.post(parametros,{
-            _success: function(response){
-                MessageManager.show({data:'Datos del proyecto almacenados con éxito',type:'OK',timer:4});
-                accionesDatagrid.actualizar({ _success: function(response){ llenar_grid_acciones(response); } });
-                $('#id-avance').val(response.data.id);
-                $('#modalEditarAvance').modal('hide');
-            },
-            _error: function(response){
-                try{
-                    var json = $.parseJSON(response.responseText);
-                    if(!json.code)
-                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-                    else{
-                        MessageManager.show(json);
-                    }
-                    Validation.formValidate(json.data);
-                }catch(e){
-                    console.log(e);
-                }                       
-            }
-        });
-    }*/
-});
-
 function seguimiento_metas(e){
     var datos_id = e.split('-');
     if(datos_id[0] == '1'){
@@ -1081,7 +1022,7 @@ $('#btnGuardarComentario').on('click',function(){
 	                	if(!json.code)
 	            	        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
 	        	        else{
-	    	            	json.container = modal_actividad + ' .modal-body';
+	    	            	//json.container = modal_actividad + ' .modal-body';
 		                    MessageManager.show(json);
 		                }
 	                	Validation.formValidate(json.data);

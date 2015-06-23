@@ -5,50 +5,16 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime,Mail;
-use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionPlanMejora,EvaluacionComentario,EvaluacionProyectoMes,ComponenteDesglose;
+use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,
+	RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionPlanMejora,EvaluacionComentario,
+	EvaluacionProyectoMes,ComponenteDesglose,Directorio;
 
 class SeguimientoInstitucionalController extends BaseController {
-	private $reglasBeneficiarios = array(
-		'id-beneficiario'			=> 'required',
-		'altaf' 					=> 'sometimes|required|integer|min:0',
-		'altam' 					=> 'sometimes|required|integer|min:0',
-		'bajaf' 					=> 'sometimes|required|integer|min:0',
-		'bajam' 					=> 'sometimes|required|integer|min:0',
-		'indigenaf'					=> 'sometimes|required|integer|min:0',
-		'indigenam'					=> 'sometimes|required|integer|min:0',
-		'inmigrantef' 				=> 'sometimes|required|integer|min:0',
-		'inmigrantem' 				=> 'sometimes|required|integer|min:0',
-		'mediaf' 					=> 'sometimes|required|integer|min:0',
-		'mediam' 					=> 'sometimes|required|integer|min:0',
-		'mestizaf' 					=> 'sometimes|required|integer|min:0',
-		'mestizam'					=> 'sometimes|required|integer|min:0',
-		'muyaltaf' 					=> 'sometimes|required|integer|min:0',
-		'muyaltam' 					=> 'sometimes|required|integer|min:0',
-		'muybajaf' 					=> 'sometimes|required|integer|min:0',
-		'muybajam' 					=> 'sometimes|required|integer|min:0',
-		'otrosf' 					=> 'sometimes|required|integer|min:0',
-		'otrosm' 					=> 'sometimes|required|integer|min:0',
-		'ruralf' 					=> 'sometimes|required|integer|min:0',
-		'ruralm' 					=> 'sometimes|required|integer|min:0',
-		'urbanaf' 					=> 'sometimes|required|integer|min:0',
-		'urbanam' 					=> 'sometimes|required|integer|min:0'
+	private $reglasDatosInformacion = array(
+		'fuente-informacion'		=> 'required',
+		'responsable-informacion'	=> 'required'
 	);
 
-	private $reglasAnalisisFuncional = array(
-		'analisis-resultado'	=> 'required',
-		'beneficiarios'			=> 'required',
-		'justificacion-global'	=> 'required'
-	);
-
-	private $reglasPlanMejora = array(
-		'accion-mejora'					=> 'required',
-		'grupo-trabajo'					=> 'required',
-		'documentacion-comprobatoria'	=> 'required',
-		'fecha-inicio'					=> 'required|date',
-		'fecha-termino'					=> 'required|date',
-		'fecha-notificacion'			=> 'required|date'
-	);
-	
 	private $reglasComentario = array(
 			'idproyecto' => 'required',
 			'idcampo' => 'required',
@@ -89,9 +55,9 @@ class SeguimientoInstitucionalController extends BaseController {
 							//->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
 							//->where('idClasificacionProyecto','=',$)
 				//$rows = $rows->with('registroAvance');
-				$rows = $rows->with(array('registroAvance'=>function($query){
+				/*$rows = $rows->with(array('registroAvance'=>function($query){
 					$query->select('id','idProyecto','mes',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'),DB::raw('count(idNivel) as registros'))->groupBy('idProyecto','mes');
-				}));
+				}));*/
 
 				//$rows = $rows->whereIn('evaluacionProyectoMes.idEstatus', array(2, 4));
 
@@ -125,7 +91,11 @@ class SeguimientoInstitucionalController extends BaseController {
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				
 				if(isset($parametros['buscar'])){				
-					$rows = $rows->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%');
+					//$rows = $rows->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%');
+					$rows = $rows->where(function($query)use($parametros){
+						$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
+							->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
+					});
 					$total = $rows->count();
 				}else{				
 					$total = $rows->count();						
@@ -133,13 +103,14 @@ class SeguimientoInstitucionalController extends BaseController {
 				
 				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
-					'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
-									->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
-									->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')									
-									->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
-									->orderBy('id', 'desc')
-									->skip(($parametros['pagina']-1)*10)->take(10)
-									->get();
+					'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl',
+					'proyectos.fuenteInformacion','proyectos.idResponsable')
+					->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
+					->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')									
+					->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
+					->orderBy('id', 'desc')
+					->skip(($parametros['pagina']-1)*10)->take(10)
+					->get();
 			}
 			
 			$data = array('resultados'=>$total,'data'=>$rows);
@@ -186,6 +157,7 @@ class SeguimientoInstitucionalController extends BaseController {
 					'evaluacionMeses'=>function($query) use ($mes_actual){
 						$query->where('mes','=',$mes_actual);
 					}))->find($id);
+				$recurso['responsables'] = Directorio::responsablesActivos($recurso->unidadResponsable)->get();
 			}elseif ($parametros['mostrar'] == 'datos-municipio-avance') {
 				//$id = idComponente y $parametros['clave-municipio'] y $parametros['nivel'] = 'componente'
 				
@@ -326,18 +298,19 @@ class SeguimientoInstitucionalController extends BaseController {
 		$respuesta['data'] = array("data"=>'');
 		
 		$parametros = Input::all();
-		//$mes_actual = Util::obtenerMesActual();
-		$mes_actual = date('n') - 1 ;
+		$mes_actual = Util::obtenerMesActual();
+		//$mes_actual = date('n') - 1 ;
 
 		if(isset($parametros['actualizarproyecto']))
 		{
 			//throw new Exception($parametros['actualizarproyecto'],1);
 			$estatus = 0;
+			$mes_avance = date('n')-1;
 			if($parametros['actualizarproyecto']=="aprobar") //Poner estatus 4 (Aprobado)
 			{
 				$validar = DB::table('evaluacionComentarios')
                     ->where('idProyecto', '=', $id)
-					->where('mes','=',$mes_actual)
+					->where('mes','=',$mes_avance)
 					//->where('anio','=',date("Y"))
 					->whereNull('borradoAl')
 					->select('evaluacionComentarios.id')->get();
@@ -361,7 +334,7 @@ class SeguimientoInstitucionalController extends BaseController {
 			{
 				$validar = DB::table('evaluacionComentarios')
                     ->where('idProyecto', '=', $id)
-					->where('mes','=',$mes_actual)
+					->where('mes','=',$mes_avance)
 					->whereNull('borradoAl')
 					->select('evaluacionComentarios.id')->get();
 							
@@ -384,7 +357,7 @@ class SeguimientoInstitucionalController extends BaseController {
 			{
 				$validar = DB::table('evaluacionComentarios')
                     ->where('idProyecto', '=', $id)
-					->where('mes','=',$mes_actual)
+					->where('mes','=',$mes_avance)
 					->whereNull('borradoAl')
 					->select('evaluacionComentarios.id')->get();
 				
@@ -402,7 +375,12 @@ class SeguimientoInstitucionalController extends BaseController {
 					$estatus = 5;
 				}
 			}
-			//Enviar correo
+			if($estatus == 3 && $mes_actual == 0){
+				$respuesta['http_status'] = 500;
+				$respuesta['data']['data'] = 'El limite de tiempo para capturar avances a terminado, el usuario no podra corregir los errores que se le señalen, por lo tanto se ha desactivo la corrección del avance.';
+				$respuesta['data']['code'] = 'S03';
+			}
+			//Guardar y Enviar correo
 			if($estatus > 0 && $respuesta['http_status'] == 200){
 				$recurso = EvaluacionProyectoMes::where('idProyecto','=',$id)
 								->where('mes','=',$mes_actual)
@@ -445,35 +423,55 @@ class SeguimientoInstitucionalController extends BaseController {
 					$respuesta['data'] = array("data"=>"Ocurrio un error al intentar validar el proyecto.",'code'=>'S01');
 				}
 			}
-		}
-		else
-		{
-			$recurso = EvaluacionComentario::find($id);
-			if(is_null($recurso)){
-				$respuesta['http_status'] = 404;
-				$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
-			}else{
-						
-				$recurso->idProyecto = $parametros['idproyecto'];
-				$recurso->mes = Util::obtenerMesActual();		
-				$recurso->idCampo = $parametros['idcampo'];
-				$recurso->tipoElemento = $parametros['tipocomentario'];
-				$recurso->idElemento = $parametros['idelemento'];
-				$recurso->observacion = $parametros['comentario'];
-			
-				$Resultado = Validador::validar($parametros, $this->reglasComentario);
-							
-				if($Resultado===true)
-					$recurso->save();
-				else
-				{
-					$respuesta['http_status'] = 500;
-					$respuesta = $Resultado;
+		}elseif(isset($parametros['guardar'])){
+			if($parametros['guardar'] == 'datos-informacion'){
+				$recurso = Proyecto::find($id);
+				$validado = Validador::validar($parametros,$this->reglasDatosInformacion);
+				if($validado === TRUE){
+					$recurso->fuenteInformacion = $parametros['fuente-informacion'];
+					$recurso->idResponsable = $parametros['responsable-informacion'];
+					if($recurso->save()){
+						$respuesta['http_status'] = 200;
+						$respuesta['data'] = array('data'=>$recurso);
+					}else{
+						$respuesta['http_status'] = 500;
+						$respuesta['data'] = array('data'=>'Ocurrio un error al intentar guardar los datos.','code'=>'S01');
+					}
+				}else{
+					$respuesta = $validado;
 				}
 			}
+		}else{
+			if($mes_actual > 0){
+				$recurso = EvaluacionComentario::find($id);
+				if(is_null($recurso)){
+					$respuesta['http_status'] = 404;
+					$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+				}else{
+							
+					$recurso->idProyecto = $parametros['idproyecto'];
+					$recurso->mes = $mes_actual;
+					$recurso->idCampo = $parametros['idcampo'];
+					$recurso->tipoElemento = $parametros['tipocomentario'];
+					$recurso->idElemento = $parametros['idelemento'];
+					$recurso->observacion = $parametros['comentario'];
+				
+					$Resultado = Validador::validar($parametros, $this->reglasComentario);
+								
+					if($Resultado===true)
+						$recurso->save();
+					else
+					{
+						$respuesta['http_status'] = 500;
+						$respuesta = $Resultado;
+					}
+				}	
+			}else{
+				$respuesta['http_status'] = 500;
+				$respuesta['data']['data'] = 'El limite de tiempo para capturar avances a terminado, el usuario no podra corregir los errores que se le señalen, por lo tanto se ha desactivo la edición de comentarios.';
+				$respuesta['data']['code'] = 'S03';
+			}
 		}
-		
-		
 		return Response::json($respuesta['data'],$respuesta['http_status']);
 	}
 	

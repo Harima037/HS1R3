@@ -36,8 +36,8 @@ class ReporteSeguimientoController extends BaseController {
 		$mes_actual = Util::obtenerMesActual();
 
 		$rows = Proyecto::getModel();
-		$rows = $rows->where('idEstatusProyecto','=',5);
-					//->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto']);
+		$rows = $rows->where('idEstatusProyecto','=',5)
+					->where('idClasificacionProyecto','=',$parametros['clasificacion-proyecto']);
 		//
 
 		if($mes_actual == 0){
@@ -70,10 +70,13 @@ class ReporteSeguimientoController extends BaseController {
 		*/
 
 		$rows = $rows->select('proyectos.id','nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto',
-			DB::raw('CONCAT_WS(" ",sentryUsers.nombres,sentryUsers.apellidoPaterno,sentryUsers.apellidoMaterno) AS nombreRevisor'),'catalogoUnidadesResponsables.descripcion AS descripcionUnidadResponsable',
+			DB::raw('CONCAT_WS(" ",datosRevisor.nombres,datosRevisor.apellidoPaterno,datosRevisor.apellidoMaterno) AS nombreRevisor'),
+			DB::raw('CONCAT_WS(" ",datosEnlace.nombres,datosEnlace.apellidoPaterno,datosEnlace.apellidoMaterno) AS nombreEnlace'),
+				'catalogoUnidadesResponsables.descripcion AS descripcionUnidadResponsable',
 				'catalogoEstatusProyectos.descripcion AS estatusAvance',
 				'unidadResponsable','finalidad','funcion','subFuncion','subSubFuncion','programaSectorial','programaPresupuestario','programaEspecial','actividadInstitucional','proyectoEstrategico','numeroProyectoEstrategico')
-				->leftjoin('sentryUsers','sentryUsers.id','=','proyectos.idUsuarioValidacionSeg')
+				->leftjoin('sentryUsers AS datosRevisor','datosRevisor.id','=','proyectos.idUsuarioValidacionSeg')
+				->leftjoin('sentryUsers AS datosEnlace','datosEnlace.id','=','proyectos.idUsuarioRendCuenta')
 				->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
 				->join('catalogoUnidadesResponsables','catalogoUnidadesResponsables.clave','=','proyectos.unidadResponsable')
 				->leftjoin('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','evaluacionProyectoMes.idEstatus')
