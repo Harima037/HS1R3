@@ -144,12 +144,12 @@ class SeguimientoController extends BaseController {
 				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
 					'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
-									->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
-									->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
-									->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
-									->orderBy('id', 'desc')
-									->skip(($parametros['pagina']-1)*10)->take(10)
-									->get();
+					->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
+					->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
+					->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
+					->orderBy('id', 'desc')
+					->skip(($parametros['pagina']-1)*10)->take(10)
+					->get();
 			}
 			
 			$data = array('resultados'=>$total,'data'=>$rows);
@@ -459,18 +459,13 @@ class SeguimientoController extends BaseController {
 				if($seguimiento_mes->idEstatus == 1 || $seguimiento_mes->idEstatus == 3){
 					$seguimiento_mes->idEstatus = 2;
 					if($seguimiento_mes->save()){
-						/*
 						$id_proyecto = $recurso->id;
 						$usuario = Sentry::getUserProvider()->createModel();
+
 						$usuario = $usuario->where('idDepartamento','=',2)
-											->join('usuariosProyectos','usuariosProyectos.idSentryUser','=','sentryUsers.id')
-											->where(function($query)use($id_proyecto){
-												$query = $query->where('usuariosProyectos.proyectos','like',$id_proyecto.'|%')
-																->orWhere('usuariosProyectos.proyectos','like','%|'.$id_proyecto.'|%')
-																->orWhere('usuariosProyectos.proyectos','like','%|'.$id_proyecto)
-																->orWhere('usuariosProyectos.proyectos','like',$id_proyecto);
-											})
-											->select('sentryUsers.id','sentryUsers.nombres','sentryUsers.email')
+											->where('id','=',$recurso->idUsuarioValidacionSeg)
+											->select('sentryUsers.id','sentryUsers.nombres','sentryUsers.email',
+													'sentryUsers.apellidoPaterno','sentryUsers.apellidoMaterno')
 											->first();
 						if($usuario){
 							$data['usuario'] = $usuario;
@@ -484,7 +479,6 @@ class SeguimientoController extends BaseController {
 						}else{
 							$respuesta['notas'] = 'Sin correo enviado';
 						}
-						*/
 						
 						$respuesta['data'] = 'El Proyecto fue enviado a Revisión';
 						return $respuesta;

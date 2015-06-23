@@ -205,7 +205,7 @@
                 </div>
                 <div class="modal-footer">
                     <div id="btn-reporte" class="pull-left">
-                        <div class="btn-group">
+                        <div class="btn-group dropup">
                             <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                 <span class="fa fa-file"></span> Imprimir Reporte <span class="caret"></span>
                             </button>

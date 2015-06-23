@@ -32,6 +32,9 @@
                         <div class="btn-toolbar pull-right" >
                             @section('panel-botones')
                                 <div class="btn-group" style="margin:5px">
+                                    <button type="button" class="btn btn-info" id="btn-reporte-seguimiento">
+                                        <span class="fa fa-file"></span> Reporte Seguimiento
+                                    </button>
                                     <button type="button" class="btn btn-success btn-edit-rows" id="btn-detalles-proyecto">
                                         <span class="glyphicon glyphicon-eye-open"></span> Ver Detalles del Proyecto
                                     </button>

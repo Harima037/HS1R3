@@ -446,11 +446,10 @@
                                     <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templatePreheader">
                                         <tr>
                                             <td valign="top" class="preheaderContent" style="padding-top:10px; padding-right:20px; padding-bottom:10px; padding-left:20px;" mc:edit="preheader_content00">
-                                                Cambio de estatus en Seguimiento de Metas
                                             </td>
                                             <!-- *|IFNOT:ARCHIVE_PAGE|* -->
                                             <td valign="top" width="180" class="preheaderContent" style="padding-top:10px; padding-right:20px; padding-bottom:10px; padding-left:0;" mc:edit="preheader_content01">
-                                                ¿No puede visualizar este email correctamente?<br /><a href="*|ARCHIVE|*" target="_blank">Ver en el Navegador</a>.
+                                                <!--¿No puede visualizar este email correctamente?<br /><a href="*|ARCHIVE|*" target="_blank">Ver en el Navegador</a>.-->
                                             </td>
                                             <!-- *|END:IF|* -->
                                         </tr>
@@ -463,8 +462,14 @@
                                 	<!-- BEGIN HEADER // -->
                                     <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateHeader">
                                         <tr>
-                                            <td valign="top" class="headerContent">
-                                            	<img src="<?php echo $message->embed('img/banner-email.png'); ?>" style="max-width:600px;" id="headerImage" mc:label="header_image" mc:edit="header_image" mc:allowdesigner mc:allowtext />
+                                            <td valign="top" align="left" class="headerContent">
+                                            	<img src="{{ $message->embed('img/LogoInstitucional.png') }}" mc:label="header_image" mc:edit="header_image" mc:allowdesigner mc:allowtext style="max-height:52px;" />
+                                            </td>
+                                            <td valign="top" align="center" class="headerContent">
+                                            	<img src="{{ $message->embed('img/EscudoGobiernoChiapas.png') }}" mc:label="header_image" mc:edit="header_image" mc:allowdesigner mc:allowtext style="max-height:52px;" />
+                                            </td>
+                                            <td valign="top" align="right" class="headerContent">
+                                            	<img src="{{ $message->embed('img/Marca.png') }}" mc:label="header_image" mc:edit="header_image" mc:allowdesigner mc:allowtext style="max-height:52px;" />
                                             </td>
                                         </tr>
                                     </table>
@@ -477,8 +482,7 @@
                                     <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateBody">
                                         <tr>
                                             <td valign="top" class="bodyContent" mc:edit="body_content">
-                                                <h1>Se ha enviado un Avance de Metas para su revisión</h1>
-                                                <h3>Estimado(a) {{$usuario->nombres}}, se ha enviado a revisión un avance de metas de un proyecto asignado a usted.</h3>
+                                                <h3>Estimado(a) {{$usuario->nombres}} {{$usuario->apellidoPaterno}} {{$usuario->apellidoMaterno}}, se ha enviado a revisión un avance de metas de un proyecto asignado a usted.</h3>
                                                 <br>
                                                 <fieldset>
                                                 	<legend>Datos del Proyecto</legend>

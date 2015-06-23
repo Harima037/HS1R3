@@ -75,18 +75,30 @@ class SeguimientoInstitucionalController extends BaseController {
 		//$mes_actual = Util::obtenerMesActual();
 		$mes_actual = date('n') - 1 ;
 		
-		if($mes_actual == 0){
+		/*if($mes_actual == 0){
 			return Response::view('errors.mes_no_disponible', array(
 				'usuario'=>$datos['usuario'],
 				'sys_activo'=>null,
 				'sys_sistemas'=>$datos['sys_sistemas'],
 				'sys_mod_activo'=>null), 403
 			);
-		}
+		}*/
 		
 		$proyecto = Proyecto::with(array('analisisFuncional'=>function($query) use ($mes_actual){
 			$query->where('mes','=',$mes_actual);
+		},'evaluacionMeses'=>function($query) use ($mes_actual){
+			$query->where('mes','=',$mes_actual)->whereIn('idEstatus',array(2));
 		}))->find($id);
+
+		if(count($proyecto->evaluacionMeses) == 0){
+			return Response::view('errors.avance_no_capturado', array(
+				'usuario'=>$datos['usuario'],
+				'sys_activo'=>null,
+				'sys_sistemas'=>$datos['sys_sistemas'],
+				'sys_mod_activo'=>null), 403
+			);
+		}
+
 		if($proyecto->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
 			$jurisdicciones = Jurisdiccion::all();
 		}elseif($proyecto->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio

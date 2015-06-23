@@ -77,47 +77,23 @@
 	<table class="tabla-datos">
 		<thead>
 			<tr>
-				<th class="encabezado-tabla">Departamento</th>
-				<th width="50" class="encabezado-tabla">Nombre</th>
-				<th width="30" class="encabezado-tabla">Cargo</th>
-				<th width="40" class="encabezado-tabla">Email</th>
-				<th width="15" class="encabezado-tabla">Telefono</th>
-				<th width="60" class="encabezado-tabla">Unidad</th>
-				<th width="13" class="encabezado-tabla">Usuario</th>
-				<th width="80" class="encabezado-tabla">Roles</th>
+				<th class="encabezado-tabla">Num</th>
+				<th class="encabezado-tabla">Clave Presupuestaria</th>
+				<th class="encabezado-tabla">Nombre Técnico</th>
+				<th class="encabezado-tabla">Dirección</th>
+				<th class="encabezado-tabla">Revisor</th>
+				<th class="encabezado-tabla">Estatus Seguimiento</th>
 			</tr>
 		</thead>
 		<tbody>
-			@foreach ($datos as $item)
+			@foreach ($datos as $row => $item)
 				<tr>
-					<td>
-					@if($item->departamento)
-						{{$item->departamento}}
-					@else
-						Sin departamento
-					@endif
-					</td>
-					<td>{{$item->nombre}}</td>
-					<td>{{$item->cargo}}</td>
-					<td>{{$item->email}}</td>
-					<td>{{$item->telefono}}</td>
-					<td>
-					@if($item->claveUnidad)
-						@foreach (explode('|',$item->claveUnidad) as $llave => $unidad)
-							@if($llave > 0) <br> @endif {{ $unidad }} {{ $unidades[$unidad] }}
-						@endforeach
-					@else
-						Sin unidad asignada
-					@endif
-					</td>
-					<td>{{$item->username}}</td>
-					<td>
-					@if(isset($roles[$item->id]))
-						@foreach ($roles[$item->id] as $llave => $rol)
-							@if($llave != 0) {{', '}} @endif {{$rol}}
-						@endforeach
-					@endif
-					</td>
+					<td>{{$row+1}}</td>
+					<td>{{$item->ClavePresupuestaria}}</td>
+					<td>{{$item->nombreTecnico}}</td>
+					<td>{{$item->descripcionUnidadResponsable}}</td>
+					<td>{{$item->nombreRevisor or 'Sin Revisor'}}</td>
+					<td>{{$item->estatusAvance or 'Inactivo'}}</td>
 				</tr>
 			@endforeach
 		</tbody>

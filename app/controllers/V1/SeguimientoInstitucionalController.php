@@ -93,14 +93,13 @@ class SeguimientoInstitucionalController extends BaseController {
 					$query->select('id','idProyecto','mes',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'),DB::raw('count(idNivel) as registros'))->groupBy('idProyecto','mes');
 				}));
 
+				//$rows = $rows->whereIn('evaluacionProyectoMes.idEstatus', array(2, 4));
+
 				if($mes_actual == 0){
 					$mes_actual = date('n') - 1;
-					$rows = $rows->whereIn('evaluacionProyectoMes.idEstatus', array(4));
-				}else{
-					$rows = $rows->whereIn('evaluacionProyectoMes.idEstatus', array(2, 4));
 				}
-
-				$rows = $rows->join('evaluacionProyectoMes', function($join) use($mes_actual){
+				
+				$rows = $rows->leftjoin('evaluacionProyectoMes', function($join) use($mes_actual){
 									$join->on('proyectos.id', '=', 'evaluacionProyectoMes.idProyecto')
 									->where('evaluacionProyectoMes.mes', '=', $mes_actual)
 									->where('evaluacionProyectoMes.anio', '=', date('Y'));
@@ -112,14 +111,7 @@ class SeguimientoInstitucionalController extends BaseController {
 				if($usuario->filtrarProyectos){
 					$rows = $rows->where('idUsuarioValidacionSeg','=',$usuario->id);
 				}
-				/*
-				if($usuario->proyectosAsignados){
-					if($usuario->proyectosAsignados->proyectos){
-						$proyectos = explode('|',$usuario->proyectosAsignados->proyectos);
-						$rows = $rows->whereIn('proyectos.id',$proyectos);
-					}
-				}
-				*/
+
 				if($usuario->claveUnidad){
 					$unidades = explode('|',$usuario->claveUnidad);
 					$rows = $rows->whereIn('unidadResponsable',$unidades);
@@ -190,9 +182,10 @@ class SeguimientoInstitucionalController extends BaseController {
 		if(isset($parametros['mostrar'])){
 			if($parametros['mostrar'] == 'datos-proyecto-avance'){
 				$recurso = Proyecto::with(array('datosFuncion','datosSubFuncion','datosProgramaPresupuestario','componentes.metasMesAgrupado'
-					,'componentes.registroAvance','componentes.actividades.metasMesAgrupado','componentes.actividades.registroAvance','evaluacionMeses'=>function($query) use ($mes_actual){
+					,'componentes.registroAvance','componentes.actividades.metasMesAgrupado','componentes.actividades.registroAvance',
+					'evaluacionMeses'=>function($query) use ($mes_actual){
 						$query->where('mes','=',$mes_actual);
-						}))->find($id);
+					}))->find($id);
 			}elseif ($parametros['mostrar'] == 'datos-municipio-avance') {
 				//$id = idComponente y $parametros['clave-municipio'] y $parametros['nivel'] = 'componente'
 				
@@ -416,23 +409,17 @@ class SeguimientoInstitucionalController extends BaseController {
 								//->where('anio','=',date("Y"))
 								->update(array('idEstatus' => $estatus));
 				if($recurso){
-					/*
+					$proyecto = Proyecto::find($id);
+
 					$usuario = Sentry::getUserProvider()->createModel();
 					$usuario = $usuario->where('idDepartamento','=',3)
-										->join('usuariosProyectos','usuariosProyectos.idSentryUser','=','sentryUsers.id')
-										->where(function($query)use($id){
-											$query = $query->where('usuariosProyectos.proyectos','like',$id.'|%')
-															->orWhere('usuariosProyectos.proyectos','like','%|'.$id.'|%')
-															->orWhere('usuariosProyectos.proyectos','like','%|'.$id)
-															->orWhere('usuariosProyectos.proyectos','like',$id);
-										})
-										->select('sentryUsers.id','sentryUsers.nombres','sentryUsers.email')
+										->where('id','=',$proyecto->idUsuarioRendCuenta)
+										->select('sentryUsers.id','sentryUsers.nombres','sentryUsers.email',
+												'sentryUsers.apellidoPaterno','sentryUsers.apellidoMaterno')
 										->first();
 					if($usuario){
 						$avance_mes =  EvaluacionProyectoMes::where('idProyecto','=',$id)
 														->where('mes','=',$mes_actual)->first();
-						$proyecto = Proyecto::find($id);
-
 						$data['usuario'] = $usuario;
 						$data['proyecto'] = $proyecto;
 						$data['mes_captura'] = Util::obtenerDescripcionMes($mes_actual);
@@ -453,7 +440,6 @@ class SeguimientoInstitucionalController extends BaseController {
 					}else{
 						$respuesta['notas'] = 'Sin correo enviado';
 					}
-					*/
 				}else{
 					$respuesta['http_status'] = 500;
 					$respuesta['data'] = array("data"=>"Ocurrio un error al intentar validar el proyecto.",'code'=>'S01');
