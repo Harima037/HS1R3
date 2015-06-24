@@ -32,7 +32,7 @@
 		<td class="negrita">{{ $proyecto['nombreTecnico'] }}</td>
 		<td class="texto-centro">Clave presupuestaria: </td>
 		<td class="negrita">{{ $proyecto['ClavePresupuestaria'] }}</td>
-		<td class="texto-derecha">Al mes de: </td>
+		<td class="texto-derecha" nowrap="nowrap">Al mes de: </td>
 		<td class="negrita">{{$mes['mes']}}</td>
 		<td></td>
 		<td></td>
@@ -225,7 +225,7 @@
 		<td class="negrita">{{ $proyecto['nombreTecnico'] }}</td>
 		<td class="texto-centro">Clave presupuestaria: </td>
 		<td class="negrita">{{ $proyecto['ClavePresupuestaria'] }}</td>
-		<td class="texto-derecha">Al mes de: </td>
+		<td class="texto-derecha" nowrap="nowrap">Al mes de: </td>
 		<td class="negrita">{{$mes['mes']}}</td>
 		<td></td>
 		<td></td>

@@ -71,7 +71,7 @@ function editar(e){
         		$('#cuenta-publica').val(response.data.cuentaPublica);
         	}else{
         		$('#modalCuentaPublica').find(".modal-title").html("Nueva Cuenta Pública");
-        		$('#cuenta-publica').val(response.data.finalidadProyecto + '\n\n' + response.data.analisisResultado + '\n\n' + response.data.beneficiarios + '\n\n' + response.data.justificacionGlobal);
+        		$('#cuenta-publica').val(response.data.finalidadProyecto + '\n\n' + response.data.analisisResultado + '\n\n' + response.data.beneficiarios);
         	}
             
             $('#id').val(response.data.id);

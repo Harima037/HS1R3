@@ -5,7 +5,7 @@
 	<style type="text/css">
 		@page {
             margin-top: 0.3em;
-            margin-left: 0.6em;
+            margin-left: 1.6em;
             margin-right: 0.6em;
             margin-bottom: 0.3em;
         }
