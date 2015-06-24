@@ -72,8 +72,10 @@ class SeguimientoInstitucionalController extends BaseController {
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
 		$datos['usuario'] = Sentry::getUser();
 
-		//$mes_actual = Util::obtenerMesActual();
-		$mes_actual = date('n') - 1 ;
+		$mes_actual = Util::obtenerMesActual();
+		if($mes_actual == 0){
+			$mes_actual = date('n') - 1 ;
+		}
 		
 		/*if($mes_actual == 0){
 			return Response::view('errors.mes_no_disponible', array(
