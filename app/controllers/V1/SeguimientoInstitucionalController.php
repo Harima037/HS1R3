@@ -382,6 +382,7 @@ class SeguimientoInstitucionalController extends BaseController {
 			}
 			//Guardar y Enviar correo
 			if($estatus > 0 && $respuesta['http_status'] == 200){
+				$mes_actual = date('n') - 1;
 				$recurso = EvaluacionProyectoMes::where('idProyecto','=',$id)
 								->where('mes','=',$mes_actual)
 								//->where('anio','=',date("Y"))
