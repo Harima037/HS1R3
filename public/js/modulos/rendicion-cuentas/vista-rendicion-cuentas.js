@@ -502,15 +502,14 @@ $('.avance-mes').on('change',function(){
             var avance_mes = ((acumulado * 100) / total_programado);
         }else if(acumulado > 0){
             if(acumulado > 999){
-                avance_mes = 999;
+                var avance_mes = 999;
             }else if(acumulado > 100){
-                avance_mes = acumulado;
+                var avance_mes = acumulado;
             }else if(acumulado > 10){
-                avance_mes = 10 * acumulado;
+                var avance_mes = 10 * acumulado;
             }else{
-                avance_mes = 100 * acumulado;
+                var avance_mes = 100 * acumulado;
             }
-            //var avance_mes = 100;
         }else{
             var avance_mes = 0;
         }
@@ -555,7 +554,15 @@ $('.avance-mes').on('change',function(){
             var total_porcentaje_acumulado = parseFloat(((total_acumulado * 100) / total_programado).toFixed(2))||0;
         }else{
             if(total_acumulado > 0){
-                var total_porcentaje_acumulado = 100;
+                if(total_acumulado > 999){
+                    var total_porcentaje_acumulado = 999;
+                }else if(total_acumulado > 100){
+                    var total_porcentaje_acumulado = total_acumulado;
+                }else if(total_acumulado > 10){
+                    var total_porcentaje_acumulado = 10 * total_acumulado;
+                }else{
+                    var total_porcentaje_acumulado = 100 * total_acumulado;
+                }
             }else{
                 var total_porcentaje_acumulado = 0;
             }

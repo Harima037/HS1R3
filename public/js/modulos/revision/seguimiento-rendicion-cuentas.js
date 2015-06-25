@@ -159,11 +159,15 @@ function seguimiento_metas(e){
             }
 
             //var total_porcentaje_acumulado = parseFloat((((total_acumulado + total_avance) * 100) / total_programado).toFixed(2)) || 0;
-            $('#total-meta-programada').text(total_programado.format());
+            $('#total-meta-programada').text(total_programado.format(2));
+            $('#total-meta-programada-analisis').text(total_programado.format(2));
             $('#total-meta-programada').attr('data-total-programado',total_programado);
-            $('#total-meta-mes').text(total_programado_mes.format());
-            $('#total-avance-mes').text(total_avance.format());
-            $('#total-avance-acumulado').text(total_acumulado.format());
+            $('#total-meta-mes').text(total_programado_mes.format(2));
+            $('#total-meta-mes-analisis').text(total_programado_mes.format(2));
+            $('#total-avance-mes').text(total_avance.format(2));
+            $('#total-avance-mes-analisis').text(total_avance.format(2));
+            $('#total-avance-acumulado').text(total_acumulado.format(2));
+            $('#total-avance-acumulado-analisis').text(total_acumulado.format(2));
             //$('#total-porcentaje').text(total_porcentaje_acumulado+'% ');
             $('.avance-mes').change();
 			
@@ -361,7 +365,15 @@ $('.avance-mes').on('change',function(){
         if(total_programado > 0){
             var avance_mes = parseFloat(((acumulado * 100) / total_programado).toFixed(2))||0;
         }else if(acumulado > 0){
-            var avance_mes = 100;
+            if(acumulado > 999){
+                var avance_mes = 999;
+            }else if(acumulado > 100){
+                var avance_mes = acumulado;
+            }else if(acumulado > 10){
+                var avance_mes = 10 * acumulado;
+            }else{
+                var avance_mes = 100 * acumulado;
+            }
         }else{
             var avance_mes = 0;
         }
@@ -383,6 +395,7 @@ $('.avance-mes').on('change',function(){
     });
     suma = +suma.toFixed(2);
     $('#total-avance-mes').text(suma.format(2));
+    $('#total-avance-mes-analisis').text(suma.format(2));
 
     var suma = 0;
     $('.avance-total').each(function(){
@@ -391,6 +404,7 @@ $('.avance-mes').on('change',function(){
     suma = +suma.toFixed(2);
     $('#total-avance-total').attr('data-total-avance',suma);
     $('#total-avance-total').text(suma.format(2));
+    $('#total-avance-total-analisis').text(suma.format(2));
 
     total_programado = parseFloat($('#total-meta-programada').attr('data-total-programado'));
     total_acumulado = parseFloat($('#total-avance-total').attr('data-total-avance'));
@@ -404,7 +418,15 @@ $('.avance-mes').on('change',function(){
             var total_porcentaje_acumulado = parseFloat(((total_acumulado * 100) / total_programado).toFixed(2))||0;
         }else{
             if(total_acumulado > 0){
-                var total_porcentaje_acumulado = 100;
+                if(total_acumulado > 999){
+                    var total_porcentaje_acumulado = 999;
+                }else if(total_acumulado > 100){
+                    var total_porcentaje_acumulado = total_acumulado;
+                }else if(total_acumulado > 10){
+                    var total_porcentaje_acumulado = 10 * total_acumulado;
+                }else{
+                    var total_porcentaje_acumulado = 100 * total_acumulado;
+                }
             }else{
                 var total_porcentaje_acumulado = 0;
             }
@@ -425,6 +447,7 @@ $('.avance-mes').on('change',function(){
     }
 
     $('#total-porcentaje').html(total_porcentaje_acumulado);
+    $('#total-porcentaje-analisis').html(total_porcentaje_acumulado);
 
     if($('#total-porcentaje').attr('data-estado-avance')){
         $('#justificacion-acumulada').attr('disabled',false);

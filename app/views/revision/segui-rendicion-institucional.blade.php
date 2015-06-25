@@ -399,16 +399,44 @@
 								<br>
 								<div class="row">
 									<div class="col-sm-12">
+										<table id="tabla-avances-metas" class="table table-condensed table-bordered">
+					                		<thead>
+					                			<tr>
+					                				<th rowspan="2" class="text-center">Jurisdicción</th>
+						                			<th colspan="2" class="bg-success text-center">Meta Programada</th>
+						                			<th colspan="3" class="bg-info text-center">Avance</th>
+						                			<th rowspan="2" width="90" class="text-center">Porcentaje Acumulado</th>
+					                			</tr>
+					                			<tr>
+					                				<th class="bg-success text-center">Acumulada</th>
+					                				<th class="bg-success text-center" nowrap="nowrap">Mes actual</th>
+					                				<th class="bg-info text-center" nowrap="nowrap">Mes actual</th>
+					                				<th class="bg-info text-center">Acumulado</th>
+					                				<th class="bg-info text-center">Total</th>
+					                			</tr>
+					                		</thead>
+											<tfoot>
+					                			<th>Totales</th>
+					                			<th class="bg-success" id="total-meta-programada-analisis">0</th>
+					                			<th id="total-meta-mes-analisis">0</th>
+					                			<th id="total-avance-mes-analisis">0</th>
+					                			<th id="total-avance-acumulado-analisis">0</th>
+					                			<th class="bg-info" id="total-avance-total-analisis">0</th>
+					                			<th id="total-porcentaje-analisis">0%</th>
+					                		</tfoot>
+					                	</table>
+									</div>
+									<div class="col-sm-12">
 										<div class="form-group">
 											<label class="input-label" for="lbl-analisis-resultados">Analisis de Resultados Acumulado</label>
-											<p class="form-control" name="lbl-analisis-resultados" id="lbl-analisis-resultados"></p>
+											<p class="form-control" name="lbl-analisis-resultados" id="lbl-analisis-resultados" style="height:auto;"></p>
                                             <button type="button" class="btn btn-default" onclick="escribirComentario('analisis-resultados','Análisis de Resultados Acumulado','lbl-analisis-resultados','nivel','nivel');"><span class="fa fa-edit"></span> Comentar Analisis de Resultados Acumulado</button>
 										</div>
 									</div>
 									<div class="col-sm-12">
 										<div class="form-group">
 											<label class="input-label" for="lbl-justificacion-acumulada">Justificación Acumulada</label>
-											<p class="form-control" name="lbl-justificacion-acumulada" id="lbl-justificacion-acumulada"></p>
+											<p class="form-control" name="lbl-justificacion-acumulada" id="lbl-justificacion-acumulada" style="height:auto;"></p>
                                             <button type="button" class="btn btn-default" onclick="escribirComentario('justificacion-acumulada','Justificación Acumulada','lbl-justificacion-acumulada','nivel','nivel');"><span class="fa fa-edit"></span> Comentar Justificación Acumulada</button>
 										</div>
 									</div>
