@@ -50,9 +50,9 @@ moduloDatagrid.actualizar({
     }
 });
 
-$('#btn-capturar-cuenta-publica').on('click', function () {
+/*$('#btn-capturar-cuenta-publica').on('click', function () {
     $('#modalCuentaPublica').modal('show');
-});
+});*/
 
 $('#btn-datos-institucionales').on('click', function () {
     $('#modalDatosInstitucionales').modal('show');
@@ -62,10 +62,19 @@ $('#btn-reporte-cuenta-publica').on('click', function(){
     window.open(SERVER_HOST+'/v1/reporte-cuenta-publica');
 });
 
+$('#modalCuentaPublica').on('hidden.bs.modal',function(){
+    Validation.cleanFormErrors('#form_cuenta_publica');
+    $('#form_cuenta_publica').get(0).reset();
+});
+
+$('#modalDatosInstitucionales').on('hidden.bs.modal',function(){
+    Validation.cleanFormErrors('#form_datos_institucionales');
+    $('#form_datos_institucionales').get(0).reset();
+});
+
 function editar(e){
     moduloResource.get(e,null,{
         _success: function(response){
-
         	if(response.data.cuentaPublica){
         		$('#modalCuentaPublica').find(".modal-title").html("Editar Cuenta Pública");
         		$('#cuenta-publica').val(response.data.cuentaPublica);
@@ -73,7 +82,6 @@ function editar(e){
         		$('#modalCuentaPublica').find(".modal-title").html("Nueva Cuenta Pública");
         		$('#cuenta-publica').val(response.data.finalidadProyecto + '\n\n' + response.data.analisisResultado + '\n\n' + response.data.beneficiarios);
         	}
-            
             $('#id').val(response.data.id);
             $('#modalCuentaPublica').modal('show');
         }

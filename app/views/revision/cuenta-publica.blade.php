@@ -95,19 +95,19 @@
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <label class="control-label" for="clave-institucional">Clave Institucional:</label>
-                                <input type="text" class="form-control" id="clave-institucional" name="clave-institucional"/>
+                                <input type="text" class="form-control" id="clave-institucional" name="clave-institucional" value="{{$datos['clave-institucional']}}"/>
                             </div>
                         </div>
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <label class="control-label" for="mision">Misión:</label>
-                                <textarea class="form-control" id="mision" name="mision" rows="5"></textarea>
+                                <textarea class="form-control" id="mision" name="mision" rows="5">{{$datos['mision']}}</textarea>
                             </div>
                         </div>
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <label class="control-label" for="vision">Visión:</label>
-                                <textarea class="form-control" id="vision" name="vision" rows="5"></textarea>
+                                <textarea class="form-control" id="vision" name="vision" rows="5">{{$datos['vision']}}</textarea>
                             </div>
                         </div>
                     </div>

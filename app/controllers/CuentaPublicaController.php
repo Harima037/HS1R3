@@ -4,6 +4,7 @@ use SSA\Utilerias\Util;
 class CuentaPublicaController extends BaseController {
 	
 	public function index(){
-		return parent::loadIndex('REVISION','CUENTPUB');
+		$variables = SysConfiguracionVariable::obtenerVariables(array('clave-institucional','mision','vision'))->lists('valor','variable');
+		return parent::loadIndex('REVISION','CUENTPUB',array('datos'=>$variables));
 	}
 }

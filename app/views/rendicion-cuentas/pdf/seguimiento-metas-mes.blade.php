@@ -90,7 +90,7 @@
 			)
 			}}
 		@else
-			100
+			0
 		@endif
 		 %</td>
 		<td class="texto-medio texto-centro"></td>
@@ -131,7 +131,7 @@
 			)
 			}}
 		@else
-			100
+			0
 		@endif
 		 %</td>
 		<td class="texto-medio texto-centro"></td>
@@ -284,7 +284,7 @@
 			)
 			}}
 		@else
-			100
+			0
 		@endif
 		%</td>
 		@else
@@ -321,7 +321,7 @@
 					)
 					}}
 				@else
-					100
+					0
 				@endif
 				 %</td>
 			@else
@@ -356,7 +356,7 @@
 							)
 							}}
 						@else
-							100
+							0
 						@endif
 						 %</td>
 						<td></td>
@@ -392,7 +392,7 @@
 				)
 				}}
 			@else
-				100
+				0
 			@endif
 			 %</td>
 			@else
@@ -431,7 +431,7 @@
 						)
 						}}
 					@else
-						100
+						0
 					@endif
 					 %</td>
 				@else

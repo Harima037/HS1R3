@@ -501,7 +501,16 @@ $('.avance-mes').on('change',function(){
         if(total_programado > 0){
             var avance_mes = ((acumulado * 100) / total_programado);
         }else if(acumulado > 0){
-            var avance_mes = 100;
+            if(acumulado > 999){
+                avance_mes = 999;
+            }else if(acumulado > 100){
+                avance_mes = acumulado;
+            }else if(acumulado > 10){
+                avance_mes = 10 * acumulado;
+            }else{
+                avance_mes = 100 * acumulado;
+            }
+            //var avance_mes = 100;
         }else{
             var avance_mes = 0;
         }
@@ -511,7 +520,7 @@ $('.avance-mes').on('change',function(){
         }else if(avance_mes < 90){
             $(row +' > td.avance-mes').html('<small class="text-danger"><span class="fa fa-arrow-down"></span> '+avance_mes+'%</small>');
         }else if(total_programado == 0 && avance_mes > 0){
-            $(row +' > td.avance-mes').html('<small class="text-info"><span class="fa fa-arrow-up"></span> '+avance_mes+'%</small>');
+            $(row +' > td.avance-mes').html('<small class="text-danger"><span class="fa fa-arrow-up"></span> '+avance_mes+'%</small>');
         }else{
             $(row +' > td.avance-mes').html('<small class="text-success">'+avance_mes+'%</small>');
         }
@@ -558,7 +567,7 @@ $('.avance-mes').on('change',function(){
             total_porcentaje_acumulado = '<small class="text-danger"><span class="fa fa-arrow-down"></span> '+total_porcentaje_acumulado+'%</small>';
             $('#total-porcentaje').attr('data-estado-avance','1');
         }else if(total_programado == 0 && total_porcentaje_acumulado > 0){
-            total_porcentaje_acumulado = '<small class="text-info"><span class="fa fa-arrow-up"></span> '+total_porcentaje_acumulado+'%</small>';
+            total_porcentaje_acumulado = '<small class="text-danger"><span class="fa fa-arrow-up"></span> '+total_porcentaje_acumulado+'%</small>';
             $('#total-porcentaje').attr('data-estado-avance','1');
         }else{
             total_porcentaje_acumulado = '<small class="text-success">'+total_porcentaje_acumulado+'%</small>';

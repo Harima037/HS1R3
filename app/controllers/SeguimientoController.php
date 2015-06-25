@@ -33,7 +33,11 @@ class SeguimientoController extends BaseController {
 				)
 		);
 		$datos['mes_avance'] = Util::obtenerMesActual();
-		$datos['mes_actual'] = date('n')-1;
+		$mes_actual = Util::obtenerMesActual();
+		if($mes_actual == 0){
+			$mes_actual = date('n')-1;
+		}
+		$datos['mes_actual'] = $mes_actual;
 		$datos['trimestre_avance'] = Util::obtenerTrimestre(date('n')-1);
 		return parent::loadIndex('RENDCUENTA','RENDINST',$datos);
 	}
@@ -63,7 +67,11 @@ class SeguimientoController extends BaseController {
 				)
 		);
 		$datos['mes_avance'] = Util::obtenerMesActual();
-		$datos['mes_actual'] = date('n')-1;
+		$mes_actual = Util::obtenerMesActual();
+		if($mes_actual == 0){
+			$mes_actual = date('n')-1;
+		}
+		$datos['mes_actual'] = $mes_actual;
 		$datos['trimestre_avance'] = Util::obtenerTrimestre(date('n')-1);
 		return parent::loadIndex('RENDCUENTA','RENDINV',$datos);
 	}

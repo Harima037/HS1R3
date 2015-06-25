@@ -147,8 +147,10 @@ class SeguimientoInstitucionalController extends BaseController {
 		$data = array();
 		$parametros = Input::all();
 		
-		//$mes_actual = Util::obtenerMesActual();
-		$mes_actual = date('n') - 1 ;
+		$mes_actual = Util::obtenerMesActual();
+		if($mes_actual == 0){
+			$mes_actual = date('n') - 1 ;
+		}
 
 		if(isset($parametros['mostrar'])){
 			if($parametros['mostrar'] == 'datos-proyecto-avance'){
@@ -216,7 +218,7 @@ class SeguimientoInstitucionalController extends BaseController {
 				}
 				
 			}elseif($parametros['mostrar'] == 'datos-beneficiarios-avance'){
-				$mes_actual = Util::obtenerMesActual();
+				//$mes_actual = Util::obtenerMesActual();
 				//$mes_actual = date('n') - 1 ;
 				$recurso['acumulado'] = RegistroAvanceBeneficiario::where('idProyecto','=',$parametros['id-proyecto'])
 														->where('idTipoBeneficiario','=',$id)
@@ -382,7 +384,10 @@ class SeguimientoInstitucionalController extends BaseController {
 			}
 			//Guardar y Enviar correo
 			if($estatus > 0 && $respuesta['http_status'] == 200){
-				$mes_actual = date('n') - 1;
+				if($mes_actual == 0){
+					$mes_actual = date('n') - 1;
+				}
+				
 				$recurso = EvaluacionProyectoMes::where('idProyecto','=',$id)
 								->where('mes','=',$mes_actual)
 								//->where('anio','=',date("Y"))

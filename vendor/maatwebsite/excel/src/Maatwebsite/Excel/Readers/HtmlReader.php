@@ -317,6 +317,11 @@ class Html extends PHPExcel_Reader_HTML {
                             $this->parseValign($sheet, $column, $row, $attribute->value);
                             break;
 
+                        // Cell format
+                        case 'data-format':
+                            $this->parseDataFormat($sheet, $column, $row, $attribute->value);
+                            break;
+
                         // Inline css styles
                         case 'style':
                             $this->parseInlineStyles($sheet, $column, $row, $attribute->value);
@@ -680,7 +685,7 @@ class Html extends PHPExcel_Reader_HTML {
      * @param  string                $cellContent
      * @return void
      */
-    protected function flushCell($sheet, &$column, $row, &$cellContent)
+    protected function flushCell($sheet, $column, $row, &$cellContent)
     {
         // Process merged cells
         list($column, $cellContent) = $this->processMergedCells($sheet, $column, $row, $cellContent);
@@ -766,6 +771,19 @@ class Html extends PHPExcel_Reader_HTML {
         // Set cell width based on image
         $this->parseWidth($sheet, $column, $row, $drawing->getWidth() / 3);
         $this->parseHeight($sheet, $column, $row, $drawing->getHeight());
+    }
+
+    /**
+     * Set cell data format
+     * @param  LaravelExcelWorksheet $sheet
+     * @param  string                $column
+     * @param  integer               $row
+     * @param  string                $format
+     * @return void
+    */
+    protected function parseDataFormat($sheet, $column, $row, $format)
+    {
+        $sheet->setColumnFormat(array($column.$row => $format));
     }
 
     /**
@@ -1208,6 +1226,10 @@ class Html extends PHPExcel_Reader_HTML {
 
                 $cells->getAlignment()->setWrapText($wrap);
 
+                break;
+
+            case 'text-indent':
+                $cells->getAlignment()->setIndent(1);
                 break;
         }
     }
