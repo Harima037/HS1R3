@@ -42,7 +42,7 @@
                     </div>
                 </div>
             </div>
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover table-condensed">
                 <thead>
                     <tr height="50">
                         <th><input type="checkbox" class="check-select-all-rows"></th>

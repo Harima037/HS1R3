@@ -128,6 +128,84 @@ class Proyecto extends BaseModel
 
 	}
 
+	public function scopeReporteCuentaPublica($query,$mes,$anio){
+		$query->select(
+				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
+				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
+				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
+				'proyectos.programaPresupuestario','proyectos.programaEspecial',
+				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
+				'proyectos.numeroProyectoEstrategico',
+
+				DB::raw('concat_ws(".",proyectos.finalidad,proyectos.funcion,proyectos.subFuncion,proyectos.subSubFuncion) AS subFuncionClave'),
+
+				DB::raw('concat_ws(" ",programaPresupuestario.clave,programaPresupuestario.descripcion) AS programaPresupuestarioDescipcion'),
+
+				DB::raw('concat_ws(".- ",funcionGasto.clave,funcionGasto.descripcion) AS funcionGasto'),
+				DB::raw('concat_ws(".- ",subFuncionGasto.clave,subFuncionGasto.descripcion) AS subFuncionGasto'),
+
+				DB::raw('concat_ws(" ",eje.clave,eje.descripcion) AS ejeDescripcion'),	
+				DB::raw('concat_ws(" ",tema.clave,tema.descripcion) AS temaDescripcion'),
+				DB::raw('concat_ws(" ",politicaPublica.clave,politicaPublica.descripcion) AS politicaPublicaDescripcion'),
+
+				'cuentaPub.cuentaPublica','cuentaPub.mes',
+
+				DB::raw('count(componenteMetas.meta) + count(actividadMetas.meta) AS totalMetas')
+			)
+
+			->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','proyectos.programaPresupuestario')
+
+			->leftjoin('catalogoObjetivosPED AS objetivoPED','objetivoPED.id','=','proyectos.idObjetivoPED')
+			->leftjoin('catalogoObjetivosPED AS eje','eje.clave','=',DB::raw('SUBSTRING(objetivoPED.clave,1,2)'))
+			->leftjoin('catalogoObjetivosPED AS tema','tema.clave','=',DB::raw('SUBSTRING(objetivoPED.clave,1,4)'))
+			->leftjoin('catalogoObjetivosPED AS politicaPublica','politicaPublica.clave','=',DB::raw('SUBSTRING(objetivoPED.clave,1,6)'))
+
+			->leftjoin('catalogoFuncionesGasto AS funcionGasto','funcionGasto.clave','=',DB::raw('concat_ws(".",proyectos.finalidad,proyectos.funcion)'))
+
+			->leftjoin('catalogoFuncionesGasto AS subFuncionGasto','subFuncionGasto.clave','=',DB::raw('concat_ws(".",proyectos.finalidad,proyectos.funcion,proyectos.subFuncion,proyectos.subSubFuncion)'))
+
+			->leftjoin('componenteMetasMes AS componenteMetas',function($join)use($mes){
+				$join->on('componenteMetas.idProyecto','=','proyectos.id')
+					->where('componenteMetas.mes','<=',$mes)
+					->whereNull('componenteMetas.borradoAl');
+			})
+
+			->leftjoin('actividadMetasMes AS actividadMetas',function($join)use($mes){
+				$join->on('actividadMetas.idProyecto','=','proyectos.id')
+					->where('actividadMetas.mes','<=',$mes)
+					->whereNull('actividadMetas.borradoAl');
+			})
+			
+			->leftjoin('evaluacionProyectoMes AS proyectoMes',function($join)use($mes,$anio){
+				$join->on('proyectoMes.idProyecto','=','proyectos.id')
+					->where('proyectoMes.mes','=',$mes)
+					->where('proyectoMes.anio','=',$anio)
+					->where('proyectoMes.idEstatus','=',DB::raw('5'));
+			})
+
+			->leftjoin('evaluacionAnalisisFuncional AS cuentaPub',function($join){
+				$join->on('cuentaPub.idProyecto','=','proyectoMes.idProyecto')
+					->on('cuentaPub.mes','=','proyectoMes.mes');
+			})
+
+			->where('proyectos.idEstatusProyecto','=',5)
+			
+			->groupBy('proyectos.id')
+
+			->orderBy('proyectos.unidadResponsable','asc')
+			->orderBy('proyectos.finalidad','asc')
+			->orderBy('proyectos.funcion','asc')
+			->orderBy('proyectos.subFuncion','asc')
+			->orderBy('proyectos.subSubFuncion','asc')
+			->orderBy('proyectos.programaSectorial','asc')
+			->orderBy('proyectos.programaPresupuestario','asc')
+			->orderBy('proyectos.programaEspecial','asc')
+			->orderBy('proyectos.actividadInstitucional','asc')
+			->orderBy('proyectos.proyectoEstrategico','asc')
+			->orderBy('proyectos.numeroProyectoEstrategico','asc')
+			->orderBy('proyectos.idClasificacionProyecto','asc');
+    }
+
 	public function scopeContenidoCompleto($query){
 		return $query->with('componentes','beneficiarios','municipio','region','clasificacionProyecto','tipoProyecto','cobertura','tipoAccion',
 			'datosUnidadResponsable','datosFinalidad','datosFuncion','datosSubFuncion','datosSubSubFuncion','datosProgramaSectorial',
@@ -145,6 +223,10 @@ class Proyecto extends BaseModel
 
 	public function componentes(){
 		return $this->hasMany('Componente','idProyecto')->with('usuario');
+	}
+
+	public function componentesMetasMes(){
+		return $this->hasMany('ComponenteMetaMes','idProyecto');
 	}
 
 	public function componentesCompletoDescripcion(){
@@ -193,6 +275,10 @@ class Proyecto extends BaseModel
 
 	public function actividades(){
 		return $this->hasMany('Actividad','idProyecto')->with('usuario');
+	}
+
+	public function actividadesMetasMes(){
+		return $this->hasMany('ActividadMetaMes','idProyecto');
 	}
 
 	public function municipio(){
