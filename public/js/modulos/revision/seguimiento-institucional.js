@@ -63,6 +63,7 @@ moduloDatagrid.actualizar({
 			if(response.data[i].evaluacion_meses.length){
                 if(response.data[i].evaluacion_meses[0].idEstatus == 1){
                     item.estado = '<span class="label label-info">En Trámite</span>';
+                    estado_actual = 0;
                 }else if(response.data[i].evaluacion_meses[0].idEstatus == 2){
                     item.estado = '<span class="label label-warning">En Revisión</span>';
                     estado_actual = 1;
