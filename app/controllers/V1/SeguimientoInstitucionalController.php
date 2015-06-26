@@ -86,6 +86,10 @@ class SeguimientoInstitucionalController extends BaseController {
 					$query->select('id','idProyecto','mes',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'),DB::raw('count(idNivel) as registros'))->groupBy('idProyecto','mes');
 				},'evaluacionMeses'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
+				},'componentesMetasMes'=>function($query){
+					$query->select('id','idProyecto','mes',DB::raw('sum(meta) AS totalMeta'))->groupBy('idProyecto','mes');
+				},'actividadesMetasMes'=>function($query){
+					$query->select('id','idProyecto','mes',DB::raw('sum(meta) AS totalMeta'))->groupBy('idProyecto','mes');
 				}));
 
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
