@@ -1,7 +1,7 @@
 <?php
 use SSA\Utilerias\Util;
 
-class RendicionFassaController extends BaseController {
+class RevisionRendicionFassaController extends BaseController {
 	
 	public function index(){
 		$datos = array();
@@ -15,6 +15,6 @@ class RendicionFassaController extends BaseController {
 			$datos['trimestre_activo'] = FALSE;
 		}
 
-		return parent::loadIndex('RENDCUENTA','RENDFASSA',$datos);
+		return parent::loadIndex('REVISION','REVFASSA',$datos);
 	}
 }
