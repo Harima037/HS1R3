@@ -15,6 +15,6 @@ class RevisionRendicionFassaController extends BaseController {
 			$datos['trimestre_activo'] = FALSE;
 		}
 
-		return parent::loadIndex('RENDCUENTA','RENDFASSA',$datos);
+		return parent::loadIndex('REVISION','REVFASSA',$datos);
 	}
 }

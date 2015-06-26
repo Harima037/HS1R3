@@ -34,13 +34,9 @@
     	                </button>
         	            <ul class="dropdown-menu pull-right" role="menu">
             	        	<li id="btnAprobarPrograma" name="btnAprobarPrograma"><a href="#" class="btn-default"><i class="fa fa-thumbs-o-up"></i> Aprobar el programa</a></li>
-                	        <li id="btnRegresarCorregir" name="btnRegresarCorregir"><a href="#" class="btn-default"><i class="fa fa-mail-reply-all"></i> Regresar para correción</a></li>        
-                            
-                            
+                	        <li id="btnRegresarCorregir" name="btnRegresarCorregir"><a href="#" class="btn-default"><i class="fa fa-mail-reply-all"></i> Regresar para correción</a></li>
                             <li id="btnFirmarPrograma" name="btnFirmarPrograma"><a href="#" class="btn-default">
-                            <span class="glyphicon glyphicon-pencil"></span> Firmar programa</a></li>        
-                            
-                                                        
+                            <span class="glyphicon glyphicon-pencil"></span> Firmar programa</a></li>
                     	</ul>
                     </div>
                 </div>
