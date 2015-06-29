@@ -33,21 +33,29 @@ class ReporteCuentaPublicaController extends BaseController {
 
 		$phpWord->setDefaultFontName('Arial');
 		$phpWord->setDefaultFontSize(12);
+		$phpWord->setDefaultParagraphStyle(
+		    array(
+		        'align'      => 'both',
+		        'spaceAfter' => \PhpOffice\PhpWord\Shared\Converter::pointToTwip(0),
+		        'spacing'    => 0,
+		    )
+		);
 
-		//$paragraphStyle = array('align' => 'center');
-		//$phpWord->addParagraphStyle('centrado', $paragraphStyle);
 		$trimestres = array(1=>'PRIMER',2=>'SEGUNDO',3=>'TERCER',4=>'CUARTO');
 		$trimestre = Util::obtenerTrimestre();
-
-		$fontStyle = array('spaceAfter' => 60, 'size' => 12);
 
 		$titulo = array('bold' => true);
 		$texto = array('bold' => false);
 		$centrado = array('align' => 'center');
 		$justificado = array('align' => 'justify');
 
-		$tableStyle = array('borderColor'=>'000000', 'borderSize'=>6);
-		$phpWord->addTableStyle('TablaInfo', $tableStyle,$tableStyle);
+		$infoStyle = array('borderColor'=>'000000', 'borderSize'=>6);
+		$claveStyle = array('borderColor'=>'000000','borderSize'=>6,'borderTopColor'=>'FFFFFF','cellMargin'=>200,'cellMarginTop'=>0);
+		$headerStyle = array('borderColor'=>'FFFFFF','borderSize'=>0);
+
+		$phpWord->addTableStyle('TablaInfo', $infoStyle);
+		$phpWord->addTableStyle('TablaClave',$claveStyle);
+		$phpWord->addTableStyle('TablaEncabezado',$headerStyle);
 
 		$phpWord->addTitleStyle(1, $titulo, $justificado);
 		$phpWord->addTitleStyle(2, $titulo, $justificado);
@@ -57,45 +65,59 @@ class ReporteCuentaPublicaController extends BaseController {
 	    // To create a basic section:
 	    $section = $phpWord->addSection(array('orientation'=>'landscape','size'=>'letter'));
 
-		// Add first page header
-		
-		//$header->firstPage();
-		//$table = $header->addTable(array('width'=>100));
-		//$table->addRow();
-
-		//$cell = $table->addCell();
-		//$textrun = $cell->addTextRun();
-		//$textrun->addText(htmlspecialchars('LOGO1'));
-
-		//$cell = $table->addCell();
-		//$textrun = $cell->addTextRun();
 	    $variables = SysConfiguracionVariable::obtenerVariables(array('clave-institucional','mision','vision'))->lists('valor','variable');
 
 		$header = $section->addHeader();
-
-		//$textrun = $header->addTextRun();
-		//$textrun->addImage('img/LogoFederal.png', array('width' => 80, 'height' => 80, 'wrappingStyle' => 'square','positioning' => 'absolute','posHorizontalRel' => 'margin','posVerticalRel' => 'line'));
-		//$header->addWatermark('img/LogoFederal.png', array('wrappingStyle' => 'square','positioning' => 'absolute','posHorizontalRel' => 'margin','posVerticalRel' => 'line'));
-
-		//$textrun = $header->addTextRun();
-		//$header->addImage('img/LogoInstitucional.png',array('wrappingStyle' => 'square','positioning' => 'absolute'));
-		//$header->addWatermark(asset('img/LogoFederal.png'));
-		//$header->addWatermark('img/LogoFederal.png');
-		
+		/*
 		$header->addText(htmlspecialchars('GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS'),$titulo,$centrado);
 		$header->addTextBreak(0);
 		$header->addText(htmlspecialchars('SECRETARÍA DE SALUD'),$titulo,$centrado);
 		$header->addTextBreak();
 		$header->addText(htmlspecialchars('ANÁLISIS FUNCIONAL AL '.$trimestres[$trimestre].' TRIMESTRE DEL '.date('Y')),$titulo,$centrado);
+		$image = $header->addImage(
+			'img/LogoInstitucional.png', 
+			array(
+				'positioning'      => \PhpOffice\PhpWord\Style\Image::POSITION_RELATIVE,
+		        'posHorizontal'    => \PhpOffice\PhpWord\Style\Image::POSITION_HORIZONTAL_RIGHT,
+		        'posHorizontalRel' => \PhpOffice\PhpWord\Style\Image::POSITION_RELATIVE_TO_IMARGIN,
+		        'posVertical'      => \PhpOffice\PhpWord\Style\Image::POSITION_VERTICAL_TOP,
+		        'posVerticalRel'   => \PhpOffice\PhpWord\Style\Image::POSITION_RELATIVE_TO_IMARGIN,
+			)
+		);
+		$image = $header->addImage(
+			'img/EscudoGobiernoChiapas.png', 
+			array(
+				'positioning'      => \PhpOffice\PhpWord\Style\Image::POSITION_RELATIVE,
+		        'posHorizontal'    => \PhpOffice\PhpWord\Style\Image::POSITION_HORIZONTAL_LEFT,
+		        'posHorizontalRel' => \PhpOffice\PhpWord\Style\Image::POSITION_RELATIVE_TO_LMARGIN,
+		        'posVertical'      => \PhpOffice\PhpWord\Style\Image::POSITION_VERTICAL_TOP,
+		        'posVerticalRel'   => \PhpOffice\PhpWord\Style\Image::POSITION_RELATIVE_TO_IMARGIN,
+			)
+		);
+		*/
+		$table = $header->addTable('TablaEncabezado');
+		$row = $table->addRow();
+		$row->addCell(3000)->addImage('img/EscudoGobiernoChiapas.png');
+		$cell = $row->addCell(8128);
+		$cell->addText(htmlspecialchars('GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS'),$titulo,$centrado);
+		$cell->addTextBreak(0);
+		$cell->addText(htmlspecialchars('SECRETARÍA DE SALUD'),$titulo,$centrado);
+		$cell->addTextBreak();
+		$cell->addText(htmlspecialchars('ANÁLISIS FUNCIONAL AL '.$trimestres[$trimestre].' TRIMESTRE DEL '.date('Y')),$titulo,$centrado);
+		$row->addCell(3000)->addImage('img/LogoInstitucional.png');
+		
+		$table = $header->addTable('TablaClave');
+		$row = $table->addRow();
+		$row->addCell(4500)->addText(htmlspecialchars($variables['clave-institucional']));
+
 		$header->addTextBreak();
 
-
 		$footer = $section->addFooter();
-		$footer->addPreserveText(htmlspecialchars('Pagina {PAGE} de {NUMPAGES}.'), null,array('align' => 'right'));
+		$footer->addPreserveText(htmlspecialchars('Página {PAGE} de {NUMPAGES}.'), null,array('align' => 'right'));
 
 		$section->addText(htmlspecialchars('ÍNDICE'),$titulo,$centrado);
 		$section->addTextBreak(2);
-		$section->addTOC($fontStyle);
+		$section->addTOC();
 		$section->addPageBreak();
 
 		$section->addTextBreak(2);
@@ -145,15 +167,15 @@ class ReporteCuentaPublicaController extends BaseController {
 			$table = $section->addTable('TablaInfo');
 
 			$row = $table->addRow();
-			$row->addCell(2000)->addText('EJE');
-			$row->addCell(2000)->addText('TEMA');
-			$row->addCell(5065)->addText('POLÍTICA PÚBLICA');
+			$row->addCell(3000)->addText('EJE');
+			$row->addCell(3000)->addText('TEMA');
+			$row->addCell(3065)->addText('POLÍTICA PÚBLICA');
 			$row->addCell(5060)->addText('PROGRAMA PRESUPUESTARIO');
 
 			$row = $table->addRow();
-			$row->addCell(2000)->addText($elemento->ejeDescripcion);
-			$row->addCell(2000)->addText($elemento->temaDescripcion);
-			$row->addCell(5065)->addText($elemento->politicaPublicaDescripcion);
+			$row->addCell(2500)->addText($elemento->ejeDescripcion);
+			$row->addCell(2500)->addText($elemento->temaDescripcion);
+			$row->addCell(4065)->addText($elemento->politicaPublicaDescripcion);
 			$row->addCell(5060)->addText($elemento->programaPresupuestarioDescipcion);
 			$section->addTextBreak();
 
@@ -173,7 +195,7 @@ class ReporteCuentaPublicaController extends BaseController {
 			$section->addTextBreak();
 		}
 		
-		$section->addPageBreak();
+		//$section->addPageBreak();
 
 		//$cell = $table->addCell();
 		//$textrun = $cell->addTextRun();
