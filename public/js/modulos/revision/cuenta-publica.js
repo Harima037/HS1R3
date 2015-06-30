@@ -26,8 +26,11 @@ moduloDatagrid.actualizar({
             }else{
             	response.data[i].cuentaPublica = '<div class="text-center"><span class="text-muted">Sin Guardar</span></div>';
             }
+            delete response.data[i].idUsuarioValidacionSeg;
+            delete response.data[i].unidadResponsable;
         }
         moduloDatagrid.cargarDatos(response.data);
+        moduloDatagrid.cargarTotalResultados(response.resultados,'<b>Captura(s)</b>');
         var total = parseInt(response.resultados/moduloDatagrid.rxpag); 
         var plus = parseInt(response.resultados)%moduloDatagrid.rxpag;
         if(plus>0) 

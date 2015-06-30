@@ -34,6 +34,17 @@ class CuentaPublicaController extends \BaseController {
 
 				$rows = EvaluacionAnalisisFuncional::cuentaPublica(Util::obtenerMesActual(),date('Y'));
 
+				$usuario = Sentry::getUser();
+				
+				if($usuario->filtrarProyectos){
+					$rows = $rows->where('idUsuarioValidacionSeg','=',$usuario->id);
+				}
+
+				if($usuario->claveUnidad){
+					$unidades = explode('|',$usuario->claveUnidad);
+					$rows = $rows->whereIn('unidadResponsable',$unidades);
+				}
+
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				
 				if(isset($parametros['buscar'])){				

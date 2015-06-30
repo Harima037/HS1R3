@@ -29,6 +29,21 @@ moduloDatagrid.actualizar({
             var mes_inicia = ((trimestre - 1) * 3) + 1;
             var meses = [1,2,3,4,5,6,7,8,9,10,11,12];
             var estado_actual = 0;
+            var meses_capturados = {'1':'','2':'','3':'','4':'','5':'','6':'','7':'','8':'','9':'','10':'','11':'','12':''};
+
+            for(var j in response.data[i].componentes_metas_mes){
+                var meta = response.data[i].componentes_metas_mes[j];
+                if(parseFloat(meta.totalMeta) > 0){
+                    meses_capturados[meta.mes] = 'style="background-color:#DDDDDD"';
+                }
+            }
+
+            for(var j in response.data[i].actividades_metas_mes){
+                var meta = response.data[i].actividades_metas_mes[j];
+                if(parseFloat(meta.totalMeta) > 0){
+                    meses_capturados[meta.mes] = 'style="background-color:#DDDDDD"';
+                }
+            }
 
             item.id = response.data[i].id;
             item.clave = response.data[i].clavePresup;
@@ -36,11 +51,11 @@ moduloDatagrid.actualizar({
 
             for(var j in meses){
                 if(meses[j] == mes_activo){
-                    item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class=""><span class="fa fa-unlock"></span></span>';
+                    item['mes_'+meses[j]] = '<div id="grid-mes-'+meses[j]+'" class="text-center" '+meses_capturados[meses[j]]+'><span class="fa fa-unlock"></span></div>';
                 }else if(meses[j] < mes_actual){
-                    item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class="text-muted"><span class="fa fa-times"></span></span>';
+                    item['mes_'+meses[j]] = '<div id="grid-mes-'+meses[j]+'" class="text-center text-muted" '+meses_capturados[meses[j]]+'><span class="fa fa-times"></span></div>';
                 }else{
-                    item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class=""><span class="fa fa-lock"></span></span>';
+                    item['mes_'+meses[j]] = '<div id="grid-mes-'+meses[j]+'" class="text-center" '+meses_capturados[meses[j]]+'><span class="fa fa-lock"></span></div>';
                 }
             }
 
@@ -68,14 +83,15 @@ moduloDatagrid.actualizar({
                 var avance = response.data[i].registro_avance[j];
                 var clase_icono = (avance.mes != mes_activo)?'fa-circle':(estado_actual != 0)?'fa-lock':'fa-unlock';
                 if(parseInt(avance.planMejora) > 0){
-                    item['mes_'+avance.mes] = '<span id="grid-mes-'+avance.mes+'" class="text-danger"><span class="fa '+clase_icono+'"></span></span>';
+                    item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-danger" '+meses_capturados[meses[j]]+'><span class="fa '+clase_icono+'"></span></div>';
                 }else{
-                    item['mes_'+avance.mes] = '<span id="grid-mes-'+avance.mes+'" class="text-success"><span class="fa '+clase_icono+'"></span></span>';
+                    item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-success" '+meses_capturados[meses[j]]+'><span class="fa '+clase_icono+'"></span></div>';
                 }
             }
             datos_grid.push(item);
         }
         moduloDatagrid.cargarDatos(datos_grid);                         
+        moduloDatagrid.cargarTotalResultados(response.resultados,'<b>Proyecto(s)</b>');
         var total = parseInt(response.resultados/moduloDatagrid.rxpag); 
         var plus = parseInt(response.resultados)%moduloDatagrid.rxpag;
         if(plus>0) 

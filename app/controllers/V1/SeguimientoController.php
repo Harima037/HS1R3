@@ -130,6 +130,10 @@ class SeguimientoController extends BaseController {
 					}else{
 						$query->where('mes','=',$mes_actual);
 					}
+				},'componentesMetasMes'=>function($query){
+					$query->select('id','idProyecto','mes',DB::raw('sum(meta) AS totalMeta'))->groupBy('idProyecto','mes');
+				},'actividadesMetasMes'=>function($query){
+					$query->select('id','idProyecto','mes',DB::raw('sum(meta) AS totalMeta'))->groupBy('idProyecto','mes');
 				}));
 
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }

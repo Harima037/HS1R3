@@ -95,7 +95,20 @@
 					<td>{{$item->descripcionUnidadResponsable}}</td>
 					<td>{{$item->nombreEnlace or 'Sin Enlace'}}</td>
 					<td>{{$item->nombreRevisor or 'Sin Revisor'}}</td>
-					<td>{{$item->estatusAvance or 'Inactivo'}}</td>
+					<td>
+					@if($item->estatusAvance)
+						{{$item->estatusAvance}}
+					@else
+						@if((
+							((isset($item->componentesMetasMes[0]))?$item->componentesMetasMes[0]->totalMeta:0) + 
+							((isset($item->actividadesMetasMes[0]))?$item->actividadesMetasMes[0]->totalMeta:0) 
+							) > 0)
+							Inactivo
+						@else
+							No Programado
+						@endif
+					@endif
+					</td>
 				</tr>
 			@endforeach
 		</tbody>

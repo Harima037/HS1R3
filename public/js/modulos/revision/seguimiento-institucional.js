@@ -26,8 +26,10 @@ moduloDatagrid.actualizar({
 
             var mes_activo = $('#datagridProyectos').attr('data-mes-activo'); 
             var trimestre = $('#datagridProyectos').attr('data-trim-activo');
+
             var mes_inicia = ((trimestre - 1) * 3) + 1;
             var meses = [1,2,3,4,5,6,7,8,9,10,11,12];
+            var estado_actual = 0;
             var meses_capturados = {'1':'','2':'','3':'','4':'','5':'','6':'','7':'','8':'','9':'','10':'','11':'','12':''};
 
             for(var j in response.data[i].componentes_metas_mes){
@@ -53,7 +55,7 @@ moduloDatagrid.actualizar({
                 if(meses[j] == mes_activo){
                     item['mes_'+meses[j]] = '<div id="grid-mes-'+meses[j]+'" class="text-center" '+meses_capturados[meses[j]]+'><span class="fa fa-unlock"></span></div>';
                 }else if(meses[j] < mes_activo){
-                    item['mes_'+meses[j]] = '<div id="grid-mes-'+meses[j]+'" class="text-center text-muted"><span class="fa fa-times"></span></div>';
+                    item['mes_'+meses[j]] = '<div id="grid-mes-'+meses[j]+'" class="text-center text-muted" '+meses_capturados[meses[j]]+'><span class="fa fa-times"></span></div>';
                 }else{
                     item['mes_'+meses[j]] = '<div id="grid-mes-'+meses[j]+'" class="text-center" '+meses_capturados[meses[j]]+'><span class="fa fa-lock"></span></div>';
                 }
@@ -63,13 +65,11 @@ moduloDatagrid.actualizar({
 			if(response.data[i].evaluacion_meses.length){
                 if(response.data[i].evaluacion_meses[0].idEstatus == 1){
                     item.estado = '<span class="label label-info">En Trámite</span>';
-                    estado_actual = 0;
                 }else if(response.data[i].evaluacion_meses[0].idEstatus == 2){
                     item.estado = '<span class="label label-warning">En Revisión</span>';
                     estado_actual = 1;
                 }else if(response.data[i].evaluacion_meses[0].idEstatus == 3){
                     item.estado = '<span class="label label-danger">En Correción</span>';
-                    estado_actual = 0;
                 }else if(response.data[i].evaluacion_meses[0].idEstatus == 4){
                     item.estado = '<span class="label label-primary">Registrado</span>';
                     estado_actual = 1;
@@ -79,7 +79,6 @@ moduloDatagrid.actualizar({
                 }
             }else{
                 item.estado = '<span class="text-muted">Inactivo</span>';
-                estado_actual = 0;
             }
 
             var fuente_informacion = '';
@@ -119,7 +118,8 @@ moduloDatagrid.actualizar({
             }*/
             datos_grid.push(item);
         }
-        moduloDatagrid.cargarDatos(datos_grid);                         
+        moduloDatagrid.cargarDatos(datos_grid);
+        moduloDatagrid.cargarTotalResultados(response.resultados,'<b>Proyecto(s)</b>');
         var total = parseInt(response.resultados/moduloDatagrid.rxpag); 
         var plus = parseInt(response.resultados)%moduloDatagrid.rxpag;
         if(plus>0) 

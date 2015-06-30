@@ -46,7 +46,7 @@
                 <thead>
                     <tr>
                         <th><input type="checkbox" class="check-select-all-rows"></th>
-                        <th>Clave Presupuestaria</th>
+                        <th width="200">Clave Presupuestaria</th>
                         <th>Nombre Técnico</th>
                         <th style="text-align:center; width:50px;">Trim</th>
                         <th style="text-align:center; width:130px;">Cuenta Pública</th>

@@ -178,7 +178,6 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
 		var context = this;
 
 		if(callbacks!= null){
-
 			fnCallbacks = {
                         _error: callbacks._error || function(jqXHR){
                         	var json = $.parseJSON(jqXHR.responseText);
@@ -213,18 +212,16 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
 							context.limpiar();
 							var colspan = $(context.selector + " thead > tr th").length;
 							$(context.selector + " tbody").append("<tr><td colspan='"+colspan+"' style='text-align:left'><i class='fa fa-info-circle'></i> "+json.data+"</td></tr>");
-
 						}else{
 							json.type = 'ERR';
 							MessageManager.show(json);
 							context.limpiar();
 						}
-						
 			        },  
 			        _success: function(response){
 						context.limpiar();
 						context.cargarDatos(response.data);
-
+						context.cargarTotalResultados(response.resultados);
 			         	var total = parseInt(response.resultados/context.rxpag); 
 			            var plus = parseInt(response.resultados)%context.rxpag;
 			            if(plus>0) 
@@ -296,13 +293,19 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
 				}
 				row += 	'</tr>'; 
 				$(this.selector + " tbody").append(row);
-                
 			}
 		}else{
 			var conteo_columnas = $(this.selector + " thead tr th").length;
 			$(this.selector + " tbody").html('<tr><td></td><td colspan="'+(conteo_columnas - 1)+'"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
 			//MessageManager.show({data:"No hay datos que cargar",type:'INF',timer:3});
 		}
+	}
+	this.cargarTotalResultados = function(total, elementos){
+		if(!elementos){
+			elementos = '<b>Elemento(s)</b>';
+		}
+		$(this.selector + ' #lbl-total-resultados-grid').remove();
+		$(this.selector + ' .panel-footer .btn-toolbar').append('<span id="lbl-total-resultados-grid" class="pull-left">'+total+' '+elementos+'</span>');
 	}
 	this.actualizarFila = function(e,objJSON){		
 		$(this.selector+" tbody").find("tr").each(function(){

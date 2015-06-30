@@ -48,7 +48,6 @@ class ReporteSeguimientoController extends BaseController {
 							$join->on('proyectos.id', '=', 'evaluacionProyectoMes.idProyecto')
 							->where('evaluacionProyectoMes.mes', '=', $mes_actual);
 						});
-		
 
 		$usuario = Sentry::getUser();
 		
@@ -69,12 +68,24 @@ class ReporteSeguimientoController extends BaseController {
 		}));
 		*/
 
+		$rows = $rows->with(array('componentesMetasMes'=>function($query)use($mes_actual){
+							$query->select('id','idProyecto',DB::raw('sum(meta) AS totalMeta'))
+							->where('mes','=',$mes_actual)
+							->groupBy('idProyecto','mes');
+						},'actividadesMetasMes'=>function($query)use($mes_actual){
+							$query->select('id','idProyecto',DB::raw('sum(meta) AS totalMeta'))
+							->where('mes','=',$mes_actual)
+							->groupBy('idProyecto','mes');
+						}));
+
 		$rows = $rows->select('proyectos.id','nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto',
 			DB::raw('CONCAT_WS(" ",datosRevisor.nombres,datosRevisor.apellidoPaterno,datosRevisor.apellidoMaterno) AS nombreRevisor'),
 			DB::raw('CONCAT_WS(" ",datosEnlace.nombres,datosEnlace.apellidoPaterno,datosEnlace.apellidoMaterno) AS nombreEnlace'),
 				'catalogoUnidadesResponsables.descripcion AS descripcionUnidadResponsable',
 				'catalogoEstatusProyectos.descripcion AS estatusAvance',
-				'unidadResponsable','finalidad','funcion','subFuncion','subSubFuncion','programaSectorial','programaPresupuestario','programaEspecial','actividadInstitucional','proyectoEstrategico','numeroProyectoEstrategico')
+				'unidadResponsable','finalidad','funcion','subFuncion','subSubFuncion','programaSectorial',
+				'programaPresupuestario','programaEspecial','actividadInstitucional','proyectoEstrategico',
+				'numeroProyectoEstrategico')
 				->leftjoin('sentryUsers AS datosRevisor','datosRevisor.id','=','proyectos.idUsuarioValidacionSeg')
 				->leftjoin('sentryUsers AS datosEnlace','datosEnlace.id','=','proyectos.idUsuarioRendCuenta')
 				->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
