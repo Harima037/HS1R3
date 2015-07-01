@@ -22,15 +22,22 @@ Route::get('/logout', array('uses' => 'AutenticacionController@logout', 'before'
 Route::get('cambiar-contrasena/{token}', array('uses' => 'AutenticacionController@cambiarContrasena'));
 
 Route::group(array('before'=>'auth.sentry'), function(){
+	Route::get('dashboard', array('uses' => 'DashboardController@index'));
 	Route::get('/', array('uses' => 'DashboardController@index'));
 
 	Route::get('configurar/cuenta',array('uses'=>'CuentaController@index'));
+
+	Route::group(array('prefix'=>'root','before'=>'auth.root'),function(){
+		Route::get('variables',array('uses'=>'AdminVariablesController@index'));
+		Route::get('modulos',array('uses'=>'AdminModulosController@index'));
+	});
 
 	Route::group(array('prefix'=>'administrador'), function(){
 		Route::get('usuarios', array('uses' => 'UsuariosController@index'));
 		Route::get('roles', array('uses' => 'RolesController@index'));
 		Route::post('usuarios', array('uses' => 'UsuariosController@validar'));
 		Route::get('config-seg-metas',array('uses' => 'ConfigurarSeguimientoController@index'));
+		Route::get('purgar-seguimientos',array('uses' => 'PurgarSeguimientoController@index'));
 	});
 
 	Route::group(array('prefix'=>'expediente'), function(){
@@ -91,11 +98,12 @@ Route::group(array('before'=>'auth.sentry'), function(){
 
 		Route::resource('reporte-usuarios',	'V1\ReporteUsuarioController');
 
-		Route::resource('usuarios',			'V1\UsuariosController');
-		Route::resource('roles',			'V1\RolesController');
-		Route::resource('permisos',			'V1\PermisosController');
-		Route::resource('cuenta',			'V1\CuentaController');
-		Route::resource('config-seg-metas', 'V1\ConfigurarSeguimientoController', array('only' => array('store')));
+		Route::resource('usuarios',				'V1\UsuariosController');
+		Route::resource('roles',				'V1\RolesController');
+		Route::resource('permisos',				'V1\PermisosController');
+		Route::resource('cuenta',				'V1\CuentaController');
+		Route::resource('config-seg-metas', 	'V1\ConfigurarSeguimientoController', array('only' => array('store')));
+		Route::resource('purgar-seguimientos',	'V1\PurgarSeguimientoController');
 		
 		Route::resource('proyectos',		'V1\ProyectosController');
 		Route::resource('inversion',		'V1\InversionController');
@@ -127,6 +135,11 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('reporte-programa',		'V1\ReporteEvaluacionProgramaController', 	array('only'=>array('show')));
 
 		Route::resource('reporte-ep-01',		'V1\EP01Controller');
+
+		Route::group(array('before'=>'auth.root'),function(){
+			Route::resource('admin-variables',	'V1\AdminVariablesController');
+			Route::resource('admin-modulos',	'V1\AdminModulosController');
+		});
 	});
 });
 

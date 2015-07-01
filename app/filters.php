@@ -102,6 +102,14 @@ Route::filter('auth.sentry', function()
 	}
 });
 
+Route::filter('auth.root', function()
+{
+	if(!Sentry::getUser()->isSuperUser()){
+		$datos['sys_sistemas'] = SysGrupoModulo::all();
+		return Response::view('errors.403', array('usuario'=>Sentry::getUser(),'sys_activo'=>null,'sys_sistemas'=>$datos['sys_sistemas'],'sys_mod_activo'=>null), 403);
+	}
+});
+
 Route::filter('auth', function()
 {
 	if (Auth::guest()) return Redirect::guest('login');

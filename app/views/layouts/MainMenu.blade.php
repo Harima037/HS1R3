@@ -9,35 +9,34 @@
         <div class="navbar-collapse collapse" id="collapse-main-menu">
             <ul class="nav navbar-nav">  
                 @if(isset($sys_sistemas))
-                @foreach($sys_sistemas as $sistema)
-                    @if($sistema->visible)
-                        @if(Sentry::hasAnyAccess(SysGrupoModulo::getPermisos($sistema->id)))
-                            @if($sys_activo)
-                            <li class="dropdown @if($sistema->key===$sys_activo->key) {{ "active" }} @endif">
-                            @else
-                            <li class="dropdown">
-                            @endif
+                    @foreach($sys_sistemas as $sistema)
+                        @if($sistema->visible)
+                            @if(Sentry::hasAnyAccess(SysGrupoModulo::getPermisos($sistema->id)))
+                                @if($sys_activo)
+                                <li class="dropdown @if($sistema->key===$sys_activo->key) {{ "active" }} @endif">
+                                @else
+                                <li class="dropdown">
+                                @endif
 
-                            @if(count($sistema->modulos)>0)
-                            <a href="{{ URL::to($sistema->uri) }}" class="dropdown-toggle" data-toggle="dropdown">
-                                <i class="fa {{ $sistema->icono }}"></i> {{ $sistema->nombre }} <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">                       
-                            @foreach($sistema->modulos as $modulo)
-                            @if(Sentry::hasAccess($sistema->key . '.' . $modulo->key . '.R') && $modulo->visible)
-                                <li><a href="{{ URL::to($sistema->uri.'/'.$modulo->uri) }}"><i class="fa {{ $modulo->icono }}"></i> {{ $modulo->nombre }}</a></li>      
+                                @if(count($sistema->modulos)>0)
+                                <a href="{{ URL::to($sistema->uri) }}" class="dropdown-toggle" data-toggle="dropdown">
+                                    <i class="fa {{ $sistema->icono }}"></i> {{ $sistema->nombre }} <b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu">                       
+                                @foreach($sistema->modulos as $modulo)
+                                @if(Sentry::hasAccess($sistema->key . '.' . $modulo->key . '.R') && $modulo->visible)
+                                    <li><a href="{{ URL::to($sistema->uri.'/'.$modulo->uri) }}"><i class="fa {{ $modulo->icono }}"></i> {{ $modulo->nombre }}</a></li>      
+                                @endif
+                                @endforeach
+                                </ul>
+                                @else
+                                <a href="{{ URL::to($sistema->uri) }}"><i class="fa {{ $sistema->icono }}"></i> {{ $sistema->nombre }}</a>
+                                @endif
+                                </li>
                             @endif
-                            @endforeach
-                            </ul>
-                            @else
-                            <a href="{{ URL::to($sistema->uri) }}"><i class="fa {{ $sistema->icono }}"></i> {{ $sistema->nombre }}</a>
-                            @endif
-                            </li>
                         @endif
-                    @endif
-                   
-                   @endforeach
-                @endif                   
+                    @endforeach
+                @endif
             </ul>  
         </div><!--/.nav-collapse -->
     </div>

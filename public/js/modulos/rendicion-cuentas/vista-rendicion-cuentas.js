@@ -660,7 +660,6 @@ function llenar_grid_acciones(response){
         var mes = $('#mes').val();
         
         if(componente.registro_avance.length){
-            
             for(var j in componente.registro_avance){
                 var avance = componente.registro_avance[j];
                 item.avances_acumulados += parseFloat(avance.avanceMes);
