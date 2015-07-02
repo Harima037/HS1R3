@@ -2,6 +2,7 @@
 class SysModulo extends Eloquent
 {
 	protected $table = "sysModulos";
+	public $timestamps = false;
 	
 	public function sistema(){
 		return $this->belongsTo("SysGrupoModulo",'idSysGrupoModulo');		

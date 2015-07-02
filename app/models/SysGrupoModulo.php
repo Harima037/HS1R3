@@ -2,6 +2,7 @@
 class SysGrupoModulo extends Eloquent
 {
 	protected $table = "sysGruposModulos";
+	public $timestamps = false;
 	
 	public function modulos(){
 		return $this->hasMany("SysModulo",'idSysGrupoModulo');		
