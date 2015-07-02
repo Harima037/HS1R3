@@ -17,7 +17,8 @@ namespace V1;
 
 use SSA\Utilerias\Validador, SSA\Utilerias\Util;
 use Illuminate\Database\QueryException, \Exception;
-use BaseController, Input, Response, DB, Sentry,Proyecto;
+use BaseController, Input, Response, DB, Sentry,Proyecto, EvaluacionProyectoMes,ComponenteMetaMes,ActividadMetaMes;
+use EvaluacionAnalisisFuncional,EvaluacionComentario,EvaluacionPlanMejora,RegistroAvanceBeneficiario,RegistroAvanceMetas;
 
 class PurgarSeguimientoController extends \BaseController {
 	/**
@@ -172,18 +173,6 @@ class PurgarSeguimientoController extends \BaseController {
 
 				$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
 				$recurso_meta->idLiderPrograma = $titular->id;
-				/*
-				$recurso_meta->numerador 				= $parametros['numerador'];
-				$recurso_meta->denominador 				= $parametros['denominador'];
-				$numerador = $parametros['numerador'];
-				$denominador = $parametros['denominador'];
-				if($parametros['tipo-formula'] == 'T'){
-					$porcentaje = floatval(($numerador * 100000)/$denominador);
-				}else{
-					$porcentaje = floatval(($numerador * 100)/$denominador);
-				}
-				$recurso_meta->porcentaje = $porcentaje;
-				*/
 				
 				$respuesta = DB::transaction(function() use ($recurso,$recurso_meta){
 					$respuesta_transaction = array();
@@ -216,102 +205,50 @@ class PurgarSeguimientoController extends \BaseController {
 	 */
 	public function update($id)
 	{
-		//
+		//en id recibo el mes
 		$respuesta = array();
 		try{
-			$valid_result = Validador::validar(Input::all(), $this->reglas);
-			if($valid_result === true){
-				$parametros = Input::all();
+			//$parametros = Input::all();
+			//$valid_result = Validador::validar($parametros, array('mes'=>'required'));
 
-				$recurso = IndicadorFASSA::find($id);
+			if(!$id){
+				throw new Exception("El mes seleccionado no es valido", 1);
+			}
 
-				//$checar_ejercicio = FALSE;
+			$mes_activo = Util::obtenerMesActual();
+			$mes_actual = $id;
 
-				if($parametros['id-meta']){
-					$recurso_meta = IndicadorFASSAMeta::find($parametros['id-meta']);
-				}else{
-					$recurso_meta = new IndicadorFASSAMeta;
-					$recurso_meta->idEstatus = 1;
-					$recurso_meta->ejercicio = date('Y');
-					$recurso_meta->claveFrecuencia = 'A';
-					//$checar_ejercicio = TRUE;
-				}
+			if($mes_actual == $mes_activo){
+				throw new Exception("El mes seleccionado aún está activo", 1);
+			}
+			//if($valid_result === true){
+			$ids_proyectos = EvaluacionProyectoMes::where('mes','=',$mes_actual)
+										->whereIn('idEstatus', array(1,2,3))
+										->get()->lists('idProyecto');
+			//
+			$respuesta = DB::transaction(function() use ($ids_proyectos,$mes_actual){
+				$respuesta_transaction = array();
 
-				/*if(($recurso->idEstatus == 2 || $recurso->idEstatus == 4) && ($recurso_meta->idEstatus == 2 || $recurso_meta->idEstatus == 4)){
-					throw new Exception("Ninguno de los elementos esta disponible para edición", 1);
-				}*/
+				EvaluacionAnalisisFuncional::whereIn('idProyecto',$ids_proyectos)->where('mes','=',$mes_actual)->delete();
+				EvaluacionComentario::whereIn('idProyecto',$ids_proyectos)->where('mes','=',$mes_actual)->delete();
+				EvaluacionPlanMejora::whereIn('idProyecto',$ids_proyectos)->where('mes','=',$mes_actual)->delete();
 
-				/*if($checar_ejercicio){
-					$ejercicios_capturados = IndicadorFASSAMeta::where('idIndicadorFASSA','=',$recurso->id)
-																->where('ejercicio','=',$recurso_meta->ejercicio)->count();
-					if($ejercicios_capturados){
-						throw new Exception('Ya se capturo la meta para el ejercicio especificado.', 1);
-					}
-				}*/
+				RegistroAvanceBeneficiario::whereIn('idProyecto',$ids_proyectos)->where('mes','=',$mes_actual)->delete();
+				RegistroAvanceMetas::whereIn('idProyecto',$ids_proyectos)->where('mes','=',$mes_actual)->delete();
 
-				$recurso->claveNivel 				= $parametros['nivel-indicador'];
-				$recurso->indicador 				= $parametros['indicador'];
-				$recurso->claveTipoFormula 			= $parametros['tipo-formula'];
-				$recurso->formula 					= $parametros['formula'];
-				$recurso->fuenteInformacion 		= $parametros['fuente-informacion'];
-				//if($recurso->idEstatus == 1 || $recurso->idEstatus == 3){
-				//}
-				
-				$tipo_formula = $recurso->claveTipoFormula;
-				
-				//if($recurso_meta->idEstatus == 1 || $recurso_meta->idEstatus == 3){
-				if($parametros['unidad-responsable'] != $recurso_meta->claveUnidadResponsable){
-					$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
-					$recurso_meta->idLiderPrograma = $titular->id;
-				}
+				ComponenteMetaMes::whereIn('idProyecto',$ids_proyectos)->where('mes','=',$mes_actual)->update(array('avance'=>null));
+				ActividadMetaMes::whereIn('idProyecto',$ids_proyectos)->where('mes','=',$mes_actual)->update(array('avance'=>null));
 
-					//$recurso_meta->ejercicio				= $parametros['ejercicio'];
-					//$recurso_meta->numerador 				= $parametros['numerador'];
-					//$recurso_meta->denominador 				= $parametros['denominador'];
-				$recurso_meta->claveUnidadResponsable 	= $parametros['unidad-responsable'];
-				$recurso_meta->idResponsableInformacion	= $parametros['responsable-informacion'];
-					/*
-					$numerador = $parametros['numerador'];
-					$denominador = $parametros['denominador'];
-					if($tipo_formula == 'T'){
-						$porcentaje = floatval(($numerador * 100000)/$denominador);
-					}else{
-						$porcentaje = floatval(($numerador * 100)/$denominador);
-					}
-					$recurso_meta->porcentaje = $porcentaje;
-					*/
-				//}
-				
-				$respuesta = DB::transaction(function() use ($recurso,$recurso_meta){
-					$respuesta_transaction = array();
+				EvaluacionProyectoMes::whereIn('idProyecto',$ids_proyectos)->where('mes','=',$mes_actual)->update(array('idEstatus'=>6));
 
-					//if($recurso->idEstatus == 1 || $recurso->idEstatus == 3){
-					//}
-					if(!$recurso->save()){
-						$respuesta_transaction['http_status'] = 500;
-						$respuesta_transaction['data'] = array("data"=>'Ocurrio un error al intentar guardar la información del indicador','code'=>'S01');
-					}
-
-					//if($recurso_meta->idEstatus == 1 || $recurso_meta->idEstatus == 3){
-					//}
-					if(!$recurso->metas()->save($recurso_meta)){
-						$respuesta_transaction['http_status'] = 500;
-						$respuesta_transaction['data'] = array("data"=>'Ocurrio un error al intentar guardar la información de las metas','code'=>'S01');
-					}
-					
-
-					if(!isset($respuesta_transaction['http_status'])){
-						$respuesta_transaction['http_status'] = 200;
-						$recurso['meta'] = $recurso_meta;
-						$respuesta_transaction['data'] = array("data"=>$recurso);
-					}
-
-					return $respuesta_transaction;
-				});
-			}else{
+				$respuesta_transaction['http_status'] = 200;
+				$respuesta_transaction['data'] = array('data' => $ids_proyectos);
+				return $respuesta_transaction;
+			});
+			/*}else{
 				$respuesta['http_status'] = $valid_result['http_status'];
 				$respuesta['data'] = $valid_result['data'];
-			}
+			}*/
 		}catch(\Exception $e){
 			$respuesta['http_status'] = 500;
 			$respuesta['data'] = array("data"=>$e->getMessage(),'code'=>'S03');

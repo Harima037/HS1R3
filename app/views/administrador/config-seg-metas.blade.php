@@ -29,6 +29,12 @@
                         </div>
                     </div>
                     @endforeach
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label class="control-label" for="mes-usuario">Mes de Captura del Usuario</label>
+                            <input type="number" class="form-control" id="mes-usuario" name="mes-usuario" value="{{$mes_usuario}}">
+                        </div>
+                    </div>
                     </form>
                     <div class="col-sm-12">
                         <button type="button" class="btn btn-primary pull-right" id="btn-guardar-configuracion">

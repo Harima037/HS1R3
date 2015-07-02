@@ -126,15 +126,23 @@ class SeguimientoController extends BaseController {
 				},'evaluacionMeses'=>function($query) use ($mes_actual){
 					if($mes_actual == 0){
 						$mes_actual = date('n') -1;
-						$query->where('mes','=',$mes_actual)->where('idEstatus','=',4);
+						$query->where('evaluacionProyectoMes.mes','<=',$mes_actual)->where('idEstatus','=',4);
 					}else{
-						$query->where('mes','=',$mes_actual);
+						$query->where('evaluacionProyectoMes.mes','<=',$mes_actual);
 					}
+					$query->leftjoin('registroAvancesMetas',function($join){
+								$join->on('registroAvancesMetas.idProyecto','=','evaluacionProyectoMes.idProyecto')
+									->on('registroAvancesMetas.mes','=','evaluacionProyectoMes.mes');
+							})
+							->select('evaluacionProyectoMes.*',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'))
+							->groupBy('registroAvancesMetas.idProyecto','registroAvancesMetas.mes');
 				},'componentesMetasMes'=>function($query){
 					$query->select('id','idProyecto','mes',DB::raw('sum(meta) AS totalMeta'))->groupBy('idProyecto','mes');
 				},'actividadesMetasMes'=>function($query){
 					$query->select('id','idProyecto','mes',DB::raw('sum(meta) AS totalMeta'))->groupBy('idProyecto','mes');
 				}));
+
+				//$avances_anteriores = EvaluacionProyectoMes::where('idProyecto')
 
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				
@@ -282,9 +290,12 @@ class SeguimientoController extends BaseController {
 			$seguimiento_mes = EvaluacionProyectoMes::where('idProyecto','=',$parametros['id-proyecto'])
 													->where('mes','=',$mes_actual)
 													->first();
-			
-			
+			//
 			if($seguimiento_mes){
+				if($seguimiento_mes->idEstatus == 6){
+					$seguimiento_mes->idEstatus = 1;
+					$seguimiento_mes->save();
+				}
 				if($seguimiento_mes->idEstatus != 1 && $seguimiento_mes->idEstatus != 3){
 					switch ($seguimiento_mes->idEstatus) {
 						case 2:

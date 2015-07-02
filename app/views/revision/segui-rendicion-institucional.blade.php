@@ -402,7 +402,6 @@
 										<table id="tabla-avances-metas" class="table table-condensed table-bordered">
 					                		<thead>
 					                			<tr>
-					                				<th rowspan="2" class="text-center">Jurisdicción</th>
 						                			<th colspan="2" class="bg-success text-center">Meta Programada</th>
 						                			<th colspan="3" class="bg-info text-center">Avance</th>
 						                			<th rowspan="2" width="90" class="text-center">Porcentaje Acumulado</th>
@@ -416,7 +415,6 @@
 					                			</tr>
 					                		</thead>
 											<tfoot>
-					                			<th>Totales</th>
 					                			<th class="bg-success" id="total-meta-programada-analisis">0</th>
 					                			<th id="total-meta-mes-analisis">0</th>
 					                			<th id="total-avance-mes-analisis">0</th>

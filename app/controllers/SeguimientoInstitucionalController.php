@@ -32,10 +32,17 @@ class SeguimientoInstitucionalController extends BaseController {
 						)
 				)
 		);
+		$datos['mes_avance'] = Util::obtenerMesActual();
 		$mes_actual = Util::obtenerMesActual();
-		$trimestre_actual = ceil(($mes_actual/3));
-		$datos['mes_avance'] = $mes_actual;
-		$datos['trimestre_avance'] = $trimestre_actual;
+		if($mes_actual == 0){
+			$mes_actual = date('n')-1;
+		}
+		$datos['mes_actual'] = $mes_actual;
+		$datos['trimestre_avance'] = Util::obtenerTrimestre(date('n')-1);
+		//$mes_actual = Util::obtenerMesActual();
+		//$trimestre_actual = ceil(($mes_actual/3));
+		//$datos['mes_avance'] = $mes_actual;
+		//$datos['trimestre_avance'] = $trimestre_actual;
 		return parent::loadIndex('REVISION','SEGUIINST',$datos);
 	}
 	public function indexInversion(){
@@ -64,7 +71,14 @@ class SeguimientoInstitucionalController extends BaseController {
 				)
 		);
 		$datos['mes_avance'] = Util::obtenerMesActual();
-		$datos['trimestre_avance'] = Util::obtenerTrimestre();
+		$mes_actual = Util::obtenerMesActual();
+		if($mes_actual == 0){
+			$mes_actual = date('n')-1;
+		}
+		$datos['mes_actual'] = $mes_actual;
+		$datos['trimestre_avance'] = Util::obtenerTrimestre(date('n')-1);
+		//$datos['mes_avance'] = Util::obtenerMesActual();
+		//$datos['trimestre_avance'] = Util::obtenerTrimestre();
 		return parent::loadIndex('REVISION','SEGUIINV',$datos);
 	}
 

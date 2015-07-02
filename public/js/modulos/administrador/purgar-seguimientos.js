@@ -78,59 +78,13 @@ $('#datagridSeguimientos .btn-quick-search').on('click',function(){
 
 /*===================================*/
 // Configuración General para cualquier módulo
-
-function submitModulo(){
-    
-    Validation.cleanFormErrors("#formRol");
-    MessageManager.dismissAlert('body');
-
-    var parametros = $("#formRol").serialize();
-    if($('#formRol #id').val()==""){
-        moduleResource.post(parametros,{
-                        _success: function(response){
-                            moduleDatagrid.actualizar();
-                            MessageManager.show({data:'Rol creado con éxito',container:'#modalRol .modal-body',type:'OK',timer:4});
-                            $('#formRol #id').val(response.data.id);
-                        },
-                        _error: function(response){
-                            try{
-                                var json = $.parseJSON(response.responseText);
-                                if(!json.code)
-                                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-                                else{
-                                    json.container = '#modalRol .modal-body';
-                                    //json.timer = 4;
-                                    MessageManager.show(json);
-                                }
-                                Validation.formValidate(json.data);
-                            }catch(e){
-                                console.log(e);
-                            }                       
-                        }
-        });
-    }else{
-        moduleResource.put($('#formRol #id').val(), parametros,{
-                        _success: function(response){
-                            moduleDatagrid.actualizar();
-                            MessageManager.show({data:'Rol actualizado con éxito',container:'#modalRol .modal-body',type:'OK',timer:4});
-                        },
-                        _error: function(response){
-                            try{
-                                var json = $.parseJSON(response.responseText);
-                                if(!json.code)
-                                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
-                                else{
-                                    json.container = '#modalRol .modal-body';
-                                    //json.timer = 4;
-                                    MessageManager.show(json);
-                                }
-                                Validation.formValidate(json.data);
-                            }catch(e){
-                                console.log(e);
-                            }                       
-                        }
-        });
-    }
-}
+$('#btn-purgar-seguimiento').on('click',function(){
+    moduleResource.put($('#mes').val(), null,{
+        _success: function(response){
+            moduleDatagrid.actualizar();
+            MessageManager.show({data:'Seguimientos purgados con exito',container:'#modalRol .modal-body',type:'OK',timer:4});
+        }
+    });
+});
 /*===================================*/
 // Funciones adicionales por módulo

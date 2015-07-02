@@ -45,7 +45,6 @@ moduloDatagrid.actualizar({
                     meses_capturados[meta.mes] = 'style="background-color:#DDDDDD"';
                 }
             }
-            //background-color:#BDBDBD
 
             item.id = response.data[i].id;
             item.clave = response.data[i].clavePresup;
@@ -60,25 +59,44 @@ moduloDatagrid.actualizar({
                     item['mes_'+meses[j]] = '<div id="grid-mes-'+meses[j]+'" class="text-center" '+meses_capturados[meses[j]]+'><span class="fa fa-lock"></span></div>';
                 }
             }
-			//console.log(response.data[i]);
-			
+			var estatus_anteriores = {};
+            item.estado = '<span class="text-muted">Inactivo</span>';
 			if(response.data[i].evaluacion_meses.length){
-                if(response.data[i].evaluacion_meses[0].idEstatus == 1){
-                    item.estado = '<span class="label label-info">En Trámite</span>';
-                }else if(response.data[i].evaluacion_meses[0].idEstatus == 2){
-                    item.estado = '<span class="label label-warning">En Revisión</span>';
-                    estado_actual = 1;
-                }else if(response.data[i].evaluacion_meses[0].idEstatus == 3){
-                    item.estado = '<span class="label label-danger">En Correción</span>';
-                }else if(response.data[i].evaluacion_meses[0].idEstatus == 4){
-                    item.estado = '<span class="label label-primary">Registrado</span>';
-                    estado_actual = 1;
-                }else if(response.data[i].evaluacion_meses[0].idEstatus == 5){
-                    item.estado = '<span class="label label-success">Firmado</span>';
-                    estado_actual = 1;
+                for(var j in response.data[i].evaluacion_meses){
+                    var evaluacion_mes = response.data[i].evaluacion_meses[j];
+                    if(evaluacion_mes.mes == mes_activo){
+                        if(evaluacion_mes.idEstatus == 1){
+                            item.estado = '<span class="label label-info">En Trámite</span>';
+                        }else if(evaluacion_mes.idEstatus == 2){
+                            item.estado = '<span class="label label-warning">En Revisión</span>';
+                            estado_actual = 1;
+                        }else if(evaluacion_mes.idEstatus == 3){
+                            item.estado = '<span class="label label-danger">En Correción</span>';
+                        }else if(evaluacion_mes.idEstatus == 4){
+                            item.estado = '<span class="label label-primary">Registrado</span>';
+                            estado_actual = 1;
+                        }else if(evaluacion_mes.idEstatus == 5){
+                            item.estado = '<span class="label label-success">Firmado</span>';
+                            estado_actual = 1;
+                        }
+                    }else{
+                        estatus_anteriores[evaluacion_mes.mes] = {idEstatus:evaluacion_mes.idEstatus,planMejora:parseInt(evaluacion_mes.planMejora)};
+                    }
                 }
             }else{
                 item.estado = '<span class="text-muted">Inactivo</span>';
+            }
+
+            if(estatus_anteriores){
+                for(var j in estatus_anteriores){
+                    if(estatus_anteriores[j].idEstatus == 6){
+                        if(parseInt(estatus_anteriores[j].planMejora) > 0){
+                            item['mes_'+j] = '<div id="grid-mes-'+j+'" class="text-center text-danger" '+meses_capturados[j]+'><span class="fa fa-circle-o"></span></div>';
+                        }else{
+                            item['mes_'+j] = '<div id="grid-mes-'+j+'" class="text-center text-success" '+meses_capturados[j]+'><span class="fa fa-circle-o"></span></div>';
+                        }
+                    }
+                }
             }
 
             var fuente_informacion = '';

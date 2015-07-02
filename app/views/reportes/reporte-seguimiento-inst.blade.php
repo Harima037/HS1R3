@@ -6,8 +6,8 @@
 @parent
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
-<script src="{{ URL::to('js/modulos/revision/seguimiento-inversion.js')}}"></script>
-<script src="{{ URL::to('js/modulos/expediente/detallesProyecto.js') }}"></script>
+<script src="{{ URL::to('js/modulos/reportes/institucional.js')}}"></script>
+<script src="{{ URL::to('js/modulos/reportes/lista-proyectos-rendicion.js') }}"></script>
 @stop
 
 @section('aside')
@@ -16,7 +16,7 @@
 @section('content')
 <div class="row">
     <div class="col-md-12">
-        <div class="panel panel-default datagrid" id="datagridProyectos" data-edit-row="cargar_datos_proyecto" data-trim-activo="{{$trimestre_avance}}" data-mes-activo="{{$mes_avance}}">
+        <div class="panel panel-default datagrid" id="datagridProyectos" data-edit-row="cargar_datos_proyecto">
             <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> {{ $sys_mod_activo->nombre }}</h4></div>
             <div class="panel-body">
                 <div class="row">
@@ -30,28 +30,22 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="btn-toolbar pull-right" >
-                            @section('panel-botones')
-                                <div class="btn-group" style="margin:5px">
-                                    <button type="button" class="btn btn-success btn-edit-rows" id="btn-detalles-proyecto">
-                                        <span class="glyphicon glyphicon-eye-open"></span> Ver Detalles del Proyecto
-                                    </button>
-                                </div>
-                            @show
+                            <div class="btn-group" style="margin:5px">
+                                <button type="button" class="btn btn-success btn-edit-rows" id="btn-detalles-proyecto">
+                                    <span class="fa fa-edit"></span> Ver Detalles del Proyecto
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover table-condensed">
                 <thead>
                     <tr height="50">
                         <th><input type="checkbox" class="check-select-all-rows"></th>
-                        <th>Clave</th>
+                        <th width="200">Clave Presupuestaria</th>
                         <th>Nombre Técnico</th>
-                        @foreach ($meses as $mes)
-                            <th width="30" class="{{ ($mes[0]['clave'] == $mes_actual)?'bg-info':'' }}"><p class="texto-vertical">{{$mes[0]['abrev']}} </p></th>
-                            <th width="30" class="{{ ($mes[1]['clave'] == $mes_actual)?'bg-info':'' }}"><p class="texto-vertical">{{$mes[1]['abrev']}} </p></th>
-                            <th width="30" class="{{ ($mes[2]['clave'] == $mes_actual)?'bg-info':'' }}"><p class="texto-vertical">{{$mes[2]['abrev']}} </p></th>
-                        @endforeach
+                        <th width="230">Revisor</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -122,68 +116,45 @@
                             </div>
                         </div>
                     </div>
-
-                    <div role="tabpanel">
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li role="presentation" class="active">
-                                <a href="#panel-metas" aria-controls="panel-metas" role="tab" data-toggle="tab">
-                                    <span class="fa fa-table"></span> Seguimiento de Metas
-                                </a>
-                            </li>
-                        </ul>
-                        <div class="tab-content">
-                            <div role="tabpanel" class="active" id="panel-metas">
-                                <div role="tabpanel">
-                                    <!-- Nav tabs -->
-                                    <ul class="nav nav-pills" role="tablist">
-                                        @for($i = 1 ; $i <= 4 ; $i++)
-                                        <li role="presentation" class="{{($i == 1)?'active':''}}">
-                                            <a href="#trim{{$i}}" aria-controls="trim{{$i}}" role="tab" data-toggle="tab">
-                                                <span class="fa fa-calendar"></span> Trim {{$i}}
-                                            </a>
-                                        </li>
-                                        @endfor
-                                    </ul>
-                                    <!-- Tab panes -->
-                                    <div class="tab-content">
-                                        @for($i = 1 ; $i <= 4 ; $i++)
-                                        <div role="tabpanel" class="tab-pane {{($i == 1)?'active':''}}" id="trim{{$i}}">
-                                            <table id="avance-trim-{{$i}}" class="table table-hover table-condensed table-stripped tabla-avance-trim">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Nivel</th>
-                                                        <th>Indicador</th>
-                                                        <th>{{$meses[$i][0]['mes']}}</th>
-                                                        <th>{{$meses[$i][1]['mes']}}</th>
-                                                        <th>{{$meses[$i][2]['mes']}}</th>
-                                                        <th>Totales</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody></tbody>
-                                                <tfoot>
-                                                    <tr class="bg-success">
-                                                        <th colspan="2">Totales</th>
-                                                        <th id="total-mes-{{$meses[$i][0]['clave']}}">0</th>
-                                                        <th id="total-mes-{{$meses[$i][1]['clave']}}">0</th>
-                                                        <th id="total-mes-{{$meses[$i][2]['clave']}}">0</th>
-                                                        <th id="total-trim-{{$i}}">0</th>
-                                                    </tr>
-                                                </tfoot>
-                                            </table>
-                                        </div>
-                                        @endfor
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <table class="table table-condensed table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th>Tipo de Reporte</th>
+                                @foreach($meses as $mes)
+                                <th class="text-center" width="50">{{$mes['abrev']}}</th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Seguimiento de Metas</td>
+                                @foreach($meses as $mes)
+                                <td class="text-center" id="rep_metas_{{$mes['clave']}}"><span class="fa fa-times"></span></td>
+                                @endforeach
+                            </tr>
+                            <tr>
+                                <td>Seguimiento de Beneficiarios</td>
+                                @foreach($meses as $mes)
+                                <td class="text-center" id="rep_benef_{{$mes['clave']}}"><span class="fa fa-times"></span></td>
+                                @endforeach
+                            </tr>
+                            <tr>
+                                <td>Plan de Acción de Mejora</td>
+                                @foreach($meses as $mes)
+                                <td class="text-center" id="rep_plan_{{$mes['clave']}}"><span class="fa fa-times"></span></td>
+                                @endforeach
+                            </tr>
+                            <tr>
+                                <td>Cuenta Pública</td>
+                                @foreach($meses as $mes)
+                                <td class="text-center" id="rep_cuenta_{{$mes['clave']}}"><span class="fa fa-times"></span></td>
+                                @endforeach
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
                 <div class="modal-footer">
-                	<button type="button" class="btn btn-success pull-left" id="btn-firmar">
-                        <span class="fa fa-pencil"></span> Firmar Avance Mensual
-                    </button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" id="btn-comentar-avance">Comentar Avances</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->

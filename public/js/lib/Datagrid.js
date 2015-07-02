@@ -185,7 +185,7 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
 								context.limpiar();
 								var colspan = $(context.selector + " thead > tr th").length;
 								$(context.selector + " tbody").append("<tr><td colspan='"+colspan+"' style='text-align:left'><i class='fa fa-info-circle'></i> "+json.data+"</td></tr>");
-
+								context.cargarTotalResultados(0);
 							}else{
 								MessageManager.show(json);
 								context.limpiar();
@@ -193,7 +193,8 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
                         },                        
                         _success: callbacks._success || function(response){							
 							context.limpiar();
-							context.cargarDatos(response.data);							
+							context.cargarDatos(response.data);	
+							context.cargarTotalResultados(response.resultados);						
                          	var total = parseInt(response.resultados/context.rxpag); 
                             var plus = parseInt(response.resultados)%context.rxpag;
                             if(plus>0) 
@@ -208,6 +209,7 @@ var Datagrid = function (pSelector, pSource, pParametros, pColumnas) {
 			        _error: function(jqXHR){
 						//console.log('{ error => "'+jqXHR.status +' - '+ jqXHR.statusText +'", response => "'+ jqXHR.responseText +'" }'); 
 						var json = $.parseJSON(jqXHR.responseText);
+						context.cargarTotalResultados(0);
 						if(json.code == "W00"){
 							context.limpiar();
 							var colspan = $(context.selector + " thead > tr th").length;

@@ -82,10 +82,17 @@ class SeguimientoInstitucionalController extends BaseController {
 					$unidades = explode('|',$usuario->claveUnidad);
 					$rows = $rows->whereIn('unidadResponsable',$unidades);
 				}
+
 				$rows = $rows->with(array('registroAvance'=>function($query){
 					$query->select('id','idProyecto','mes',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'),DB::raw('count(idNivel) as registros'))->groupBy('idProyecto','mes');
 				},'evaluacionMeses'=>function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
+					$query->where('evaluacionProyectoMes.mes','<=',$mes_actual);
+					$query->leftjoin('registroAvancesMetas',function($join){
+								$join->on('registroAvancesMetas.idProyecto','=','evaluacionProyectoMes.idProyecto')
+									->on('registroAvancesMetas.mes','=','evaluacionProyectoMes.mes');
+							})
+							->select('evaluacionProyectoMes.*',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'))
+							->groupBy('registroAvancesMetas.idProyecto','registroAvancesMetas.mes');
 				},'componentesMetasMes'=>function($query){
 					$query->select('id','idProyecto','mes',DB::raw('sum(meta) AS totalMeta'))->groupBy('idProyecto','mes');
 				},'actividadesMetasMes'=>function($query){

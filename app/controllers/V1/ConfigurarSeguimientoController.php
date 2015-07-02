@@ -36,13 +36,19 @@ class ConfigurarSeguimientoController extends \BaseController {
 				}else{
 					$variable->valor = null;
 				}
-				
+			}
+			$usuario = Sentry::getUser();
+			if($parametros['mes-usuario']){
+				$usuario->mesCaptura = intval($parametros['mes-usuario']);
+			}else{
+				$usuario->mesCaptura = null;
 			}
 
-			DB::transaction(function()use($variables){
+			DB::transaction(function()use($variables,$usuario){
 				foreach ($variables as $variable) {
 					$variable->save();
 				}
+				$usuario->save();
 			});
 
 			$respuesta['data'] = array('data'=>$variables);

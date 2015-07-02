@@ -90,6 +90,10 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('reporte-ep-01',array('uses'=>'EP01Controller@index'));
 	});
 
+	Route::group(array('prefix'=>'reportes'),function(){
+		Route::get('reporte-seguimiento-inst',array('uses'=>'ReporteSeguimientoMetasController@indexInstitucional'));
+	});
+
 	Route::group(array('prefix'=>"v1"),function(){
 		Route::get('/', function()
 		{
@@ -114,6 +118,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('rend-cuenta-inv', 		'V1\SeguimientoController');
 		Route::resource('rend-cuenta-prog', 	'V1\RendicionProgramaController');
 		Route::resource('rend-cuenta-fassa',	'V1\RendicionFassaController');
+
+		Route::resource('reporte-seguimiento-inst',	'V1\ReporteSeguimientoMetasController', array('only' => array('index','show')));
 
 		Route::resource('cuenta-publica',			'V1\CuentaPublicaController');
 		Route::resource('reporte-cuenta-publica',	'V1\ReporteCuentaPublicaController');
