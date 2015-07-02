@@ -41,37 +41,49 @@ moduloDatagrid.actualizar({
 });
 
 function cargar_datos_proyecto(e){
-    $('#modalDatosSeguimiento').modal('show');
-    return false;
-    var parametros = {'mostrar':'datos-proyecto-avance'};
-    moduloResource.get(e,parametros,{
+    moduloResource.get(e,null,{
         _success: function(response){
-            //
+            $('#modalDatosSeguimiento').find(".modal-title").html('Clave: <small>' + response.data.ClavePresupuestaria + '</small>');
+
+            $('#nombre-tecnico').text(response.data.nombreTecnico);
+            $('#programa-presupuestario').text(response.data.datos_programa_presupuestario.clave + ' ' + response.data.datos_programa_presupuestario.descripcion);
+            $('#funcion').text(response.data.datos_funcion.clave + ' ' + response.data.datos_funcion.descripcion);
+            $('#subfuncion').text(response.data.datos_sub_funcion.clave + ' ' + response.data.datos_sub_funcion.descripcion);
+            $('#id').val(response.data.id);
+
+            for(var i in response.data.evaluacion_meses){
+                var evaluacion = response.data.evaluacion_meses[i];
+                var icono = 'fa-file-pdf-o';
+                var clase = 'btn-default';
+                if(evaluacion.idEstatus == 4){
+                    icono = 'fa-check';
+                    clase = 'btn-primary';
+                }else{
+                    icono = 'fa-pencil';
+                    clase = 'btn-success';
+                }
+                $('#rep_metas_'+evaluacion.mes).html('<button onClick="cargarReporte(\'seg-metas\','+evaluacion.mes+')" class="btn '+clase+'" type="button"><span class="fa '+icono+'"></span></button>');
+                if(evaluacion.mes%3 == 0){
+                    $('#rep_benef_'+evaluacion.mes).html('<button onClick="cargarReporte(\'seg-beneficiarios\','+evaluacion.mes+')" class="btn '+clase+'" type="button"><span class="fa '+icono+'"></span></button>');
+                    $('#rep_plan_'+evaluacion.mes).html('<button onClick="cargarReporte(\'plan-mejora\','+evaluacion.mes+')" class="btn '+clase+'" type="button"><span class="fa '+icono+'"></span></button>');
+                    $('#rep_cuenta_'+evaluacion.mes).html('<button onClick="cargarReporte(\'analisis\','+evaluacion.mes+')" class="btn '+clase+'" type="button"><span class="fa '+icono+'"></span></button>');
+                }
+            }
+
+            $('#modalDatosSeguimiento').modal('show');
         }
     });
 }
+$('#modalDatosSeguimiento').on('hide.bs.modal',function(e){
+    $('#tabla-reportes tbody td.reporte-boton').html('<span class="fa fa-times"></span>');
+});
 
-//rend-cuenta-inst-editar
-$('#btn-reporte-general').off('click');
-$('#btn-reporte-general').on('click',function(){
-    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '|seg-metas';
-    window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
-});
-$('#btn-reporte-beneficiarios').off('click');
-$('#btn-reporte-beneficiarios').on('click',function(){
-    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '|seg-beneficiarios';
-    window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
-});
-$('#btn-reporte-plan-mejora').off('click');
-$('#btn-reporte-plan-mejora').on('click',function(){
-    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '|plan-mejora';
-    window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
-});
-$('#btn-reporte-analisis').off('click');
-$('#btn-reporte-analisis').on('click',function(){
-    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '|analisis';
-    window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
-});
+function cargarReporte(tipo,mes){
+    if($('#id').val()){
+        var parametros = $('#id').val() + '?tipo='+tipo+'&mes='+mes;
+        window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
+    }
+}
 
 /*             Extras               */
 /**

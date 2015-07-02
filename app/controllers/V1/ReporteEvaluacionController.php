@@ -30,17 +30,20 @@ class ReporteEvaluacionController extends BaseController {
 	 * @return Response
 	 */
 	public function show($id){
-		$id = explode('|', $id);
-		if(isset($id[1])){
-			$tipo_reporte = $id[1];
-		}else{
-			$tipo_reporte = 'general';
+		$parametros = Input::all();
+		$tipo_reporte = 'general';
+		
+		if(isset($parametros['tipo'])){
+			$tipo_reporte = $parametros['tipo'];
 		}
-		$id = intval($id[0]);
 
-		$mes_actual = Util::obtenerMesActual();
-
-		if($mes_actual == 0){
+		if(isset($parametros['mes'])){
+			$mes_actual = intval($parametros['mes']);
+		}else{
+			$mes_actual = Util::obtenerMesActual();
+		}
+		
+		if($mes_actual == 0 || $mes_actual > 12){
 			$mes_actual = date('n') - 1;
 		}
 

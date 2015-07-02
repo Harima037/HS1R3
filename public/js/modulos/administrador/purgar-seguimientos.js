@@ -55,9 +55,17 @@ moduleDatagrid.actualizar({
 /*===================================*/
 // Implementación personalizada del módulo
 
+$('#mes').on('change',function(){
+    realizar_busqueda();
+});
+
+$('#clasificacion').on('change',function(){
+    realizar_busqueda();
+});
+
 function editar (e){
-    $('#modalSeguimiento').find(".modal-title").html("Detalles Seguimiento");
-    $('#modalSeguimiento').modal('show');
+    //$('#modalSeguimiento').find(".modal-title").html("Detalles Seguimiento");
+    //$('#modalSeguimiento').modal('show');
     /*moduleResource.get(e,null,{
         _success: function(response){
             $('#modalSeguimiento').find(".modal-title").html("Detalles Seguimiento");
@@ -66,24 +74,47 @@ function editar (e){
     });*/
 }
 
+$("#datagridSeguimientos .txt-quick-search").off('keydown');
+$("#datagridSeguimientos .txt-quick-search").on('keydown', function(event){
+    if (event.which == 13) {
+        realizar_busqueda();
+    }
+});
+
 $('#datagridSeguimientos .btn-quick-search').off('click');
 $('#datagridSeguimientos .btn-quick-search').on('click',function(){
+    realizar_busqueda();
+})
+
+function realizar_busqueda(){
     moduleDatagrid.setPagina(1);
     moduleDatagrid.parametros.buscar = $('.txt-quick-search').val();
     moduleDatagrid.parametros.clasificacionProyecto = $('#clasificacion').val();
     moduleDatagrid.parametros.mes = $('#mes').val();
     moduleDatagrid.actualizar();
-})
-
+}
 
 /*===================================*/
 // Configuración General para cualquier módulo
 $('#btn-purgar-seguimiento').on('click',function(){
-    moduleResource.put($('#mes').val(), null,{
-        _success: function(response){
-            moduleDatagrid.actualizar();
-            MessageManager.show({data:'Seguimientos purgados con exito',container:'#modalRol .modal-body',type:'OK',timer:4});
-        }
+    var mes_seleccionado = $('#mes option:selected').text();
+    Confirm.show({
+        titulo:"Purgar Seguimientos Incompletos",
+        mensaje: "Esta acción eliminara todos los seguimientos del mes de "+mes_seleccionado+" cuyo proceso no haya finalizado, borrando todos los avances capturados ¿Está seguro de continuar?",
+        botones: [ 
+            {   selector:"btn-modal-confirm-si", 
+                nombre: '<span class="fa fa-eraser"></span> Purgar', 
+                clase: 'btn-danger', 
+                callback: function(){ 
+                    moduleResource.put($('#mes').val(), null,{
+                        _success: function(response){
+                            moduleDatagrid.actualizar();
+                            MessageManager.show({data:'Seguimientos purgados con exito',container:'#modalRol .modal-body',type:'OK',timer:4});
+                        }
+                    });
+                }},
+            { selector:"btn-modal-confirm-no", nombre: 'Cancelar', clase: 'btn-default', callback: function(){ } }
+        ]
     });
 });
 /*===================================*/

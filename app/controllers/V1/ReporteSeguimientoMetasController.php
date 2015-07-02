@@ -107,68 +107,12 @@ class ReporteSeguimientoMetasController extends BaseController {
 		//
 		$http_status = 200;
 		$data = array();
-		$parametros = Input::all();
-
-		if(isset($parametros['mostrar'])){
-			if($parametros['mostrar'] == 'datos-proyecto-avance'){
-				$mes_actual = Util::obtenerMesActual();
-				$recurso = Proyecto::with(array('datosFuncion','datosSubFuncion','datosProgramaPresupuestario','componentes.metasMesAgrupado','componentes.registroAvance','componentes.actividades.metasMesAgrupado','componentes.actividades.registroAvance','beneficiarios.registroAvance','beneficiarios.tipoBeneficiario',
-					'evaluacionMeses'=>function($query) use ($mes_actual){
-						if($mes_actual == 0){
-							$mes_actual = date('n') - 1;
-							$query->where('mes','=',$mes_actual)->where('idEstatus','=',4);
-						}else{
-							$query->where('mes','=',$mes_actual);
-						}
-					}))->find($id);
-			}elseif ($parametros['mostrar'] == 'datos-municipio-avance') {
-				//$id = idComponente y $parametros['clave-municipio'] y $parametros['nivel'] = 'componente'
-				$mes_actual = Util::obtenerMesActual();
-				if($parametros['nivel'] == 'componente'){
-					$recurso = ComponenteDesglose::listarDatos()->where('claveMunicipio','=',$parametros['clave-municipio'])
-													->where('idComponente','=',$id);
-				}
-				$recurso = $recurso->with(array('metasMes'=>function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'metasMesAcumuladas'=>function($query) use ($mes_actual){
-					$query->where('mes','<=',$mes_actual);
-				}))->get();
-			}elseif($parametros['mostrar'] == 'datos-metas-avance'){
-				$mes_actual = Util::obtenerMesActual();
-				if($parametros['nivel'] == 'componente'){
-					$recurso = Componente::getModel();
-				}else{
-					$recurso = Actividad::getModel();
-				}
-				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
-				$recurso = $recurso->with(array('metasMesJurisdiccion'=>function($query) use ($mes_actual){
-					$query->where('mes','<=',$mes_actual);
-				},'registroAvance'=>function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'metasMes' => function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'planMejora'=>function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'unidadMedida','comentarios'))->find($id);
-
-				if($parametros['nivel'] == 'componente'){
-					$recurso->load('desgloseMunicipios');
-					//$queries = DB::getQueryLog();
-					//throw new Exception(print_r(end($queries),true), 1);
-				}
-			}elseif($parametros['mostrar'] == 'datos-beneficiarios-avance'){
-				$mes_actual = Util::obtenerMesActual();
-				$recurso['acumulado'] = RegistroAvanceBeneficiario::where('idProyecto','=',$parametros['id-proyecto'])
-														->where('idTipoBeneficiario','=',$id)
-														->where('mes','<',$mes_actual)->groupBy('idTipoBeneficiario','sexo')
-														->select('idTipoBeneficiario','sexo',DB::raw('sum(total) AS total'))->get();
-				$recurso['beneficiario'] = Beneficiario::with(array('tipoBeneficiario','registroAvance'=>function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'comentarios'))->where('idProyecto','=',$parametros['id-proyecto'])->where('idTipoBeneficiario','=',$id)->get();
-			}elseif ($parametros['mostrar'] == 'analisis-funcional') {
-				$recurso = EvaluacionAnalisisFuncional::with('comentarios')->find($id);
-			}
-		}
+		
+		$recurso = Proyecto::with(array('datosFuncion','datosSubFuncion','datosProgramaPresupuestario',
+			'evaluacionMeses'=>function($query){
+				$query->whereIn('idEstatus',array(4,5));
+			})
+		)->find($id);
 
 		if(is_null($recurso)){
 			$http_status = 404;

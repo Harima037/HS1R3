@@ -316,23 +316,23 @@ $('#btn-editar-avance').on('click',function(){
 
 $('#btn-reporte-general').off('click');
 $('#btn-reporte-general').on('click',function(){
-    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '|seg-metas';
+    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '?tipo=seg-metas';
     window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
 });
 $('#btn-reporte-beneficiarios').off('click');
 $('#btn-reporte-beneficiarios').on('click',function(){
-    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '|seg-beneficiarios';
+    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '?tipo=seg-beneficiarios';
     window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
 });
 $('#btn-reporte-plan-mejora').off('click');
 $('#btn-reporte-plan-mejora').on('click',function(){
-    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '|plan-mejora';
+    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '?tipo=plan-mejora';
     window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
 });
 
 $('#btn-reporte-analisis').off('click');
 $('#btn-reporte-analisis').on('click',function(){
-    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '|analisis';
+    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '?tipo=analisis';
     window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
 });
 /*

@@ -101,6 +101,8 @@
                                         <p class="form-control-static" id="programa-presupuestario"></p>
                                     </div>
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <label class="control-label">Función</label>
@@ -113,10 +115,11 @@
                                         <p class="form-control-static" id="subfuncion"></p>
                                     </div>
                                 </div>
+                                <input type="hidden" id="id" value="">
                             </div>
                         </div>
                     </div>
-                    <table class="table table-condensed table-hover table-striped">
+                    <table id="tabla-reportes" class="table table-condensed table-hover table-striped">
                         <thead>
                             <tr>
                                 <th>Tipo de Reporte</th>
@@ -129,28 +132,45 @@
                             <tr>
                                 <td>Seguimiento de Metas</td>
                                 @foreach($meses as $mes)
-                                <td class="text-center" id="rep_metas_{{$mes['clave']}}"><span class="fa fa-times"></span></td>
+                                <td class="text-center reporte-boton" id="rep_metas_{{$mes['clave']}}">
+                                    <span class="fa fa-times"></span>
+                                </td>
                                 @endforeach
                             </tr>
                             <tr>
                                 <td>Seguimiento de Beneficiarios</td>
                                 @foreach($meses as $mes)
-                                <td class="text-center" id="rep_benef_{{$mes['clave']}}"><span class="fa fa-times"></span></td>
+                                <td class="text-center reporte-boton {{(($mes['clave']%3 != 0))?'text-muted':''}}" id="rep_benef_{{$mes['clave']}}">
+                                    <span class="fa fa-times"></span>
+                                </td>
                                 @endforeach
                             </tr>
                             <tr>
                                 <td>Plan de Acción de Mejora</td>
                                 @foreach($meses as $mes)
-                                <td class="text-center" id="rep_plan_{{$mes['clave']}}"><span class="fa fa-times"></span></td>
+                                <td class="text-center reporte-boton {{(($mes['clave']%3 != 0))?'text-muted':''}}" id="rep_plan_{{$mes['clave']}}">
+                                    <span class="fa fa-times"></span>
+                                </td>
                                 @endforeach
                             </tr>
                             <tr>
                                 <td>Cuenta Pública</td>
                                 @foreach($meses as $mes)
-                                <td class="text-center" id="rep_cuenta_{{$mes['clave']}}"><span class="fa fa-times"></span></td>
+                                <td class="text-center reporte-boton {{(($mes['clave']%3 != 0))?'text-muted':''}}" id="rep_cuenta_{{$mes['clave']}}">
+                                    <span class="fa fa-times"></span>
+                                </td>
                                 @endforeach
                             </tr>
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="13" class="text-right">
+                                    <b>Estatus del Reporte: </b>
+                                    <span class="btn btn-primary btn-xs"><span class="fa fa-check"></span></span> Registrado 
+                                    <span class="btn btn-success btn-xs"><span class="fa fa-pencil"></span></span> Firmado
+                                </td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
                 <div class="modal-footer">
