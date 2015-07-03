@@ -174,7 +174,7 @@
 	</tr>
 </tbody>
 </table>
-<table>
+<table  style="page-break-inside:avoid;">
 	<tr>
 		<td colspan="5">&nbsp;</td>
 	</tr>

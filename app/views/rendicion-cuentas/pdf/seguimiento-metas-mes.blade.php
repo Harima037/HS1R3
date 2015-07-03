@@ -178,7 +178,7 @@
 	</tr>
 	<tr height="10"><td>&nbsp;</td></tr>
 </table>
-<table>
+<table style="page-break-inside:avoid;">
 	<tr class="negrita" height="20">
 		<td width="10%"></td>
 		<td align="center">RESPONSABLE DE LA INFORMACIÓN</td>
