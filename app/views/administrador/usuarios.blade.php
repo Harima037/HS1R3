@@ -142,11 +142,13 @@
                                 <span class="fa fa-file"></span> Caratulas
                             </a>
                         </li>
+                        @if($usuario->idDepartamento == 2 || $usuario->isSuperUser())
                         <li>
                             <a href="#tab-proyectos" role="tab" data-toggle="tab">
                                 <span class="fa fa-file"></span> Proyectos
                             </a>
                         </li>
+                        @endif
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="tab-datos">
@@ -202,6 +204,12 @@
                                         <label for="unidad" class="control-label ">Unidad Asignada</label>
                                         {{Form::select('unidad[]',$unidades_responsables->lists('descripcion','clave'),0,array('class'=>'form-control chosen-one','id'=>'unidad','multiple'=>'multiple','data-placeholder'=>'Selecciona las unidades a asignar'))}}
                                         <p class="help-block">Si no selecciona ninguna unidad, el usuario tendrá acceso a todas las unidades disponibles.</p>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label for="jurisdiccion" class="control-label ">Jurisdicción</label>
+                                        {{Form::select('jurisdiccion',$jurisdicciones,0,array('class'=>'form-control','id'=>'jurisdiccion'))}}
                                     </div>
                                 </div>
                             </div>
@@ -296,7 +304,7 @@
                                     </div>
                                 </div>
                         </div>
-
+                        @if($usuario->idDepartamento == 2 || $usuario->isSuperUser())
                         <div class="tab-pane" id="tab-proyectos">
                             <br>
                             <label class="control-label">
@@ -327,7 +335,7 @@
                                 <span class="fa fa-trash"></span> Quitar todos
                             </button>
                         </div>
-
+                        @endif
                         <div class="tab-pane" id="tab-caratulas">
                             <br>
                             <label class="control-label">

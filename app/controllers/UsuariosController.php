@@ -15,10 +15,12 @@ class UsuariosController extends \BaseController {
 		}else{
 			$departamentos = SysDepartamento::all();
 		}
+		$jurisdicciones =  array(''=>'Selecciona una jurisdicción') + Jurisdiccion::all()->lists('nombre','clave');
 		$catalogos = array(
 				'sys_roles'=>Sentry::findAllGroups(),
 				'unidades_responsables'=>UnidadResponsable::all(),
-				'departamentos'=>$departamentos
+				'departamentos'=>$departamentos,
+				'jurisdicciones'=>$jurisdicciones
 			);
 		return parent::loadIndex('ADMIN','USUARIOS',$catalogos);
 	}

@@ -20,12 +20,12 @@
 
                                 @if(count($sistema->modulos)>0)
                                 <a href="{{ URL::to($sistema->uri) }}" class="dropdown-toggle" data-toggle="dropdown">
-                                    <i class="fa {{ $sistema->icono }}"></i> {{ $sistema->nombre }} <b class="caret"></b>
+                                    <i class="fa-fw fa {{ $sistema->icono }}"></i> {{ $sistema->nombre }} <b class="caret"></b>
                                 </a>
                                 <ul class="dropdown-menu">                       
                                 @foreach($sistema->modulos as $modulo)
                                 @if(Sentry::hasAccess($sistema->key . '.' . $modulo->key . '.R') && $modulo->visible)
-                                    <li><a href="{{ URL::to($sistema->uri.'/'.$modulo->uri) }}"><i class="fa {{ $modulo->icono }}"></i> {{ $modulo->nombre }}</a></li>      
+                                    <li><a href="{{ URL::to($sistema->uri.'/'.$modulo->uri) }}"><i class="fa-fw fa {{ $modulo->icono }}"></i> {{ $modulo->nombre }}</a></li>      
                                 @endif
                                 @endforeach
                                 </ul>

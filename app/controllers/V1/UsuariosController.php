@@ -254,6 +254,7 @@ class UsuariosController extends \BaseController {
 					'apellidoPaterno' => Input::get('apellido-paterno'),
 					'apellidoMaterno' => Input::get('apellido-materno'),
 					'claveUnidad' => $unidades,
+					'claveJurisdiccion' => (Input::get('jurisdiccion'))?Input::get('jurisdiccion'):NULL,
 					'idDepartamento' => (Input::get('departamento'))?Input::get('departamento'):NULL,
 					'cargo' => Input::get('cargo'),
 					'telefono' => Input::get('telefono'),
@@ -375,6 +376,7 @@ class UsuariosController extends \BaseController {
 				$recurso->apellidoPaterno		= Input::get('apellido-paterno');
 				$recurso->apellidoMaterno		= Input::get('apellido-materno');
 				$recurso->claveUnidad			= $unidades;
+				$recurso->claveJurisdiccion		= (Input::get('jurisdiccion'))?Input::get('jurisdiccion'):NULL;
 				$recurso->cargo					= (Input::get('cargo'))?Input::get('cargo'):NULL;
 				$recurso->telefono				= (Input::get('telefono'))?Input::get('telefono'):NULL;
 

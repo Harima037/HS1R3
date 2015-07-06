@@ -76,6 +76,14 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		
 	});
 
+	Route::group(array('prefix'=>'visor-gerencial'),function(){
+		Route::get('proyectos-inst',array('uses'=>'VisorGerencialController@indexInstitucional'));
+		Route::get('proyectos-inv',array('uses'=>'VisorGerencialController@indexInversion'));
+
+		Route::get('ver-avance/{id}',array('uses'=>'VisorGerencialController@rendicionCuentas'));
+		Route::get('visor-general',array('uses'=>'VisorGerencialController@desempenioGeneral'));
+	});
+
 	Route::group(array('prefix'=>'rendicion-cuentas'),function(){
 		Route::get('rend-cuenta-inst',array('uses'=>'SeguimientoController@indexInstitucional'));
 		Route::get('rend-cuenta-inv',array('uses'=>'SeguimientoController@indexInversion'));
@@ -113,6 +121,9 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('inversion',		'V1\InversionController');
 		Route::resource('reporteProyecto',	'V1\ReporteProyectoController', array('only' => array('show')));
 		Route::resource('fibap',			'V1\FibapController');
+
+		Route::resource('visor-gerencial-inst', 	'V1\VisorGerencialController');
+		Route::resource('visor-gerencial-inv', 	'V1\VisorGerencialController');
 
 		Route::resource('rend-cuenta-inst', 	'V1\SeguimientoController');
 		Route::resource('rend-cuenta-inv', 		'V1\SeguimientoController');

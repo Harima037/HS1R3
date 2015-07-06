@@ -95,6 +95,7 @@ function editar (e){
             $('#formModulo #apellido-materno').val(response.data.apellidoMaterno);
             $('#formModulo #cargo').val(response.data.cargo);
             $('#formModulo #departamento').val(response.data.idDepartamento);
+            $('#formModulo #jurisdiccion').val(response.data.claveJurisdiccion);
             $('#formModulo #email').val(response.data.email);
             $('#formModulo #telefono').val(response.data.telefono);
             $('#formModulo #rol').val(response.data.roles);
