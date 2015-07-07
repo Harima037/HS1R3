@@ -6,7 +6,7 @@
 @parent
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
-<script src="{{ URL::to('js/modulos/cargar/reporte-ep-01.js')}}"></script>
+<script src="{{ URL::to('js/modulos/cargar/reporte-regionalizado.js')}}"></script>
 @stop
 
 @section('aside')
@@ -32,7 +32,7 @@
                             @section('panel-botones')
                                 <div class="btn-group" style="margin:5px">
                                     <button type="button" class="btn btn-success" id="btn-cargar-achivo">
-                                        <span class="fa fa-upload"></span> Cargar Archivo EP01
+                                        <span class="fa fa-upload"></span> Cargar Archivo Regionalizado
                                     </button>
                                     <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                                         <span class="caret"></span>
@@ -59,6 +59,7 @@
                         <th>Ejercicio</th>
                         <th>Mes</th>
                         <th>Total de Resgistros</th>
+                        <th>Total del Importe</th>
                         <th style="text-align:center; width:85px;"><span class="glyphicon glyphicon-user"></span></th>
                         <th style="text-align:center; width:120px;"><span class="glyphicon glyphicon-calendar"></span></th>
                     </tr>
@@ -140,14 +141,11 @@
                         <thead>
                             <tr>
                                 <th>Total de Registros</th>
-                                <th>Presupuesto Aprobado</th>
-                                <th>Presupuesto Modificado</th>
-                                <th>Presupuesto Liberado</th>
-                                <th>Presupuesto Por Liberar</th>
+                                <th>Total del Importe</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td>0</td><td>$ 0.00</td><td>$ 0.00</td><td>$ 0.00</td><td>$ 0.00</td></tr>
+                            <tr><td>0</td><td>$ 0.00</td></tr>
                         </tbody>
                     </table>
                     <input type="hidden" id="id" name="id">

@@ -1,17 +1,17 @@
 /*=====================================
 
     # Nombre:
-        reporte-ep-01.js
+        reporte-regionalizado.js
 
     # Módulos:
-        cargar/reporte-ep-01
+        cargar/reporte-regionalizado
 
     # Descripción:
-        Funciones para cargar archivos csv del EP01
+        Funciones para cargar archivos csv del EP01 regionalizado
 
 =====================================*/
 
-var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/reporte-ep-01');
+var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/reporte-regionalizado');
 var moduloDatagrid = new Datagrid("#datagridCarga",moduloResource,{ formatogrid:true, pagina: 1});
 
 moduloDatagrid.init();
@@ -22,8 +22,10 @@ moduloDatagrid.actualizar({
         for(var i in response.data){
             response.data[i].mes = meses[response.data[i].mes-1];
             response.data[i].modificadoAl = response.data[i].modificadoAl.substring(0,11);
+            response.data[i].totalRegistros = parseFloat(response.data[i].totalRegistros).format(2);
+            response.data[i].totalImporte = '$ ' + parseFloat(response.data[i].totalImporte).format(2);
         }
-        moduloDatagrid.cargarDatos(response.data);                         
+        moduloDatagrid.cargarDatos(response.data);
         var total = parseInt(response.resultados/moduloDatagrid.rxpag); 
         var plus = parseInt(response.resultados)%moduloDatagrid.rxpag;
         if(plus>0) 
@@ -56,7 +58,7 @@ $('#modalCargar').on('hidden.bs.modal',function(){
     $('#form_carga').get(0).reset();
     $('#form_carga #id').val("");
     $('#tabla-conteo-totales tbody').empty();
-    $('#tabla-conteo-totales tbody').html('<tr><td>0</td><td>$ 0.00</td><td>$ 0.00</td><td>$ 0.00</td><td>$ 0.00</td></tr>');
+    $('#tabla-conteo-totales tbody').html('<tr><td>0</td><td>$ 0.00</td></tr>');
     $('#archivo').prop('disabled',false);
     $('#ejercicio').prop('disabled',false);
     Validation.cleanFormErrors('#form_carga');
@@ -108,10 +110,7 @@ function editar(e){
             
             var html_row = '<tr>' +
             '<td>' + parseFloat(response.data.totalRegistros).format() + '</td>' +
-            '<td>$ ' + parseFloat(response.data.presupuestoAprobado).format(2) + '</td>' +
-            '<td>$ ' + parseFloat(response.data.presupuestoModificado).format(2) + '</td>' +
-            '<td>$ ' + parseFloat(response.data.presupuestoLiberado).format(2) + '</td>' +
-            '<td>$ ' + parseFloat(response.data.presupuestoPorLiberar).format(2) + '</td>' +
+            '<td>$ ' + parseFloat(response.data.totalImporte).format(2) + '</td>' +
             '</tr>';
 
             $('#tabla-conteo-totales tbody').html(html_row);
@@ -133,7 +132,7 @@ function subirArchivoConDatos(){
     data.append('ejercicio', $('#ejercicio').val());
     
     $.ajax({
-        url: SERVER_HOST+'/v1/reporte-ep-01', //Url a donde la enviaremos
+        url: SERVER_HOST+'/v1/reporte-regionalizado', //Url a donde la enviaremos
         type:'POST', //Metodo que usaremos
         dataType:'json',
         contentType:false, //Debe estar en false para que pase el objeto sin procesar
@@ -146,10 +145,7 @@ function subirArchivoConDatos(){
 
             var html_row = '<tr>' +
             '<td>' + parseFloat(response.data.totalRegistros).format() + '</td>' +
-            '<td>$ ' + parseFloat(response.data.presupuestoAprobado).format(2) + '</td>' +
-            '<td>$ ' + parseFloat(response.data.presupuestoModificado).format(2) + '</td>' +
-            '<td>$ ' + parseFloat(response.data.presupuestoLiberado).format(2) + '</td>' +
-            '<td>$ ' + parseFloat(response.data.presupuestoPorLiberar).format(2) + '</td>' +
+            '<td>$ ' + parseFloat(response.data.totalImporte).format(2) + '</td>' +
             '</tr>';
 
             $('#tabla-conteo-totales tbody').empty();

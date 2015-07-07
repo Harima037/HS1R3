@@ -4,9 +4,9 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry,Exception;
-use Hash, File, BitacoraCargaEP01, CargaDatosEP01;
+use Hash, File, BitacoraCargaEPRegion, CargaDatosEPRegion;
 
-class EP01Controller extends \BaseController {
+class EPRegionalizadoController extends \BaseController {
 	private $reglas = array(
 			'mes' => 'required',
 			'ejercicio' => 'sometimes|required'
@@ -27,23 +27,21 @@ class EP01Controller extends \BaseController {
 			$parametros = Input::all();
 			if(isset($parametros['formatogrid'])){
 				
-				$rows = BitacoraCargaEP01::getModel();
+				$rows = BitacoraCargaEPRegion::getModel();
 
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				
 				if(isset($parametros['buscar'])){				
-					$rows = $rows->where('bitacoraCargaEP01.ejercicio','like','%'.$parametros['buscar'].'%')
-							->where('bitacoraCargaEP01.mes','like','%'.$parametros['buscar'].'%');
+					$rows = $rows->where('bitacoraCargaEPRegion.ejercicio','like','%'.$parametros['buscar'].'%')
+							->where('bitacoraCargaEPRegion.mes','like','%'.$parametros['buscar'].'%');
 					$total = $rows->count();
 				}else{				
 					$total = $rows->count();						
 				}
 
-				$rows = $rows->select('bitacoraCargaEP01.id','ejercicio','mes',
-										DB::raw('FORMAT(totalRegistros,0) AS totalRegistros'),
-										'usuario.username',
-										'bitacoraCargaEP01.modificadoAl')
-									->leftjoin('sentryUsers AS usuario','usuario.id','=','bitacoraCargaEP01.actualizadoPor')
+				$rows = $rows->select('bitacoraCargaEPRegion.id','ejercicio','mes','totalRegistros','totalImporte',
+										'usuario.username','bitacoraCargaEPRegion.modificadoAl')
+									->leftjoin('sentryUsers AS usuario','usuario.id','=','bitacoraCargaEPRegion.actualizadoPor')
 									->orderBy('id', 'desc')
 									->skip(($parametros['pagina']-1)*10)->take(10)
 									->get();
@@ -58,7 +56,7 @@ class EP01Controller extends \BaseController {
 				return Response::json($data,$http_status);
 			}	
 
-			$rows = BitacoraCargaEP01::all();
+			$rows = BitacoraCargaEPRegion::all();
 
 			if(count($rows) == 0){
 				$http_status = 404;
@@ -86,7 +84,7 @@ class EP01Controller extends \BaseController {
 		$http_status = 200;
 		$data = array();
 
-		$recurso = BitacoraCargaEP01::find($id);
+		$recurso = BitacoraCargaEPRegion::find($id);
 
 		if(is_null($recurso)){
 			$http_status = 404;
@@ -130,7 +128,7 @@ class EP01Controller extends \BaseController {
 					$ejercicio = $parametros['ejercicio'];
 					while (($data2 = fgetcsv($handle, 1000, ",")) !== FALSE) {
 						if($row > 1){
-							if(count($data2) < 30){ //Número de columnas de cada línea, para validar si todos los campos se tienen
+							if(count($data2) < 20){ //Número de columnas de cada línea, para validar si todos los campos se tienen
 								$lineasConErrorEnCampos = $lineasConErrorEnCampos . $row . ", ";
 								$errorNumeroCampos = 1;
 							}
@@ -153,11 +151,11 @@ class EP01Controller extends \BaseController {
 						}
 						$respuesta['data'] = array("data"=>$errores,'code'=>'U06');
 					}else{
-						$recurso = new BitacoraCargaEP01;
+						$recurso = new BitacoraCargaEPRegion;
 						$recurso->mes = $parametros['mes'];
 						$recurso->ejercicio = $parametros['ejercicio'];
 						
-						$validarEjercicioMes = BitacoraCargaEP01::getModel();
+						$validarEjercicioMes = BitacoraCargaEPRegion::getModel();
 						$validarEjercicioMes = $validarEjercicioMes->where('mes','=',$parametros['mes'])
 														 ->where('ejercicio','=',$parametros['ejercicio'])->count();
 						//
@@ -178,52 +176,27 @@ class EP01Controller extends \BaseController {
 									$idInsertado = $recurso->id;
 									$query = sprintf("
 										LOAD DATA local INFILE '%s' 
-										INTO TABLE cargaDatosEP01 
+										INTO TABLE cargaDatosEPRegion 
 										FIELDS TERMINATED BY ',' 
 										OPTIONALLY ENCLOSED BY '\"' 
 										ESCAPED BY '\"' 
 										LINES TERMINATED BY '\\n' 
 										IGNORE 1 LINES 
 										(`UR`,`FI`,`FU`,`SF`,`SSF`,`PS`,`PP`,`PE`,`AI`,`PT`,`MPIO`,`OG`,`STG`,`FF`,`SFF`,`DG`,`CP`,
-										`DM`,`presupuestoAprobado`,`modificacionNeta`,`presupuestoModificado`,`presupuestoLiberado`,
-										`presupuestoPorLiberar`,`presupuestoMinistrado`,`presupuestoComprometidoModificado`,
-										`presupuestoDevengadoModificado`,`presupuestoEjercidoModificado`,`presupuestoPagadoModificado`,
-										`disponibilidadFinancieraModificada`,`disponiblePresupuestarioModificado`) 
-										set idBitacoraCargaEP01='%s', mes='%s'
+										`DM`,`clave`,`importe`) 
+										set idBitacoraCargaEPRegion='%s', mes='%s'
 										", addslashes($csv), $idInsertado, $parametros['mes']);
 									DB::connection()->getpdo()->exec($query);
 
-									$conteoTotales = CargaDatosEP01::getModel();
+									$conteoTotales = CargaDatosEPRegion::getModel();
 									$conteoTotales = $conteoTotales->select(
 										DB::raw('COUNT(id) AS registros'),
-										DB::raw('SUM(presupuestoAprobado) AS presupuestoAprobado'),
-										DB::raw('SUM(modificacionNeta) AS modificacionNeta'),
-										DB::raw('SUM(presupuestoModificado) AS presupuestoModificado'),
-										DB::raw('SUM(presupuestoLiberado) AS presupuestoLiberado'),
-										DB::raw('SUM(presupuestoPorLiberar) AS presupuestoPorLiberar'),
-										DB::raw('SUM(presupuestoMinistrado) AS presupuestoMinistrado'),
-										DB::raw('SUM(presupuestoComprometidoModificado) AS presupuestoComprometidoModificado'),
-										DB::raw('SUM(presupuestoDevengadoModificado) AS presupuestoDevengadoModificado'),
-										DB::raw('SUM(presupuestoEjercidoModificado) AS presupuestoEjercidoModificado'),
-										DB::raw('SUM(presupuestoPagadoModificado) AS presupuestoPagadoModificado'),
-										DB::raw('SUM(disponibilidadFinancieraModificada) AS disponibilidadFinancieraModificada'),
-										DB::raw('SUM(disponiblePresupuestarioModificado) AS disponiblePresupuestarioModificado')
+										DB::raw('SUM(importe) AS totalImporte')
 									);
-									$conteoTotales = $conteoTotales->where('idBitacoraCargaEP01','=',$idInsertado)->first();
+									$conteoTotales = $conteoTotales->where('idBitacoraCargaEPRegion','=',$idInsertado)->first();
 									
 									$recurso->totalRegistros = $conteoTotales->registros;
-									$recurso->presupuestoAprobado = $conteoTotales->presupuestoAprobado;
-									$recurso->modificacionNeta = $conteoTotales->modificacionNeta;
-									$recurso->presupuestoModificado = $conteoTotales->presupuestoModificado;
-									$recurso->presupuestoLiberado = $conteoTotales->presupuestoLiberado;
-									$recurso->presupuestoPorLiberar = $conteoTotales->presupuestoPorLiberar;
-									$recurso->presupuestoMinistrado = $conteoTotales->presupuestoMinistrado;
-									$recurso->presupuestoComprometidoModificado = $conteoTotales->presupuestoComprometidoModificado;
-									$recurso->presupuestoDevengadoModificado = $conteoTotales->presupuestoDevengadoModificado;
-									$recurso->presupuestoEjercidoModificado = $conteoTotales->presupuestoEjercidoModificado;
-									$recurso->presupuestoPagadoModificado = $conteoTotales->presupuestoPagadoModificado;
-									$recurso->disponibilidadFinancieraModificada = $conteoTotales->disponibilidadFinancieraModificada;
-									$recurso->disponiblePresupuestarioModificado = $conteoTotales->disponiblePresupuestarioModificado;
+									$recurso->totalImporte = $conteoTotales->totalImporte;
 
 									$recurso->save();
 
@@ -277,14 +250,14 @@ class EP01Controller extends \BaseController {
 		$respuesta['data'] = array("data"=>'');	
 
 		try{
-			$recurso = BitacoraCargaEP01::find($id);
+			$recurso = BitacoraCargaEPRegion::find($id);
 			$parametros = Input::all();
 
 			if(is_null($recurso)){
 				$respuesta['http_status'] = 404;
 				$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
 			}else{
-				$validarEjercicioMes = BitacoraCargaEP01::getModel();
+				$validarEjercicioMes = BitacoraCargaEPRegion::getModel();
 				$validarEjercicioMes = $validarEjercicioMes->where('mes','=',$parametros['mes'])
 												 ->where('ejercicio','=',$recurso->ejercicio)
 												 ->where('id','<>',$recurso->id)
@@ -301,7 +274,7 @@ class EP01Controller extends \BaseController {
 					if($resultado===true){
 						DB::transaction(function()use($recurso){
 							if($recurso->save()){
-								CargaDatosEP01::where('idBitacoraCargaEP01','=',$recurso->id)
+								CargaDatosEPRegion::where('idBitacoraCargaEPRegion','=',$recurso->id)
 												->update(array('mes'=>$recurso->mes));
 							}else{
 								throw new Exception("No se pudieron actualizar los datos de la carga", 1);
@@ -335,8 +308,8 @@ class EP01Controller extends \BaseController {
 			$ids = Input::get('rows');
 
 			$rows = DB::transaction(function()use($ids){
-				CargaDatosEP01::whereIn('idBitacoraCargaEP01',$ids)->delete();
-				$rows = BitacoraCargaEP01::whereIn('id', $ids)->delete();
+				CargaDatosEPRegion::whereIn('idBitacoraCargaEPRegion',$ids)->delete();
+				$rows = BitacoraCargaEPRegion::whereIn('id', $ids)->delete();
 				return $rows;
 			});
 

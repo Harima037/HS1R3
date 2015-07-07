@@ -95,7 +95,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 	});
 
 	Route::group(array('prefix'=>'cargar'),function(){
-		Route::get('reporte-ep-01',array('uses'=>'EP01Controller@index'));
+		Route::get('reporte-ep-01',array('uses'=>'CargarArchivoController@cargarEP01'));
+		Route::get('reporte-regionalizado',array('uses'=>'CargarArchivoController@cargarRegionalizado'));
 	});
 
 	Route::group(array('prefix'=>'reportes'),function(){
@@ -151,7 +152,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('reporte-evaluacion',	'V1\ReporteEvaluacionController', 			array('only'=>array('show')));
 		Route::resource('reporte-programa',		'V1\ReporteEvaluacionProgramaController', 	array('only'=>array('show')));
 
-		Route::resource('reporte-ep-01',		'V1\EP01Controller');
+		Route::resource('reporte-ep-01',			'V1\EP01Controller');
+		Route::resource('reporte-regionalizado',	'V1\EPRegionalizadoController');
 
 		Route::group(array('before'=>'auth.root'),function(){
 			Route::resource('admin-variables',	'V1\AdminVariablesController');
