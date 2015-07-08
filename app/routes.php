@@ -101,6 +101,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 
 	Route::group(array('prefix'=>'reportes'),function(){
 		Route::get('reporte-seguimiento-inst',array('uses'=>'ReporteSeguimientoMetasController@indexInstitucional'));
+		Route::get('cedulas-avances',array('uses'=>'CedulaAvanceController@index'));
 	});
 
 	Route::group(array('prefix'=>"v1"),function(){
@@ -135,6 +136,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 
 		Route::resource('cuenta-publica',			'V1\CuentaPublicaController');
 		Route::resource('reporte-cuenta-publica',	'V1\ReporteCuentaPublicaController');
+		Route::resource('cedulas-avances',			'V1\ReporteCedulaAvanceController',array('only'=>array('index')));
 
 		Route::resource('reporte-seguimiento',	'V1\ReporteSeguimientoController', array('only' => array('index')));
 		Route::resource('revision-proyectos',	'V1\RevisionController');

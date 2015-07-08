@@ -1,61 +1,50 @@
-<table>
-	<tr>
-		<td rowspan="5" class="imagen izquierda">
-			<img src="{{ URL::to('img/LogoFederal.png') }}" width="125">
-		</td>
-		<td height="20" class="titulo1" align="center">INSTITUTO DE SALUD</td>
-		<td rowspan="5" class="imagen derecha">
-			<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="125">
-		</td>
-	</tr>
-	<tr>
-		<td height="19" class="titulo2" align="center">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td>
-	</tr>
-	<tr>
-		<td height="18" class="titulo3" align="center">SUBDIRECCIÓN DE PROGRAMACIÓN, ORGANIZACIÓN Y PRESUPUESTO</td>
-	</tr>
-	<tr>
-		<td height="18" class="titulo3" align="center">DEPARTAMENTO DE EVALUACIÓN</td>
-	</tr>
-	<tr>
-		<td height="18" class="titulo3" align="center">
-			PLAN DE ACCIÓN DE MEJORA {{$mes['trimestre_letras']}} TRIMESTRE {{$proyecto['ejercicio']}}
-		</td>
-	</tr>
-	<tr>
-		<td height="18" colspan="3" align="right" class="negrita">Formato RC-7</td>
-	</tr>
-</table>
-<table>
-	<tr height="90" class="texto-medio texto">
-		<td class="texto-centro">Nombre del proyecto: </td>
-		<td class="negrita" colspan="7">{{ $proyecto['nombreTecnico'] }}</td>
-		<td class="texto-centro">Clave presupuestaria: </td>
-		<td class="negrita" colspan="2">{{ $proyecto['ClavePresupuestaria'] }}</td>
-	</tr>
-
-	<tr><td colspan="13" height="20"></td></tr>
-</table>
+<div class="header">
+	<table>
+		<tr>
+			<td rowspan="5" class="imagen izquierda">
+				<img src="{{ URL::to('img/LogoFederal.png') }}" width="125">
+			</td>
+			<td class="titulo1" align="center">INSTITUTO DE SALUD</td>
+			<td rowspan="5" class="imagen derecha">
+				<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="125">
+			</td>
+		</tr>
+		<tr><td class="titulo2" align="center">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td></tr>
+		<tr><td class="titulo3" align="center">SUBDIRECCIÓN DE PROGRAMACIÓN, ORGANIZACIÓN Y PRESUPUESTO</td></tr>
+		<tr><td class="titulo3" align="center">DEPARTAMENTO DE EVALUACIÓN</td></tr>
+		<tr><td class="titulo3" align="center">PLAN DE ACCIÓN DE MEJORA {{$mes['trimestre_letras']}} TRIMESTRE {{$proyecto['ejercicio']}}</td></tr>
+		<tr><td colspan="3" align="right" class="negrita">Formato RC-7</td></tr>
+	</table>
+	<table>
+		<tr height="90" class="texto-medio texto">
+			<td width="100" class="texto-centro">Nombre del proyecto: </td>
+			<td class="negrita" colspan="7">{{ $proyecto['nombreTecnico'] }}</td>
+			<td width="105" class="texto-centro">Clave presupuestaria: </td>
+			<td width="90" class="negrita" colspan="2">{{ $proyecto['ClavePresupuestaria'] }}</td>
+		</tr>
+		<tr><td colspan="13" height="20"></td></tr>
+	</table>
+</div>
 
 <table class="tabla-datos">
 <thead>
 	<tr>
-		<th width="60" rowspan="2" class="encabezado-tabla" style="font-size:6;">NIVEL</th>
-		<th width="79" rowspan="2" class="encabezado-tabla" style="font-size:6;">INDICADOR</th>
-		<th width="50" rowspan="2" class="encabezado-tabla" style="font-size:6;">% DE AVANCE ACUMULADO</th>
-		<th width="79" rowspan="2" class="encabezado-tabla" style="font-size:6;">ANÁLISIS DE RESULTADOS </th>
-		<th width="79" rowspan="2" class="encabezado-tabla" style="font-size:6;">JUSTIFICACIÓN</th>
-		<th width="40" colspan="2" class="encabezado-tabla" style="font-size:6;">¿REQUIERE ACCIÓN DE MEJORA?</th>
-		<th rowspan="2" class="encabezado-tabla" style="font-size:6;">ACCIÓN <br>DE MEJORA</th>
-		<th rowspan="2" class="encabezado-tabla" style="font-size:6;">GRUPO DE <br>TRABAJO</th>
-		<th rowspan="2" class="encabezado-tabla" style="font-size:6;">FECHA DE <br>INICIO</th>
-		<th rowspan="2" class="encabezado-tabla" style="font-size:6;">FECHA DE <br>TERMINO</th>
-		<th rowspan="2" class="encabezado-tabla" style="font-size:6;">FECHA DE <br>NOTIFICACIÓN</th>
-		<th rowspan="2" class="encabezado-tabla" style="font-size:6;">DOCUMENTACIÓN <br>COMPROBATORIA</th>
+		<th height="20" width="60" rowspan="2" class="encabezado-tabla" style="font-size:6;">NIVEL</th>
+		<th height="20" width="79" rowspan="2" class="encabezado-tabla" style="font-size:6;">INDICADOR</th>
+		<th height="20" width="50" rowspan="2" class="encabezado-tabla" style="font-size:6;">% DE AVANCE ACUMULADO</th>
+		<th height="20" width="79" rowspan="2" class="encabezado-tabla" style="font-size:6;">ANÁLISIS DE RESULTADOS </th>
+		<th height="20" width="79" rowspan="2" class="encabezado-tabla" style="font-size:6;">JUSTIFICACIÓN</th>
+		<th height="20" width="40" colspan="2" class="encabezado-tabla" style="font-size:6;">¿REQUIERE ACCIÓN DE MEJORA?</th>
+		<th height="20" rowspan="2" class="encabezado-tabla" style="font-size:6;">ACCIÓN <br>DE MEJORA</th>
+		<th height="20" rowspan="2" class="encabezado-tabla" style="font-size:6;">GRUPO DE <br>TRABAJO</th>
+		<th height="20" rowspan="2" class="encabezado-tabla" style="font-size:6;">FECHA DE <br>INICIO</th>
+		<th height="20" rowspan="2" class="encabezado-tabla" style="font-size:6;">FECHA DE <br>TERMINO</th>
+		<th height="20" rowspan="2" class="encabezado-tabla" style="font-size:6;">FECHA DE <br>NOTIFICACIÓN</th>
+		<th height="20" rowspan="2" class="encabezado-tabla" style="font-size:6;">DOCUMENTACIÓN <br>COMPROBATORIA</th>
 	</tr>
 	<tr>
-		<th class="encabezado-tabla" style="font-size:6;">SI</th>
-		<th class="encabezado-tabla" style="font-size:6;">NO</th>
+		<th height="13" class="encabezado-tabla" style="font-size:6;">SI</th>
+		<th height="13" class="encabezado-tabla" style="font-size:6;">NO</th>
 	</tr>
 </thead>
 <tbody>

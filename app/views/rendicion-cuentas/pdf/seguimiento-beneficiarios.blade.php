@@ -1,46 +1,32 @@
-<table>
-	<tr>
-		<td rowspan="5" class="imagen izquierda">
-			<img src="{{ URL::to('img/LogoFederal.png') }}" width="125">
-		</td>
-		<td height="20" class="titulo1" align="center">INSTITUTO DE SALUD</td>
-		<td rowspan="5" class="imagen derecha">
-			<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="125">
-		</td>
-	</tr>
-	<tr>
-		<td height="19" class="titulo2" align="center">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td>
-	</tr>
-	<tr>
-		<td height="18" class="titulo3" align="center">SUBDIRECCIÓN DE PROGRAMACIÓN, ORGANIZACIÓN Y PRESUPUESTO</td>
-	</tr>
-	<tr>
-		<td height="18" class="titulo3" align="center">DEPARTAMENTO DE EVALUACIÓN</td>
-	</tr>
-	<tr>
-		<td height="18" class="titulo3" align="center">SEGUIMIENTO DE BENEFICIARIOS {{$proyecto['ejercicio']}}</td>
-	</tr>
-	<tr>
-		<td height="18" colspan="3" align="right" class="negrita">Formato RC-5</td>
-	</tr>
-</table>
-
-<table>
-	<tr height="90" class="texto-medio texto">
-		<td class="texto-centro">Nombre del proyecto: </td>
-		<td class="negrita" colspan="4">{{ $proyecto['nombreTecnico'] }}</td>
-		<td></td>
-		<td class="texto-centro">Clave presupuestaria: </td>
-		<td class="negrita" colspan="2">{{ $proyecto['ClavePresupuestaria'] }}</td>
-		<td></td>
-		<td></td>
-		<td class="texto-derecha">Trimestre: </td>
-		<td class="negrita">{{$mes['trimestre']}}</td>
-		<td></td>
-		<td></td>
-	</tr>
-	<tr height="40"><td colspan="15">&nbsp;</td></tr>
-</table>
+<div class="header">
+	<table>
+		<tr>
+			<td rowspan="5" class="imagen izquierda">
+				<img src="{{ URL::to('img/LogoFederal.png') }}" width="125">
+			</td>
+			<td class="titulo1" align="center">INSTITUTO DE SALUD</td>
+			<td rowspan="5" class="imagen derecha">
+				<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="125">
+			</td>
+		</tr>
+		<tr><td class="titulo2" align="center">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td></tr>
+		<tr><td class="titulo3" align="center">SUBDIRECCIÓN DE PROGRAMACIÓN, ORGANIZACIÓN Y PRESUPUESTO</td></tr>
+		<tr><td class="titulo3" align="center">DEPARTAMENTO DE EVALUACIÓN</td></tr>
+		<tr><td class="titulo3" align="center">SEGUIMIENTO DE BENEFICIARIOS {{$proyecto['ejercicio']}}</td></tr>
+		<tr><td colspan="3" align="right" class="negrita">Formato RC-5</td></tr>
+	</table>
+	<table>
+		<tr height="90" class="texto-medio texto">
+			<td width="100" class="texto-centro">Nombre del proyecto: </td>
+			<td class="negrita" colspan="4">{{ $proyecto['nombreTecnico'] }}</td>
+			<td width="105" class="texto-centro">Clave presupuestaria: </td>
+			<td width="90" class="negrita" colspan="2">{{ $proyecto['ClavePresupuestaria'] }}</td>
+			<td width="80" class="texto-derecha">Trimestre: </td>
+			<td width="20" class="negrita">{{$mes['trimestre']}}</td>
+		</tr>
+		<tr height="40"><td colspan="6">&nbsp;</td></tr>
+	</table>
+</div>
 
 @foreach($beneficiarios as $beneficiario)
 <table>

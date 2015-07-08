@@ -1,25 +1,21 @@
-<div>
-<table>
-	<tr>
-		<td rowspan="4" class="imagen izquierda">
-			<img src="{{ URL::to('img/LogoFederal.png') }}" width="125">
-		</td>
-		<td height="20" class="titulo3" align="center">GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS</td>
-		<td rowspan="4" class="imagen derecha">
-			<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="125">
-		</td>
-	</tr>
-	<tr>
-		<td height="19" class="titulo4" align="center">INSTITUTO DE SALUD</td>
-	</tr>
-	<tr>
-		<td height="18" class="titulo4" align="center">ANÁLISIS FUNCIONAL {{$mes['trimestre_letras']}} TRIMESTRE {{$proyecto['ejercicio']}}</td>
-	</tr>
-	<tr><td height="10"></td></tr>
-	<tr>
-		<td height="18" align="right" colspan="4" class="negrita">Formato RC-6</td>
-	</tr>
-</table>
+<div class="header">
+	<table>
+		<tr>
+			<td rowspan="4" class="imagen izquierda">
+				<img src="{{ URL::to('img/LogoFederal.png') }}" width="125">
+			</td>
+			<td height="20" class="titulo3" align="center">GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS</td>
+			<td rowspan="4" class="imagen derecha">
+				<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="125">
+			</td>
+		</tr>
+		<tr><td height="19" class="titulo4" align="center">INSTITUTO DE SALUD</td></tr>
+		<tr><td height="18" class="titulo4" align="center">ANÁLISIS FUNCIONAL {{$mes['trimestre_letras']}} TRIMESTRE {{$proyecto['ejercicio']}}</td></tr>
+		<tr><td height="10"></td></tr>
+		<tr><td height="18" align="right" colspan="4" class="negrita">Formato RC-6</td></tr>
+	</table>
+</div>
+
 <table>
 	<tr class="tabla-datos" height="20">
 		<th colspan="2" class="encabezado-tabla texto-izquierda" style="font-size:8;">EJE:</th>
@@ -130,4 +126,3 @@
 		<td></td>
 	</tr>
 </table>
-</div>

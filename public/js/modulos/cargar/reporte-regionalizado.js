@@ -22,7 +22,7 @@ moduloDatagrid.actualizar({
         for(var i in response.data){
             response.data[i].mes = meses[response.data[i].mes-1];
             response.data[i].modificadoAl = response.data[i].modificadoAl.substring(0,11);
-            response.data[i].totalRegistros = parseFloat(response.data[i].totalRegistros).format(2);
+            response.data[i].totalRegistros = parseInt(response.data[i].totalRegistros).format();
             response.data[i].totalImporte = '$ ' + parseFloat(response.data[i].totalImporte).format(2);
         }
         moduloDatagrid.cargarDatos(response.data);

@@ -48,8 +48,8 @@ class CuentaPublicaController extends \BaseController {
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				
 				if(isset($parametros['buscar'])){				
-					$rows = $rows->where(function($query){
-							$query->where('clavePresupuestaria','like','%'.$parametros['buscar'].'%')
+					$rows = $rows->where(function($query)use($parametros){
+							$query->where(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%')
 								->orWhere('nombreTecnico','like','%'.$parametros['buscar'].'%');
 					});
 					$total = $rows->count();

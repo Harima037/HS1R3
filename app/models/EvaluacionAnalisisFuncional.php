@@ -30,7 +30,7 @@ class EvaluacionAnalisisFuncional extends BaseModel
     		$query = $query->where('evaluacionProyectoMes.anio','=',$anio);
     	}
 
-    	$query = $query->where('evaluacionProyectoMes.idEstatus','=',5);
+    	$query = $query->whereIn('evaluacionProyectoMes.idEstatus',array(4,5));
 
     	return $query;
     }

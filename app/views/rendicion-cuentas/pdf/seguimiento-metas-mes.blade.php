@@ -1,54 +1,36 @@
-<table>
-	<tr>
-		<td rowspan="5" class="imagen izquierda">
-			<img src="{{ URL::to('img/LogoFederal.png') }}" width="125">
-		</td>
-		<td height="20" class="titulo1" align="center">INSTITUTO DE SALUD</td>
-		<td rowspan="5" class="imagen derecha">
-			<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="125">
-		</td>
-	</tr>
-	<tr>
-		<td height="19" class="titulo2" align="center">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td>
-	</tr>
-	<tr>
-		<td height="18" class="titulo3" align="center">SUBDIRECCIÓN DE PROGRAMACIÓN, ORGANIZACIÓN Y PRESUPUESTO</td>
-	</tr>
-	<tr>
-		<td height="18" class="titulo3" align="center">DEPARTAMENTO DE EVALUACIÓN</td>
-	</tr>
-	<tr>
-		<td height="18" class="titulo3" align="center">SEGUIMIENTO DE METAS {{$proyecto['ejercicio']}}</td>
-	</tr>
-	<tr>
-		<td height="18" colspan="3" align="right" class="negrita">Formato RC-3</td>
-	</tr>
-</table>
+<div class="header">
+	<table>
+		<tr>
+			<td rowspan="5" class="imagen izquierda"><img src="{{ URL::to('img/LogoFederal.png') }}" width="125"></td>
+			<td class="titulo1" align="center">INSTITUTO DE SALUD</td>
+			<td rowspan="5" class="imagen derecha"><img src="{{ URL::to('img/LogoInstitucional.png') }}" width="125"></td>
+		</tr>
+		<tr><td class="titulo2" align="center">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td></tr>
+		<tr><td class="titulo3" align="center">SUBDIRECCIÓN DE PROGRAMACIÓN, ORGANIZACIÓN Y PRESUPUESTO</td></tr>
+		<tr><td class="titulo3" align="center">DEPARTAMENTO DE EVALUACIÓN</td></tr>
+		<tr><td class="titulo3" align="center">SEGUIMIENTO DE METAS {{$proyecto['ejercicio']}}</td></tr>
+		<tr><td colspan="3" align="right" class="negrita">Formato RC-3</td></tr>
+	</table>
+	<table width="100%">
+		<tr height="90" class="texto-medio texto">
+			<td width="100" class="texto-derecha">Nombre del proyecto: </td>
+			<td class="negrita" >{{ $proyecto['nombreTecnico'] }}</td>
+			<td width="105" class="texto-centro">Clave presupuestaria: </td>
+			<td width="90" class="negrita">{{ $proyecto['ClavePresupuestaria'] }}</td>
+			<td width="80" class="texto-derecha" nowrap="nowrap">Al mes de: </td>
+			<td width="50" class="negrita">{{$mes['mes']}}</td>
+		</tr>
+		<tr height="10"><td colspan="6">&nbsp;</td></tr>
+	</table>
+</diV>
 
 <table width="100%">
-
-	<tr height="90" class="texto-medio texto">
-		<td class="texto-derecha">Nombre del proyecto: </td>
-		<td class="negrita">{{ $proyecto['nombreTecnico'] }}</td>
-		<td class="texto-centro">Clave presupuestaria: </td>
-		<td class="negrita">{{ $proyecto['ClavePresupuestaria'] }}</td>
-		<td class="texto-derecha" nowrap="nowrap">Al mes de: </td>
-		<td class="negrita">{{$mes['mes']}}</td>
-		<td></td>
-		<td></td>
-	</tr>
-
-	<tr height="15"><td colspan="8">&nbsp;</td></tr>
-
-
 	<tr height="20" class="texto">
-		<td class="texto-derecha">Información: </td>
+		<td width="100" class="texto-derecha">Información: </td>
 		<td class="negrita">Estatal</td>
 		<td colspan="6"></td>
 	</tr>
-
 	<tr height="15"><td colspan="8">&nbsp;</td></tr>
-
 </table>
 
 <table width="100%">
@@ -212,56 +194,12 @@
 <div style="page-break-after:always;"></div>
 
 <table>
-	<tr>
-		<td rowspan="5" class="imagen izquierda">
-			<img src="{{ URL::to('img/LogoFederal.png') }}" width="125">
-		</td>
-		<td height="20" class="titulo1" align="center">INSTITUTO DE SALUD</td>
-		<td rowspan="5" class="imagen derecha">
-			<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="125">
-		</td>
-	</tr>
-	<tr>
-		<td height="19" class="titulo2" align="center">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td>
-	</tr>
-	<tr>
-		<td height="18" class="titulo3" align="center">SUBDIRECCIÓN DE PROGRAMACIÓN, ORGANIZACIÓN Y PRESUPUESTO</td>
-	</tr>
-	<tr>
-		<td height="18" class="titulo3" align="center">DEPARTAMENTO DE EVALUACIÓN</td>
-	</tr>
-	<tr>
-		<td height="18" class="titulo3" align="center">SEGUIMIENTO DE METAS {{$proyecto['ejercicio']}}</td>
-	</tr>
-	<tr>
-		<td height="18" colspan="3" align="right" class="negrita">Formato RC-3</td>
-	</tr>
-</table>
-
-<table>
-
-	<tr height="90" class="texto-medio texto">
-		<td class="texto-derecha">Nombre del proyecto: </td>
-		<td class="negrita">{{ $proyecto['nombreTecnico'] }}</td>
-		<td class="texto-centro">Clave presupuestaria: </td>
-		<td class="negrita">{{ $proyecto['ClavePresupuestaria'] }}</td>
-		<td class="texto-derecha" nowrap="nowrap">Al mes de: </td>
-		<td class="negrita">{{$mes['mes']}}</td>
-		<td></td>
-		<td></td>
-	</tr>
-
-	<tr height="15"><td colspan="8">&nbsp;</td></tr>
-
-
 	<tr height="20" class="texto">
-		<td class="texto-derecha">Información: </td>
+		<td width="100" class="texto-derecha">Información: </td>
 		<td class="negrita">Jurisdiccional</td>
 		<td colspan="6"></td>
 	</tr>
-
 	<tr height="15"><td colspan="8">&nbsp;</td></tr>
-
 </table>
 
 <table>

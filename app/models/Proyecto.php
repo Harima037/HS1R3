@@ -128,6 +128,57 @@ class Proyecto extends BaseModel
 
 	}
 
+	public function scopeReporteCedulasAvances($query,$mes,$ejercicio,$buscar){
+		$query->select(
+				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
+				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
+				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
+				'proyectos.programaPresupuestario','proyectos.programaEspecial',
+				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
+				'proyectos.numeroProyectoEstrategico',
+
+				DB::raw('sum(ep01.presupuestoAprobado) AS presupuestoAprobado'),
+				DB::raw('sum(ep01.presupuestoModificado) AS presupuestoModificado'),
+				DB::raw('sum(ep01.presupuestoEjercidoModificado) AS presupuestoEjercidoModificado'),
+
+				DB::raw('concat_ws(" ",programaPresupuestario.clave,programaPresupuestario.descripcion) AS programaPresupuestarioDescipcion')
+			)
+
+			->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','proyectos.programaPresupuestario')
+
+			->leftjoin('cargaDatosEP01 AS ep01',function($join) use ($mes,$ejercicio){
+				$join->on('ep01.UR','=','proyectos.unidadResponsable')
+					->on('ep01.FI','=','proyectos.finalidad')
+					->on('ep01.FU','=','proyectos.funcion')
+					->on('ep01.SF','=','proyectos.subFuncion')
+					->on('ep01.SSF','=','proyectos.subSubFuncion')
+					->on('ep01.PS','=','proyectos.programaSectorial')
+					->on('ep01.PP','=','proyectos.programaPresupuestario')
+					->on('ep01.PE','=','proyectos.programaEspecial')
+					->on('ep01.AI','=','proyectos.actividadInstitucional')
+					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'))
+					->where('ep01.mes','=',$mes)
+					->where('ep01.CP','=',$ejercicio);
+			})
+
+			->where('proyectos.idEstatusProyecto','=',5)
+			
+			->groupBy('proyectos.id')
+
+			->orderBy('proyectos.unidadResponsable','asc')
+			->orderBy('proyectos.finalidad','asc')
+			->orderBy('proyectos.funcion','asc')
+			->orderBy('proyectos.subFuncion','asc')
+			->orderBy('proyectos.subSubFuncion','asc')
+			->orderBy('proyectos.programaSectorial','asc')
+			->orderBy('proyectos.programaPresupuestario','asc')
+			->orderBy('proyectos.programaEspecial','asc')
+			->orderBy('proyectos.actividadInstitucional','asc')
+			->orderBy('proyectos.proyectoEstrategico','asc')
+			->orderBy('proyectos.numeroProyectoEstrategico','asc')
+			->orderBy('proyectos.idClasificacionProyecto','asc');
+	}
+
 	public function scopeReporteCuentaPublica($query,$mes,$anio){
 		$query->select(
 				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',

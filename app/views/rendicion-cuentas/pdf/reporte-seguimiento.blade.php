@@ -4,10 +4,10 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<style type="text/css">
 		@page {
-            margin-top: 0.3em;
+            margin-top: 10.3em;
             margin-left: 1.6em;
             margin-right: 0.6em;
-            margin-bottom: 0.3em;
+            margin-bottom: 1.3em;
         }
         table{
         	width:100%;
@@ -19,30 +19,30 @@
         }
 		.cuerpo{
 			font-size: 8pt;
-			font-family: Arial, Calibri;
+			font-family: arial, sans-serif;
 		}
 		.titulo1{
 			font-weight: bold;
-			font-family: Arial;
+			font-family: arial, sans-serif;
 			font-size: 14;
 		}
 		.titulo2{
 			font-weight: bold;
-			font-family: Arial;
+			font-family: arial, sans-serif;
 			font-size: 13;
 		}
 		.titulo3{
 			font-weight: bold;
-			font-family: Arial;
+			font-family: arial, sans-serif;
 			font-size: 12;
 		}
 		.titulo4{
 			font-weight: bold;
-			font-family: Arial;
+			font-family: arial, sans-serif;
 			font-size: 11;
 		}
 		.texto{
-			font-family: Arial;
+			font-family: arial, sans-serif;
 			font-size: 10;
 		}
 		.negrita{
@@ -64,9 +64,9 @@
 			text-align: left;
 		}
 		.encabezado-tabla{
-			font-family: Arial;
+			font-family: arial, sans-serif;
 			font-size: 8;
-			font-weight: bold;
+			font-weight: normal;
 			text-align: center;
 			vertical-align: middle;
 			color: #FFFFFF;
@@ -83,12 +83,12 @@
 			background-color: #DDDDDD;
 		}
 		.nota-titulo{
-			font-family: Arial;
+			font-family: arial, sans-serif;
 			font-size:8;
 			font-weight: bold;
 		}
 		.nota-contenido{
-			font-family: Arial;
+			font-family: arial, sans-serif;
 			font-size:8;
 		}
 		.imagen{
@@ -106,13 +106,20 @@
 			border: none;
 			border-collapse: collapse;
 		}
-		.portrait {
-		    -webkit-transform: rotate(90deg); /* Safari and Chrome */
-		    -moz-transform: rotate(90deg);   /* Firefox */
-		    -ms-transform: rotate(90deg);   /* IE 9 */
-		    -o-transform: rotate(90deg);   /* Opera */
-		    transform: rotate(90deg);
-		} 
+		.header,.footer {
+		    width: 100%;
+		    text-align: center;
+		    position: fixed;
+		}
+		.header {
+		    top: -15.0em;
+		}
+		.footer {
+		    bottom: 0px;
+		}
+		.pagenum:before {
+		    content: counter(page);
+		}
 	</style>
 </head>
 <body class="cuerpo">

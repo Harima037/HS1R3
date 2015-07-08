@@ -378,6 +378,12 @@ class ReporteEvaluacionController extends BaseController {
 		}else{
 			
 		}*/
+		$pdf->output();
+		$dom_pdf = $pdf->getDomPDF();
+		$canvas = $dom_pdf ->get_canvas();
+		$w = $canvas->get_width();
+  		$h = $canvas->get_height();
+		$canvas->page_text(($w-75), ($h-16), "Página {PAGE_NUM} de {PAGE_COUNT}", null, 10, array(0, 0, 0));
 
 		return $pdf->stream('reporte_seguimiento.pdf');
 

@@ -128,7 +128,7 @@ class EPRegionalizadoController extends \BaseController {
 					$ejercicio = $parametros['ejercicio'];
 					while (($data2 = fgetcsv($handle, 1000, ",")) !== FALSE) {
 						if($row > 1){
-							if(count($data2) < 20){ //Número de columnas de cada línea, para validar si todos los campos se tienen
+							if(count($data2) != 19){ //Número de columnas de cada línea, para validar si todos los campos se tienen
 								$lineasConErrorEnCampos = $lineasConErrorEnCampos . $row . ", ";
 								$errorNumeroCampos = 1;
 							}
@@ -144,10 +144,10 @@ class EPRegionalizadoController extends \BaseController {
 						$respuesta['http_status'] = 404;
 						$errores = '';
 						if($lineasConErrorEnCampos != ""){
-							$errores .= "Error en los datos, las lineas ".$lineasConErrorEnCampos."no están completas";
+							$errores .= "Error en los datos, las siguientes lineas no están completas: ".$lineasConErrorEnCampos;
 						}
 						if($lineasConErrorEjercicio != ""){
-							$errores .= "Error en los datos, las lineas ".$lineasConErrorEjercicio."no corresponden al ejercicio proporcionado";
+							$errores .= "Error en los datos, las siguientes lineas no corresponden al ejercicio proporcionado: ".$lineasConErrorEjercicio;
 						}
 						$respuesta['data'] = array("data"=>$errores,'code'=>'U06');
 					}else{
@@ -183,7 +183,7 @@ class EPRegionalizadoController extends \BaseController {
 										LINES TERMINATED BY '\\n' 
 										IGNORE 1 LINES 
 										(`UR`,`FI`,`FU`,`SF`,`SSF`,`PS`,`PP`,`PE`,`AI`,`PT`,`MPIO`,`OG`,`STG`,`FF`,`SFF`,`DG`,`CP`,
-										`DM`,`clave`,`importe`) 
+										`DM`,`importe`) 
 										set idBitacoraCargaEPRegion='%s', mes='%s'
 										", addslashes($csv), $idInsertado, $parametros['mes']);
 									DB::connection()->getpdo()->exec($query);
