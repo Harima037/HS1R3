@@ -31,7 +31,7 @@ $('#btn-enviar-proyecto').on('click',function(){
 
     Confirm.show({
         titulo:"Enviar avance a Validación",
-        mensaje: "¿Estás seguro que deseas enviar este avance para su validación? <br><b>IMPORTANTE:</b> Mientras el proyecto este en validación no se podra editar.",
+        mensaje: "¿Estás seguro que deseas enviar este avance para su validación? <br><b>IMPORTANTE:</b> Mientras el proyecto este en validación no se podrá editar.",
         si: '<span class="fa fa-send"></span> Enviar',
         no: 'Cancelar',
         callback: function(){

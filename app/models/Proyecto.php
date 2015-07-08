@@ -128,7 +128,7 @@ class Proyecto extends BaseModel
 
 	}
 
-	public function scopeReporteCedulasAvances($query,$mes,$ejercicio,$buscar){
+	public function scopeCedulasAvances($query,$mes,$ejercicio){
 		$query->select(
 				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
 				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
@@ -163,7 +163,50 @@ class Proyecto extends BaseModel
 
 			->where('proyectos.idEstatusProyecto','=',5)
 			
-			->groupBy('proyectos.id')
+			->groupBy('proyectos.id');
+	}
+
+	public function scopeReporteCedulasAvances($query,$mes,$ejercicio){
+		$query->cedulasAvances($mes,$ejercicio)
+
+			->with(array('componentes'=>function($componente)use($mes){
+				$componente->select('proyectoComponentes.id',
+					'proyectoComponentes.idProyecto','proyectoComponentes.indicador',
+					'proyectoComponentes.valorNumerador AS metaAnual',
+					'unidadesMedida.descripcion AS unidadMedida',
+					DB::raw('sum(metasMes.avance) AS avanceAcumulado'))
+					->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','proyectoComponentes.idUnidadMedida')
+					->leftjoin('componenteMetasMes AS metasMes',function($join)use($mes){
+						$join->on('metasMes.idComponente','=','proyectoComponentes.id')
+							->where('metasMes.mes','<=',$mes);
+					})
+					->groupBy('proyectoComponentes.id','metasMes.idComponente');
+
+			},'actividades'=>function($actividad)use($mes){
+				$actividad->select('componenteActividades.id','componenteActividades.idComponente',
+					'componenteActividades.idProyecto','componenteActividades.indicador',
+					'componenteActividades.valorNumerador AS metaAnual',
+					'unidadesMedida.descripcion AS unidadMedida',
+					DB::raw('sum(metasMes.avance) AS avanceAcumulado'))
+					->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','componenteActividades.idUnidadMedida')
+					->leftjoin('actividadMetasMes AS metasMes',function($join)use($mes){
+						$join->on('metasMes.idActividad','=','componenteActividades.id')
+							->where('metasMes.mes','<=',$mes);
+					})
+					->groupBy('componenteActividades.id','metasMes.idActividad');
+			},'beneficiariosDescripcion'=>function($beneficiarios)use($mes){
+				$beneficiarios->select('proyectoBeneficiarios.id','proyectoBeneficiarios.idTipoBeneficiario',
+					'proyectoBeneficiarios.idProyecto',DB::raw('sum(avanceBenef.total) AS avanceTotal'),
+					DB::raw('sum(proyectoBeneficiarios.total) AS programadoTotal'),
+					'tipoBeneficiario.descripcion AS tipoBeneficiario')
+					->leftjoin('registroAvancesBeneficiarios AS avanceBenef',function($join)use($mes){
+						$join->on('avanceBenef.idTipoBeneficiario','=','proyectoBeneficiarios.idTipoBeneficiario')
+							->on('avanceBenef.idProyecto','=','proyectoBeneficiarios.idProyecto')
+							->on('avanceBenef.idProyectoBeneficiario','=','proyectoBeneficiarios.id')
+							->where('avanceBenef.mes','<=',$mes);
+					})
+					->groupBy('proyectoBeneficiarios.idProyecto','proyectoBeneficiarios.idTipoBeneficiario','avanceBenef.idTipoBeneficiario','avanceBenef.idProyecto');
+			}))
 
 			->orderBy('proyectos.unidadResponsable','asc')
 			->orderBy('proyectos.finalidad','asc')

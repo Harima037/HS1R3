@@ -32,7 +32,7 @@
         </li>
         <li role="presentation">
         	<a href="#analisis-funcional" aria-controls="analisis-funcional" role="tab" data-toggle="tab" id="tab-link-analisis-funcional">
-                <span class="fa fa-check-square"></span> Analisis Funcional
+                <span class="fa fa-check-square"></span> Análisis Funcional
             </a>
         </li>
         @endif
@@ -90,7 +90,7 @@
 	    			</div>
 	    			<div class="col-sm-12">
 	    				<div class="form-group">
-	    					<label class="control-label" for="analisis-resultado">Analisis de Resultado</label>
+	    					<label class="control-label" for="analisis-resultado">Análisis de Resultado</label>
 	    					<textarea id="analisis-resultado" name="analisis-resultado" rows="4" class="form-control"></textarea>
 	    				</div>
 	    			</div>
@@ -112,7 +112,7 @@
     		<div class="row">
     			<div class="col-sm-6">
     				<button type="button" class="btn btn-primary" id="btn-guadar-analisis-funcional">
-    					<span class="fa fa-floppy-o"></span> Guardar Analisis Funcional
+    					<span class="fa fa-floppy-o"></span> Guardar Análisis Funcional
     				</button>
     			</div>
     		</div>
@@ -256,7 +256,7 @@
 							</li>
 							<li role="presentation">
 								<a href="#panel-justificacion" aria-controls="panel-justificacion" role="tab" data-toggle="tab" id="tab-link-justificacion">
-									<span class="fa fa-align-left"></span> Analisis y Justificación
+									<span class="fa fa-align-left"></span> Análisis y Justificación
 								</a>
 							</li>
 							@if($trimestre_activo)
@@ -395,7 +395,7 @@
 									</div>
 									<div class="col-sm-12">
 										<div class="form-group">
-											<label class="control-label" for="analisis-resultados">Analisis de Resultados Acumulado</label>
+											<label class="control-label" for="analisis-resultados">Análisis de Resultados Acumulados</label>
 											<textarea rows="6" class="form-control" name="analisis-resultados" id="analisis-resultados"></textarea>
 										</div>
 									</div>
@@ -431,7 +431,7 @@
 									</div>
 									<div class="col-sm-4">
 										<div class="form-group">
-											<label class="control-label" for="fecha-termino">Fecha de Termino</label>
+											<label class="control-label" for="fecha-termino">Fecha de Término</label>
 											<input type="date" placeholder="aaaa-mm-dd" class="form-control" name="fecha-termino" id="fecha-termino">
 										</div>
 									</div>
@@ -606,7 +606,7 @@
 					<thead>
 						<tr>
 							<th >Mestiza</th>
-							<th >Indigena</th>
+							<th >Indígena</th>
 							<th >Inmigrante</th>
 							<th >Otros</th>
 						</tr>

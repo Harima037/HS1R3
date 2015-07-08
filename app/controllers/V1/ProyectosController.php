@@ -163,7 +163,10 @@ class ProyectosController extends BaseController {
 			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 			
 			if(isset($parametros['buscar'])){				
-				$rows = $rows->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%');
+				$rows = $rows->where(function($query)use($parametros){
+					$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
+						->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
+				});
 				$total = $rows->count();
 			}else{				
 				$total = $rows->count();						

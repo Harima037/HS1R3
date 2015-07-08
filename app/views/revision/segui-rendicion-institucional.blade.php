@@ -25,7 +25,7 @@
     	    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
         	<ul class="dropdown-menu pull-right" role="menu">
         		<li id="btnAprobarProyecto" name="btnAprobarProyecto"><a href="#" class="btn-default"><i class="fa fa-thumbs-o-up"></i> Aprobar el avance del mes</a></li>
-	            <li id="btnRegresarCorregir" name="btnRegresarCorregir"><a href="#" class="btn-default"><i class="fa fa-mail-reply-all"></i> Regresar para correción</a></li>
+	            <li id="btnRegresarCorregir" name="btnRegresarCorregir"><a href="#" class="btn-default"><i class="fa fa-mail-reply-all"></i> Regresar para corrección</a></li>
     	    </ul>
 		</div>
 	</div>
@@ -43,7 +43,7 @@
         </li>
         <li role="presentation">
         	<a href="#analisis-funcional" aria-controls="analisis-funcional" role="tab" data-toggle="tab" id="tab-link-analisis-funcional">
-                <span class="fa fa-check-square"></span> Analisis Funcional
+                <span class="fa fa-check-square"></span> Análisis Funcional
             </a>
         </li>
         
@@ -72,9 +72,9 @@
                 
 	    			<div class="col-sm-12">
 	    				<div class="form-group">
-	    					<label class="control-label" for="lbl-analisis-resultado">Analisis de Resultado </label>
+	    					<label class="control-label" for="lbl-analisis-resultado">Análisis de Resultado </label>
 	    					<p id="lbl-analisis-resultado" name="lbl-analisis-resultado" style="height:auto" class="form-control"></p>
-                            <p align="right"><button type="button" class="btn btn-default" onclick="escribirComentario('analisis-resultado','Análisis de resultado','lbl-analisis-resultado','4','id-analisis');"><span class="fa fa-edit"></span> Comentar Analisis de Resultado</button></p>
+                            <p align="right"><button type="button" class="btn btn-default" onclick="escribirComentario('analisis-resultado','Análisis de resultado','lbl-analisis-resultado','4','id-analisis');"><span class="fa fa-edit"></span> Comentar Análisis de Resultado</button></p>
 	    				</div>
 	    			</div>
 	    			<div class="col-sm-12">
@@ -286,7 +286,7 @@
 							</li>
 							<li role="presentation">
 								<a href="#panel-justificacion" aria-controls="panel-justificacion" role="tab" data-toggle="tab" id="tab-link-justificacion">
-									<span class="fa fa-align-left"></span> Analisis y Justificación
+									<span class="fa fa-align-left"></span> Análisis y Justificación
 								</a>
 							</li>
 							@if($trimestre_activo)
@@ -426,9 +426,9 @@
 									</div>
 									<div class="col-sm-12">
 										<div class="form-group">
-											<label class="input-label" for="lbl-analisis-resultados">Analisis de Resultados Acumulado</label>
+											<label class="input-label" for="lbl-analisis-resultados">Análisis de Resultados Acumulados</label>
 											<p class="form-control" name="lbl-analisis-resultados" id="lbl-analisis-resultados" style="height:auto;"></p>
-                                            <button type="button" class="btn btn-default" onclick="escribirComentario('analisis-resultados','Análisis de Resultados Acumulado','lbl-analisis-resultados','nivel','nivel');"><span class="fa fa-edit"></span> Comentar Analisis de Resultados Acumulado</button>
+                                            <button type="button" class="btn btn-default" onclick="escribirComentario('analisis-resultados','Análisis de Resultados Acumulado','lbl-analisis-resultados','nivel','nivel');"><span class="fa fa-edit"></span> Comentar Análisis de Resultados Acumulado</button>
 										</div>
 									</div>
 									<div class="col-sm-12">
@@ -685,7 +685,7 @@
 					<thead>
 						<tr>
 							<th >Mestiza</th>
-							<th >Indigena</th>
+							<th >Indígena</th>
 							<th >Inmigrante</th>
 							<th >Otros</th>
 						</tr>

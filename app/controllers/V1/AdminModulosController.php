@@ -44,7 +44,7 @@ class AdminModulosController extends \BaseController {
 						->join('sysPermisos','sysPermisos.id','=','sysModulos.idSysPermiso');
 
 			if(isset($parametros['buscar'])){				
-				$rows = $rows->where(function($query){
+				$rows = $rows->where(function($query)use($parametros){
 					$query->where('sysGruposModulos.key','like','%'.$parametros['buscar'].'%')
 						->orWhere('sysGruposModulos.nombre','like','%'.$parametros['buscar'].'%')
 						->orWhere('sysGruposModulos.uri','like','%'.$parametros['buscar'].'%')
