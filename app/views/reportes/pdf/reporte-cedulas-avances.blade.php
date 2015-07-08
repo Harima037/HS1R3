@@ -14,7 +14,7 @@
         	border-collapse: collapse;
         }
 		.cuerpo{
-			font-size: 8pt;
+			font-size: 11pt;
 			font-family: arial, sans-serif;
 		}
         .titulo1{
@@ -55,7 +55,7 @@
 		    position: fixed;
 		}
 		.header {
-		    top: -9.5em;
+		    top: -7.5em;
 		}
 		.footer {
 		    bottom: 0px;
@@ -89,42 +89,45 @@
 	<div style="page-break-after:always;"></div>
 	@foreach($datos as $proyecto)
 	<table>
+		<tr><td colspan="2" height="7">&nbsp;</td></tr>
 		<tr>
-			<td>Programa Presupuestario: </td>
+			<th class="texto-izquierda" nowrap="nowrap" width="1">Programa Presupuestario: </th>
 			<td>{{ $proyecto->programaPresupuestarioDescipcion }}</td>
 		</tr>
+		<tr><td colspan="2" height="7">&nbsp;</td></tr>
 		<tr>
-			<td>
+			<th class="texto-izquierda">
 				@if($proyecto->idCalsificacionProyecto == 1)
 					Proyecto Institucional:
 				@else
 					Proyecto de Inversión:
 				@endif
-			</td>
+			</th>
 			<td>
 				{{ $proyecto->nombreTecnico }}
 			</td>
 		</tr>
 		<tr>
-			<td>Clave Presupuestaria:</td>
+			<th class="texto-izquierda">Clave Presupuestaria:</th>
 			<td>{{ $proyecto->ClavePresupuestaria }}</td>
 		</tr>
+		<tr><td colspan="2" height="7">&nbsp;</td></tr>
 		<tr>
-			<td>Objetivo General:</td>
+			<th class="texto-izquierda">Objetivo General:</th>
 			<td></td>
 		</tr>
 	</table>
 	<br>
-	<table>
+	<table style="width:60%">
 		<tr>
 			<th>Presupuesto Autorizado</th>
 			<th>Presupuesto Modfificado</th>
 			<th>Presupuesto Ejercido</th>
 		</tr>
 		<tr>
-			<td>{{$proyecto->presupuestoAprobado}}</td>
-			<td>{{$proyecto->presupuestoModfificado}}</td>
-			<td>{{$proyecto->presupuestoEjercidoModificado}}</td>
+			<td class="texto-derecha">$ {{number_format($proyecto->presupuestoAprobado,2)}}</td>
+			<td class="texto-derecha">$ {{number_format($proyecto->presupuestoModificado,2)}}</td>
+			<td class="texto-derecha">$ {{number_format($proyecto->presupuestoEjercidoModificado,2)}}</td>
 		</tr>
 	</table>
 	<br>
@@ -139,26 +142,43 @@
 		</tr>
 		@foreach($proyecto->componentes AS $indice => $componente)
 		<tr>
-			<td>C</td>
+			<td class="texto-centro">C {{$indice+1}}</td>
 			<td>{{$componente->indicador}}</td>
-			<td>{{$componente->unidadMedida}}</td>
-			<td>{{$componente->metaAnual}}</td>
-			<td>{{$componente->avanceAcumulado}}</td>
-			<td>00.00</td>
+			<td class="texto-centro">{{$componente->unidadMedida}}</td>
+			<td class="texto-centro">{{number_format($componente->metaAnual,2)}}</td>
+			<td class="texto-centro">{{number_format($componente->avanceAcumulado,2)}}</td>
+			<td class="texto-centro">
+			@if($componente->avanceAcumulado)
+				{{number_format(($componente->avanceAcumulado*100)/$componente->metaAnual,2)}}
+			@else
+				0.00
+			@endif
+			</td>
 		</tr>
 		@endforeach
 		@foreach($proyecto->actividades AS $indice => $actividad)
 		<tr>
-			<td>A</td>
+			<td class="texto-centro">A {{$indice+1}}</td>
 			<td>{{$actividad->indicador}}</td>
-			<td>{{$actividad->unidadMedida}}</td>
-			<td>{{$actividad->metaAnual}}</td>
-			<td>{{$actividad->avanceAcumulado}}</td>
-			<td>00.00</td>
+			<td class="texto-centro">{{$actividad->unidadMedida}}</td>
+			<td class="texto-centro">{{number_format($actividad->metaAnual,2)}}</td>
+			<td class="texto-centro">{{number_format($actividad->avanceAcumulado,2)}}</td>
+			<td class="texto-centro">
+			@if($actividad->avanceAcumulado)
+				{{number_format(($actividad->avanceAcumulado*100)/$actividad->metaAnual,2)}}
+			@else
+				0.00
+			@endif
+			</td>
 		</tr>
 		@endforeach
 	</table>
-	<table>
+	<br>
+	<table style="width:50%; margin-left:auto; margin-right:auto;">
+		<tr>
+			<th colspan="4">Beneficiarios</th>
+		</tr>
+		<tr><th colspan="4" height="7">&nbsp;</th></tr>
 		<tr>
 			<th>Tipo de Beneficiario</th>
 			<th>Programado</th>
@@ -167,12 +187,18 @@
 		</tr>
 		@foreach($proyecto->beneficiariosDescripcion AS $beneficiario)
 		<tr>
-			<td>{{$beneficiario->tipoBeneficiario}}</td>
-			<td>{{$beneficiario->programadoTotal}}</td>
-			<td>{{$beneficiario->avanceTotal}}</td>
-			<td>00.00</td>
+			<td class="texto-centro">{{$beneficiario->tipoBeneficiario}}</td>
+			<td class="texto-centro">{{number_format($total_programado += $beneficiario->programadoTotal)}}</td>
+			<td class="texto-centro">{{number_format($total_avance += $beneficiario->avanceTotal)}}</td>
+			<td class="texto-centro">00.00</td>
 		</tr>
 		@endforeach
+		<tr>
+			<th>Total</th>
+			<th>{{number_format($total_programado)}}</th>
+			<th>{{number_format($total_avance)}}</th>
+			<th></th>
+		</tr>
 	</table>
 	<div style="page-break-after:always;"></div>
 	@endforeach

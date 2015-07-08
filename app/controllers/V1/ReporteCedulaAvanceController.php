@@ -78,6 +78,8 @@ class ReporteCedulaAvanceController extends BaseController {
 			$rows = Proyecto::reporteCedulasAvances($mes,$ejercicio)->get();
 
 			$datos = array('datos'=>$rows);
+			$datos['total_programado'] = 0;
+			$datos['total_avance'] = 0;
 
 			$pdf = PDF::setPaper('LETTER')->setOrientation('landscape')->setWarnings(false)->loadView('reportes.pdf.reporte-cedulas-avances',$datos);
 
