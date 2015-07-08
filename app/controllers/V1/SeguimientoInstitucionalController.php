@@ -318,7 +318,10 @@ class SeguimientoInstitucionalController extends BaseController {
 		{
 			//throw new Exception($parametros['actualizarproyecto'],1);
 			$estatus = 0;
-			$mes_avance = date('n')-1;
+			$mes_avance = Util::obtenerMesActual();
+			if($mes_avance == 0){
+				$mes_avance = date('n')-1;
+			}
 			if($parametros['actualizarproyecto']=="aprobar") //Poner estatus 4 (Aprobado)
 			{
 				$validar = DB::table('evaluacionComentarios')

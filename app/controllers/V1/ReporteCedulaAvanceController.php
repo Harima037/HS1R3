@@ -32,7 +32,7 @@ class ReporteCedulaAvanceController extends BaseController {
 		$parametros = Input::all();
 
 		if(!isset($parametros['mes'])){
-			$mes = Utl::obtenerMesActual();
+			$mes = Util::obtenerMesActual();
 			if($mes == 0){ $mes = date('n')-1; }
 		}else{
 			$mes = intval($parametros['mes']);
@@ -80,6 +80,7 @@ class ReporteCedulaAvanceController extends BaseController {
 			$datos = array('datos'=>$rows);
 			$datos['total_programado'] = 0;
 			$datos['total_avance'] = 0;
+			$datos['indices'] = array();
 
 			$pdf = PDF::setPaper('LETTER')->setOrientation('landscape')->setWarnings(false)->loadView('reportes.pdf.reporte-cedulas-avances',$datos);
 

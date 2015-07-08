@@ -842,8 +842,8 @@ function sumar_trimestres(){
 }
 
 function ejecutar_formula(){   
-    var numerador = parseInt($('#numerador-programa').val()) || 0;
-    var denominador = parseInt($('#denominador-programa').val()) || 1;
+    var numerador = parseFloat($('#numerador-programa').val()) || 0;
+    var denominador = parseFloat($('#denominador-programa').val()) || 1;
     var total;
     var id_formula = $('#formula-programa').val();
     switch(id_formula){
@@ -881,7 +881,7 @@ function ejecutar_formula(){
     }
     $('#meta-programa').val(total);
     if(total != ''){
-        $('#lbl-meta-programa').text(total.format());
+        $('#lbl-meta-programa').text(total.format(2));
     }else{
         $('#lbl-meta-programa').text('');
     }

@@ -135,7 +135,7 @@ class Proyecto extends BaseModel
 				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
 				'proyectos.programaPresupuestario','proyectos.programaEspecial',
 				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
-				'proyectos.numeroProyectoEstrategico',
+				'proyectos.numeroProyectoEstrategico','analisisFunc.finalidadProyecto',
 
 				DB::raw('sum(ep01.presupuestoAprobado) AS presupuestoAprobado'),
 				DB::raw('sum(ep01.presupuestoModificado) AS presupuestoModificado'),
@@ -143,6 +143,11 @@ class Proyecto extends BaseModel
 
 				DB::raw('concat_ws(" ",programaPresupuestario.clave,programaPresupuestario.descripcion) AS programaPresupuestarioDescipcion')
 			)
+
+			->leftjoin('evaluacionAnalisisFuncional AS analisisFunc',function($join)use($mes){
+				$join->on('analisisFunc.idProyecto','=','proyectos.id')
+					->where('analisisFunc.mes','=',$mes);
+			})
 
 			->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','proyectos.programaPresupuestario')
 
