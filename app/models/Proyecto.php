@@ -122,10 +122,82 @@ class Proyecto extends BaseModel
 						'jefePlaneacion.cargo AS jefePlaneacionCargo',
 						'coordinadorGrupoEstrategico.cargo AS coordinadorGrupoEstrategicoCargo',
 						'responsableInformacion.cargo AS responsableInformacionCargo'
+					);
 
-						
-						);
+	}
 
+	public function scopeIndicadoresResultados($query,$mes,$ejercicio){
+		$query->select(
+				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
+				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
+				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
+				'proyectos.programaPresupuestario','proyectos.programaEspecial',
+				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
+				'proyectos.numeroProyectoEstrategico',
+				DB::raw('concat_ws(".- ",subFuncionGasto.clave,subFuncionGasto.descripcion) AS subFuncionGasto')
+			)
+
+			->leftjoin('catalogoFuncionesGasto AS subFuncionGasto','subFuncionGasto.clave','=',DB::raw('concat_ws(".",proyectos.finalidad,proyectos.funcion,proyectos.subFuncion,proyectos.subSubFuncion)'))
+
+			->with(array('componentes'=>function($componente)use($mes){
+				$componente->select('proyectoComponentes.id',
+					'proyectoComponentes.idProyecto','proyectoComponentes.indicador',
+					'proyectoComponentes.valorNumerador AS metaAnual','unidadesMedida.descripcion AS unidadMedida',
+					'avanceMetas.planMejora','avanceMetas.avanceMes','avanceMetas.justificacionAcumulada',
+					DB::raw('sum(metasMes.avance) AS avanceAcumulado'))
+					->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','proyectoComponentes.idUnidadMedida')
+					->leftjoin('componenteMetasMes AS metasMes',function($join)use($mes){
+						$join->on('metasMes.idComponente','=','proyectoComponentes.id')
+							->where('metasMes.mes','<=',$mes)
+							->whereNull('metasMes.borradoAl');
+					})
+					->leftjoin('registroAvancesMetas AS avanceMetas',function($join)use($mes){
+						$join->on('avanceMetas.idProyecto','=','proyectoComponentes.idProyecto')
+							->on('avanceMetas.idNivel','=','proyectoComponentes.id')
+							->where('avanceMetas.mes','=',$mes)
+							->where('avanceMetas.nivel','=',1)
+							->whereNull('avanceMetas.borradoAl');
+					})
+					->groupBy('proyectoComponentes.id','metasMes.idComponente');
+
+			},'actividades'=>function($actividad)use($mes){
+				$actividad->select('componenteActividades.id','componenteActividades.idComponente',
+					'componenteActividades.idProyecto','componenteActividades.indicador',
+					'componenteActividades.valorNumerador AS metaAnual','unidadesMedida.descripcion AS unidadMedida',
+					'avanceMetas.planMejora','avanceMetas.avanceMes','avanceMetas.justificacionAcumulada',
+					DB::raw('sum(metasMes.avance) AS avanceAcumulado'))
+					->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','componenteActividades.idUnidadMedida')
+					->leftjoin('actividadMetasMes AS metasMes',function($join)use($mes){
+						$join->on('metasMes.idActividad','=','componenteActividades.id')
+							->where('metasMes.mes','<=',$mes)
+							->whereNull('metasMes.borradoAl');
+					})
+					->leftjoin('registroAvancesMetas AS avanceMetas',function($join)use($mes){
+						$join->on('avanceMetas.idProyecto','=','componenteActividades.idProyecto')
+							->on('avanceMetas.idNivel','=','componenteActividades.id')
+							->where('avanceMetas.mes','=',$mes)
+							->where('avanceMetas.nivel','=',2)
+							->whereNull('avanceMetas.borradoAl');
+					})
+					->groupBy('componenteActividades.id','metasMes.idActividad');
+			}))
+
+			->where('proyectos.idEstatusProyecto','=',5)
+			
+			->groupBy('proyectos.id')
+
+			->orderBy('proyectos.unidadResponsable','asc')
+			->orderBy('proyectos.finalidad','asc')
+			->orderBy('proyectos.funcion','asc')
+			->orderBy('proyectos.subFuncion','asc')
+			->orderBy('proyectos.subSubFuncion','asc')
+			->orderBy('proyectos.programaSectorial','asc')
+			->orderBy('proyectos.programaPresupuestario','asc')
+			->orderBy('proyectos.programaEspecial','asc')
+			->orderBy('proyectos.actividadInstitucional','asc')
+			->orderBy('proyectos.proyectoEstrategico','asc')
+			->orderBy('proyectos.numeroProyectoEstrategico','asc')
+			->orderBy('proyectos.idClasificacionProyecto','asc');
 	}
 
 	public function scopeCedulasAvances($query,$mes,$ejercicio){
@@ -183,7 +255,8 @@ class Proyecto extends BaseModel
 					->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','proyectoComponentes.idUnidadMedida')
 					->leftjoin('componenteMetasMes AS metasMes',function($join)use($mes){
 						$join->on('metasMes.idComponente','=','proyectoComponentes.id')
-							->where('metasMes.mes','<=',$mes);
+							->where('metasMes.mes','<=',$mes)
+							->whereNull('metasMes.borradoAl');
 					})
 					->groupBy('proyectoComponentes.id','metasMes.idComponente');
 
@@ -196,7 +269,8 @@ class Proyecto extends BaseModel
 					->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','componenteActividades.idUnidadMedida')
 					->leftjoin('actividadMetasMes AS metasMes',function($join)use($mes){
 						$join->on('metasMes.idActividad','=','componenteActividades.id')
-							->where('metasMes.mes','<=',$mes);
+							->where('metasMes.mes','<=',$mes)
+							->whereNull('metasMes.borradoAl');
 					})
 					->groupBy('componenteActividades.id','metasMes.idActividad');
 			},'beneficiariosDescripcion'=>function($beneficiarios)use($mes){

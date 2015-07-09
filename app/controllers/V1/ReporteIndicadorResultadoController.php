@@ -50,6 +50,10 @@ class ReporteIndicadorResultadoController extends BaseController {
 				$datos['ejercicio'] = intval($parametros['ejercicio']);
 			}
 
+			$proyectos = Proyecto::indicadoresResultados($mes,$datos['ejercicio'])->get();
+
+			//return Response::json($proyectos,200);
+			$datos['proyectos'] = $proyectos;
 			$datos['total_presup_aprobado'] = '1 001 260 223.02';
 			$datos['total_presup_modificado'] = '949 910 992.55';
 			$datos['total_presup_devengado'] = '805 003 657.69 ';
@@ -132,6 +136,20 @@ class ReporteIndicadorResultadoController extends BaseController {
 					    	)
 					    )
 					));
+					
+					for ($i='A'; $i < 'O' ; $i++) { 
+						if($i != 'H'){
+							$sheet->getStyle($i.'16:'.$i.'118')->applyFromArray(array(
+							    'font' => array( 'size' => 8),
+							    'borders' => array(
+							    	'right' => array(
+							    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+		            					'color' => array('argb' => '002060')
+							    	)
+							    )
+							));
+						}
+					}
 			    });
 			})->download('xlsx');
 		}catch(Exception $ex){

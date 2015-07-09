@@ -76,8 +76,160 @@
 		</tr>
 
 		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		<tr>
+			<td>
+				<!-- Numero de Proyecto Estrategio -->
+			</td>
+			<td>
+				<!-- ODM vacio? -->
+			</td>
 
+			<td align="center"><b>PROYECTOS INSTITUCIONALES:</b></td>
+			
+			<td>
+				<!-- Undidad Medida -->
+			</td>
+			<td>
+				<!-- Programado Anual -->
+			</td>
+			<td>
+				<!-- Programado/Modificado Anual -->
+			</td>
+			<td>
+				<!-- Avance acumulado al periodo -->
+			</td>
 
+			<td>
+				<!-- a/ Señalar para justificaciones -->
+			</td>
+			<td>
+				<!-- Porcentaje avance -->
+			</td>
+
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>
+				<!-- Numero de Proyecto Estrategio -->
+			</td>
+			<td>
+				<!-- ODM vacio? -->
+			</td>
+
+			<td align="center">Fuentes de financiamiento</td>
+			
+			<td>
+				<!-- Undidad Medida -->
+			</td>
+			<td>
+				<!-- Programado Anual -->
+			</td>
+			<td>
+				<!-- Programado/Modificado Anual -->
+			</td>
+			<td>
+				<!-- Avance acumulado al periodo -->
+			</td>
+
+			<td>
+				<!-- a/ Señalar para justificaciones -->
+			</td>
+			<td>
+				<!-- Porcentaje avance -->
+			</td>
+
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		@foreach($proyectos as $proyecto)
+		<tr>
+			<td>
+				{{$proyecto->proyectoEstrategico}}{{str_pad($proyecto->numeroProyectoEstrategico, 3,'0',STR_PAD_LEFT)}}
+			</td>
+			<td>
+				<!-- ODM vacio? -->
+			</td>
+
+			<td align="center"><b>{{{ $proyecto->nombreTecnico }}}</b></td>
+			
+			<td>
+				<!-- Undidad Medida -->
+			</td>
+			<td>
+				<!-- Programado Anual -->
+			</td>
+			<td>
+				<!-- Programado/Modificado Anual -->
+			</td>
+			<td>
+				<!-- Avance acumulado al periodo -->
+			</td>
+
+			<td>
+				<!-- a/ Señalar para justificaciones -->
+			</td>
+			<td>
+				<!-- Porcentaje avance -->
+			</td>
+
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		@foreach($proyecto->componentes as $componente)
+		<tr>
+			<td></td>
+			<td></td>
+			<td>{{{ $componente->indicador }}}</td>
+			<td>{{{ $componente->unidadMedida }}}</td>
+			<td>{{{ $componente->metaAnual }}}</td>
+			<td>{{{ $componente->metaAnual }}}</td>
+			<td>{{{ $componente->avanceMes }}}</td>
+			<td>{{{ $componente->planMejora }}}</td>
+			<td>100.00</td>
+
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		@endforeach
+		@foreach($proyecto->actividades as $actividad)
+		<tr>
+			<td></td>
+			<td></td>
+			<td>{{{ $actividad->indicador }}}</td>
+			<td>{{{ $actividad->unidadMedida }}}</td>
+			<td>{{{ $actividad->metaAnual }}}</td>
+			<td>{{{ $actividad->metaAnual }}}</td>
+			<td>{{{ $actividad->avanceMes }}}</td>
+			<td>{{{ $actividad->planMejora }}}</td>
+			<td>100.00</td>
+
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		@endforeach
+		@endforeach
+		
 	</table>
 </body>
 </html>
