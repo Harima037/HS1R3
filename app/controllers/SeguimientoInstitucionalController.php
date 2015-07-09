@@ -103,7 +103,7 @@ class SeguimientoInstitucionalController extends BaseController {
 		$proyecto = Proyecto::with(array('analisisFuncional'=>function($query) use ($mes_actual){
 			$query->where('mes','=',$mes_actual);
 		},'evaluacionMeses'=>function($query) use ($mes_actual){
-			$query->where('mes','=',$mes_actual)->whereIn('idEstatus',array(2));
+			$query->where('mes','=',$mes_actual)->whereIn('idEstatus',array(2,4));
 		}))->find($id);
 
 		if(count($proyecto->evaluacionMeses) == 0){
