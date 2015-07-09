@@ -44,24 +44,26 @@ class ReporteCedulaAvanceController extends BaseController {
 			$ejercicio = intval($parametros['ejercicio']);
 		}
 
-		/*if(!isset($parametros['buscar'])){
-			$buscar = NULL;
-		}else{
-			$buscar = $parametros['buscar'];
-		}*/
 		if(isset($parametros['formatogrid'])){
 			$rows = Proyecto::cedulasAvances($mes,$ejercicio);
 
 			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 
-			if(isset($parametros['buscar'])){				
-				$rows = $rows->where(function($query)use($parametros){
-					$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
-						->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
-				});
+			if(isset($parametros['buscar'])){		
+				if($parametros['buscar']){
+					$rows = $rows->where(function($query)use($parametros){
+						$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
+							->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
+					});
+				}
 			}
-
-			$total = $rows->count('proyectos.id');
+			
+			$total = $rows->get();
+			$total = count($total);
+			
+			//var_dump($total);die;
+			//$queries = DB::getQueryLog();
+			//var_dump(end($queries));die;
 
 			$rows = $rows->skip(($parametros['pagina']-1)*10)->take(10)->get();
 

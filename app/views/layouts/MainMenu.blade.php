@@ -8,6 +8,17 @@
         </div>
         <div class="navbar-collapse collapse" id="collapse-main-menu">
             <ul class="nav navbar-nav">  
+                @if(Sentry::getUser()->isSuperUser())
+                <li class="dropdown">
+                    <a href="{{ URL::to('/').'/root' }}" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa-fw fa fa-terminal"></i>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ URL::to('/root/modulos') }}"><i class="fa-fw fa fa-magic"></i> Modulos</a></li>      
+                        <li><a href="{{ URL::to('/root/variables') }}"><i class="fa-fw fa fa-flag"></i> Variables</a></li>      
+                    </ul>
+                </li>
+                @endif
                 @if(isset($sys_sistemas))
                     @foreach($sys_sistemas as $sistema)
                         @if($sistema->visible)
@@ -22,10 +33,10 @@
                                 <a href="{{ URL::to($sistema->uri) }}" class="dropdown-toggle" data-toggle="dropdown">
                                     <i class="fa-fw fa {{ $sistema->icono }}"></i> {{ $sistema->nombre }} <b class="caret"></b>
                                 </a>
-                                <ul class="dropdown-menu">                       
+                                <ul class="dropdown-menu">
                                 @foreach($sistema->modulos as $modulo)
                                 @if(Sentry::hasAccess($sistema->key . '.' . $modulo->key . '.R') && $modulo->visible)
-                                    <li><a href="{{ URL::to($sistema->uri.'/'.$modulo->uri) }}"><i class="fa-fw fa {{ $modulo->icono }}"></i> {{ $modulo->nombre }}</a></li>      
+                                    <li><a href="{{ URL::to($sistema->uri.'/'.$modulo->uri) }}"><i class="fa-fw fa {{ $modulo->icono }}"></i> {{ $modulo->nombre }}</a></li>
                                 @endif
                                 @endforeach
                                 </ul>

@@ -151,7 +151,7 @@ class Proyecto extends BaseModel
 
 			->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','proyectos.programaPresupuestario')
 
-			->leftjoin('cargaDatosEP01 AS ep01',function($join) use ($mes,$ejercicio){
+			->join('cargaDatosEP01 AS ep01',function($join) use ($mes,$ejercicio){
 				$join->on('ep01.UR','=','proyectos.unidadResponsable')
 					->on('ep01.FI','=','proyectos.finalidad')
 					->on('ep01.FU','=','proyectos.funcion')

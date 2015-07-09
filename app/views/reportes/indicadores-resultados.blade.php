@@ -6,7 +6,7 @@
 @parent
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
-<script src="{{ URL::to('js/modulos/reportes/cedulas-avances.js') }}"></script>
+<script src="{{ URL::to('js/modulos/reportes/indicadores-resultados.js') }}"></script>
 @stop
 
 @section('aside')
