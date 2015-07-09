@@ -2,126 +2,82 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<style type="text/css">
-		.titulo1{
-			font-weight: bold;
-			font-family: Arial;
-			font-size: 18;
-		}
-		.titulo2{
-			font-weight: bold;
-			font-family: Arial;
-			font-size: 16;
-		}
-		.titulo3{
-			font-weight: bold;
-			font-family: Arial;
-			font-size: 14;
-		}
-		.texto{
-			font-family: Arial;
-			font-size: 12;
-		}
-		.negrita{
-			font-weight: bold;
-		}
-		.linea-firma{
-			border-bottom: 1 solid #000000;
-		}
-		.texto-medio{
-			vertical-align: middle;
-		}
-		.texto-centro{
-			text-align: center;
-		}
-		.texto-derecha{
-			text-align: right;
-		}
-		.texto-izquierda{
-			text-align: left;
-		}
-		.encabezado-tabla{
-			font-family: Arial;
-			font-size: 11;
-			font-weight: bold;
-			text-align: center;
-			vertical-align: middle;
-			color: #FFFFFF;
-			background-color: #28A659;
-		}
-		.tabla-datos td,th{
-			border: 1 solid #000000;
-			border-collapse: collapse;
-			padding:1;
-		}
-		.tabla-datos td{
-			vertical-align: top;
-			padding: 5px;
-		}
-		.subtitulo-tabla{
-			font-weight: bold;
-			background-color: #DDDDDD;
-		}
-		.nota-titulo{
-			font-family: Arial;
-			font-size:8;
-			font-weight: bold;
-		}
-		.nota-contenido{
-			font-family: Arial;
-			font-size:8;
-		}
-	</style>
 </head>
 <body>
 	<table>
-		<tr><td colspan="15" height="20">&nbsp;</td></tr>
+
+		<tr><td width="8.4"></td><td width="8.4"></td><td width="52.5"></td><td width="12.7"></td><td width="12.7"></td><td width="12.7"></td><td width="12.7"></td><td width="1.8"></td><td width="9.7"></td><td width="17.5"></td><td width="17.5"></td><td width="17.5"></td><td width="12.5"></td><td width="12.5"></td><td width="12.5"></td></tr>
 
 		<tr>
-			<td colspan="15" class="titulo1">GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS</td>
+			<td><b>GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS</b></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
-		<tr><td colspan="15" height="20">&nbsp;</td></tr>
+		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 		<tr>
-			<td colspan="15" class="titulo1">INDICADORES DE RESULTADOS AL |CUARTO| TRIMESTRE DEL |2014|</td>
+			<td><b>INDICADORES DE RESULTADOS AL {{$trimestre}} TRIMESTRE DEL {{$ejercicio}}</b></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 
-		<tr><td colspan="15" height="20">&nbsp;</td></tr>
-		<tr><td colspan="15" height="20">&nbsp;</td></tr>
+		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 
 		<tr>
-			<td colspan="2">&nbsp;</td>
+			<td></td><td></td>
 			<td><b>Organismo Público:</b> Instituto de Salud</td>
-			<td colspan="12">&nbsp;</td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 
-		<tr><td colspan="15" height="20">&nbsp;</td></tr>
+		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 
-		<tr class="encabezado-tabla">
-			<td rowspan="2">NUM. CONSEC. / CLAVE PROYECTO</td>
-			<td rowspan="2">OBJETIVO DEL MILENIO</td>
-			<td>SUBFUNCIÓN / TIPO DE PROYECTO / FUENTE DE FINANCIAMIENTO</td>
-			<td rowspan="2">UNIDAD DE MEDIDA</td>
-			<td colspan="5">METAS</td>
-			<td rowspan="2">PRESUPUESTO APROBADO ( PESOS )</td>
-			<td rowspan="2">PRESUPUESTO MODIFICADO ( PESOS )</td>
-			<td rowspan="2">PRESUPUESTO DEVENGADO ( PESOS )</td>
-			<td colspan="3">BENEFICIARIOS</td>
+		<tr>
+			<td valign="middle" height="23">NUM. CONSEC. / CLAVE PROYECTO</td>
+			<td valign="middle">OBJETIVO DEL MILENIO</td>
+			<td valign="middle">SUBFUNCIÓN / TIPO DE PROYECTO / FUENTE DE FINANCIAMIENTO</td>
+			<td valign="middle">UNIDAD DE MEDIDA</td>
+			<td valign="middle">METAS</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td valign="middle">PRESUPUESTO<br>APROBADO<br>( PESOS )</td>
+			<td valign="middle">PRESUPUESTO<br>MODIFICADO<br> ( PESOS )</td>
+			<td valign="middle">PRESUPUESTO<br>DEVENGADO<br>( PESOS )</td>
+			<td valign="middle">BENEFICIARIOS</td>
+			<td></td>
+			<td></td>
 		</tr>
 
-		<tr class="encabezado-tabla">
-			<td>PROYECTOS /  METAS (CONCEPTOS)</td>
-			<td>PROGRAM.ANUAL</td>
-			<td>MODIF. ANUAL</td>
-			<td>ALCANZ. AL PERIODO</td>
-			<td colspan="2">% CUMPLIM./MODIF.</td>
-			<td>MUNICIPIO</td>
-			<td>LOCALIDAD</td>
-			<td>PERSONA</td>
+		<tr>
+			<td height="38"></td>
+			<td></td>
+			<td valign="middle">PROYECTOS /  METAS (CONCEPTOS)</td>
+			<td></td>
+			<td valign="middle">PROGRAM.ANUAL</td>
+			<td valign="middle">MODIF. ANUAL</td>
+			<td valign="middle">ALCANZ. AL PERIODO</td>
+			<td valign="middle">% CUMPLIM./MODIF.</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td valign="middle">MUNICIPIO</td>
+			<td valign="middle">LOCALIDAD</td>
+			<td valign="middle">PERSONA</td>
 		</tr>
 		
 		<tr class="encabezado-tabla">
-			<td colspan="15">SALUD</td>
+			<td valign="middle" height="23">SALUD</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
+
+		<tr>
+			<td></td><td></td>
+			<td valign="top" height="30">PRESTACIÓN DE SERVICIOS DE SALUD A LA COMUNIDAD</td>
+			<td></td><td></td><td></td><td></td><td></td><td></td>
+			<td valign="top">{{$total_presup_aprobado}}</td><td valign="top">{{$total_presup_modificado}}</td><td valign="top">{{$total_presup_devengado}}</td>
+			<td></td><td></td><td></td>
+		</tr>
+
+		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+
+
 	</table>
 </body>
 </html>

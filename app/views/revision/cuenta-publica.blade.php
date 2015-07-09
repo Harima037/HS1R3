@@ -29,9 +29,9 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="btn-toolbar pull-right" >
-                            <button type="button" class="btn btn-info" id="btn-datos-institucionales">
+                            <!--button type="button" class="btn btn-info" id="btn-datos-institucionales">
                                 <span class="fa fa-building"></span> Datos Institucionales
-                            </button>
+                            </button-->
                             <button type="button" class="btn btn-info" id="btn-reporte-cuenta-publica">
                                 <span class="fa fa-file-word-o"></span> Reporte
                             </button>
