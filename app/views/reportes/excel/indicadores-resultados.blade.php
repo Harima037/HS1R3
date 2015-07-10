@@ -108,46 +108,70 @@
 			</td>
 			<td></td>
 			<td align="center" style="font-weight:bold;">{{{ $proyecto->nombreTecnico }}}</td>
-			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td></td><td></td><td></td><td></td><td></td><td></td>
+			<td valign="top" {{$estilo_fuente = (count($proyecto->fuentesFinanciamiento) > 1)?'style="font-weight:bold; text-decoration:underline;"':''}} >{{$proyecto->totalPresupuestoAprobado}}</td>
+			<td valign="top" {{$estilo_fuente}}>{{$proyecto->totalPresupuestoModificado}}</td>
+			<td valign="top" {{$estilo_fuente}}>{{$proyecto->totalPresupuestoDevengado}}</td>
+			<td></td><td></td><td></td>
 		</tr>
 
-		@foreach($proyecto->componentes as $componente)
-		<tr>
-			<td></td><td></td>
-			<td valign="top">{{{ $componente->indicador }}}</td>
-			<td valign="top">{{{ $componente->unidadMedida }}}</td>
-			<td valign="top">{{{ $componente->metaAnual }}}</td>
-			<td valign="top">{{{ $componente->metaAnual }}}</td>
-			<td valign="top">{{{ $componente->avanceMes }}}</td>
-			<td valign="top">
-			@if($componente->planMejora)
-				{{{ $componente->identificador }}}
-				{{$hoja['justificaciones'][$componente->identificador]=$componente->justificacionAcumulada}}
+		@for($i = 0 ; $i < $proyecto->totalItems ; $i++)
+			<tr>
+				<td></td><td></td>
+				
+			@if(isset($proyecto->componentes[$i]))
+				<td valign="top">{{{ $proyecto->componentes[$i]->indicador }}}</td>
+				<td valign="top" align="center">{{{ $proyecto->componentes[$i]->unidadMedida }}}</td>
+				<td valign="top">{{{ $proyecto->componentes[$i]->metaAnual }}}</td>
+				<td valign="top">{{{ $proyecto->componentes[$i]->metaAnual }}}</td>
+				<td valign="top">{{{ $proyecto->componentes[$i]->avanceMes }}}</td>
+				<td valign="top">
+				@if($proyecto->componentes[$i]->planMejora)
+					{{{ $proyecto->componentes[$i]->identificador }}}
+					<!-- {{ $hoja['justificaciones'][$proyecto->componentes[$i]->identificador]=$proyecto->componentes[$i]->justificacionAcumulada }} -->
+				@endif
+				</td>
+				<td valign="top">
+				@if($proyecto->componentes[$i]->avanceMes > 0)
+					{{($proyecto->componentes[$i]->avanceMes/$proyecto->componentes[$i]->metaAnual)*100}}
+				@else
+					0.00
+				@endif
+				</td>
+			@elseif(isset($proyecto->actividades[$i-$proyecto->desfaseActividades]))
+				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->indicador }}}</td>
+				<td valign="top" align="center">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->unidadMedida }}}</td>
+				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->metaAnual }}}</td>
+				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->metaAnual }}}</td>
+				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->avanceMes }}}</td>
+				<td valign="top">
+				@if($proyecto->actividades[$i-$proyecto->desfaseActividades]->planMejora)
+					{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->identificador }}}
+					<!-- {{ $hoja['justificaciones'][$proyecto->actividades[$i-$proyecto->desfaseActividades]->identificador]=$proyecto->actividades[$i-$proyecto->desfaseActividades]->justificacionAcumulada }} -->
+				@endif
+				</td>
+				<td valign="top">
+					@if($proyecto->actividades[$i-$proyecto->desfaseActividades]->avanceMes > 0)
+						{{($proyecto->actividades[$i-$proyecto->desfaseActividades]->avanceMes/$proyecto->actividades[$i-$proyecto->desfaseActividades]->metaAnual)*100}}
+					@else
+						0.00
+					@endif
+				</td>
+			@else
+				<td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 			@endif
-			</td>
-			<td valign="top">100.00</td>
-			<td></td><td></td><td></td><td></td><td></td><td></td>
-		</tr>
-		@endforeach
 
-		@foreach($proyecto->actividades as $actividad)
-		<tr>
-			<td></td><td></td>
-			<td valign="top">{{{ $actividad->indicador }}}</td>
-			<td valign="top">{{{ $actividad->unidadMedida }}}</td>
-			<td valign="top">{{{ $actividad->metaAnual }}}</td>
-			<td valign="top">{{{ $actividad->metaAnual }}}</td>
-			<td valign="top">{{{ $actividad->avanceMes }}}</td>
-			<td valign="top">
-			@if($actividad->planMejora)
-				{{{ $actividad->identificador }}}
-				<!-- {{  $hoja['justificaciones'][$actividad->identificador]=$actividad->justificacionAcumulada }} -->
+			@if(isset($proyecto->fuentesFinanciamiento[$i]) && count($proyecto->fuentesFinanciamiento) > 1)
+				<td valign="top">{{$proyecto->fuentesFinanciamiento[$i]->presupuestoAprobado}}</td>
+				<td valign="top">{{$proyecto->fuentesFinanciamiento[$i]->presupuestoModificado}}</td>
+				<td valign="top">{{$proyecto->fuentesFinanciamiento[$i]->presupuestoDevengado}}</td>
+			@else
+				<td></td><td></td><td></td>
 			@endif
-			</td>
-			<td valign="top">100.00</td>
-			<td></td><td></td><td></td><td></td><td></td><td></td>
-		</tr>
-		@endforeach
+
+				<td></td><td></td><td></td>
+			</tr>
+		@endfor
 
 		@endforeach
 

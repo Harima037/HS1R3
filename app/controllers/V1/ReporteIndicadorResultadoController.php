@@ -59,13 +59,18 @@ class ReporteIndicadorResultadoController extends BaseController {
 				if(!isset($hojas[$row->subFuncionClave])){
 					$hojas[$row->subFuncionClave] = array(
 						'titulo' => $row->subFuncionDescripcion,
-						'total_presup_aprobado' => 1001260223.02,
-						'total_presup_modificado' => 949910992.55,
-						'total_presup_devengado' => 805003657.69,
+						'total_presup_aprobado' => 0,
+						'total_presup_modificado' => 0,
+						'total_presup_devengado' => 0,
 						'conteo_items' => 0,
 						'justificaciones'=>array(),
 						'clase' => array()
 					);
+				}
+
+				if(!isset($hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto])){
+					$hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto] = array('fuentes'=>array());
+					$hojas[$row->subFuncionClave]['conteo_items']++;
 				}
 
 				$clave_fuentes = '';
@@ -88,10 +93,9 @@ class ReporteIndicadorResultadoController extends BaseController {
 						$titulo_fuentes .= $ultimo . $fuente->descripcion;
 					}
 					$clave_fuentes .= $fuente->clave .'_';
-				}
-				if(!isset($hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto])){
-					$hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto] = array('fuentes'=>array());
-					$hojas[$row->subFuncionClave]['conteo_items']++;
+					$row->totalPresupuestoAprobado += $fuente->presupuestoAprobado;
+					$row->totalPresupuestoModificado += $fuente->presupuestoModificado;
+					$row->totalPresupuestoDevengado += $fuente->presupuestoDevengado;
 				}
 
 				if(!isset($hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto]['fuentes'][$clave_fuentes])){
@@ -105,15 +109,27 @@ class ReporteIndicadorResultadoController extends BaseController {
 				$hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto]['fuentes'][$clave_fuentes]['proyectos'][] = $row;
 				$hojas[$row->subFuncionClave]['conteo_items']++;
 
-				$hojas[$row->subFuncionClave]['conteo_items'] += count($row->componentes);
-				$hojas[$row->subFuncionClave]['conteo_items'] += count($row->actividades);
+				$row->desfaseActividades = count($row->componentes);
+
+				$total_acciones = count($row->componentes) + count($row->actividades);
+				$total_fuentes = count($row->fuentesFinanciamiento);
+
+				if($total_acciones > $total_fuentes){
+					$row->totalItems = $total_acciones;
+				}else{
+					$row->totalItems = $total_fuentes;
+				}
+
+				$hojas[$row->subFuncionClave]['conteo_items'] += $row->totalItems;
+				
+				$hojas[$row->subFuncionClave]['total_presup_aprobado'] += $row->totalPresupuestoAprobado;
+				$hojas[$row->subFuncionClave]['total_presup_modificado'] += $row->totalPresupuestoModificado;
+				$hojas[$row->subFuncionClave]['total_presup_devengado'] += $row->totalPresupuestoDevengado;
 			}
-			//return Response::json($proyectos,200);
+			
+			//return Response::json($hojas,200);
 
 			$datos['hojas'] = $hojas;
-			$datos['total_presup_aprobado'] = '1 001 260 223.02';
-			$datos['total_presup_modificado'] = '949 910 992.55';
-			$datos['total_presup_devengado'] = '805 003 657.69 ';
 
 			Excel::create('indicadores-resultados', function($excel) use ( $datos ){
 				$datos_hoja = array();
@@ -215,6 +231,11 @@ class ReporteIndicadorResultadoController extends BaseController {
 							}
 						}
 						$sheet->getStyle('A14:O'.$total)->getAlignment()->setWrapText(true);
+						$sheet->setColumnFormat(array(
+						    'E14:G'.$total => '### ### ### ##0.00',
+						    'I12:L'.$total => '### ### ### ##0.00',
+						    'O14:O'.$total => '### ### ### ##0'
+						));
 				    });
 				}
 			})->download('xlsx');

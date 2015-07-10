@@ -134,7 +134,9 @@ class Proyecto extends BaseModel
 				'proyectos.programaPresupuestario','proyectos.programaEspecial',
 				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
 				'proyectos.numeroProyectoEstrategico','subFuncionGasto.clave AS subFuncionClave',
-				'subFuncionGasto.descripcion AS subFuncionDescripcion'
+				'subFuncionGasto.descripcion AS subFuncionDescripcion',
+				DB::raw('0 AS totalPresupuestoAprobado'),DB::raw('0 AS totalPresupuestoModificado'),
+				DB::raw('0 AS totalPresupuestoDevengado')
 			)
 
 			->leftjoin('catalogoFuncionesGasto AS subFuncionGasto','subFuncionGasto.clave','=',DB::raw('concat_ws(".",proyectos.finalidad,proyectos.funcion,proyectos.subFuncion,proyectos.subSubFuncion)'))
@@ -180,12 +182,32 @@ class Proyecto extends BaseModel
 							->whereNull('avanceMetas.borradoAl');
 					})
 					->groupBy('componenteActividades.id','metasMes.idActividad');
-			},'fuentesFinanciamiento'=>function($query){
+			},'fuentesFinanciamiento'=>function($query) use ($mes,$ejercicio){
 				$query->join('catalogoFuenteFinanciamiento AS fuente',function($join){
 					$join->on('fuente.id','=','proyectoFinanciamiento.idFuenteFinanciamiento')
 						->whereNull('fuente.borradoAl');
-				})->select('proyectoFinanciamiento.id','proyectoFinanciamiento.idProyecto','proyectoFinanciamiento.idFuenteFinanciamiento',
-						'fuente.clave','fuente.descripcion');
+				})->join('proyectos','proyectos.id','=','proyectoFinanciamiento.idProyecto')
+				->join('cargaDatosEP01 AS ep01',function($join) use ($mes,$ejercicio){
+					$join->on('ep01.UR','=','proyectos.unidadResponsable')
+						->on('ep01.FI','=','proyectos.finalidad')
+						->on('ep01.FU','=','proyectos.funcion')
+						->on('ep01.SF','=','proyectos.subFuncion')
+						->on('ep01.SSF','=','proyectos.subSubFuncion')
+						->on('ep01.PS','=','proyectos.programaSectorial')
+						->on('ep01.PP','=','proyectos.programaPresupuestario')
+						->on('ep01.PE','=','proyectos.programaEspecial')
+						->on('ep01.AI','=','proyectos.actividadInstitucional')
+						->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(proyectos.numeroProyectoEstrategico,3,"0"))'))
+						->on('ep01.FF','=','fuente.clave')
+						->where('ep01.mes','=',$mes)
+						->where('ep01.CP','=',$ejercicio);
+				})->select(
+						'proyectoFinanciamiento.id','proyectoFinanciamiento.idProyecto','proyectoFinanciamiento.idFuenteFinanciamiento',
+						'fuente.clave','fuente.descripcion',DB::raw('sum(ep01.presupuestoAprobado) AS presupuestoAprobado'),
+						DB::raw('sum(ep01.presupuestoModificado) AS presupuestoModificado'),
+						DB::raw('sum(ep01.presupuestoDevengadoModificado) AS presupuestoDevengado')
+					)
+				->groupBy('proyectoFinanciamiento.id','proyectoFinanciamiento.idProyecto','ep01.FF');
 			}))
 
 			->where('proyectos.idEstatusProyecto','=',5)
