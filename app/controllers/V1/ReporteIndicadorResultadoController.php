@@ -50,107 +50,173 @@ class ReporteIndicadorResultadoController extends BaseController {
 				$datos['ejercicio'] = intval($parametros['ejercicio']);
 			}
 
-			$proyectos = Proyecto::indicadoresResultados($mes,$datos['ejercicio'])->get();
+			$rows = Proyecto::indicadoresResultados($mes,$datos['ejercicio'])->get();
 
+			//return Response::json($rows,200);
+
+			$hojas = array();
+			foreach ($rows as $row) {
+				if(!isset($hojas[$row->subFuncionClave])){
+					$hojas[$row->subFuncionClave] = array(
+						'titulo' => $row->subFuncionDescripcion,
+						'total_presup_aprobado' => 1001260223.02,
+						'total_presup_modificado' => 949910992.55,
+						'total_presup_devengado' => 805003657.69,
+						'conteo_items' => 0,
+						'justificaciones'=>array(),
+						'clase' => array()
+					);
+				}
+
+				$clave_fuentes = '';
+				$titulo_fuentes = '';
+				$total_fuentes = count($row->fuentesFinanciamiento) - 1;
+				foreach ($row->fuentesFinanciamiento as $key => $fuente) {
+					if($key == 0){
+						$titulo_fuentes = $fuente->descripcion;
+					}elseif($key < $total_fuentes){
+						$titulo_fuentes .= ', ' . $fuente->descripcion;
+					}else{
+						$ultimo = ' y ';
+						if(strtolower(substr($fuente->descripcion,0,1)) == 'i'){
+							$ultimo = ' e ';
+						}elseif(strtolower(substr($fuente->descripcion,0,1)) == 'h'){
+							if(strtolower(substr($fuente->descripcion,1,1)) == 'i'){
+								$ultimo = ' e ';
+							}
+						}
+						$titulo_fuentes .= $ultimo . $fuente->descripcion;
+					}
+					$clave_fuentes .= $fuente->clave .'_';
+				}
+				if(!isset($hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto])){
+					$hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto] = array('fuentes'=>array());
+					$hojas[$row->subFuncionClave]['conteo_items']++;
+				}
+
+				if(!isset($hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto]['fuentes'][$clave_fuentes])){
+					$hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto]['fuentes'][$clave_fuentes] = array(
+						'titulo' => $titulo_fuentes,
+						'proyectos'=>array()
+					);
+					$hojas[$row->subFuncionClave]['conteo_items']++;
+				}
+
+				$hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto]['fuentes'][$clave_fuentes]['proyectos'][] = $row;
+				$hojas[$row->subFuncionClave]['conteo_items']++;
+
+				$hojas[$row->subFuncionClave]['conteo_items'] += count($row->componentes);
+				$hojas[$row->subFuncionClave]['conteo_items'] += count($row->actividades);
+			}
 			//return Response::json($proyectos,200);
-			$datos['proyectos'] = $proyectos;
+
+			$datos['hojas'] = $hojas;
 			$datos['total_presup_aprobado'] = '1 001 260 223.02';
 			$datos['total_presup_modificado'] = '949 910 992.55';
 			$datos['total_presup_devengado'] = '805 003 657.69 ';
 
 			Excel::create('indicadores-resultados', function($excel) use ( $datos ){
-				$excel->sheet('PP', function($sheet) use ( $datos ){
-					$sheet->setStyle(array(
-					    'font' => array(
-					        'name'      =>  'Arial',
-					        'size'      =>  10
-					    )
-					));
+				$datos_hoja = array();
+				$datos_hoja['ejercicio'] = $datos['ejercicio'];
+				$datos_hoja['trimestre'] = $datos['trimestre'];
 
-			    	$sheet->loadView('reportes.excel.indicadores-resultados',$datos);
-			    	
-			    	$sheet->mergeCells('A2:O2');
-					$sheet->mergeCells('A4:O4');
-					$sheet->cells('A2:O4',function($cells){ $cells->setAlignment('center'); });
-					$sheet->mergeCells('A9:A10');
-					$sheet->mergeCells('B9:B10');
-					$sheet->mergeCells('D9:D10');
-					$sheet->mergeCells('E9:I9');
-					$sheet->mergeCells('H10:I10');
-					$sheet->mergeCells('J9:J10');
-					$sheet->mergeCells('K9:K10');
-					$sheet->mergeCells('L9:L10');
-					$sheet->mergeCells('M9:O9');
-					$sheet->mergeCells('A11:O11');
-					$sheet->cells('A9:O12',function($cells) {
-						$cells->setAlignment('center');
-					});
-					$sheet->getStyle('A9:O12')->getAlignment()->setWrapText(true);
-					$sheet->getStyle('A9:O11')->applyFromArray(array(
-					    'fill' => array(
-					        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-					        'color' => array('rgb' => '28A659')
-					    ),
-					    'font' => array(
-					        'size'      =>  8,
-					        'bold'      =>  true,
-					        'color'		=> array('rgb'=>'FFFFFF')
-					    ),
-					    'borders' => array(
-					    	'allborders' => array(
-					    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
-            					'color' => array('argb' => 'FFFFFF')
-					    	)
-					    )
-					));
-					$sheet->getStyle('A11:O11')->applyFromArray(array(
-					    'font' => array(
-					        'size'      =>  12,
-					        'bold'      =>  true
-					    ),
-					    'borders' => array(
-					    	'top' => array(
-					    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-            					'color' => array('argb' => 'FFFFFF')
-					    	)
-					    )
-					));
-					$sheet->getStyle('A12:O12')->applyFromArray(array(
-					    'fill' => array(
-					        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-					        'color' => array('rgb' => 'DDDDDD')
-					    ),
-					    'font' => array(
-					        'size'      =>  11,
-					        'bold'      =>  true,
-					        'color'		=> array('rgb'=>'000000')
-					    ),
-					    'borders' => array(
-					    	'top' => array(
-					    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-            					'color' => array('argb' => '28A659')
-					    	),
-					    	'bottom' => array(
-					    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-            					'color' => array('argb' => '28A659')
-					    	)
-					    )
-					));
-					
-					for ($i='A'; $i < 'O' ; $i++) { 
-						if($i != 'H'){
-							$sheet->getStyle($i.'16:'.$i.'118')->applyFromArray(array(
-							    'font' => array( 'size' => 8),
-							    'borders' => array(
-							    	'right' => array(
-							    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-		            					'color' => array('argb' => '002060')
-							    	)
-							    )
-							));
+				foreach ($datos['hojas'] as $clave => $hoja) {
+					$excel->sheet($clave, function($sheet) use ( $datos_hoja, $hoja ){
+						$sheet->setStyle(array(
+						    'font' => array(
+						        'name'      =>  'Arial',
+						        'size'      =>  10
+						    )
+						));
+
+						$datos_hoja['hoja'] = $hoja;
+
+				    	$sheet->loadView('reportes.excel.indicadores-resultados',$datos_hoja);
+				    	
+				    	$sheet->mergeCells('A2:O2');
+						$sheet->mergeCells('A4:O4');
+						$sheet->cells('A2:O4',function($cells){ $cells->setAlignment('center'); });
+						$sheet->mergeCells('A9:A10');
+						$sheet->mergeCells('B9:B10');
+						$sheet->mergeCells('D9:D10');
+						$sheet->mergeCells('E9:I9');
+						$sheet->mergeCells('H10:I10');
+						$sheet->mergeCells('J9:J10');
+						$sheet->mergeCells('K9:K10');
+						$sheet->mergeCells('L9:L10');
+						$sheet->mergeCells('M9:O9');
+						$sheet->mergeCells('A11:O11');
+						$sheet->cells('A9:O12',function($cells) {
+							$cells->setAlignment('center');
+						});
+						$sheet->getStyle('A9:O12')->getAlignment()->setWrapText(true);
+						$sheet->getStyle('A9:O11')->applyFromArray(array(
+						    'fill' => array(
+						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
+						        'color' => array('rgb' => '28A659')
+						    ),
+						    'font' => array(
+						        'size'      =>  8,
+						        'bold'      =>  true,
+						        'color'		=> array('rgb'=>'FFFFFF')
+						    ),
+						    'borders' => array(
+						    	'allborders' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
+	            					'color' => array('argb' => 'FFFFFF')
+						    	)
+						    )
+						));
+						$sheet->getStyle('A11:O11')->applyFromArray(array(
+						    'font' => array(
+						        'size'      =>  12,
+						        'bold'      =>  true
+						    ),
+						    'borders' => array(
+						    	'top' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+	            					'color' => array('argb' => 'FFFFFF')
+						    	)
+						    )
+						));
+						$sheet->getStyle('A12:O12')->applyFromArray(array(
+						    'fill' => array(
+						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
+						        'color' => array('rgb' => 'DDDDDD')
+						    ),
+						    'font' => array(
+						        'size'      =>  11,
+						        'bold'      =>  true,
+						        'color'		=> array('rgb'=>'000000')
+						    ),
+						    'borders' => array(
+						    	'top' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+	            					'color' => array('argb' => '28A659')
+						    	),
+						    	'bottom' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+	            					'color' => array('argb' => '28A659')
+						    	)
+						    )
+						));
+						$total = $hoja['conteo_items'] + 13;
+						for ($i='A'; $i < 'O' ; $i++) { 
+							if($i != 'H'){
+								$sheet->getStyle($i.'14:'.$i.$total)->applyFromArray(array(
+								    'font' => array( 'size' => 8),
+								    'borders' => array(
+								    	'right' => array(
+								    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+			            					'color' => array('argb' => '002060')
+								    	)
+								    )
+								));
+							}
 						}
-					}
-			    });
+						$sheet->getStyle('A14:O'.$total)->getAlignment()->setWrapText(true);
+				    });
+				}
 			})->download('xlsx');
 		}catch(Exception $ex){
 			return Response::json(array('data'=>'Ocurrio un error al generar el reporte.','message'=>$ex->getMessage(),'line'=>$ex->getLine()),500);

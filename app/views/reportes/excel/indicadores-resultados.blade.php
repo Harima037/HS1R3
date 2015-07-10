@@ -69,167 +69,99 @@
 
 		<tr>
 			<td></td><td></td>
-			<td valign="top" height="30">PRESTACIÓN DE SERVICIOS DE SALUD A LA COMUNIDAD</td>
+			<td valign="top" height="30">{{$hoja['titulo']}}</td>
 			<td></td><td></td><td></td><td></td><td></td><td></td>
-			<td valign="top">{{$total_presup_aprobado}}</td><td valign="top">{{$total_presup_modificado}}</td><td valign="top">{{$total_presup_devengado}}</td>
+			<td valign="top">{{$hoja['total_presup_aprobado']}}</td>
+			<td valign="top">{{$hoja['total_presup_modificado']}}</td>
+			<td valign="top">{{$hoja['total_presup_devengado']}}</td>
 			<td></td><td></td><td></td>
 		</tr>
 
-		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 		<tr>
-			<td>
-				<!-- Numero de Proyecto Estrategio -->
-			</td>
-			<td>
-				<!-- ODM vacio? -->
-			</td>
-
-			<td align="center"><b>PROYECTOS INSTITUCIONALES:</b></td>
-			
-			<td>
-				<!-- Undidad Medida -->
-			</td>
-			<td>
-				<!-- Programado Anual -->
-			</td>
-			<td>
-				<!-- Programado/Modificado Anual -->
-			</td>
-			<td>
-				<!-- Avance acumulado al periodo -->
-			</td>
-
-			<td>
-				<!-- a/ Señalar para justificaciones -->
-			</td>
-			<td>
-				<!-- Porcentaje avance -->
-			</td>
-
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+		<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
+		@foreach($hoja['clase'] as $idClasificacion => $clasificacion)
+
 		<tr>
-			<td>
-				<!-- Numero de Proyecto Estrategio -->
+			<td></td><td></td>
+			<td height="20" align="center" valign="top" style="font-size:10; font-weight:bold;">
+			@if($idClasificacion == '1')
+				PROYECTOS INSTITUCIONALES:
+			@else
+				PROYECTOS DE INVERSIÓN:
+			@endif
 			</td>
-			<td>
-				<!-- ODM vacio? -->
-			</td>
-
-			<td align="center">Fuentes de financiamiento</td>
-			
-			<td>
-				<!-- Undidad Medida -->
-			</td>
-			<td>
-				<!-- Programado Anual -->
-			</td>
-			<td>
-				<!-- Programado/Modificado Anual -->
-			</td>
-			<td>
-				<!-- Avance acumulado al periodo -->
-			</td>
-
-			<td>
-				<!-- a/ Señalar para justificaciones -->
-			</td>
-			<td>
-				<!-- Porcentaje avance -->
-			</td>
-
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
-		@foreach($proyectos as $proyecto)
+
+		@foreach($clasificacion['fuentes'] as $fuente)
+
 		<tr>
-			<td>
+			<td></td><td></td>
+			<td align="center" valign="top" style="text-decoration:underline; font-size:9;">{{$fuente['titulo']}}</td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+		</tr>
+		@foreach($fuente['proyectos'] as $proyecto)
+		<tr>
+			<td align="center" valign="top" style="font-weight:bold;">
 				{{$proyecto->proyectoEstrategico}}{{str_pad($proyecto->numeroProyectoEstrategico, 3,'0',STR_PAD_LEFT)}}
 			</td>
-			<td>
-				<!-- ODM vacio? -->
-			</td>
-
-			<td align="center"><b>{{{ $proyecto->nombreTecnico }}}</b></td>
-			
-			<td>
-				<!-- Undidad Medida -->
-			</td>
-			<td>
-				<!-- Programado Anual -->
-			</td>
-			<td>
-				<!-- Programado/Modificado Anual -->
-			</td>
-			<td>
-				<!-- Avance acumulado al periodo -->
-			</td>
-
-			<td>
-				<!-- a/ Señalar para justificaciones -->
-			</td>
-			<td>
-				<!-- Porcentaje avance -->
-			</td>
-
 			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+			<td align="center" style="font-weight:bold;">{{{ $proyecto->nombreTecnico }}}</td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
+
 		@foreach($proyecto->componentes as $componente)
 		<tr>
-			<td></td>
-			<td></td>
-			<td>{{{ $componente->indicador }}}</td>
-			<td>{{{ $componente->unidadMedida }}}</td>
-			<td>{{{ $componente->metaAnual }}}</td>
-			<td>{{{ $componente->metaAnual }}}</td>
-			<td>{{{ $componente->avanceMes }}}</td>
-			<td>{{{ $componente->planMejora }}}</td>
-			<td>100.00</td>
-
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+			<td></td><td></td>
+			<td valign="top">{{{ $componente->indicador }}}</td>
+			<td valign="top">{{{ $componente->unidadMedida }}}</td>
+			<td valign="top">{{{ $componente->metaAnual }}}</td>
+			<td valign="top">{{{ $componente->metaAnual }}}</td>
+			<td valign="top">{{{ $componente->avanceMes }}}</td>
+			<td valign="top">
+			@if($componente->planMejora)
+				{{{ $componente->identificador }}}
+				{{$hoja['justificaciones'][$componente->identificador]=$componente->justificacionAcumulada}}
+			@endif
+			</td>
+			<td valign="top">100.00</td>
+			<td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		@endforeach
+
 		@foreach($proyecto->actividades as $actividad)
 		<tr>
-			<td></td>
-			<td></td>
-			<td>{{{ $actividad->indicador }}}</td>
-			<td>{{{ $actividad->unidadMedida }}}</td>
-			<td>{{{ $actividad->metaAnual }}}</td>
-			<td>{{{ $actividad->metaAnual }}}</td>
-			<td>{{{ $actividad->avanceMes }}}</td>
-			<td>{{{ $actividad->planMejora }}}</td>
-			<td>100.00</td>
-
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
-			<td></td>
+			<td></td><td></td>
+			<td valign="top">{{{ $actividad->indicador }}}</td>
+			<td valign="top">{{{ $actividad->unidadMedida }}}</td>
+			<td valign="top">{{{ $actividad->metaAnual }}}</td>
+			<td valign="top">{{{ $actividad->metaAnual }}}</td>
+			<td valign="top">{{{ $actividad->avanceMes }}}</td>
+			<td valign="top">
+			@if($actividad->planMejora)
+				{{{ $actividad->identificador }}}
+				<!-- {{  $hoja['justificaciones'][$actividad->identificador]=$actividad->justificacionAcumulada }} -->
+			@endif
+			</td>
+			<td valign="top">100.00</td>
+			<td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		@endforeach
+
 		@endforeach
-		
+
+		@endforeach
+
+		@endforeach
+
+		@foreach($hoja['justificaciones'] as $identificador => $justificacion)
+		<tr>
+			<td></td><td></td>
+			<td>{{$identificador}} {{{$justificacion}}}</td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+		</tr>
+		@endforeach
 	</table>
 </body>
 </html>

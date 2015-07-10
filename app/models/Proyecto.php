@@ -133,8 +133,8 @@ class Proyecto extends BaseModel
 				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
 				'proyectos.programaPresupuestario','proyectos.programaEspecial',
 				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
-				'proyectos.numeroProyectoEstrategico',
-				DB::raw('concat_ws(".- ",subFuncionGasto.clave,subFuncionGasto.descripcion) AS subFuncionGasto')
+				'proyectos.numeroProyectoEstrategico','subFuncionGasto.clave AS subFuncionClave',
+				'subFuncionGasto.descripcion AS subFuncionDescripcion'
 			)
 
 			->leftjoin('catalogoFuncionesGasto AS subFuncionGasto','subFuncionGasto.clave','=',DB::raw('concat_ws(".",proyectos.finalidad,proyectos.funcion,proyectos.subFuncion,proyectos.subSubFuncion)'))
@@ -143,7 +143,7 @@ class Proyecto extends BaseModel
 				$componente->select('proyectoComponentes.id',
 					'proyectoComponentes.idProyecto','proyectoComponentes.indicador',
 					'proyectoComponentes.valorNumerador AS metaAnual','unidadesMedida.descripcion AS unidadMedida',
-					'avanceMetas.planMejora','avanceMetas.avanceMes','avanceMetas.justificacionAcumulada',
+					'avanceMetas.planMejora','avanceMetas.avanceMes','avanceMetas.justificacionAcumulada','avanceMetas.id AS identificador',
 					DB::raw('sum(metasMes.avance) AS avanceAcumulado'))
 					->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','proyectoComponentes.idUnidadMedida')
 					->leftjoin('componenteMetasMes AS metasMes',function($join)use($mes){
@@ -164,7 +164,7 @@ class Proyecto extends BaseModel
 				$actividad->select('componenteActividades.id','componenteActividades.idComponente',
 					'componenteActividades.idProyecto','componenteActividades.indicador',
 					'componenteActividades.valorNumerador AS metaAnual','unidadesMedida.descripcion AS unidadMedida',
-					'avanceMetas.planMejora','avanceMetas.avanceMes','avanceMetas.justificacionAcumulada',
+					'avanceMetas.planMejora','avanceMetas.avanceMes','avanceMetas.justificacionAcumulada','avanceMetas.id AS identificador',
 					DB::raw('sum(metasMes.avance) AS avanceAcumulado'))
 					->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','componenteActividades.idUnidadMedida')
 					->leftjoin('actividadMetasMes AS metasMes',function($join)use($mes){
@@ -180,6 +180,12 @@ class Proyecto extends BaseModel
 							->whereNull('avanceMetas.borradoAl');
 					})
 					->groupBy('componenteActividades.id','metasMes.idActividad');
+			},'fuentesFinanciamiento'=>function($query){
+				$query->join('catalogoFuenteFinanciamiento AS fuente',function($join){
+					$join->on('fuente.id','=','proyectoFinanciamiento.idFuenteFinanciamiento')
+						->whereNull('fuente.borradoAl');
+				})->select('proyectoFinanciamiento.id','proyectoFinanciamiento.idProyecto','proyectoFinanciamiento.idFuenteFinanciamiento',
+						'fuente.clave','fuente.descripcion');
 			}))
 
 			->where('proyectos.idEstatusProyecto','=',5)
