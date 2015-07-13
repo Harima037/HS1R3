@@ -134,18 +134,20 @@ class Proyecto extends BaseModel
 				'proyectos.programaPresupuestario','proyectos.programaEspecial',
 				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
 				'proyectos.numeroProyectoEstrategico','subFuncionGasto.clave AS subFuncionClave',
-				'subFuncionGasto.descripcion AS subFuncionDescripcion',
+				'subFuncionGasto.descripcion AS subFuncionDescripcion','municipios.nombre AS municipio','proyectos.idCobertura',
 				DB::raw('0 AS totalPresupuestoAprobado'),DB::raw('0 AS totalPresupuestoModificado'),
 				DB::raw('0 AS totalPresupuestoDevengado')
 			)
 
 			->leftjoin('catalogoFuncionesGasto AS subFuncionGasto','subFuncionGasto.clave','=',DB::raw('concat_ws(".",proyectos.finalidad,proyectos.funcion,proyectos.subFuncion,proyectos.subSubFuncion)'))
 
+			->leftjoin('vistaMunicipios AS municipios','municipios.clave','=','proyectos.claveMunicipio')
+
 			->with(array('componentes'=>function($componente)use($mes){
 				$componente->select('proyectoComponentes.id',
 					'proyectoComponentes.idProyecto','proyectoComponentes.indicador',
 					'proyectoComponentes.valorNumerador AS metaAnual','unidadesMedida.descripcion AS unidadMedida',
-					'avanceMetas.planMejora','avanceMetas.avanceMes','avanceMetas.justificacionAcumulada','avanceMetas.id AS identificador',
+					'avanceMetas.planMejora','avanceMetas.justificacionAcumulada','avanceMetas.id AS identificador',
 					DB::raw('sum(metasMes.avance) AS avanceAcumulado'))
 					->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','proyectoComponentes.idUnidadMedida')
 					->leftjoin('componenteMetasMes AS metasMes',function($join)use($mes){
@@ -166,7 +168,7 @@ class Proyecto extends BaseModel
 				$actividad->select('componenteActividades.id','componenteActividades.idComponente',
 					'componenteActividades.idProyecto','componenteActividades.indicador',
 					'componenteActividades.valorNumerador AS metaAnual','unidadesMedida.descripcion AS unidadMedida',
-					'avanceMetas.planMejora','avanceMetas.avanceMes','avanceMetas.justificacionAcumulada','avanceMetas.id AS identificador',
+					'avanceMetas.planMejora','avanceMetas.justificacionAcumulada','avanceMetas.id AS identificador',
 					DB::raw('sum(metasMes.avance) AS avanceAcumulado'))
 					->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','componenteActividades.idUnidadMedida')
 					->leftjoin('actividadMetasMes AS metasMes',function($join)use($mes){
@@ -182,8 +184,8 @@ class Proyecto extends BaseModel
 							->whereNull('avanceMetas.borradoAl');
 					})
 					->groupBy('componenteActividades.id','metasMes.idActividad');
-			},'fuentesFinanciamiento'=>function($query) use ($mes,$ejercicio){
-				$query->join('catalogoFuenteFinanciamiento AS fuente',function($join){
+			},'fuentesFinanciamiento'=>function($fuenteFinan) use ($mes,$ejercicio){
+				$fuenteFinan->join('catalogoFuenteFinanciamiento AS fuente',function($join){
 					$join->on('fuente.id','=','proyectoFinanciamiento.idFuenteFinanciamiento')
 						->whereNull('fuente.borradoAl');
 				})->join('proyectos','proyectos.id','=','proyectoFinanciamiento.idProyecto')
@@ -208,7 +210,18 @@ class Proyecto extends BaseModel
 						DB::raw('sum(ep01.presupuestoDevengadoModificado) AS presupuestoDevengado')
 					)
 				->groupBy('proyectoFinanciamiento.id','proyectoFinanciamiento.idProyecto','ep01.FF');
-			}))
+			},'beneficiariosDescripcion'=>function($beneficiario) use ($mes){
+				$beneficiario->leftjoin('registroAvancesBeneficiarios as avanceBenef',function($join)use($mes){
+					$join->on('avanceBenef.idProyectoBeneficiario','=','proyectoBeneficiarios.id')
+						->on('avanceBenef.idTipoBeneficiario','=','proyectoBeneficiarios.idTipoBeneficiario')
+						->where('avanceBenef.mes','<=',$mes);
+				})
+				->select('proyectoBeneficiarios.id','proyectoBeneficiarios.idProyecto','proyectoBeneficiarios.idTipoBeneficiario',
+					DB::raw('sum(avanceBenef.total) AS avanceBeneficiario'),
+					'tipoBeneficiario.descripcion AS tipoBeneficiario')
+				->groupBy('proyectoBeneficiarios.idProyecto','avanceBenef.idTipoBeneficiario');
+			}
+			))
 
 			->where('proyectos.idEstatusProyecto','=',5)
 			

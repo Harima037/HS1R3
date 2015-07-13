@@ -6,7 +6,7 @@
 <body>
 	<table>
 
-		<tr><td width="8.4"></td><td width="8.4"></td><td width="52.5"></td><td width="12.7"></td><td width="12.7"></td><td width="12.7"></td><td width="12.7"></td><td width="1.8"></td><td width="9.7"></td><td width="17.5"></td><td width="17.5"></td><td width="17.5"></td><td width="12.5"></td><td width="12.5"></td><td width="12.5"></td></tr>
+		<tr><td width="8.4"></td><td width="8.4"></td><td width="52.5"></td><td width="12.7"></td><td width="12.7"></td><td width="12.7"></td><td width="12.7"></td><td width="1.8"></td><td width="9.7"></td><td width="17.5"></td><td width="17.5"></td><td width="17.5"></td><td width="13.8"></td><td width="13.8"></td><td width="12.5"></td></tr>
 
 		<tr>
 			<td><b>GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS</b></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
@@ -112,7 +112,31 @@
 			<td valign="top" {{$estilo_fuente = (count($proyecto->fuentesFinanciamiento) > 1)?'style="font-weight:bold; text-decoration:underline;"':''}} >{{$proyecto->totalPresupuestoAprobado}}</td>
 			<td valign="top" {{$estilo_fuente}}>{{$proyecto->totalPresupuestoModificado}}</td>
 			<td valign="top" {{$estilo_fuente}}>{{$proyecto->totalPresupuestoDevengado}}</td>
-			<td></td><td></td><td></td>
+			<td valign="top">
+				@if($proyecto->idCobertura == 1)
+				Cobertura Estatal
+				@elseif($proyecto->idCobertura == 2)
+				{{$proyecto->municipio}}
+				@else
+				Cobertura Regional
+				@endif
+			</td>
+			<td valign="top">
+				@if($proyecto->idCobertura == 1)
+				Cobertura Estatal
+				@elseif($proyecto->idCobertura == 2)
+				{{$proyecto->municipio}}
+				@else
+				Cobertura Regional
+				@endif
+			</td>
+			@if(count($proyecto->beneficiariosDescripcion) > 1)
+				@foreach($proyecto->beneficiariosDescripcion AS $beneficiario)
+				<td>{{$beneficiario->tipoBeneficiario}}</td><td>{{$beneficiario->avanceBeneficiario}}</td>
+				@endforeach
+			@else
+				<td>{{$proyecto->beneficiariosDescripcion[0]->avanceBeneficiario}}</td>
+			@endif
 		</tr>
 
 		@for($i = 0 ; $i < $proyecto->totalItems ; $i++)
@@ -124,7 +148,7 @@
 				<td valign="top" align="center">{{{ $proyecto->componentes[$i]->unidadMedida }}}</td>
 				<td valign="top">{{{ $proyecto->componentes[$i]->metaAnual }}}</td>
 				<td valign="top">{{{ $proyecto->componentes[$i]->metaAnual }}}</td>
-				<td valign="top">{{{ $proyecto->componentes[$i]->avanceMes }}}</td>
+				<td valign="top">{{{ $proyecto->componentes[$i]->avanceAcumulado }}}</td>
 				<td valign="top">
 				@if($proyecto->componentes[$i]->planMejora)
 					{{{ $proyecto->componentes[$i]->identificador }}}
@@ -132,8 +156,8 @@
 				@endif
 				</td>
 				<td valign="top">
-				@if($proyecto->componentes[$i]->avanceMes > 0)
-					{{($proyecto->componentes[$i]->avanceMes/$proyecto->componentes[$i]->metaAnual)*100}}
+				@if($proyecto->componentes[$i]->avanceAcumulado > 0)
+					{{($proyecto->componentes[$i]->avanceAcumulado/$proyecto->componentes[$i]->metaAnual)*100}}
 				@else
 					0.00
 				@endif
@@ -143,7 +167,7 @@
 				<td valign="top" align="center">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->unidadMedida }}}</td>
 				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->metaAnual }}}</td>
 				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->metaAnual }}}</td>
-				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->avanceMes }}}</td>
+				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->avanceAcumulado }}}</td>
 				<td valign="top">
 				@if($proyecto->actividades[$i-$proyecto->desfaseActividades]->planMejora)
 					{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->identificador }}}
@@ -151,8 +175,8 @@
 				@endif
 				</td>
 				<td valign="top">
-					@if($proyecto->actividades[$i-$proyecto->desfaseActividades]->avanceMes > 0)
-						{{($proyecto->actividades[$i-$proyecto->desfaseActividades]->avanceMes/$proyecto->actividades[$i-$proyecto->desfaseActividades]->metaAnual)*100}}
+					@if($proyecto->actividades[$i-$proyecto->desfaseActividades]->avanceAcumulado > 0)
+						{{($proyecto->actividades[$i-$proyecto->desfaseActividades]->avanceAcumulado/$proyecto->actividades[$i-$proyecto->desfaseActividades]->metaAnual)*100}}
 					@else
 						0.00
 					@endif
