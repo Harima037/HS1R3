@@ -135,10 +135,11 @@ Route::group(array('before'=>'auth.sentry'), function(){
 
 		Route::resource('reporte-seguimiento-inst',	'V1\ReporteSeguimientoMetasController', array('only' => array('index','show')));
 
-		Route::resource('cuenta-publica',			'V1\CuentaPublicaController');
-		Route::resource('reporte-cuenta-publica',	'V1\ReporteCuentaPublicaController');
-		Route::resource('cedulas-avances',			'V1\ReporteCedulaAvanceController',array('only'=>array('index')));
-		Route::resource('indicadores-resultados',	'V1\ReporteIndicadorResultadoController',array('only'=>array('index')));
+		Route::resource('cuenta-publica',				'V1\CuentaPublicaController');
+		Route::resource('reporte-cuenta-publica',		'V1\ReporteCuentaPublicaController');
+		Route::resource('cedulas-avances',				'V1\ReporteCedulaAvanceController',array('only'=>array('index')));
+		Route::resource('indicadores-resultados',		'V1\IndicadorResultadoController');
+		Route::resource('rep-indicadores-resultados',	'V1\ReporteIndicadorResultadoController',array('only'=>array('index')));
 
 		Route::resource('reporte-seguimiento',	'V1\ReporteSeguimientoController', array('only' => array('index')));
 		Route::resource('revision-proyectos',	'V1\RevisionController');

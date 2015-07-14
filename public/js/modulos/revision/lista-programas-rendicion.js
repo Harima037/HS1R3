@@ -100,10 +100,10 @@ function cargar_datos_programa(e){
                     'claveTipo': indicador.claveTipoIndicador,
                     'nombre': indicador.descripcionIndicador,
                     'metas': {
-                        1: parseFloat(indicador.trim1) + 0,
-                        2: parseFloat(indicador.trim1) + parseFloat(indicador.trim2),
-                        3: parseFloat(indicador.trim1) + parseFloat(indicador.trim2) + parseFloat(indicador.trim3),
-                        4: parseFloat(indicador.trim1) + parseFloat(indicador.trim2) + parseFloat(indicador.trim3) + parseFloat(indicador.trim4)
+                        1: (parseFloat(indicador.trim1) || 0) + 0,
+                        2: (parseFloat(indicador.trim1) || 0) + (parseFloat(indicador.trim2) || 0) + 0,
+                        3: (parseFloat(indicador.trim1) || 0) + (parseFloat(indicador.trim2) || 0) + (parseFloat(indicador.trim3) || 0) + 0,
+                        4: (parseFloat(indicador.trim1) || 0) + (parseFloat(indicador.trim2) || 0) + (parseFloat(indicador.trim3) || 0) + (parseFloat(indicador.trim4) || 0) + 0
                     },
                     'avances': {
                         1:0,

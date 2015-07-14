@@ -135,10 +135,10 @@ function seguimiento_metas(e){
             var trimestre = $('#trimestre').val();
             var acumulado = 0;
             for(var i = 1; i <= trimestre ; i++){
-                acumulado += parseFloat(response.data['trim'+i]);
+                acumulado += (parseFloat(response.data['trim'+i]) || 0);
             }
 
-            var valor_trimestre = parseFloat(response.data['trim'+trimestre]);
+            var valor_trimestre = (parseFloat(response.data['trim'+trimestre]) || 0);
 
             $('#trimestre-meta').text((valor_trimestre+0).format(2));
                 
@@ -283,10 +283,10 @@ function llenar_grid_indicadores(response){
         if(indicador.registro_avance.length){
             for(var j in indicador.registro_avance){
                 var avance = indicador.registro_avance[j];
-                item.avances_acumulados += avance.avance;
+                item.avances_acumulados += parseFloat(avance.avance);
                 if(avance.trimestre == trimestre){
                     item.justificacion += '<span class="fa fa-floppy-o"></span> ';
-                    item.avances_mes += avance.avance;
+                    item.avances_mes += parseFloat(avance.avance);
                     if(avance.justificacion){
                         item.justificacion += '<span class="fa fa-align-left"></span>';
                     }

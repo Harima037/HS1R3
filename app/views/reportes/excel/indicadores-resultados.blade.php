@@ -101,6 +101,7 @@
 			<td align="center" valign="top" style="text-decoration:underline; font-size:9;">{{$fuente['titulo']}}</td>
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
+
 		@foreach($fuente['proyectos'] as $proyecto)
 		<tr>
 			<td align="center" valign="top" style="font-weight:bold;">
@@ -131,11 +132,21 @@
 				@endif
 			</td>
 			@if(count($proyecto->beneficiariosDescripcion) > 1)
-				@foreach($proyecto->beneficiariosDescripcion AS $beneficiario)
-				<td>{{$beneficiario->tipoBeneficiario}}</td><td>{{$beneficiario->avanceBeneficiario}}</td>
-				@endforeach
+				@if($proyecto->evaluacionMes)
+					@if($proyecto->evaluacionMes->indicadorResultadoBeneficiarios)
+						<td valign="top">{{$proyecto->evaluacionMes->indicadorResultadoBeneficiarios or 0}}</td>
+					@else
+						@foreach($proyecto->beneficiariosDescripcion AS $beneficiario)
+						<td valign="top">{{$beneficiario->tipoBeneficiario}}</td><td>{{$beneficiario->avanceBeneficiario}}</td>
+						@endforeach
+					@endif
+				@else
+					@foreach($proyecto->beneficiariosDescripcion AS $beneficiario)
+					<td valign="top">{{$beneficiario->tipoBeneficiario}}</td><td>{{$beneficiario->avanceBeneficiario}}</td>
+					@endforeach
+				@endif
 			@else
-				<td>{{$proyecto->beneficiariosDescripcion[0]->avanceBeneficiario}}</td>
+				<td valign="top">{{$proyecto->beneficiariosDescripcion[0]->avanceBeneficiario or 0}}</td>
 			@endif
 		</tr>
 
@@ -148,7 +159,7 @@
 				<td valign="top" align="center">{{{ $proyecto->componentes[$i]->unidadMedida }}}</td>
 				<td valign="top">{{{ $proyecto->componentes[$i]->metaAnual }}}</td>
 				<td valign="top">{{{ $proyecto->componentes[$i]->metaAnual }}}</td>
-				<td valign="top">{{{ $proyecto->componentes[$i]->avanceAcumulado }}}</td>
+				<td valign="top">{{{ $proyecto->componentes[$i]->avanceAcumulado or 0.00 }}}</td>
 				<td valign="top">
 				@if($proyecto->componentes[$i]->planMejora)
 					{{{ $proyecto->componentes[$i]->identificador }}}
@@ -167,7 +178,7 @@
 				<td valign="top" align="center">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->unidadMedida }}}</td>
 				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->metaAnual }}}</td>
 				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->metaAnual }}}</td>
-				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->avanceAcumulado }}}</td>
+				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->avanceAcumulado or 0.00 }}}</td>
 				<td valign="top">
 				@if($proyecto->actividades[$i-$proyecto->desfaseActividades]->planMejora)
 					{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->identificador }}}
@@ -186,9 +197,9 @@
 			@endif
 
 			@if(isset($proyecto->fuentesFinanciamiento[$i]) && count($proyecto->fuentesFinanciamiento) > 1)
-				<td valign="top">{{$proyecto->fuentesFinanciamiento[$i]->presupuestoAprobado}}</td>
-				<td valign="top">{{$proyecto->fuentesFinanciamiento[$i]->presupuestoModificado}}</td>
-				<td valign="top">{{$proyecto->fuentesFinanciamiento[$i]->presupuestoDevengado}}</td>
+				<td valign="top">{{$proyecto->fuentesFinanciamiento[$i]->presupuestoAprobado or 0.00}}</td>
+				<td valign="top">{{$proyecto->fuentesFinanciamiento[$i]->presupuestoModificado or 0.00}}</td>
+				<td valign="top">{{$proyecto->fuentesFinanciamiento[$i]->presupuestoDevengado or 0.00}}</td>
 			@else
 				<td></td><td></td><td></td>
 			@endif

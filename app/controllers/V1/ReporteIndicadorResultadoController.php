@@ -29,10 +29,19 @@ class ReporteIndicadorResultadoController extends BaseController {
 	 * @return Response
 	 */
 	public function index(){
+		if(!Sentry::hasAccess('REPORTES.INDIRESULT.R')){
+			return Response::view('errors.403', array(
+				'usuario'=>$datos['usuario'],
+				'sys_activo'=>null,
+				'sys_sistemas'=>$datos['sys_sistemas'],
+				'sys_mod_activo'=>null), 403
+			);
+		}
+
 		try{
 			$parametros = Input::all();
 			$datos = array();
-
+			
 			if(!isset($parametros['mes'])){
 				$mes = Util::obtenerMesActual();
 				if($mes == 0){ $mes = date('n')-1; }
@@ -50,8 +59,10 @@ class ReporteIndicadorResultadoController extends BaseController {
 				$datos['ejercicio'] = intval($parametros['ejercicio']);
 			}
 
-			$rows = Proyecto::indicadoresResultados($mes,$datos['ejercicio'])->get();
+			$rows = Proyecto::reporteIndicadoresResultados($mes,$datos['ejercicio'])->get();
 
+			//$queries = DB::getQueryLog();
+			//var_dump(end($queries));die;
 			//return Response::json($rows,200);
 
 			$hojas = array();

@@ -126,7 +126,33 @@ class Proyecto extends BaseModel
 
 	}
 
-	public function scopeIndicadoresResultados($query,$mes,$ejercicio){
+	public function scopeIndicadoresResultados($query,$mes=NULL,$ejercicio=NULL){
+		$query->select(
+				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
+				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
+				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
+				'proyectos.programaPresupuestario','proyectos.programaEspecial','estatusMes.indicadorResultadoBeneficiarios',
+				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico','estatusMes.idEstatus AS idEstatusAvance',
+				'proyectos.numeroProyectoEstrategico','proyectos.idCobertura','cobertura.clave AS claveCobertura',
+				DB::raw('count(distinct beneficiarios.idTipoBeneficiario) AS beneficiarios')
+			)
+			->leftjoin('catalogoCoberturas AS cobertura','cobertura.id','=','proyectos.idCobertura')
+			->leftjoin('proyectoBeneficiarios AS beneficiarios',function($join){
+				$join->on('beneficiarios.idProyecto','=','proyectos.id')
+					->whereNull('beneficiarios.borradoAl');
+			})
+			->leftjoin('evaluacionProyectoMes AS estatusMes',function($join)use($mes){
+				$join->on('estatusMes.idProyecto','=','proyectos.id')
+					->where('estatusMes.mes','=',$mes)
+					->where('estatusMes.idEstatus','>=',4);
+			})
+			->where('proyectos.idEstatusProyecto','=',5)
+			->groupBy('proyectos.id')
+			->orderBy(DB::raw('count(distinct beneficiarios.idTipoBeneficiario)'),'desc')
+			->orderBy('proyectos.id','desc');
+	}
+
+	public function scopeReporteIndicadoresResultados($query,$mes,$ejercicio){
 		$query->select(
 				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
 				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
@@ -219,10 +245,17 @@ class Proyecto extends BaseModel
 				->select('proyectoBeneficiarios.id','proyectoBeneficiarios.idProyecto','proyectoBeneficiarios.idTipoBeneficiario',
 					DB::raw('sum(avanceBenef.total) AS avanceBeneficiario'),
 					'tipoBeneficiario.descripcion AS tipoBeneficiario')
-				->groupBy('proyectoBeneficiarios.idProyecto','avanceBenef.idTipoBeneficiario');
+				->groupBy('proyectoBeneficiarios.idProyecto','proyectoBeneficiarios.idTipoBeneficiario');
+			},'evaluacionMes'=>function($evaluacionMes)use($mes){
+				$evaluacionMes->where('evaluacionProyectoMes.mes','<=',$mes)
+							->where('evaluacionProyectoMes.idEstatus','>=',4)
+							->where('evaluacionProyectoMes.idEstatus','<',6)
+							->orderBy('evaluacionProyectoMes.mes','desc')
+							->select('evaluacionProyectoMes.id','evaluacionProyectoMes.idProyecto','evaluacionProyectoMes.mes',
+								'evaluacionProyectoMes.indicadorResultadoBeneficiarios');
 			}
 			))
-
+			
 			->where('proyectos.idEstatusProyecto','=',5)
 			
 			->groupBy('proyectos.id')
@@ -582,6 +615,10 @@ class Proyecto extends BaseModel
 	
 	public function evaluacionMeses(){
 		return $this->hasMany('EvaluacionProyectoMes','idProyecto');
+	}
+
+	public function evaluacionMes(){
+		return $this->hasOne('EvaluacionProyectoMes','idProyecto');
 	}
 
 	public function fuentesFinanciamiento(){
