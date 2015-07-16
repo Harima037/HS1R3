@@ -89,8 +89,8 @@ class ReporteCedulaAvanceController extends BaseController {
 					}
 				}
 
-				$rows = $rows->get();
-
+				$rows = $rows->get()->toArray();
+				//var_dump($rows->toArray());die;
 				$datos = array('datos'=>$rows);
 				$datos['total_programado'] = 0;
 				$datos['total_avance'] = 0;
@@ -100,7 +100,7 @@ class ReporteCedulaAvanceController extends BaseController {
 
 				$pdf->output();
 				$dom_pdf = $pdf->getDomPDF();
-				$canvas = $dom_pdf ->get_canvas();
+				$canvas = $dom_pdf->get_canvas();
 				$w = $canvas->get_width();
 		  		$h = $canvas->get_height();
 				$canvas->page_text(($w-75), ($h-16), "Página {PAGE_NUM} de {PAGE_COUNT}", null, 10, array(0, 0, 0));

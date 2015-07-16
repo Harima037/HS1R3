@@ -97,29 +97,29 @@
 		<tr><td colspan="2" height="7">&nbsp;</td></tr>
 		<tr>
 			<th class="texto-izquierda" nowrap="nowrap" width="1">Programa Presupuestario: </th>
-			<td>{{ $proyecto->programaPresupuestarioDescipcion }}</td>
+			<td>{{ $proyecto['programaPresupuestarioDescipcion'] }}</td>
 		</tr>
 		<tr><td colspan="2" height="7">&nbsp;</td></tr>
 		<tr>
 			<th class="texto-izquierda">
-				@if($proyecto->idCalsificacionProyecto == 1)
+				@if($proyecto['idClasificacionProyecto'] == 1)
 					Proyecto Institucional:
 				@else
 					Proyecto de Inversión:
 				@endif
 			</th>
 			<td>
-				{{ $proyecto->nombreTecnico }}
+				{{ $proyecto['nombreTecnico'] }}
 			</td>
 		</tr>
 		<tr>
 			<th class="texto-izquierda">Clave Presupuestaria:</th>
-			<td>{{ $proyecto->ClavePresupuestaria }}</td>
+			<td>{{ $proyecto['ClavePresupuestaria'] }}</td>
 		</tr>
 		<tr><td colspan="2" height="7">&nbsp;</td></tr>
 		<tr>
 			<th class="texto-izquierda">Objetivo General:</th>
-			<td>{{ $proyecto->finalidadProyecto }}</td>
+			<td>{{ $proyecto['finalidadProyecto'] }}</td>
 		</tr>
 	</table>
 	<br>
@@ -130,9 +130,9 @@
 			<th>Presupuesto Ejercido</th>
 		</tr>
 		<tr>
-			<td class="texto-derecha">$ {{number_format($proyecto->presupuestoAprobado,2)}}</td>
-			<td class="texto-derecha">$ {{number_format($proyecto->presupuestoModificado,2)}}</td>
-			<td class="texto-derecha">$ {{number_format($proyecto->presupuestoEjercidoModificado,2)}}</td>
+			<td class="texto-derecha">$ {{number_format($proyecto['presupuestoAprobado'],2)}}</td>
+			<td class="texto-derecha">$ {{number_format($proyecto['presupuestoModificado'],2)}}</td>
+			<td class="texto-derecha">$ {{number_format($proyecto['presupuestoEjercidoModificado'],2)}}</td>
 		</tr>
 	</table>
 	<br>
@@ -145,34 +145,34 @@
 			<th>Avance</th>
 			<th>% Avance</th>
 		</tr>
-		@foreach($proyecto->componentes AS $indice => $componente)
+		@foreach($proyecto['componentes'] AS $indice => $componente)
 		<tr>
-			<td class="texto-centro">C {{$indices[$componente->id]['indice'] = $indice+1}}</td>
-			<td>{{$componente->indicador}}
-				<!-- {{$indices[$componente->id]['indiceActividad']=1}} -->
+			<td class="texto-centro">C {{$indices[$componente['id']]['indice'] = $indice+1}}</td>
+			<td>{{$componente['indicador']}}
+				<!-- {{$indices[$componente['id']]['indiceActividad']=1}} -->
 			</td>
-			<td class="texto-centro">{{$componente->unidadMedida}}</td>
-			<td class="texto-centro">{{number_format($componente->metaAnual,2)}}</td>
-			<td class="texto-centro">{{number_format($componente->avanceAcumulado,2)}}</td>
+			<td class="texto-centro">{{$componente['unidadMedida']}}</td>
+			<td class="texto-centro">{{number_format($componente['metaAnual'],2)}}</td>
+			<td class="texto-centro">{{number_format($componente['avanceAcumulado'],2)}}</td>
 			<td class="texto-centro">
-			@if($componente->avanceAcumulado)
-				{{number_format(($componente->avanceAcumulado/$componente->metaAnual)*100,2)}}
+			@if($componente['avanceAcumulado'])
+				{{number_format(($componente['avanceAcumulado']/$componente['metaAnual'])*100,2)}}
 			@else
 				0.00
 			@endif
 			</td>
 		</tr>
 		@endforeach
-		@foreach($proyecto->actividades AS $indice => $actividad)
+		@foreach($proyecto['actividades'] AS $indice => $actividad)
 		<tr>
-			<td class="texto-centro">A {{$indices[$actividad->idComponente]['indice']}}.{{$indices[$actividad->idComponente]['indiceActividad']++}}</td>
-			<td>{{$actividad->indicador}}</td>
-			<td class="texto-centro">{{$actividad->unidadMedida}}</td>
-			<td class="texto-centro">{{number_format($actividad->metaAnual,2)}}</td>
-			<td class="texto-centro">{{number_format($actividad->avanceAcumulado,2)}}</td>
+			<td class="texto-centro">A {{$indices[$actividad['idComponente']]['indice']}}.{{$indices[$actividad['idComponente']]['indiceActividad']++}}</td>
+			<td>{{$actividad['indicador']}}</td>
+			<td class="texto-centro">{{$actividad['unidadMedida']}}</td>
+			<td class="texto-centro">{{number_format($actividad['metaAnual'],2)}}</td>
+			<td class="texto-centro">{{number_format($actividad['avanceAcumulado'],2)}}</td>
 			<td class="texto-centro">
-			@if($actividad->avanceAcumulado)
-				{{number_format(($actividad->avanceAcumulado/$actividad->metaAnual)*100,2)}}
+			@if($actividad['avanceAcumulado'])
+				{{number_format(($actividad['avanceAcumulado']/$actividad['metaAnual'])*100,2)}}
 			@else
 				0.00
 			@endif
@@ -193,16 +193,16 @@
 			<th>Atendido</th>
 			<th>% Avance</th>
 		</tr>
-		@foreach($proyecto->beneficiariosDescripcion AS $beneficiario)
+		@foreach($proyecto['beneficiarios_descripcion'] AS $beneficiario)
 		<tr>
-			<td class="texto-centro">{{$beneficiario->tipoBeneficiario}}</td>
-			<td class="texto-centro">{{number_format($beneficiario->programadoTotal)}}
-			<!--{{$total_programado += $beneficiario->programadoTotal}}-->
+			<td class="texto-centro">{{$beneficiario['tipoBeneficiario']}}</td>
+			<td class="texto-centro">{{number_format($beneficiario['programadoTotal'])}}
+			<!--{{$total_programado += $beneficiario['programadoTotal']}}-->
 			</td>
-			<td class="texto-centro">{{number_format($beneficiario->avanceTotal)}}
-			<!--{{$total_avance += $beneficiario->avanceTotal}}-->
+			<td class="texto-centro">{{number_format($beneficiario['avanceTotal'])}}
+			<!--{{$total_avance += $beneficiario['avanceTotal']}}-->
 			</td>
-			<td class="texto-centro">{{number_format(($beneficiario->avanceTotal/$beneficiario->programadoTotal)*100,2)}}</td>
+			<td class="texto-centro">{{number_format(($beneficiario['avanceTotal']/$beneficiario['programadoTotal'])*100,2)}}</td>
 		</tr>
 		@endforeach
 		<tr>
