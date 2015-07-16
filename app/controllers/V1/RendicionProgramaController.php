@@ -59,9 +59,13 @@ class RendicionProgramaController extends BaseController {
 
 				$total = $rows->count();
 				
-				$rows = $rows->select('programa.id','programaPresupuestario.descripcion AS programa','programaPresupuestario.clave')
+				$rows = $rows->select('programa.id','programaPresupuestario.descripcion AS programa','programaPresupuestario.clave',
+									DB::raw('count(programaIndicador.trim1) AS trim1'),DB::raw('count(programaIndicador.trim2) AS trim2'),
+									DB::raw('count(programaIndicador.trim3) AS trim3'),DB::raw('count(programaIndicador.trim4) AS trim4'))
 									->join('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','programa.claveProgramaPresupuestario')
+									->leftjoin('programaIndicador','programaIndicador.idPrograma','=','programa.id')
 									->orderBy('id', 'desc')
+									->groupBy('programa.id')
 									->skip(($parametros['pagina']-1)*10)->take(10)
 									->get();
 			}
@@ -101,7 +105,12 @@ class RendicionProgramaController extends BaseController {
 		$parametros = Input::all();
 
 		if(isset($parametros['mostrar'])){
-			if($parametros['mostrar'] == 'datos-programa-avance'){
+			if($parametros['mostrar'] == 'datos-programa-presupuestario'){
+				$recurso = Programa::join('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','programa.claveProgramaPresupuestario')
+					->join('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','programa.claveUnidadResponsable')
+					->select('programa.*','programaPresupuestario.descripcion AS programaPresupuestario','unidadResponsable.descripcion AS unidadResponsable')
+					->find($id);
+			}elseif($parametros['mostrar'] == 'datos-programa-avance'){
 				$mes_del_trimestre = Util::obtenerMesTrimestre();
 				if($mes_del_trimestre == 3){
 					$trimestre_actual = Util::obtenerTrimestre();

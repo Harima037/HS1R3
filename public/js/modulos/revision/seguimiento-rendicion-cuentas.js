@@ -537,7 +537,11 @@ function llenar_grid_acciones(response){
 
         var item = {};
         item.id = '1-' + componente.id;
-        item.nivel = 'Componente ' + contador_componente;
+        if(componente.comentarios.length){
+            item.nivel = '<span class="fa fa-warning"></span> Componente ' + contador_componente;
+        }else{
+            item.nivel = 'Componente ' + contador_componente;
+        }
         item.indicador = componente.indicador;
         item.meta = (parseFloat(componente.valorNumerador) || 0).format(2);
         item.avances_acumulados = 0;
@@ -568,7 +572,11 @@ function llenar_grid_acciones(response){
             var actividad = componente.actividades[j];
             var item = {};
             item.id = '2-' + actividad.id;
-            item.nivel = 'Actividad ' + contador_componente + '.' + contador_actividad;
+            if(actividad.comentarios.length){
+                item.nivel = '<span class="fa fa-warning"></span> Actividad ' + contador_componente + '.' + contador_actividad;
+            }else{
+                item.nivel = 'Actividad ' + contador_componente + '.' + contador_actividad;
+            }
             item.indicador = actividad.indicador;
             item.meta = (parseFloat(actividad.valorNumerador) || 0).format(2);
             item.avances_acumulados = 0;

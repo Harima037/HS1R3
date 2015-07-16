@@ -27,7 +27,7 @@ moduloDatagrid.actualizar({
             item.id = response.data[i].id;
             item.clave = response.data[i].clavePresup;
             item.nombre_tecnico = response.data[i].nombreTecnico;
-            item.revisor = response.data[i].nombreRevisor || '<span class="text-muted">Sin revisor asignado</span>';
+            //item.revisor = response.data[i].nombreRevisor || '<span class="text-muted">Sin revisor asignado</span>';
             datos_grid.push(item);
         }
         moduloDatagrid.cargarDatos(datos_grid);                         

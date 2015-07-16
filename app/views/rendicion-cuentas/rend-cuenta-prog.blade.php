@@ -36,15 +36,37 @@
                     <tr height="50">
                         <th><input type="checkbox" class="check-select-all-rows"></th>
                         <th>Programa Presupuestario</th>
-                        <th width="70">Trim 1</th>
-                        <th width="70">Trim 2</th>
-                        <th width="70">Trim 3</th>
-                        <th width="70">Trim 4</th>
+                        <th class="text-center" width="70">Trim 1</th>
+                        <th class="text-center" width="70">Trim 2</th>
+                        <th class="text-center" width="70">Trim 3</th>
+                        <th class="text-center" width="70">Trim 4</th>
                         <th width="100">Estado</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
+            <div class="panel-footer">
+                <div class="btn-toolbar ">
+                    <div class="btn-group pull-right" style="margin-left:5px; margin-bottom:5px;">
+                        <button class="btn btn-default btn-back-rows"><i class="glyphicon glyphicon-arrow-left"></i></button>
+                        <button class="btn btn-default btn-next-rows"><i class="glyphicon glyphicon-arrow-right"></i></button>
+                    </div>
+                    <div class="btn-group pull-right " style="width:200px; ">   
+                        <div class="input-group" > 
+                            <span class="input-group-addon">Pág.</span> 
+                            <input type="text" class="txt-go-page form-control" style="text-align:center" value="1" >     
+                            <span class="input-group-addon btn-total-paginas" data-pages="0">de 0</span> 
+                            <div class="input-group-btn dropup">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                                <ul class="dropdown-menu pull-right">
+                                    <li><a class="btn-go-first-rows" href="#">Primera Página</a></li>
+                                    <li><a class="btn-go-last-rows" href="#">Última Página</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

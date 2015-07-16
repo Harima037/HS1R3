@@ -250,9 +250,9 @@ class Proyecto extends BaseModel
 				$evaluacionMes->where('evaluacionProyectoMes.mes','<=',$mes)
 							->where('evaluacionProyectoMes.idEstatus','>=',4)
 							->where('evaluacionProyectoMes.idEstatus','<',6)
-							->orderBy('evaluacionProyectoMes.mes','desc')
+							->groupBy('evaluacionProyectoMes.idProyecto')
 							->select('evaluacionProyectoMes.id','evaluacionProyectoMes.idProyecto','evaluacionProyectoMes.mes',
-								'evaluacionProyectoMes.indicadorResultadoBeneficiarios');
+								DB::raw('sum(evaluacionProyectoMes.indicadorResultadoBeneficiarios) AS indicadorResultadoBeneficiarios'));
 			}
 			))
 			

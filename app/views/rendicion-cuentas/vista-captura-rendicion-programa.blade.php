@@ -18,6 +18,20 @@
 	<h3 class="panel-title">Seguimiento de Metas del Trimestre {{$trimestre_activo}}</h3>
 </div>
 <div class="panel-body" id="panel-rendicion-cuentas">
+    <div class="row">
+        <div class="col-sm-8">
+            <div class="form-group">
+                <label class="control-label">Programa Presupuestario</label>
+                <p id="lbl-programa-presup" class="form-control-static"></p>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="control-label">Unidad Responsable</label>
+                <p id="lbl-unidad-responsable" class="form-control-static"></p>
+            </div>
+        </div>
+    </div>
 	<br>
     <div class="panel panel-default datagrid" id="datagridIndicadores" data-edit-row="seguimiento_metas">
     	<div class="panel-body">
@@ -42,7 +56,7 @@
                     <th>Indicador</th>
                     <th>Meta Programada</th>
                     <th>Avance Acumulado</th>
-					<th>del Trimestre</th>
+					<th>Avance del Trimestre</th>
 					<th width="50"></th>
                 </tr>
             </thead>

@@ -43,6 +43,7 @@ moduloDatagrid.actualizar({
             datos_grid.push(item);
         }
         moduloDatagrid.cargarDatos(datos_grid);
+        moduloDatagrid.cargarTotalResultados(response.resultados,'<b>Programa(s)</b>');
         var total = parseInt(response.resultados/moduloDatagrid.rxpag); 
         var plus = parseInt(response.resultados)%moduloDatagrid.rxpag;
         if(plus>0) 

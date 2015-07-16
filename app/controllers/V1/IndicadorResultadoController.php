@@ -131,10 +131,10 @@ class IndicadorResultadoController extends BaseController {
 							$beneficiario->leftjoin('registroAvancesBeneficiarios as avanceBenef',function($join)use($mes){
 								$join->on('avanceBenef.idProyectoBeneficiario','=','proyectoBeneficiarios.id')
 									->on('avanceBenef.idTipoBeneficiario','=','proyectoBeneficiarios.idTipoBeneficiario')
-									->where('avanceBenef.mes','<=',$mes);
+									->where('avanceBenef.mes','=',$mes);
 							})
 							->select('proyectoBeneficiarios.id','proyectoBeneficiarios.idProyecto','proyectoBeneficiarios.idTipoBeneficiario','avanceBenef.sexo',
-								DB::raw('sum(avanceBenef.total) AS avanceBeneficiario'),
+								DB::raw('avanceBenef.total AS avanceBeneficiario'),
 								'tipoBeneficiario.descripcion AS tipoBeneficiario')
 							->groupBy('proyectoBeneficiarios.idProyecto','proyectoBeneficiarios.id','proyectoBeneficiarios.sexo','proyectoBeneficiarios.idTipoBeneficiario');
 						}))

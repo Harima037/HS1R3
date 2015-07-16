@@ -22,14 +22,24 @@ moduloDatagrid.actualizar({
         var trimestre = $('#datagridProgramas').attr('data-trim-activo');
         var label_lock = '<span class=""><span class="fa fa-lock"></span></span>';
         var label_miss = '<span class="text-muted"><span class="fa fa-times"></span></span>';
+        var estilo_programado = 'style="background-color:#DDDDDD"';
         for(var i in response.data){
+            var estilos = [];
+            for(var j = 1; j <= 4; j++){
+                if(response.data[i]['trim'+j]){
+                    estilos[j] = estilo_programado;
+                }else{
+                    estilos[j] = '';
+                }
+            }
+
             var item = {
                 'id':       response.data[i].id,
                 'programa': response.data[i].clave + ' ' + response.data[i].programa,
-                'trim_1':   (trimestre > 1)?label_miss:label_lock,
-                'trim_2':   (trimestre > 2)?label_miss:label_lock,
-                'trim_3':   (trimestre > 3)?label_miss:label_lock,
-                'trim_4':   (trimestre > 4)?label_miss:label_lock,
+                'trim_1':   '<div class="text-center" '+estilos[1]+'>'+((trimestre > 1)?label_miss:label_lock)+'</div>',
+                'trim_2':   '<div class="text-center" '+estilos[2]+'>'+((trimestre > 2)?label_miss:label_lock)+'</div>',
+                'trim_3':   '<div class="text-center" '+estilos[3]+'>'+((trimestre > 3)?label_miss:label_lock)+'</div>',
+                'trim_4':   '<div class="text-center" '+estilos[4]+'>'+((trimestre > 4)?label_miss:label_lock)+'</div>',
                 'estado':   '<span class="text-muted">Inactivo</span>'
             };
 
@@ -48,21 +58,22 @@ moduloDatagrid.actualizar({
             }
 
             if(trimestre > 0){
-                item['trim_'+trimestre] = '<span id="grid-trim-'+trimestre+'" class=""><span class="fa fa-unlock"></span></span>'; 
+                item['trim_'+trimestre] = '<div class="text-center" '+estilos[trimestre]+'><span id="grid-trim-'+trimestre+'" class=""><span class="fa fa-unlock"></span></span></div>'; 
             }
 
             for(var j in response.data[i].registro_avance){
                 var avance = response.data[i].registro_avance[j];
                 var clase_icono = (avance.trimestre == trimestre)?'fa-unlock':'fa-circle';
                 if(parseInt(avance.justificacion) > 0){
-                    item['trim_'+avance.trimestre] = '<span id="grid-trim-'+avance.trimestre+'" class="text-danger"><span class="fa '+clase_icono+'"></span></span>';
+                    item['trim_'+avance.trimestre] = '<div class="text-center" '+estilos[avance.trimestre]+'><span id="grid-trim-'+avance.trimestre+'" class="text-danger"><span class="fa '+clase_icono+'"></span></span></div>';
                 }else{
-                    item['trim_'+avance.trimestre] = '<span id="grid-trim-'+avance.trimestre+'" class="text-success"><span class="fa '+clase_icono+'"></span></span>';
+                    item['trim_'+avance.trimestre] = '<div class="text-center" '+estilos[avance.trimestre]+'><span id="grid-trim-'+avance.trimestre+'" class="text-success"><span class="fa '+clase_icono+'"></span></span></div>';
                 }
             }
             datos_grid.push(item);
         }
-        moduloDatagrid.cargarDatos(datos_grid);                         
+        moduloDatagrid.cargarDatos(datos_grid);
+        moduloDatagrid.cargarTotalResultados(response.resultados,'<b>Programas(s)</b>');
         var total = parseInt(response.resultados/moduloDatagrid.rxpag); 
         var plus = parseInt(response.resultados)%moduloDatagrid.rxpag;
         if(plus>0) 
