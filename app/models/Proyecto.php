@@ -433,7 +433,7 @@ class Proyecto extends BaseModel
 			->leftjoin('evaluacionAnalisisFuncional AS cuentaPub',function($join){
 				$join->on('cuentaPub.idProyecto','=','proyectoMes.idProyecto')
 					->on('cuentaPub.mes','=','proyectoMes.mes')
-					->whereNull('evaluacionAnalisisFuncional.borradoAl');
+					->whereNull('cuentaPub.borradoAl');
 			})
 
 			->where('proyectos.idEstatusProyecto','=',5)
