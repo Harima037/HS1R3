@@ -103,6 +103,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('reporte-seguimiento-inst',array('uses'=>'ReporteSeguimientoMetasController@indexInstitucional'));
 		Route::get('cedulas-avances',array('uses'=>'CedulaAvanceController@index'));
 		Route::get('indicadores-resultados',array('uses'=>'IndicadorResultadoController@index'));
+		Route::get('gasto-regionalizado',array('uses'=>'GastoRegionalizadoController@index'));
 	});
 
 	Route::group(array('prefix'=>"v1"),function(){
@@ -140,6 +141,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('cedulas-avances',				'V1\ReporteCedulaAvanceController',array('only'=>array('index')));
 		Route::resource('indicadores-resultados',		'V1\IndicadorResultadoController');
 		Route::resource('rep-indicadores-resultados',	'V1\ReporteIndicadorResultadoController',array('only'=>array('index')));
+		Route::resource('gasto-regionalizado',		'V1\ReporteGastoRegionalizadoController',array('only'=>array('index')));
 
 		Route::resource('reporte-seguimiento',	'V1\ReporteSeguimientoController', array('only' => array('index')));
 		Route::resource('revision-proyectos',	'V1\RevisionController');
