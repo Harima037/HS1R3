@@ -98,9 +98,9 @@
 			<td>{{$totalRegional['13']}}</td>			
 			<td>{{$totalRegional['14']}}</td>			
 			<td>{{$totalRegional['15']}}</td>
-			<td></td>
-			<td></td>
-			<td></td>
+			<td>{{ $totalTotalDevengado }}</td>
+			<td>{{ $totalTotalAprobado }}</td>
+			<td>{{ $totalTotalModificado }}</td>
 		</tr>
         @foreach($fila as $filaEP01)
         <tr>
@@ -132,7 +132,10 @@
         <tr>
 			<td>SUMA TOTAL</td><td>{{$totalEstatal}}</td><td>{{$totalRegional['1']}}</td><td>{{$totalRegional['2']}}</td><td>{{$totalRegional['3']}}</td><td>{{$totalRegional['4']}}</td><td>{{$totalRegional['5']}}</td>
             <td>{{$totalRegional['6']}}</td><td>{{$totalRegional['7']}}</td><td>{{$totalRegional['8']}}</td><td>{{$totalRegional['9']}}</td><td>{{$totalRegional['10']}}</td><td>{{$totalRegional['11']}}</td><td>{{$totalRegional['12']}}</td>
-            <td>{{$totalRegional['13']}}</td><td>{{$totalRegional['14']}}</td><td>{{$totalRegional['15']}}</td><td></td><td></td><td></td>
+            <td>{{$totalRegional['13']}}</td><td>{{$totalRegional['14']}}</td><td>{{$totalRegional['15']}}</td>
+            <td>{{ $totalTotalDevengado }}</td>
+			<td>{{ $totalTotalAprobado }}</td>
+			<td>{{ $totalTotalModificado }}</td>
 		</tr>
         <tr>
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td>

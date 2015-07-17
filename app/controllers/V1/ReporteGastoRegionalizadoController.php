@@ -52,12 +52,12 @@ class ReporteGastoRegionalizadoController extends BaseController {
 				$datos['ejercicio'] = intval($parametros['ejercicio']);
 			}
 						
-			$rows = CargaDatosEP01::reporteRegionalizado($mes)->get();
-			$rowsCoberturaEstatal = CargaDatosEPRegion::reporteEstatal($mes)->get();
+			$rows = CargaDatosEP01::reporteRegionalizado($mes,$datos['ejercicio'])->get();
+			$rowsCoberturaEstatal = CargaDatosEPRegion::reporteEstatal($mes,$datos['ejercicio'])->get();
 			$rowsRegiones = array();
 			
 			for($i=1; $i<=15; $i++)				
-				$rowsRegiones[$i] = CargaDatosEPRegion::reporteRegional($mes,$i);
+				$rowsRegiones[$i] = CargaDatosEPRegion::reporteRegional($mes,$i,$datos['ejercicio']);
 			
 				//var_dump($rowsRegiones[$i]);die;
 			
@@ -66,6 +66,9 @@ class ReporteGastoRegionalizadoController extends BaseController {
 			$cuantos = 0;	
 			$totalEstatal = 0;
 			$totalRegional = array_fill(1, 15, 0);
+			$datos['totalTotalDevengado'] = 0;
+			$datos['totalTotalAprobado'] = 0;
+			$datos['totalTotalModificado'] = 0;
 													
 			foreach ($rows as $row) {
 				$importeEstatal = 0;
@@ -89,6 +92,10 @@ class ReporteGastoRegionalizadoController extends BaseController {
 						}
 					}
 				}
+				
+				$datos['totalTotalDevengado'] += $row['PresDevengado'];
+				$datos['totalTotalAprobado'] += $row['PresAprobado'];
+				$datos['totalTotalModificado'] += $row['PresModificado'];
 				
 				$data_row = array(					
 					'programapre'=>$row['PP'].' '.$row['nombrePrograma'],
@@ -244,6 +251,23 @@ class ReporteGastoRegionalizadoController extends BaseController {
 					}
 					$sheet->setColumnFormat(array(
 						'A13:T'.$total => '### ### ### ##0.00'
+					));
+					
+					$sheet->setColumnFormat(array(
+						'B12:T12' => '### ### ### ##0.00'
+					));
+					
+					$filatotales = $total+2;
+					
+					$sheet->setColumnFormat(array(
+						'B'.$filatotales.':T'.$filatotales => '### ### ### ##0.00'
+					));
+					
+					$sheet->getStyle('A'.$filatotales.':T'.$filatotales)->applyFromArray(array(
+						'fill' => array(
+					        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
+				    	    'color' => array('rgb' => 'DDDDDD')
+					    )
 					));
 					
 					
