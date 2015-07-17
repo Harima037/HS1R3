@@ -131,7 +131,12 @@ class ReporteCuentaPublicaController extends BaseController {
 		$section->addText(htmlspecialchars($variables['vision']),$texto,$justificado);
 		//$section->addPageBreak();
 
-		$rows = Proyecto::reporteCuentaPublica(Util::obtenerMesActual(),date('Y'))->get();
+		$mes = Util::obtenerMesActual();
+		if($mes == 0){
+			$mes = date('n') - 1;
+		}
+
+		$rows = Proyecto::reporteCuentaPublica($mes,date('Y'))->get();
 		//var_dump($rows->toArray());die;
 		//$queries = DB::getQueryLog();
 		//var_dump(end($queries));die;
@@ -161,16 +166,16 @@ class ReporteCuentaPublicaController extends BaseController {
 				$clasificacion_anterior = $elemento->idClasificacionProyecto;
 			}
 
-			$section->addTitle(htmlspecialchars('Proyecto: '.$elemento->nombreTecnico),4);
+			$section->addTitle(htmlspecialchars('Proyecto: '.$elemento->nombreTecnico.' ( '.$elemento->unidadResponsableDescipcion.' )'),4);
 			$section->addTextBreak();
 
 			$table = $section->addTable('TablaInfo');
 
 			$row = $table->addRow();
-			$row->addCell(3000)->addText('EJE');
-			$row->addCell(3000)->addText('TEMA');
-			$row->addCell(3065)->addText('POLÍTICA PÚBLICA');
-			$row->addCell(5060)->addText('PROGRAMA PRESUPUESTARIO');
+			$row->addCell(3000)->addText('EJE',$titulo,$centrado);
+			$row->addCell(3000)->addText('TEMA',$titulo,$centrado);
+			$row->addCell(3065)->addText('POLÍTICA PÚBLICA',$titulo,$centrado);
+			$row->addCell(5060)->addText('PROGRAMA PRESUPUESTARIO',$titulo,$centrado);
 
 			$row = $table->addRow();
 			$row->addCell(2500)->addText($elemento->ejeDescripcion);
@@ -194,58 +199,11 @@ class ReporteCuentaPublicaController extends BaseController {
 			}
 			$section->addTextBreak();
 		}
-		
-		//$section->addPageBreak();
 
-		//$cell = $table->addCell();
-		//$textrun = $cell->addTextRun();
-		//$textrun->addText(htmlspecialchars('LOGO2'));
-		/*$table->addCell(4500)->addImage(
-		    'resources/PhpWord.png',
-		    array('width' => 80, 'height' => 80, 'align' => 'right')
-		);*/
-		// Add header for all other pages
-		//$subsequent = $section->addHeader();
-		//$subsequent->addText(htmlspecialchars('Subsequent pages in Section 1 will Have this!'));
-		//$subsequent->addImage('resources/_mars.jpg', array('width' => 80, 'height' => 80));
-		// Add footer
-		
-		/*
-		$section2 = $phpWord->addSection();
-		$sec2Header = $section2->addHeader();
-		$sec2Header->addText(htmlspecialchars('All pages in Section 2 will Have this!'));
-		// Write some text
-		$section2->addTextBreak();
-		$section2->addText(htmlspecialchars('Some text...'));
-		*/
-
-	    /*
-	    // After creating a section, you can append elements:
-	    $section->addText('Hello world!');
-
-	    // You can directly style your text by giving the addText function an array:
-	    $section->addText('Hello world! I am formatted.',
-	        array('name'=>'Tahoma', 'size'=>16, 'bold'=>true));
-
-	    // If you often need the same style again you can create a user defined style
-	    // to the word document and give the addText function the name of the style:
-	    $phpWord->addFontStyle('myOwnStyle',
-	        array('name'=>'Verdana', 'size'=>14, 'color'=>'1B2232'));
-	    $section->addText('Hello world! I am formatted by a user defined style',
-	        'myOwnStyle');
-
-	    // You can also put the appended element to local object like this:
-	    $fontStyle = new \PhpOffice\PhpWord\Style\Font();
-	    $fontStyle->setBold(true);
-	    $fontStyle->setName('Verdana');
-	    $fontStyle->setSize(22);
-	    $myTextElement = $section->addText('Hello World!');
-	    $myTextElement->setFontStyle($fontStyle);*/
 		header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
 	    header("Content-Description: File Transfer");
 		header('Content-Disposition: attachment; filename="CuentaPublica.docx"');
-	    // Finally, write the document:
-	        // The files will be in your public folder
+	    
 	    $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
 	    $objWriter->save('php://output');
 	}

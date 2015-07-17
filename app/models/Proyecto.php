@@ -386,6 +386,8 @@ class Proyecto extends BaseModel
 
 				DB::raw('concat_ws(".",proyectos.finalidad,proyectos.funcion,proyectos.subFuncion,proyectos.subSubFuncion) AS subFuncionClave'),
 
+				'unidadesResponsables.descripcion AS unidadResponsableDescipcion',
+
 				DB::raw('concat_ws(" ",programaPresupuestario.clave,programaPresupuestario.descripcion) AS programaPresupuestarioDescipcion'),
 
 				DB::raw('concat_ws(".- ",funcionGasto.clave,funcionGasto.descripcion) AS funcionGasto'),
@@ -399,7 +401,9 @@ class Proyecto extends BaseModel
 
 				DB::raw('count(componenteMetas.meta) + count(actividadMetas.meta) AS totalMetas')
 			)
-
+			
+			->leftjoin('catalogoUnidadesResponsables AS unidadesResponsables','unidadesResponsables.clave','=','proyectos.unidadResponsable')
+			
 			->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','proyectos.programaPresupuestario')
 
 			->leftjoin('catalogoObjetivosPED AS objetivoPED','objetivoPED.id','=','proyectos.idObjetivoPED')
