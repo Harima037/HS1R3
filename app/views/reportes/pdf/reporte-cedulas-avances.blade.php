@@ -88,7 +88,7 @@
 	</div>
 	<table>
 		<tr>
-			<td height="500" class="titulo1 texto-medio texto-centro">Cédulas de Avances Físico-financieros al Tercer Trimestre del 2014</td>
+			<td height="500" class="titulo1 texto-medio texto-centro">Cédulas de Avances Físico-financieros al {{$trimestre}} Trimestre del {{$ejercicio}}</td>
 		</tr>
 	</table>
 	@foreach($datos as $proyecto)

@@ -95,6 +95,10 @@ class ReporteCedulaAvanceController extends BaseController {
 				$datos['total_programado'] = 0;
 				$datos['total_avance'] = 0;
 				$datos['indices'] = array();
+				$trimestre = Util::obtenerTrimestre($mes);
+				$texto_trimestres = array(1=>'Primer',2=>'Segundo',3=>'Tercer',4=>'Cuarto');
+				$datos['trimestre'] = $texto_trimestres[$trimestre];
+				$datos['ejercicio'] = $ejercicio;
 
 				$pdf = PDF::setPaper('LETTER')->setOrientation('landscape')->setWarnings(false)->loadView('reportes.pdf.reporte-cedulas-avances',$datos);
 
