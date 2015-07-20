@@ -42,11 +42,11 @@ accionesDatagrid.actualizar({
             var componente = response.data.componentes[i];
             var item = {};
             item.id = '1-' + componente.id;
-            item.nivel = 'Componente ' + contador_componente;
+            item.nivel = 'C ' + contador_componente;
             item.indicador = componente.indicador;
-            item.meta = (parseFloat(componente.valorNumerador) || 0).format(2);
-            item.metaAcumulada = 0;
-            item.avanceAcumulado = 0;
+            item.meta = (parseFloat(componente.metaAnual) || 0).format(2);
+            item.metaAcumulada = (parseFloat(componente.metaMes) || 0).format(2);
+            item.avanceAcumulado = (parseFloat(componente.avanceMes) || 0).format(2);
             item.avanceMes = 0;
 
             var fecha = new Date();
@@ -59,11 +59,11 @@ accionesDatagrid.actualizar({
                 var actividad = componente.actividades[j];
                 var item = {};
                 item.id = '2-' + actividad.id;
-                item.nivel = 'Actividad ' + contador_componente + '.' + contador_actividad;
+                item.nivel = 'A ' + contador_componente + '.' + contador_actividad;
                 item.indicador = actividad.indicador;
-                item.meta = (parseFloat(actividad.valorNumerador) || 0).format(2);
-                item.metaAcumulada = 0;
-                item.avanceAcumulado = 0;
+                item.meta = (parseFloat(actividad.metaAnual) || 0).format(2);
+                item.metaAcumulada = (parseFloat(actividad.metaMes) || 0).format(2);
+                item.avanceAcumulado = (parseFloat(actividad.avanceMes) || 0).format(2);
                 item.avanceMes = 0;
                 
                 datos_grid.push(item);
@@ -79,7 +79,6 @@ accionesDatagrid.actualizar({
 });
 
 function seguimiento_metas(e){
-    return false;
     var datos_id = e.split('-');
     if(datos_id[0] == '1'){
         var nivel = 'componente';
@@ -104,33 +103,27 @@ function seguimiento_metas(e){
             
             $('#id-accion').val(response.data.id);
 
-            var total_programado = 0;
-            var total_acumulado = 0;
-            var total_avance = 0;
+            var meta_acumulada = 0;
+            var avance_acumulado = 0;
 
-            for(var i in response.data.metas_mes_jurisdiccion){
-                var dato = response.data.metas_mes_jurisdiccion[i];
-                var row = '#tabla-avances-metas > tbody > tr[data-clave-jurisdiccion="'+dato.claveJurisdiccion+'"]';
+            for(var i in response.data.metas_mes){
+                var programado = response.data.metas_mes[i];
 
-                var dato_meta = parseFloat(dato.meta) || 0;
-                dato_meta = +dato_meta.toFixed(2);
+                meta_acumulada += parseFloat(programado.meta) || 0;
+                avance_acumulado += parseFloat(programado.avance) || 0;
 
-                total_programado += parseFloat(dato_meta || 0);
-                
-                $(row + ' > td.meta-programada').attr('data-meta',dato_meta);
-                $(row + ' > td.meta-programada').text(dato_meta.format(2));
+                var mes = programado.mes;
 
-                var dato_avance = parseFloat(dato.avance) || 0;
-
-                if(dato.avance){
-                    total_acumulado += dato_avance;
-                    $(row + ' > td.avance-acumulado').text(dato_avance);
-                    $(row + ' > td.avance-acumulado').attr('data-acumulado',dato_avance);
-                    $(row + ' > td.avance-total').attr('data-avance-total',dato_avance);
-                    $(row + ' > td.avance-total').text(dato_avance.format());
-                }
+                $('#meta-mes-'+mes).text(parseFloat((programado.meta)||0).format(2));
+                $('#meta-acumulada-'+mes).text(meta_acumulada.format(2));
+                $('#avance-acumulado-'+mes).text((avance_acumulado-parseFloat((programado.avance)||0)).format(2));
+                $('#avance-mes-'+mes).text(parseFloat((programado.avance)||0).format(2));
+                $('#avance-total-'+mes).text(avance_acumulado.format(2));
+                $('#porcentaje-acumulado-'+mes).text('0,00 %');
             }
 
+            //console.log(metas_jurisdiccion);
+            /*
             var total_programado_mes = 0;
             for(var i in response.data.metas_mes){
                 var dato = response.data.metas_mes[i];
@@ -156,56 +149,14 @@ function seguimiento_metas(e){
                     $(row + ' > td.avance-acumulado').attr('data-acumulado',(avance_jurisdiccion - dato_avance));
                 }
             }
+            */
 
-            if(response.data.registro_avance.length){
-                $('#id-avance').val(response.data.registro_avance[0].id);
-                $('#analisis-resultados').val(response.data.registro_avance[0].analisisResultados);
-                $('#justificacion-acumulada').val(response.data.registro_avance[0].justificacionAcumulada);
-            }
-
-            if(response.data.plan_mejora.length){
-                var plan_mejora = response.data.plan_mejora[0];
-                $('#accion-mejora').val(plan_mejora.accionMejora);
-                $('#grupo-trabajo').val(plan_mejora.grupoTrabajo);
-                $('#documentacion-comprobatoria').val(plan_mejora.documentacionComprobatoria);
-                $('#fecha-inicio').val(plan_mejora.fechaInicio);
-                $('#fecha-termino').val(plan_mejora.fechaTermino);
-                $('#fecha-notificacion').val(plan_mejora.fechaNotificacion);
-            }
-
-            //var total_porcentaje_acumulado = parseFloat((((total_acumulado + total_avance) * 100) / total_programado).toFixed(2)) || 0;
-            $('#total-meta-programada').text(total_programado.format(2));
-            $('#total-meta-programada-analisis').text(total_programado.format(2));
-            $('#total-meta-programada').attr('data-total-programado',total_programado);
-            $('#total-meta-mes').text(total_programado_mes.format(2));
-            $('#total-meta-mes-analisis').text(total_programado_mes.format(2));
-            $('#total-avance-mes').text(total_avance.format(2));
-            $('#total-avance-mes-analisis').text(total_avance.format(2));
-            $('#total-avance-acumulado').text(total_acumulado.format(2));
-            $('#total-avance-acumulado-analisis').text(total_acumulado.format(2));
-            //$('#total-porcentaje').text(total_porcentaje_acumulado+'% ');
-            $('.avance-mes').change();
-
-            if(response.data.desglose_municipios){
+            /*if(response.data.desglose_municipios){
                 if(response.data.desglose_municipios.length){
                     asignar_municipios(response.data.desglose_municipios);
                     $('input.avance-mes').attr('disabled',true);
                 }
-            }
-
-            if(response.data.comentarios.length){
-                for(var i in response.data.comentarios){
-                    var comentario = response.data.comentarios[i];
-                    var id_campo = comentario.idCampo;
-                    var observacion = comentario.observacion;
-                    if(id_campo == 'avancesmetas'){
-                        $('#tabla-avances-metas').before('<p class="texto-comentario text-warning"><span class="fa fa-warning"></span> '+observacion+'</p>');
-                    }else{
-                        $('#'+id_campo).parent('.form-group').addClass('has-warning');
-                        $('#'+id_campo).after('<p class="texto-comentario help-block"><span class="fa fa-warning"></span> '+observacion+'</p>');
-                    }
-                }
-            }
+            }*/
             $('#modalEditarAvance').modal('show');
         }
     });    
@@ -533,6 +484,8 @@ $('.avance-mes').on('change',function(){
 
 $('#modalEditarAvance').on('hide.bs.modal',function(e){
     $('#modalEditarAvance .alert').remove();
+    $('.valores').empty();
+    /*
     $('#form_avance').get(0).reset();
     $('#form_avance input[type="hidden"]').val('');
     $('#form_avance .texto-comentario').remove();
@@ -563,7 +516,7 @@ $('#modalEditarAvance').on('hide.bs.modal',function(e){
     $('#tab-link-plan-mejora').parent().addClass('disabled');
     $('#tabs-seguimiento-metas a:first').tab('show');
     $('.lista-localidades-jurisdiccion').remove();
-    Validation.cleanFormErrors('#form_avance');
+    Validation.cleanFormErrors('#form_avance');*/
 });
 
 /********************************************************************************************************************************

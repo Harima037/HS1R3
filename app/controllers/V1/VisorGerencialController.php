@@ -45,7 +45,7 @@ class VisorGerencialController extends BaseController {
 					$rows = Proyecto::with(array(
 								'componentes'=>function($query)use($mes_actual){
 									$query->select('proyectoComponentes.id','proyectoComponentes.idProyecto','proyectoComponentes.indicador',
-										'proyectoComponentes.valorNumerador',DB::raw('sum(metasMes.meta) AS metaMes'),
+										'proyectoComponentes.valorNumerador AS metaAnual',DB::raw('sum(metasMes.meta) AS metaMes'),
 										DB::raw('sum(metasMes.avance) AS avanceMes'))
 										->leftjoin('componenteMetasMes AS metasMes',function($join)use($mes_actual){
 											$join->on('metasMes.idComponente','=','proyectoComponentes.id')
@@ -55,7 +55,7 @@ class VisorGerencialController extends BaseController {
 								},
 								'componentes.actividades'=>function($query)use($mes_actual){
 									$query->select('componenteActividades.id','componenteActividades.idComponente','componenteActividades.indicador',
-										'componenteActividades.valorNumerador',DB::raw('sum(metasMes.meta) AS metaMes'),
+										'componenteActividades.valorNumerador AS metaAnual',DB::raw('sum(metasMes.meta) AS metaMes'),
 										DB::raw('sum(metasMes.avance) AS avanceMes'))
 										->leftjoin('actividadMetasMes AS metasMes',function($join)use($mes_actual){
 											$join->on('metasMes.idActividad','=','componenteActividades.id')
@@ -114,30 +114,7 @@ class VisorGerencialController extends BaseController {
 							->orderBy('mes','asc');
 					}
 				));
-				/*
-				$rows = $rows->with(array(
-					'evaluacionMeses'=>function($query) use ($mes_actual,$claveJurisdiccion){
-						$query->where('evaluacionProyectoMes.mes','<=',$mes_actual)
-						->whereIn('idEstatus',array(4,5))
-						->leftjoin('componenteMetasMes',function($join)use($claveJurisdiccion){
-							$join->on('componenteMetasMes.mes','=','evaluacionProyectoMes.mes')
-								->on('componenteMetasMes.idProyecto','=','evaluacionProyectoMes.idProyecto')
-								->where('componenteMetasMes.claveJurisdiccion','=',$claveJurisdiccion)
-								->whereNull('componenteMetasMes.borradoAl');
-						})->leftjoin('actividadMetasMes',function($join)use($claveJurisdiccion){
-							$join->on('actividadMetasMes.mes','=','evaluacionProyectoMes.mes')
-								->on('actividadMetasMes.idProyecto','=','evaluacionProyectoMes.idProyecto')
-								->where('actividadMetasMes.claveJurisdiccion','=',$claveJurisdiccion)
-								->whereNull('actividadMetasMes.borradoAl');
-						})->select('evaluacionProyectoMes.*',
-								DB::raw('sum(componenteMetasMes.meta) + sum(actividadMetasMes.meta) as totalMetas'),
-								DB::raw('sum(componenteMetasMes.avance) + sum(actividadMetasMes.avance) as totalAvances')
-						)->groupBy('evaluacionProyectoMes.idProyecto','evaluacionProyectoMes.mes');
-					}
-				));*/
-
-				//$avances_anteriores = EvaluacionProyectoMes::where('idProyecto')
-
+				
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				
 				if(isset($parametros['buscar'])){
@@ -210,7 +187,7 @@ class VisorGerencialController extends BaseController {
 					}))->find($id);
 			}elseif ($parametros['mostrar'] == 'datos-municipio-avance') {
 				//$id = idComponente y $parametros['clave-municipio'] y $parametros['nivel'] = 'componente'
-				$mes_actual = Util::obtenerMesActual();
+				/*$mes_actual = Util::obtenerMesActual();
 				if($parametros['nivel'] == 'componente'){
 					$recurso = ComponenteDesglose::listarDatos()->where('claveMunicipio','=',$parametros['clave-municipio'])
 													->where('idComponente','=',$id);
@@ -219,8 +196,43 @@ class VisorGerencialController extends BaseController {
 					$query->where('mes','=',$mes_actual);
 				},'metasMesAcumuladas'=>function($query) use ($mes_actual){
 					$query->where('mes','<=',$mes_actual);
-				}))->get();
+				}))->get();*/
 			}elseif($parametros['mostrar'] == 'datos-metas-avance'){
+				$mes_actual = Util::obtenerMesActual();
+				if($mes_actual == 0){
+					$mes_actual = date('n')-1;
+				}
+				if($parametros['nivel'] == 'componente'){
+					$recurso = Componente::getModel();
+				}else{
+					$recurso = Actividad::getModel();
+				}
+
+				$usuario = Sentry::getUser();
+				if($usuario->claveJurisdiccion){
+					//Se Agrupan por proyecto y se sacan solo los de la jurisdiccion del usuario
+					$claveJurisdiccion = $usuario->claveJurisdiccion;
+				}else{
+					$claveJurisdiccion = '00';
+				}
+
+				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
+				$recurso = $recurso->with(array(
+				 	'metasMes'=>function($query) use ($mes_actual,$claveJurisdiccion){
+						$query->where('mes','<=',$mes_actual)
+							->where('claveJurisdiccion','=',$claveJurisdiccion)
+							->orderBy('mes','asc');
+					},'metasMesJurisdiccion'=>function($query) use ($mes_actual){
+						$query->where('mes','<=',$mes_actual);
+					},'unidadMedida'
+				))->find($id);
+
+				/*if($parametros['nivel'] == 'componente'){
+					$recurso->load('desgloseMunicipios');
+					//$queries = DB::getQueryLog();
+					//throw new Exception(print_r(end($queries),true), 1);
+				}*/
+			}elseif($parametros['mostrar'] == 'datos-jurisdicciones-avances'){
 				$mes_actual = Util::obtenerMesActual();
 				if($parametros['nivel'] == 'componente'){
 					$recurso = Componente::getModel();
@@ -243,17 +255,6 @@ class VisorGerencialController extends BaseController {
 					//$queries = DB::getQueryLog();
 					//throw new Exception(print_r(end($queries),true), 1);
 				}
-			}elseif($parametros['mostrar'] == 'datos-beneficiarios-avance'){
-				$mes_actual = Util::obtenerMesActual();
-				$recurso['acumulado'] = RegistroAvanceBeneficiario::where('idProyecto','=',$parametros['id-proyecto'])
-														->where('idTipoBeneficiario','=',$id)
-														->where('mes','<',$mes_actual)->groupBy('idTipoBeneficiario','sexo')
-														->select('idTipoBeneficiario','sexo',DB::raw('sum(total) AS total'))->get();
-				$recurso['beneficiario'] = Beneficiario::with(array('tipoBeneficiario','registroAvance'=>function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'comentarios'))->where('idProyecto','=',$parametros['id-proyecto'])->where('idTipoBeneficiario','=',$id)->get();
-			}elseif ($parametros['mostrar'] == 'analisis-funcional') {
-				$recurso = EvaluacionAnalisisFuncional::with('comentarios')->find($id);
 			}
 		}
 

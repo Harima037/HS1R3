@@ -99,6 +99,7 @@ class VisorGerencialController extends BaseController {
 						7=>'Julio',8=>'Agosto',9=>'Septiembre',10=>'Octubre',11=>'Noviembre',12=>'Diciembre');
 
 		$datos['mes_clave'] = $mes_actual;
+		$datos['meses'] = $meses;
 		$datos['mes'] = $meses[$datos['mes_clave']];
 		$mes_del_trimestre = Util::obtenerMesTrimestre();
 		if($mes_del_trimestre == 3){
@@ -111,13 +112,7 @@ class VisorGerencialController extends BaseController {
 		
 		$datos['id'] = $id;
 		$datos['id_clasificacion'] = $proyecto->idClasificacionProyecto;
-
-		if(count($proyecto->analisisFuncional)){
-			$datos['id_analisis'] = $proyecto->analisisFuncional[0]->id;
-		}else{
-			$datos['id_analisis'] = '';
-		}
-
+		
 		$datos['sys_activo'] = SysGrupoModulo::findByKey('VISORGER');
 
 		if($proyecto->idClasificacionProyecto == 1){
