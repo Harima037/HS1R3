@@ -43,7 +43,7 @@
                 <thead>
                     <tr height="50">
                         <th><input type="checkbox" class="check-select-all-rows"></th>
-                        <th>Clave Presupuestaria</th>
+                        <th width="190">Clave Presupuestaria</th>
                         <th>Nombre Técnico</th>
                         @foreach ($meses as $mes)
                             <th width="30" class="{{ ($mes[0]['clave'] == $mes_actual)?'bg-info':'' }}"><p class="texto-vertical">{{$mes[0]['abrev']}} </p></th>

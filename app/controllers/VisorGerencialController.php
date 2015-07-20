@@ -81,14 +81,8 @@ class VisorGerencialController extends BaseController {
 		$datos['usuario'] = Sentry::getUser();
 
 		$mes_actual = Util::obtenerMesActual();
-
 		if($mes_actual == 0){
-			return Response::view('errors.mes_no_disponible', array(
-				'usuario'=>$datos['usuario'],
-				'sys_activo'=>null,
-				'sys_sistemas'=>$datos['sys_sistemas'],
-				'sys_mod_activo'=>null), 403
-			);
+			$mes_actual = date('n')-1;
 		}
 
 		$proyecto = Proyecto::with(array('analisisFuncional'=>function($query) use ($mes_actual){
@@ -104,7 +98,7 @@ class VisorGerencialController extends BaseController {
 		$meses = array(1=>'Enero',2=>'Febrero',3=>'Marzo',4=>'Abril',5=>'Mayo',6=>'Junio',
 						7=>'Julio',8=>'Agosto',9=>'Septiembre',10=>'Octubre',11=>'Noviembre',12=>'Diciembre');
 
-		$datos['mes_clave'] = Util::obtenerMesActual();
+		$datos['mes_clave'] = $mes_actual;
 		$datos['mes'] = $meses[$datos['mes_clave']];
 		$mes_del_trimestre = Util::obtenerMesTrimestre();
 		if($mes_del_trimestre == 3){
