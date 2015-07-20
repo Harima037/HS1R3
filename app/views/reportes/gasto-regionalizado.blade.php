@@ -45,7 +45,7 @@
                     </div>
                     <div class="col-md-2">
                         <button type="button" class="btn btn-primary btn-block" id="btn-ver-cedulas">
-                            <span class="fa fa-file-pdf-o"></span> Ver Cédulas
+                            <span class="fa fa-file-pdf-o"></span> Ver Reporte
                         </button>
                     </div>
                 </div>
