@@ -10,6 +10,12 @@
         Para rendición de cuentas de proyectos
 
 =====================================*/
+var google_api = false;
+// Load the Visualization API and the piechart package.
+google.load('visualization', '1.0', {'packages':['corechart']});
+// Set a callback to run when the Google Visualization API is loaded.
+google.setOnLoadCallback(inicializar);
+
 
 // Inicialización General para casi cualquier módulo
 if($('#btn-proyecto-cancelar').attr('data-clase-proyecto') == 1){
@@ -26,6 +32,39 @@ $('#btn-proyecto-cancelar').on('click',function(){
     }
 });
 
+function inicializar(){
+    google_api = true;
+    if (document.addEventListener) {
+        window.addEventListener('resize', resizeCharts);
+    }
+    else if (document.attachEvent) {
+        window.attachEvent('onresize', resizeCharts);
+    }
+    else {
+        window.resize = resizeCharts;
+    }
+}
+
+var charts = {};
+
+function resizeCharts (key) {
+    if(key){
+        if(charts[key]){
+            var chart = charts[key].chart;
+            var data = charts[key].data;
+            var options = charts[key].options;
+            chart.draw(data, options);
+        }
+    }else{
+        for(var i in charts){
+            var chart = charts[i].chart;
+            var data = charts[i].data;
+            var options = charts[i].options;
+            chart.draw(data, options);
+        }
+    }
+    
+}
 /********************************************************************************************************************************
         Inicio: Seguimiento de Metas
 *********************************************************************************************************************************/
@@ -78,6 +117,9 @@ accionesDatagrid.actualizar({
     } 
 });
 
+
+$('#tablink-cumplimiento-mensual').on('shown.bs.tab',function (e){ resizeCharts('mensual'); });
+$('#tablink-cumplimiento-jurisdiccion').on('shown.bs.tab',function (e){ resizeCharts('jurisdiccion'); });
 function seguimiento_metas(e){
     var datos_id = e.split('-');
     if(datos_id[0] == '1'){
@@ -118,11 +160,20 @@ function seguimiento_metas(e){
             var meta_acumulada = 0;
             var avance_acumulado = 0;
             var ultimo_estatus = 0;
+
+            var avance_acumulado_mes = [];
+            var meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
             for (var i = 1; i <= 12; i++) {
+                var mes = [];
+                mes.push(meses[i-1]);
+
                 if(metas[i]){
                     meta_acumulada += metas[i].metaMes;
                     avance_acumulado += metas[i].avanceMes;
                 }
+
+                mes.push(meta_acumulada);
 
                 $('#meta-acumulada-'+i).text(meta_acumulada.format(2));
 
@@ -131,12 +182,15 @@ function seguimiento_metas(e){
                 }else{
                     $('#meta-mes-'+i).text('0.00');
                 }
+
                 if(i <= mes_actual){
                     if(meta_acumulada > 0){
                         var porcentaje = (avance_acumulado*100) / meta_acumulada;
                     }else{
                         var porcentaje = (avance_acumulado*100);
                     }
+
+                    mes.push(avance_acumulado);
 
                     var clase = 'text-success';
                     var icono = '';
@@ -168,37 +222,97 @@ function seguimiento_metas(e){
                         $('#avance-mes-'+i).text('0.00');
                     }
                 }else{
+                    mes.push(null);
                     $('#avance-acumulado-'+i).text('');
                     $('#avance-mes-'+i).text('');
                     $('#avance-total-'+i).text('');
                     $('#porcentaje-acumulado-'+i).text('');
                 }
+                avance_acumulado_mes.push(mes);
             };
 
             if(ultimo_estatus == 2){
                 $('#mensaje-alerta').removeClass('hidden');
             }
 
-            var avance_bajo = { 
-                fillColor: '#FF0000',lineColor:'#FF0000',lineWidth: 2,symbol:'triangle-down'
-            };
-            var avance_alto = { 
-                fillColor: '#FF0000',lineColor:'#FF0000',lineWidth: 2,symbol:'triangle'
-            };
-            var avance = { 
-                fillColor: '#7CECB5',lineColor:'#7CECB5',lineWidth: 2,symbol:'circle'
-            };
+            $('#modalEditarAvance').modal('show');
 
+            if(google_api){
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'X');
+                data.addColumn('number', 'Meta Acumulada');
+                data.addColumn('number', 'Avance Acumulado');
+                data.addRows(avance_acumulado_mes);
 
+                // Set chart options
+                var options = {
+                    hAxis: { title: 'Meses' },
+                    vAxis: {
+                      title: 'Metas',
+                      maxValue:meta_acumulada,
+                      minValue:0
+                    },
+                    series: {
+                      0: {curveType:'none',color:'#000000'},  
+                      1: {curveType:'none',color:'#7CB5EC'}
+                    },
+                    legend:{ position:'top' }
+                };
+
+                // Instantiate and draw our chart, passing in some options.
+                var chart = new google.visualization.LineChart(document.getElementById('grafica_cumplimiento_mensual'));
+                chart.draw(data, options);
+
+                charts['mensual']={chart:chart,data:data,options:options};
+
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Jurisdicciones');
+                data.addColumn('number', 'Meta Acumulada');
+                data.addColumn('number', 'Avance Acumulado');
+
+                var avances_jurisdicciones = [];
+                for(var i in response.data.metas_mes_jurisdiccion){
+                    var metas_mes = response.data.metas_mes_jurisdiccion[i];
+                    avances_jurisdicciones.push(
+                        [ 
+                            metas_mes.claveJurisdiccion,
+                            parseFloat(metas_mes.meta),
+                            parseFloat(metas_mes.avance)
+                        ]
+                    );
+                }
+
+                data.addRows(avances_jurisdicciones);
+
+                var options = {
+                    focusTarget: 'category',
+                    hAxis: {
+                      title: 'Jurisdicciones'
+                    },
+                    vAxis: {
+                      title: 'Metas'
+                    },
+                    legend:{ position:'top' }
+                };
+
+                var chart = new google.visualization.ColumnChart(document.getElementById('grafica_cumplimiento_jurisdiccion'));
+                chart.draw(data, options);
+                charts['jurisdiccion']={chart:chart,data:data,options:options};
+                //[{v: [8, 0, 0], f: '8 am'}, 1, .25]
+            }else{
+                $('#grafica_cumplimiento_mensual').html('<div class="alert alert-info">Las librerias de graficas aun no se han cargado por completo, por favor vuelva a cargar el Comonente/Actividad para poder generar la gráfica.</div>');
+            }
+
+            //var avance_bajo = { fillColor: '#FF0000',lineColor:'#FF0000',lineWidth: 2,symbol:'triangle-down' };
+            //var avance_alto = { fillColor: '#FF0000',lineColor:'#FF0000',lineWidth: 2,symbol:'triangle' };
+            //var avance = { fillColor: '#7CECB5',lineColor:'#7CECB5',lineWidth: 2,symbol:'circle' };
+
+            /*
             $('#grafica-cumplimiento-mensual').highcharts({
                 title: {
                     text: 'Cumplimiento Mensual',
                     x: -20 //center
                 },
-                /*subtitle: {
-                    text: 'Indicador',
-                    x: -20
-                },*/
                 xAxis: {
                     categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
                         'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
@@ -251,11 +365,11 @@ function seguimiento_metas(e){
                     }
                 ]
             });
-
-            $('#modalEditarAvance').modal('show');
+            */
         }
     });    
 }
+
 /*
 function asignar_municipios(datos){
     //datos

@@ -6,7 +6,8 @@
 @parent
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
-<script src="{{ URL::to('js/dependencias/highcharts.js')}}"></script>
+<!--script src="@{{ URL::to('js/dependencias/highcharts.js')}}"></script-->
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script src="{{ URL::to('js/modulos/visor-gerencial/vista-rendicion-cuentas.js')}}"></script>
 @stop
 
@@ -120,12 +121,12 @@
 							</a>
 						</li>
 						<li role="presentation">
-							<a href="#cumplimiento-mensual" aria-controls="cumplimiento-mensual" role="tab" data-toggle="tab">
+							<a href="#cumplimiento-mensual" aria-controls="cumplimiento-mensual" id="tablink-cumplimiento-mensual" role="tab" data-toggle="tab">
 								<span class="fa fa-line-chart"></span> Cumplimiento Mensual
 							</a>
 						</li>
 						<li role="presentation">
-							<a href="#cumplimiento-jurisdiccion" aria-controls="cumplimiento-jurisdiccion" role="tab" data-toggle="tab">
+							<a href="#cumplimiento-jurisdiccion" aria-controls="cumplimiento-jurisdiccion" id="tablink-cumplimiento-jurisdiccion" role="tab" data-toggle="tab">
 								<span class="fa fa-bar-chart"></span> Cumplimiento por Jurisdicción
 							</a>
 						</li>
@@ -175,14 +176,11 @@
 						</div>
 						<div role="tabpanel" class="tab-pane" id="cumplimiento-mensual">
 							<br>
-							<div id="grafica-cumplimiento-mensual"></div>
+							<div id="grafica_cumplimiento_mensual" style="width: 100%; height: 20%;"></div>
 						</div>
 						<div role="tabpanel" class="tab-pane" id="cumplimiento-jurisdiccion">
 							<br>
-							<div class="row">
-								<div class="col-sm-12">
-								</div>
-							</div>
+							<div id="grafica_cumplimiento_jurisdiccion" style="width: 100%; height: 20%;"></div>
 						</div>
 					</div>
 				</div>
