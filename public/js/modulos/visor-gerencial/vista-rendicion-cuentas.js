@@ -179,18 +179,34 @@ function seguimiento_metas(e){
                 $('#mensaje-alerta').removeClass('hidden');
             }
 
+            var avance_bajo = { 
+                fillColor: '#FF0000',lineColor:'#FF0000',lineWidth: 2,symbol:'triangle-down'
+            };
+            var avance_alto = { 
+                fillColor: '#FF0000',lineColor:'#FF0000',lineWidth: 2,symbol:'triangle'
+            };
+            var avance = { 
+                fillColor: '#7CECB5',lineColor:'#7CECB5',lineWidth: 2,symbol:'circle'
+            };
+
+
             $('#grafica-cumplimiento-mensual').highcharts({
                 title: {
                     text: 'Cumplimiento Mensual',
                     x: -20 //center
                 },
-                subtitle: {
+                /*subtitle: {
                     text: 'Indicador',
                     x: -20
-                },
+                },*/
                 xAxis: {
                     categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
                         'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+                },
+                tooltip: {
+                    pointFormat: '{series.name}: <span style="font-weight:bold;color:{point.color};">{point.y}</span><br/>',
+                    valueSuffix: ' %',
+                    shared: true
                 },
                 yAxis: {
                     title: {
@@ -204,9 +220,6 @@ function seguimiento_metas(e){
                         color: '#808080'
                     }]
                 },
-                tooltip: {
-                    valueSuffix: '%'
-                },
                 legend: {
                     layout: 'vertical',
                     align: 'right',
@@ -215,12 +228,26 @@ function seguimiento_metas(e){
                 },
                 series: [
                     {
+                        color:'#7CB5EC',
                         name: 'Meta Acumulada',
                         data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
                     }, 
                     {
+                        color:'#DDDDDD',
                         name: 'Total Avance',
-                        data: [0, 0.8, 5.7, 11.3, {y:17.0,marker:{fillColor: '#FF0000',lineWidth: 2,lineColor:'#FF0000'}}, 22.0, 24.8, 24.1, null, null, null, null]
+                        data: [
+                            {y:0,marker:avance},
+                            {y:0.8,marker:avance},
+                            {y:5.7,marker:avance_alto},
+                            {y:11.3,marker:avance},
+                            {y:17.0,marker:avance_bajo}, 
+                            {y:22.0,marker:avance},
+                            {y:24.8,marker:avance_bajo},
+                            {y:24.1,marker:avance},
+                            null,
+                            null,
+                            null,
+                            null]
                     }
                 ]
             });

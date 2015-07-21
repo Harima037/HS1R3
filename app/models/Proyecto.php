@@ -429,9 +429,9 @@ class Proyecto extends BaseModel
 			
 			->leftjoin('evaluacionProyectoMes AS proyectoMes',function($join)use($mes,$anio){
 				$join->on('proyectoMes.idProyecto','=','proyectos.id')
+					->on('proyectoMes.idEstatus','in',DB::raw('(4,5)'))
 					->where('proyectoMes.mes','=',$mes)
-					->where('proyectoMes.anio','=',$anio)
-					->where('proyectoMes.idEstatus','=',DB::raw('5'));
+					->where('proyectoMes.anio','=',$anio);
 			})
 
 			->leftjoin('evaluacionAnalisisFuncional AS cuentaPub',function($join){
