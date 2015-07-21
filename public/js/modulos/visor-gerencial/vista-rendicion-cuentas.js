@@ -103,60 +103,128 @@ function seguimiento_metas(e){
             
             $('#id-accion').val(response.data.id);
 
-            var meta_acumulada = 0;
-            var avance_acumulado = 0;
+            var mes_actual = parseInt($('#mes').val());
 
+            var metas = {};
             for(var i in response.data.metas_mes){
                 var programado = response.data.metas_mes[i];
 
-                meta_acumulada += parseFloat(programado.meta) || 0;
-                avance_acumulado += parseFloat(programado.avance) || 0;
-
-                var mes = programado.mes;
-
-                $('#meta-mes-'+mes).text(parseFloat((programado.meta)||0).format(2));
-                $('#meta-acumulada-'+mes).text(meta_acumulada.format(2));
-                $('#avance-acumulado-'+mes).text((avance_acumulado-parseFloat((programado.avance)||0)).format(2));
-                $('#avance-mes-'+mes).text(parseFloat((programado.avance)||0).format(2));
-                $('#avance-total-'+mes).text(avance_acumulado.format(2));
-                $('#porcentaje-acumulado-'+mes).text('0,00 %');
-            }
-
-            //console.log(metas_jurisdiccion);
-            /*
-            var total_programado_mes = 0;
-            for(var i in response.data.metas_mes){
-                var dato = response.data.metas_mes[i];
-                var row = '#tabla-avances-metas > tbody > tr[data-clave-jurisdiccion="'+dato.claveJurisdiccion+'"]';
-                
-                var dato_meta = parseFloat(dato.meta) || 0;
-                dato_meta = +dato_meta.toFixed(2);
-
-                $('#avance_'+dato.claveJurisdiccion).attr('data-meta-programada',dato_meta);
-                
-                $(row + ' > td.meta-del-mes').text(dato_meta.format(2));
-                $(row + ' > td.meta-del-mes').attr('data-meta-mes',dato_meta);
-                total_programado_mes += dato_meta;
-
-                var dato_avance = parseFloat(dato.avance) || 0;
-
-                if(dato.avance != null){
-                    $('#avance_'+dato.claveJurisdiccion).val(dato_avance);
-                    total_avance += dato_avance;
-                    total_acumulado -= dato_avance;
-                    avance_jurisdiccion = parseFloat($(row + ' > td.avance-acumulado').attr('data-acumulado')) || 0;
-                    $(row + ' > td.avance-acumulado').text((avance_jurisdiccion - dato_avance).format(2));
-                    $(row + ' > td.avance-acumulado').attr('data-acumulado',(avance_jurisdiccion - dato_avance));
+                metas[programado.mes] = {
+                    metaMes:parseFloat(programado.meta)||0,
+                    avanceMes:parseFloat(programado.avance)||0
                 }
             }
-            */
 
-            /*if(response.data.desglose_municipios){
-                if(response.data.desglose_municipios.length){
-                    asignar_municipios(response.data.desglose_municipios);
-                    $('input.avance-mes').attr('disabled',true);
+            var meta_acumulada = 0;
+            var avance_acumulado = 0;
+            var ultimo_estatus = 0;
+            for (var i = 1; i <= 12; i++) {
+                if(metas[i]){
+                    meta_acumulada += metas[i].metaMes;
+                    avance_acumulado += metas[i].avanceMes;
                 }
-            }*/
+
+                $('#meta-acumulada-'+i).text(meta_acumulada.format(2));
+
+                if(metas[i]){
+                    $('#meta-mes-'+i).text(metas[i].metaMes.format(2));
+                }else{
+                    $('#meta-mes-'+i).text('0.00');
+                }
+                if(i <= mes_actual){
+                    if(meta_acumulada > 0){
+                        var porcentaje = (avance_acumulado*100) / meta_acumulada;
+                    }else{
+                        var porcentaje = (avance_acumulado*100);
+                    }
+
+                    var clase = 'text-success';
+                    var icono = '';
+                    ultimo_estatus = 1;
+                    if(!(meta_acumulada == 0 && avance_acumulado == 0)){
+                        if(porcentaje > 110){
+                            clase = 'text-danger';
+                            ultimo_estatus = 2;
+                            icono = 'fa-arrow-up';
+                        }else if(porcentaje < 90){
+                            clase = 'text-danger';
+                            ultimo_estatus = 2;
+                            icono = 'fa-arrow-down';
+                        }else if(porcentaje > 0 && meta_acumulada == 0){
+                            clase = 'text-danger';
+                            ultimo_estatus = 2;
+                            icono = 'fa-arrow-up';
+                        }
+                    }
+
+                    $('#avance-total-'+i).text(avance_acumulado.format(2));
+                    $('#porcentaje-acumulado-'+i).html('<small><span class="fa '+icono+'"></span> '+porcentaje.format(2) + ' %</small>');
+                    $('#porcentaje-acumulado-'+i).addClass(clase);
+                    if(metas[i]){
+                        $('#avance-acumulado-'+i).text((avance_acumulado-metas[i].avanceMes).format(2));
+                        $('#avance-mes-'+i).text(metas[i].avanceMes.format(2));
+                    }else{
+                        $('#avance-acumulado-'+i).text(avance_acumulado.format(2));
+                        $('#avance-mes-'+i).text('0.00');
+                    }
+                }else{
+                    $('#avance-acumulado-'+i).text('');
+                    $('#avance-mes-'+i).text('');
+                    $('#avance-total-'+i).text('');
+                    $('#porcentaje-acumulado-'+i).text('');
+                }
+            };
+
+            if(ultimo_estatus == 2){
+                $('#mensaje-alerta').removeClass('hidden');
+            }
+
+            $('#grafica-cumplimiento-mensual').highcharts({
+                title: {
+                    text: 'Cumplimiento Mensual',
+                    x: -20 //center
+                },
+                subtitle: {
+                    text: 'Indicador',
+                    x: -20
+                },
+                xAxis: {
+                    categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+                        'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+                },
+                yAxis: {
+                    title: {
+                        text: 'Porcentaje ( % )'
+                    },
+                    max:100,
+                    min:0,
+                    plotLines: [{
+                        value: 0,
+                        width: 1,
+                        color: '#808080'
+                    }]
+                },
+                tooltip: {
+                    valueSuffix: '%'
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'middle',
+                    borderWidth: 0
+                },
+                series: [
+                    {
+                        name: 'Meta Acumulada',
+                        data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
+                    }, 
+                    {
+                        name: 'Total Avance',
+                        data: [0, 0.8, 5.7, 11.3, {y:17.0,marker:{fillColor: '#FF0000',lineWidth: 2,lineColor:'#FF0000'}}, 22.0, 24.8, 24.1, null, null, null, null]
+                    }
+                ]
+            });
+
             $('#modalEditarAvance').modal('show');
         }
     });    
@@ -485,6 +553,7 @@ $('.avance-mes').on('change',function(){
 $('#modalEditarAvance').on('hide.bs.modal',function(e){
     $('#modalEditarAvance .alert').remove();
     $('.valores').empty();
+    $('#mensaje-alerta').addClass('hidden');
     /*
     $('#form_avance').get(0).reset();
     $('#form_avance input[type="hidden"]').val('');

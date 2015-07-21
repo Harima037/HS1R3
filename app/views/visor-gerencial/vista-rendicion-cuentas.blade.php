@@ -6,6 +6,7 @@
 @parent
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
+<script src="{{ URL::to('js/dependencias/highcharts.js')}}"></script>
 <script src="{{ URL::to('js/modulos/visor-gerencial/vista-rendicion-cuentas.js')}}"></script>
 @stop
 
@@ -151,34 +152,30 @@
 		                		</thead>
 		                		<tbody>
 		                		@foreach($meses as $clave => $mes)
-		                			<tr>
-		                				<td>{{$mes}}</td>
-		                				<td class="valores" id="meta-mes-{{$clave}}"><span class="text-muted fa fa-minus"></span></td>
-		                				<td class="valores bg-success" id="meta-acumulada-{{$clave}}" class="bg-success"><span class="text-muted fa fa-minus"></span></td>
-		                				<td class="valores" id="avance-acumulado-{{$clave}}"><span class="text-muted fa fa-minus"></span></td>
-		                				<td class="valores" id="avance-mes-{{$clave}}"><span class="text-muted fa fa-minus"></span></td>
-		                				<td class="valores bg-info" id="avance-total-{{$clave}}" class="bg-info"><span class="text-muted fa fa-minus"></span></td>
-		                				<td class="valores" id="porcentaje-acumulado-{{$clave}}"><span class="text-muted fa fa-minus"></span></td>
+		                			<tr {{($mes_clave == $clave)?'style="font-weight:bold;"':''}}>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}}>{{$mes}}</td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores" id="meta-mes-{{$clave}}"><span class="text-muted fa fa-minus"></span></td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores bg-success" id="meta-acumulada-{{$clave}}" class="bg-success"><span class="text-muted fa fa-minus"></span></td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores" id="avance-acumulado-{{$clave}}"><span class="text-muted fa fa-minus"></span></td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores" id="avance-mes-{{$clave}}"><span class="text-muted fa fa-minus"></span></td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores bg-info" id="avance-total-{{$clave}}" class="bg-info"><span class="text-muted fa fa-minus"></span></td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores" id="porcentaje-acumulado-{{$clave}}"><span class="text-muted fa fa-minus"></span></td>
 		                			</tr>
 		                		@endforeach
 		                		</tbody>
-		                		<tfoot>
-		                			<th>Anual</th>
-		                			<th id="anual-meta-mes">0</th>
-		                			<th id="anual-meta-acumulada" class="bg-success">0</th>
-		                			<th id="anual-avance-acumulado">0</th>
-		                			<th id="anual-avance-mes">0</th>
-		                			<th id="anual-avance-total" class="bg-info">0</th>
-		                			<th id="anual-porcentaje-acumulado">0%</th>
-		                		</tfoot>
 		                	</table>
+		                	<div class="form-group hidden" id="mensaje-alerta">
+		                		<label class="control-label">Observaciones:</label>
+		                		<p class="form-control-static" style="font-size:bigger;">
+		                			<big>
+		                				De acuerdo a los resultados acumulados del indicador es necesario implementar un Plan de Acción de Mejora
+		                			</big>
+		                		</p>
+		                	</div>
 						</div>
 						<div role="tabpanel" class="tab-pane" id="cumplimiento-mensual">
 							<br>
-							<div class="row">
-								<div class="col-sm-12">
-								</div>
-							</div>
+							<div id="grafica-cumplimiento-mensual"></div>
 						</div>
 						<div role="tabpanel" class="tab-pane" id="cumplimiento-jurisdiccion">
 							<br>

@@ -219,7 +219,7 @@ class VisorGerencialController extends BaseController {
 				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
 				$recurso = $recurso->with(array(
 				 	'metasMes'=>function($query) use ($mes_actual,$claveJurisdiccion){
-						$query->where('mes','<=',$mes_actual)
+						$query//->where('mes','<=',$mes_actual)
 							->where('claveJurisdiccion','=',$claveJurisdiccion)
 							->orderBy('mes','asc');
 					},'metasMesJurisdiccion'=>function($query) use ($mes_actual){
