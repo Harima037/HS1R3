@@ -6,7 +6,6 @@
 @parent
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
-<!--script src="@{{ URL::to('js/dependencias/highcharts.js')}}"></script-->
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 <script src="{{ URL::to('js/modulos/visor-gerencial/vista-rendicion-cuentas.js')}}"></script>
 @stop
@@ -155,12 +154,12 @@
 		                		@foreach($meses as $clave => $mes)
 		                			<tr {{($mes_clave == $clave)?'style="font-weight:bold;"':''}}>
 		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}}>{{$mes}}</td>
-		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores" id="meta-mes-{{$clave}}"><span class="text-muted fa fa-minus"></span></td>
-		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores bg-success" id="meta-acumulada-{{$clave}}" class="bg-success"><span class="text-muted fa fa-minus"></span></td>
-		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores" id="avance-acumulado-{{$clave}}"><span class="text-muted fa fa-minus"></span></td>
-		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores" id="avance-mes-{{$clave}}"><span class="text-muted fa fa-minus"></span></td>
-		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores bg-info" id="avance-total-{{$clave}}" class="bg-info"><span class="text-muted fa fa-minus"></span></td>
-		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores" id="porcentaje-acumulado-{{$clave}}"><span class="text-muted fa fa-minus"></span></td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores" id="meta-mes-{{$clave}}"></td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores bg-success" id="meta-acumulada-{{$clave}}" class="bg-success"></td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores" id="avance-acumulado-{{$clave}}"></td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores" id="avance-mes-{{$clave}}"></td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores bg-info" id="avance-total-{{$clave}}" class="bg-info"></td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores" id="porcentaje-acumulado-{{$clave}}"></td>
 		                			</tr>
 		                		@endforeach
 		                		</tbody>
@@ -176,11 +175,11 @@
 						</div>
 						<div role="tabpanel" class="tab-pane" id="cumplimiento-mensual">
 							<br>
-							<div id="grafica_cumplimiento_mensual" style="width: 100%; height: 20%;"></div>
+							<div id="grafica_cumplimiento_mensual" style="width:100%; height:300px;"></div>
 						</div>
 						<div role="tabpanel" class="tab-pane" id="cumplimiento-jurisdiccion">
 							<br>
-							<div id="grafica_cumplimiento_jurisdiccion" style="width: 100%; height: 20%;"></div>
+							<div id="grafica_cumplimiento_jurisdiccion" style="width:100%; height:300px;"></div>
 						</div>
 					</div>
 				</div>

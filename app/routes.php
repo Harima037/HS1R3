@@ -81,7 +81,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('proyectos-inv',array('uses'=>'VisorGerencialController@indexInversion'));
 
 		Route::get('ver-avance/{id}',array('uses'=>'VisorGerencialController@rendicionCuentas'));
-		Route::get('visor-general',array('uses'=>'VisorGerencialController@desempenioGeneral'));
+		Route::get('general',array('uses'=>'VisorGerencialController@desempenioGeneral'));
 	});
 
 	Route::group(array('prefix'=>'rendicion-cuentas'),function(){

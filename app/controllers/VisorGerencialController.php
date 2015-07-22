@@ -76,6 +76,10 @@ class VisorGerencialController extends BaseController {
 		return parent::loadIndex('VISORGER','VIGEINV',$datos);
 	}
 
+	public function desempenioGeneral(){
+		return parent::loadIndex('VISORGER','VIGEDESEMP');
+	}
+
 	public function rendicionCuentas($id){
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
 		$datos['usuario'] = Sentry::getUser();

@@ -26,9 +26,9 @@ if($('#btn-proyecto-cancelar').attr('data-clase-proyecto') == 1){
 
 $('#btn-proyecto-cancelar').on('click',function(){
     if($(this).attr('data-clase-proyecto') == 1){
-        window.location.href = SERVER_HOST+'/visor-gerencial/rend-cuenta-inst';
+        window.location.href = SERVER_HOST+'/visor-gerencial/proyectos-inst';
     }else if($(this).attr('data-clase-proyecto') == 2){
-        window.location.href = SERVER_HOST+'/visor-gerencial/rend-cuenta-inv';
+        window.location.href = SERVER_HOST+'/visor-gerencial/proyectos-inv';
     }
 });
 
@@ -75,6 +75,7 @@ accionesDatagrid.actualizar({
         accionesDatagrid.limpiar();
         var datos_grid = [];
         var contador_componente = 0;
+        var mes_actual = $('#mes').val();
         for(var i in response.data.componentes){
             var contador_actividad = 0;
             contador_componente++;
@@ -83,13 +84,26 @@ accionesDatagrid.actualizar({
             item.id = '1-' + componente.id;
             item.nivel = 'C ' + contador_componente;
             item.indicador = componente.indicador;
-            item.meta = (parseFloat(componente.metaAnual) || 0).format(2);
-            item.metaAcumulada = (parseFloat(componente.metaMes) || 0).format(2);
-            item.avanceAcumulado = (parseFloat(componente.avanceMes) || 0).format(2);
+            item.meta = 0;
+            item.metaAcumulada = 0;
+            item.avanceAcumulado = 0;
             item.avanceMes = 0;
 
-            var fecha = new Date();
-            var mes = $('#mes').val();
+            for(var j in componente.metas_mes){
+                item.meta += parseFloat(componente.metas_mes[j].meta);
+                if(componente.metas_mes[j].mes <= mes_actual){
+                    item.metaAcumulada += parseFloat(componente.metas_mes[j].meta) || 0;
+                    item.avanceAcumulado += parseFloat(componente.metas_mes[j].avance) || 0;
+                }
+                if(componente.metas_mes[j].mes == mes_actual){
+                    item.avanceMes = parseFloat(componente.metas_mes[j].avance) || 0;
+                }
+            }
+
+            item.meta = item.meta.format(2);
+            item.metaAcumulada = item.metaAcumulada.format(2);
+            item.avanceAcumulado = item.avanceAcumulado.format(2);
+            item.avanceMes = item.avanceMes.format(2);
 
             datos_grid.push(item);
 
@@ -100,10 +114,26 @@ accionesDatagrid.actualizar({
                 item.id = '2-' + actividad.id;
                 item.nivel = 'A ' + contador_componente + '.' + contador_actividad;
                 item.indicador = actividad.indicador;
-                item.meta = (parseFloat(actividad.metaAnual) || 0).format(2);
-                item.metaAcumulada = (parseFloat(actividad.metaMes) || 0).format(2);
-                item.avanceAcumulado = (parseFloat(actividad.avanceMes) || 0).format(2);
+                item.meta = 0;
+                item.metaAcumulada = 0;
+                item.avanceAcumulado = 0;
                 item.avanceMes = 0;
+
+                for(var k in actividad.metas_mes){
+                    item.meta += parseFloat(actividad.metas_mes[k].meta);
+                    if(actividad.metas_mes[k].mes <= mes_actual){
+                        item.metaAcumulada += parseFloat(actividad.metas_mes[k].meta) || 0;
+                        item.avanceAcumulado += parseFloat(actividad.metas_mes[k].avance) || 0;
+                    }
+                    if(actividad.metas_mes[k].mes == mes_actual){
+                        item.avanceMes = parseFloat(actividad.metas_mes[k].avance) || 0;
+                    }
+                }
+
+                item.meta = item.meta.format(2);
+                item.metaAcumulada = item.metaAcumulada.format(2);
+                item.avanceAcumulado = item.avanceAcumulado.format(2);
+                item.avanceMes = item.avanceMes.format(2);
                 
                 datos_grid.push(item);
             }
@@ -120,6 +150,7 @@ accionesDatagrid.actualizar({
 
 $('#tablink-cumplimiento-mensual').on('shown.bs.tab',function (e){ resizeCharts('mensual'); });
 $('#tablink-cumplimiento-jurisdiccion').on('shown.bs.tab',function (e){ resizeCharts('jurisdiccion'); });
+
 function seguimiento_metas(e){
     var datos_id = e.split('-');
     if(datos_id[0] == '1'){
@@ -141,7 +172,7 @@ function seguimiento_metas(e){
 
             $('#indicador').text(response.data.indicador);
             $('#unidad-medida').text(response.data.unidad_medida.descripcion);
-            $('#meta-total').text((parseFloat(response.data.valorNumerador) || 0).format());
+            //$('#meta-total').text((parseFloat(response.data.valorNumerador) || 0).format());
             
             $('#id-accion').val(response.data.id);
 
@@ -231,11 +262,11 @@ function seguimiento_metas(e){
                 avance_acumulado_mes.push(mes);
             };
 
+            $('#meta-total').text(meta_acumulada.format(2));
+
             if(ultimo_estatus == 2){
                 $('#mensaje-alerta').removeClass('hidden');
             }
-
-            $('#modalEditarAvance').modal('show');
 
             if(google_api){
                 var data = new google.visualization.DataTable();
@@ -253,8 +284,8 @@ function seguimiento_metas(e){
                       minValue:0
                     },
                     series: {
-                      0: {curveType:'none',color:'#000000'},  
-                      1: {curveType:'none',color:'#7CB5EC'}
+                      0: {curveType:'none',color:'#7CB5EC'},
+                      1: {curveType:'none',color:'#AEEAFF'}
                     },
                     legend:{ position:'top' }
                 };
@@ -292,16 +323,22 @@ function seguimiento_metas(e){
                     vAxis: {
                       title: 'Metas'
                     },
+                    series: {
+                        0: {color:'#7CB5EC'},
+                        1: {color:'#AEEAFF'}
+                    },
                     legend:{ position:'top' }
                 };
 
                 var chart = new google.visualization.ColumnChart(document.getElementById('grafica_cumplimiento_jurisdiccion'));
                 chart.draw(data, options);
                 charts['jurisdiccion']={chart:chart,data:data,options:options};
-                //[{v: [8, 0, 0], f: '8 am'}, 1, .25]
             }else{
-                $('#grafica_cumplimiento_mensual').html('<div class="alert alert-info">Las librerias de graficas aun no se han cargado por completo, por favor vuelva a cargar el Comonente/Actividad para poder generar la gráfica.</div>');
+                $('#grafica_cumplimiento_mensual,#grafica_cumplimiento_jurisdiccion').html('<div class="alert alert-info">Las librerias de graficas aun no se han cargado por completo, por favor vuelva a cargar el Comonente/Actividad para poder generar la gráfica.</div>');
             }
+
+            $('#tabs-seguimiento-metas a:first').tab('show');
+            $('#modalEditarAvance').modal('show');
 
             //var avance_bajo = { fillColor: '#FF0000',lineColor:'#FF0000',lineWidth: 2,symbol:'triangle-down' };
             //var avance_alto = { fillColor: '#FF0000',lineColor:'#FF0000',lineWidth: 2,symbol:'triangle' };
@@ -694,6 +731,7 @@ $('.avance-mes').on('change',function(){
 $('#modalEditarAvance').on('hide.bs.modal',function(e){
     $('#modalEditarAvance .alert').remove();
     $('.valores').empty();
+    $('.valores').removeClass('text-danger').removeClass('text-success');
     $('#mensaje-alerta').addClass('hidden');
     /*
     $('#form_avance').get(0).reset();
