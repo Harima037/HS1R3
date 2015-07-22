@@ -10,12 +10,6 @@
         Para rendición de cuentas de proyectos
 
 =====================================*/
-var google_api = false;
-// Load the Visualization API and the piechart package.
-google.load('visualization', '1.0', {'packages':['corechart']});
-// Set a callback to run when the Google Visualization API is loaded.
-google.setOnLoadCallback(inicializar);
-
 
 // Inicialización General para casi cualquier módulo
 if($('#btn-proyecto-cancelar').attr('data-clase-proyecto') == 1){
@@ -32,6 +26,13 @@ $('#btn-proyecto-cancelar').on('click',function(){
     }
 });
 
+var google_api = false;
+
+// Load the Visualization API and the piechart package.
+google.load('visualization', '1.0', {'packages':['corechart']});
+// Set a callback to run when the Google Visualization API is loaded.
+google.setOnLoadCallback(inicializar);
+
 function inicializar(){
     google_api = true;
     if (document.addEventListener) {
@@ -43,9 +44,11 @@ function inicializar(){
     else {
         window.resize = resizeCharts;
     }
+    generateCharts();
 }
 
 var charts = {};
+var charts_data = {};
 
 function resizeCharts (key) {
     if(key){
@@ -63,7 +66,6 @@ function resizeCharts (key) {
             chart.draw(data, options);
         }
     }
-    
 }
 /********************************************************************************************************************************
         Inicio: Seguimiento de Metas
@@ -147,7 +149,6 @@ accionesDatagrid.actualizar({
     } 
 });
 
-
 $('#tablink-cumplimiento-mensual').on('shown.bs.tab',function (e){ resizeCharts('mensual'); });
 $('#tablink-cumplimiento-jurisdiccion').on('shown.bs.tab',function (e){ resizeCharts('jurisdiccion'); });
 
@@ -177,7 +178,7 @@ function seguimiento_metas(e){
             $('#id-accion').val(response.data.id);
 
             var mes_actual = parseInt($('#mes').val());
-
+            var meta_total = 0;
             var metas = {};
             for(var i in response.data.metas_mes){
                 var programado = response.data.metas_mes[i];
@@ -186,6 +187,7 @@ function seguimiento_metas(e){
                     metaMes:parseFloat(programado.meta)||0,
                     avanceMes:parseFloat(programado.avance)||0
                 }
+                meta_total += metas[programado.mes].metaMes;
             }
 
             var meta_acumulada = 0;
@@ -193,18 +195,20 @@ function seguimiento_metas(e){
             var ultimo_estatus = 0;
 
             var avance_acumulado_mes = [];
-            var meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+            var meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
             for (var i = 1; i <= 12; i++) {
                 var mes = [];
-                mes.push(meses[i-1]);
+                mes.push(meses[i-1].substring(0,3));
 
                 if(metas[i]){
                     meta_acumulada += metas[i].metaMes;
                     avance_acumulado += metas[i].avanceMes;
                 }
 
-                mes.push(meta_acumulada);
+                //mes.push(meta_acumulada);
+                mes.push((meta_acumulada*100)/meta_total);
+                mes.push('<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" style="white-space:nowrap;" colspan="2"><big>'+meses[i-1]+' '+((meta_acumulada*100)/meta_total).format(2)+'%</big></th></tr><tr><td style="white-space:nowrap;">Meta Acumulada: </td><th class="text-center text-info">'+meta_acumulada.format(2)+'</th></tr></table>');
 
                 $('#meta-acumulada-'+i).text(meta_acumulada.format(2));
 
@@ -221,7 +225,10 @@ function seguimiento_metas(e){
                         var porcentaje = (avance_acumulado*100);
                     }
 
-                    mes.push(avance_acumulado);
+                    //mes.push(avance_acumulado);
+                    var porcentaje_del_mes = (avance_acumulado*100)/meta_total;
+                    mes.push(porcentaje_del_mes);
+                    mes.push('<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" colspan="2"><big>'+meses[i-1]+' '+porcentaje_del_mes.format(2)+'%</big></th></tr><tr><td style="white-space:nowrap;">Meta Acumulada: </td><th class="text-center text-info"> '+meta_acumulada.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Avance Acumulado: </td><th class="text-center text-primary"> '+avance_acumulado.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Avance del Mes: </td><th class="text-center text-success"> '+(+porcentaje.format(2))+'%</th></tr></table>');
 
                     var clase = 'text-success';
                     var icono = '';
@@ -229,7 +236,7 @@ function seguimiento_metas(e){
                     if(!(meta_acumulada == 0 && avance_acumulado == 0)){
                         if(porcentaje > 110){
                             clase = 'text-danger';
-                            ultimo_estatus = 2;
+                            ultimo_estatus = 3;
                             icono = 'fa-arrow-up';
                         }else if(porcentaje < 90){
                             clase = 'text-danger';
@@ -237,9 +244,26 @@ function seguimiento_metas(e){
                             icono = 'fa-arrow-down';
                         }else if(porcentaje > 0 && meta_acumulada == 0){
                             clase = 'text-danger';
-                            ultimo_estatus = 2;
+                            ultimo_estatus = 3;
                             icono = 'fa-arrow-up';
                         }
+                    }
+
+                    if(ultimo_estatus == 3){
+                        mes.push(porcentaje_del_mes);
+                        mes.push('<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" colspan="2"><big>'+meses[i-1]+' '+porcentaje_del_mes.format(2)+'%</big></th></tr><tr><td style="white-space:nowrap;">Meta Acumulada: </td><th class="text-center text-info"> '+meta_acumulada.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Avance Acumulado: </td><th class="text-center text-primary"> '+avance_acumulado.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Alto Avance: </td><th class="text-center text-danger"> '+(+porcentaje.format(2))+'%</th></tr></table>');
+                        mes.push(null);
+                        mes.push(null);
+                    }else if(ultimo_estatus == 2){
+                        mes.push(null);
+                        mes.push(null);
+                        mes.push(porcentaje_del_mes);
+                        mes.push('<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" colspan="2"><big>'+meses[i-1]+' '+porcentaje_del_mes.format(2)+'%</big></th></tr><tr><td style="white-space:nowrap;">Meta Acumulada: </td><th class="text-center text-info"> '+meta_acumulada.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Avance Acumulado: </td><th class="text-center text-primary"> '+avance_acumulado.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Bajo Avance: </td><th class="text-center text-danger"> '+(+porcentaje.format(2))+'%</th></tr></table>');
+                    }else{
+                        mes.push(null);
+                        mes.push(null);
+                        mes.push(null);
+                        mes.push(null);
                     }
 
                     $('#avance-total-'+i).text(avance_acumulado.format(2));
@@ -254,6 +278,11 @@ function seguimiento_metas(e){
                     }
                 }else{
                     mes.push(null);
+                    mes.push(null);
+                    mes.push(null);
+                    mes.push(null);
+                    mes.push(null);
+                    mes.push(null);
                     $('#avance-acumulado-'+i).text('');
                     $('#avance-mes-'+i).text('');
                     $('#avance-total-'+i).text('');
@@ -264,147 +293,129 @@ function seguimiento_metas(e){
 
             $('#meta-total').text(meta_acumulada.format(2));
 
-            if(ultimo_estatus == 2){
+            if(ultimo_estatus > 1){
                 $('#mensaje-alerta').removeClass('hidden');
             }
 
-            if(google_api){
-                var data = new google.visualization.DataTable();
-                data.addColumn('string', 'X');
-                data.addColumn('number', 'Meta Acumulada');
-                data.addColumn('number', 'Avance Acumulado');
-                data.addRows(avance_acumulado_mes);
+            var avances_jurisdicciones = [['Jurisdiccion','Porcentaje',{role:'style'},{role:'annotation'},{role:'tooltip',p:{html:true}}]];
+            
+            if(response.data.metas_mes_jurisdiccion.length == 0){
+                avances_jurisdicciones = false;
+                $('#grafica_cumplimiento_jurisdiccion').html('<div class="alert alert-info">No se tienen avances resgistrados para ninguna Jurisdicción</div>');
+            }
 
-                // Set chart options
-                var options = {
-                    hAxis: { title: 'Meses' },
-                    vAxis: {
-                      title: 'Metas',
-                      maxValue:meta_acumulada,
-                      minValue:0
-                    },
-                    series: {
-                      0: {curveType:'none',color:'#7CB5EC'},
-                      1: {curveType:'none',color:'#AEEAFF'}
-                    },
-                    legend:{ position:'top' }
-                };
+            for(var i in response.data.metas_mes_jurisdiccion){
 
-                // Instantiate and draw our chart, passing in some options.
-                var chart = new google.visualization.LineChart(document.getElementById('grafica_cumplimiento_mensual'));
-                chart.draw(data, options);
+                var metas_mes = response.data.metas_mes_jurisdiccion[i];
 
-                charts['mensual']={chart:chart,data:data,options:options};
-
-                var data = new google.visualization.DataTable();
-                data.addColumn('string', 'Jurisdicciones');
-                data.addColumn('number', 'Meta Acumulada');
-                data.addColumn('number', 'Avance Acumulado');
-
-                var avances_jurisdicciones = [];
-                for(var i in response.data.metas_mes_jurisdiccion){
-                    var metas_mes = response.data.metas_mes_jurisdiccion[i];
-                    avances_jurisdicciones.push(
-                        [ 
-                            metas_mes.claveJurisdiccion,
-                            parseFloat(metas_mes.meta),
-                            parseFloat(metas_mes.avance)
-                        ]
-                    );
+                if(metas_mes.claveJurisdiccion == 'OC'){
+                    metas_mes.jurisdiccion = 'OFICINA CENTRAL';
                 }
 
-                data.addRows(avances_jurisdicciones);
+                var meta = parseFloat(metas_mes.meta)||0;
+                var avance = parseFloat(metas_mes.avance)||0;
 
-                var options = {
-                    focusTarget: 'category',
-                    hAxis: {
-                      title: 'Jurisdicciones'
-                    },
-                    vAxis: {
-                      title: 'Metas'
-                    },
-                    series: {
-                        0: {color:'#7CB5EC'},
-                        1: {color:'#AEEAFF'}
-                    },
-                    legend:{ position:'top' }
-                };
+                if(meta > 0){
+                    var porcentaje = (avance*100) / meta;
+                }else{
+                    var porcentaje = (avance*100);
+                }
 
-                var chart = new google.visualization.ColumnChart(document.getElementById('grafica_cumplimiento_jurisdiccion'));
-                chart.draw(data, options);
-                charts['jurisdiccion']={chart:chart,data:data,options:options};
+                var estatus = '#4B804C';
+                if(!(meta_acumulada == 0 && avance_acumulado == 0)){
+                    if(porcentaje > 110){
+                        estatus = '#A94442';
+                    }else if(porcentaje < 90){
+                        estatus = '#A94442';
+                    }else if(porcentaje > 0 && meta_acumulada == 0){
+                        estatus = '#A94442';
+                    }
+                }
+
+                avances_jurisdicciones.push(
+                    [ 
+                        metas_mes.claveJurisdiccion,porcentaje,estatus,(+porcentaje.toFixed(2)) + '%',
+                        '<b>'+metas_mes.jurisdiccion + '</b><br>' + ((porcentaje > 110)?'Alto ':(porcentaje < 90)?'Bajo ':'') + 'Avance: <span style="color:'+estatus+';font-weight:bold;">'+(+porcentaje.toFixed(2)) + '%</span>'
+                    ]
+                );
+            }
+            
+            charts_data['mensual'] = avance_acumulado_mes;
+            charts_data['jurisdiccion'] = avances_jurisdicciones;
+
+            if(google_api){
+                generateCharts();
             }else{
-                $('#grafica_cumplimiento_mensual,#grafica_cumplimiento_jurisdiccion').html('<div class="alert alert-info">Las librerias de graficas aun no se han cargado por completo, por favor vuelva a cargar el Comonente/Actividad para poder generar la gráfica.</div>');
+                $('#grafica_cumplimiento_mensual,#grafica_cumplimiento_jurisdiccion').html('<div class="alert alert-info"><span class="fa fa-spinner fa-spin"></span> Cargando Librerias... Por favor espere... </div>');
             }
 
             $('#tabs-seguimiento-metas a:first').tab('show');
             $('#modalEditarAvance').modal('show');
-
-            //var avance_bajo = { fillColor: '#FF0000',lineColor:'#FF0000',lineWidth: 2,symbol:'triangle-down' };
-            //var avance_alto = { fillColor: '#FF0000',lineColor:'#FF0000',lineWidth: 2,symbol:'triangle' };
-            //var avance = { fillColor: '#7CECB5',lineColor:'#7CECB5',lineWidth: 2,symbol:'circle' };
-
-            /*
-            $('#grafica-cumplimiento-mensual').highcharts({
-                title: {
-                    text: 'Cumplimiento Mensual',
-                    x: -20 //center
-                },
-                xAxis: {
-                    categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
-                        'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-                },
-                tooltip: {
-                    pointFormat: '{series.name}: <span style="font-weight:bold;color:{point.color};">{point.y}</span><br/>',
-                    valueSuffix: ' %',
-                    shared: true
-                },
-                yAxis: {
-                    title: {
-                        text: 'Porcentaje ( % )'
-                    },
-                    max:100,
-                    min:0,
-                    plotLines: [{
-                        value: 0,
-                        width: 1,
-                        color: '#808080'
-                    }]
-                },
-                legend: {
-                    layout: 'vertical',
-                    align: 'right',
-                    verticalAlign: 'middle',
-                    borderWidth: 0
-                },
-                series: [
-                    {
-                        color:'#7CB5EC',
-                        name: 'Meta Acumulada',
-                        data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, 26.5, 23.3, 18.3, 13.9, 9.6]
-                    }, 
-                    {
-                        color:'#DDDDDD',
-                        name: 'Total Avance',
-                        data: [
-                            {y:0,marker:avance},
-                            {y:0.8,marker:avance},
-                            {y:5.7,marker:avance_alto},
-                            {y:11.3,marker:avance},
-                            {y:17.0,marker:avance_bajo}, 
-                            {y:22.0,marker:avance},
-                            {y:24.8,marker:avance_bajo},
-                            {y:24.1,marker:avance},
-                            null,
-                            null,
-                            null,
-                            null]
-                    }
-                ]
-            });
-            */
         }
     });    
+}
+
+function generateCharts(){
+    if(charts_data['mensual']){
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'X');
+        data.addColumn('number', 'Meta Acumulada');
+        data.addColumn({type:'string',role:'tooltip',p:{html:true}});
+        data.addColumn('number', 'Avance Acumulado');
+        data.addColumn({type:'string',role:'tooltip',p:{html:true}});
+        data.addColumn('number', 'Alto Avance');
+        data.addColumn({type:'string',role:'tooltip',p:{html:true}});
+        data.addColumn('number', 'Bajo Avance');
+        data.addColumn({type:'string',role:'tooltip',p:{html:true}});
+        data.addRows(charts_data['mensual']);
+        // Set chart options
+        var options = {
+            title:'Porcentaje de cumplimiento de metas por mes',
+            hAxis: { title: 'Meses' },
+            vAxis: {
+              title: 'Porcentaje',
+              maxValue:100,
+              minValue:0
+            },
+            series: {
+              0: {curveType:'none',color:'#7CB5EC'},
+              1: {curveType:'none',color:'#4B804C'},
+              2: {
+                    lineWidth:0,
+                    color:'#A94442',
+                    pointShape: { type: 'triangle' },
+                    pointSize:15
+                },
+              3: {
+                    lineWidth:0,
+                    color:'#A94442',
+                    pointShape: { type: 'triangle',rotation: 180 },
+                    pointSize:15
+                }
+            },
+            legend:{ position:'none' },
+            tooltip: {isHtml: true},
+            pointSize:6
+        };
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.LineChart(document.getElementById('grafica_cumplimiento_mensual'));
+        charts['mensual']={chart:chart,data:data,options:options};
+    }
+    
+    if(charts_data['jurisdiccion']){
+        var data = new google.visualization.arrayToDataTable(charts_data['jurisdiccion']);
+        var options = {
+            title: 'Porcentaje de cumplimiento de metas por Jurisdicción con corte al mes actual',
+            hAxis: { title: 'Jurisdicciones' },
+            vAxis: { title: 'Porcentaje',maxValue:100,minValue:0},
+            legend:{ position:'none' },
+            annotations: { textStyle: { fontSize:10 }, alwaysOutside:true },
+            tooltip: {isHtml: true}
+        };
+        var chart = new google.visualization.ColumnChart(document.getElementById('grafica_cumplimiento_jurisdiccion'));
+        charts['jurisdiccion']={chart:chart,data:data,options:options};
+    }
+    resizeCharts();
 }
 
 /*
@@ -794,7 +805,14 @@ function sumar_valores(identificador,resultado){
  */
 Number.prototype.format = function(n, x) {
     var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\.' : '$') + ')';
-    return this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+    //return this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+    var formateado = this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+    var partes = formateado.split('.');
+    if(parseInt(partes[1]) == 0){
+        return partes[0];
+    }else{
+        return formateado;
+    }
 };
 
 /********************************************************************************************************************************

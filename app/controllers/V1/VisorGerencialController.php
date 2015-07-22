@@ -216,8 +216,12 @@ class VisorGerencialController extends BaseController {
 				}
 				if($parametros['nivel'] == 'componente'){
 					$recurso = Componente::getModel();
+					$tabla = 'componenteMetasMes.';
+					$campo = 'idComponente';
 				}else{
 					$recurso = Actividad::getModel();
+					$tabla = 'actividadMetasMes.';
+					$campo = 'idActividad';
 				}
 
 				$usuario = Sentry::getUser();
@@ -230,11 +234,13 @@ class VisorGerencialController extends BaseController {
 
 				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
 				$recurso = $recurso->with(array(
-				 	'metasMes'=>function($query) use ($mes_actual,$claveJurisdiccion){
+				 	'metasMes'=>function($query) use ($claveJurisdiccion){
 						$query->where('claveJurisdiccion','=',$claveJurisdiccion)
 							->orderBy('mes','asc');
-					},'metasMesJurisdiccion'=>function($query) use ($mes_actual){
-						$query->where('mes','<=',$mes_actual);
+					},'metasMesJurisdiccion'=>function($query) use ($mes_actual,$tabla,$campo){
+						$query->select($tabla.'id','idProyecto',$campo,'claveJurisdiccion',DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'),'vistaJurisdicciones.nombre AS jurisdiccion')
+							->where('mes','<=',$mes_actual)
+							->leftjoin('vistaJurisdicciones','vistaJurisdicciones.clave','=','claveJurisdiccion');
 					},'unidadMedida'
 				))->find($id);
 
