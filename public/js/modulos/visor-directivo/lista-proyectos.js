@@ -117,7 +117,6 @@ moduloDatagrid.actualizar({
                     item['mes_'+meses[j]] = '<div id="grid-mes-'+meses[j]+'" class="text-center" '+meses_capturados[meses[j]]+'><span class="fa fa-lock"></span></div>';
                 }
             }
-            var estatus_anteriores = {};
             if(response.data[i].evaluacion_meses.length){
                 for(var j in response.data[i].evaluacion_meses){
                     var evaluacion_mes = response.data[i].evaluacion_meses[j];
@@ -156,7 +155,7 @@ moduloDatagrid.actualizar({
 });
 
 function cargar_datos_proyecto(e){
-    window.location.href = SERVER_HOST+'/visor-gerencial/ver-avance/' + e;
+    window.location.href = SERVER_HOST+'/visor-directivo/ver-avance/' + e;
 }
 
 /*             Extras               */

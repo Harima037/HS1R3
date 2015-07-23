@@ -84,6 +84,14 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('general',array('uses'=>'VisorGerencialController@desempenioGeneral'));
 	});
 
+	Route::group(array('prefix'=>'visor-directivo'),function(){
+		Route::get('proyectos-inst',array('uses'=>'VisorDirectivoController@indexInstitucional'));
+		Route::get('proyectos-inv',array('uses'=>'VisorDirectivoController@indexInversion'));
+
+		Route::get('ver-avance/{id}',array('uses'=>'VisorDirectivoController@rendicionCuentas'));
+		Route::get('general',array('uses'=>'VisorDirectivoController@desempenioGeneral'));
+	});
+
 	Route::group(array('prefix'=>'rendicion-cuentas'),function(){
 		Route::get('rend-cuenta-inst',array('uses'=>'SeguimientoController@indexInstitucional'));
 		Route::get('rend-cuenta-inv',array('uses'=>'SeguimientoController@indexInversion'));
@@ -126,10 +134,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('reporteProyecto',	'V1\ReporteProyectoController', array('only' => array('show')));
 		Route::resource('fibap',			'V1\FibapController');
 
-		Route::resource('visor-gerencial', 	'V1\VisorGerencialController');
-		//Route::resource('visor-gerencial-inv', 		'V1\VisorGerencialController');
-		//Route::resource('visor-gerencial-general', 	'V1\VisorGerencialController\?grafica-general=1');
-
+		Route::resource('visor-gerencial', 	'V1\VisorGerencialController', array('only' => array('index','show')));
+		Route::resource('visor-directivo', 	'V1\VisorDirectivoController', array('only' => array('index','show')));
 
 		Route::resource('rend-cuenta-inst', 	'V1\SeguimientoController');
 		Route::resource('rend-cuenta-inv', 		'V1\SeguimientoController');

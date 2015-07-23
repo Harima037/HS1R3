@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime,Mail;
-use Proyecto,ComponenteMetaMes,ActividadMetaMes;
+use Proyecto,ComponenteMetaMes,ActividadMetaMes,Componente,Actividad;
 
 class VisorGerencialController extends BaseController {
 
@@ -139,10 +139,10 @@ class VisorGerencialController extends BaseController {
 
 			if(isset($parametros['grid'])){
 				if($parametros['grid'] == 'rendicion-acciones'){
-					$mes_actual = Util::obtenerMesActual();
+					/*$mes_actual = Util::obtenerMesActual();
 					if($mes_actual == 0){
 						$mes_actual = date('n') -1;
-					}
+					}*/
 					$usuario = Sentry::getUser();
 					if($usuario->claveJurisdiccion){
 						$clave_jurisdiccion = $usuario->claveJurisdiccion;
@@ -163,15 +163,15 @@ class VisorGerencialController extends BaseController {
 										'componenteMetasMes.mes','componenteMetasMes.avance')
 										->where('componenteMetasMes.claveJurisdiccion','=',$clave_jurisdiccion);
 								},
-								'componentes.actividades'=>function($query)use($clave_jurisdiccion){
-									$query->select('componenteActividades.id','componenteActividades.idComponente','componenteActividades.indicador')
+								'actividades'=>function($query)use($clave_jurisdiccion){
+									$query->select('componenteActividades.id','componenteActividades.idProyecto','componenteActividades.idComponente','componenteActividades.indicador')
 										->join('actividadMetasMes AS metasMes',function($join)use($clave_jurisdiccion){
 											$join->on('metasMes.idActividad','=','componenteActividades.id')
 												->where('metasMes.claveJurisdiccion','=',$clave_jurisdiccion)
 												->whereNull('metasMes.borradoAl');
 										})
 										->groupBy('metasMes.idActividad');
-								},'componentes.actividades.metasMes'=>function($query)use($clave_jurisdiccion){
+								},'actividades.metasMes'=>function($query)use($clave_jurisdiccion){
 									$query->select('actividadMetasMes.id','actividadMetasMes.idActividad','actividadMetasMes.meta',
 										'actividadMetasMes.mes','actividadMetasMes.avance')
 										->where('actividadMetasMes.claveJurisdiccion','=',$clave_jurisdiccion);

@@ -4,6 +4,9 @@
 
 @section('js')
 @parent
+<script type="text/javascript">
+	$("#loading").fadeIn();
+</script>
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -16,7 +19,7 @@
 @section('content')
 <div class="panel panel-default">
 <div class="panel-heading">
-	<h3 class="panel-title">Rendición de cuentas del mes de {{$mes}}</h3>
+	<h3 class="panel-title">Estado de los indicadores al mes de {{$mes}}</h3>
 </div>
 <div class="panel-body" id="panel-rendicion-cuentas">
     <ul class="nav nav-tabs" role="tablist">

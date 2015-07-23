@@ -1,7 +1,7 @@
 <?php
 use SSA\Utilerias\Util;
 
-class VisorGerencialController extends BaseController {
+class VisorDirectivoController extends BaseController {
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -39,7 +39,7 @@ class VisorGerencialController extends BaseController {
 		}
 		$datos['mes_actual'] = $mes_actual;
 		$datos['trimestre_avance'] = Util::obtenerTrimestre(date('n')-1);
-		return parent::loadIndex('VISORGER','VIGEINST',$datos);
+		return parent::loadIndex('VISORDIR','VIDIINST',$datos);
 	}
 	public function indexInversion(){
 		$datos = array(
@@ -73,11 +73,11 @@ class VisorGerencialController extends BaseController {
 		}
 		$datos['mes_actual'] = $mes_actual;
 		$datos['trimestre_avance'] = Util::obtenerTrimestre(date('n')-1);
-		return parent::loadIndex('VISORGER','VIGEINV',$datos);
+		return parent::loadIndex('VISORDIR','VIDIINV',$datos);
 	}
 
 	public function desempenioGeneral(){
-		return parent::loadIndex('VISORGER','VIGEDESEMP');
+		return parent::loadIndex('VISORDIR','VIDIDESEMP');
 	}
 
 	public function rendicionCuentas($id){
@@ -92,13 +92,13 @@ class VisorGerencialController extends BaseController {
 		$proyecto = Proyecto::with(array('analisisFuncional'=>function($query) use ($mes_actual){
 			$query->where('mes','=',$mes_actual);
 		}))->find($id);
-		/*if($proyecto->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
+		if($proyecto->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
 			$jurisdicciones = Jurisdiccion::all();
 		}elseif($proyecto->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
 			$jurisdicciones = Municipio::obtenerJurisdicciones($proyecto->claveMunicipio)->get();
 		}elseif($proyecto->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
 			$jurisdicciones = Region::obtenerJurisdicciones($proyecto->claveRegion)->get();
-		}*/
+		}
 		$meses = array(1=>'Enero',2=>'Febrero',3=>'Marzo',4=>'Abril',5=>'Mayo',6=>'Junio',
 						7=>'Julio',8=>'Agosto',9=>'Septiembre',10=>'Octubre',11=>'Noviembre',12=>'Diciembre');
 
@@ -112,19 +112,19 @@ class VisorGerencialController extends BaseController {
 			$datos['trimestre_activo'] = FALSE;
 		}
 
-		//$datos['jurisdicciones'] = array('OC'=>'Oficina Central') + $jurisdicciones->lists('nombre','clave');
+		$datos['jurisdicciones'] = array('OC'=>'Oficina Central') + $jurisdicciones->lists('nombre','clave');
 		
 		$datos['id'] = $id;
 		$datos['id_clasificacion'] = $proyecto->idClasificacionProyecto;
 		
-		$datos['sys_activo'] = SysGrupoModulo::findByKey('VISORGER');
+		$datos['sys_activo'] = SysGrupoModulo::findByKey('VISORDIR');
 
 		if($proyecto->idClasificacionProyecto == 1){
-			$datos['sys_mod_activo'] = SysModulo::findByKey('VIGEINST');
-			$permiso = 'VISORGER.VIGEINST.R';
+			$datos['sys_mod_activo'] = SysModulo::findByKey('VIDIINST');
+			$permiso = 'VISORDIR.VIDIINST.R';
 		}else{
-			$datos['sys_mod_activo'] = SysModulo::findByKey('VIGEINV');
-			$permiso = 'VISORGER.VIGEINV.R';
+			$datos['sys_mod_activo'] = SysModulo::findByKey('VIDIINV');
+			$permiso = 'VISORDIR.VIDIINV.R';
 		}
 		
 		$uri = 'visor-gerencial.vista-rendicion-cuentas';
