@@ -12,5 +12,5 @@
 =====================================*/
 
 // Inicialización General para casi cualquier módulo
-var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/visor-gerencial-inst');
+var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/visor-gerencial');
 var moduloDatagrid = new Datagrid("#datagridProyectos",moduloResource,{ formatogrid:true, pagina: 1, clasificacionProyecto: 1});

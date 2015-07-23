@@ -126,8 +126,10 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('reporteProyecto',	'V1\ReporteProyectoController', array('only' => array('show')));
 		Route::resource('fibap',			'V1\FibapController');
 
-		Route::resource('visor-gerencial-inst', 	'V1\VisorGerencialController');
-		Route::resource('visor-gerencial-inv', 	'V1\VisorGerencialController');
+		Route::resource('visor-gerencial', 	'V1\VisorGerencialController');
+		//Route::resource('visor-gerencial-inv', 		'V1\VisorGerencialController');
+		//Route::resource('visor-gerencial-general', 	'V1\VisorGerencialController\?grafica-general=1');
+
 
 		Route::resource('rend-cuenta-inst', 	'V1\SeguimientoController');
 		Route::resource('rend-cuenta-inv', 		'V1\SeguimientoController');
