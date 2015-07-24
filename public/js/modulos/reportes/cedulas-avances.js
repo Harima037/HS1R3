@@ -26,8 +26,8 @@ moduleDatagrid.actualizar({
             item.id = response.data[i].id;
             item.clave = response.data[i].ClavePresupuestaria;
             item.nombre_tecnico = response.data[i].nombreTecnico;
-            item.presupMod = '$ ' + parseFloat(response.data[i].presupuestoModificado || 0).format(2);
-            item.presupEjer = '$ ' + parseFloat(response.data[i].presupuestoEjercidoModificado || 0).format(2);
+            item.presupMod = '$ ' + response.data[i].presupuestoModificado;
+            item.presupEjer = '$ ' + response.data[i].presupuestoEjercidoModificado;
             
             datos_grid.push(item);
         }

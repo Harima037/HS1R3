@@ -90,7 +90,12 @@ class ReporteCedulaAvanceController extends BaseController {
 				}
 
 				$rows = $rows->get()->toArray();
-				//var_dump($rows->toArray());die;
+				//var_dump($rows);die;
+				//print_r($rows);die;
+
+				//$queries = DB::getQueryLog();
+				//var_dump(end($queries));die;
+
 				$datos = array('datos'=>$rows);
 				$datos['total_programado'] = 0;
 				$datos['total_avance'] = 0;
@@ -99,17 +104,24 @@ class ReporteCedulaAvanceController extends BaseController {
 				$texto_trimestres = array(1=>'Primer',2=>'Segundo',3=>'Tercer',4=>'Cuarto');
 				$datos['trimestre'] = $texto_trimestres[$trimestre];
 				$datos['ejercicio'] = $ejercicio;
-
+				/*
+				Excel::create('cedulasAvance', function($excel) use ( $datos ){
+					$excel->sheet('Reporte', function($sheet) use ( $datos ){
+						$sheet->loadView('reportes.pdf.reporte-cedulas-avances',$datos);
+					});
+				})->export('pdf');
+				*/
 				$pdf = PDF::setPaper('LETTER')->setOrientation('landscape')->setWarnings(false)->loadView('reportes.pdf.reporte-cedulas-avances',$datos);
-
+				/*
 				$pdf->output();
 				$dom_pdf = $pdf->getDomPDF();
 				$canvas = $dom_pdf->get_canvas();
 				$w = $canvas->get_width();
 		  		$h = $canvas->get_height();
 				$canvas->page_text(($w-75), ($h-16), "Página {PAGE_NUM} de {PAGE_COUNT}", null, 10, array(0, 0, 0));
+				*/
 
-				return $pdf->stream('reporte_cedulas_avances.pdf');
+				return $pdf->stream('Cedulas_avances.pdf');
 			}
 		}catch(Exception $ex){
 			return Response::json(array('data'=>'Ocurrio un error al generar el reporte.','message'=>$ex->getMessage(),'line'=>$ex->getLine()),500);

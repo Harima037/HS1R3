@@ -32,6 +32,19 @@ class EvaluacionAnalisisFuncional extends BaseModel
 
     	$query = $query->whereIn('evaluacionProyectoMes.idEstatus',array(4,5));
 
+        $query = $query->orderBy('proyectos.finalidad','asc')
+            ->orderBy('proyectos.funcion','asc')
+            ->orderBy('proyectos.subFuncion','asc')
+            ->orderBy('proyectos.subSubFuncion','asc')
+            ->orderBy('proyectos.unidadResponsable','asc')
+            ->orderBy('proyectos.programaSectorial','asc')
+            ->orderBy('proyectos.programaPresupuestario','asc')
+            ->orderBy('proyectos.programaEspecial','asc')
+            ->orderBy('proyectos.actividadInstitucional','asc')
+            ->orderBy('proyectos.proyectoEstrategico','asc')
+            ->orderBy('proyectos.numeroProyectoEstrategico','asc')
+            ->orderBy('proyectos.idClasificacionProyecto','asc');
+
     	return $query;
     }
 }

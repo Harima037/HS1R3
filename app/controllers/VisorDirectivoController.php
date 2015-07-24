@@ -127,7 +127,7 @@ class VisorDirectivoController extends BaseController {
 			$permiso = 'VISORDIR.VIDIINV.R';
 		}
 		
-		$uri = 'visor-gerencial.vista-rendicion-cuentas';
+		$uri = 'visor-directivo.vista-rendicion-cuentas';
 		
 		if(Sentry::hasAccess($permiso)){
 			return View::make($uri)->with($datos);

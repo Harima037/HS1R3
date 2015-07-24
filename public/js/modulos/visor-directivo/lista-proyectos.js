@@ -23,84 +23,25 @@ moduloDatagrid.actualizar({
 
         for(var i in response.data){
             var item = {};
+
+            //var mes_activo = $('#datagridProyectos').attr('data-mes-activo'); 
             
             var mes_inicia = ((trimestre - 1) * 3) + 1;
             var meses = [1,2,3,4,5,6,7,8,9,10,11,12];
             var estado_actual = 0;
             var meses_capturados = {'1':'','2':'','3':'','4':'','5':'','6':'','7':'','8':'','9':'','10':'','11':'','12':''};
-            var estatus_meses = {};
-            var meta_acumulado = {'componentes':{},'actividades':{}};
-            var avance_acumulado = {'componentes':{},'actividades':{}};
 
             for(var j in response.data[i].componentes_metas_mes){
                 var meta = response.data[i].componentes_metas_mes[j];
-                var meta_mes = parseFloat(meta.meta) || 0;
-                var avance_mes = parseFloat(meta.avance) || 0;
-                if(!meta_acumulado['componentes'][meta.idComponente]){
-                    meta_acumulado['componentes'][meta.idComponente] = 0;
-                }
-                if(!avance_acumulado['componentes'][meta.idComponente]){
-                    avance_acumulado['componentes'][meta.idComponente] = 0;
-                }
-                meta_acumulado['componentes'][meta.idComponente] += meta_mes;
-                avance_acumulado['componentes'][meta.idComponente] += avance_mes;
-                var registro_mes = false;
-                var porcentaje = 0;
-                if( meta_mes > 0){
-                    registro_mes = true;
+                if(parseFloat(meta.totalMeta) > 0){
                     meses_capturados[meta.mes] = 'style="background-color:#DDDDDD"';
-                    porcentaje = parseFloat(((avance_acumulado['componentes'][meta.idComponente] * 100) / meta_acumulado['componentes'][meta.idComponente]).toFixed(2)) || 0;
-                }else if(avance_mes > 0){
-                    registro_mes = true;
-                    if(meta_acumulado['componentes'][meta.idComponente] > 0){
-                        porcentaje = parseFloat(((avance_acumulado['componentes'][meta.idComponente] * 100) / meta_acumulado['componentes'][meta.idComponente]).toFixed(2)) || 0;
-                    }else{
-                        porcentaje = 200;
-                    }
-                }
-                if(registro_mes){
-                    if(!estatus_meses[meta.mes]){
-                        estatus_meses[meta.mes] = 1;
-                    }
-                    if(porcentaje > 110 || porcentaje < 90 ){
-                        estatus_meses[meta.mes] = 2;
-                    }
                 }
             }
 
             for(var j in response.data[i].actividades_metas_mes){
                 var meta = response.data[i].actividades_metas_mes[j];
-                var meta_mes = parseFloat(meta.meta) || 0;
-                var avance_mes = parseFloat(meta.avance) || 0;
-                if(!meta_acumulado['actividades'][meta.idActividad]){
-                    meta_acumulado['actividades'][meta.idActividad] = 0;
-                }
-                if(!avance_acumulado['actividades'][meta.idActividad]){
-                    avance_acumulado['actividades'][meta.idActividad] = 0;
-                }
-                meta_acumulado['actividades'][meta.idActividad] += meta_mes;
-                avance_acumulado['actividades'][meta.idActividad] += avance_mes;
-                var registro_mes = false;
-                var porcentaje = 0;
-                if( meta_mes > 0){
-                    registro_mes = true;
+                if(parseFloat(meta.totalMeta) > 0){
                     meses_capturados[meta.mes] = 'style="background-color:#DDDDDD"';
-                    porcentaje = parseFloat(((avance_acumulado['actividades'][meta.idActividad] * 100) / meta_acumulado['actividades'][meta.idActividad]).toFixed(2)) || 0;
-                }else if(avance_mes > 0){
-                    registro_mes = true;
-                    if(meta_acumulado['actividades'][meta.idActividad] > 0){
-                        porcentaje = parseFloat(((avance_acumulado['actividades'][meta.idActividad] * 100) / meta_acumulado['actividades'][meta.idActividad]).toFixed(2)) || 0;
-                    }else{
-                        porcentaje = 200;
-                    }
-                }
-                if(registro_mes){
-                    if(!estatus_meses[meta.mes]){
-                        estatus_meses[meta.mes] = 1;
-                    }
-                    if(porcentaje > 110 || porcentaje < 90 ){
-                        estatus_meses[meta.mes] = 2;
-                    }
                 }
             }
 
@@ -117,31 +58,41 @@ moduloDatagrid.actualizar({
                     item['mes_'+meses[j]] = '<div id="grid-mes-'+meses[j]+'" class="text-center" '+meses_capturados[meses[j]]+'><span class="fa fa-lock"></span></div>';
                 }
             }
+            var estatus_anteriores = {};
             if(response.data[i].evaluacion_meses.length){
                 for(var j in response.data[i].evaluacion_meses){
                     var evaluacion_mes = response.data[i].evaluacion_meses[j];
                     if(evaluacion_mes.mes == mes_activo){
-                        if(evaluacion_mes.idEstatus == 2){
-                            estado_actual = 1;
-                        }else if(evaluacion_mes.idEstatus == 4){
-                            estado_actual = 1;
-                        }else if(evaluacion_mes.idEstatus == 5){
+                        if(evaluacion_mes.idEstatus == 2 || evaluacion_mes.idEstatus == 4 || evaluacion_mes.idEstatus == 5){
                             estado_actual = 1;
                         }
+                    }else{
+                        estatus_anteriores[evaluacion_mes.mes] = {idEstatus:evaluacion_mes.idEstatus,planMejora:parseInt(evaluacion_mes.planMejora)};
                     }
-                    var color_circle = 'text-muted';
-                    if(estatus_meses[evaluacion_mes.mes]){
-                        if(estatus_meses[evaluacion_mes.mes] == 2){
-                            color_circle = 'text-danger';
-                        }else{
-                            color_circle = 'text-success';
-                        }
-                    }
-                    var clase_icono = (evaluacion_mes.mes != mes_activo)?'fa-circle':(estado_actual != 0)?'fa-lock':'fa-unlock';
-                    item['mes_'+evaluacion_mes.mes] = '<div id="grid-mes-'+evaluacion_mes.mes+'" class="text-center '+color_circle+'" '+meses_capturados[meses[j]]+'><span class="fa '+clase_icono+'"></span></div>';
                 }
             }
-            
+
+            if(estatus_anteriores){
+                for(var j in estatus_anteriores){
+                    if(estatus_anteriores[j].idEstatus == 6){
+                        if(parseInt(estatus_anteriores[j].planMejora) > 0){
+                            item['mes_'+j] = '<div id="grid-mes-'+j+'" class="text-center text-danger" '+meses_capturados[j]+'><span class="fa fa-circle-o"></span></div>';
+                        }else{
+                            item['mes_'+j] = '<div id="grid-mes-'+j+'" class="text-center text-success" '+meses_capturados[j]+'><span class="fa fa-circle-o"></span></div>';
+                        }
+                    }
+                }
+            }
+
+            for(var j in response.data[i].registro_avance){
+                var avance = response.data[i].registro_avance[j];
+                var clase_icono = (avance.mes != mes_activo)?'fa-circle':(estado_actual != 0)?'fa-lock':'fa-unlock';
+                if(parseInt(avance.planMejora) > 0){
+                    item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-danger" '+meses_capturados[meses[j]]+'><span class="fa '+clase_icono+'"></span></div>';
+                }else{
+                    item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-success" '+meses_capturados[meses[j]]+'><span class="fa '+clase_icono+'"></span></div>';
+                }
+            }
             datos_grid.push(item);
         }
         moduloDatagrid.cargarDatos(datos_grid);                         

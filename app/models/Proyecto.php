@@ -283,9 +283,9 @@ class Proyecto extends BaseModel
 				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
 				'proyectos.numeroProyectoEstrategico','analisisFunc.finalidadProyecto',
 
-				DB::raw('sum(ep01.presupuestoAprobado) AS presupuestoAprobado'),
-				DB::raw('sum(ep01.presupuestoModificado) AS presupuestoModificado'),
-				DB::raw('sum(ep01.presupuestoEjercidoModificado) AS presupuestoEjercidoModificado'),
+				DB::raw('FORMAT(sum(ep01.presupuestoAprobado),2) AS presupuestoAprobado'),
+				DB::raw('FORMAT(sum(ep01.presupuestoModificado),2) AS presupuestoModificado'),
+				DB::raw('FORMAT(sum(ep01.presupuestoEjercidoModificado),2) AS presupuestoEjercidoModificado'),
 
 				DB::raw('concat_ws(" ",programaPresupuestario.clave,programaPresupuestario.descripcion) AS programaPresupuestarioDescipcion')
 			)
@@ -323,9 +323,9 @@ class Proyecto extends BaseModel
 			->with(array('componentes'=>function($componente)use($mes){
 				$componente->select('proyectoComponentes.id',
 					'proyectoComponentes.idProyecto','proyectoComponentes.indicador',
-					'proyectoComponentes.valorNumerador AS metaAnual',
+					DB::raw('FORMAT(proyectoComponentes.valorNumerador,2) AS metaAnual'),
 					'unidadesMedida.descripcion AS unidadMedida',
-					DB::raw('sum(metasMes.avance) AS avanceAcumulado'))
+					DB::raw('FORMAT(sum(metasMes.avance),2) AS avanceAcumulado'))
 					->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','proyectoComponentes.idUnidadMedida')
 					->leftjoin('componenteMetasMes AS metasMes',function($join)use($mes){
 						$join->on('metasMes.idComponente','=','proyectoComponentes.id')
@@ -337,9 +337,9 @@ class Proyecto extends BaseModel
 			},'actividades'=>function($actividad)use($mes){
 				$actividad->select('componenteActividades.id','componenteActividades.idComponente',
 					'componenteActividades.idProyecto','componenteActividades.indicador',
-					'componenteActividades.valorNumerador AS metaAnual',
+					DB::raw('FORMAT(componenteActividades.valorNumerador,2) AS metaAnual'),
 					'unidadesMedida.descripcion AS unidadMedida',
-					DB::raw('sum(metasMes.avance) AS avanceAcumulado'))
+					DB::raw('FORMAT(sum(metasMes.avance),2) AS avanceAcumulado'))
 					->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','componenteActividades.idUnidadMedida')
 					->leftjoin('actividadMetasMes AS metasMes',function($join)use($mes){
 						$join->on('metasMes.idActividad','=','componenteActividades.id')
@@ -431,7 +431,8 @@ class Proyecto extends BaseModel
 				$join->on('proyectoMes.idProyecto','=','proyectos.id')
 					->on('proyectoMes.idEstatus','in',DB::raw('(4,5)'))
 					->where('proyectoMes.mes','=',$mes)
-					->where('proyectoMes.anio','=',$anio);
+					->where('proyectoMes.anio','=',$anio)
+					->whereNull('proyectoMes.borradoAl');
 			})
 
 			->leftjoin('evaluacionAnalisisFuncional AS cuentaPub',function($join){
@@ -444,11 +445,11 @@ class Proyecto extends BaseModel
 			
 			->groupBy('proyectos.id')
 
-			->orderBy('proyectos.unidadResponsable','asc')
 			->orderBy('proyectos.finalidad','asc')
 			->orderBy('proyectos.funcion','asc')
 			->orderBy('proyectos.subFuncion','asc')
 			->orderBy('proyectos.subSubFuncion','asc')
+			->orderBy('proyectos.unidadResponsable','asc')
 			->orderBy('proyectos.programaSectorial','asc')
 			->orderBy('proyectos.programaPresupuestario','asc')
 			->orderBy('proyectos.programaEspecial','asc')

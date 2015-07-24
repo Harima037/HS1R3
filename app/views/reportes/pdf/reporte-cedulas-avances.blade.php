@@ -76,11 +76,11 @@
 			<tr><td colspan="3" height="10">&nbsp;</td></tr>
 			<tr>
 				<td class="imagen izquierda">
-					<img src="{{ URL::to('img/EscudoGobiernoChiapas.png') }}" width="180">
+					<!--img src="@{{ URL::to('img/EscudoGobiernoChiapas.png') }}" width="180"-->
 				</td>
 				<td height="40" class="titulo2 texto-medio" align="center">Instituto de Salud</td>
 				<td class="imagen derecha">
-					<img src="{{ URL::to('img/Marca.png') }}" width="180">
+					<!--img src="@{{ URL::to('img/Marca.png') }}" width="180"-->
 				</td>
 			</tr>
 			<tr><td colspan="3" height="10">&nbsp;</td></tr>
@@ -130,9 +130,9 @@
 			<th>Presupuesto Ejercido</th>
 		</tr>
 		<tr>
-			<td class="texto-derecha">$ {{number_format($proyecto['presupuestoAprobado'],2)}}</td>
-			<td class="texto-derecha">$ {{number_format($proyecto['presupuestoModificado'],2)}}</td>
-			<td class="texto-derecha">$ {{number_format($proyecto['presupuestoEjercidoModificado'],2)}}</td>
+			<td class="texto-derecha">$ {{$proyecto['presupuestoAprobado']}}</td>
+			<td class="texto-derecha">$ {{$proyecto['presupuestoModificado']}}</td>
+			<td class="texto-derecha">$ {{$proyecto['presupuestoEjercidoModificado']}}</td>
 		</tr>
 	</table>
 	<br>
@@ -152,8 +152,8 @@
 				<!-- {{$indices[$componente['id']]['indiceActividad']=1}} -->
 			</td>
 			<td class="texto-centro">{{$componente['unidadMedida']}}</td>
-			<td class="texto-centro">{{number_format($componente['metaAnual'],2)}}</td>
-			<td class="texto-centro">{{number_format($componente['avanceAcumulado'],2)}}</td>
+			<td class="texto-centro">{{$componente['metaAnual']}}</td>
+			<td class="texto-centro">{{$componente['avanceAcumulado']}}</td>
 			<td class="texto-centro">
 			@if($componente['avanceAcumulado'])
 				{{number_format(($componente['avanceAcumulado']/$componente['metaAnual'])*100,2)}}
@@ -168,8 +168,8 @@
 			<td class="texto-centro">A {{$indices[$actividad['idComponente']]['indice']}}.{{$indices[$actividad['idComponente']]['indiceActividad']++}}</td>
 			<td>{{$actividad['indicador']}}</td>
 			<td class="texto-centro">{{$actividad['unidadMedida']}}</td>
-			<td class="texto-centro">{{number_format($actividad['metaAnual'],2)}}</td>
-			<td class="texto-centro">{{number_format($actividad['avanceAcumulado'],2)}}</td>
+			<td class="texto-centro">{{$actividad['metaAnual']}}</td>
+			<td class="texto-centro">{{$actividad['avanceAcumulado']}}</td>
 			<td class="texto-centro">
 			@if($actividad['avanceAcumulado'])
 				{{number_format(($actividad['avanceAcumulado']/$actividad['metaAnual'])*100,2)}}
