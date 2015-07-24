@@ -40,7 +40,7 @@
 		                    <div class="btn-toolbar pull-right" >
 		                        <div class="btn-group" style="margin:5px">
 		                            <button type="button" class="btn btn-primary btn-edit-rows">
-		                                <span class="fa fa-eye"></span> Ver Avance Metas
+		                                <span class="fa fa-eye"></span> Ver Avance de Metas
 		                            </button>
 		                        </div>
 		                    </div>
@@ -146,7 +146,7 @@
 			                			<th rowspan="2" class="text-center" width="90">Porcentaje Acumulado</th>
 		                			</tr>
 		                			<tr>
-		                				<th width="135" class="text-center" nowrap="nowrap">Mes</th>
+		                				<th width="135" class="bg-success text-center" nowrap="nowrap">Mes</th>
 		                				<th width="135" class="bg-success text-center">Acumulada</th>
 		                				<th width="135" class="bg-info text-center">Acumulado</th>
 		                				<th width="135" class="bg-info text-center" nowrap="nowrap">Mes</th>

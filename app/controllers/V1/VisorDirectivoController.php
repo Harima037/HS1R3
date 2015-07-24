@@ -40,99 +40,30 @@ class VisorDirectivoController extends BaseController {
 				$mes_actual = date('n') -1;
 			}
 
-			$usuario = Sentry::getUser();
-			if($usuario->claveJurisdiccion){
-				//Se Agrupan por proyecto y se sacan solo los de la jurisdiccion del usuario
-				$clave_jurisdiccion = $usuario->claveJurisdiccion;
-			}else{
-				$clave_jurisdiccion = '00';
-			}
-
-			$componentes = ComponenteMetaMes::where('claveJurisdiccion','=',$clave_jurisdiccion)
-											->where('mes','<=',$mes_actual)
-											->where(function($query){
-												$query->where('meta','>',0.00)->orWhere('avance','>',0.00);
-											})
+			$componentes = ComponenteMetaMes::where('mes','<=',$mes_actual)
 											->groupBy('idComponente')
 											->select('id','idComponente AS idElemento','idProyecto',DB::raw('sum(meta) AS meta'),
-												DB::raw('sum(avance) AS avance'))
-											->get();
+												DB::raw('sum(avance) AS avance'));
 			
-			$actividades = ActividadMetaMes::where('claveJurisdiccion','=',$clave_jurisdiccion)
-											->where('mes','<=',$mes_actual)
-											->where(function($query){
-												$query->where('meta','>',0.00)->orWhere('avance','>',0.00);
-											})
+			$actividades = ActividadMetaMes::where('mes','<=',$mes_actual)
 											->groupBy('idActividad')
 											->select('id','idActividad AS idElemento','idProyecto',DB::raw('sum(meta) AS meta'),
-												DB::raw('sum(avance) AS avance'))
-											->get();
+												DB::raw('sum(avance) AS avance'));
+
+			$usuario = Sentry::getUser();
+			if($usuario->claveUnidad){
+				$unidades = explode('|',$usuario->claveUnidad);
+				$proyectos_ids = Proyecto::whereIn('unidadResponsable',$unidades)->get()->lists('id');
+				$componentes = $componentes->whereIn('idProyecto',$proyectos_ids);
+				$actividades = $actividades->whereIn('idProyecto',$proyectos_ids);
+			}
+			
+			$componentes = $componentes->get();
+			$actividades = $actividades->get();
 
 			$data = array();
 			$data['componentes'] = $componentes;
 			$data['actividades'] = $actividades;
-
-			/*$elementos = $componentes->toArray() + $actividades->toArray();
-			$total = count($elementos);
-			$data = array('resultados2'=>$total,'data2'=>$elementos);*/
-			/*
-			$rows = Proyecto::getModel();
-			$rows = $rows->where('idEstatusProyecto','=',5);
-			
-			$rows = $rows->with(array(
-				'componentesMetasMes'=>function($query) use ($mes_actual,$clave_jurisdiccion){
-					$query->where('claveJurisdiccion','=',$clave_jurisdiccion)
-						->where('mes','<=',$mes_actual)
-						->groupBy('idProyecto')
-						->select('id','idComponente','idProyecto',DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'),DB::raw('count(distinct idComponente) AS totalComponentes'));
-				},
-				'actividadesMetasMes'=>function($query) use ($mes_actual,$clave_jurisdiccion){
-					$query->where('claveJurisdiccion','=',$clave_jurisdiccion)
-						->where('mes','<=',$mes_actual)
-						->groupBy('idProyecto')
-						->select('id','idActividad','idProyecto',DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'),DB::raw('count(distinct idActividad) AS totalActividades'));
-				}
-			));*/
-			/*
-			$rows = $rows->leftjoin('componenteMetasMes AS compMetasMes',function($join)use($mes_actual,$clave_jurisdiccion){
-							$join->on('compMetasMes.idProyecto','=','proyectos.id')
-								->where('compMetasMes.mes','<=',$mes_actual)
-								->where('compMetasMes.claveJurisdiccion','=',$clave_jurisdiccion)
-								->where(function($where){
-									$where->where('compMetasMes.meta','>',0.00)->orWhere('compMetasMes.avance','>',0.00);
-								})
-								->whereNull('compMetasMes.borradoAl');
-						})->leftjoin('actividadMetasMes AS actMetasMes',function($join)use($mes_actual,$clave_jurisdiccion){
-							$join->on('actMetasMes.idProyecto','=','proyectos.id')
-								->where('actMetasMes.mes','<=',$mes_actual)
-								->where('actMetasMes.claveJurisdiccion','=',$clave_jurisdiccion)
-								->where(function($where){
-									$where->where('compMetasMes.meta','>',0.00)->orWhere('compMetasMes.avance','>',0.00);
-								})
-								->whereNull('actMetasMes.borradoAl');
-						})
-						//->groupBy('proyectos.id')
-						->having(DB::raw('count(actMetasMes.claveJurisdiccion) + count(compMetasMes.claveJurisdiccion)'),'>',0)
-						->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
-							'nombreTecnico','proyectos.idEstatusProyecto'
-							,DB::raw('count(distinct compMetasMes.idComponente) AS componentes')
-							,DB::raw('count(distinct actMetasMes.idActividad) AS actividades'))
-						->get()
-						;
-			*/
-			//$queries = DB::getQueryLog();
-			//var_dump(end($queries));die;
-
-			//$total = count($rows);
-
-			//$data = array('resultados'=>$total,'data'=>$rows);
-			//$data['resultados'] = $total;
-			//$data['data'] = $rows;
-
-			/*if($total<=0){
-				$http_status = 404;
-				$data = array('resultados'=>$total,"data"=>"No hay datos",'code'=>'W00');
-			}*/
 
 			return Response::json($data,$http_status);
 		}elseif(isset($parametros['formatogrid'])){
@@ -292,32 +223,31 @@ class VisorDirectivoController extends BaseController {
 					$tabla = 'actividadMetasMes.';
 					$campo = 'idActividad';
 				}
-
-				$usuario = Sentry::getUser();
-				if($usuario->claveJurisdiccion){
-					//Se Agrupan por proyecto y se sacan solo los de la jurisdiccion del usuario
-					$claveJurisdiccion = $usuario->claveJurisdiccion;
-				}else{
-					$claveJurisdiccion = '00';
-				}
-
+				
 				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
 				$recurso = $recurso->with(array(
-				 	'metasMes'=>function($query) use ($claveJurisdiccion){
-						$query->where('claveJurisdiccion','=',$claveJurisdiccion)
-							->orderBy('mes','asc');
-					},'metasMesJurisdiccion'=>function($query) use ($mes_actual,$tabla,$campo){
-						$query->select($tabla.'id','idProyecto',$campo,'claveJurisdiccion',DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'),'vistaJurisdicciones.nombre AS jurisdiccion')
+				'metasMes' => function($query)use($mes_actual){
+					$query->where('mes','=',$mes_actual);
+				},'metasMesAgrupado' => function($query){
+					$query->orderBy('mes','asc');
+				},'metasMesJurisdiccion'=>function($query) use ($mes_actual,$tabla,$campo){
+					$query->select($tabla.'id','idProyecto',$campo,'claveJurisdiccion',
+						DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'),
+						'vistaJurisdicciones.nombre AS jurisdiccion')
 							->where('mes','<=',$mes_actual)
 							->leftjoin('vistaJurisdicciones','vistaJurisdicciones.clave','=','claveJurisdiccion');
-					},'unidadMedida'
-				))->find($id);
+					//$query->where('mes','<=',$mes_actual);
+				},'registroAvance'=>function($query) use ($mes_actual){
+					$query->where('mes','=',$mes_actual);
+				},'planMejora'=>function($query) use ($mes_actual){
+					$query->where('mes','=',$mes_actual);
+				},'unidadMedida'))->find($id);
 
-				/*if($parametros['nivel'] == 'componente'){
+				if($parametros['nivel'] == 'componente'){
 					$recurso->load('desgloseMunicipios');
 					//$queries = DB::getQueryLog();
 					//throw new Exception(print_r(end($queries),true), 1);
-				}*/
+				}
 			}elseif($parametros['mostrar'] == 'datos-jurisdicciones-avances'){
 				$mes_actual = Util::obtenerMesActual();
 				if($parametros['nivel'] == 'componente'){
