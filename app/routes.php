@@ -38,6 +38,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::post('usuarios', array('uses' => 'UsuariosController@validar'));
 		Route::get('config-seg-metas',array('uses' => 'ConfigurarSeguimientoController@index'));
 		Route::get('purgar-seguimientos',array('uses' => 'PurgarSeguimientoController@index'));
+		Route::get('admin-proyectos',array('uses'=>'AdminProyectosController@index'));
 	});
 
 	Route::group(array('prefix'=>'expediente'), function(){
@@ -128,6 +129,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('cuenta',				'V1\CuentaController');
 		Route::resource('config-seg-metas', 	'V1\ConfigurarSeguimientoController', array('only' => array('store')));
 		Route::resource('purgar-seguimientos',	'V1\PurgarSeguimientoController');
+		Route::resource('admin-proyectos',		'V1\AdminProyectosController', array('only' => array('index','show','update')));
 		
 		Route::resource('proyectos',		'V1\ProyectosController');
 		Route::resource('inversion',		'V1\InversionController');
