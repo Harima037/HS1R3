@@ -174,6 +174,47 @@ class VisorController extends BaseController {
 
 						$data = array('data'=>$metas,'total'=>$total);
 					break;
+				case 'metas_cumplidas_unidad':
+						$datos = $this->metasCumplidasPorUnidad();
+						$data = array('data'=>$datos['metas_unidad'],'total'=>$datos['total_metas']);
+					break;
+				case 'metas_cumplidas_jurisdiccion':
+					break;
+				case 'presupuesto_ejercido_unidad':
+						$datos = $this->presupuestoEjercidoPorUnidad();
+						$data = array('data'=>$datos['presupuesto_unidad'],'total'=>$datos['total_modificado']);
+					break;
+				case 'presupuesto_vs_metas_unidad':
+						$datos_metas = $this->metasCumplidasPorUnidad();
+						$datos_presupuesto = $this->presupuestoEjercidoPorUnidad();
+
+						$metas_vs_presupuesto = array();
+						foreach ($datos_metas['metas_unidad'] as $clave => $metas) {
+							$metas_vs_presupuesto[$clave] = array(
+								'unidadResponsable'=>$metas['unidadResponsable'],
+								'metasTotal'=>$metas['totalMetas'],
+								'metasCumplidas'=>$metas['cumplidas'],
+								'presupuestoModificado'=>0,
+								'presupuestoEjercido'=>0
+							);
+						}
+
+						foreach ($datos_presupuesto['presupuesto_unidad'] as $presupuesto) {
+							if(!isset($metas_vs_presupuesto[$presupuesto->clave])){
+								$metas_vs_presupuesto[$presupuesto->clave] = array(
+									'unidadResponsable'=>$presupuesto->unidadResponsable,
+									'metasTotal'=>0,
+									'metasCumplidas'=>0,
+									'presupuestoModificado'=>floatval($presupuesto->presupuestoModificado),
+									'presupuestoEjercido'=>floatval($presupuesto->presupuestoEjercido)
+								);
+							}else{
+								$metas_vs_presupuesto[$presupuesto->clave]['presupuestoModificado']=floatval($presupuesto->presupuestoModificado);
+								$metas_vs_presupuesto[$presupuesto->clave]['presupuestoEjercido']=floatval($presupuesto->presupuestoEjercido);
+							}
+						}
+						$data = array('data'=>$metas_vs_presupuesto);
+					break;
 				default:
 					# code...
 					break;
@@ -407,6 +448,113 @@ class VisorController extends BaseController {
 		*/
 		
 		return Response::json($data,$http_status);
+	}
+
+	public function presupuestoEjercidoPorUnidad(){
+		$mes_actual = Util::obtenerMesActual();
+		if($mes_actual == 0){ $mes_actual = date('n') -1; }
+
+		$rows = CargaDatosEP01::where('mes','=',$mes_actual)
+					->select(DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
+						DB::raw('sum(presupuestoEjercidoModificado) AS presupuestoEjercido'),
+						'unidad.descripcion AS unidadResponsable','UR AS clave')
+					->leftjoin('catalogoUnidadesResponsables AS unidad','unidad.clave','=','UR')
+					->groupBy('UR')
+					->get();
+		$total_modif = $rows->sum('presupuestoModificado');
+		$total_ejer = $rows->sum('presupuestoEjercido');
+		return array('presupuesto_unidad'=>$rows,'total_modificado'=>$total_modif,'total_ejercido'=>$total_ejer);
+	}
+
+	public function metasCumplidasPorUnidad(){
+		$mes_actual = Util::obtenerMesActual();
+		if($mes_actual == 0){
+			$mes_actual = date('n') -1;
+		}
+
+		$componentes = ComponenteMetaMes::where('mes','<=',$mes_actual)
+										->join('proyectos',function($join){
+											$join->on('proyectos.id','=','componenteMetasMes.idProyecto')
+												->where('proyectos.idEstatusProyecto','=',5)
+												->whereNull('proyectos.borradoAl');
+										})
+										->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','proyectos.unidadResponsable')
+										->groupBy('idComponente')
+										->orderBy('unidadResponsable')
+										->select('idComponente','unidades.descripcion AS unidad',
+											'proyectos.unidadResponsable',
+											DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'))->get();
+		//
+		$actividades = ActividadMetaMes::where('mes','<=',$mes_actual)
+										->join('proyectos',function($join){
+											$join->on('proyectos.id','=','actividadMetasMes.idProyecto')
+												->where('proyectos.idEstatusProyecto','=',5)
+												->whereNull('proyectos.borradoAl');
+										})
+										->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','proyectos.unidadResponsable')
+										->groupBy('idActividad')
+										->orderBy('unidadResponsable')
+										->select('idActividad','unidades.descripcion AS unidad',
+											'proyectos.unidadResponsable',
+											DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'))->get();
+		//
+		$total = count($componentes) + count($actividades);
+		$metas_unidad = array();
+		foreach ($componentes as $componente) {
+			if(!isset($metas_unidad[$componente->unidadResponsable])){
+				$metas_unidad[$componente->unidadResponsable] = array(
+					'unidadResponsable'=>$componente->unidad,
+					'totalMetas'=>0,
+					'cumplidas'=>0
+				);
+			}
+			$meta = floatval($componente->meta);
+	        $avance = floatval($componente->avance);
+
+	        if($meta > 0){ $porcentaje = ($avance*100) / $meta; }
+	        else{ $porcentaje = ($avance*100); }
+
+	        $estatus = 1;
+	        if(!($meta == 0 && $avance == 0)){
+				if($porcentaje > 110){ $estatus = 3; }
+				elseif($porcentaje < 90){ $estatus = 2; }
+				elseif($porcentaje > 0 && $meta == 0){ $estatus = 3; }
+	        }
+
+	        if($estatus == 1){ 
+	        	$metas_unidad[$componente->unidadResponsable]['cumplidas']++; 
+	        }
+	       	$metas_unidad[$componente->unidadResponsable]['totalMetas']++;
+		}
+
+		foreach ($actividades as $actividad) {
+			if(!isset($metas_unidad[$actividad->unidadResponsable])){
+				$metas_unidad[$actividad->unidadResponsable] = array(
+					'unidadResponsable'=>$actividad->unidad,
+					'totalMetas'=>0,
+					'cumplidas'=>0
+				);
+			}
+			$meta = floatval($actividad->meta);
+	        $avance = floatval($actividad->avance);
+
+	        if($meta > 0){ $porcentaje = ($avance*100) / $meta; }
+	        else{ $porcentaje = ($avance*100); }
+
+	        $estatus = 1;
+	        if(!($meta == 0 && $avance == 0)){
+				if($porcentaje > 110){ $estatus = 3; }
+				elseif($porcentaje < 90){ $estatus = 2; }
+				elseif($porcentaje > 0 && $meta == 0){ $estatus = 3; }
+	        }
+
+	        if($estatus == 1){ 
+	        	$metas_unidad[$actividad->unidadResponsable]['cumplidas']++; 
+	        }
+	       	$metas_unidad[$actividad->unidadResponsable]['totalMetas']++;
+		}
+
+		return array('metas_unidad'=>$metas_unidad,'total_metas'=>$total);
 	}
 
 	/**

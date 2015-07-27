@@ -41,21 +41,38 @@ function graficaMetasCumplidas(){
 	var parametros = {grafica:'metas_cumplidas'};
 	moduloResource.get(null,parametros,{
 		_success: function(response){
+			$('#area-graficas').empty();
+			$('#area-graficas').html('<div class="row"><div class="col-sm-6"><div id="left-grafica" style="height:500px;"></div></div><div class="col-sm-6"><div id="right-grafica" style="height:500px;"></div></div></div>')
 			var data = google.visualization.arrayToDataTable([
 				['Tipo', 'Indicadores'],
-				['Metas No Cumplidas',(response.data.bajoAvance + response.data.altoAvance)],
-				['Metas Cumplidas',response.data.cumplidas]
+				['Metas Cumplidas',response.data.cumplidas],
+				['Metas No Cumplidas',(response.data.bajoAvance + response.data.altoAvance)]
 			]);
 
 			var options = { 
 				title:'Metas ( '+response.total.format(2)+' )',
+				legend:{position:'bottom'}
+			};
+
+			var chart = new google.visualization.PieChart(document.getElementById('left-grafica'));
+			chart.draw(data, options);
+
+			var data = google.visualization.arrayToDataTable([
+				['Tipo', 'Indicadores'],
+				['Alto Avance',response.data.altoAvance],
+				['Bajo Avance',response.data.bajoAvance]
+			]);
+
+			var options = { 
+				title:'Metas No Cumplidas ( '+(response.data.bajoAvance + response.data.altoAvance).format(2)+' )',
 				legend:{position:'bottom'},
 				slices:{
-				  0:{color:'#A94442'},1:{color:'#4B804C'}
+					0: {color:'#DC3912'},
+					1: {color:'#AA1505'}
 				}
 			};
 
-			var chart = new google.visualization.PieChart(document.getElementById('area-graficas'));
+			var chart = new google.visualization.PieChart(document.getElementById('right-grafica'));
 			chart.draw(data, options);
 		}
 	});
@@ -114,7 +131,7 @@ function graficaPresupuestoEjercido(){
 
 			var options = { 
 				title:'Presupuesto : $ '+(parseFloat(response.data.presupuestoModificado)||0).format(2),
-				legend:{position:'right',alignment:'center'}
+				legend:{position:'bottom',alignment:'center'}
 			};
 
 			var chart = new google.visualization.PieChart(document.getElementById('area-graficas'));
