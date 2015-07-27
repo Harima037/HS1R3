@@ -51,7 +51,7 @@ accionesDatagrid.actualizar({
             item.nivel = 'C ' + contador_componente;
             item.indicador = componente.indicador;
             item.meta = (parseFloat(componente.valorNumerador) || 0).format(2);
-            item.meta_acumulada = 0;
+            item.meta_acumulada = (parseFloat(componente.metasAlMes) || 0).format(2);
             item.avances_acumulados = 0;
             item.avances_mes = 0;
 
@@ -78,7 +78,7 @@ accionesDatagrid.actualizar({
                 item.nivel = 'A ' + contador_componente + '.' + contador_actividad;
                 item.indicador = actividad.indicador;
                 item.meta = (parseFloat(actividad.valorNumerador) || 0).format(2);
-                item.meta_acumulada = 0;
+                item.meta_acumulada = (parseFloat(actividad.metasAlMes) || 0).format(2);
                 item.avances_acumulados = 0;
                 item.avances_mes = 0;
                 
@@ -382,11 +382,11 @@ function seguimiento_metas(e){
                 $('#tab-link-plan-mejora').addClass('hidden');
             }
 
-            $('#total-meta-mes').text(total_meta_mes);
-            $('#total-meta-acumulada').text(total_meta_acumulada);
-            $('#total-avance-acumulado').text(total_avance_acumulado);
-            $('#total-avance-mes').text(total_avance_mes);
-            $('#total-avance-total').text(total_avance_total);
+            $('#total-meta-mes').text(total_meta_mes.format(2));
+            $('#total-meta-acumulada').text(total_meta_acumulada.format(2));
+            $('#total-avance-acumulado').text(total_avance_acumulado.format(2));
+            $('#total-avance-mes').text(total_avance_mes.format(2));
+            $('#total-avance-total').text(total_avance_total.format(2));
 
             if(total_meta_acumulada > 0){
                 var porcentaje = (total_avance_total*100) / total_meta_acumulada;

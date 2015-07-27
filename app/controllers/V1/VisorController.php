@@ -21,7 +21,7 @@ use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime,Mail;
 use Proyecto,ComponenteMetaMes,ActividadMetaMes,Componente,Actividad,CargaDatosEP01;
 
-class VisorDirectivoController extends BaseController {
+class VisorController extends BaseController {
 
 	/**
 	 * Display a listing of the resource.
@@ -34,6 +34,155 @@ class VisorDirectivoController extends BaseController {
 
 		$parametros = Input::all();
 
+		if(isset($parametros['grafica'])){
+			switch ($parametros['grafica']) {
+				case 'proyectos_direccion':
+						$rows = Proyecto::select('unidadResponsable AS clave', 'unidades.descripcion AS unidad', 
+												DB::raw('count(distinct proyectos.id) AS noProyectos'))
+										->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','proyectos.unidadResponsable')
+										->where('idEstatusProyecto','=',5)
+										->groupBy('unidadResponsable')
+										->get();
+						$total = $rows->sum('noProyectos');
+						//$queries = DB::getQueryLog();
+						//var_dump(count($queries));die;
+						$data = array('data'=>$rows,'total'=>$total);
+					break;
+				case 'proyectos_tipo':
+						$rows = Proyecto::select('clasificacion.descripcion AS tipoProyecto', 
+												DB::raw('count(distinct proyectos.id) AS noProyectos'))
+										->leftjoin('catalogoClasificacionProyectos AS clasificacion','clasificacion.id','=','proyectos.idClasificacionProyecto')
+										->where('idEstatusProyecto','=',5)
+										->groupBy('idClasificacionProyecto')
+										->get();
+						$total = $rows->sum('noProyectos');
+						$data = array('data'=>$rows,'total'=>$total);
+					break;
+				case 'presupuesto_fuente':
+						$mes_actual = Util::obtenerMesActual();
+						if($mes_actual == 0){ $mes_actual = date('n') -1; }
+
+						$rows = CargaDatosEP01::where('mes','=',$mes_actual);
+
+						/*$usuario = Sentry::getUser();
+						if($usuario->claveUnidad){
+							$unidades = explode('|',$usuario->claveUnidad);
+							$rows = $rows->whereIn('UR',$unidades);
+						}*/
+
+						$rows = $rows->select(DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
+											'fuenteFinan.descripcion AS fuenteFinanciamiento')
+									->leftjoin('catalogoFuenteFinanciamiento AS fuenteFinan','fuenteFinan.clave','=','FF')
+									->groupBy('FF')
+									->get();
+						$total = $rows->sum('presupuestoModificado');
+						$data = array('data'=>$rows,'total'=>$total);
+					break;
+				case 'presupuesto_ejercido':
+						$mes_actual = Util::obtenerMesActual();
+						if($mes_actual == 0){
+							$mes_actual = date('n') -1;
+						}
+
+						$presupuesto = CargaDatosEP01::where('mes','=',$mes_actual)
+														->select(DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
+															DB::raw('sum(presupuestoEjercidoModificado) AS presupuestoEjercido'))
+														->first();
+						//
+						$data = array('data'=>$presupuesto);
+					break;
+				case 'metas_unidad':
+						$rows = Proyecto::select('unidadResponsable AS clave', 'unidades.descripcion AS unidad', 
+										DB::raw('count(distinct componentes.id)+count(distinct actividades.id) AS noMetas'))
+										->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','proyectos.unidadResponsable')
+										->leftjoin('proyectoComponentes AS componentes',function($join){
+											$join->on('componentes.idProyecto','=','proyectos.id')
+												->whereNull('componentes.borradoAl');
+										})
+										->leftjoin('componenteActividades AS actividades',function($join){
+											$join->on('actividades.idProyecto','=','proyectos.id')
+												->whereNull('actividades.borradoAl');
+										})
+										->where('idEstatusProyecto','=',5)
+										->groupBy('unidadResponsable')
+										->get();
+						$total = $rows->sum('noMetas');
+						//$queries = DB::getQueryLog();
+						//var_dump(count($queries));die;
+						$data = array('data'=>$rows,'total'=>$total);
+					break;
+				case 'metas_cumplidas':
+						$mes_actual = Util::obtenerMesActual();
+						if($mes_actual == 0){
+							$mes_actual = date('n') -1;
+						}
+
+						$proyectos_ids = Proyecto::where('idEstatusProyecto','=',5)->lists('id');
+
+						$componentes = ComponenteMetaMes::where('mes','<=',$mes_actual)
+														->whereIn('idProyecto',$proyectos_ids)
+														->groupBy('idComponente')
+														->select('id','idComponente AS idElemento','idProyecto',DB::raw('sum(meta) AS meta'),
+															DB::raw('sum(avance) AS avance'))->get();
+						//
+						$actividades = ActividadMetaMes::where('mes','<=',$mes_actual)
+														->whereIn('idProyecto',$proyectos_ids)
+														->groupBy('idActividad')
+														->select('id','idActividad AS idElemento','idProyecto',DB::raw('sum(meta) AS meta'),
+															DB::raw('sum(avance) AS avance'))->get();
+						//
+						$total = count($componentes) + count($actividades);
+
+						$metas = array('cumplidas'=>0,'altoAvance'=>0,'bajoAvance'=>0);
+						foreach ($componentes as $componente) {
+							$meta = floatval($componente->meta);
+					        $avance = floatval($componente->avance);
+
+					        if($meta > 0){ $porcentaje = ($avance*100) / $meta; }
+					        else{ $porcentaje = ($avance*100); }
+
+					        $estatus = 1;
+					        if(!($meta == 0 && $avance == 0)){
+								if($porcentaje > 110){ $estatus = 3; }
+								elseif($porcentaje < 90){ $estatus = 2; }
+								elseif($porcentaje > 0 && $meta == 0){ $estatus = 3; }
+					        }
+
+					        if($estatus == 1){ $metas['cumplidas']++; }
+					        elseif($estatus == 2){ $metas['bajoAvance']++; }
+					        else{ $metas['altoAvance']++; }
+						}
+
+						foreach ($actividades as $actividad) {
+							$meta = floatval($actividad->meta);
+					        $avance = floatval($actividad->avance);
+
+					        if($meta > 0){ $porcentaje = ($avance*100) / $meta; }
+					        else{ $porcentaje = ($avance*100); }
+
+					        $estatus = 1;
+					        if(!($meta == 0 && $avance == 0)){
+								if($porcentaje > 110){ $estatus = 3; }
+								elseif($porcentaje < 90){ $estatus = 2; }
+								elseif($porcentaje > 0 && $meta == 0){ $estatus = 3; }
+					        }
+
+					        if($estatus == 1){ $metas['cumplidas']++; }
+					        elseif($estatus == 2){ $metas['bajoAvance']++; }
+					        else{ $metas['altoAvance']++; }
+						}
+
+						$data = array('data'=>$metas,'total'=>$total);
+					break;
+				default:
+					# code...
+					break;
+			}
+		}else{
+			$data = array("data"=>"No hay datos",'code'=>'W00');
+		}
+
+		/*
 		if(isset($parametros['graficapresupuestometa'])){
 			$mes_actual = Util::obtenerMesActual();
 			if($mes_actual == 0){
@@ -73,10 +222,6 @@ class VisorDirectivoController extends BaseController {
 			//var_dump(end($queries));die;
 			
 			$data = array('data'=>array('presupuesto'=>$presupuesto,'componentes'=>$componentes,'actividades'=>$actividades));
-			/*if($total[0]->presupuestoModificado <= 0){
-				$http_status = 404;
-				$data = array("data"=>"No hay datos",'code'=>'W00');
-			}*/
 			return Response::json($data,$http_status);
 		}elseif(isset($parametros['graficapresupuesto'])){
 			$mes_actual = Util::obtenerMesActual();
@@ -125,9 +270,7 @@ class VisorDirectivoController extends BaseController {
 			$usuario = Sentry::getUser();
 			if($usuario->claveUnidad){
 				$unidades = explode('|',$usuario->claveUnidad);
-				$proyectos_ids = Proyecto::whereIn('unidadResponsable',$unidades)
-										->where('idEstatusProyecto','=',5)
-										->groupBy('id')->lists('id');
+				$proyectos_ids = Proyecto::whereIn('unidadResponsable',$unidades)->groupBy('id')->lists('id');
 				$componentes = $componentes->whereIn('idProyecto',$proyectos_ids);
 				$actividades = $actividades->whereIn('idProyecto',$proyectos_ids);
 			}
@@ -261,16 +404,8 @@ class VisorDirectivoController extends BaseController {
 
 			return Response::json($data,$http_status);
 		}
+		*/
 		
-		$rows = Proyecto::all();
-
-		if(count($rows) == 0){
-			$http_status = 404;
-			$data = array("data"=>"No hay datos",'code'=>'W00');
-		}else{
-			$data = array("data"=>$rows->toArray());
-		}
-
 		return Response::json($data,$http_status);
 	}
 
@@ -280,108 +415,5 @@ class VisorDirectivoController extends BaseController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show($id){
-		//
-		$http_status = 200;
-		$data = array();
-		$parametros = Input::all();
-
-		if(isset($parametros['mostrar'])){
-			if($parametros['mostrar'] == 'datos-proyecto-avance'){
-				$mes_actual = Util::obtenerMesActual();
-				$recurso = Proyecto::with(array('datosFuncion','datosSubFuncion','datosProgramaPresupuestario','componentes.metasMesAgrupado','componentes.registroAvance','componentes.actividades.metasMesAgrupado','componentes.actividades.registroAvance','beneficiarios.registroAvance','beneficiarios.tipoBeneficiario',
-					'evaluacionMeses'=>function($query) use ($mes_actual){
-						if($mes_actual == 0){
-							$mes_actual = date('n') - 1;
-							$query->where('mes','=',$mes_actual)->where('idEstatus','=',4);
-						}else{
-							$query->where('mes','=',$mes_actual);
-						}
-					}))->find($id);
-			}elseif ($parametros['mostrar'] == 'datos-municipio-avance') {
-				//$id = idComponente y $parametros['clave-municipio'] y $parametros['nivel'] = 'componente'
-				/*$mes_actual = Util::obtenerMesActual();
-				if($parametros['nivel'] == 'componente'){
-					$recurso = ComponenteDesglose::listarDatos()->where('claveMunicipio','=',$parametros['clave-municipio'])
-													->where('idComponente','=',$id);
-				}
-				$recurso = $recurso->with(array('metasMes'=>function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'metasMesAcumuladas'=>function($query) use ($mes_actual){
-					$query->where('mes','<=',$mes_actual);
-				}))->get();*/
-			}elseif($parametros['mostrar'] == 'datos-metas-avance'){
-				$mes_actual = Util::obtenerMesActual();
-				if($mes_actual == 0){
-					$mes_actual = date('n')-1;
-				}
-				if($parametros['nivel'] == 'componente'){
-					$recurso = Componente::getModel();
-					$tabla = 'componenteMetasMes.';
-					$campo = 'idComponente';
-				}else{
-					$recurso = Actividad::getModel();
-					$tabla = 'actividadMetasMes.';
-					$campo = 'idActividad';
-				}
-				
-				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
-				$recurso = $recurso->with(array(
-				'metasMes' => function($query)use($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'metasMesAgrupado' => function($query){
-					$query->orderBy('mes','asc');
-				},'metasMesJurisdiccion'=>function($query) use ($mes_actual,$tabla,$campo){
-					$query->select($tabla.'id','idProyecto',$campo,'claveJurisdiccion',
-						DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'),
-						'vistaJurisdicciones.nombre AS jurisdiccion')
-							->where('mes','<=',$mes_actual)
-							->leftjoin('vistaJurisdicciones','vistaJurisdicciones.clave','=','claveJurisdiccion');
-					//$query->where('mes','<=',$mes_actual);
-				},'registroAvance'=>function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'planMejora'=>function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'unidadMedida'))->find($id);
-
-				if($parametros['nivel'] == 'componente'){
-					$recurso->load('desgloseMunicipios');
-					//$queries = DB::getQueryLog();
-					//throw new Exception(print_r(end($queries),true), 1);
-				}
-			}elseif($parametros['mostrar'] == 'datos-jurisdicciones-avances'){
-				$mes_actual = Util::obtenerMesActual();
-				if($parametros['nivel'] == 'componente'){
-					$recurso = Componente::getModel();
-				}else{
-					$recurso = Actividad::getModel();
-				}
-				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
-				$recurso = $recurso->with(array('metasMesJurisdiccion'=>function($query) use ($mes_actual){
-					$query->where('mes','<=',$mes_actual);
-				},'registroAvance'=>function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'metasMes' => function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'planMejora'=>function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'unidadMedida','comentarios'))->find($id);
-
-				if($parametros['nivel'] == 'componente'){
-					$recurso->load('desgloseMunicipios');
-					//$queries = DB::getQueryLog();
-					//throw new Exception(print_r(end($queries),true), 1);
-				}
-			}
-		}
-
-		if(is_null($recurso)){
-			$http_status = 404;
-			$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
-		}else{
-			$data["data"] = $recurso;
-		}
-
-		return Response::json($data,$http_status);
-	}
+	public function show($id){}
 }

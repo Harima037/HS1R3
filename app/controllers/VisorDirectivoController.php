@@ -80,6 +80,14 @@ class VisorDirectivoController extends BaseController {
 		return parent::loadIndex('VISORDIR','VIDIDESEMP');
 	}
 
+	public function presupuesto(){
+		return parent::loadIndex('VISORDIR','VIDIPRESUP');
+	}
+
+	public function presupuestoMeta(){
+		return parent::loadIndex('VISORDIR','VIDIPRESME');
+	}
+
 	public function rendicionCuentas($id){
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
 		$datos['usuario'] = Sentry::getUser();

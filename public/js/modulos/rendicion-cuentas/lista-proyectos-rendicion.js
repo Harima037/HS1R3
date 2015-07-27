@@ -102,9 +102,9 @@ moduloDatagrid.actualizar({
                 var avance = response.data[i].registro_avance[j];
                 var clase_icono = (avance.mes != mes_activo)?'fa-circle':(estado_actual != 0)?'fa-lock':'fa-unlock';
                 if(parseInt(avance.planMejora) > 0){
-                    item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-danger" '+meses_capturados[meses[j]]+'><span class="fa '+clase_icono+'"></span></div>';
+                    item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-danger" '+meses_capturados[avance.mes]+'><span class="fa '+clase_icono+'"></span></div>';
                 }else{
-                    item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-success" '+meses_capturados[meses[j]]+'><span class="fa '+clase_icono+'"></span></div>';
+                    item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-success" '+meses_capturados[avance.mes]+'><span class="fa '+clase_icono+'"></span></div>';
                 }
             }
             datos_grid.push(item);

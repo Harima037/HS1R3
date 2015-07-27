@@ -48,7 +48,7 @@ moduloDatagrid.actualizar({
             item.id = response.data[i].id;
             item.clave = response.data[i].clavePresup;
             item.nombre_tecnico = response.data[i].nombreTecnico;
-
+            
             for(var j in meses){
                 if(meses[j] == mes_activo){
                     item['mes_'+meses[j]] = '<div id="grid-mes-'+meses[j]+'" class="text-center" '+meses_capturados[meses[j]]+'><span class="fa fa-unlock"></span></div>';
@@ -58,6 +58,7 @@ moduloDatagrid.actualizar({
                     item['mes_'+meses[j]] = '<div id="grid-mes-'+meses[j]+'" class="text-center" '+meses_capturados[meses[j]]+'><span class="fa fa-lock"></span></div>';
                 }
             }
+            
             var estatus_anteriores = {};
             if(response.data[i].evaluacion_meses.length){
                 for(var j in response.data[i].evaluacion_meses){
@@ -88,9 +89,9 @@ moduloDatagrid.actualizar({
                 var avance = response.data[i].registro_avance[j];
                 var clase_icono = (avance.mes != mes_activo)?'fa-circle':(estado_actual != 0)?'fa-lock':'fa-unlock';
                 if(parseInt(avance.planMejora) > 0){
-                    item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-danger" '+meses_capturados[meses[j]]+'><span class="fa '+clase_icono+'"></span></div>';
+                    item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-danger" '+meses_capturados[avance.mes]+'><span class="fa '+clase_icono+'"></span></div>';
                 }else{
-                    item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-success" '+meses_capturados[meses[j]]+'><span class="fa '+clase_icono+'"></span></div>';
+                    item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-success" '+meses_capturados[avance.mes]+'><span class="fa '+clase_icono+'"></span></div>';
                 }
             }
             datos_grid.push(item);

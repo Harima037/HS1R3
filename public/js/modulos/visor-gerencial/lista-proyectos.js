@@ -139,7 +139,7 @@ moduloDatagrid.actualizar({
                         }
                     }
                     var clase_icono = (evaluacion_mes.mes != mes_activo)?'fa-circle':(estado_actual != 0)?'fa-lock':'fa-unlock';
-                    item['mes_'+evaluacion_mes.mes] = '<div id="grid-mes-'+evaluacion_mes.mes+'" class="text-center '+color_circle+'" '+meses_capturados[meses[j]]+'><span class="fa '+clase_icono+'"></span></div>';
+                    item['mes_'+evaluacion_mes.mes] = '<div id="grid-mes-'+evaluacion_mes.mes+'" class="text-center '+color_circle+'" '+meses_capturados[evaluacion_mes.mes]+'><span class="fa '+clase_icono+'"></span></div>';
                 }
             }
             

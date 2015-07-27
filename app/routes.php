@@ -77,6 +77,19 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		
 	});
 
+	Route::group(array('prefix'=>'visor'),function(){
+		Route::get('estatal',array('uses'=>'VisorController@indexEstatal'));
+		Route::get('direcciones',array('uses'=>'VisorController@indexDirecciones'));
+
+		Route::get('proyectos-inst',array('uses'=>'VisorController@indexInstitucional'));
+		Route::get('proyectos-inv',array('uses'=>'VisorController@indexInversion'));
+		Route::get('avance-indicadores/{id}',array('uses'=>'VisorController@avanceIndicadores'));
+
+		Route::get('general',array('uses'=>'VisorController@indexDesempenioGeneral'));
+		Route::get('presupuesto',array('uses'=>'VisorController@indexPresupuesto'));
+		Route::get('presupuesto-meta',array('uses'=>'VisorController@indexPresupuestoMeta'));
+	});
+
 	Route::group(array('prefix'=>'visor-gerencial'),function(){
 		Route::get('proyectos-inst',array('uses'=>'VisorGerencialController@indexInstitucional'));
 		Route::get('proyectos-inv',array('uses'=>'VisorGerencialController@indexInversion'));
@@ -88,9 +101,11 @@ Route::group(array('before'=>'auth.sentry'), function(){
 	Route::group(array('prefix'=>'visor-directivo'),function(){
 		Route::get('proyectos-inst',array('uses'=>'VisorDirectivoController@indexInstitucional'));
 		Route::get('proyectos-inv',array('uses'=>'VisorDirectivoController@indexInversion'));
-
 		Route::get('ver-avance/{id}',array('uses'=>'VisorDirectivoController@rendicionCuentas'));
+
 		Route::get('general',array('uses'=>'VisorDirectivoController@desempenioGeneral'));
+		Route::get('presupuesto',array('uses'=>'VisorDirectivoController@presupuesto'));
+		Route::get('presupuesto-meta',array('uses'=>'VisorDirectivoController@presupuestoMeta'));
 	});
 
 	Route::group(array('prefix'=>'rendicion-cuentas'),function(){
@@ -136,6 +151,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('reporteProyecto',	'V1\ReporteProyectoController', array('only' => array('show')));
 		Route::resource('fibap',			'V1\FibapController');
 
+		Route::resource('visor', 			'V1\VisorController', array('only' => array('index','show')));
 		Route::resource('visor-gerencial', 	'V1\VisorGerencialController', array('only' => array('index','show')));
 		Route::resource('visor-directivo', 	'V1\VisorDirectivoController', array('only' => array('index','show')));
 
