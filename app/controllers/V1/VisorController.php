@@ -219,6 +219,137 @@ class VisorController extends BaseController {
 					# code...
 					break;
 			}
+		}elseif(isset($parametros['formatogrid'])){
+			if(isset($parametros['clasificacionProyecto'])){
+				$mes_actual = Util::obtenerMesActual();
+				$mes_activo = $mes_actual;
+				if($mes_actual == 0){ $mes_actual = date('n') - 1; }
+
+				$rows = Proyecto::where('idEstatusProyecto','=',5)
+							->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto']);
+				
+				$usuario = Sentry::getUser();
+				//if($usuario->filtrarProyectos){ $rows = $rows->where('idUsuarioValidacionSeg','=',$usuario->id); }
+				//Obtenemos las unidades asignadas al usuario -- mas tarde agregar condicion para jurisdicciones
+				if($usuario->claveUnidad){
+					$unidades = explode('|',$usuario->claveUnidad);
+					$rows = $rows->whereIn('unidadResponsable',$unidades);
+				}
+
+				$rows = $rows->with(array(
+				'evaluacionMeses'=>function($query) use ($mes_actual){
+					$query->where('evaluacionProyectoMes.mes','<=',$mes_actual)
+						->leftjoin('registroAvancesMetas',function($join){
+								$join->on('registroAvancesMetas.idProyecto','=','evaluacionProyectoMes.idProyecto')
+									->on('registroAvancesMetas.mes','=','evaluacionProyectoMes.mes');
+						})
+						->select('evaluacionProyectoMes.*',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'))
+						->groupBy('registroAvancesMetas.idProyecto','registroAvancesMetas.mes');
+				},
+				'componentesMetasMes'=>function($query){
+					$query->select('id','idProyecto','mes',DB::raw('sum(meta) AS totalMeta'))->groupBy('idProyecto','mes');
+				},
+				'actividadesMetasMes'=>function($query){
+					$query->select('id','idProyecto','mes',DB::raw('sum(meta) AS totalMeta'))->groupBy('idProyecto','mes');
+				}));
+
+				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
+				
+				if(isset($parametros['buscar'])){				
+					$rows = $rows->where(function($query)use($parametros){
+						$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
+							->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
+					});
+					$total = $rows->count();
+				}else{				
+					$total = $rows->count();						
+				}
+
+				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
+					'nombreTecnico')
+					->orderBy('id', 'desc')
+					->skip(($parametros['pagina']-1)*10)->take(10)
+					->get();
+
+				$proyectos = array();
+				foreach ($rows as $proyecto) {
+					$proyecto_beta = array(
+						'id' => $proyecto->id,
+						'clavePresupuestaria' => $proyecto->clavePresup,
+						'nombreTecnico' => $proyecto->nombreTecnico,
+						'meses'=>array()
+					);
+
+					foreach ($proyecto->componentesMetasMes as $metas_mes) {
+						if(floatval($metas_mes->totalMeta) > 0){
+							$proyecto_beta['meses'][$metas_mes->mes] = array(
+								'programado'=>true,'estatus'=>0,'avance'=>0
+							);
+						}
+					}
+
+					foreach ($proyecto->actividadesMetasMes as $metas_mes) {
+						if(floatval($metas_mes->totalMeta) > 0){
+							if(!isset($proyecto_beta['meses'][$metas_mes->mes])){
+								$proyecto_beta['meses'][$metas_mes->mes] = array(
+									'programado'=>true,'estatus'=>0,'avance'=>0
+								);
+							}
+						}
+					}
+
+					foreach($proyecto->evaluacionMeses as $estatus_mes){
+						if(!isset($proyecto_beta['meses'][$estatus_mes->mes])){
+							$proyecto_beta['meses'][$estatus_mes->mes] = array(
+								'programado'=>false,
+								'estatus'=>$estatus_mes->idEstatus,
+								'avance'=>floatval($estatus_mes->planMejora)
+							);
+						}else{
+							$proyecto_beta['meses'][$estatus_mes->mes]['estatus'] = $estatus_mes->idEstatus;
+							$proyecto_beta['meses'][$estatus_mes->mes]['avance'] = floatval($estatus_mes->planMejora);
+						}
+					}
+					$proyectos[] = $proyecto_beta;
+				}
+				$data = array('data'=>$proyectos,'resultados'=>$total,'mesActual'=>$mes_actual,'mesActivo'=>$mes_activo);
+			}elseif(isset($parametros['avancesIndicadores'])){
+				$mes_actual = Util::obtenerMesActual();
+				if($mes_actual == 0){
+					$mes_actual = date('n') -1;
+				}
+				//SEparar Componentes y Actividades
+				$rows = Proyecto::with(array(
+						'componentes'=>function($query)use($mes_actual){
+							$query->select('proyectoComponentes.id','proyectoComponentes.indicador',
+										'proyectoComponentes.valorNumerador','proyectoComponentes.idProyecto',
+										DB::raw('sum(componenteMetasMes.meta) AS metasAlMes'))
+								->leftjoin('componenteMetasMes',function($join)use($mes_actual){
+									$join->on('componenteMetasMes.idComponente','=','proyectoComponentes.id')
+										->where('componenteMetasMes.mes','<=',$mes_actual)
+										->whereNull('componenteMetasMes.borradoAl');
+								})
+								->groupBy('proyectoComponentes.id');
+						}
+						,'componentes.registroAvance'
+						,'actividades'=>function($query)use($mes_actual){
+							$query->select('componenteActividades.id','componenteActividades.indicador','componenteActividades.idComponente',
+										'componenteActividades.valorNumerador','componenteActividades.idProyecto',
+										DB::raw('sum(actividadMetasMes.meta) AS metasAlMes'))
+								->leftjoin('actividadMetasMes',function($join)use($mes_actual){
+									$join->on('actividadMetasMes.idActividad','=','componenteActividades.id')
+										->where('actividadMetasMes.mes','<=',$mes_actual)
+										->whereNull('actividadMetasMes.borradoAl');
+								})
+								->groupBy('componenteActividades.id');
+						}
+						,'actividades.registroAvance'))
+						->find($parametros['idProyecto']);
+				return Response::json($rows,$http_status);
+				
+				$total = count($rows);
+				$data = array('data'=>$rows,'resultados'=>$total);
+			}
 		}else{
 			$data = array("data"=>"No hay datos",'code'=>'W00');
 		}
@@ -450,6 +581,14 @@ class VisorController extends BaseController {
 		return Response::json($data,$http_status);
 	}
 
+	/**
+	 * Display the specified resource.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function show($id){}
+
 	public function presupuestoEjercidoPorUnidad(){
 		$mes_actual = Util::obtenerMesActual();
 		if($mes_actual == 0){ $mes_actual = date('n') -1; }
@@ -557,11 +696,4 @@ class VisorController extends BaseController {
 		return array('metas_unidad'=>$metas_unidad,'total_metas'=>$total);
 	}
 
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id){}
 }
