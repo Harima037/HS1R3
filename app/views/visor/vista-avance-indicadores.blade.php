@@ -4,7 +4,7 @@
 
 @section('js')
 @parent
-<!--script type="text/javascript"> $("#loading").fadeIn(); </script-->
+<script type="text/javascript"> $("#loading").fadeIn(); </script>
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
 <script type="text/javascript" src="https://www.google.com/jsapi"></script>

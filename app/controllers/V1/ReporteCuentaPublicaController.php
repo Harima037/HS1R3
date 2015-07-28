@@ -166,7 +166,7 @@ class ReporteCuentaPublicaController extends BaseController {
 				$clasificacion_anterior = $elemento->idClasificacionProyecto;
 			}
 
-			$section->addTitle(htmlspecialchars('Proyecto: '.$elemento->nombreTecnico.' ( '.$elemento->unidadResponsableDescipcion.' )'),4);
+			$section->addTitle(htmlspecialchars('Proyecto: '.$elemento->nombreTecnico.' ('.$elemento->unidadResponsableDescipcion.')'),4);
 			$section->addTextBreak();
 
 			$table = $section->addTable('TablaInfo');

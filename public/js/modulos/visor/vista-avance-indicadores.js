@@ -40,61 +40,19 @@ accionesDatagrid.actualizar({
     _success: function(response){ 
         accionesDatagrid.limpiar();
         var datos_grid = [];
-        var contador_componente = 0;
-        for(var i in response.data.componentes){
-            var contador_actividad = 0;
-            contador_componente++;
-            var componente = response.data.componentes[i];
+        for(var i in response.data){
+            var elemento = response.data[i];
 
             var item = {};
-            item.id = '1-' + componente.id;
-            item.nivel = 'C ' + contador_componente;
-            item.indicador = componente.indicador;
-            item.meta = (parseFloat(componente.valorNumerador) || 0).format(2);
-            item.meta_acumulada = (parseFloat(componente.metasAlMes) || 0).format(2);
-            item.avances_acumulados = 0;
-            item.avances_mes = 0;
+            item.id = elemento.tipo + '-' + elemento.id;
+            item.nivel = elemento.nivel;
+            item.indicador = elemento.indicador;
+            item.meta = elemento.metaAnual.format(2);
+            item.meta_acumulada = elemento.metaMes.format(2);
+            item.avances_acumulados = elemento.avanceAcumulado.format(2);
+            item.avances_mes = elemento.avanceMes.format(2);
 
-            var mes = $('#mes').val();
-            
-            if(componente.registro_avance.length){
-                for(var j in componente.registro_avance){
-                    var avance = componente.registro_avance[j];
-                    item.avances_acumulados += parseFloat(avance.avanceMes);
-                    if(avance.mes == mes){
-                        item.avances_mes += parseFloat(avance.avanceMes);                        
-                    }
-                }
-            }
-            item.avances_acumulados = item.avances_acumulados.format(2);
-            item.avances_mes = item.avances_mes.format(2);
             datos_grid.push(item);
-
-            for(var j in componente.actividades){
-                contador_actividad++;
-                var actividad = componente.actividades[j];
-                var item = {};
-                item.id = '2-' + actividad.id;
-                item.nivel = 'A ' + contador_componente + '.' + contador_actividad;
-                item.indicador = actividad.indicador;
-                item.meta = (parseFloat(actividad.valorNumerador) || 0).format(2);
-                item.meta_acumulada = (parseFloat(actividad.metasAlMes) || 0).format(2);
-                item.avances_acumulados = 0;
-                item.avances_mes = 0;
-                
-                if(actividad.registro_avance.length){
-                    for(var j in actividad.registro_avance){
-                        var avance = actividad.registro_avance[j];
-                        item.avances_acumulados += parseFloat(avance.avanceMes);
-                        if(avance.mes == mes){
-                            item.avances_mes += parseFloat(avance.avanceMes);
-                        }
-                    }
-                }
-                item.avances_acumulados = item.avances_acumulados.format(2);
-                item.avances_mes = item.avances_mes.format(2);
-                datos_grid.push(item);
-            }
         }
         accionesDatagrid.cargarDatos(datos_grid);                         
         var total = parseInt(response.resultados/accionesDatagrid.rxpag); 
@@ -112,7 +70,7 @@ function seguimiento_metas(e){
     }else{
         var nivel = 'actividad';
     }
-    var parametros = {'mostrar':'datos-metas-avance','nivel':nivel};
+    var parametros = {'mostrar':'detalles-avance-indicador','nivel':nivel};
     var id = datos_id[1];
     moduloResource.get(id,parametros,{
         _success: function(response){
@@ -203,28 +161,7 @@ function seguimiento_metas(e){
             var metas = {};
             for(var i in response.data.metas_mes_agrupado){
                 var programado = response.data.metas_mes_agrupado[i];
-                /*
-                meta += parseFloat(programado.meta) || 0;
-                avance += parseFloat(programado.avance) || 0;
-
-                var porcentaje = 0;
-                if(meta > 0){
-                    porcentaje = (avance*100) / meta;
-                }else{
-                    porcentaje = (avance*100);
-                }
                 
-                var estatus = 1;
-                if(!(meta == 0 && avance == 0)){
-                    if(porcentaje > 110){
-                        estatus = 3;
-                    }else if(porcentaje < 90){
-                        estatus = 2;
-                    }else if(porcentaje > 0 && meta == 0){
-                        estatus = 3;
-                    }
-                }*/
-
                 metas[programado.mes] = {
                     metaMes:parseFloat(programado.meta) || 0,
                     avanceMes:parseFloat(programado.avance) || 0
