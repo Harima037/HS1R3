@@ -10,7 +10,7 @@ class EvaluacionAnalisisFuncional extends BaseModel
 	public function comentarios(){
     	return $this->hasMany('EvaluacionComentario','idElemento')->where('tipoElemento','=',4);
     }
-
+	
     public function scopeCuentaPublica($query,$mes=NULL,$anio=NULL){
     	$query =  $query->join('proyectos','proyectos.id','=','evaluacionAnalisisFuncional.idProyecto')
     				->join('evaluacionProyectoMes',function($join){

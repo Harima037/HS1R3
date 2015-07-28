@@ -273,6 +273,90 @@ class Proyecto extends BaseModel
 			->orderBy('proyectos.numeroProyectoEstrategico','asc')
 			->orderBy('proyectos.idClasificacionProyecto','asc');
 	}
+	
+	public function scopeVariacionesGasto($query,$mes,$ejercicio){
+		$query->select(
+				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
+				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
+				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
+				'proyectos.programaPresupuestario','proyectos.programaEspecial',
+				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
+				'proyectos.numeroProyectoEstrategico','variacionGasto.razones',
+
+				DB::raw('sum(ep01.presupuestoAprobado) AS presupuestoAprobado'),
+				DB::raw('sum(ep01.presupuestoModificado) AS presupuestoModificado'),
+				DB::raw('sum(ep01.presupuestoEjercidoModificado) AS presupuestoEjercidoModificado'),
+
+				DB::raw('concat_ws(" ",programaPresupuestario.clave,programaPresupuestario.descripcion) AS programaPresupuestarioDescipcion')
+			)
+
+			->leftjoin('proyectosVariacionGastoRazones AS variacionGasto',function($join)use($mes){
+				$join->on('variacionGasto.idProyecto','=','proyectos.id')
+					->where('variacionGasto.mes','=',$mes);
+			})
+
+			->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','proyectos.programaPresupuestario')
+
+			->join('cargaDatosEP01 AS ep01',function($join) use ($mes,$ejercicio){
+				$join->on('ep01.UR','=','proyectos.unidadResponsable')
+					->on('ep01.FI','=','proyectos.finalidad')
+					->on('ep01.FU','=','proyectos.funcion')
+					->on('ep01.SF','=','proyectos.subFuncion')
+					->on('ep01.SSF','=','proyectos.subSubFuncion')
+					->on('ep01.PS','=','proyectos.programaSectorial')
+					->on('ep01.PP','=','proyectos.programaPresupuestario')
+					->on('ep01.PE','=','proyectos.programaEspecial')
+					->on('ep01.AI','=','proyectos.actividadInstitucional')
+					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'))
+					->where('ep01.mes','=',$mes)
+					->where('ep01.CP','=',$ejercicio);
+			})
+
+			->where('proyectos.idEstatusProyecto','=',5)
+			
+			->groupBy('proyectos.id');
+	}
+	
+	public function scopeReporteVariacionesGasto($query,$mes,$ejercicio){
+		$query->select(
+				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
+				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
+				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
+				'proyectos.programaPresupuestario','proyectos.programaEspecial',
+				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
+				'proyectos.numeroProyectoEstrategico','variacionGasto.razones',
+
+				DB::raw('sum(ep01.presupuestoAprobado) AS presupuestoAprobado'),
+				DB::raw('sum(ep01.presupuestoModificado) AS presupuestoModificado'),
+				DB::raw('sum(ep01.presupuestoDevengadoModificado) AS presupuestoDevengado'),
+				DB::raw('concat_ws(" ",programaPresupuestario.clave,programaPresupuestario.descripcion) AS programaPresupuestarioDescipcion')
+			)
+
+			->leftjoin('proyectosVariacionGastoRazones AS variacionGasto',function($join)use($mes){
+				$join->on('variacionGasto.idProyecto','=','proyectos.id')
+					->where('variacionGasto.mes','=',$mes);
+			})
+
+			->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','proyectos.programaPresupuestario')
+
+			->join('cargaDatosEP01 AS ep01',function($join) use ($mes,$ejercicio){
+				$join->on('ep01.UR','=','proyectos.unidadResponsable')
+					->on('ep01.FI','=','proyectos.finalidad')
+					->on('ep01.FU','=','proyectos.funcion')
+					->on('ep01.SF','=','proyectos.subFuncion')
+					->on('ep01.SSF','=','proyectos.subSubFuncion')
+					->on('ep01.PS','=','proyectos.programaSectorial')
+					->on('ep01.PP','=','proyectos.programaPresupuestario')
+					->on('ep01.PE','=','proyectos.programaEspecial')
+					->on('ep01.AI','=','proyectos.actividadInstitucional')
+					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'))
+					->where('ep01.mes','=',$mes)
+					->where('ep01.CP','=',$ejercicio);
+			})
+			->where('proyectos.idEstatusProyecto','=',5)			
+			->groupBy('proyectos.id');
+	}
+	
 
 	public function scopeCedulasAvances($query,$mes,$ejercicio){
 		$query->select(
