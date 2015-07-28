@@ -686,47 +686,133 @@ class VisorController extends BaseController {
 				
 				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
 				$recurso = $recurso->with(array(
-				'metasMes' => function($query)use($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'metasMesAgrupado' => function($query){
-					$query->orderBy('mes','asc');
-				},'metasMesJurisdiccion'=>function($query) use ($mes_actual,$tabla,$campo){
-					$query->select($tabla.'id','idProyecto',$campo,'claveJurisdiccion',
-						DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'),
-						'vistaJurisdicciones.nombre AS jurisdiccion')
-							->where('mes','<=',$mes_actual)
-							->leftjoin('vistaJurisdicciones','vistaJurisdicciones.clave','=','claveJurisdiccion');
-					//$query->where('mes','<=',$mes_actual);
-				},'registroAvance'=>function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'planMejora'=>function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'unidadMedida'))->find($id);
+							'metasMes' => function($query)use($mes_actual){
+								$query->where('mes','=',$mes_actual);
+							},'metasMesAgrupado' => function($query){
+								$query->orderBy('mes','asc');
+							},'metasMesJurisdiccion'=>function($query) use ($mes_actual,$tabla,$campo){
+								$query->select($tabla.'id','idProyecto',$campo,'claveJurisdiccion',
+									DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'),
+									'vistaJurisdicciones.nombre AS jurisdiccion')
+										->where('mes','<=',$mes_actual)
+										->leftjoin('vistaJurisdicciones','vistaJurisdicciones.clave','=','claveJurisdiccion');
+							},'registroAvance'=>function($query) use ($mes_actual){
+								$query->join('evaluacionProyectoMes AS proyectoMes',function($join){
+									$join->on('proyectoMes.idProyecto','=','registroAvancesMetas.idProyecto')
+										->on('proyectoMes.mes','=','registroAvancesMetas.mes')
+										->on('proyectoMes.idEstatus','in',DB::raw('(4,5)'))
+										->whereNull('proyectoMes.borradoAl');
+									})->where('registroAvancesMetas.mes','<=',$mes_actual)
+									->orderBy('registroAvancesMetas.mes','desc')
+									->select('registroAvancesMetas.*');
+							}
+							,'planMejora'=>function($query) use ($mes_actual){
+								$query->where('mes','=',$mes_actual);
+							},'unidadMedida'))->find($id);
 
 				$elemento = array(
 					'id' => $recurso->id,
+					'nivel' => $parametros['nivel'],
 					'indicador' => $recurso->indicador,
 					'unidadMedida' => $recurso->unidadMedida->descripcion,
-					'metaTotal' => $recurso->metasMesAgrupado->sum('meta')
+					'metaTotal' => $recurso->metasMesAgrupado->sum('meta'),
+					'analisisResultados' => null,'justificacion' => null,
+					'planMejora' => null
 				);
-				if($recurso->registroAvances)
 
-				$data['beta'] = $elemento;
+				$meses_capturados = $recurso->registroAvance->lists('mes','mes');
+
+				if(isset($meses_capturados[$mes_actual])){
+					$elemento['analisisResultados'] = $recurso->registroAvance[0]->analisisResultados;
+					$elemento['justificacion'] = $recurso->registroAvance[0]->justificacionAcumulada;
+				}
+
+				if(count($recurso->planMejora)){
+					$elemento['planMejora'] = $recurso->planMejora[0]->toArray();
+				}
+
+				$juris_metas = array();
+				foreach ($recurso->metasMesJurisdiccion as $datos) {
+					$meta = floatval($datos->meta);
+			        $avance = floatval($datos->avance);
+
+			        if($meta > 0){ $porcentaje = ($avance*100) / $meta; }
+			        else{ $porcentaje = ($avance*100); }
+
+			        $estatus = 1;
+			        if(!($meta == 0 && $avance == 0)){
+						if($porcentaje > 110){ $estatus = 3; }
+						elseif($porcentaje < 90){ $estatus = 2; }
+						elseif($porcentaje > 0 && $meta == 0){ $estatus = 3; }
+			        }
+
+					$juris_metas[$datos->claveJurisdiccion] = array(
+						'nombre' => $datos->jurisdiccion,
+						'metaMes' => 0,
+						'metaAcumulada' => $meta,
+						'avanceAcumulado' => $avance,
+						'avanceMes' => 0,
+						'avanceTotal' => $avance,
+						'porcentaje' => $porcentaje,
+						'estatus' => $estatus
+					);
+				}
+				foreach ($recurso->metasMes as $meta_mes) {
+					$juris_metas[$meta_mes->claveJurisdiccion]['metaMes'] = floatval($meta_mes->meta);
+					$juris_metas[$meta_mes->claveJurisdiccion]['avanceMes'] = floatval($meta_mes->avance);
+					$juris_metas[$meta_mes->claveJurisdiccion]['avanceAcumulado'] = $juris_metas[$meta_mes->claveJurisdiccion]['avanceTotal'] - floatval($meta_mes->avance);
+				}
+				$elemento['jurisdicciones'] = $juris_metas;
+
+				$mes_metas = array();
+				$meta_acumulada = 0;
+				$avance_acumulado = 0;
+				foreach ($recurso->metasMesAgrupado as $meta_mes) {
+					$meta_acumulada += floatval($meta_mes->meta);
+					$mes_metas[$meta_mes->mes] = array(
+						'meta' => floatval($meta_mes->meta),
+						'metaAcumulada' => $meta_acumulada,
+						'estatus' => 0, 'activo'=>false, 'porcentaje'=>0
+					);
+
+					if(isset($meses_capturados[$meta_mes->mes])){
+						$avance_acumulado += floatval($meta_mes->avance);
+						$mes_metas[$meta_mes->mes]['avance'] = floatval($meta_mes->avance);
+						$mes_metas[$meta_mes->mes]['avanceAcumulado'] = $avance_acumulado;
+						$mes_metas[$meta_mes->mes]['activo'] = true;
+					}
+
+					if($meta_acumulada > 0){ $porcentaje = ($avance_acumulado*100) / $meta_acumulada; }
+			        else{ $porcentaje = ($avance_acumulado*100); }
+
+			        $estatus = 1;
+			        if(!($meta_acumulada == 0 && $avance_acumulado == 0)){
+						if($porcentaje > 110){ $estatus = 3; }
+						elseif($porcentaje < 90){ $estatus = 2; }
+						elseif($porcentaje > 0 && $meta_acumulada == 0){ $estatus = 3; }
+			        }
+
+			        $mes_metas[$meta_mes->mes]['estatus'] = $estatus;
+			        $mes_metas[$meta_mes->mes]['porcentaje'] = $porcentaje;
+				}
+				$elemento['meses'] = $mes_metas;
 
 				if($parametros['nivel'] == 'componente'){
 					$recurso->load('desgloseMunicipios');
-					//$queries = DB::getQueryLog();
-					//throw new Exception(print_r(end($queries),true), 1);
+					$elemento['desgloseMunicipios'] = $recurso->desgloseMunicipios;
 				}
+				$data['data'] = $elemento;
+				//$data["data"] = $recurso;
 			}
 		}
 
 		if(is_null($recurso)){
 			$http_status = 404;
 			$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
-		}else{
-			$data["data"] = $recurso;
 		}
+		/*else{
+			$data["data"] = $recurso;
+		}*/
 		return Response::json($data,$http_status);
 	}
 
