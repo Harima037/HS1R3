@@ -17,7 +17,7 @@
 @section('content')
 <div class="panel panel-default">
 <div class="panel-heading">
-	<h3 class="panel-title">Rendición de cuentas al mes de {{$mes}}</h3>
+	<h3 class="panel-title">Estado de los indicadores al mes de {{$mes}}</h3>
 </div>
 <div class="panel-body" id="panel-rendicion-cuentas">
     <ul class="nav nav-tabs" role="tablist">
@@ -143,7 +143,13 @@
 							<table id="tabla-avances-metas" class="table table-condensed table-bordered">
 		                		<thead>
 		                			<tr>
-		                				<th rowspan="2" class="text-center">Jurisdicción</th>
+		                				<th rowspan="2" class="text-center">
+		                				@if(isset($jurisdicciones))
+		                					Jurisdicción
+										@else
+											Mes
+										@endif
+		                				</th>
 			                			<th colspan="2" class="bg-success text-center">Meta Programada</th>
 			                			<th colspan="3" class="bg-info text-center">Avance</th>
 			                			<th rowspan="2" width="90" class="text-center">Porcentaje Acumulado</th>
@@ -156,6 +162,7 @@
 		                				<th class="bg-info text-center">Total</th>
 		                			</tr>
 		                		</thead>
+		                		@if(isset($jurisdicciones))
 		                		<tbody>
 		                			@foreach ($jurisdicciones as $clave => $jurisdiccion)
 		                			<tr data-clave-jurisdiccion="{{$clave}}">
@@ -180,6 +187,21 @@
 		                			<th id="total-avance-total" class="bg-info">0</th>
 		                			<th id="total-porcentaje-mes">0%</th>
 		                		</tfoot>
+		                		@else
+		                		<tbody>
+		                		@foreach($meses as $clave => $mes)
+		                			<tr {{($mes_clave == $clave)?'style="font-weight:bold;"':''}}>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} width="135" >{{$mes}}</td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} width="135" class="valores" id="meta-mes-{{$clave}}"></td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} width="135" class="valores bg-success" id="meta-acumulada-{{$clave}}" class="bg-success"></td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} width="135" class="valores" id="avance-acumulado-{{$clave}}"></td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} width="135" class="valores" id="avance-mes-{{$clave}}"></td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} width="135" class="valores bg-info" id="avance-total-{{$clave}}" class="bg-info"></td>
+		                				<td {{($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} class="valores" id="porcentaje-acumulado-{{$clave}}"></td>
+		                			</tr>
+		                		@endforeach
+		                		</tbody>
+		                		@endif
 		                	</table>
 		                	<div id="panel-estructura-localidades" class="hidden">
 		                		<table class="table table-condensed">
@@ -228,6 +250,7 @@
 			                		</tfoot>
 			                	</table>
 		                	</div>
+		                	@if(isset($jurisdicciones))
 		                	<div class="row">
 								<div class="col-sm-6">
 									<div class="form-group">
@@ -242,6 +265,16 @@
 									</div>
 								</div>
 							</div>
+							@else
+							<div class="form-group hidden" id="mensaje-alerta">
+		                		<label class="control-label">Observaciones:</label>
+		                		<p class="form-control-static" style="font-size:bigger;">
+		                			<big>
+		                				De acuerdo a los resultados acumulados del indicador es necesario implementar un Plan de Acción de Mejora
+		                			</big>
+		                		</p>
+		                	</div>
+							@endif
 						</div>
 						<div role="tabpanel" class="tab-pane" id="panel-plan-mejora">
 							<br>

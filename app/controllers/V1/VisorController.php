@@ -283,33 +283,32 @@ class VisorController extends BaseController {
 				$mes_activo = $mes_actual;
 				if($mes_actual == 0){ $mes_actual = date('n') - 1; }
 
+				$jurisdiccion = false;
+
 				$rows = Proyecto::where('idEstatusProyecto','=',5)
 							->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto']);
 				
 				$usuario = Sentry::getUser();
-				//if($usuario->filtrarProyectos){ $rows = $rows->where('idUsuarioValidacionSeg','=',$usuario->id); }
-				//Obtenemos las unidades asignadas al usuario -- mas tarde agregar condicion para jurisdicciones
-				if($usuario->claveUnidad){
+				if($usuario->claveJurisdiccion){
+					$jurisdiccion = $usuario->claveJurisdiccion;
+					$query_actividades = DB::table('actividadMetasMes')->select('idProyecto')
+															 ->where('claveJurisdiccion','=',$usuario->claveJurisdiccion)
+															 ->whereNull('borradoAl')
+															 ->where(function($query){
+															 	$query->where('meta','>','0')->orWhere('avance','>','0');
+															 })->groupBy('idProyecto');
+					$proyectos_ids = ComponenteMetaMes::select('idProyecto')
+															 ->where('claveJurisdiccion','=',$usuario->claveJurisdiccion)
+															 ->where(function($query){
+															 	$query->where('meta','>','0')->orWhere('avance','>','0');
+															 })->groupBy('idProyecto')
+															 ->union($query_actividades)->lists('idProyecto');
+					//
+					$rows = $rows->whereIn('id',$proyectos_ids);
+				}elseif($usuario->claveUnidad){
 					$unidades = explode('|',$usuario->claveUnidad);
 					$rows = $rows->whereIn('unidadResponsable',$unidades);
 				}
-
-				$rows = $rows->with(array(
-				'evaluacionMeses'=>function($query) use ($mes_actual){
-					$query->where('evaluacionProyectoMes.mes','<=',$mes_actual)
-						->leftjoin('registroAvancesMetas',function($join){
-								$join->on('registroAvancesMetas.idProyecto','=','evaluacionProyectoMes.idProyecto')
-									->on('registroAvancesMetas.mes','=','evaluacionProyectoMes.mes');
-						})
-						->select('evaluacionProyectoMes.*',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'))
-						->groupBy('registroAvancesMetas.idProyecto','registroAvancesMetas.mes');
-				},
-				'componentesMetasMes'=>function($query){
-					$query->select('id','idProyecto','mes',DB::raw('sum(meta) AS totalMeta'))->groupBy('idProyecto','mes');
-				},
-				'actividadesMetasMes'=>function($query){
-					$query->select('id','idProyecto','mes',DB::raw('sum(meta) AS totalMeta'))->groupBy('idProyecto','mes');
-				}));
 
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				
@@ -323,12 +322,34 @@ class VisorController extends BaseController {
 					$total = $rows->count();						
 				}
 
+				$rows = $rows->with(array(
+				'evaluacionMeses'=>function($query) use ($mes_actual){
+					$query->where('evaluacionProyectoMes.mes','<=',$mes_actual)
+						->leftjoin('registroAvancesMetas',function($join){
+								$join->on('registroAvancesMetas.idProyecto','=','evaluacionProyectoMes.idProyecto')
+									->on('registroAvancesMetas.mes','=','evaluacionProyectoMes.mes');
+						})
+						->select('evaluacionProyectoMes.*',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'))
+						->groupBy('registroAvancesMetas.idProyecto','registroAvancesMetas.mes');
+				},
+				'componentesMetasMes'=>function($query)use($jurisdiccion){
+					$query->select('id','idProyecto','mes',DB::raw('sum(meta) AS totalMeta'),DB::raw('sum(avance) AS totalAvance'))
+						 ->groupBy('idProyecto','mes');
+					if($jurisdiccion){ $query->where('claveJurisdiccion','=',$jurisdiccion); }
+				},
+				'actividadesMetasMes'=>function($query)use($jurisdiccion){
+					$query->select('id','idProyecto','mes',DB::raw('sum(meta) AS totalMeta'),DB::raw('sum(avance) AS totalAvance'))
+				 		 ->groupBy('idProyecto','mes');
+					if($jurisdiccion){ $query->where('claveJurisdiccion','=',$jurisdiccion); }
+				}));
+
 				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 					'nombreTecnico')
 					->orderBy('id', 'desc')
 					->skip(($parametros['pagina']-1)*10)->take(10)
 					->get();
-
+				//return Response::json($rows,$http_status);
+				//var_dump($rows->toArray());die;
 				$proyectos = array();
 				foreach ($rows as $proyecto) {
 					$proyecto_beta = array(
@@ -338,12 +359,46 @@ class VisorController extends BaseController {
 						'meses'=>array()
 					);
 
+					if($jurisdiccion){
+						$estatus_meses = $proyecto->evaluacionMeses->lists('idEstatus','mes');
+						$avance_acumulado = 0;
+						$meta_acumulada = 0;
+					}else{
+						$estatus_meses = array();
+					}
+
 					foreach ($proyecto->componentesMetasMes as $metas_mes) {
 						if(floatval($metas_mes->totalMeta) > 0){
 							$proyecto_beta['meses'][$metas_mes->mes] = array(
 								'programado'=>true,'estatus'=>0,'avance'=>0
 							);
 						}
+						if($jurisdiccion){
+							$avance_acumulado += floatval($metas_mes->totalAvance);
+							$meta_acumulada += floatval($metas_mes->totalMeta);
+							if(isset($estatus_meses[$metas_mes->mes])){
+								if(!isset($proyecto_beta['meses'][$metas_mes->mes])){
+									$proyecto_beta['meses'][$metas_mes->mes] = array(
+										'programado'=>false,'estatus'=>$estatus_meses[$metas_mes->mes],'avance'=>0
+									);
+								}else{
+									$proyecto_beta['meses'][$metas_mes->mes]['estatus'] = $estatus_meses[$metas_mes->mes];
+								}
+								if($avance_acumulado > 0 || $meta_acumulada > 0){
+									if($meta_acumulada > 0){ $porcentaje = ($avance_acumulado*100)/$meta_acumulada; }
+									else{ $porcentaje = ($avance_acumulado*100); }
+
+									if($porcentaje > 110 || ($porcentaje > 0 && $meta_acumulada == 0) || $porcentaje < 90){ $tipo_avance = 2; }
+									else{ $tipo_avance = 1; }
+									$proyecto_beta['meses'][$metas_mes->mes]['avance'] = $tipo_avance;
+								}
+							}
+						}
+					}
+
+					if($jurisdiccion){
+						$avance_acumulado = 0;
+						$meta_acumulada = 0;
 					}
 
 					foreach ($proyecto->actividadesMetasMes as $metas_mes) {
@@ -354,20 +409,58 @@ class VisorController extends BaseController {
 								);
 							}
 						}
+
+						if($jurisdiccion){
+							$avance_acumulado += floatval($metas_mes->totalAvance);
+							$meta_acumulada += floatval($metas_mes->totalMeta);
+							if(isset($estatus_meses[$metas_mes->mes])){
+								if(!isset($proyecto_beta['meses'][$metas_mes->mes])){
+									$proyecto_beta['meses'][$metas_mes->mes] = array(
+										'programado'=>false,'estatus'=>$estatus_meses[$metas_mes->mes],'avance'=>0
+									);
+								}else{
+									$proyecto_beta['meses'][$metas_mes->mes]['estatus'] = $estatus_meses[$metas_mes->mes];
+								}
+								if($avance_acumulado > 0 || $meta_acumulada > 0){
+									if($meta_acumulada > 0){ $porcentaje = ($avance_acumulado*100)/$meta_acumulada; }
+									else{ $porcentaje = ($avance_acumulado*100); }
+
+									if($porcentaje > 110 || ($porcentaje > 0 && $meta_acumulada == 0) || $porcentaje < 90){ $tipo_avance = 2; }
+									else{ $tipo_avance = 1; }
+									if($tipo_avance > $proyecto_beta['meses'][$metas_mes->mes]['avance']){
+										$proyecto_beta['meses'][$metas_mes->mes]['avance'] = $tipo_avance;
+									}
+								}
+							}
+						}
 					}
 
 					foreach($proyecto->evaluacionMeses as $estatus_mes){
-						if(!isset($proyecto_beta['meses'][$estatus_mes->mes])){
-							$proyecto_beta['meses'][$estatus_mes->mes] = array(
-								'programado'=>false,
-								'estatus'=>$estatus_mes->idEstatus,
-								'avance'=>floatval($estatus_mes->planMejora)
-							);
+						if($jurisdiccion){
+							if(!isset($proyecto_beta['meses'][$estatus_mes->mes])){
+								$proyecto_beta['meses'][$estatus_mes->mes] = array(
+									'programado'=>false,
+									'estatus'=>$estatus_mes->idEstatus,
+									'avance'=>0
+								);
+							}
 						}else{
-							$proyecto_beta['meses'][$estatus_mes->mes]['estatus'] = $estatus_mes->idEstatus;
-							$proyecto_beta['meses'][$estatus_mes->mes]['avance'] = floatval($estatus_mes->planMejora);
+							if(floatval($estatus_mes->planMejora) > 0){ $avance = 2; }
+							else{ $avance = 1; }
+
+							if(!isset($proyecto_beta['meses'][$estatus_mes->mes])){
+								$proyecto_beta['meses'][$estatus_mes->mes] = array(
+									'programado'=>false,
+									'estatus'=>$estatus_mes->idEstatus,
+									'avance'=>$avance
+								);
+							}else{
+								$proyecto_beta['meses'][$estatus_mes->mes]['estatus'] = $estatus_mes->idEstatus;
+								$proyecto_beta['meses'][$estatus_mes->mes]['avance'] = $avance;
+							}
 						}
 					}
+					
 					$proyectos[] = $proyecto_beta;
 				}
 				$data = array('data'=>$proyectos,'resultados'=>$total,'mesActual'=>$mes_actual,'mesActivo'=>$mes_activo);
@@ -377,18 +470,29 @@ class VisorController extends BaseController {
 					$mes_actual = date('n') -1;
 				}
 				
-				$componentes = Componente::select('proyectoComponentes.id','proyectoComponentes.idProyecto',
+				$jurisdiccion = false;
+
+				$componentes = Componente::getModel();
+				$actividades = Actividad::getModel();
+
+				$usuario = Sentry::getUser();
+				if($usuario->claveJurisdiccion){
+					$jurisdiccion = $usuario->claveJurisdiccion;
+				}
+
+				$componentes = $componentes->select('proyectoComponentes.id','proyectoComponentes.idProyecto',
 											'proyectoComponentes.indicador',DB::raw('sum(metasMes.meta) AS metaAnual'))
-										->join('componenteMetasMes AS metasMes',function($join){
+										->join('componenteMetasMes AS metasMes',function($join)use($jurisdiccion){
 											$join->on('metasMes.idComponente','=','proyectoComponentes.id')
-												//->where('metasMes.claveJurisdiccion','=',$clave_jurisdiccion)
 												->whereNull('metasMes.borradoAl');
+											if($jurisdiccion){ $join->where('metasMes.claveJurisdiccion','=',$jurisdiccion); }
 										})
-										->with(array('metasMes'=>function($query)use($mes_actual){
+										->with(array('metasMes'=>function($query)use($mes_actual,$jurisdiccion){
 											$query->select('id','idComponente',DB::raw('sum(meta) AS meta'),'mes',
 													DB::raw('sum(avance) AS avance'))
 												->where('mes','<=',$mes_actual)
 												->groupBy('idComponente','mes')->orderBy('mes','desc');
+											if($jurisdiccion){ $query->where('claveJurisdiccion','=',$jurisdiccion); }
 										},'registroAvance'=>function($query){
 											$query->join('evaluacionProyectoMes AS proyectoMes',function($join){
 												$join->on('proyectoMes.idProyecto','=','registroAvancesMetas.idProyecto')
@@ -400,19 +504,20 @@ class VisorController extends BaseController {
 										->groupBy('proyectoComponentes.id')
 										->where('proyectoComponentes.idProyecto','=',$parametros['idProyecto'])
 										->get();
-				$actividades = Actividad::select('componenteActividades.id','componenteActividades.idProyecto',
+				$actividades = $actividades->select('componenteActividades.id','componenteActividades.idProyecto',
 											'componenteActividades.idComponente','componenteActividades.indicador',
 											DB::raw('sum(metasMes.meta) AS metaAnual'))
-										->join('actividadMetasMes AS metasMes',function($join){
+										->join('actividadMetasMes AS metasMes',function($join)use($jurisdiccion){
 											$join->on('metasMes.idActividad','=','componenteActividades.id')
-												//->where('metasMes.claveJurisdiccion','=',$clave_jurisdiccion)
 												->whereNull('metasMes.borradoAl');
+											if($jurisdiccion){ $join->where('metasMes.claveJurisdiccion','=',$jurisdiccion); }
 										})
-										->with(array('metasMes'=>function($query)use($mes_actual){
+										->with(array('metasMes'=>function($query)use($mes_actual,$jurisdiccion){
 											$query->select('id','idActividad',DB::raw('sum(meta) AS meta'),'mes',
 													DB::raw('sum(avance) AS avance'))
 												->where('mes','<=',$mes_actual)
 												->groupBy('idActividad','mes')->orderBy('mes','desc');
+											if($jurisdiccion){ $query->where('claveJurisdiccion','=',$jurisdiccion); }
 										},'registroAvance'=>function($query){
 											$query->join('evaluacionProyectoMes AS proyectoMes',function($join){
 												$join->on('proyectoMes.idProyecto','=','registroAvancesMetas.idProyecto')
@@ -742,12 +847,20 @@ class VisorController extends BaseController {
 					$campo = 'idActividad';
 				}
 				
+				$jurisdiccion = false;
+
+				$usuario = Sentry::getUser();
+				if($usuario->claveJurisdiccion){
+					$jurisdiccion = $usuario->claveJurisdiccion;
+				}
+
 				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
 				$recurso = $recurso->with(array(
 							'metasMes' => function($query)use($mes_actual){
 								$query->where('mes','=',$mes_actual);
-							},'metasMesAgrupado' => function($query){
+							},'metasMesAgrupado' => function($query)use($jurisdiccion){
 								$query->orderBy('mes','asc');
+								if($jurisdiccion){ $query->where('claveJurisdiccion','=',$jurisdiccion); }
 							},'metasMesJurisdiccion'=>function($query) use ($mes_actual,$tabla,$campo){
 								$query->select($tabla.'id','idProyecto',$campo,'claveJurisdiccion',
 									DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'),
@@ -871,6 +984,13 @@ class VisorController extends BaseController {
 					$recurso->load('desgloseMunicipios');
 					$elemento['desgloseMunicipios'] = $recurso->desgloseMunicipios;
 				}
+
+				if($jurisdiccion){
+					$elemento['tomar'] = 'meses';
+				}else{
+					$elemento['tomar'] = 'jurisdicciones';
+				}
+
 				$data['data'] = $elemento;
 				//$data["data"] = $recurso;
 			}

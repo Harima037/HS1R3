@@ -80,10 +80,13 @@ function seguimiento_metas(e){
             $('#indicador').text(response.data.indicador);
             $('#unidad-medida').text(response.data.unidadMedida);
             $('#meta-total').text(response.data.metaTotal.format(2));
-            $('#analisis-resultados').text(response.data.analisisResultados);
-            $('#justificacion-acumulada').text(response.data.justificacion);
+
+            if(response.data.tomar == 'jurisdicciones'){
+                $('#analisis-resultados').text(response.data.analisisResultados);
+                $('#justificacion-acumulada').text(response.data.justificacion);
+            }
             
-            if(response.data.planMejora){
+            if(response.data.planMejora && response.data.tomar == 'jurisdicciones'){
                 $('#tab-link-plan-mejora').removeClass('hidden');
                 var plan_mejora = response.data.planMejora;
                 $('#accion-mejora').text(plan_mejora.accionMejora);
@@ -113,17 +116,19 @@ function seguimiento_metas(e){
                 var jurisdiccion = response.data.jurisdicciones[i];
                 var clave = jurisdiccion.clave;
 
-                $('#meta-mes-'+clave).text(jurisdiccion.metaMes.format(2));
-                $('#meta-acumulada-'+clave).text(jurisdiccion.metaAcumulada.format(2));
-                $('#avance-acumulado-'+clave).text(jurisdiccion.avanceAcumulado.format(2));
-                $('#avance-mes-'+clave).text(jurisdiccion.avanceMes.format(2));
-                $('#avance-total-'+clave).text(jurisdiccion.avanceTotal.format(2));
+                if(response.data.tomar == 'jurisdicciones'){
+                    $('#meta-mes-'+clave).text(jurisdiccion.metaMes.format(2));
+                    $('#meta-acumulada-'+clave).text(jurisdiccion.metaAcumulada.format(2));
+                    $('#avance-acumulado-'+clave).text(jurisdiccion.avanceAcumulado.format(2));
+                    $('#avance-mes-'+clave).text(jurisdiccion.avanceMes.format(2));
+                    $('#avance-total-'+clave).text(jurisdiccion.avanceTotal.format(2));
 
-                total_meta_mes += jurisdiccion.metaMes;
-                total_meta_acumulada += jurisdiccion.metaAcumulada;
-                total_avance_acumulado += jurisdiccion.avanceAcumulado;
-                total_avance_mes += jurisdiccion.avanceMes;
-                total_avance_total += jurisdiccion.avanceTotal;
+                    total_meta_mes += jurisdiccion.metaMes;
+                    total_meta_acumulada += jurisdiccion.metaAcumulada;
+                    total_avance_acumulado += jurisdiccion.avanceAcumulado;
+                    total_avance_mes += jurisdiccion.avanceMes;
+                    total_avance_total += jurisdiccion.avanceTotal;
+                }
 
                 var clase = 'text-danger';
                 var icono = '';
@@ -136,7 +141,9 @@ function seguimiento_metas(e){
                     clase = 'text-success';
                     estatus = '#4B804C';
                 }
-                $('#porcentaje-mes-'+clave).html('<span class="'+clase+'">'+icono+jurisdiccion.porcentaje.format(2)+' %</span>');
+                if(response.data.tomar == 'jurisdicciones'){
+                    $('#porcentaje-mes-'+clave).html('<span class="'+clase+'">'+icono+jurisdiccion.porcentaje.format(2)+' %</span>');
+                }
 
                 datos_jurisdicciones.push([
                     clave,jurisdiccion.porcentaje,estatus,(jurisdiccion.porcentaje.format(2)) + '%',
@@ -229,9 +236,6 @@ function seguimiento_metas(e){
 
                     var porcentaje_del_mes = (avance_acumulado*100)/meta_total; //pocentaje del avance en base a la meta total
 
-                    mes.push(porcentaje_del_mes);
-                    mes.push('<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" colspan="2"><big>'+meses[i-1]+' '+porcentaje_del_mes.format(2)+'%</big></th></tr><tr><td style="white-space:nowrap;">Meta Acumulada: </td><th class="text-center text-info"> '+meta_acumulada.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Avance Acumulado: </td><th class="text-center text-primary"> '+avance_acumulado.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Porcentaje del Mes: </td><th class="text-center text-success"> '+(porcentaje.format(2))+'%</th></tr></table>');
-
                     var clase = 'text-danger';
                     var icono = '';
                     if(estatus == 2){
@@ -241,20 +245,32 @@ function seguimiento_metas(e){
                     }else{
                         clase = 'text-success';
                     }
+                    
+                    if(!hay_captura){
+                        clase = 'text-muted';
+                    }
 
-                    if(estatus == 3){
+                    mes.push(porcentaje_del_mes);
+                    mes.push('<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" colspan="2"><big>'+meses[i-1]+' '+porcentaje_del_mes.format(2)+'%</big></th></tr><tr><td style="white-space:nowrap;">Meta Acumulada: </td><th class="text-center text-info"> '+meta_acumulada.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Avance Acumulado: </td><th class="text-center text-primary"> '+avance_acumulado.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Porcentaje del Mes: </td><th class="text-center '+clase+'"> '+(porcentaje.format(2))+'%</th></tr></table>');
+
+                    if(!hay_captura){
+                        mes.push(null);mes.push(null); //Avance Normal
+                        mes.push(null);mes.push(null); //Alto Avance
+                        mes.push(null);mes.push(null); //Bajo Avance
+                    }else if(estatus == 3){
                         mes.push(null);mes.push(null); //Avance Normal
                         mes.push(porcentaje_del_mes);
-                        mes.push('<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" colspan="2"><big>'+meses[i-1]+' '+porcentaje_del_mes.format(2)+'%</big></th></tr><tr><td style="white-space:nowrap;">Meta Acumulada: </td><th class="text-center text-info"> '+meta_acumulada.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Avance Acumulado: </td><th class="text-center text-primary"> '+avance_acumulado.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Porcentaje de Avance: </td><th class="text-center text-danger"> '+(porcentaje.format(2))+'%</th></tr></table>');
+                        mes.push('<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" colspan="2"><big>'+meses[i-1]+' '+porcentaje_del_mes.format(2)+'%</big></th></tr><tr><td style="white-space:nowrap;">Meta Acumulada: </td><th class="text-center text-info"> '+meta_acumulada.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Avance Acumulado: </td><th class="text-center text-primary"> '+avance_acumulado.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Porcentaje de Avance: </td><th class="text-center '+clase+'"> '+(porcentaje.format(2))+'%</th></tr></table>');
                         mes.push(null);mes.push(null); //Bajo Avance
                     }else if(estatus == 2){
                         mes.push(null);mes.push(null); //Avance Normal
                         mes.push(null);mes.push(null); //Alto Avance
                         mes.push(porcentaje_del_mes);
-                        mes.push('<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" colspan="2"><big>'+meses[i-1]+' '+porcentaje_del_mes.format(2)+'%</big></th></tr><tr><td style="white-space:nowrap;">Meta Acumulada: </td><th class="text-center text-info"> '+meta_acumulada.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Avance Acumulado: </td><th class="text-center text-primary"> '+avance_acumulado.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Porcentaje de Avance: </td><th class="text-center text-danger"> '+(porcentaje.format(2))+'%</th></tr></table>');
+                        mes.push('<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" colspan="2"><big>'+meses[i-1]+' '+porcentaje_del_mes.format(2)+'%</big></th></tr><tr><td style="white-space:nowrap;">Meta Acumulada: </td><th class="text-center text-info"> '+meta_acumulada.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Avance Acumulado: </td><th class="text-center text-primary"> '+avance_acumulado.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Porcentaje de Avance: </td><th class="text-center '+clase+'"> '+(porcentaje.format(2))+'%</th></tr></table>');
+                        //mes.push('point { shape-type: triangle; fill-color: '+color+'; shape-rotation: 180;');
                     }else if(estatus == 1){
                         mes.push(porcentaje_del_mes);
-                        mes.push('<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" colspan="2"><big>'+meses[i-1]+' '+porcentaje_del_mes.format(2)+'%</big></th></tr><tr><td style="white-space:nowrap;">Avance del Mes: </td><th class="text-center text-success"> '+avance_actual.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Meta Acumulada: </td><th class="text-center text-info"> '+meta_acumulada.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Avance Acumulado: </td><th class="text-center text-primary"> '+avance_acumulado.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Porcentaje de Avance: </td><th class="text-center text-success"> '+(porcentaje.format(2))+'%</th></tr></table>');
+                        mes.push('<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" colspan="2"><big>'+meses[i-1]+' '+porcentaje_del_mes.format(2)+'%</big></th></tr><tr><td style="white-space:nowrap;">Avance del Mes: </td><th class="text-center text-success"> '+avance_actual.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Meta Acumulada: </td><th class="text-center text-info"> '+meta_acumulada.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Avance Acumulado: </td><th class="text-center text-primary"> '+avance_acumulado.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Porcentaje de Avance: </td><th class="text-center '+clase+'"> '+(porcentaje.format(2))+'%</th></tr></table>');
                         mes.push(null);mes.push(null); //Alto Avance
                         mes.push(null);mes.push(null); //Bajo Avance
                     }else{
@@ -269,6 +285,19 @@ function seguimiento_metas(e){
                     mes.push(null);mes.push(null); //Bajo Avance
                 }
                 avance_acumulado_mes.push(mes);
+
+                if(response.data.tomar == 'meses'){
+                    $('#meta-mes-'+i).text(meta_actual.format(2));
+                    $('#meta-acumulada-'+i).text(meta_acumulada.format(2));
+                    if(i <= mes_actual){
+                        $('#avance-acumulado-'+i).text((avance_acumulado-avance_actual).format(2));
+                        $('#avance-mes-'+i).text(avance_actual.format(2));
+                        $('#avance-total-'+i).text(avance_acumulado.format(2));
+                        $('#porcentaje-acumulado-'+i).html('<div class="'+clase+'"><small><span class="fa '+icono+'"></span> '+porcentaje.format(2) + ' %</small></div>');
+                        if(i == mes_actual){ $('#mensaje-alerta').removeClass('hidden'); }
+                        else{ $('#mensaje-alerta').addClass('hidden'); }
+                    }
+                }
             }
             charts_data['mensual'] = avance_acumulado_mes;
 
@@ -539,7 +568,7 @@ function generateCharts(){
               5: {
                     lineWidth:0,
                     color:'#A94442',
-                    pointShape: { type: 'triangle',rotation: 180 },
+                    pointShape: { type: 'triangle', rotation:180 },
                     pointSize:15
                 }
             },

@@ -71,25 +71,27 @@ class VisorController extends BaseController {
 		$datos['usuario'] = Sentry::getUser();
 
 		$mes_actual = Util::obtenerMesActual();
-		if($mes_actual == 0){
-			$mes_actual = date('n')-1;
-		}
-
-		$proyecto = Proyecto::find($id);
-
-		if($proyecto->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
-			$jurisdicciones = Jurisdiccion::all();
-		}elseif($proyecto->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
-			$jurisdicciones = Municipio::obtenerJurisdicciones($proyecto->claveMunicipio)->get();
-		}elseif($proyecto->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
-			$jurisdicciones = Region::obtenerJurisdicciones($proyecto->claveRegion)->get();
-		}
+		if($mes_actual == 0){ $mes_actual = date('n')-1; }
 
 		$meses = array(1=>'Enero',2=>'Febrero',3=>'Marzo',4=>'Abril',5=>'Mayo',6=>'Junio',
 						7=>'Julio',8=>'Agosto',9=>'Septiembre',10=>'Octubre',11=>'Noviembre',12=>'Diciembre');
 
+		$proyecto = Proyecto::find($id);
+
+		if($datos['usuario']->claveJurisdiccion){
+			$datos['meses'] = $meses;
+		}else{
+			if($proyecto->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
+				$jurisdicciones = Jurisdiccion::all();
+			}elseif($proyecto->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
+				$jurisdicciones = Municipio::obtenerJurisdicciones($proyecto->claveMunicipio)->get();
+			}elseif($proyecto->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
+				$jurisdicciones = Region::obtenerJurisdicciones($proyecto->claveRegion)->get();
+			}
+			$datos['jurisdicciones'] = array('OC'=>'OFICINA CENTRAL') + $jurisdicciones->lists('nombre','clave');
+		}
+
 		$datos['mes_clave'] = $mes_actual;
-		$datos['meses'] = $meses;
 		$datos['mes'] = $meses[$datos['mes_clave']];
 		$mes_del_trimestre = Util::obtenerMesTrimestre();
 		if($mes_del_trimestre == 3){
@@ -97,8 +99,6 @@ class VisorController extends BaseController {
 		}else{
 			$datos['trimestre_activo'] = FALSE;
 		}
-
-		$datos['jurisdicciones'] = array('OC'=>'Oficina Central') + $jurisdicciones->lists('nombre','clave');
 		
 		$datos['id'] = $id;
 		$datos['id_clasificacion'] = $proyecto->idClasificacionProyecto;

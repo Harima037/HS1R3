@@ -46,10 +46,12 @@ moduloDatagrid.actualizar({
                         fondo = 'style="background-color:#DDDDDD"';
                     }
                     if(proyecto.meses[mes].estatus > 0){
-                        if(proyecto.meses[mes].avance > 0){
+                        if(proyecto.meses[mes].avance > 1){
                             estatus = 'text-danger';
-                        }else{
+                        }else if(proyecto.meses[mes].avance == 1){
                             estatus = 'text-success';
+                        }else{
+                            estatus = 'text-muted';
                         }
                         if(mes < mes_actual && proyecto.meses[mes].estatus == 6){
                             icono = 'fa-circle-o';
