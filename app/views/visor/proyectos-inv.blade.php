@@ -6,7 +6,7 @@
 @parent
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
-<script src="{{ URL::to('js/modulos/visor/institucional.js')}}"></script>
+<script src="{{ URL::to('js/modulos/visor/inversion.js')}}"></script>
 <script src="{{ URL::to('js/modulos/visor/lista-proyectos.js') }}"></script>
 @stop
 
@@ -17,7 +17,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="panel panel-default datagrid" id="datagridProyectos" data-edit-row="cargar_datos_proyecto" data-trim-activo="{{$trimestre_avance}}" data-mes-activo="{{$mes_avance}}" data-mes-actual="{{$mes_actual}}">
-            <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> Proyectos Institucionales</h4></div>
+            <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> Proyectos de Inversión</h4></div>
             <div class="panel-body">
                 <div class="row">
                     <div class="col-lg-6 col-md-6">

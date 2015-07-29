@@ -14,9 +14,9 @@
 // Inicialización General para casi cualquier módulo
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/visor');
 google.load("visualization", "1", {packages:["corechart"]});
-google.setOnLoadCallback(datos_cargadoss);
+google.setOnLoadCallback(datos_cargados);
 
-function datos_cargadoss(){
+function datos_cargados(){
 	$('#mensaje-carga-librerias').html('<span class="fa fa-2x fa-check"></span> <big>Librerias cargadas con éxito.</big>');
 	$('#btn-metas-cumplidas').on('click',function(){ cargarGrafica('unidad_metas_cumplidas'); });
 	$('#btn-presupuesto-ejercido').on('click',function(){ cargarGrafica('unidad_persupuesto_ejercido'); });

@@ -80,6 +80,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 	Route::group(array('prefix'=>'visor'),function(){
 		Route::get('estatal',array('uses'=>'VisorController@indexEstatal'));
 		Route::get('direcciones',array('uses'=>'VisorController@indexDirecciones'));
+		Route::get('jurisdicciones',array('uses'=>'VisorController@indexJurisdicciones'));
 
 		Route::get('proyectos-inst',array('uses'=>'VisorController@indexInstitucional'));
 		Route::get('proyectos-inv',array('uses'=>'VisorController@indexInversion'));

@@ -109,11 +109,9 @@ function seguimiento_metas(e){
                 var datos_jurisdicciones = [['Jurisdiccion','Porcentaje',{role:'style'},{role:'annotation'},{role:'tooltip',p:{html:true}}]];
             }
 
-            for(var clave in response.data.jurisdicciones){
-                if(clave == 'OC'){
-                    response.data.jurisdicciones[clave].nombre = 'OFICINA CENTRAL';
-                }
-                var jurisdiccion = response.data.jurisdicciones[clave];
+            for(var i in response.data.jurisdicciones){
+                var jurisdiccion = response.data.jurisdicciones[i];
+                var clave = jurisdiccion.clave;
 
                 $('#meta-mes-'+clave).text(jurisdiccion.metaMes.format(2));
                 $('#meta-acumulada-'+clave).text(jurisdiccion.metaAcumulada.format(2));
@@ -138,19 +136,12 @@ function seguimiento_metas(e){
                     clase = 'text-success';
                     estatus = '#4B804C';
                 }
-
                 $('#porcentaje-mes-'+clave).html('<span class="'+clase+'">'+icono+jurisdiccion.porcentaje.format(2)+' %</span>');
 
-                if(clave != 'OC'){
-                    indice = parseInt(clave);
-                }else{
-                    indice = response.data.jurisdicciones.length + 1;
-                }
-                
-                datos_jurisdicciones[indice] = [
+                datos_jurisdicciones.push([
                     clave,jurisdiccion.porcentaje,estatus,(jurisdiccion.porcentaje.format(2)) + '%',
                     '<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" style="white-space:nowrap;" colspan="2"><big>'+jurisdiccion.nombre+'</big></th></tr><tr><td style="white-space:nowrap;">Avance: </td><th class="text-center" style="color:'+estatus+';font-weight:bold;">'+(jurisdiccion.porcentaje.format(2))+'%</th></tr></table>'
-                ];
+                ]);
             }
             charts_data['jurisdiccion'] = datos_jurisdicciones;
 
@@ -201,6 +192,7 @@ function seguimiento_metas(e){
                 var avance_actual = 0;
                 var estatus = 1;
                 var porcentaje = 0;
+                var hay_captura = false;
                 if(datos_mes){
                     meta_acumulada = datos_mes.metaAcumulada;
                     meta_actual = datos_mes.meta;
@@ -209,10 +201,19 @@ function seguimiento_metas(e){
                     if(datos_mes.activo){
                         avance_actual = datos_mes.avance;
                         avance_acumulado = datos_mes.avanceAcumulado;
+                        hay_captura = true;
+                    }
+                }else{
+                    if(meta_acumulada > 0){ porcentaje = (avance_acumulado*100) / meta_acumulada; }
+                    else{ porcentaje = (avance_acumulado*100); }
+                    if(!(meta_acumulada == 0 && avance_acumulado == 0)){
+                        if(porcentaje > 110){ estatus = 3; }
+                        else if(porcentaje < 90){ estatus = 2; }
+                        else if(porcentaje > 0 && meta_acumulada == 0){ estatus = 3;}
                     }
                 }
 
-                var porcentaje_meta = (meta_acumulada*100)/meta_total;
+                var porcentaje_meta = (meta_acumulada*100)/meta_total; //porcentaje de la meta en base a la meta total
 
                 mes.push(porcentaje_meta);
                 mes.push('<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" style="white-space:nowrap;" colspan="2"><big>'+meses[i-1]+' '+porcentaje_meta.format(2)+'%</big></th></tr><tr><td style="white-space:nowrap;">Meta Acumulada: </td><th class="text-center text-info">'+meta_acumulada.format(2)+'</th></tr></table>');
@@ -226,7 +227,7 @@ function seguimiento_metas(e){
 
                 if(i <= mes_actual){
 
-                    var porcentaje_del_mes = (avance_acumulado*100)/meta_total;
+                    var porcentaje_del_mes = (avance_acumulado*100)/meta_total; //pocentaje del avance en base a la meta total
 
                     mes.push(porcentaje_del_mes);
                     mes.push('<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" colspan="2"><big>'+meses[i-1]+' '+porcentaje_del_mes.format(2)+'%</big></th></tr><tr><td style="white-space:nowrap;">Meta Acumulada: </td><th class="text-center text-info"> '+meta_acumulada.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Avance Acumulado: </td><th class="text-center text-primary"> '+avance_acumulado.format(2)+'</th></tr><tr><td style="white-space:nowrap;">Porcentaje del Mes: </td><th class="text-center text-success"> '+(porcentaje.format(2))+'%</th></tr></table>');

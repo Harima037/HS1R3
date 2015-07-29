@@ -61,6 +61,11 @@ class VisorController extends BaseController {
 		return parent::loadIndex('VISORGEN','VIDIRECS');
 	}
 
+	public function indexJurisdicciones(){
+		$catalogos = array( 'jurisdicciones' => array('OC'=>'OFICINA CENTRAL') + Jurisdiccion::all()->lists('nombre','clave') );
+		return parent::loadIndex('VISORGEN','VIJURIS',$catalogos);
+	}
+
 	public function avanceIndicadores($id){
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
 		$datos['usuario'] = Sentry::getUser();

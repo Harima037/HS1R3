@@ -37,7 +37,13 @@ class VisorController extends BaseController {
 		if(isset($parametros['grafica'])){
 			switch ($parametros['grafica']) {
 				case 'proyectos_direccion':
-						$rows = Proyecto::select('unidadResponsable AS clave', 'unidades.descripcion AS unidad', 
+						$rows = Proyecto::getModel();
+						$usuario = Sentry::getUser();
+						if($usuario->claveUnidad){
+							$unidades = explode('|',$usuario->claveUnidad);
+							$rows = $rows->whereIn('unidadResponsable',$unidades);
+						}
+						$rows = $rows->select('unidadResponsable AS clave', 'unidades.descripcion AS unidad', 
 												DB::raw('count(distinct proyectos.id) AS noProyectos'))
 										->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','proyectos.unidadResponsable')
 										->where('idEstatusProyecto','=',5)
@@ -49,7 +55,13 @@ class VisorController extends BaseController {
 						$data = array('data'=>$rows,'total'=>$total);
 					break;
 				case 'proyectos_tipo':
-						$rows = Proyecto::select('clasificacion.descripcion AS tipoProyecto', 
+						$rows = Proyecto::getModel();
+						$usuario = Sentry::getUser();
+						if($usuario->claveUnidad){
+							$unidades = explode('|',$usuario->claveUnidad);
+							$rows = $rows->whereIn('unidadResponsable',$unidades);
+						}
+						$rows = $rows->select('clasificacion.descripcion AS tipoProyecto', 
 												DB::raw('count(distinct proyectos.id) AS noProyectos'))
 										->leftjoin('catalogoClasificacionProyectos AS clasificacion','clasificacion.id','=','proyectos.idClasificacionProyecto')
 										->where('idEstatusProyecto','=',5)
@@ -64,11 +76,11 @@ class VisorController extends BaseController {
 
 						$rows = CargaDatosEP01::where('mes','=',$mes_actual);
 
-						/*$usuario = Sentry::getUser();
+						$usuario = Sentry::getUser();
 						if($usuario->claveUnidad){
 							$unidades = explode('|',$usuario->claveUnidad);
 							$rows = $rows->whereIn('UR',$unidades);
-						}*/
+						}
 
 						$rows = $rows->select(DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
 											'fuenteFinan.descripcion AS fuenteFinanciamiento')
@@ -83,8 +95,13 @@ class VisorController extends BaseController {
 						if($mes_actual == 0){
 							$mes_actual = date('n') -1;
 						}
-
-						$presupuesto = CargaDatosEP01::where('mes','=',$mes_actual)
+						$presupuesto = CargaDatosEP01::getModel();
+						$usuario = Sentry::getUser();
+						if($usuario->claveUnidad){
+							$unidades = explode('|',$usuario->claveUnidad);
+							$presupuesto = $presupuesto->whereIn('UR',$unidades);
+						}
+						$presupuesto = $presupuesto->where('mes','=',$mes_actual)
 														->select(DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
 															DB::raw('sum(presupuestoEjercidoModificado) AS presupuestoEjercido'))
 														->first();
@@ -92,7 +109,13 @@ class VisorController extends BaseController {
 						$data = array('data'=>$presupuesto);
 					break;
 				case 'metas_unidad':
-						$rows = Proyecto::select('unidadResponsable AS clave', 'unidades.descripcion AS unidad', 
+						$rows = Proyecto::getModel();
+						$usuario = Sentry::getUser();
+						if($usuario->claveUnidad){
+							$unidades = explode('|',$usuario->claveUnidad);
+							$rows = $rows->whereIn('unidadResponsable',$unidades);
+						}
+						$rows = $rows->select('unidadResponsable AS clave', 'unidades.descripcion AS unidad', 
 										DB::raw('count(distinct componentes.id)+count(distinct actividades.id) AS noMetas'))
 										->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','proyectos.unidadResponsable')
 										->leftjoin('proyectoComponentes AS componentes',function($join){
@@ -117,17 +140,50 @@ class VisorController extends BaseController {
 							$mes_actual = date('n') -1;
 						}
 
-						$proyectos_ids = Proyecto::where('idEstatusProyecto','=',5)->lists('id');
+						$componentes = ComponenteMetaMes::getModel();
+						$actividades = ActividadMetaMes::getModel();
 
-						$componentes = ComponenteMetaMes::where('mes','<=',$mes_actual)
+						$proyectos_ids = Proyecto::where('idEstatusProyecto','=',5);
+						$jurisdiccion = false;
+						$unidades = false;
+
+						$usuario = Sentry::getUser();
+						if($usuario->claveJurisdiccion){
+							$jurisdiccion = $usuario->claveJurisdiccion;
+						}elseif($usuario->claveUnidad){
+							$unidades = explode('|',$usuario->claveUnidad);
+						}elseif(isset($parametros['estatal'])){
+							if(isset($parametros['unidad'])){
+								$unidades = array($parametros['unidad']);
+							}
+							if(isset($parametros['jurisdiccion'])){
+								$jurisdiccion = $parametros['jurisdiccion'];
+							}
+						}
+
+						if($unidades){
+							$proyectos_ids = $proyectos_ids->whereIn('unidadResponsable',$unidades);
+						}
+
+						$proyectos_ids = $proyectos_ids->lists('id');
+
+						if($jurisdiccion){
+							$componentes = $componentes->where('claveJurisdiccion','=',$jurisdiccion)
+														 ->groupBy('idComponente','claveJurisdiccion');
+							$actividades = $actividades->where('claveJurisdiccion','=',$jurisdiccion)
+														 ->groupBy('idActividad','claveJurisdiccion');
+						}else{
+							$componentes = $componentes->groupBy('idComponente');
+							$actividades = $actividades->groupBy('idActividad');
+						}
+						
+						$componentes = $componentes->where('mes','<=',$mes_actual)
 														->whereIn('idProyecto',$proyectos_ids)
-														->groupBy('idComponente')
 														->select('id','idComponente AS idElemento','idProyecto',DB::raw('sum(meta) AS meta'),
 															DB::raw('sum(avance) AS avance'))->get();
 						//
-						$actividades = ActividadMetaMes::where('mes','<=',$mes_actual)
+						$actividades = $actividades->where('mes','<=',$mes_actual)
 														->whereIn('idProyecto',$proyectos_ids)
-														->groupBy('idActividad')
 														->select('id','idActividad AS idElemento','idProyecto',DB::raw('sum(meta) AS meta'),
 															DB::raw('sum(avance) AS avance'))->get();
 						//
@@ -179,6 +235,8 @@ class VisorController extends BaseController {
 						$data = array('data'=>$datos['metas_unidad'],'total'=>$datos['total_metas']);
 					break;
 				case 'metas_cumplidas_jurisdiccion':
+						$datos = $this->metasCumplidasPorJurisdiccion();
+						$data = array('data'=>$datos['metas_jurisdiccion'],'total'=>$datos['total_metas']);
 					break;
 				case 'presupuesto_ejercido_unidad':
 						$datos = $this->presupuestoEjercidoPorUnidad();
@@ -746,8 +804,15 @@ class VisorController extends BaseController {
 						elseif($porcentaje > 0 && $meta == 0){ $estatus = 3; }
 			        }
 
-					$juris_metas[$datos->claveJurisdiccion] = array(
-						'nombre' => $datos->jurisdiccion,
+			        if($datos->claveJurisdiccion != 'OC'){
+			        	$idJuris = intval($datos->claveJurisdiccion);
+			        }else{
+			        	$idJuris = 0;
+			        }
+
+					$juris_metas[$idJuris] = array(
+						'nombre' => ($datos->jurisdiccion)?$datos->jurisdiccion:'OFICINA CENTRAL',
+						'clave' => $datos->claveJurisdiccion,
 						'metaMes' => 0,
 						'metaAcumulada' => $meta,
 						'avanceAcumulado' => $avance,
@@ -758,9 +823,14 @@ class VisorController extends BaseController {
 					);
 				}
 				foreach ($recurso->metasMes as $meta_mes) {
-					$juris_metas[$meta_mes->claveJurisdiccion]['metaMes'] = floatval($meta_mes->meta);
-					$juris_metas[$meta_mes->claveJurisdiccion]['avanceMes'] = floatval($meta_mes->avance);
-					$juris_metas[$meta_mes->claveJurisdiccion]['avanceAcumulado'] = $juris_metas[$meta_mes->claveJurisdiccion]['avanceTotal'] - floatval($meta_mes->avance);
+					if($meta_mes->claveJurisdiccion != 'OC'){
+			        	$idJuris = intval($meta_mes->claveJurisdiccion);
+			        }else{
+			        	$idJuris = 0;
+			        }
+					$juris_metas[$idJuris]['metaMes'] = floatval($meta_mes->meta);
+					$juris_metas[$idJuris]['avanceMes'] = floatval($meta_mes->avance);
+					$juris_metas[$idJuris]['avanceAcumulado'] = $juris_metas[$idJuris]['avanceTotal'] - floatval($meta_mes->avance);
 				}
 				$elemento['jurisdicciones'] = $juris_metas;
 
@@ -810,9 +880,7 @@ class VisorController extends BaseController {
 			$http_status = 404;
 			$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
 		}
-		/*else{
-			$data["data"] = $recurso;
-		}*/
+		
 		return Response::json($data,$http_status);
 	}
 
@@ -820,7 +888,16 @@ class VisorController extends BaseController {
 		$mes_actual = Util::obtenerMesActual();
 		if($mes_actual == 0){ $mes_actual = date('n') -1; }
 
-		$rows = CargaDatosEP01::where('mes','=',$mes_actual)
+		$rows = CargaDatosEP01::getModel();
+
+		$usuario = Sentry::getUser();
+		if($usuario->claveUnidad){
+			$unidades = explode('|',$usuario->claveUnidad);
+			$rows = $rows->whereIn('UR',$unidades);
+		}
+
+		//$rows = CargaDatosEP01::where('mes','=',$mes_actual)
+		$rows = $rows->where('mes','=',$mes_actual)
 					->select(DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
 						DB::raw('sum(presupuestoEjercidoModificado) AS presupuestoEjercido'),
 						'unidad.descripcion AS unidadResponsable','UR AS clave')
@@ -838,31 +915,44 @@ class VisorController extends BaseController {
 			$mes_actual = date('n') -1;
 		}
 
+		$usuario = Sentry::getUser();
+		if($usuario->claveUnidad){
+			$unidades = explode('|',$usuario->claveUnidad);
+		}else{
+			$unidades = null;
+		}
+
 		$componentes = ComponenteMetaMes::where('mes','<=',$mes_actual)
-										->join('proyectos',function($join){
-											$join->on('proyectos.id','=','componenteMetasMes.idProyecto')
-												->where('proyectos.idEstatusProyecto','=',5)
-												->whereNull('proyectos.borradoAl');
-										})
-										->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','proyectos.unidadResponsable')
-										->groupBy('idComponente')
-										->orderBy('unidadResponsable')
-										->select('idComponente','unidades.descripcion AS unidad',
-											'proyectos.unidadResponsable',
-											DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'))->get();
+						->join('proyectos',function($join)use($unidades){
+							$join->on('proyectos.id','=','componenteMetasMes.idProyecto')
+								->where('proyectos.idEstatusProyecto','=',5)
+								->whereNull('proyectos.borradoAl');
+							if($unidades){
+								$join = $join->on('proyectos.unidadResponsable','in',DB::raw('('.implode(',',$unidades).')'));
+							}
+						})
+						->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','proyectos.unidadResponsable')
+						->groupBy('idComponente')
+						->orderBy('unidadResponsable')
+						->select('idComponente','unidades.descripcion AS unidad',
+							'proyectos.unidadResponsable',
+							DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'))->get();
 		//
 		$actividades = ActividadMetaMes::where('mes','<=',$mes_actual)
-										->join('proyectos',function($join){
-											$join->on('proyectos.id','=','actividadMetasMes.idProyecto')
-												->where('proyectos.idEstatusProyecto','=',5)
-												->whereNull('proyectos.borradoAl');
-										})
-										->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','proyectos.unidadResponsable')
-										->groupBy('idActividad')
-										->orderBy('unidadResponsable')
-										->select('idActividad','unidades.descripcion AS unidad',
-											'proyectos.unidadResponsable',
-											DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'))->get();
+						->join('proyectos',function($join)use($unidades){
+							$join->on('proyectos.id','=','actividadMetasMes.idProyecto')
+								->where('proyectos.idEstatusProyecto','=',5)
+								->whereNull('proyectos.borradoAl');
+							if($unidades){
+								$join = $join->on('proyectos.unidadResponsable','in',DB::raw('('.implode(',',$unidades).')'));
+							}
+						})
+						->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','proyectos.unidadResponsable')
+						->groupBy('idActividad')
+						->orderBy('unidadResponsable')
+						->select('idActividad','unidades.descripcion AS unidad',
+							'proyectos.unidadResponsable',
+							DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'))->get();
 		//
 		$total = count($componentes) + count($actividades);
 		$metas_unidad = array();
@@ -923,4 +1013,102 @@ class VisorController extends BaseController {
 		return array('metas_unidad'=>$metas_unidad,'total_metas'=>$total);
 	}
 
+	public function metasCumplidasPorJurisdiccion(){
+		$mes_actual = Util::obtenerMesActual();
+		if($mes_actual == 0){ $mes_actual = date('n') -1; }
+
+		$componentes = ComponenteMetaMes::where('mes','<=',$mes_actual)
+						->join('proyectos',function($join){
+							$join->on('proyectos.id','=','componenteMetasMes.idProyecto')
+								->where('proyectos.idEstatusProyecto','=',5)
+								->whereNull('proyectos.borradoAl');
+						})
+						->leftjoin('vistaJurisdicciones AS jurisdiccion','jurisdiccion.clave','=','claveJurisdiccion')
+						->groupBy('idComponente','claveJurisdiccion')
+						->select('idComponente','jurisdiccion.nombre AS jurisdiccion',
+							'claveJurisdiccion',
+							DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'))->get();
+		//
+		$actividades = ActividadMetaMes::where('mes','<=',$mes_actual)
+						->join('proyectos',function($join){
+							$join->on('proyectos.id','=','actividadMetasMes.idProyecto')
+								->where('proyectos.idEstatusProyecto','=',5)
+								->whereNull('proyectos.borradoAl');
+						})
+						->leftjoin('vistaJurisdicciones AS jurisdiccion','jurisdiccion.clave','=','claveJurisdiccion')
+						->groupBy('idActividad','claveJurisdiccion')
+						->select('idActividad','jurisdiccion.nombre AS jurisdiccion',
+							'claveJurisdiccion',
+							DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'))->get();
+		//
+		$total = count($componentes) + count($actividades);
+		$metas_jurisdiccion = array();
+		foreach ($componentes as $componente) {
+			if($componente->claveJurisdiccion != 'OC'){
+				$idJuris = intval($componente->claveJurisdiccion);
+			}else{
+				$idJuris = 0;
+			}
+			if(!isset($metas_jurisdiccion[$idJuris])){
+				$metas_jurisdiccion[$idJuris] = array(
+					'clave'=>$componente->claveJurisdiccion,
+					'jurisdiccion'=>($componente->jurisdiccion)?$componente->jurisdiccion:'OFICINA CENTRAL',
+					'totalMetas'=>0,
+					'cumplidas'=>0
+				);
+			}
+			$meta = floatval($componente->meta);
+	        $avance = floatval($componente->avance);
+
+	        if($meta > 0){ $porcentaje = ($avance*100) / $meta; }
+	        else{ $porcentaje = ($avance*100); }
+
+	        $estatus = 1;
+	        if(!($meta == 0 && $avance == 0)){
+				if($porcentaje > 110){ $estatus = 3; }
+				elseif($porcentaje < 90){ $estatus = 2; }
+				elseif($porcentaje > 0 && $meta == 0){ $estatus = 3; }
+	        }
+
+	        if($estatus == 1){ 
+	        	$metas_jurisdiccion[$idJuris]['cumplidas']++; 
+	        }
+	       	$metas_jurisdiccion[$idJuris]['totalMetas']++;
+		}
+
+		foreach ($actividades as $actividad) {
+			if($actividad->claveJurisdiccion != 'OC'){
+				$idJuris = intval($actividad->claveJurisdiccion);
+			}else{
+				$idJuris = 0;
+			}
+			if(!isset($metas_jurisdiccion[$idJuris])){
+				$metas_jurisdiccion[$idJuris] = array(
+					'clave'=>$actividad->claveJurisdiccion,
+					'jurisdiccion'=>($actividad->jurisdiccion)?$actividad->jurisdiccion:'OFICINA CENTRAL',
+					'totalMetas'=>0,
+					'cumplidas'=>0
+				);
+			}
+			$meta = floatval($actividad->meta);
+	        $avance = floatval($actividad->avance);
+
+	        if($meta > 0){ $porcentaje = ($avance*100) / $meta; }
+	        else{ $porcentaje = ($avance*100); }
+
+	        $estatus = 1;
+	        if(!($meta == 0 && $avance == 0)){
+				if($porcentaje > 110){ $estatus = 3; }
+				elseif($porcentaje < 90){ $estatus = 2; }
+				elseif($porcentaje > 0 && $meta == 0){ $estatus = 3; }
+	        }
+
+	        if($estatus == 1){ 
+	        	$metas_jurisdiccion[$idJuris]['cumplidas']++; 
+	        }
+	       	$metas_jurisdiccion[$idJuris]['totalMetas']++;
+		}
+
+		return array('metas_jurisdiccion'=>$metas_jurisdiccion,'total_metas'=>$total);
+	}
 }
