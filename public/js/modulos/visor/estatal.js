@@ -24,6 +24,7 @@ function datos_cargadoss(){
 	$('#lnk-metas-cumplidas').on('click',function(){ cargarGrafica('metas_cumplidas'); });
 	$('#lnk-presup-fuente').on('click',function(){ cargarGrafica('presup_fuente'); });
 	$('#lnk-presup-ejercido').on('click',function(){ cargarGrafica('presup_ejercido'); });
+	$('#lnk-presup-ejercido-capitulo').on('click',function(){ cargarGrafica('presup_ejercido_capitulo'); });
 }
 
 function cargarGrafica(tipo_grafica){
@@ -34,6 +35,7 @@ function cargarGrafica(tipo_grafica){
 		case 'metas_cumplidas': graficaMetasCumplidas(); break;
 		case 'presup_fuente': graficaPresupuestoFuente(); break;
 		case 'presup_ejercido': graficaPresupuestoEjercido(); break;
+		case 'presup_ejercido_capitulo': graficaPresupuestoEjercidoCapitulo(); break;
 	}
 }
 
@@ -132,6 +134,35 @@ function graficaPresupuestoEjercido(){
 			var options = { 
 				title:'Presupuesto : $ '+(parseFloat(response.data.presupuestoModificado)||0).format(2),
 				legend:{position:'bottom',alignment:'center'}
+			};
+
+			var chart = new google.visualization.PieChart(document.getElementById('area-graficas'));
+			chart.draw(data, options);
+		}
+	});
+}
+
+function graficaPresupuestoEjercidoCapitulo(){
+	var parametros = {grafica:'presupuesto_ejercido_capitulo'};
+	moduloResource.get(null,parametros,{
+		_success: function(response){
+			var elementos = [['Capitulo', 'Presupuesto Ejercido']];
+			for(var i in response.data){
+				elementos.push(
+					[
+						response.data[i].capitulo,
+						+(parseFloat(response.data[i].presupuestoEjercido) || 0)
+					]
+				);
+			}
+			var data = google.visualization.arrayToDataTable(elementos);
+
+			var formatter = new google.visualization.NumberFormat( {pattern: '$ #,###,###,###.##'} );
+			formatter.format(data, 1);
+
+			var options = { 
+				title:'Presupuesto : $ '+(parseFloat(response.total)||0).format(2),
+				legend:{position:'right',alignment:'center'}
 			};
 
 			var chart = new google.visualization.PieChart(document.getElementById('area-graficas'));

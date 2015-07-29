@@ -40,6 +40,7 @@
                         <ul class="dropdown-menu">
                             <li><a id="lnk-presup-fuente" href="#"><span class="fa fa-pie-chart"></span> Presupuesto por Fuente de Financiamiento</a></li>
                             <li><a id="lnk-presup-ejercido" href="#"><span class="fa fa-pie-chart"></span> Presupuesto Ejercido</a></li>
+                            <li><a id="lnk-presup-ejercido-capitulo" href="#"><span class="fa fa-pie-chart"></span> Presupuesto Ejercido Por Capitulo</a></li>
                         </ul>
                     </div>
                 </div>

@@ -90,6 +90,31 @@ class VisorController extends BaseController {
 						$total = $rows->sum('presupuestoModificado');
 						$data = array('data'=>$rows,'total'=>$total);
 					break;
+				case 'presupuesto_ejercido_capitulo':
+						$mes_actual = Util::obtenerMesActual();
+						if($mes_actual == 0){ $mes_actual = date('n') -1; }
+
+						$rows = CargaDatosEP01::where('mes','=',$mes_actual);
+
+						$usuario = Sentry::getUser();
+						if($usuario->claveUnidad){
+							$unidades = explode('|',$usuario->claveUnidad);
+							$rows = $rows->whereIn('UR',$unidades);
+						}
+
+						$rows = $rows->select(DB::raw('sum(presupuestoEjercidoModificado) AS presupuestoEjercido'),
+											'capitulo.descripcion AS capitulo')
+									->leftjoin('catalogoObjetosGasto AS objetoGasto','objetoGasto.clave','=','OG')
+									->leftjoin('catalogoObjetosGasto AS partida','partida.id','=','objetoGasto.idPadre')
+									->leftjoin('catalogoObjetosGasto AS concepto','concepto.id','=','partida.idPadre')
+									->leftjoin('catalogoObjetosGasto AS capitulo','capitulo.id','=','concepto.idPadre')
+									->groupBy('capitulo.clave')
+									->get();
+						//$queries = DB::getQueryLog();
+						//var_dump(end($queries));die;
+						$total = $rows->sum('presupuestoEjercido');
+						$data = array('data'=>$rows,'total'=>$total);
+					break;
 				case 'presupuesto_ejercido':
 						$mes_actual = Util::obtenerMesActual();
 						if($mes_actual == 0){
@@ -274,7 +299,6 @@ class VisorController extends BaseController {
 						$data = array('data'=>$metas_vs_presupuesto);
 					break;
 				default:
-					# code...
 					break;
 			}
 		}elseif(isset($parametros['formatogrid'])){
@@ -592,230 +616,6 @@ class VisorController extends BaseController {
 		}else{
 			$data = array("data"=>"No hay datos",'code'=>'W00');
 		}
-
-		/*
-		if(isset($parametros['graficapresupuestometa'])){
-			$mes_actual = Util::obtenerMesActual();
-			if($mes_actual == 0){
-				$mes_actual = date('n') -1;
-			}
-
-			$presupuesto = CargaDatosEP01::where('mes','=',$mes_actual)
-										->select(DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
-											DB::raw('sum(presupuestoEjercidoModificado) AS presupuestoEjercido'));
-
-			$componentes = ComponenteMetaMes::where('mes','<=',$mes_actual)
-											->groupBy('idComponente')
-											->select('id','idComponente AS idElemento','idProyecto',DB::raw('sum(meta) AS meta'),
-												DB::raw('sum(avance) AS avance'));
-			
-			$actividades = ActividadMetaMes::where('mes','<=',$mes_actual)
-											->groupBy('idActividad')
-											->select('id','idActividad AS idElemento','idProyecto',DB::raw('sum(meta) AS meta'),
-												DB::raw('sum(avance) AS avance'));
-
-			$usuario = Sentry::getUser();
-			if($usuario->claveUnidad){
-				$unidades = explode('|',$usuario->claveUnidad);
-				$presupuesto = $presupuesto->whereIn('UR',$unidades);
-
-				$proyectos_ids = Proyecto::whereIn('unidadResponsable',$unidades)->groupBy('id')->lists('id');
-				$componentes = $componentes->whereIn('idProyecto',$proyectos_ids);
-				$actividades = $actividades->whereIn('idProyecto',$proyectos_ids);
-			}
-
-			
-			
-			$componentes = $componentes->get();
-			$actividades = $actividades->get();
-			$presupuesto = $presupuesto->first();
-			//$queries = DB::getQueryLog();
-			//var_dump(end($queries));die;
-			
-			$data = array('data'=>array('presupuesto'=>$presupuesto,'componentes'=>$componentes,'actividades'=>$actividades));
-			return Response::json($data,$http_status);
-		}elseif(isset($parametros['graficapresupuesto'])){
-			$mes_actual = Util::obtenerMesActual();
-			if($mes_actual == 0){
-				$mes_actual = date('n') -1;
-			}
-
-			$rows = CargaDatosEP01::where('mes','=',$mes_actual);
-
-			$usuario = Sentry::getUser();
-			if($usuario->claveUnidad){
-				$unidades = explode('|',$usuario->claveUnidad);
-				$rows = $rows->whereIn('UR',$unidades);
-			}
-
-			$total = $rows->select(DB::raw('sum(presupuestoModificado) AS presupuestoModificado'))->get();
-			$rows = $rows->select('FF','mes','UR',DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
-								'fuenteFinan.descripcion AS fuenteFinanciamiento')
-						->leftjoin('catalogoFuenteFinanciamiento AS fuenteFinan','fuenteFinan.clave','=','FF')
-						->groupBy('FF')->get();
-			//$queries = DB::getQueryLog();
-			//var_dump(end($queries));die;
-
-			$data = array('total'=>$total[0]->presupuestoModificado,'data'=>$rows);
-			if($total[0]->presupuestoModificado <= 0){
-				$http_status = 404;
-				$data = array("data"=>"No hay datos",'code'=>'W00');
-			}
-			return Response::json($data,$http_status);
-		}elseif(isset($parametros['graficageneral'])){
-			$mes_actual = Util::obtenerMesActual();
-			if($mes_actual == 0){
-				$mes_actual = date('n') -1;
-			}
-
-			$componentes = ComponenteMetaMes::where('mes','<=',$mes_actual)
-											->groupBy('idComponente')
-											->select('id','idComponente AS idElemento','idProyecto',DB::raw('sum(meta) AS meta'),
-												DB::raw('sum(avance) AS avance'));
-			
-			$actividades = ActividadMetaMes::where('mes','<=',$mes_actual)
-											->groupBy('idActividad')
-											->select('id','idActividad AS idElemento','idProyecto',DB::raw('sum(meta) AS meta'),
-												DB::raw('sum(avance) AS avance'));
-
-			$usuario = Sentry::getUser();
-			if($usuario->claveUnidad){
-				$unidades = explode('|',$usuario->claveUnidad);
-				$proyectos_ids = Proyecto::whereIn('unidadResponsable',$unidades)->groupBy('id')->lists('id');
-				$componentes = $componentes->whereIn('idProyecto',$proyectos_ids);
-				$actividades = $actividades->whereIn('idProyecto',$proyectos_ids);
-			}
-			
-			$componentes = $componentes->get();
-			$actividades = $actividades->get();
-			//$queries = DB::getQueryLog();
-			//var_dump(end($queries));die;
-
-			$data = array();
-			$data['componentes'] = $componentes;
-			$data['actividades'] = $actividades;
-
-			return Response::json($data,$http_status);
-		}elseif(isset($parametros['formatogrid'])){
-			if(isset($parametros['grid'])){
-				if($parametros['grid'] == 'rendicion-acciones'){
-					$mes_actual = Util::obtenerMesActual();
-					if($mes_actual == 0){
-						$mes_actual = date('n') -1;
-					}
-					$rows = Proyecto::with(array(
-									'componentes'=>function($query)use($mes_actual){
-										$query->select('proyectoComponentes.id','proyectoComponentes.indicador',
-													'proyectoComponentes.valorNumerador','proyectoComponentes.idProyecto',
-													DB::raw('sum(componenteMetasMes.meta) AS metasAlMes'))
-											->leftjoin('componenteMetasMes',function($join)use($mes_actual){
-												$join->on('componenteMetasMes.idComponente','=','proyectoComponentes.id')
-													->where('componenteMetasMes.mes','<=',$mes_actual)
-													->whereNull('componenteMetasMes.borradoAl');
-											})
-											->groupBy('proyectoComponentes.id');
-									}
-									,'componentes.registroAvance'
-									,'componentes.actividades'=>function($query)use($mes_actual){
-										$query->select('componenteActividades.id','componenteActividades.idComponente',
-													'componenteActividades.indicador','componenteActividades.valorNumerador',
-													'componenteActividades.idProyecto',DB::raw('sum(actividadMetasMes.meta) AS metasAlMes'))
-											->leftjoin('actividadMetasMes',function($join)use($mes_actual){
-												$join->on('actividadMetasMes.idActividad','=','componenteActividades.id')
-													->where('actividadMetasMes.mes','<=',$mes_actual)
-													->whereNull('actividadMetasMes.borradoAl');
-											})
-											->groupBy('componenteActividades.id');
-									}
-									,'componentes.actividades.registroAvance'))
-									->find($parametros['idProyecto']);
-					
-					$total = count($rows);
-				}
-			}else{
-				$mes_actual = Util::obtenerMesActual();
-
-				$rows = Proyecto::getModel();
-				$rows = $rows->where('idEstatusProyecto','=',5)
-							->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto']);
-
-				if($mes_actual == 0){
-					$mes_actual = date('n') - 1;
-				}
-				
-				$rows = $rows->leftjoin('evaluacionProyectoMes', function($join) use($mes_actual){
-									$join->on('proyectos.id', '=', 'evaluacionProyectoMes.idProyecto')
-									->where('evaluacionProyectoMes.mes', '=', $mes_actual)
-									->where('evaluacionProyectoMes.anio', '=', date('Y'));
-								});
-				
-
-				$usuario = Sentry::getUser();
-				
-				if($usuario->filtrarProyectos){
-					$rows = $rows->where('idUsuarioValidacionSeg','=',$usuario->id);
-				}
-
-				if($usuario->claveUnidad){
-					$unidades = explode('|',$usuario->claveUnidad);
-					$rows = $rows->whereIn('unidadResponsable',$unidades);
-				}
-
-				$rows = $rows->with(array('registroAvance'=>function($query){
-					$query->select('id','idProyecto','mes',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'),DB::raw('count(idNivel) as registros'))->groupBy('idProyecto','mes');
-				},'evaluacionMeses'=>function($query) use ($mes_actual){
-					$query->where('evaluacionProyectoMes.mes','<=',$mes_actual);
-					$query->leftjoin('registroAvancesMetas',function($join){
-								$join->on('registroAvancesMetas.idProyecto','=','evaluacionProyectoMes.idProyecto')
-									->on('registroAvancesMetas.mes','=','evaluacionProyectoMes.mes');
-							})
-							->select('evaluacionProyectoMes.*',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'))
-							->groupBy('registroAvancesMetas.idProyecto','registroAvancesMetas.mes');
-				},'componentesMetasMes'=>function($query){
-					$query->select('id','idProyecto','mes',DB::raw('sum(meta) AS totalMeta'))->groupBy('idProyecto','mes');
-				},'actividadesMetasMes'=>function($query){
-					$query->select('id','idProyecto','mes',DB::raw('sum(meta) AS totalMeta'))->groupBy('idProyecto','mes');
-				}));
-
-				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
-				
-				if(isset($parametros['buscar'])){				
-					//$rows = $rows->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%');
-					$rows = $rows->where(function($query)use($parametros){
-						$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
-							->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
-					});
-					$total = $rows->count();
-				}else{				
-					$total = $rows->count();						
-				}
-				
-				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
-				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
-					'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl',
-					'proyectos.fuenteInformacion','proyectos.idResponsable')
-					->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
-					->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')									
-					->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
-					->orderBy('id', 'desc')
-					->skip(($parametros['pagina']-1)*10)->take(10)
-					->get();
-				//var_dump($total);die;
-				//$queries = DB::getQueryLog();
-				//var_dump(end($queries));die;
-				//var_dump($rows->toArray());die;
-			}
-			
-			$data = array('resultados'=>$total,'data'=>$rows);
-
-			if($total<=0){
-				$http_status = 404;
-				$data = array('resultados'=>$total,"data"=>"No hay datos",'code'=>'W00');
-			}
-
-			return Response::json($data,$http_status);
-		}
-		*/
 		
 		return Response::json($data,$http_status);
 	}
