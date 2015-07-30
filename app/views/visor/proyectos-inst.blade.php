@@ -31,7 +31,7 @@
                         <select class="form-control" id="filtro-jurisdiccion">
                             <option value="">Estatal</option>
                             @foreach($jurisdicciones as $clave => $jurisdiccion)
-                            <option value="{{$clave}}">{{$clave}} {{$jurisdiccion}}</option>
+                            <option value="{{$clave}}" {{($jurisdiccion_select==$clave)?'selected':''}}>{{$clave}} {{$jurisdiccion}}</option>
                             @endforeach
                         </select>
 

@@ -45,8 +45,15 @@ class VisorController extends BaseController {
 			$datos['mostrar_filtrado'] = true;
 			$datos['jurisdicciones'] = array('OC'=>'OFICINA CENTRAL') + Jurisdiccion::all()->lists('nombre','clave');
 			$datos['unidades_responsables'] = UnidadResponsable::all()->lists('descripcion','clave');
-		}
+			$datos['jurisdiccion_select'] = '';
+			$parametros = Input::all();
+			if(isset($parametros['j'])){
+				if($parametros['j']){
+					$datos['jurisdiccion_select'] = $parametros['j'];
+				}
+			}
 
+		}
 		return $datos;
 	}
 	public function indexDesempenioGeneral(){
@@ -82,6 +89,8 @@ class VisorController extends BaseController {
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
 		$datos['usuario'] = Sentry::getUser();
 
+		$parametros = Input::all();
+
 		$mes_actual = Util::obtenerMesActual();
 		if($mes_actual == 0){ $mes_actual = date('n')-1; }
 
@@ -90,7 +99,28 @@ class VisorController extends BaseController {
 
 		$proyecto = Proyecto::find($id);
 
+		$es_jurisdiccion = false;
+
 		if($datos['usuario']->claveJurisdiccion){
+			$es_jurisdiccion = true;
+		}
+
+		$datos['unidad'] = '';
+		if(isset($parametros['unidad'])){
+			if($parametros['unidad']){
+				$datos['unidad'] = $parametros['unidad'];
+			}
+		}
+
+		$datos['jurisdiccion'] = '';
+		if(isset($parametros['jurisdiccion'])){
+			if($parametros['jurisdiccion']){
+				$es_jurisdiccion = true;
+				$datos['jurisdiccion'] = $parametros['jurisdiccion'];
+			}
+		}
+
+		if($es_jurisdiccion){
 			$datos['meses'] = $meses;
 		}else{
 			if($proyecto->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
@@ -102,6 +132,7 @@ class VisorController extends BaseController {
 			}
 			$datos['jurisdicciones'] = array('OC'=>'OFICINA CENTRAL') + $jurisdicciones->lists('nombre','clave');
 		}
+
 
 		$datos['mes_clave'] = $mes_actual;
 		$datos['mes'] = $meses[$datos['mes_clave']];

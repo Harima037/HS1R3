@@ -520,6 +520,12 @@ class VisorController extends BaseController {
 				$usuario = Sentry::getUser();
 				if($usuario->claveJurisdiccion){
 					$jurisdiccion = $usuario->claveJurisdiccion;
+				}else{
+					if(isset($parametros['jurisdiccion'])){
+						if($parametros['jurisdiccion']){
+							$jurisdiccion = $parametros['jurisdiccion'];
+						}
+					}
 				}
 
 				$componentes = $componentes->select('proyectoComponentes.id','proyectoComponentes.idProyecto',
@@ -670,6 +676,12 @@ class VisorController extends BaseController {
 				$usuario = Sentry::getUser();
 				if($usuario->claveJurisdiccion){
 					$jurisdiccion = $usuario->claveJurisdiccion;
+				}else{
+					if(isset($parametros['jurisdiccion'])){
+						if($parametros['jurisdiccion']){
+							$jurisdiccion = $parametros['jurisdiccion'];
+						}
+					}
 				}
 
 				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción

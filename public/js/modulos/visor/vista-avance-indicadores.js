@@ -15,10 +15,24 @@
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/visor');
 
 $('#btn-proyecto-cancelar').on('click',function(){
+    var parametros = [];
+    if($(this).attr('data-unidad')){
+        parametros.push('u='+$(this).attr('data-unidad'));
+    }
+    if($(this).attr('data-jurisdiccion')){
+        parametros.push('j='+$(this).attr('data-jurisdiccion'));
+    }
+
+    if(parametros.length){
+        var params = '?' + parametros.join('&');
+    }else{
+        var params = ''
+    }
+
     if($(this).attr('data-clase-proyecto') == 1){
-        window.location.href = SERVER_HOST+'/visor/proyectos-inst';
+        window.location.href = SERVER_HOST+'/visor/proyectos-inst'+params;
     }else if($(this).attr('data-clase-proyecto') == 2){
-        window.location.href = SERVER_HOST+'/visor/proyectos-inv';
+        window.location.href = SERVER_HOST+'/visor/proyectos-inv'+params;
     }
 });
 
@@ -34,7 +48,11 @@ google.setOnLoadCallback(inicializar);
 /********************************************************************************************************************************
         Inicio: Seguimiento de Metas
 *********************************************************************************************************************************/
-var accionesDatagrid = new Datagrid("#datagridAcciones",moduloResource,{ formatogrid:true, pagina: 1, idProyecto: $('#id').val(), avancesIndicadores:true});
+var parametros_datagrid = { formatogrid:true, pagina: 1, idProyecto: $('#id').val(), avancesIndicadores:true};
+if($('#btn-proyecto-cancelar').attr('data-jurisdiccion')){
+    parametros_datagrid.jurisdiccion = $('#btn-proyecto-cancelar').attr('data-jurisdiccion');
+}
+var accionesDatagrid = new Datagrid("#datagridAcciones",moduloResource,parametros_datagrid);
 accionesDatagrid.init();
 accionesDatagrid.actualizar({ 
     _success: function(response){ 
@@ -71,6 +89,9 @@ function seguimiento_metas(e){
         var nivel = 'actividad';
     }
     var parametros = {'mostrar':'detalles-avance-indicador','nivel':nivel};
+    if(accionesDatagrid.parametros.jurisdiccion){
+        parametros.jurisdiccion = accionesDatagrid.parametros.jurisdiccion;
+    }
     var id = datos_id[1];
     moduloResource.get(id,parametros,{
         _success: function(response){
