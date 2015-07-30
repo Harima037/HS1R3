@@ -76,7 +76,7 @@
         <tr>
     		<td>PROYECTO</td>            
             <td>MODIFICADO</td>
-            <td>APROBADO</td>
+            <td>DEVENGADO</td>
             <td>VARIACIÓN</td>
             <td></td>
             <td>RAZONES</td>

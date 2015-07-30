@@ -34,9 +34,9 @@ moduleDatagrid.actualizar({
 				presupuestosIguales.push(item);
 			
 			if(response.data[i].razones)
-				item.razones = '<span class="label label-primary">Registradas</span>';
+				item.razones = '<span class="label label-info">Registradas</span>';
 			else
-				item.razones = '<span class="label label-warning">Sin registro</span>';
+				item.razones = '<span class="label label-default">Sin registro</span>';
             
             datos_grid.push(item);
         }
