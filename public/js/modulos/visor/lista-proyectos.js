@@ -12,6 +12,27 @@
 
 =====================================*/
 moduloDatagrid.init();
+
+if($('#filtro-unidad').length){
+    if($('#filtro-unidad').val() != ''){
+        moduloDatagrid.parametros.unidad = $('#filtro-unidad').val();
+    }
+    $('#filtro-unidad').on('change',function(){
+        moduloDatagrid.parametros.unidad = $('#filtro-unidad').val();
+        moduloDatagrid.actualizar();
+    });
+}
+
+if($('#filtro-jurisdiccion').length){
+    if($('#filtro-jurisdiccion').val() != ''){
+        moduloDatagrid.parametros.jurisdiccion = $('#filtro-jurisdiccion').val();
+    }
+    $('#filtro-jurisdiccion').on('change',function(){
+        moduloDatagrid.parametros.jurisdiccion = $('#filtro-jurisdiccion').val();
+        moduloDatagrid.actualizar();
+    });
+}
+
 moduloDatagrid.actualizar({
     _success: function(response){
         moduloDatagrid.limpiar();
@@ -77,7 +98,25 @@ moduloDatagrid.actualizar({
 });
 
 function cargar_datos_proyecto(e){
-    window.location.href = SERVER_HOST+'/visor/avance-indicadores/' + e;
+    var parametros = [];
+    if($('#filtro-unidad').length){
+        if($('#filtro-unidad').val() != ''){
+            parametros.push('unidad='+$('#filtro-unidad').val());
+        }
+    }
+    if($('#filtro-jurisdiccion').length){
+        if($('#filtro-jurisdiccion').val() != ''){
+            parametros.push('jurisdiccion='+$('#filtro-jurisdiccion').val());
+        }
+    }
+
+    if(parametros.length){
+        var params = '?' + parametros.join('&');
+    }else{
+        var params = ''
+    }
+    
+    window.location.href = SERVER_HOST+'/visor/avance-indicadores/' + e + params;
 }
 
 /**

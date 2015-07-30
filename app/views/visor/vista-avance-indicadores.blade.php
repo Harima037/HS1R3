@@ -69,7 +69,7 @@
 <div class="panel-footer">
     <div class="row">
         <div class="col-sm-12">
-            <button type="button" class="btn btn-default" id="btn-proyecto-cancelar" data-clase-proyecto="{{$id_clasificacion}}">
+            <button type="button" class="btn btn-default" id="btn-proyecto-cancelar" data-clase-proyecto="{{$id_clasificacion}}" data-unidad="{{$unidad}}" data-jurisdiccion="{{$jurisdiccion}}">
                 <span class="fa fa-chevron-left"></span> Regresar a la lista de Proyectos
             </button>
         </div>

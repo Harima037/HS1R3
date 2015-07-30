@@ -47,6 +47,29 @@
             </div>
             <div class="panel-body">
                 <div class="row">
+                    <div id="filtro-unidades" class="col-sm-6 hidden">
+                        <select id="unidad" class="form-control">
+                            <option value="">Todas las unidades</option>
+                            @foreach($unidades_responsables as $clave => $unidad)
+                            <option value="{{$clave}}">{{$unidad}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div id="filtro-jurisdicciones" class="col-sm-5 hidden">
+                        <select id="jurisdiccion" class="form-control">
+                            <option value="">Todas las jurisdicciones</option>
+                            @foreach($jurisdicciones as $clave => $jurisdiccion)
+                            <option value="{{$clave}}">{{$jurisdiccion}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div id="panel-btn-filtro" class="col-sm-1 hidden">
+                        <button type="button" class="btn btn-default" id="btn-filtro" data-grafica="">
+                            <span class="fa fa-filter"></span>
+                        </button>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-sm-12">
                         <div id="area-graficas" style="width:100%;height:500px;">
                             <div id="mensaje-carga-librerias" class="alert alert-info">

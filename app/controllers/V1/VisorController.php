@@ -80,6 +80,11 @@ class VisorController extends BaseController {
 						if($usuario->claveUnidad){
 							$unidades = explode('|',$usuario->claveUnidad);
 							$rows = $rows->whereIn('UR',$unidades);
+						}else{
+							if(isset($parametros['unidad'])){
+								$unidad = array($parametros['unidad']);
+								$rows = $rows->where('UR',$unidad);
+							}
 						}
 
 						$rows = $rows->select(DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
@@ -177,7 +182,7 @@ class VisorController extends BaseController {
 							$jurisdiccion = $usuario->claveJurisdiccion;
 						}elseif($usuario->claveUnidad){
 							$unidades = explode('|',$usuario->claveUnidad);
-						}elseif(isset($parametros['estatal'])){
+						}else{
 							if(isset($parametros['unidad'])){
 								$unidades = array($parametros['unidad']);
 							}
@@ -315,23 +320,36 @@ class VisorController extends BaseController {
 				$usuario = Sentry::getUser();
 				if($usuario->claveJurisdiccion){
 					$jurisdiccion = $usuario->claveJurisdiccion;
-					$query_actividades = DB::table('actividadMetasMes')->select('idProyecto')
-															 ->where('claveJurisdiccion','=',$usuario->claveJurisdiccion)
-															 ->whereNull('borradoAl')
-															 ->where(function($query){
-															 	$query->where('meta','>','0')->orWhere('avance','>','0');
-															 })->groupBy('idProyecto');
-					$proyectos_ids = ComponenteMetaMes::select('idProyecto')
-															 ->where('claveJurisdiccion','=',$usuario->claveJurisdiccion)
-															 ->where(function($query){
-															 	$query->where('meta','>','0')->orWhere('avance','>','0');
-															 })->groupBy('idProyecto')
-															 ->union($query_actividades)->lists('idProyecto');
-					//
-					$rows = $rows->whereIn('id',$proyectos_ids);
 				}elseif($usuario->claveUnidad){
 					$unidades = explode('|',$usuario->claveUnidad);
 					$rows = $rows->whereIn('unidadResponsable',$unidades);
+				}else{
+					if(isset($parametros['unidad'])){
+						if($parametros['unidad']){
+							$rows = $rows->where('unidadResponsable','=',$parametros['unidad']);
+						}
+					}
+					if(isset($parametros['jurisdiccion'])){
+						if($parametros['jurisdiccion']){
+							$jurisdiccion = $parametros['jurisdiccion'];
+						}
+					}
+				}
+
+				if($jurisdiccion){
+					$query_actividades = DB::table('actividadMetasMes')->select('idProyecto')
+													 ->where('claveJurisdiccion','=',$jurisdiccion)
+													 ->whereNull('borradoAl')
+													 ->where(function($query){
+													 	$query->where('meta','>','0')->orWhere('avance','>','0');
+													 })->groupBy('idProyecto');
+					$proyectos_ids = ComponenteMetaMes::select('idProyecto')
+													 ->where('claveJurisdiccion','=',$jurisdiccion)
+													 ->where(function($query){
+													 	$query->where('meta','>','0')->orWhere('avance','>','0');
+													 })->groupBy('idProyecto')
+													 ->union($query_actividades)->lists('idProyecto');
+					$rows = $rows->whereIn('id',$proyectos_ids);
 				}
 
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
@@ -502,6 +520,12 @@ class VisorController extends BaseController {
 				$usuario = Sentry::getUser();
 				if($usuario->claveJurisdiccion){
 					$jurisdiccion = $usuario->claveJurisdiccion;
+				}else{
+					if(isset($parametros['jurisdiccion'])){
+						if($parametros['jurisdiccion']){
+							$jurisdiccion = $parametros['jurisdiccion'];
+						}
+					}
 				}
 
 				$componentes = $componentes->select('proyectoComponentes.id','proyectoComponentes.idProyecto',
@@ -652,6 +676,12 @@ class VisorController extends BaseController {
 				$usuario = Sentry::getUser();
 				if($usuario->claveJurisdiccion){
 					$jurisdiccion = $usuario->claveJurisdiccion;
+				}else{
+					if(isset($parametros['jurisdiccion'])){
+						if($parametros['jurisdiccion']){
+							$jurisdiccion = $parametros['jurisdiccion'];
+						}
+					}
 				}
 
 				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
