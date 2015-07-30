@@ -14,20 +14,24 @@
 // Inicialización General para casi cualquier módulo
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/visor');
 google.load("visualization", "1", {packages:["corechart"]});
-google.setOnLoadCallback(datos_cargadoss);
+google.setOnLoadCallback(datos_cargados);
 
-function datos_cargadoss(){
+function datos_cargados(){
 	$('#mensaje-carga-librerias').html('<span class="fa fa-2x fa-check"></span> <big>Librerias cargadas con éxito.</big>');
-	$('#lnk-proy-unidad').on('click',function(){ cargarGrafica('proy_unidad'); });
-	$('#lnk-proy-tipos').on('click',function(){ cargarGrafica('proy_tipos'); });
-	$('#lnk-metas-unidad').on('click',function(){ cargarGrafica('metas_unidad'); });
-	$('#lnk-metas-cumplidas').on('click',function(){ cargarGrafica('metas_cumplidas'); });
-	$('#lnk-presup-fuente').on('click',function(){ cargarGrafica('presup_fuente'); });
-	$('#lnk-presup-ejercido').on('click',function(){ cargarGrafica('presup_ejercido'); });
-	$('#lnk-presup-ejercido-capitulo').on('click',function(){ cargarGrafica('presup_ejercido_capitulo'); });
+	$('#lnk-proy-unidad').on('click',function (e){ e.preventDefault(); cargarGrafica('proy_unidad'); });
+	$('#lnk-proy-tipos').on('click',function (e){ e.preventDefault(); cargarGrafica('proy_tipos'); });
+	$('#lnk-metas-unidad').on('click',function (e){ e.preventDefault(); cargarGrafica('metas_unidad'); });
+	$('#lnk-presup-fuente').on('click',function (e){ e.preventDefault(); cargarGrafica('presup_fuente'); });
+	$('#lnk-presup-ejercido').on('click',function (e){ e.preventDefault(); cargarGrafica('presup_ejercido'); });
+	$('#lnk-presup-ejercido-capitulo').on('click',function (e){ e.preventDefault(); cargarGrafica('presup_ejercido_capitulo'); });
+	$('#lnk-metas-cumplidas').on('click',function (e){ e.preventDefault(); cargarGrafica('metas_cumplidas'); });
 }
 
 function cargarGrafica(tipo_grafica){
+	$('#filtro-unidades').addClass('hidden');
+	$('#filtro-jurisdicciones').addClass('hidden');
+	$('#panel-btn-filtro').addClass('hidden');
+	$('#btn-filtro').attr('data-grafica',tipo_grafica);
 	switch(tipo_grafica){
 		case 'proy_unidad': graficaProyectosDireccion(); break;
 		case 'proy_tipos': graficaProyectosTipo(); break;
@@ -39,8 +43,33 @@ function cargarGrafica(tipo_grafica){
 	}
 }
 
+$('#btn-filtro').on('click',function (e){
+	e.preventDefault();
+	var tipo_grafica = $('#btn-filtro').attr('data-grafica');
+	if(tipo_grafica){
+		switch(tipo_grafica){
+			case 'proy_unidad': graficaProyectosDireccion(); break;
+			case 'proy_tipos': graficaProyectosTipo(); break;
+			case 'metas_unidad': graficaMetasDireccion(); break;
+			case 'metas_cumplidas': graficaMetasCumplidas(); break;
+			case 'presup_fuente': graficaPresupuestoFuente(); break;
+			case 'presup_ejercido': graficaPresupuestoEjercido(); break;
+			case 'presup_ejercido_capitulo': graficaPresupuestoEjercidoCapitulo(); break;
+		}
+	}
+});
+
 function graficaMetasCumplidas(){
+	$('#filtro-unidades').removeClass('hidden');
+	$('#filtro-jurisdicciones').removeClass('hidden');
+	$('#panel-btn-filtro').removeClass('hidden');
 	var parametros = {grafica:'metas_cumplidas'};
+	if($('#unidad').val() != ''){
+		parametros.unidad = $('#unidad').val();
+	}
+	if($('#jurisdiccion').val() != ''){
+		parametros.jurisdiccion = $('#jurisdiccion').val();
+	}
 	moduloResource.get(null,parametros,{
 		_success: function(response){
 			$('#area-graficas').empty();
@@ -172,7 +201,12 @@ function graficaPresupuestoEjercidoCapitulo(){
 }
 
 function graficaPresupuestoFuente(){
+	$('#filtro-unidades').removeClass('hidden');
+	$('#panel-btn-filtro').removeClass('hidden');
 	var parametros = {grafica:'presupuesto_fuente'};
+	if($('#unidad').val() != ''){
+		parametros.unidad = $('#unidad').val();
+	}
 	moduloResource.get(null,parametros,{
 		_success: function(response){
 			var elementos = [['Fuente Financiamiento', 'Presupuesto Modificado']];

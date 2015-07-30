@@ -39,6 +39,14 @@ class VisorController extends BaseController {
 		}
 		$datos['mes_actual'] = $mes_actual;
 		$datos['trimestre_avance'] = Util::obtenerTrimestre(date('n')-1);
+
+		$usuario = Sentry::getUser();
+		if(!$usuario->claveJurisdiccion && !$usuario->claveUnidad){
+			$datos['mostrar_filtrado'] = true;
+			$datos['jurisdicciones'] = array('OC'=>'OFICINA CENTRAL') + Jurisdiccion::all()->lists('nombre','clave');
+			$datos['unidades_responsables'] = UnidadResponsable::all()->lists('descripcion','clave');
+		}
+
 		return $datos;
 	}
 	public function indexDesempenioGeneral(){
@@ -54,7 +62,11 @@ class VisorController extends BaseController {
 	}
 
 	public function indexEstatal(){
-		return parent::loadIndex('VISORGEN','VIESTATAL');
+		$catalogos = array( 
+			'jurisdicciones' => array('OC'=>'OFICINA CENTRAL') + Jurisdiccion::all()->lists('nombre','clave'),
+			'unidades_responsables' => UnidadResponsable::all()->lists('descripcion','clave')
+		);
+		return parent::loadIndex('VISORGEN','VIESTATAL',$catalogos);
 	}
 
 	public function indexDirecciones(){

@@ -76,6 +76,20 @@ moduloDatagrid.actualizar({
     }
 });
 
+if($('#filtro-unidad').length){
+    $('#filtro-unidad').on('change',function(){
+        moduloDatagrid.parametros.unidad = $('#filtro-unidad').val();
+        moduloDatagrid.actualizar();
+    });
+}
+
+if($('#filtro-jurisdiccion').length){
+    $('#filtro-jurisdiccion').on('change',function(){
+        moduloDatagrid.parametros.jurisdiccion = $('#filtro-jurisdiccion').val();
+        moduloDatagrid.actualizar();
+    });
+}
+
 function cargar_datos_proyecto(e){
     window.location.href = SERVER_HOST+'/visor/avance-indicadores/' + e;
 }
