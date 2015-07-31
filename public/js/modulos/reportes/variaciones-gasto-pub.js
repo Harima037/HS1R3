@@ -72,8 +72,10 @@ function editar (e){
 	moduleResource.get(e,parametros,{
         _success: function(response){
 			if(response.data[0])
+			{
 				$('#razones').val(response.data[0].razonesAprobado);
-				$('#razones2').val(response.data[0].razonesDevengado);				
+				$('#razones2').val(response.data[0].razonesDevengado);
+			}
         }
    	});
 		
