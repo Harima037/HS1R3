@@ -475,11 +475,13 @@ class Proyecto extends BaseModel
 				DB::raw('concat_ws(" ",programaPresupuestario.clave,programaPresupuestario.descripcion) AS programaPresupuestarioDescipcion'),
 
 				DB::raw('concat_ws(".- ",funcionGasto.clave,funcionGasto.descripcion) AS funcionGasto'),
-				DB::raw('concat_ws(".- ",subFuncionGasto.clave,subFuncionGasto.descripcion) AS subFuncionGasto'),
+				DB::raw('UPPER(concat_ws(".- ",subFuncionGasto.clave,subFuncionGasto.descripcion)) AS subFuncionGasto'),
 
 				DB::raw('concat_ws(" ",eje.clave,eje.descripcion) AS ejeDescripcion'),	
 				DB::raw('concat_ws(" ",tema.clave,tema.descripcion) AS temaDescripcion'),
 				DB::raw('concat_ws(" ",politicaPublica.clave,politicaPublica.descripcion) AS politicaPublicaDescripcion'),
+
+				'politicaPublica.clave AS politicaPublicaClave',
 
 				'cuentaPub.cuentaPublica','cuentaPub.mes',
 
@@ -533,9 +535,12 @@ class Proyecto extends BaseModel
 			->orderBy('proyectos.funcion','asc')
 			->orderBy('proyectos.subFuncion','asc')
 			->orderBy('proyectos.subSubFuncion','asc')
+
+			->orderBy('politicaPublica.clave','asc')
+			->orderBy('proyectos.programaPresupuestario','asc')
+
 			->orderBy('proyectos.unidadResponsable','asc')
 			->orderBy('proyectos.programaSectorial','asc')
-			->orderBy('proyectos.programaPresupuestario','asc')
 			->orderBy('proyectos.programaEspecial','asc')
 			->orderBy('proyectos.actividadInstitucional','asc')
 			->orderBy('proyectos.proyectoEstrategico','asc')

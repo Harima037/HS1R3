@@ -68,33 +68,7 @@ class ReporteCuentaPublicaController extends BaseController {
 	    $variables = SysConfiguracionVariable::obtenerVariables(array('clave-institucional','mision','vision'))->lists('valor','variable');
 
 		$header = $section->addHeader();
-		/*
-		$header->addText(htmlspecialchars('GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS'),$titulo,$centrado);
-		$header->addTextBreak(0);
-		$header->addText(htmlspecialchars('SECRETARÍA DE SALUD'),$titulo,$centrado);
-		$header->addTextBreak();
-		$header->addText(htmlspecialchars('ANÁLISIS FUNCIONAL AL '.$trimestres[$trimestre].' TRIMESTRE DEL '.date('Y')),$titulo,$centrado);
-		$image = $header->addImage(
-			'img/LogoInstitucional.png', 
-			array(
-				'positioning'      => \PhpOffice\PhpWord\Style\Image::POSITION_RELATIVE,
-		        'posHorizontal'    => \PhpOffice\PhpWord\Style\Image::POSITION_HORIZONTAL_RIGHT,
-		        'posHorizontalRel' => \PhpOffice\PhpWord\Style\Image::POSITION_RELATIVE_TO_IMARGIN,
-		        'posVertical'      => \PhpOffice\PhpWord\Style\Image::POSITION_VERTICAL_TOP,
-		        'posVerticalRel'   => \PhpOffice\PhpWord\Style\Image::POSITION_RELATIVE_TO_IMARGIN,
-			)
-		);
-		$image = $header->addImage(
-			'img/EscudoGobiernoChiapas.png', 
-			array(
-				'positioning'      => \PhpOffice\PhpWord\Style\Image::POSITION_RELATIVE,
-		        'posHorizontal'    => \PhpOffice\PhpWord\Style\Image::POSITION_HORIZONTAL_LEFT,
-		        'posHorizontalRel' => \PhpOffice\PhpWord\Style\Image::POSITION_RELATIVE_TO_LMARGIN,
-		        'posVertical'      => \PhpOffice\PhpWord\Style\Image::POSITION_VERTICAL_TOP,
-		        'posVerticalRel'   => \PhpOffice\PhpWord\Style\Image::POSITION_RELATIVE_TO_IMARGIN,
-			)
-		);
-		*/
+		
 		$table = $header->addTable('TablaEncabezado');
 		$row = $table->addRow();
 		$row->addCell(3000)->addImage('img/EscudoGobiernoChiapas.png');
@@ -143,6 +117,7 @@ class ReporteCuentaPublicaController extends BaseController {
 		
 		$subfuncion_anterior = '';
 		$clasificacion_anterior = 0;
+		$politica_programa_anterior = '';
 		foreach ($rows as $elemento) {
 			if($subfuncion_anterior != $elemento->subFuncionClave){
 				$section->addPageBreak();
@@ -152,6 +127,7 @@ class ReporteCuentaPublicaController extends BaseController {
 				$section->addTextBreak();
 				$subfuncion_anterior = $elemento->subFuncionClave;
 				$clasificacion_anterior = 0;
+				$politica_programa_anterior = '';
 			}
 
 			if($clasificacion_anterior != $elemento->idClasificacionProyecto){
@@ -164,35 +140,41 @@ class ReporteCuentaPublicaController extends BaseController {
 				}
 				$section->addTextBreak();
 				$clasificacion_anterior = $elemento->idClasificacionProyecto;
+				$politica_programa_anterior = '';
 			}
 
-			$section->addTitle(htmlspecialchars('Proyecto: '.$elemento->nombreTecnico.' ('.$elemento->unidadResponsableDescipcion.')'),4);
-			$section->addTextBreak();
+			$politica_programa_actual = $elemento->politicaPublicaClave.'-'.$elemento->programaPresupuestario;
 
-			$table = $section->addTable('TablaInfo');
+			if($politica_programa_anterior != $politica_programa_actual){
+				$table = $section->addTable('TablaInfo');
 
-			$row = $table->addRow();
-			$row->addCell(3000)->addText('EJE',$titulo,$centrado);
-			$row->addCell(3000)->addText('TEMA',$titulo,$centrado);
-			$row->addCell(3065)->addText('POLÍTICA PÚBLICA',$titulo,$centrado);
-			$row->addCell(5060)->addText('PROGRAMA PRESUPUESTARIO',$titulo,$centrado);
+				$row = $table->addRow();
+				$row->addCell(3000)->addText('EJE',$titulo,$centrado);
+				$row->addCell(3000)->addText('TEMA',$titulo,$centrado);
+				$row->addCell(3065)->addText('POLÍTICA PÚBLICA',$titulo,$centrado);
+				$row->addCell(5060)->addText('PROGRAMA PRESUPUESTARIO',$titulo,$centrado);
 
-			$row = $table->addRow();
-			$row->addCell(2500)->addText($elemento->ejeDescripcion);
-			$row->addCell(2500)->addText($elemento->temaDescripcion);
-			$row->addCell(4065)->addText($elemento->politicaPublicaDescripcion);
-			$row->addCell(5060)->addText($elemento->programaPresupuestarioDescipcion);
+				$row = $table->addRow();
+				$row->addCell(2500)->addText($elemento->ejeDescripcion);
+				$row->addCell(2500)->addText($elemento->temaDescripcion);
+				$row->addCell(4065)->addText($elemento->politicaPublicaDescripcion);
+				$row->addCell(5060)->addText($elemento->programaPresupuestarioDescipcion);
+				$section->addTextBreak();
+				$politica_programa_anterior = $politica_programa_actual;
+			}
+
+			$section->addTitle(htmlspecialchars('Proyecto: '.rtrim($elemento->nombreTecnico,'.').'. ('.$elemento->unidadResponsableDescipcion.').'),4);
 			$section->addTextBreak();
 
 			if($elemento->totalMetas > 0){
 				if($elemento->cuentaPublica){
-					$section->addText(htmlspecialchars($elemento->cuentaPublica),$texto,$justificado);
+					$section->addText(htmlspecialchars(trim($elemento->cuentaPublica)),$texto,$justificado);
 				}else{
 					$section->addText(htmlspecialchars('No presentaron avances.'),$texto,$justificado);
 				}
 			}else{
 				if($elemento->cuentaPublica){
-					$section->addText(htmlspecialchars($elemento->cuentaPublica),$texto,$justificado);
+					$section->addText(htmlspecialchars(trim($elemento->cuentaPublica)),$texto,$justificado);
 				}else{
 					$section->addText(htmlspecialchars('No hay metas programadas para este trimestre.'),$texto,$justificado);
 				}
