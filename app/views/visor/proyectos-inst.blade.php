@@ -54,7 +54,7 @@
                         <select class="form-control" id="filtro-unidad">
                             <option value="">Todas las Unidades</option>
                             @foreach($unidades_responsables as $clave => $unidad)
-                            <option value="{{$clave}}">{{$clave}} {{$unidad}}</option>
+                            <option value="{{$clave}}" {{($unidad_select==$clave)?'selected':''}}>{{$clave}} {{$unidad}}</option>
                             @endforeach
                         </select>
                         @endif

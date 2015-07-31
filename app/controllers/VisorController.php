@@ -46,10 +46,16 @@ class VisorController extends BaseController {
 			$datos['jurisdicciones'] = array('OC'=>'OFICINA CENTRAL') + Jurisdiccion::all()->lists('nombre','clave');
 			$datos['unidades_responsables'] = UnidadResponsable::all()->lists('descripcion','clave');
 			$datos['jurisdiccion_select'] = '';
+			$datos['unidad_select'] = '';
 			$parametros = Input::all();
 			if(isset($parametros['j'])){
 				if($parametros['j']){
 					$datos['jurisdiccion_select'] = $parametros['j'];
+				}
+			}
+			if(isset($parametros['u'])){
+				if($parametros['u']){
+					$datos['unidad_select'] = $parametros['u'];
 				}
 			}
 
@@ -61,14 +67,44 @@ class VisorController extends BaseController {
 	}
 
 	public function indexPresupuesto(){
+		$datos['usuario'] = Sentry::getUser();
+		if($datos['usuario']->claveJurisdiccion){
+			$datos['sys_sistemas'] = SysGrupoModulo::all();
+			return Response::view('errors.403', array(
+				'usuario'=>$datos['usuario'],
+				'sys_activo'=>null,
+				'sys_sistemas'=>$datos['sys_sistemas'],
+				'sys_mod_activo'=>null), 403
+			);
+		}
 		return parent::loadIndex('VISORGEN','VIPRESUP');
 	}
 
 	public function indexPresupuestoMeta(){
+		$datos['usuario'] = Sentry::getUser();
+		if($datos['usuario']->claveJurisdiccion){
+			$datos['sys_sistemas'] = SysGrupoModulo::all();
+			return Response::view('errors.403', array(
+				'usuario'=>$datos['usuario'],
+				'sys_activo'=>null,
+				'sys_sistemas'=>$datos['sys_sistemas'],
+				'sys_mod_activo'=>null), 403
+			);
+		}
 		return parent::loadIndex('VISORGEN','VIPRESUPME');
 	}
 
 	public function indexEstatal(){
+		$datos['usuario'] = Sentry::getUser();
+		if($datos['usuario']->claveJurisdiccion || $datos['usuario']->claveUnidad){
+			$datos['sys_sistemas'] = SysGrupoModulo::all();
+			return Response::view('errors.403', array(
+				'usuario'=>$datos['usuario'],
+				'sys_activo'=>null,
+				'sys_sistemas'=>$datos['sys_sistemas'],
+				'sys_mod_activo'=>null), 403
+			);
+		}
 		$catalogos = array( 
 			'jurisdicciones' => array('OC'=>'OFICINA CENTRAL') + Jurisdiccion::all()->lists('nombre','clave'),
 			'unidades_responsables' => UnidadResponsable::all()->lists('descripcion','clave')
@@ -77,10 +113,30 @@ class VisorController extends BaseController {
 	}
 
 	public function indexDirecciones(){
+		$datos['usuario'] = Sentry::getUser();
+		if($datos['usuario']->claveJurisdiccion || $datos['usuario']->claveUnidad){
+			$datos['sys_sistemas'] = SysGrupoModulo::all();
+			return Response::view('errors.403', array(
+				'usuario'=>$datos['usuario'],
+				'sys_activo'=>null,
+				'sys_sistemas'=>$datos['sys_sistemas'],
+				'sys_mod_activo'=>null), 403
+			);
+		}
 		return parent::loadIndex('VISORGEN','VIDIRECS');
 	}
 
 	public function indexJurisdicciones(){
+		$datos['usuario'] = Sentry::getUser();
+		if($datos['usuario']->claveJurisdiccion || $datos['usuario']->claveUnidad){
+			$datos['sys_sistemas'] = SysGrupoModulo::all();
+			return Response::view('errors.403', array(
+				'usuario'=>$datos['usuario'],
+				'sys_activo'=>null,
+				'sys_sistemas'=>$datos['sys_sistemas'],
+				'sys_mod_activo'=>null), 403
+			);
+		}
 		$catalogos = array( 'jurisdicciones' => array('OC'=>'OFICINA CENTRAL') + Jurisdiccion::all()->lists('nombre','clave') );
 		return parent::loadIndex('VISORGEN','VIJURIS',$catalogos);
 	}
@@ -106,17 +162,17 @@ class VisorController extends BaseController {
 		}
 
 		$datos['unidad'] = '';
-		if(isset($parametros['unidad'])){
-			if($parametros['unidad']){
-				$datos['unidad'] = $parametros['unidad'];
+		if(isset($parametros['u'])){
+			if($parametros['u']){
+				$datos['unidad'] = $parametros['u'];
 			}
 		}
 
 		$datos['jurisdiccion'] = '';
-		if(isset($parametros['jurisdiccion'])){
-			if($parametros['jurisdiccion']){
+		if(isset($parametros['j'])){
+			if($parametros['j']){
 				$es_jurisdiccion = true;
-				$datos['jurisdiccion'] = $parametros['jurisdiccion'];
+				$datos['jurisdiccion'] = $parametros['j'];
 			}
 		}
 

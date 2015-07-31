@@ -80,9 +80,11 @@
 		<tr>
 		<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
+		<!-- {{ $current_row = 13; }} -->
+		
 		@foreach($hoja['clase'] as $idClasificacion => $clasificacion)
-
 		<tr>
+		<!-- {{ $current_row++; }} -->
 			<td></td><td></td>
 			<td height="20" align="center" valign="top" style="font-size:10; font-weight:bold;">
 			@if($idClasificacion == '1')
@@ -93,26 +95,35 @@
 			</td>
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
-
+		
 		@foreach($clasificacion['fuentes'] as $fuente)
 
 		<tr>
+		<!-- {{ $current_row++; }} -->
 			<td></td><td></td>
 			<td align="center" valign="top" style="text-decoration:underline; font-size:9;">{{$fuente['titulo']}}</td>
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
-
+		
 		@foreach($fuente['proyectos'] as $proyecto)
 		<tr>
+		<!-- {{ $current_row++; }} -->
 			<td align="center" valign="top" style="font-weight:bold;">
 				{{$proyecto->proyectoEstrategico}}{{str_pad($proyecto->numeroProyectoEstrategico, 3,'0',STR_PAD_LEFT)}}
+				<!-- {{ $sum_rows[] = $current_row; }} -->
 			</td>
 			<td></td>
 			<td align="center" style="font-weight:bold;">{{{ $proyecto->nombreTecnico }}}</td>
 			<td></td><td></td><td></td><td></td><td></td><td></td>
-			<td valign="top" {{$estilo_fuente = (count($proyecto->fuentesFinanciamiento) > 1)?'style="font-weight:bold; text-decoration:underline;"':''}} >{{$proyecto->totalPresupuestoAprobado}}</td>
-			<td valign="top" {{$estilo_fuente}}>{{$proyecto->totalPresupuestoModificado}}</td>
-			<td valign="top" {{$estilo_fuente}}>{{$proyecto->totalPresupuestoDevengado}}</td>
+			<td valign="top" {{$estilo_fuente = (count($proyecto->fuentesFinanciamiento) > 1)?'style="font-weight:bold; text-decoration:underline;"':''}} >
+			{{ (count($proyecto->fuentesFinanciamiento) > 1)?'=SUM(J'.($current_row+1).':J'.($current_row+count($proyecto->fuentesFinanciamiento)).')':$proyecto->totalPresupuestoAprobado}}
+			</td>
+			<td valign="top" {{$estilo_fuente}}>
+			{{ (count($proyecto->fuentesFinanciamiento) > 1)?'=SUM(K'.($current_row+1).':K'.($current_row+count($proyecto->fuentesFinanciamiento)).')':$proyecto->totalPresupuestoModificado}}
+			</td>
+			<td valign="top" {{$estilo_fuente}}>
+			{{ (count($proyecto->fuentesFinanciamiento) > 1)?'=SUM(L'.($current_row+1).':L'.($current_row+count($proyecto->fuentesFinanciamiento)).')':$proyecto->totalPresupuestoDevengado}}
+			</td>
 			<td valign="top">
 				@if($proyecto->idCobertura == 1)
 				Cobertura Estatal
@@ -152,6 +163,7 @@
 
 		@for($i = 0 ; $i < $proyecto->totalItems ; $i++)
 			<tr>
+			<!-- {{ $current_row++; }} -->
 				<td></td><td></td>
 				
 			@if(isset($proyecto->componentes[$i]))
@@ -167,11 +179,7 @@
 				@endif
 				</td>
 				<td valign="top">
-				@if($proyecto->componentes[$i]->avanceAcumulado > 0)
-					{{($proyecto->componentes[$i]->avanceAcumulado/$proyecto->componentes[$i]->metaAnual)*100}}
-				@else
-					0.00
-				@endif
+				{{'=SUM(G'.$current_row.')/F'.$current_row.'*100'}}
 				</td>
 			@elseif(isset($proyecto->actividades[$i-$proyecto->desfaseActividades]))
 				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->indicador }}}</td>
@@ -186,11 +194,7 @@
 				@endif
 				</td>
 				<td valign="top">
-					@if($proyecto->actividades[$i-$proyecto->desfaseActividades]->avanceAcumulado > 0)
-						{{($proyecto->actividades[$i-$proyecto->desfaseActividades]->avanceAcumulado/$proyecto->actividades[$i-$proyecto->desfaseActividades]->metaAnual)*100}}
-					@else
-						0.00
-					@endif
+					{{'=SUM(G'.$current_row.')/F'.$current_row.'*100'}}
 				</td>
 			@else
 				<td></td><td></td><td></td><td></td><td></td><td></td><td></td>
@@ -221,6 +225,13 @@
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		@endforeach
+
+		<tr>
+			<td>{{implode(',',$sum_rows)}}</td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+		</tr>
+		
 	</table>
 </body>
 </html>

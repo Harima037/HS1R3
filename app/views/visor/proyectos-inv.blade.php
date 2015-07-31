@@ -18,24 +18,51 @@
     <div class="col-md-12">
         <div class="panel panel-default datagrid" id="datagridProyectos" data-edit-row="cargar_datos_proyecto" data-trim-activo="{{$trimestre_avance}}" data-mes-activo="{{$mes_avance}}" data-mes-actual="{{$mes_actual}}">
             <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> Proyectos de Inversión</h4></div>
+            @if(isset($mostrar_filtrado))
+            <div class="panel-body bg-info">
+                <div class="row">
+                    <div class="col-sm-7">
+                        <label class="control-label pull-right" style="margin-top:5px;margin-bottom:5px;" for="filtro-jurisdiccion">
+                            Nivel : 
+                        </label>
+                    </div>
+                    <div class="col-sm-5">
+                        
+                        <select class="form-control" id="filtro-jurisdiccion">
+                            <option value="">Estatal</option>
+                            @foreach($jurisdicciones as $clave => $jurisdiccion)
+                            <option value="{{$clave}}" {{($jurisdiccion_select==$clave)?'selected':''}}>{{$clave}} {{$jurisdiccion}}</option>
+                            @endforeach
+                        </select>
+
+                    </div>
+                </div>
+            </div>
+            @endif
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-lg-6 col-md-6">
-                        <div class="input-group" style="margin:5px">                            
+                    <div class="col-sm-5">
+                        <div class="input-group">
                             <input type="text" class="form-control txt-quick-search" placeholder="Buscar">
                             <span class="input-group-btn">
                                 <button class="btn btn-default btn-quick-search" type="button"><span class="glyphicon glyphicon-search"></span></button>
                             </span>
                         </div>
                     </div>
-                    <div class="col-lg-6">
-                        <div class="btn-toolbar pull-right" >
-                            <div class="btn-group" style="margin:5px">
-                                <button type="button" class="btn btn-success btn-edit-rows" id="btn-detalles-proyecto">
-                                    <span class="fa fa-edit"></span> Ver Detalles del Proyecto
-                                </button>
-                            </div>
-                        </div>
+                    <div class="col-sm-5">
+                        @if(isset($mostrar_filtrado))
+                        <select class="form-control" id="filtro-unidad">
+                            <option value="">Todas las Unidades</option>
+                            @foreach($unidades_responsables as $clave => $unidad)
+                            <option value="{{$clave}}" {{($unidad_select==$clave)?'selected':''}}>{{$clave}} {{$unidad}}</option>
+                            @endforeach
+                        </select>
+                        @endif
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-block btn-success btn-edit-rows" id="btn-detalles-proyecto">
+                            <span class="fa fa-edit"></span> Ver Detalles
+                        </button>
                     </div>
                 </div>
             </div>

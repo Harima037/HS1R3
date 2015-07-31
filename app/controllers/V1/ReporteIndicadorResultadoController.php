@@ -146,7 +146,6 @@ class ReporteIndicadorResultadoController extends BaseController {
 				$datos_hoja = array();
 				$datos_hoja['ejercicio'] = $datos['ejercicio'];
 				$datos_hoja['trimestre'] = $datos['trimestre'];
-
 				foreach ($datos['hojas'] as $clave => $hoja) {
 					$excel->sheet($clave, function($sheet) use ( $datos_hoja, $hoja ){
 						$sheet->setStyle(array(
@@ -243,11 +242,29 @@ class ReporteIndicadorResultadoController extends BaseController {
 						}
 						$sheet->getStyle('A14:O'.$total)->getAlignment()->setWrapText(true);
 						$sheet->setColumnFormat(array(
+							'J12:L12' => '### ### ### ##0.00',
 						    'E14:G'.$total => '### ### ### ##0.00',
 						    'I12:L'.$total => '### ### ### ##0.00',
 						    'O14:O'.$total => '### ### ### ##0'
 						));
 				    });
+					
+					$ultima_linea = $excel->getActiveSheet()->getHighestDataRow();
+					$rows_sumar = explode(',',$excel->getActiveSheet()->getCell('A'.$ultima_linea)->getValue());
+
+					$suma_j = '';
+					$suma_k = '';
+					$suma_l = '';
+					foreach ($rows_sumar as $indice => $valor) {
+						$suma_j .= 'J'.$valor.',';
+						$suma_k .= 'K'.$valor.',';
+						$suma_l .= 'L'.$valor.',';
+					}
+					
+					$excel->getActiveSheet()->setCellValue('A'.$ultima_linea,null);
+					$excel->getActiveSheet()->setCellValue('J12','=SUM('.rtrim($suma_j,',').')');
+					$excel->getActiveSheet()->setCellValue('K12','=SUM('.rtrim($suma_k,',').')');
+					$excel->getActiveSheet()->setCellValue('L12','=SUM('.rtrim($suma_l,',').')');
 				}
 			})->download('xlsx');
 		}catch(Exception $ex){

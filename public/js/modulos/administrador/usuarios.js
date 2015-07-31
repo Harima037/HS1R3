@@ -152,8 +152,8 @@ function editar (e){
                 $("#btn-limpiar-permisos").show();
                 $("#nav-tab-seguridad").show();
                 $("#tab-seguridad").attr("style",'');
-                $('#formModulo .chosen-one').trigger('chosen:updated');
             }
+            $('#formModulo .chosen-one').trigger('chosen:updated');
 
             $('#modalModulo').find(".modal-title").html("Editar Usuario");
             $('#modalModulo').modal('show');  

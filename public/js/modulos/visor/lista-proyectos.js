@@ -19,6 +19,7 @@ if($('#filtro-unidad').length){
     }
     $('#filtro-unidad').on('change',function(){
         moduloDatagrid.parametros.unidad = $('#filtro-unidad').val();
+        $('#datagridProyectos .txt-go-page').val(1);
         moduloDatagrid.actualizar();
     });
 }
@@ -29,6 +30,7 @@ if($('#filtro-jurisdiccion').length){
     }
     $('#filtro-jurisdiccion').on('change',function(){
         moduloDatagrid.parametros.jurisdiccion = $('#filtro-jurisdiccion').val();
+        $('#datagridProyectos .txt-go-page').val(1);
         moduloDatagrid.actualizar();
     });
 }
@@ -101,12 +103,12 @@ function cargar_datos_proyecto(e){
     var parametros = [];
     if($('#filtro-unidad').length){
         if($('#filtro-unidad').val() != ''){
-            parametros.push('unidad='+$('#filtro-unidad').val());
+            parametros.push('u='+$('#filtro-unidad').val());
         }
     }
     if($('#filtro-jurisdiccion').length){
         if($('#filtro-jurisdiccion').val() != ''){
-            parametros.push('jurisdiccion='+$('#filtro-jurisdiccion').val());
+            parametros.push('j='+$('#filtro-jurisdiccion').val());
         }
     }
 
