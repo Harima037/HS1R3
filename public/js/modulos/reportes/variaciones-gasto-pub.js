@@ -27,13 +27,15 @@ moduleDatagrid.actualizar({
             item.id = response.data[i].id;
             item.clave = response.data[i].ClavePresupuestaria;
             item.nombre_tecnico = response.data[i].nombreTecnico;
-            item.presupMod = '$ ' + parseFloat(response.data[i].presupuestoModificado || 0).format(2);
 			item.presupApr = '$ ' + parseFloat(response.data[i].presupuestoAprobado || 0).format(2);		
+            item.presupMod = '$ ' + parseFloat(response.data[i].presupuestoModificado || 0).format(2);
+			item.presupDev = '$ ' + parseFloat(response.data[i].presupuestoDevengadoModificado || 0).format(2);
+			
 			
 			if(item.presupMod == item.presupApr)
 				presupuestosIguales.push(item);
 			
-			if(response.data[i].razones)
+			if(response.data[i].razonesAprobado)
 				item.razones = '<span class="label label-info">Registradas</span>';
 			else
 				item.razones = '<span class="label label-default">Sin registro</span>';
@@ -70,7 +72,8 @@ function editar (e){
 	moduleResource.get(e,parametros,{
         _success: function(response){
 			if(response.data[0])
-				$('#razones').val(response.data[0].razones);
+				$('#razones').val(response.data[0].razonesAprobado);
+				$('#razones2').val(response.data[0].razonesDevengado);				
         }
    	});
 		

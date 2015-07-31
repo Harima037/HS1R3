@@ -109,7 +109,8 @@ class ReporteVariacionesGastoController extends BaseController {
 						'devengado' => $row['presupuestoDevengado']/1000000,
 						'variacion' => ($row['presupuestoAprobado']-$row['presupuestoModificado'])/1000000,
 						'variacion2' => ($row['presupuestoDevengado']-$row['presupuestoModificado'])/1000000,
-						'razones' => $row['razones']
+						'razonesAprobado' => $row['razonesAprobado'],
+						'razonesDevengado' => $row['razonesDevengado']						
 					);
 					
 					$totalModificado += $row['presupuestoModificado']/1000000;
@@ -491,7 +492,8 @@ class ReporteVariacionesGastoController extends BaseController {
 				$recurso->mes = $parametros["mes-razones"];
 			}
 			//Si no es nulo, solamente actualizar las razones
-			$recurso->razones = $parametros["razones"];				
+			$recurso->razonesAprobado = $parametros["razones"];
+			$recurso->razonesDevengado = $parametros["razones2"];
 			$recurso->save();
 			$respuesta['data']['data'] = $recurso;		
 		}
