@@ -281,11 +281,11 @@ class Proyecto extends BaseModel
 				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
 				'proyectos.programaPresupuestario','proyectos.programaEspecial',
 				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
-				'proyectos.numeroProyectoEstrategico','variacionGasto.razones',
+				'proyectos.numeroProyectoEstrategico','variacionGasto.razonesAprobado','variacionGasto.razonesDevengado',
 
 				DB::raw('sum(ep01.presupuestoAprobado) AS presupuestoAprobado'),
 				DB::raw('sum(ep01.presupuestoModificado) AS presupuestoModificado'),
-				DB::raw('sum(ep01.presupuestoEjercidoModificado) AS presupuestoEjercidoModificado'),
+				DB::raw('sum(ep01.presupuestoDevengadoModificado) AS presupuestoDevengadoModificado'),
 
 				DB::raw('concat_ws(" ",programaPresupuestario.clave,programaPresupuestario.descripcion) AS programaPresupuestarioDescipcion')
 			)
@@ -324,7 +324,7 @@ class Proyecto extends BaseModel
 				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
 				'proyectos.programaPresupuestario','proyectos.programaEspecial',
 				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
-				'proyectos.numeroProyectoEstrategico','variacionGasto.razones',
+				'proyectos.numeroProyectoEstrategico','variacionGasto.razonesAprobado','variacionGasto.razonesDevengado',
 
 				DB::raw('sum(ep01.presupuestoAprobado) AS presupuestoAprobado'),
 				DB::raw('sum(ep01.presupuestoModificado) AS presupuestoModificado'),

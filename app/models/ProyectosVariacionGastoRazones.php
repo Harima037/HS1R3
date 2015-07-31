@@ -9,7 +9,7 @@ class ProyectosVariacionGastoRazones extends BaseModel
 	
 	public function scopeUltimaRazon($query, $idproyecto)
 	{
-		$query -> select('proyectosVariacionGastoRazones.razones')
+		$query -> select('proyectosVariacionGastoRazones.razonesAprobado','proyectosVariacionGastoRazones.razonesDevengado')
 				->where('proyectosVariacionGastoRazones.idProyecto','=',$idproyecto)
 				->orderBy('proyectosVariacionGastoRazones.mes', 'desc')
 				->take(1);

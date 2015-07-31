@@ -98,7 +98,7 @@
             <td>{{{ $arrayReporte['devengado'] }}}</td>
             <td>{{{ $arrayReporte['variacion2'] }}}</td>
             <td></td>
-            <td></td>
+            <td>{{{ $arrayReporte['razonesDevengado'] }}}</td>
 		</tr>
         @endforeach
               

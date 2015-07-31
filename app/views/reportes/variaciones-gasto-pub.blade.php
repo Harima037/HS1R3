@@ -56,8 +56,9 @@
                         <th><input type="checkbox" class="check-select-all-rows"></th>
                         <th width="200">Clave Presupuestaria</th>
                         <th>Nombre Técnico</th>
-                        <th width="150">Presupuesto<br>Modificado</th>
                         <th width="150">Presupuesto<br>Aprobado</th>
+                        <th width="150">Presupuesto<br>Modificado</th>
+                        <th width="150">Presupuesto<br>Devengado</th>
                         <th width="100">Razones</th>
                     </tr>
                 </thead>
@@ -109,11 +110,20 @@
 						<div class="row">
                         	<div class="col-sm-12">
                         	<div class="form-group">
-                        	
+                        	<label for="razones">Razones por diferencia entre presupuesto Modificado y Aprobado</label>
                             <textarea class="form-control" name="razones" id="razones" rows="8"></textarea>
                      	   	</div>
                             </div>
                         </div>
+                        						<div class="row">
+                        	<div class="col-sm-12">
+                        	<div class="form-group">
+                        	<label for="razones2">Razones por diferencia entre presupuesto Modificado y Devengado</label>
+                            <textarea class="form-control" name="razones2" id="razones2" rows="8"></textarea>
+                     	   	</div>
+                            </div>
+                        </div>
+
                 </form>
                 </div>
                 <div class="modal-footer">
