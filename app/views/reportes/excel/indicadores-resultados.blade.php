@@ -6,32 +6,33 @@
 <body>
 	<table>
 
-		<tr><td width="8.4"></td><td width="8.4"></td><td width="52.5"></td><td width="12.7"></td><td width="12.7"></td><td width="12.7"></td><td width="12.7"></td><td width="1.8"></td><td width="9.7"></td><td width="20.5"></td><td width="20.5"></td><td width="20.5"></td><td width="13.8"></td><td width="13.8"></td><td width="12.5"></td></tr>
+		<tr><td width="8.4"></td><td width="8.4"></td><td width="52.5"></td><td width="1.8"></td><td width="12.7"></td><td width="12.7"></td><td width="12.7"></td><td width="12.7"></td><td width="1.8"></td><td width="9.7"></td><td width="20.5"></td><td width="20.5"></td><td width="20.5"></td><td width="16.8"></td><td width="16.8"></td><td width="12.5"></td></tr>
 
 		<tr>
-			<td style="font-size:10; font-weight:bold;">GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td style="font-size:10; font-weight:bold;">GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
-		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 		<tr>
-			<td style="font-size:10; font-weight:bold;">INDICADORES DE RESULTADOS AL {{$trimestre}} TRIMESTRE DEL {{$ejercicio}}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td style="font-size:10; font-weight:bold;">INDICADORES DE RESULTADOS AL {{$trimestre}} TRIMESTRE DEL {{$ejercicio}}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 
-		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 
 		<tr>
 			<td></td><td></td>
 			<td><span style="font-weight:bold;">Organismo Público:</span> Instituto de Salud</td>
-			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 
-		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 
 		<tr>
 			<td valign="middle" height="23">NUM. CONSEC. / CLAVE PROYECTO</td>
 			<td valign="middle">OBJETIVO DEL MILENIO</td>
 			<td valign="middle">SUBFUNCIÓN / TIPO DE PROYECTO / FUENTE DE FINANCIAMIENTO</td>
 			<td valign="middle">UNIDAD DE MEDIDA</td>
+			<td></td>
 			<td valign="middle">METAS</td>
 			<td></td>
 			<td></td>
@@ -50,6 +51,7 @@
 			<td></td>
 			<td valign="middle">PROYECTOS /  METAS (CONCEPTOS)</td>
 			<td></td>
+			<td></td>
 			<td valign="middle">PROGRAM.ANUAL</td>
 			<td valign="middle">MODIF. ANUAL</td>
 			<td valign="middle">ALCANZ. AL PERIODO</td>
@@ -64,21 +66,21 @@
 		</tr>
 		
 		<tr class="encabezado-tabla">
-			<td valign="middle" height="23">SALUD</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td></td><td></td><td valign="middle" height="23">SALUD</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 
 		<tr>
 			<td></td><td></td>
 			<td valign="top" height="30">{{$hoja['titulo']}}</td>
-			<td></td><td></td><td></td><td></td><td></td><td></td>
-			<td valign="top">{{$hoja['total_presup_aprobado']}}</td>
-			<td valign="top">{{$hoja['total_presup_modificado']}}</td>
-			<td valign="top">{{$hoja['total_presup_devengado']}}</td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td valign="top">Formulas</td>
+			<td valign="top">Formulas</td>
+			<td valign="top">Formulas</td>
 			<td></td><td></td><td></td>
 		</tr>
 
 		<tr>
-		<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+		<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		<!-- {{ $current_row = 13; }} -->
 		
@@ -93,7 +95,7 @@
 				PROYECTOS DE INVERSIÓN:
 			@endif
 			</td>
-			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		
 		@foreach($clasificacion['fuentes'] as $fuente)
@@ -101,8 +103,8 @@
 		<tr>
 		<!-- {{ $current_row++; }} -->
 			<td></td><td></td>
-			<td align="center" valign="top" style="text-decoration:underline; font-size:11;">{{$fuente['titulo']}}</td>
-			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td align="center" valign="top" style="text-decoration:underline; font-size:11; font-weight:bold;">{{$fuente['titulo']}}</td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		
 		@foreach($fuente['proyectos'] as $proyecto)
@@ -114,15 +116,15 @@
 			</td>
 			<td></td>
 			<td align="center" style="font-weight:bold;text-align:justify;">{{{ rtrim($proyecto->nombreTecnico,'.') }}}</td>
-			<td></td><td></td><td></td><td></td><td></td><td></td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 			<td valign="top" {{$estilo_fuente = (count($proyecto->fuentesFinanciamiento) > 1)?'style="font-weight:bold; text-decoration:underline;"':''}} >
-			{{ (count($proyecto->fuentesFinanciamiento) > 1)?'=SUM(J'.($current_row+1).':J'.($current_row+count($proyecto->fuentesFinanciamiento)).')':$proyecto->totalPresupuestoAprobado}}
+			{{ (count($proyecto->fuentesFinanciamiento) > 1)?'=SUM(K'.($current_row+1).':K'.($current_row+count($proyecto->fuentesFinanciamiento)).')':$proyecto->totalPresupuestoAprobado}}
 			</td>
 			<td valign="top" {{$estilo_fuente}}>
-			{{ (count($proyecto->fuentesFinanciamiento) > 1)?'=SUM(K'.($current_row+1).':K'.($current_row+count($proyecto->fuentesFinanciamiento)).')':$proyecto->totalPresupuestoModificado}}
+			{{ (count($proyecto->fuentesFinanciamiento) > 1)?'=SUM(L'.($current_row+1).':L'.($current_row+count($proyecto->fuentesFinanciamiento)).')':$proyecto->totalPresupuestoModificado}}
 			</td>
 			<td valign="top" {{$estilo_fuente}}>
-			{{ (count($proyecto->fuentesFinanciamiento) > 1)?'=SUM(L'.($current_row+1).':L'.($current_row+count($proyecto->fuentesFinanciamiento)).')':$proyecto->totalPresupuestoDevengado}}
+			{{ (count($proyecto->fuentesFinanciamiento) > 1)?'=SUM(M'.($current_row+1).':M'.($current_row+count($proyecto->fuentesFinanciamiento)).')':$proyecto->totalPresupuestoDevengado}}
 			</td>
 			<td valign="top">
 				@if($proyecto->idCobertura == 1)
@@ -168,6 +170,7 @@
 				
 			@if(isset($proyecto->componentes[$i]))
 				<td valign="top" style="text-align:justify;">{{{ rtrim($proyecto->componentes[$i]->indicador,'.') }}}</td>
+				<td></td>
 				<td valign="top" align="center">{{{ $proyecto->componentes[$i]->unidadMedida }}}</td>
 				<td valign="top">{{{ $proyecto->componentes[$i]->metaAnual }}}</td>
 				<td valign="top">{{{ $proyecto->componentes[$i]->metaAnual }}}</td>
@@ -179,12 +182,13 @@
 				@endif
 				</td>
 				<td valign="top">
-				{{'=SUM(G'.$current_row.')/F'.$current_row.'*100'}}
+				{{'=SUM(H'.$current_row.')/G'.$current_row.'*100'}}
 				</td>
 			@elseif(isset($proyecto->actividades[$i-$proyecto->desfaseActividades]))
 				<td valign="top" style="text-align:justify;">
 				{{{ rtrim($proyecto->actividades[$i-$proyecto->desfaseActividades]->indicador,'.') }}}
 				</td>
+				<td></td>
 				<td valign="top" align="center">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->unidadMedida }}}</td>
 				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->metaAnual }}}</td>
 				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->metaAnual }}}</td>
@@ -196,10 +200,10 @@
 				@endif
 				</td>
 				<td valign="top">
-					{{'=SUM(G'.$current_row.')/F'.$current_row.'*100'}}
+					{{'=SUM(H'.$current_row.')/G'.$current_row.'*100'}}
 				</td>
 			@else
-				<td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+				<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 			@endif
 
 			@if(isset($proyecto->fuentesFinanciamiento[$i]) && count($proyecto->fuentesFinanciamiento) > 1)
@@ -224,12 +228,12 @@
 		<tr>
 			<td></td><td></td>
 			<td>{{$identificador}} {{{$justificacion}}}</td>
-			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		@endforeach
 
 		<tr>
-			<td>{{implode(',',$sum_rows)}}</td>
+			<td>{{implode(',',$sum_rows)}}</td><td></td>
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>

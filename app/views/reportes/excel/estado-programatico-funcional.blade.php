@@ -49,8 +49,8 @@
 		<tr>
 			<td style="font-size:9;" valign="top" height="25" >{{ $dato->concepto }}</td>
 			<td style="font-size:8;" valign="top" align="right">{{ $dato->presupuestoAprobado }}</td>
-			<td style="font-size:8;" valign="top" align="right">{{ '=D'.$current_row.'-B'.$current_row }}</td>
-			<td style="font-size:8;" valign="top" align="right">{{ $dato->presupuestoModificado }}</td>
+			<td style="font-size:8;" valign="top" align="right">{{ $dato->modificacionNeta }}</td>
+			<td style="font-size:8;" valign="top" align="right">{{ '=SUM(B'.$current_row.':C'.$current_row.')' }}</td>
 			<td></td>
 			<td style="font-size:8;" valign="top" align="right">{{ $dato->presupuestoDevengadoModificado }}</td>
 			<td style="font-size:8;" valign="top" align="right">{{ $dato->presupuestoComprometidoModificado }}</td>

@@ -164,19 +164,17 @@ class ReporteIndicadorResultadoController extends BaseController {
 						$sheet->cells('A2:O4',function($cells){ $cells->setAlignment('center'); });
 						$sheet->mergeCells('A9:A10');
 						$sheet->mergeCells('B9:B10');
-						$sheet->mergeCells('D9:D10');
-						$sheet->mergeCells('E9:I9');
+						$sheet->mergeCells('D9:E10');
+						$sheet->mergeCells('F9:J9');
 						$sheet->mergeCells('H10:I10');
-						$sheet->mergeCells('J9:J10');
 						$sheet->mergeCells('K9:K10');
 						$sheet->mergeCells('L9:L10');
-						$sheet->mergeCells('M9:O9');
-						$sheet->mergeCells('A11:O11');
-						$sheet->cells('A9:O12',function($cells) {
-							$cells->setAlignment('center');
-						});
-						$sheet->getStyle('A9:O12')->getAlignment()->setWrapText(true);
-						$sheet->getStyle('A9:O11')->applyFromArray(array(
+						$sheet->mergeCells('M9:M10');
+						$sheet->mergeCells('N9:P9');
+						$sheet->mergeCells('C11:P11');
+						$sheet->cells('A9:P12',function($cells) { $cells->setAlignment('center'); });
+						$sheet->getStyle('A9:P12')->getAlignment()->setWrapText(true);
+						$sheet->getStyle('A9:P11')->applyFromArray(array(
 						    'fill' => array(
 						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
 						        'color' => array('rgb' => '28A659')
@@ -193,7 +191,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 						    	)
 						    )
 						));
-						$sheet->getStyle('A11:O11')->applyFromArray(array(
+						$sheet->getStyle('A11:P11')->applyFromArray(array(
 						    'font' => array(
 						        'size'      =>  13,
 						        'bold'      =>  true
@@ -205,7 +203,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 						    	)
 						    )
 						));
-						$sheet->getStyle('A12:O12')->applyFromArray(array(
+						$sheet->getStyle('A12:P12')->applyFromArray(array(
 						    'fill' => array(
 						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
 						        'color' => array('rgb' => 'DDDDDD')
@@ -227,49 +225,50 @@ class ReporteIndicadorResultadoController extends BaseController {
 						    )
 						));
 						$total = $hoja['conteo_items'] + 13;
-						for ($i='A'; $i < 'O' ; $i++) { 
-							if($i != 'H'){
+						for ($i='A'; $i < 'P' ; $i++) { 
+							if($i != 'D' && $i != 'I'){
 								$sheet->getStyle($i.'14:'.$i.$total)->applyFromArray(array(
-								    'font' => array( 'size' => 8),
+								    'font' => array( 'size' => 10),
 								    'borders' => array(
 								    	'right' => array(
-								    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+								    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
 			            					'color' => array('argb' => '002060')
 								    	)
 								    )
 								));
 							}
 						}
-						$sheet->getStyle('A14:O'.$total)->getAlignment()->setWrapText(true);
+						$sheet->getStyle('A14:P'.$total)->getAlignment()->setWrapText(true);
 						$sheet->setColumnFormat(array(
-							'J12:L12' => '### ### ### ##0.00',
-						    'E14:G'.$total => '### ### ### ##0.00',
-						    'I12:L'.$total => '### ### ### ##0.00',
-						    'O14:O'.$total => '### ### ### ##0'
+							'F14:H'.$total => '### ### ### ##0.00',
+							'K12:M12' => '### ### ### ##0.00',
+						    'J12:M'.$total => '### ### ### ##0.00',
+						    'P14:P'.$total => '### ### ### ##0'
 						));
 
 						$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','A1');
 						$imagen->setWorksheet($sheet);
-						$imagen = $this->obtenerImagen('LogoInstitucional.png','N1',10);
+						$imagen = $this->obtenerImagen('LogoInstitucional.png','O1');
 						$imagen->setWorksheet($sheet);
 				    });
 					
 					$ultima_linea = $excel->getActiveSheet()->getHighestDataRow();
 					$rows_sumar = explode(',',$excel->getActiveSheet()->getCell('A'.$ultima_linea)->getValue());
 
-					$suma_j = '';
+					
 					$suma_k = '';
 					$suma_l = '';
+					$suma_m = '';
 					foreach ($rows_sumar as $indice => $valor) {
-						$suma_j .= 'J'.$valor.',';
 						$suma_k .= 'K'.$valor.',';
 						$suma_l .= 'L'.$valor.',';
+						$suma_m .= 'M'.$valor.',';
 					}
 					
 					$excel->getActiveSheet()->setCellValue('A'.$ultima_linea,null);
-					$excel->getActiveSheet()->setCellValue('J12','=SUM('.rtrim($suma_j,',').')');
 					$excel->getActiveSheet()->setCellValue('K12','=SUM('.rtrim($suma_k,',').')');
 					$excel->getActiveSheet()->setCellValue('L12','=SUM('.rtrim($suma_l,',').')');
+					$excel->getActiveSheet()->setCellValue('M12','=SUM('.rtrim($suma_m,',').')');
 
 					$excel->getActiveSheet()->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(1,10);
 

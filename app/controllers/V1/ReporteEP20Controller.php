@@ -96,7 +96,7 @@ class ReporteEP20Controller extends BaseController {
 						->groupBy('cargaDatosEP01.SSF')
 						->select('funcionesGasto.descripcion AS concepto',
 								DB::raw('sum(cargaDatosEP01.presupuestoAprobado) AS presupuestoAprobado'),
-								DB::raw('sum(cargaDatosEP01.presupuestoModificado) AS presupuestoModificado'),
+								DB::raw('sum(cargaDatosEP01.modificacionNeta) AS modificacionNeta'),
 								DB::raw('sum(cargaDatosEP01.presupuestoDevengadoModificado) AS presupuestoDevengadoModificado'),
 								DB::raw('sum(cargaDatosEP01.presupuestoComprometidoModificado) AS presupuestoComprometidoModificado'),
 								DB::raw('sum(cargaDatosEP01.presupuestoPorLiberar) AS presupuestoPorLiberar'),
