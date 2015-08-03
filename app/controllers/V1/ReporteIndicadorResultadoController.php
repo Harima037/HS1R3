@@ -247,6 +247,11 @@ class ReporteIndicadorResultadoController extends BaseController {
 						    'I12:L'.$total => '### ### ### ##0.00',
 						    'O14:O'.$total => '### ### ### ##0'
 						));
+
+						$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','A1');
+						$imagen->setWorksheet($sheet);
+						$imagen = $this->obtenerImagen('LogoInstitucional.png','N1',10);
+						$imagen->setWorksheet($sheet);
 				    });
 					
 					$ultima_linea = $excel->getActiveSheet()->getHighestDataRow();
@@ -265,11 +270,42 @@ class ReporteIndicadorResultadoController extends BaseController {
 					$excel->getActiveSheet()->setCellValue('J12','=SUM('.rtrim($suma_j,',').')');
 					$excel->getActiveSheet()->setCellValue('K12','=SUM('.rtrim($suma_k,',').')');
 					$excel->getActiveSheet()->setCellValue('L12','=SUM('.rtrim($suma_l,',').')');
+
+					$excel->getActiveSheet()->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(1,10);
+
+					$excel->getActiveSheet()->getHeaderFooter()->setOddHeader('&RPágina &P / &N');
+					$excel->getActiveSheet()->getHeaderFooter()->setEvenHeader('&RPágina &P / &N');
+
+					$excel->getActiveSheet()->getPageSetup()->setPaperSize(\PHPExcel_Worksheet_PageSetup::PAPERSIZE_LETTER);
+					$excel->getActiveSheet()->getPageSetup()->setOrientation(\PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
+
+					$excel->getActiveSheet()->getPageSetup()->setFitToPage(true);
+					$excel->getActiveSheet()->getPageSetup()->setFitToWidth(1);
+					$excel->getActiveSheet()->getPageSetup()->setFitToHeight(0);
+
+					$excel->getActiveSheet()->getPageMargins()->setTop(0.3543307);
+					$excel->getActiveSheet()->getPageMargins()->setBottom(0.3543307);
+
+					$excel->getActiveSheet()->getPageMargins()->setRight(0.1968504);
+					$excel->getActiveSheet()->getPageMargins()->setLeft(0.2755906);
+					
+					$excel->getActiveSheet()->getPageMargins()->setHeader(0.9055118);
+					$excel->getActiveSheet()->getPageMargins()->setFooter(0.5118110);
 				}
 			})->download('xlsx');
 		}catch(Exception $ex){
 			return Response::json(array('data'=>'Ocurrio un error al generar el reporte.','message'=>$ex->getMessage(),'line'=>$ex->getLine()),500);
 		}
+	}
+
+	private function obtenerImagen($imagen,$celda,$offset = 10){
+		$objDrawing = new \PHPExcel_Worksheet_Drawing();
+		$objDrawing->setPath('./img/'.$imagen);// filesystem reference for the image file
+		$objDrawing->setHeight(90);// sets the image height to 36px (overriding the actual image height); 
+		$objDrawing->setWidth(180);// sets the image height to 36px (overriding the actual image height); 
+		$objDrawing->setCoordinates($celda);// pins the top-left corner of the image to cell D24
+		$objDrawing->setOffsetX($offset);// pins the top left corner of the image at an offset of 10 points horizontally to the right of the top-left corner of the cell
+		return $objDrawing;
 	}
 }
 ?>
