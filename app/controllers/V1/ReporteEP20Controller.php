@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, View, PDF;
-use Excel, CargaDatosEP01;
+use Excel, CargaDatosEP01, Directorio;
 
 class ReporteEP20Controller extends BaseController {
 
@@ -118,8 +118,16 @@ class ReporteEP20Controller extends BaseController {
 
 				$datos = array('datos'=>$rows);
 				$datos['fecha_trimestre'] = '30 de Junio del 2015';
+				$datos['firmas'] = array();
+				$titulares = Directorio::titularesActivos(array('00','01'))->get();
 
-				//return Response::json($rows,200);
+				foreach ($titulares as $titular) {
+					if($titular->claveUnidad == '00'){ //Dirección General
+						$datos['firmas']['secretario'] = $titular;
+					}elseif ($titular->claveUnidad == '01') { //Dirección de Planeación y Desarrollo
+						$datos['firmas']['dir_planeacion'] = $titular;
+					}
+				}
 
 				Excel::create('ep20', function($excel) use ( $datos ){
 					$excel->sheet('EP 20', function($sheet) use ( $datos ){
@@ -148,7 +156,7 @@ class ReporteEP20Controller extends BaseController {
 						$sheet->getStyle('A8:J10')->applyFromArray(array(
 						    'fill' => array(
 						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-						        'color' => array('rgb' => '28A659')
+						        'color' => array('rgb' => '92D050')
 						    ),
 						    'font' => array(
 						        'size'      =>  8,
@@ -165,7 +173,82 @@ class ReporteEP20Controller extends BaseController {
 						$total = count($datos['datos']);
 						$sheet->getStyle('A12:J'.($total+11))->getAlignment()->setWrapText(true);
 						$sheet->setColumnFormat(array( 'B12:J'.($total+15) => '### ### ### ##0.00' ));
+
+						$sheet->getStyle('D'.($total+15))->applyFromArray(array(
+						    'borders' => array(
+						    	'bottom' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_DOUBLE,
+	            					'color' => array('argb' => '000000')
+						    	)
+						    )
+						));
+
+						$sheet->getStyle('J'.($total+15))->applyFromArray(array(
+						    'borders' => array(
+						    	'bottom' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_DOUBLE,
+	            					'color' => array('argb' => '000000')
+						    	)
+						    )
+						));
+
+						$sheet->getStyle('A'.($total+16).':J'.($total+16).'')->applyFromArray(array(
+						    'borders' => array(
+						    	'bottom' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
+	            					'color' => array('argb' => '000000')
+						    	)
+						    )
+						));
+
+						$linea_firmas = $total+19;
+
+						$sheet->getStyle('B'.($linea_firmas-1).':D'.($linea_firmas-1).'')->applyFromArray(array(
+						    'borders' => array(
+						    	'bottom' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,'color' => array('argb' => '000000')
+						    	)
+						    )
+						));
+
+						$sheet->getStyle('G'.($linea_firmas-1).':I'.($linea_firmas-1).'')->applyFromArray(array(
+						    'borders' => array(
+						    	'bottom' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,'color' => array('argb' => '000000')
+						    	)
+						    )
+						));
+
+						$sheet->mergeCells('B'.$linea_firmas.':D'.$linea_firmas.'');
+						$sheet->mergeCells('B'.($linea_firmas+1).':D'.($linea_firmas+1).'');
+						$sheet->mergeCells('G'.$linea_firmas.':I'.$linea_firmas.'');
+						$sheet->mergeCells('G'.($linea_firmas+1).':I'.($linea_firmas+1).'');
+						$sheet->cells('A'.$linea_firmas.':J'.($linea_firmas+1),function($cells) { 
+							$cells->setAlignment('center'); 
+						});
+
+						$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','A1');
+						$imagen->setWorksheet($sheet);
+						$imagen = $this->obtenerImagen('LogoInstitucional.png','J1',(-15));
+						$imagen->setWorksheet($sheet);
+
 					});
+					$ultima_linea = $excel->getActiveSheet()->getHighestDataRow();
+					$excel->getActiveSheet()->getStyle('A1:J'.$ultima_linea)->applyFromArray(
+						array( 'font' => array( 'name'=> 'Arial' ) )
+					);
+
+					$excel->getActiveSheet()->getPageSetup()->setPaperSize(\PHPExcel_Worksheet_PageSetup::PAPERSIZE_LETTER);
+					$excel->getActiveSheet()->getPageSetup()->setOrientation(\PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
+
+					$excel->getActiveSheet()->getPageSetup()->setHorizontalCentered(true);
+
+					$excel->getActiveSheet()->getPageMargins()->setTop(0.3543307);
+					$excel->getActiveSheet()->getPageMargins()->setRight(0);
+					$excel->getActiveSheet()->getPageMargins()->setLeft(0.1968504);
+					$excel->getActiveSheet()->getPageMargins()->setBottom(0.3543307);
+					$excel->getActiveSheet()->getPageMargins()->setHeader(0.3149606);
+					$excel->getActiveSheet()->getPageMargins()->setFooter(0.3149606);
 				})->export('xlsx');
 			}
 		}catch(Exception $ex){
@@ -173,125 +256,14 @@ class ReporteEP20Controller extends BaseController {
 		}
 	}
 
-	function obtenerWord($datos){
-		$phpWord = new \PhpOffice\PhpWord\PhpWord();
-
-		$phpWord->setDefaultFontName('Arial');
-		$phpWord->setDefaultFontSize(12);
-		$phpWord->setDefaultParagraphStyle(
-		    array(
-		        'align'      => 'both',
-		        'spaceAfter' => \PhpOffice\PhpWord\Shared\Converter::pointToTwip(0),
-		        'spacing'    => 0,
-		    )
-		);
-
-		$titulo = array('bold' => true);
-		$texto = array('bold' => false);
-		$centrado = array('align' => 'center');
-		$justificado = array('align' => 'justify');
-
-		$infoStyle = array('borderColor'=>'000000', 'borderSize'=>6);
-		$claveStyle = array('borderColor'=>'000000','borderSize'=>6,'borderTopColor'=>'FFFFFF','cellMargin'=>200,'cellMarginTop'=>0);
-		$headerStyle = array('borderColor'=>'FFFFFF','borderSize'=>0);
-
-		$phpWord->addTableStyle('TablaInfo', $infoStyle);
-		$phpWord->addTableStyle('TablaClave',$claveStyle);
-		$phpWord->addTableStyle('TablaEncabezado',$headerStyle);
-
-		$phpWord->addTitleStyle(1, $titulo, $justificado);
-		$phpWord->addTitleStyle(2, $titulo, $justificado);
-		$phpWord->addTitleStyle(3, $titulo, $justificado);
-		$phpWord->addTitleStyle(4, $titulo, $justificado);
-	    // Every element you want to append to the word document is placed in a section.
-	    // To create a basic section:
-	    $section = $phpWord->addSection(array('orientation'=>'landscape','size'=>'letter'));
-
-		$header = $section->addHeader();
-		$table = $header->addTable('TablaEncabezado');
-		$row = $table->addRow();
-		$row->addCell(3000)->addImage('img/EscudoGobiernoChiapas.png');
-		$cell = $row->addCell(8128);
-		$cell->addText(htmlspecialchars('GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS'),$titulo,$centrado);
-		$cell->addTextBreak(0);
-		$cell->addText(htmlspecialchars('SECRETARÍA DE SALUD'),$titulo,$centrado);
-		$cell->addTextBreak();
-		//$cell->addText(htmlspecialchars('ANÁLISIS FUNCIONAL AL '.$trimestres[$trimestre].' TRIMESTRE DEL '.date('Y')),$titulo,$centrado);
-		$row->addCell(3000)->addImage('img/LogoInstitucional.png');
-		$header->addTextBreak();
-
-		$footer = $section->addFooter();
-		$footer->addPreserveText(htmlspecialchars('Página {PAGE} de {NUMPAGES}.'), null,array('align' => 'right'));
-
-		$section->addPageBreak();
-		foreach ($datos['datos'] as $proyecto) {
-			
-			$section->addText(htmlspecialchars($proyecto['programaPresupuestarioDescipcion']));
-			$section->addTextBreak();
-			$section->addText(htmlspecialchars($proyecto['idClasificacionProyecto']));
-			$section->addTextBreak();
-			$section->addText(htmlspecialchars($proyecto['nombreTecnico']));
-			$section->addTextBreak();
-			$section->addText(htmlspecialchars($proyecto['ClavePresupuestaria']));
-			$section->addTextBreak();
-			$section->addText(htmlspecialchars($proyecto['finalidadProyecto']));
-			$section->addTextBreak();
-
-			$section->addPageBreak();
-			/*
-			if($clasificacion_anterior != $elemento->idClasificacionProyecto){
-				$section->addText(htmlspecialchars('OBJETIVOS Y PRINCIPALES COMENTARIOS DE LOS PROYECTOS INMERSOS EN ESTA SUBFUNCIÓN'),$titulo);
-				$section->addTextBreak();
-				if($elemento->idClasificacionProyecto == 1){
-					$section->addTitle(htmlspecialchars('PROYECTOS INSTITUCIONALES'),3);
-				}else{
-					$section->addTitle(htmlspecialchars('PROYECTOS DE INVERSIÓN'),3);
-				}
-				$section->addTextBreak();
-				$clasificacion_anterior = $elemento->idClasificacionProyecto;
-			}
-
-			$section->addTitle(htmlspecialchars('Proyecto: '.$elemento->nombreTecnico.' ('.$elemento->unidadResponsableDescipcion.')'),4);
-			$section->addTextBreak();
-
-			$table = $section->addTable('TablaInfo');
-
-			$row = $table->addRow();
-			$row->addCell(3000)->addText('EJE',$titulo,$centrado);
-			$row->addCell(3000)->addText('TEMA',$titulo,$centrado);
-			$row->addCell(3065)->addText('POLÍTICA PÚBLICA',$titulo,$centrado);
-			$row->addCell(5060)->addText('PROGRAMA PRESUPUESTARIO',$titulo,$centrado);
-
-			$row = $table->addRow();
-			$row->addCell(2500)->addText($elemento->ejeDescripcion);
-			$row->addCell(2500)->addText($elemento->temaDescripcion);
-			$row->addCell(4065)->addText($elemento->politicaPublicaDescripcion);
-			$row->addCell(5060)->addText($elemento->programaPresupuestarioDescipcion);
-			$section->addTextBreak();
-
-			if($elemento->totalMetas > 0){
-				if($elemento->cuentaPublica){
-					$section->addText(htmlspecialchars($elemento->cuentaPublica),$texto,$justificado);
-				}else{
-					$section->addText(htmlspecialchars('No presentaron avances.'),$texto,$justificado);
-				}
-			}else{
-				if($elemento->cuentaPublica){
-					$section->addText(htmlspecialchars($elemento->cuentaPublica),$texto,$justificado);
-				}else{
-					$section->addText(htmlspecialchars('No hay metas programadas para este trimestre.'),$texto,$justificado);
-				}
-			}
-			$section->addTextBreak();
-			*/
-		}
-
-		header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-	    header("Content-Description: File Transfer");
-		header('Content-Disposition: attachment; filename="CedulasAvance.docx"');
-	    
-	    $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
-	    $objWriter->save('php://output');
+	private function obtenerImagen($imagen,$celda,$offset = 10){
+		$objDrawing = new \PHPExcel_Worksheet_Drawing();
+		$objDrawing->setPath('./img/'.$imagen);// filesystem reference for the image file
+		$objDrawing->setHeight(90);// sets the image height to 36px (overriding the actual image height); 
+		$objDrawing->setWidth(180);// sets the image height to 36px (overriding the actual image height); 
+		$objDrawing->setCoordinates($celda);// pins the top-left corner of the image to cell D24
+		$objDrawing->setOffsetX($offset);// pins the top left corner of the image at an offset of 10 points horizontally to the right of the top-left corner of the cell
+		return $objDrawing;
 	}
 }
 ?>
