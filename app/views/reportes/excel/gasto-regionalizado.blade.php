@@ -6,7 +6,7 @@
 <body>
 	<table>
 
-		<tr><td width="36"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="20"></td><td width="20"></td><td width="20"></td></tr>
+		<tr><td width="38"></td><td width="21"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="12"></td><td width="22"></td><td width="22"></td><td width="22"></td></tr>
 
 		<tr>
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
@@ -19,7 +19,7 @@
 		
 
 		<tr>			
-			<td>2112 064 0 INSTITUTO DE SALUD</td><td></td><td></td>
+			<td></td><td></td><td>2112 064 0 INSTITUTO DE SALUD</td>
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
                	
@@ -124,11 +124,6 @@
             <td>{{{ $filaEP01['presupuestoDevengado'] }}}</td><td>{{{ $filaEP01['presupuestoAprobado'] }}}</td><td>{{{ $filaEP01['presupuestoModificado'] }}}</td>
 		</tr>
         @endforeach
-        <tr>
-			<td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-            <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-            <td></td><td></td><td></td><td></td><td></td><td></td>
-		</tr>
         <tr>
 			<td>SUMA TOTAL</td><td>{{$totalEstatal}}</td><td>{{$totalRegional['1']}}</td><td>{{$totalRegional['2']}}</td><td>{{$totalRegional['3']}}</td><td>{{$totalRegional['4']}}</td><td>{{$totalRegional['5']}}</td>
             <td>{{$totalRegional['6']}}</td><td>{{$totalRegional['7']}}</td><td>{{$totalRegional['8']}}</td><td>{{$totalRegional['9']}}</td><td>{{$totalRegional['10']}}</td><td>{{$totalRegional['11']}}</td><td>{{$totalRegional['12']}}</td>

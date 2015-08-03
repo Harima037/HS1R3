@@ -133,7 +133,7 @@ class ReporteGastoRegionalizadoController extends BaseController {
 					$sheet->setStyle(array(
 					    'font' => array(
 					        'name'      =>  'Arial',
-					        'size'      =>  8
+					        'size'      =>  10
 					    )
 					));
 
@@ -166,7 +166,7 @@ class ReporteGastoRegionalizadoController extends BaseController {
 					        'color' => array('rgb' => 'DDDDDD')
 					    ),
 					    'font' => array(
-					        'size'      =>  8,
+					        'size'      =>  12,
 					        'bold'      =>  true,
 					        'color'		=> array('rgb'=>'000000')
 					    ),
@@ -178,9 +178,16 @@ class ReporteGastoRegionalizadoController extends BaseController {
 					    )
 					));
 						
-					$sheet->getStyle('A5')->applyFromArray(array(						    
+					$sheet->getStyle('C5')->applyFromArray(array(						    
 					    'font' => array(
-					        'size'      =>  8,
+					        'size'      =>  12,
+					        'bold'      =>  true
+					    )
+					));
+					
+					$sheet->getStyle('B9:Q9')->applyFromArray(array(						    
+					    'font' => array(
+					        'size'      =>  14,
 					        'bold'      =>  true
 					    )
 					));
@@ -191,14 +198,14 @@ class ReporteGastoRegionalizadoController extends BaseController {
 					        'color' => array('rgb' => '28A659')
 					    ),
 					    'font' => array(
-					        'size'      =>  8,
+					        'size'      =>  12,
 					        'bold'      =>  true,
 					        'color'		=> array('rgb'=>'FFFFFF')
 					    )
 					));
 					$sheet->getStyle('A12:T12')->applyFromArray(array(
 						'font' => array(
-							'size'      =>  8,
+							'size'      =>  10,
 						    'bold'      =>  true,
 						),
 						'borders' => array(
@@ -220,12 +227,15 @@ class ReporteGastoRegionalizadoController extends BaseController {
 					
 					$sheet->getStyle('A13:A'.$total)->applyFromArray(array(
 						'font' => array(
-							'size'      =>  8,
+							'size'      =>  10,
 						    'bold'      =>  true,
+						),
+						'alignment' => array(
+							'horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_JUSTIFY,
 						)
 					));
 					
-					for($c = 13 ; $c<= $total; $c++)
+					/*for($c = 13 ; $c<= $total; $c++)
 					{
 						$sheet->getStyle('A'.$c.':T'.$c)->applyFromArray(array(
 							'borders' => array(
@@ -235,12 +245,12 @@ class ReporteGastoRegionalizadoController extends BaseController {
 						    	)
 							 )
 						));
-					}
+					}*/
 					
 					for($i='A'; $i<'V'; $i++)
 					{
 						$sheet->getStyle($i.'13:'.$i.$total)->applyFromArray(array(
-								'font' => array( 'size' => 8),
+								'font' => array( 'size' => 10),
 							    'borders' => array(
 							    	'left' => array(
 							    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
@@ -257,19 +267,26 @@ class ReporteGastoRegionalizadoController extends BaseController {
 						'B12:T12' => '### ### ### ##0.00'
 					));
 					
-					$filatotales = $total+2;
+					$filatotales = $total+1;
 					
 					$sheet->setColumnFormat(array(
 						'B'.$filatotales.':T'.$filatotales => '### ### ### ##0.00'
 					));
 					
 					$sheet->getStyle('A'.$filatotales.':T'.$filatotales)->applyFromArray(array(
+						'font' => array(
+							'size'      =>  10,
+						    'bold'      =>  true,
+						)
+					));
+					
+					/*$sheet->getStyle('A'.$filatotales.':T'.$filatotales)->applyFromArray(array(
 						'fill' => array(
 					        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
 				    	    'color' => array('rgb' => 'DDDDDD')
 					    )
 					));
-					
+					*/
 					
 					
 					
