@@ -195,7 +195,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 						));
 						$sheet->getStyle('A11:O11')->applyFromArray(array(
 						    'font' => array(
-						        'size'      =>  12,
+						        'size'      =>  13,
 						        'bold'      =>  true
 						    ),
 						    'borders' => array(
@@ -211,7 +211,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 						        'color' => array('rgb' => 'DDDDDD')
 						    ),
 						    'font' => array(
-						        'size'      =>  11,
+						        'size'      =>  12,
 						        'bold'      =>  true,
 						        'color'		=> array('rgb'=>'000000')
 						    ),

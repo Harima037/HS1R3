@@ -130,7 +130,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('indicadores-resultados',array('uses'=>'IndicadorResultadoController@index'));
 		Route::get('gasto-regionalizado',array('uses'=>'GastoRegionalizadoController@index'));
 		Route::get('variaciones-gasto-pub',array('uses'=>'VariacionesGastoController@index'));
-
+		Route::get('estado-programatico-funcional',array('uses'=>'ReporteEP20Controller@index'));
 	});
 
 	Route::group(array('prefix'=>"v1"),function(){
@@ -172,6 +172,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('rep-indicadores-resultados',	'V1\ReporteIndicadorResultadoController',array('only'=>array('index')));
 		Route::resource('gasto-regionalizado',			'V1\ReporteGastoRegionalizadoController',array('only'=>array('index')));
 		Route::resource('variaciones-gasto-pub',		'V1\ReporteVariacionesGastoController');
+		Route::resource('estado-programatico-funcional','V1\ReporteEP20Controller',array('only'=>array('index')));
 
 		Route::resource('reporte-seguimiento',	'V1\ReporteSeguimientoController', array('only' => array('index')));
 		Route::resource('revision-proyectos',	'V1\RevisionController');

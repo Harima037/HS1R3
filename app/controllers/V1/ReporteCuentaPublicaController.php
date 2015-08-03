@@ -45,6 +45,7 @@ class ReporteCuentaPublicaController extends BaseController {
 		$trimestre = Util::obtenerTrimestre();
 
 		$titulo = array('bold' => true);
+		$titulo_tabla = array('bold' => true, 'size'=>10);
 		$texto = array('bold' => false);
 		$centrado = array('align' => 'center');
 		$justificado = array('align' => 'justify');
@@ -61,9 +62,16 @@ class ReporteCuentaPublicaController extends BaseController {
 		$phpWord->addTitleStyle(2, $titulo, $justificado);
 		$phpWord->addTitleStyle(3, $titulo, $justificado);
 		$phpWord->addTitleStyle(4, $titulo, $justificado);
+
 	    // Every element you want to append to the word document is placed in a section.
 	    // To create a basic section:
 	    $section = $phpWord->addSection(array('orientation'=>'landscape','size'=>'letter'));
+	    $sectionStyle = $section->getStyle();
+		$sectionStyle->setMarginLeft(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(3));
+		$sectionStyle->setMarginRight(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(2.19));
+		$sectionStyle->setMarginTop(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(4.33));
+		$sectionStyle->setMarginBottom(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(3));
+
 
 	    $variables = SysConfiguracionVariable::obtenerVariables(array('clave-institucional','mision','vision'))->lists('valor','variable');
 
@@ -76,13 +84,13 @@ class ReporteCuentaPublicaController extends BaseController {
 		$cell->addText(htmlspecialchars('GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS'),$titulo,$centrado);
 		$cell->addTextBreak(0);
 		$cell->addText(htmlspecialchars('SECRETARÍA DE SALUD'),$titulo,$centrado);
-		$cell->addTextBreak();
+		$cell->addTextBreak(0);
 		$cell->addText(htmlspecialchars('ANÁLISIS FUNCIONAL AL '.$trimestres[$trimestre].' TRIMESTRE DEL '.date('Y')),$titulo,$centrado);
 		$row->addCell(3000)->addImage('img/LogoInstitucional.png');
 		
 		$table = $header->addTable('TablaClave');
 		$row = $table->addRow();
-		$row->addCell(4500)->addText(htmlspecialchars($variables['clave-institucional']));
+		$row->addCell(2250)->addText(htmlspecialchars($variables['clave-institucional']));
 
 		$header->addTextBreak();
 
@@ -134,9 +142,9 @@ class ReporteCuentaPublicaController extends BaseController {
 				$section->addText(htmlspecialchars('OBJETIVOS Y PRINCIPALES COMENTARIOS DE LOS PROYECTOS INMERSOS EN ESTA SUBFUNCIÓN'),$titulo);
 				$section->addTextBreak();
 				if($elemento->idClasificacionProyecto == 1){
-					$section->addTitle(htmlspecialchars('PROYECTOS INSTITUCIONALES'),3);
+					$section->addTitle(htmlspecialchars('PROYECTOS INSTITUCIONALES:'),3);
 				}else{
-					$section->addTitle(htmlspecialchars('PROYECTOS DE INVERSIÓN'),3);
+					$section->addTitle(htmlspecialchars('PROYECTOS DE INVERSIÓN:'),3);
 				}
 				$section->addTextBreak();
 				$clasificacion_anterior = $elemento->idClasificacionProyecto;
@@ -149,10 +157,10 @@ class ReporteCuentaPublicaController extends BaseController {
 				$table = $section->addTable('TablaInfo');
 
 				$row = $table->addRow();
-				$row->addCell(3000)->addText('EJE',$titulo,$centrado);
-				$row->addCell(3000)->addText('TEMA',$titulo,$centrado);
-				$row->addCell(3065)->addText('POLÍTICA PÚBLICA',$titulo,$centrado);
-				$row->addCell(5060)->addText('PROGRAMA PRESUPUESTARIO',$titulo,$centrado);
+				$row->addCell(3000)->addText('EJE',$titulo_tabla,$centrado);
+				$row->addCell(3000)->addText('TEMA',$titulo_tabla,$centrado);
+				$row->addCell(3065)->addText('POLÍTICA PÚBLICA',$titulo_tabla,$centrado);
+				$row->addCell(5060)->addText('PROGRAMA PRESUPUESTARIO',$titulo_tabla,$centrado);
 
 				$row = $table->addRow();
 				$row->addCell(2500)->addText($elemento->ejeDescripcion);

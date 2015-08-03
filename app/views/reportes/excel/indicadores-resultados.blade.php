@@ -21,7 +21,7 @@
 
 		<tr>
 			<td></td><td></td>
-			<td><b>Organismo Público:</b> Instituto de Salud</td>
+			<td><span style="font-weight:bold;">Organismo Público:</span> Instituto de Salud</td>
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 
@@ -101,7 +101,7 @@
 		<tr>
 		<!-- {{ $current_row++; }} -->
 			<td></td><td></td>
-			<td align="center" valign="top" style="text-decoration:underline; font-size:9;">{{$fuente['titulo']}}</td>
+			<td align="center" valign="top" style="text-decoration:underline; font-size:11;">{{$fuente['titulo']}}</td>
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		
@@ -113,7 +113,7 @@
 				<!-- {{ $sum_rows[] = $current_row; }} -->
 			</td>
 			<td></td>
-			<td align="center" style="font-weight:bold;">{{{ $proyecto->nombreTecnico }}}</td>
+			<td align="center" style="font-weight:bold;text-align:justify;">{{{ rtrim($proyecto->nombreTecnico,'.') }}}</td>
 			<td></td><td></td><td></td><td></td><td></td><td></td>
 			<td valign="top" {{$estilo_fuente = (count($proyecto->fuentesFinanciamiento) > 1)?'style="font-weight:bold; text-decoration:underline;"':''}} >
 			{{ (count($proyecto->fuentesFinanciamiento) > 1)?'=SUM(J'.($current_row+1).':J'.($current_row+count($proyecto->fuentesFinanciamiento)).')':$proyecto->totalPresupuestoAprobado}}
@@ -167,7 +167,7 @@
 				<td></td><td></td>
 				
 			@if(isset($proyecto->componentes[$i]))
-				<td valign="top">{{{ $proyecto->componentes[$i]->indicador }}}</td>
+				<td valign="top" style="text-align:justify;">{{{ rtrim($proyecto->componentes[$i]->indicador,'.') }}}</td>
 				<td valign="top" align="center">{{{ $proyecto->componentes[$i]->unidadMedida }}}</td>
 				<td valign="top">{{{ $proyecto->componentes[$i]->metaAnual }}}</td>
 				<td valign="top">{{{ $proyecto->componentes[$i]->metaAnual }}}</td>
@@ -182,7 +182,9 @@
 				{{'=SUM(G'.$current_row.')/F'.$current_row.'*100'}}
 				</td>
 			@elseif(isset($proyecto->actividades[$i-$proyecto->desfaseActividades]))
-				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->indicador }}}</td>
+				<td valign="top" style="text-align:justify;">
+				{{{ rtrim($proyecto->actividades[$i-$proyecto->desfaseActividades]->indicador,'.') }}}
+				</td>
 				<td valign="top" align="center">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->unidadMedida }}}</td>
 				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->metaAnual }}}</td>
 				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->metaAnual }}}</td>
