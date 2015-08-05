@@ -500,7 +500,7 @@ class Proyecto extends BaseModel
 			->leftjoin('catalogoFuncionesGasto AS funcionGasto','funcionGasto.clave','=',DB::raw('concat_ws(".",proyectos.finalidad,proyectos.funcion)'))
 
 			->leftjoin('catalogoFuncionesGasto AS subFuncionGasto','subFuncionGasto.clave','=',DB::raw('concat_ws(".",proyectos.finalidad,proyectos.funcion,proyectos.subFuncion,proyectos.subSubFuncion)'))
-
+			
 			->leftjoin('componenteMetasMes AS componenteMetas',function($join)use($mes){
 				$join->on('componenteMetas.idProyecto','=','proyectos.id')
 					->where('componenteMetas.mes','<=',$mes)

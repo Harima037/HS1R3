@@ -118,7 +118,21 @@ class ReporteCuentaPublicaController extends BaseController {
 			$mes = date('n') - 1;
 		}
 
-		$rows = Proyecto::reporteCuentaPublica($mes,date('Y'))->get();
+		$rows = Proyecto::reporteCuentaPublica($mes,date('Y'));
+
+		$rows = $rows->with(array(
+		'componentesMetasMes'=>function($query){
+			$query->select('componenteMetasMes.id','componenteMetasMes.idProyecto',DB::raw('min(componenteMetasMes.mes) AS mes'))
+				->whereNull('componenteMetasMes.borradoAl')
+				->groupBy('componenteMetasMes.idProyecto');
+		},
+		'actividadesMetasMes'=>function($query){
+			$query->select('actividadMetasMes.id','actividadMetasMes.idProyecto',DB::raw('min(actividadMetasMes.mes) AS mes'))
+				->whereNull('actividadMetasMes.borradoAl')
+				->groupBy('actividadMetasMes.idProyecto');
+		}
+		))->get();
+		//return Response::json($rows,200);
 		//var_dump($rows->toArray());die;
 		//$queries = DB::getQueryLog();
 		//var_dump(end($queries));die;
@@ -184,7 +198,14 @@ class ReporteCuentaPublicaController extends BaseController {
 				if($elemento->cuentaPublica){
 					$section->addText(htmlspecialchars(trim($elemento->cuentaPublica)),$texto,$justificado);
 				}else{
-					$section->addText(htmlspecialchars('No hay metas programadas para este trimestre.'),$texto,$justificado);
+					$mes_programado = 0;
+					if($elemento->componentesMetasMes[0]->mes < $elemento->actividadesMetasMes[0]->mes){
+						$mes_programado = $elemento->componentesMetasMes[0]->mes;
+					}else{
+						$mes_programado = $elemento->actividadesMetasMes[0]->mes;
+					}
+					$trimestre_programado = Util::obtenerTrimestre($mes_programado);
+					$section->addText(htmlspecialchars('Las acciones de este proyecto se encuentran programadas al '.$trimestre_programado.' trimestre.'),$texto,$justificado);
 				}
 			}
 			$section->addTextBreak();
