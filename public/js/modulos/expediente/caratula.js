@@ -923,9 +923,9 @@ function guardar_datos_componente(cerrar){
 					$(modal_componente).modal('hide');
 				}else{
 					$('#tablink-componente-actividades').tab('show');
+					actualizar_metas('componente',response.metas);
 				}
 				actualizar_grid_componentes(response.componentes);
-				actualizar_metas('componente',response.metas);
 	        },
 	        _error: function(response){
 	            try{
@@ -953,9 +953,9 @@ function guardar_datos_componente(cerrar){
 					$('#tablink-componente-actividades').attr('data-toggle','tab');
 					$('#tablink-componente-actividades').parent().removeClass('disabled');
 					$('#tablink-componente-actividades').tab('show');
+					actualizar_metas('componente',response.metas);
 				}
 				actualizar_grid_componentes(response.componentes);
-				actualizar_metas('componente',response.metas);
 	        },
 	        _error: function(response){
 	            try{
@@ -1198,7 +1198,7 @@ function actualizar_grid_actividades(datos){
 		actividades.push(actividad);
 	}
 
-	$('#conteo-actividades').text(' ' + actividades.length + ' / 5 ');
+	$('#conteo-actividades').text(' ' + actividades.length + ' ');
 
 	if(actividades.length == 0){
 		$(grid_actividades + ' > table > tbody').html('<tr><td colspan="6" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
@@ -1291,8 +1291,7 @@ function reset_modal_form(formulario){
     	$(form_componente + ' .metas-mes').attr('data-meta-id','');
     	$(modal_componente + ' .alert').remove();
     	$('#id-componente').val('');
-    	//$(grid_actividades + ' > table > tbody').empty();
-    	$('#conteo-actividades').text(' 0 / 5 ');
+    	$('#conteo-actividades').text(' 0 ');
     	$(grid_actividades + ' > table > tbody').html('<tr><td colspan="6" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
     }else if(formulario == form_actividad){
     	$(form_actividad + ' .metas-mes').attr('data-meta-id','');

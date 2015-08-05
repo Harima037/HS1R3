@@ -418,11 +418,12 @@ context.mostrar_datos_actividad = function(datos){
         var trimestre = 0;
         for(var i in datos.metas_mes){
             var meta = datos.metas_mes[i];
-
+            var meta_valor = parseFloat(meta.meta);
             trimestre = Math.ceil(meta.mes/3);
-            suma_trimestre[trimestre] += meta.meta;
-            suma += meta.meta;
-            $('#mes-actividad-' + meta.claveJurisdiccion + '-' + meta.mes).val(meta.meta);
+
+            suma_trimestre[trimestre] += meta_valor;
+            suma += meta_valor;
+            $('#mes-actividad-' + meta.claveJurisdiccion + '-' + meta.mes).val(meta_valor);
             $('#mes-actividad-' + meta.claveJurisdiccion + '-' + meta.mes).attr('data-meta-id',meta.id);
         }
         for(var i in suma_trimestre){
@@ -430,7 +431,7 @@ context.mostrar_datos_actividad = function(datos){
             $('#trim'+i+'-actividad-lbl').text(suma_trimestre[i]);
         }
         $('#numerador-actividad').val(suma);
-        $('#numerador-actividad-lbl').text(suma);
+        $('#numerador-actividad-lbl').text(suma.format(2));
         ejecutar_formula('actividad');
     }
 
@@ -850,7 +851,7 @@ function llenar_datagrid_actividades(datos){
         actividades.push(actividad);
     }
 
-    $('#conteo-actividades').text(' ' + actividades.length + ' / 5 ');
+    $('#conteo-actividades').text(' ' + actividades.length + ' ');
 
     if(actividades.length == 0){
         $('#datagridActividades > table > tbody').html('<tr><td colspan="6" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
@@ -1132,22 +1133,22 @@ function actualizar_eventos_metas(identificador){
 
         for(var i = mes_inicio; i <= mes_fin; i++) {
             $('.metas-mes[data-meta-mes="' + i + '"][data-meta-identificador="' + identificador + '"]').each(function(){
-                suma += parseInt($(this).val()) || 0;
+                suma += parseFloat($(this).val()) || 0;
             });
         }
         
         $('#trim'+trimestre+'-'+identificador).val(suma);
         $('#trim'+trimestre+'-'+identificador+'-lbl').text(suma);
 
-        var trim1 = parseInt($('#trim1-'+identificador).val()) || 0;
-        var trim2 = parseInt($('#trim2-'+identificador).val()) || 0;
-        var trim3 = parseInt($('#trim3-'+identificador).val()) || 0;
-        var trim4 = parseInt($('#trim4-'+identificador).val()) || 0;
+        var trim1 = parseFloat($('#trim1-'+identificador).val()) || 0;
+        var trim2 = parseFloat($('#trim2-'+identificador).val()) || 0;
+        var trim3 = parseFloat($('#trim3-'+identificador).val()) || 0;
+        var trim4 = parseFloat($('#trim4-'+identificador).val()) || 0;
 
         suma = trim1 + trim2 + trim3 + trim4;
 
         $('#numerador-'+identificador).val(suma);
-        $('#numerador-'+identificador+'-lbl').text(suma);
+        $('#numerador-'+identificador+'-lbl').text(suma.format(2));
         ejecutar_formula(identificador);
     });
 }

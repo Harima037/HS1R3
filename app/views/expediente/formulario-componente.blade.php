@@ -26,7 +26,7 @@
         @if(isset($lista_actividades))
         <li role="presentation" class="pull-right disabled">
             <a id="tablink-{{$identificador}}-actividades" href="#actividades_{{$identificador}}" role="tab" >
-                <span class="fa fa-thumb-tack"></span> Actividades <span id="conteo-actividades" class="badge">0 / 5</span>
+                <span class="fa fa-thumb-tack"></span> Actividades <span id="conteo-actividades" class="badge">0</span>
             </a>
         </li>
         @endif
