@@ -154,13 +154,14 @@ class Proyecto extends BaseModel
 
 	public function scopeReporteIndicadoresResultados($query,$mes,$ejercicio){
 		$query->select(
-				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
+				'proyectos.id', DB::raw('UPPER(proyectos.nombreTecnico) As nombreTecnico'), 'proyectos.idClasificacionProyecto',
 				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
 				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
 				'proyectos.programaPresupuestario','proyectos.programaEspecial',
 				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
 				'proyectos.numeroProyectoEstrategico','subFuncionGasto.clave AS subFuncionClave',
-				'subFuncionGasto.descripcion AS subFuncionDescripcion','municipios.nombre AS municipio','proyectos.idCobertura',
+				DB::raw('UPPER(subFuncionGasto.descripcion) AS subFuncionDescripcion'),'municipios.nombre AS municipio',
+				'proyectos.idCobertura',
 				DB::raw('0 AS totalPresupuestoAprobado'),DB::raw('0 AS totalPresupuestoModificado'),
 				DB::raw('0 AS totalPresupuestoDevengado')
 			)

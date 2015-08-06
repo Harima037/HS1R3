@@ -64,11 +64,11 @@ class ReporteGastoRegionalizadoController extends BaseController {
 			$datos['fila'] = array();
 			$arreglo = array();	
 			$cuantos = 0;	
-			$totalEstatal = 0;
-			$totalRegional = array_fill(1, 15, 0);
-			$datos['totalTotalDevengado'] = 0;
-			$datos['totalTotalAprobado'] = 0;
-			$datos['totalTotalModificado'] = 0;
+			//$totalEstatal = 0;
+			//$totalRegional = array_fill(1, 15, 0);
+			//$datos['totalTotalDevengado'] = 0;
+			//$datos['totalTotalAprobado'] = 0;
+			//$datos['totalTotalModificado'] = 0;
 													
 			foreach ($rows as $row) {
 				$importeEstatal = 0;
@@ -78,7 +78,7 @@ class ReporteGastoRegionalizadoController extends BaseController {
 					if($row['PP']==$row2['PP'])
 					{
 						$importeEstatal = $row2['ImporteEstatal'];
-						$totalEstatal+=$importeEstatal;
+						//$totalEstatal+=$importeEstatal;
 					}
 				for($i=1; $i<=15; $i++)
 				{
@@ -88,14 +88,14 @@ class ReporteGastoRegionalizadoController extends BaseController {
 						if($row['PP']==$auxiliar['PP'])
 						{
 							$arrayRegion[$i] = $auxiliar['importe'];
-							$totalRegional[$i]+=$arrayRegion[$i];
+							//$totalRegional[$i]+=$arrayRegion[$i];
 						}
 					}
 				}
 				
-				$datos['totalTotalDevengado'] += $row['PresDevengado'];
-				$datos['totalTotalAprobado'] += $row['PresAprobado'];
-				$datos['totalTotalModificado'] += $row['PresModificado'];
+				//$datos['totalTotalDevengado'] += $row['PresDevengado'];
+				//$datos['totalTotalAprobado'] += $row['PresAprobado'];
+				//$datos['totalTotalModificado'] += $row['PresModificado'];
 				
 				$data_row = array(					
 					'programapre'=>$row['PP'].' '.$row['nombrePrograma'],
@@ -108,25 +108,13 @@ class ReporteGastoRegionalizadoController extends BaseController {
 				$arreglo[] = $data_row;
 				$cuantos++;
 			}
-			$datos['totalEstatal'] = $totalEstatal;
-			$datos['totalRegional'] = $totalRegional;
+			//$datos['totalEstatal'] = $totalEstatal;
+			//$datos['totalRegional'] = $totalRegional;
 			
 			$datos['cuantos'] = $cuantos;
 			
 			$datos['fila'] = $arreglo;
-						
-			//var_dump($rows);die;
-			//$datos['fila']=$rows;
-							
-			/*foreach ($rows as $row) {
-				$datos['fila']=array(
-					'' => 
-					
-				);
-			}*/
 			
-			//var_dump($datos['fila']);die;
-
 			Excel::create('gasto-regionalizado', function($excel) use ( $datos ){
 				
 				$excel->sheet('Reporte', function($sheet) use ( $datos ){
@@ -140,30 +128,27 @@ class ReporteGastoRegionalizadoController extends BaseController {
 					$sheet->loadView('reportes.excel.gasto-regionalizado',$datos);
 					$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','A1');
 					$imagen->setWorksheet($sheet);
-					$imagen = $this->obtenerImagen('LogoInstitucional.png','S1');
+					$imagen = $this->obtenerImagen('LogoInstitucional.png','T1',(-18));
 					$imagen->setWorksheet($sheet);
 					
-					$sheet->mergeCells('A2:T2');
-					$sheet->cells('A2:O4',function($cells){ $cells->setAlignment('center'); });
-					$sheet->mergeCells('A9:A10');
-					$sheet->mergeCells('B9:Q9');
-					$sheet->mergeCells('R9:R10');
-					$sheet->mergeCells('S9:S10');
-					$sheet->mergeCells('T9:T10');
-						
-					$sheet->mergeCells('A7:T7');
-					$sheet->mergeCells('A8:T8');
-											
-												
-					$sheet->cells('A7:T10',function($cells) {
+					$sheet->mergeCells('A12:A13');
+					$sheet->mergeCells('B12:Q12');
+					$sheet->mergeCells('R12:R13');
+					$sheet->mergeCells('S12:S13');
+					$sheet->mergeCells('T12:T13');
+					
+					$sheet->mergeCells('A10:T10');
+					$sheet->mergeCells('A11:T11');
+
+					$sheet->cells('A10:T13',function($cells) {
 						$cells->setAlignment('center');
 					});
 					
-					$sheet->getStyle('A9:T10')->getAlignment()->setWrapText(true);
-					$sheet->getStyle('A9:T10')->applyFromArray(array(
+					$sheet->getStyle('A12:T13')->getAlignment()->setWrapText(true);
+					$sheet->getStyle('A12:T13')->applyFromArray(array(
 					    'fill' => array(
 					        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-					        'color' => array('rgb' => 'DDDDDD')
+					        'color' => array('rgb' => 'C0C0C0')
 					    ),
 					    'font' => array(
 					        'size'      =>  12,
@@ -178,21 +163,21 @@ class ReporteGastoRegionalizadoController extends BaseController {
 					    )
 					));
 						
-					$sheet->getStyle('C5')->applyFromArray(array(						    
+					$sheet->getStyle('A8')->applyFromArray(array(						    
 					    'font' => array(
 					        'size'      =>  12,
 					        'bold'      =>  true
 					    )
 					));
 					
-					$sheet->getStyle('B9:Q9')->applyFromArray(array(						    
+					$sheet->getStyle('B12:Q12')->applyFromArray(array(						    
 					    'font' => array(
 					        'size'      =>  14,
 					        'bold'      =>  true
 					    )
 					));
 						
-					$sheet->getStyle('A7:T8')->applyFromArray(array(
+					$sheet->getStyle('A10:T11')->applyFromArray(array(
 					    'fill' => array(
 					        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
 					        'color' => array('rgb' => '28A659')
@@ -203,71 +188,72 @@ class ReporteGastoRegionalizadoController extends BaseController {
 					        'color'		=> array('rgb'=>'FFFFFF')
 					    )
 					));
-					$sheet->getStyle('A12:T12')->applyFromArray(array(
+					$sheet->getStyle('A15:T15')->applyFromArray(array(
 						'font' => array(
-							'size'      =>  10,
+							'size'      =>  11,
 						    'bold'      =>  true,
 						),
 						'borders' => array(
-						  	'top' => array(
-								'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-	            				'color' => array('argb' => '28A659')
-						    ),
-						    'bottom' => array(
-								'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-								'color' => array('argb' => '28A659')
-					    	)
-						 )
+							'bottom' => array(
+									'style' => \PHPExcel_Style_Border::BORDER_THIN,
+									'color' => array('argb' => '000000')
+						    	)
+						)
 					));
 					
-					$total = 12+$datos['cuantos'];
+					$total = 15+$datos['cuantos'];
+
+					$sheet->getStyle('A16:A'.$total)->getAlignment()->setWrapText(true);
 					
-					$sheet->getStyle('A13:A'.$total)->getAlignment()->setWrapText(true);
 					
-					
-					$sheet->getStyle('A13:A'.$total)->applyFromArray(array(
+					$sheet->getStyle('A16:A'.$total)->applyFromArray(array(
 						'font' => array(
-							'size'      =>  10,
-						    'bold'      =>  true,
+							'size'      =>  11,
+						    'bold'      =>  false,
 						),
 						'alignment' => array(
 							'horizontal' => \PHPExcel_Style_Alignment::HORIZONTAL_JUSTIFY,
 						)
 					));
-					
-					/*for($c = 13 ; $c<= $total; $c++)
+										
+					for($i='A'; $i<='T'; $i++)
 					{
-						$sheet->getStyle('A'.$c.':T'.$c)->applyFromArray(array(
+						if($i != 'A'){
+							$sheet->setCellValue($i.'15','=SUM('.$i.'16:'.$i.$total.')');
+							$sheet->setCellValue($i.($total+2),'=SUM('.$i.'16:'.$i.$total.')');
+						}
+						$sheet->getStyle($i.'15')->applyFromArray(array(
+							'font' => array( 'size' => 11),
 							'borders' => array(
-							    'bottom' => array(
-									'style' => \PHPExcel_Style_Border::BORDER_THIN,
-									'color' => array('argb' => 'FF808080')
-						    	)
-							 )
+								'left' => array(
+										'style' => \PHPExcel_Style_Border::BORDER_THIN,
+										'color' => array('argb' => '000000')
+							    ),
+							    'right' => array(
+										'style' => \PHPExcel_Style_Border::BORDER_THIN,
+										'color' => array('argb' => '000000')
+							    )
+							)
 						));
-					}*/
-					
-					for($i='A'; $i<'V'; $i++)
-					{
-						$sheet->getStyle($i.'13:'.$i.$total)->applyFromArray(array(
-								'font' => array( 'size' => 10),
+						$sheet->getStyle($i.'16:'.$i.$total)->applyFromArray(array(
+								'font' => array( 'size' => 11),
 							    'borders' => array(
-							    	'left' => array(
+							    	'allborders' => array(
 							    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
-			           					'color' => array('argb' => 'FF808080')
+			           					'color' => array('argb' => '000000')
 							    	)
 							    )
 							));
 					}
 					$sheet->setColumnFormat(array(
-						'A13:T'.$total => '### ### ### ##0.00'
+						'A16:T'.$total => '### ### ### ##0.00'
 					));
 					
 					$sheet->setColumnFormat(array(
-						'B12:T12' => '### ### ### ##0.00'
+						'B15:T15' => '### ### ### ##0.00'
 					));
 					
-					$filatotales = $total+1;
+					$filatotales = $total+2;
 					
 					$sheet->setColumnFormat(array(
 						'B'.$filatotales.':T'.$filatotales => '### ### ### ##0.00'
@@ -275,35 +261,21 @@ class ReporteGastoRegionalizadoController extends BaseController {
 					
 					$sheet->getStyle('A'.$filatotales.':T'.$filatotales)->applyFromArray(array(
 						'font' => array(
-							'size'      =>  10,
+							'size'      =>  11,
 						    'bold'      =>  true,
-						)
-					));
-					
-					/*$sheet->getStyle('A'.$filatotales.':T'.$filatotales)->applyFromArray(array(
+						),
 						'fill' => array(
 					        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-				    	    'color' => array('rgb' => 'DDDDDD')
+					        'color' => array('rgb' => 'C0C0C0')
+					    ),
+					));
+					
+					$sheet->getStyle('A'.($filatotales+2).':T'.($filatotales+2))->applyFromArray(array(
+						'fill' => array(
+					        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
+					        'color' => array('rgb' => '28A659')
 					    )
 					));
-					*/
-					
-					
-					
-					/*for ($i='A'; $i < 'O' ; $i++) { 
-						if($i != 'H'){
-							$sheet->getStyle($i.'14:'.$i.$total)->applyFromArray(array(
-								'font' => array( 'size' => 8),
-							    'borders' => array(
-							    	'right' => array(
-							    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-			           					'color' => array('argb' => '002060')
-							    	)
-							    )
-							));
-						}
-					}*/
-					$sheet->getStyle('A14:O'.$total)->getAlignment()->setWrapText(true);
 			    });
 
 			})->download('xlsx');
