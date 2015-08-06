@@ -58,7 +58,7 @@
         </tr>  
         <tr>
     	    <td></td><td></td>
-            <td></td><td></td>
+            <td>{{{ $totalAprobado }}}</td><td>{{{ $totalModificado }}}</td>
             <td></td><td></td>
             <td></td>
         </tr> 
@@ -101,15 +101,16 @@
             <td></td><td></td>
         </tr>
          @foreach($fila as $arrayReporte)
-        <tr>
-        	<td valign="top">{{{ $arrayReporte['nombre'] }}}</td><td></td><td></td>                       
-            <td>{{{ $arrayReporte['aprobado'] }}}</td>
-            <td>{{{ $arrayReporte['modificado'] }}}</td>
-            <td></td>
-            <td>{{{ $arrayReporte['razonesAprobado'] }}}</td>
-		</tr>
+	         @if($arrayReporte['mostrarAprobado']==1)
+	    	    <tr>
+    	    		<td valign="top">{{{ $arrayReporte['nombre'] }}}</td><td></td><td></td>                       
+        	    	<td>{{{ $arrayReporte['aprobado'] }}}</td>
+		            <td>{{{ $arrayReporte['modificado'] }}}</td>
+		            <td></td>
+        		    <td>{{{ $arrayReporte['razonesAprobado'] }}}</td>
+				</tr>
+			@endif
         @endforeach
-              
         
         <tr>
     		<td>TOTAL</td><td></td><td></td>            
