@@ -7,32 +7,33 @@
 	<table>
     
 		<tr>
-        	<td width="40"></td>
+        	<td width="15"></td>
+            <td width="15"></td>
     	    <td width="18"></td>
-	        <td width="18"></td>
-        	<td width="10"></td>
-    	    <td width="10"></td>
+	        <td width="15"></td>
+        	<td width="15"></td>
+    	    <td width="15"></td>
         	<td width="40"></td>
         </tr>
         
         <tr>
-    	    <td></td><td></td><td></td><td></td><td></td><td></td>
+    	    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
         </tr>
         <tr>
-    	    <td></td><td></td><td></td><td></td><td></td><td></td>
+    	    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
         </tr>
         <tr>
-    	    <td></td><td></td><td></td><td></td><td></td><td></td>
+    	    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
         </tr>
         <tr>
-    	    <td></td>
+    	    <td></td><td></td>
             <td>FUNCIÓN: SALUD</td><td></td><td></td><td></td><td></td>
         </tr>  
         <tr>
-    	    <td></td><td></td><td></td><td></td><td></td><td></td>
+    	    <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
         </tr>      		
         <tr>
-    	    <td></td>
+    	    <td></td><td></td>
             <td>PRESUPUESTO (Millones de Pesos)</td>
             <td></td>
             <td></td>
@@ -40,15 +41,15 @@
             <td></td>
         </tr>      	
         <tr>
-    	    <td></td>
-            <td>MODIFICADO</td>
+    	    <td></td><td></td>
             <td>APROBADO</td>
+            <td>MODIFICADO</td>
             <td>VARIACIÓN</td>
             <td></td>
             <td></td>
         </tr>	
         <tr>
-    	    <td></td>
+    	    <td></td><td></td>
             <td></td>
             <td></td>
             <td>MONTO</td>
@@ -56,29 +57,37 @@
             <td></td>
         </tr>  
         <tr>
-    	    <td></td>
-            <td>{{{ $totalModificado }}}</td>
-            <td>{{{ $totalAprobado }}}</td>
-            <td>{{{ $totalVariacion }}}</td>
-            <td>{{{ $porcentajeVariacion }}}</td>
+    	    <td></td><td></td>
+            <td></td><td></td>
+            <td></td><td></td>
             <td></td>
         </tr> 
+        
+        <tr>
+    	    <td></td><td></td>
+            <td></td><td></td>
+            <td></td><td></td>
+            <td></td>
+        </tr>
+        <tr>
+    	    <td></td><td></td>
+            <td></td><td></td>
+            <td></td><td></td>
+            <td></td>
+        </tr>
         
         <tr>
     		<td>PRINCIPALES PROYECTOS Y RAZONES DE LA VARIACIÓN</td>
             <td></td>
             <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td></td><td></td><td></td><td></td>
         </tr>
         
         <tr>
-    		<td>PROYECTO</td>            
-            <td>MODIFICADO</td>
+    		<td>PROYECTO</td><td></td><td></td>            
             <td>APROBADO</td>
-            <td>VARIACIÓN</td>
-            <td></td>
+            <td>MODIFICADO</td>
+            <td>VARIACIÓN</td>            
             <td>RAZONES</td>
         </tr>   
         
@@ -89,14 +98,13 @@
             <td></td>
             <td></td>
             <td></td>
-            <td></td>
+            <td></td><td></td>
         </tr>
          @foreach($fila as $arrayReporte)
         <tr>
-        	<td valign="top">{{{ $arrayReporte['nombre'] }}}</td>            
-            <td>{{{ $arrayReporte['modificado'] }}}</td>
+        	<td valign="top">{{{ $arrayReporte['nombre'] }}}</td><td></td><td></td>                       
             <td>{{{ $arrayReporte['aprobado'] }}}</td>
-            <td>{{{ $arrayReporte['variacion'] }}}</td>
+            <td>{{{ $arrayReporte['modificado'] }}}</td>
             <td></td>
             <td>{{{ $arrayReporte['razonesAprobado'] }}}</td>
 		</tr>
@@ -104,22 +112,12 @@
               
         
         <tr>
-    		<td>TOTAL</td>            
-            <td>{{{ $totalModificado }}}</td>
-            <td>{{{ $totalAprobado }}}</td>
-            <td>{{{ $totalVariacion }}}</td>
-            <td></td>
-            <td></td>
-        </tr> 	
-        
-        
+    		<td>TOTAL</td><td></td><td></td>            
+            <td></td><td></td><td></td><td></td>
+        </tr>
         <tr>
-    	    <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+    	    <td></td><td></td><td></td>
+            <td></td><td></td><td></td><td></td>
         </tr>
         
         
