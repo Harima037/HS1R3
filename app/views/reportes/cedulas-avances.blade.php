@@ -44,9 +44,22 @@
                         <button class="btn btn-default btn-block btn-quick-search" type="button"><span class="fa fa-search"></span></button>
                     </div>
                     <div class="col-md-2">
-                        <button type="button" class="btn btn-primary btn-block" id="btn-ver-cedulas">
-                            <span class="fa fa-file-pdf-o"></span> Ver Cédulas
-                        </button>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary">
+                                <span class="fa fa-file"></span> Reporte
+                            </button>
+                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu pull-right" role="menu">
+                                <li>
+                                    <a href="#" id="btn-ver-cedulas"><span class="fa fa-file-pdf-o"></span> Cédulas de Avance</a>
+                                </li>
+                                <li>
+                                    <a href="#" id="btn-ver-resumen"><span class="fa fa-file-pdf-o"></span> Resumen de Avance</a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -74,6 +74,14 @@ $('#btn-ver-cedulas').on('click',function(){
     }
     window.open(SERVER_HOST+'/v1/cedulas-avances'+parametros);
 });
+
+$('#btn-ver-resumen').on('click',function(){
+    var parametros = '?mes='+$('#mes').val()+'&ejercicio='+$('#ejercicio').val()+'&resumen=1';
+    if($('.txt-quick-search').val()){
+        parametros += '&buscar='+$('.txt-quick-search').val();
+    }
+    window.open(SERVER_HOST+'/v1/cedulas-avances'+parametros);
+});
 /*===================================*/
 // Funciones adicionales por módulo
 

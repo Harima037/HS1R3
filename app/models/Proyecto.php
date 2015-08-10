@@ -460,6 +460,96 @@ class Proyecto extends BaseModel
 			->orderBy('proyectos.idClasificacionProyecto','asc');
 	}
 
+	public function scopeReporteResumenAvances($query,$mes,$ejercicio){
+		$query->select(
+				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
+				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
+				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
+				'proyectos.programaPresupuestario','proyectos.programaEspecial',
+				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
+				'proyectos.numeroProyectoEstrategico',
+
+				DB::raw('FORMAT(sum(ep01.presupuestoDevengadoModificado),2) AS presupuestoDevengadoModificado')
+			)
+
+			->join('cargaDatosEP01 AS ep01',function($join) use ($mes,$ejercicio){
+				$join->on('ep01.UR','=','proyectos.unidadResponsable')
+					->on('ep01.FI','=','proyectos.finalidad')
+					->on('ep01.FU','=','proyectos.funcion')
+					->on('ep01.SF','=','proyectos.subFuncion')
+					->on('ep01.SSF','=','proyectos.subSubFuncion')
+					->on('ep01.PS','=','proyectos.programaSectorial')
+					->on('ep01.PP','=','proyectos.programaPresupuestario')
+					->on('ep01.PE','=','proyectos.programaEspecial')
+					->on('ep01.AI','=','proyectos.actividadInstitucional')
+					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'))
+					->where('ep01.mes','=',$mes)
+					->where('ep01.CP','=',$ejercicio);
+			})
+
+			->where('proyectos.idEstatusProyecto','=',5)
+			
+			->groupBy('proyectos.id')
+
+			->with(array(
+			'componentesMetasMes'=>function($componente)use($mes){
+				$componente->select('componenteMetasMes.id',
+					'componenteMetasMes.idProyecto',
+					DB::raw('componente.valorNumerador AS metaAnual'),
+					DB::raw('sum(componenteMetasMes.avance) AS avanceAcumulado'),
+					DB::raw('(sum(componenteMetasMes.avance)/componente.valorNumerador)*100 AS porcentajeAcumulado')
+					)
+					->where('componenteMetasMes.mes','<=',$mes)
+					->leftjoin('proyectoComponentes AS componente',function($join)use($mes){
+						$join->on('componente.id','=','componenteMetasMes.idComponente')
+							->whereNull('componente.borradoAl');
+					})
+					->groupBy('componenteMetasMes.idComponente');
+
+			},'actividadesMetasMes'=>function($actividad)use($mes){
+				$actividad->select('actividadMetasMes.id',
+					'actividadMetasMes.idProyecto',
+					DB::raw('actividad.valorNumerador AS metaAnual'),
+					DB::raw('sum(actividadMetasMes.avance) AS avanceAcumulado'),
+					DB::raw('(sum(actividadMetasMes.avance)/actividad.valorNumerador)*100 AS porcentajeAcumulado')
+					)
+					->where('actividadMetasMes.mes','<=',$mes)
+					->leftjoin('componenteActividades AS actividad',function($join)use($mes){
+						$join->on('actividad.id','=','actividadMetasMes.idActividad')
+							->whereNull('actividad.borradoAl');
+					})
+					->groupBy('actividadMetasMes.idActividad');
+			},'registroAvanceBeneficiarios'=>function($beneficiarios)use($mes){
+				$beneficiarios->select('registroAvancesBeneficiarios.id','registroAvancesBeneficiarios.idProyecto',
+					'registroAvancesBeneficiarios.idTipoBeneficiario',
+					DB::raw('sum(registroAvancesBeneficiarios.total) AS avanceBeneficiario'))
+				->where('registroAvancesBeneficiarios.mes','<=',$mes)
+				->groupBy('registroAvancesBeneficiarios.idProyecto','registroAvancesBeneficiarios.idTipoBeneficiario');
+			},'evaluacionMes'=>function($evaluacionMes)use($mes){
+				$evaluacionMes->where('evaluacionProyectoMes.mes','<=',$mes)
+					->where('evaluacionProyectoMes.idEstatus','>=',4)
+					->where('evaluacionProyectoMes.idEstatus','<',6)
+					->groupBy('evaluacionProyectoMes.idProyecto')
+					->select('evaluacionProyectoMes.id','evaluacionProyectoMes.idProyecto','evaluacionProyectoMes.mes',
+						DB::raw('sum(evaluacionProyectoMes.indicadorResultadoBeneficiarios) AS indicadorResultadoBeneficiarios')
+					);
+			}))
+
+			->orderBy('proyectos.idClasificacionProyecto','asc')
+			->orderBy('proyectos.unidadResponsable','asc')
+			->orderBy('proyectos.finalidad','asc')
+			->orderBy('proyectos.funcion','asc')
+			->orderBy('proyectos.subFuncion','asc')
+			->orderBy('proyectos.subSubFuncion','asc')
+			->orderBy('proyectos.programaSectorial','asc')
+			->orderBy('proyectos.programaPresupuestario','asc')
+			->orderBy('proyectos.programaEspecial','asc')
+			->orderBy('proyectos.actividadInstitucional','asc')
+			->orderBy('proyectos.proyectoEstrategico','asc')
+			->orderBy('proyectos.numeroProyectoEstrategico','asc')
+			;
+	}
+
 	public function scopeReporteCuentaPublica($query,$mes,$anio){
 		$query->select(
 				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',

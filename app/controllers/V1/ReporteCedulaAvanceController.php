@@ -77,6 +77,73 @@ class ReporteCedulaAvanceController extends BaseController {
 				}
 
 				return Response::json($data,$http_status);
+			}elseif(isset($parametros['resumen'])){
+				$rows = Proyecto::reporteResumenAvances($mes,$ejercicio);
+				
+				if(isset($parametros['buscar'])){		
+					if($parametros['buscar']){
+						$rows = $rows->where(function($query)use($parametros){
+							$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
+								->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
+						});
+					}
+				}
+				
+				$rows = $rows->get()->toArray();
+
+				foreach ($rows as $indice => $row) {
+					$suma_porcentajes = 0;
+					$total_porcentajes = count($row['componentes_metas_mes']) + count($row['actividades_metas_mes']);
+					foreach ($row['componentes_metas_mes'] as $componente) {
+						$suma_porcentajes = floatval($componente['porcentajeAcumulado']);
+					}
+					foreach ($row['actividades_metas_mes'] as $actividad) {
+						$suma_porcentajes = floatval($actividad['porcentajeAcumulado']);
+					}
+					if($total_porcentajes > 0){
+						$rows[$indice]['nivelCumplimientoFisico'] = number_format($suma_porcentajes / $total_porcentajes,2);
+					}else{
+						$rows[$indice]['nivelCumplimientoFisico'] = number_format(0,2);
+					}
+					$beneficiarios = NULL;
+					if($row['evaluacion_mes']){
+						if($row['evaluacion_mes']['indicadorResultadoBeneficiarios']){
+							$beneficiarios = intval($row['evaluacion_mes']['indicadorResultadoBeneficiarios']);
+						}
+					}
+					if($beneficiarios === NULL){
+						foreach ($row['registro_avance_beneficiarios'] as $beneficiario) {
+							if(intval($beneficiario['avanceBeneficiario']) > $beneficiarios){
+								$beneficiarios = intval($beneficiario['avanceBeneficiario']);
+							}
+						}
+					}
+					if($beneficiarios != 0){
+						$rows[$indice]['totalBeneficiarios'] = number_format($beneficiarios);
+					}else{
+						$rows[$indice]['totalBeneficiarios'] = 0;
+					}
+				}
+
+				$datos = array('datos'=>$rows);
+				$trimestre = Util::obtenerTrimestre($mes);
+				$texto_trimestres = array(1=>'Primer',2=>'Segundo',3=>'Tercer',4=>'Cuarto');
+				$datos['trimestre'] = $texto_trimestres[$trimestre];
+				$datos['ejercicio'] = $ejercicio;
+
+				//print_r($rows);die;
+
+				$pdf = PDF::setPaper('LETTER')->setOrientation('landscape')->setWarnings(false)->loadView('reportes.pdf.reporte-resumen-avances',$datos);
+				
+				$pdf->output();
+				$dom_pdf = $pdf->getDomPDF();
+				$canvas = $dom_pdf->get_canvas();
+				$w = $canvas->get_width();
+		  		$h = $canvas->get_height();
+				$canvas->page_text(($w-75), ($h-16), "Página {PAGE_NUM} de {PAGE_COUNT}", null, 10, array(0, 0, 0));
+				
+
+				return $pdf->stream('Resumen_Avances.pdf');
 			}else{
 				$rows = Proyecto::reporteCedulasAvances($mes,$ejercicio);
 
