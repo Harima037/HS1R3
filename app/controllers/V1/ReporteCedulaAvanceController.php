@@ -167,6 +167,13 @@ class ReporteCedulaAvanceController extends BaseController {
 					}
 				}
 
+				if(!isset($parametros['parte'])){
+					$parte = 1;
+				}else{
+					$parte = intval($parametros['parte']);
+				}
+
+				//$rows = $rows->skip(($parte-1)*37)->take(37)->get()->toArray();
 				$rows = $rows->get()->toArray();
 				//var_dump($rows);die;
 				//print_r($rows);die;
@@ -183,7 +190,7 @@ class ReporteCedulaAvanceController extends BaseController {
 				$datos['trimestre'] = $texto_trimestres[$trimestre];
 				$datos['ejercicio'] = $ejercicio;
 				
-				//$this->obtenerWord($datos);
+				$this->obtenerWord($datos);
 
 				//return View::make('reportes.pdf.reporte-cedulas-avances')->with($datos);
 
@@ -192,7 +199,8 @@ class ReporteCedulaAvanceController extends BaseController {
 						$sheet->loadView('reportes.excel.reporte-cedulas-avance',$datos);
 					});
 				})->export('xlsx');*/
-
+	
+				/*
 				$pdf = PDF::setPaper('LETTER')->setOrientation('landscape')->setWarnings(false)->loadView('reportes.pdf.reporte-cedulas-avances',$datos);
 				
 				$pdf->output();
@@ -202,8 +210,8 @@ class ReporteCedulaAvanceController extends BaseController {
 		  		$h = $canvas->get_height();
 				$canvas->page_text(($w-75), ($h-16), "Página {PAGE_NUM} de {PAGE_COUNT}", null, 10, array(0, 0, 0));
 				
-
 				return $pdf->stream('Cedulas_avances.pdf');
+				*/
 				
 			}
 		}catch(Exception $ex){
@@ -228,6 +236,7 @@ class ReporteCedulaAvanceController extends BaseController {
 		$texto = array('bold' => false);
 		$centrado = array('align' => 'center');
 		$justificado = array('align' => 'justify');
+		$derecha = array('align' => 'right');
 
 		$infoStyle = array('borderColor'=>'000000', 'borderSize'=>6);
 		$claveStyle = array('borderColor'=>'000000','borderSize'=>6,'borderTopColor'=>'FFFFFF','cellMargin'=>200,'cellMarginTop'=>0);
@@ -250,10 +259,7 @@ class ReporteCedulaAvanceController extends BaseController {
 		$row = $table->addRow();
 		$row->addCell(3000)->addImage('img/EscudoGobiernoChiapas.png');
 		$cell = $row->addCell(8128);
-		$cell->addText(htmlspecialchars('GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS'),$titulo,$centrado);
-		$cell->addTextBreak(0);
-		$cell->addText(htmlspecialchars('SECRETARÍA DE SALUD'),$titulo,$centrado);
-		$cell->addTextBreak();
+		$cell->addText(htmlspecialchars('INSTITUTO DE SALUD'),$titulo,$centrado);
 		//$cell->addText(htmlspecialchars('ANÁLISIS FUNCIONAL AL '.$trimestres[$trimestre].' TRIMESTRE DEL '.date('Y')),$titulo,$centrado);
 		$row->addCell(3000)->addImage('img/LogoInstitucional.png');
 		$header->addTextBreak();
@@ -263,17 +269,108 @@ class ReporteCedulaAvanceController extends BaseController {
 
 		$section->addPageBreak();
 		foreach ($datos['datos'] as $proyecto) {
-			
-			$section->addText(htmlspecialchars($proyecto['programaPresupuestarioDescipcion']));
+
+			$table = $section->addTable('TablaEncabezado');
+
+			$row = $table->addRow();
+			$row->addCell(4000)->addText('Programa Presupuestario:',$titulo,$justificado);
+			$row->addCell(10125)->addText(htmlspecialchars($proyecto['programaPresupuestarioDescipcion']),$texto,$justificado);
+
+			$row = $table->addRow();
+			if($proyecto['idClasificacionProyecto'] == 1){
+				$tipo_proyecto = 'Institucional';
+			}else{
+				$tipo_proyecto = 'de Inversión';
+			}
+			$row->addCell(3900)->addText('Proyecto '.$tipo_proyecto.':',$titulo,$justificado);
+			$row->addCell(10225)->addText(htmlspecialchars($proyecto['nombreTecnico']),$texto,$justificado);
+
+			$row = $table->addRow();
+			$row->addCell(3900)->addText('Clave Presupuestaria:',$titulo,$justificado);
+			$row->addCell(10225)->addText(htmlspecialchars($proyecto['ClavePresupuestaria']),$texto,$justificado);
+
+			$row = $table->addRow();
+			$row->addCell(3900)->addText('Objetivo General:',$titulo,$justificado);
+			$row->addCell(10225)->addText(htmlspecialchars($proyecto['finalidadProyecto']),$texto,$justificado);
+
 			$section->addTextBreak();
-			$section->addText(htmlspecialchars($proyecto['idClasificacionProyecto']));
+
+			$table = $section->addTable('TablaInfo');
+			$row = $table->addRow();
+			$row->addCell(3500)->addText('Presupuesto Autorizado',$titulo,$centrado);
+			$row->addCell(3500)->addText('Presupuesto Modificado',$titulo,$centrado);
+			$row->addCell(3500)->addText('Presupuesto Ejercido',$titulo,$centrado);
+
+			$row = $table->addRow();
+			$row->addCell(3500)->addText(htmlspecialchars('$ '.$proyecto['presupuestoAprobado']),$texto,$derecha);
+			$row->addCell(3500)->addText(htmlspecialchars('$ '.$proyecto['presupuestoModificado']),$texto,$derecha);
+			$row->addCell(3500)->addText(htmlspecialchars('$ '.$proyecto['presupuestoEjercidoModificado']),$texto,$derecha);
 			$section->addTextBreak();
-			$section->addText(htmlspecialchars($proyecto['nombreTecnico']));
+
+			$table = $section->addTable('TablaInfo');
+
+			$row = $table->addRow();
+			$row->addCell(1025)->addText('Nivel',$titulo,$centrado);
+			$row->addCell(4200)->addText('Indicador',$titulo,$centrado);
+			$row->addCell(3000)->addText('Unidad/Medida',$titulo,$centrado);
+			$row->addCell(2250)->addText('Meta',$titulo,$centrado);
+			$row->addCell(2250)->addText('Avance',$titulo,$centrado);
+			$row->addCell(1400)->addText('% Avance',$titulo,$centrado);
+
+			foreach($proyecto['componentes'] AS $indice => $componente){
+				$indices[$componente['id']]['indice'] = $indice+1;
+				$indices[$componente['id']]['indiceActividad'] = 1;
+
+				if($componente['avanceAcumulado']){
+					$porcentaje = number_format(($componente['avanceAcumulado']*100)/$componente['metaAnual'],2);
+				}else{
+					$porcentaje = '0.00';
+				}
+
+				$row = $table->addRow();
+				$row->addCell(1025)->addText('C '.$indice+1 ,$texto,$centrado);
+				$row->addCell(4200)->addText(htmlspecialchars($componente['indicador']),$texto,$justificado);
+				$row->addCell(3000)->addText(htmlspecialchars($componente['unidadMedida']),$texto,$centrado);
+				$row->addCell(2250)->addText(number_format(floatval($componente['metaAnual']),2),$texto,$centrado);
+				$row->addCell(2250)->addText(number_format(floatval($componente['avanceAcumulado']),2),$texto,$centrado);
+				$row->addCell(1400)->addText($porcentaje,$texto,$centrado);
+			}
+
+			foreach($proyecto['actividades'] AS $indice => $actividad){
+				$indice_componente = $indices[$actividad['idComponente']]['indice'];
+				$indice_actividad = $indices[$actividad['idComponente']]['indiceActividad']++;
+
+				if($actividad['avanceAcumulado']){
+					$porcentaje = number_format(($actividad['avanceAcumulado']*100)/$actividad['metaAnual'],2);
+				}else{
+					$porcentaje = '0.00';
+				}
+
+				$row = $table->addRow();
+				$row->addCell(1025)->addText('A '. $indice_componente . '.' . $indice_actividad ,$texto,$centrado);
+				$row->addCell(4200)->addText(htmlspecialchars($actividad['indicador']),$texto,$justificado);
+				$row->addCell(3000)->addText(htmlspecialchars($actividad['unidadMedida']),$texto,$centrado);
+				$row->addCell(2250)->addText(number_format(floatval($actividad['metaAnual']),2),$texto,$centrado);
+				$row->addCell(2250)->addText(number_format(floatval($actividad['avanceAcumulado']),2),$texto,$centrado);
+				$row->addCell(1400)->addText($porcentaje,$texto,$centrado);
+			}
 			$section->addTextBreak();
-			$section->addText(htmlspecialchars($proyecto['ClavePresupuestaria']));
-			$section->addTextBreak();
-			$section->addText(htmlspecialchars($proyecto['finalidadProyecto']));
-			$section->addTextBreak();
+
+			/*
+			$table = $section->addTable('TablaInfo');
+
+			$row = $table->addRow();
+			$row->addCell(3000)->addText('Tipo de Beneficiario',$titulo,$centrado);
+			$row->addCell(3000)->addText('Programado',$titulo,$centrado);
+			$row->addCell(3065)->addText('Atendido',$titulo,$centrado);
+			$row->addCell(5060)->addText('% Avance',$titulo,$centrado);
+
+			$row = $table->addRow();
+			$row->addCell(2500)->addText($elemento->ejeDescripcion);
+			$row->addCell(2500)->addText($elemento->temaDescripcion);
+			$row->addCell(4065)->addText($elemento->politicaPublicaDescripcion);
+			$row->addCell(5060)->addText($elemento->programaPresupuestarioDescipcion);
+			$section->addTextBreak();*/
 
 			$section->addPageBreak();
 			/*
