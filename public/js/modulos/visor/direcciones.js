@@ -40,7 +40,7 @@ function graficaMetasCumplidas(){
                 var dato = response.data[clave];
                 var porcentaje = (dato.cumplidas*100) / dato.totalMetas;
                 data_unidades.push([
-                    clave,porcentaje,(porcentaje.format(2)) + '%',
+                    dato.unidadAbreviacion,porcentaje,(porcentaje.format(2)) + '%',
                     '<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" style="white-space:nowrap;" colspan="2"><big>'+clave+' '+dato.unidadResponsable+'</big></th></tr><tr><td style="white-space:nowrap;">Total Metas: </td><th class="text-center" style="font-weight:bold;">'+(dato.totalMetas.format(2))+'</th></tr><tr><td style="white-space:nowrap;">Metas Cumplidas: </td><th class="text-center" style="font-weight:bold;">'+(dato.cumplidas.format(2))+'</th></tr></table>'
                 ]);
             }
@@ -69,7 +69,7 @@ function graficaPresupuestoEjercido(){
                 var dato = response.data[i];
                 var porcentaje = (parseFloat(dato.presupuestoEjercido)*100) / parseFloat(dato.presupuestoModificado);
                 data_unidades.push([
-                    dato.clave,porcentaje,(porcentaje.format(2)) + '%',
+                    dato.unidadAbreviacion,porcentaje,(porcentaje.format(2)) + '%',
                     '<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" style="white-space:nowrap;" colspan="2"><big>'+dato.clave+' '+dato.unidadResponsable+'</big></th></tr><tr><td style="white-space:nowrap;">Presupuesto Modificado: </td><th class="text-center" style="font-weight:bold;">$ '+(parseFloat(dato.presupuestoModificado).format(2))+'</th></tr><tr><td style="white-space:nowrap;">Presupuesto Ejercido: </td><th class="text-center" style="font-weight:bold;">$ '+(parseFloat(dato.presupuestoEjercido).format(2))+'</th></tr></table>'
                 ]);
             }
@@ -109,7 +109,7 @@ function graficaMetasPresupuesto(){
 				var porcentajePresupuesto = (dato.presupuestoEjercido*100) / dato.presupuestoModificado;
 				datos.push(
 					[
-						clave,
+						dato.abreviacion,
 						porcentajeMetas,porcentajeMetas.format(2)+'%',
 						'<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" style="white-space:nowrap;" colspan="2"><big>'+clave+' '+dato.unidadResponsable+'</big></th></tr><tr><td style="white-space:nowrap;">Total Metas: </td><th class="text-center" style="font-weight:bold;">'+(dato.metasTotal.format(2))+'</th></tr><tr><td style="white-space:nowrap;">Metas Cumplidas: </td><th class="text-center" style="font-weight:bold;">'+(dato.metasCumplidas.format(2))+'</th></tr></table>',
 						porcentajePresupuesto,porcentajePresupuesto.format(2)+'%',

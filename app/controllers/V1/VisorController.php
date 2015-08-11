@@ -280,6 +280,7 @@ class VisorController extends BaseController {
 						foreach ($datos_metas['metas_unidad'] as $clave => $metas) {
 							$metas_vs_presupuesto[$clave] = array(
 								'unidadResponsable'=>$metas['unidadResponsable'],
+								'abreviacion'=>$metas['unidadAbreviacion'],
 								'metasTotal'=>$metas['totalMetas'],
 								'metasCumplidas'=>$metas['cumplidas'],
 								'presupuestoModificado'=>0,
@@ -291,6 +292,7 @@ class VisorController extends BaseController {
 							if(!isset($metas_vs_presupuesto[$presupuesto->clave])){
 								$metas_vs_presupuesto[$presupuesto->clave] = array(
 									'unidadResponsable'=>$presupuesto->unidadResponsable,
+									'abreviacion'=>$presupuesto->unidadAbreviacion,
 									'metasTotal'=>0,
 									'metasCumplidas'=>0,
 									'presupuestoModificado'=>floatval($presupuesto->presupuestoModificado),
@@ -850,7 +852,7 @@ class VisorController extends BaseController {
 		$rows = $rows->where('mes','=',$mes_actual)
 					->select(DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
 						DB::raw('sum(presupuestoEjercidoModificado) AS presupuestoEjercido'),
-						'unidad.descripcion AS unidadResponsable','UR AS clave')
+						'unidad.descripcion AS unidadResponsable','UR AS clave','unidad.abreviatura AS unidadAbreviacion')
 					->leftjoin('catalogoUnidadesResponsables AS unidad','unidad.clave','=','UR')
 					->groupBy('UR')
 					->get();
@@ -884,7 +886,7 @@ class VisorController extends BaseController {
 						->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','proyectos.unidadResponsable')
 						->groupBy('idComponente')
 						->orderBy('unidadResponsable')
-						->select('idComponente','unidades.descripcion AS unidad',
+						->select('idComponente','unidades.descripcion AS unidad','unidades.abreviatura AS unidadAbreviacion',
 							'proyectos.unidadResponsable',
 							DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'))->get();
 		//
@@ -900,7 +902,7 @@ class VisorController extends BaseController {
 						->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','proyectos.unidadResponsable')
 						->groupBy('idActividad')
 						->orderBy('unidadResponsable')
-						->select('idActividad','unidades.descripcion AS unidad',
+						->select('idActividad','unidades.descripcion AS unidad','unidades.abreviatura AS unidadAbreviacion',
 							'proyectos.unidadResponsable',
 							DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'))->get();
 		//
@@ -910,6 +912,7 @@ class VisorController extends BaseController {
 			if(!isset($metas_unidad[$componente->unidadResponsable])){
 				$metas_unidad[$componente->unidadResponsable] = array(
 					'unidadResponsable'=>$componente->unidad,
+					'unidadAbreviacion'=>$componente->unidadAbreviacion,
 					'totalMetas'=>0,
 					'cumplidas'=>0
 				);
@@ -937,6 +940,7 @@ class VisorController extends BaseController {
 			if(!isset($metas_unidad[$actividad->unidadResponsable])){
 				$metas_unidad[$actividad->unidadResponsable] = array(
 					'unidadResponsable'=>$actividad->unidad,
+					'unidadAbreviacion'=>$actividad->unidadAbreviacion,
 					'totalMetas'=>0,
 					'cumplidas'=>0
 				);

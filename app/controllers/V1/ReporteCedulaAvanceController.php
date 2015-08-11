@@ -223,7 +223,7 @@ class ReporteCedulaAvanceController extends BaseController {
 		$phpWord = new \PhpOffice\PhpWord\PhpWord();
 
 		$phpWord->setDefaultFontName('Arial');
-		$phpWord->setDefaultFontSize(12);
+		$phpWord->setDefaultFontSize(10);
 		$phpWord->setDefaultParagraphStyle(
 		    array(
 		        'align'      => 'both',
@@ -232,6 +232,7 @@ class ReporteCedulaAvanceController extends BaseController {
 		    )
 		);
 
+		$titulo_pag = array('bold' => true,'size'=>20);
 		$titulo = array('bold' => true);
 		$texto = array('bold' => false);
 		$centrado = array('align' => 'center');
@@ -239,36 +240,40 @@ class ReporteCedulaAvanceController extends BaseController {
 		$derecha = array('align' => 'right');
 
 		$infoStyle = array('borderColor'=>'000000', 'borderSize'=>6);
-		$claveStyle = array('borderColor'=>'000000','borderSize'=>6,'borderTopColor'=>'FFFFFF','cellMargin'=>200,'cellMarginTop'=>0);
 		$headerStyle = array('borderColor'=>'FFFFFF','borderSize'=>0);
 
 		$phpWord->addTableStyle('TablaInfo', $infoStyle);
-		$phpWord->addTableStyle('TablaClave',$claveStyle);
 		$phpWord->addTableStyle('TablaEncabezado',$headerStyle);
 
-		$phpWord->addTitleStyle(1, $titulo, $justificado);
-		$phpWord->addTitleStyle(2, $titulo, $justificado);
-		$phpWord->addTitleStyle(3, $titulo, $justificado);
-		$phpWord->addTitleStyle(4, $titulo, $justificado);
 	    // Every element you want to append to the word document is placed in a section.
 	    // To create a basic section:
 	    $section = $phpWord->addSection(array('orientation'=>'landscape','size'=>'letter'));
 
+	    $sectionStyle = $section->getStyle();
+		$sectionStyle->setMarginLeft(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.75));
+		$sectionStyle->setMarginRight(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.5));
+		$sectionStyle->setMarginTop(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.1));
+		$sectionStyle->setMarginBottom(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.5));
+
 		$header = $section->addHeader();
 		$table = $header->addTable('TablaEncabezado');
 		$row = $table->addRow();
-		$row->addCell(3000)->addImage('img/EscudoGobiernoChiapas.png');
-		$cell = $row->addCell(8128);
-		$cell->addText(htmlspecialchars('INSTITUTO DE SALUD'),$titulo,$centrado);
-		//$cell->addText(htmlspecialchars('ANÁLISIS FUNCIONAL AL '.$trimestres[$trimestre].' TRIMESTRE DEL '.date('Y')),$titulo,$centrado);
-		$row->addCell(3000)->addImage('img/LogoInstitucional.png');
+		$row->addCell(2000)->addImage('img/EscudoGobiernoChiapas.png',array('width' => 203,'height' => 70,'align'=>'left'));
+		$cell = $row->addCell(10128);
+		$cell->addTextBreak();
+		$cell->addText(htmlspecialchars('INSTITUTO DE SALUD'),$titulo_pag,$centrado);
+		$row->addCell(2000)->addImage('img/LogoInstitucional.png',array('width' => 160,'height' => 70,'align'=>'right'));
 		$header->addTextBreak();
 
 		$footer = $section->addFooter();
 		$footer->addPreserveText(htmlspecialchars('Página {PAGE} de {NUMPAGES}.'), null,array('align' => 'right'));
 
-		$section->addPageBreak();
+		$section->addTextBreak(10);
+		$section->addText(htmlspecialchars('Cédulas de Avances Físico-financieros al '.$datos['trimestre'].' Trimestre del '.$datos['ejercicio']),array('bold' => true,'size'=>28),$centrado);
+
+		
 		foreach ($datos['datos'] as $proyecto) {
+			$section->addPageBreak();
 
 			$table = $section->addTable('TablaEncabezado');
 
@@ -328,7 +333,7 @@ class ReporteCedulaAvanceController extends BaseController {
 				}
 
 				$row = $table->addRow();
-				$row->addCell(1025)->addText('C '.$indice+1 ,$texto,$centrado);
+				$row->addCell(1025)->addText('C '.($indice+1) ,$texto,$centrado);
 				$row->addCell(4200)->addText(htmlspecialchars($componente['indicador']),$texto,$justificado);
 				$row->addCell(3000)->addText(htmlspecialchars($componente['unidadMedida']),$texto,$centrado);
 				$row->addCell(2250)->addText(number_format(floatval($componente['metaAnual']),2),$texto,$centrado);
@@ -356,69 +361,42 @@ class ReporteCedulaAvanceController extends BaseController {
 			}
 			$section->addTextBreak();
 
-			/*
-			$table = $section->addTable('TablaInfo');
-
+			$table = $section->addTable('TablaEncabezado');
 			$row = $table->addRow();
-			$row->addCell(3000)->addText('Tipo de Beneficiario',$titulo,$centrado);
-			$row->addCell(3000)->addText('Programado',$titulo,$centrado);
-			$row->addCell(3065)->addText('Atendido',$titulo,$centrado);
-			$row->addCell(5060)->addText('% Avance',$titulo,$centrado);
+			$row->addCell(2500,$headerStyle);
+			$row->addCell(9900,$infoStyle)->addText('Beneficiarios',$titulo,$centrado);
+			$row->addCell(2500,$headerStyle);
 
+			$table = $section->addTable('TablaEncabezado');
 			$row = $table->addRow();
-			$row->addCell(2500)->addText($elemento->ejeDescripcion);
-			$row->addCell(2500)->addText($elemento->temaDescripcion);
-			$row->addCell(4065)->addText($elemento->politicaPublicaDescripcion);
-			$row->addCell(5060)->addText($elemento->programaPresupuestarioDescipcion);
-			$section->addTextBreak();*/
+			$row->addCell(2500,$headerStyle);
+			$row->addCell(4000,$infoStyle)->addText('Tipo de Beneficiario',$titulo,$centrado);
+			$row->addCell(2250,$infoStyle)->addText('Programado',$titulo,$centrado);
+			$row->addCell(2250,$infoStyle)->addText('Atendido',$titulo,$centrado);
+			$row->addCell(1400,$infoStyle)->addText('% Avance',$titulo,$centrado);
+			$row->addCell(2500,$headerStyle);
 
-			$section->addPageBreak();
-			/*
-			if($clasificacion_anterior != $elemento->idClasificacionProyecto){
-				$section->addText(htmlspecialchars('OBJETIVOS Y PRINCIPALES COMENTARIOS DE LOS PROYECTOS INMERSOS EN ESTA SUBFUNCIÓN'),$titulo);
-				$section->addTextBreak();
-				if($elemento->idClasificacionProyecto == 1){
-					$section->addTitle(htmlspecialchars('PROYECTOS INSTITUCIONALES'),3);
-				}else{
-					$section->addTitle(htmlspecialchars('PROYECTOS DE INVERSIÓN'),3);
-				}
-				$section->addTextBreak();
-				$clasificacion_anterior = $elemento->idClasificacionProyecto;
+			$total_programado = 0;
+			$total_avance = 0;
+			foreach($proyecto['beneficiarios_descripcion'] AS $beneficiario){
+				$total_programado += $beneficiario['programadoTotal'];
+				$total_avance += $beneficiario['avanceTotal'];
+				$row = $table->addRow();
+				$row->addCell(2500,$headerStyle);
+				$row->addCell(4000,$infoStyle)->addText(htmlspecialchars($beneficiario['tipoBeneficiario']),$texto,$centrado);
+				$row->addCell(2250,$infoStyle)->addText(number_format($beneficiario['programadoTotal']),$texto,$centrado);
+				$row->addCell(2250,$infoStyle)->addText(number_format($beneficiario['avanceTotal']),$texto,$centrado);
+				$row->addCell(1400,$infoStyle)->addText(number_format(($beneficiario['avanceTotal']/$beneficiario['programadoTotal'])*100,2),$texto,$centrado);
+				$row->addCell(2500,$headerStyle);
 			}
 
-			$section->addTitle(htmlspecialchars('Proyecto: '.$elemento->nombreTecnico.' ('.$elemento->unidadResponsableDescipcion.')'),4);
-			$section->addTextBreak();
-
-			$table = $section->addTable('TablaInfo');
-
 			$row = $table->addRow();
-			$row->addCell(3000)->addText('EJE',$titulo,$centrado);
-			$row->addCell(3000)->addText('TEMA',$titulo,$centrado);
-			$row->addCell(3065)->addText('POLÍTICA PÚBLICA',$titulo,$centrado);
-			$row->addCell(5060)->addText('PROGRAMA PRESUPUESTARIO',$titulo,$centrado);
-
-			$row = $table->addRow();
-			$row->addCell(2500)->addText($elemento->ejeDescripcion);
-			$row->addCell(2500)->addText($elemento->temaDescripcion);
-			$row->addCell(4065)->addText($elemento->politicaPublicaDescripcion);
-			$row->addCell(5060)->addText($elemento->programaPresupuestarioDescipcion);
-			$section->addTextBreak();
-
-			if($elemento->totalMetas > 0){
-				if($elemento->cuentaPublica){
-					$section->addText(htmlspecialchars($elemento->cuentaPublica),$texto,$justificado);
-				}else{
-					$section->addText(htmlspecialchars('No presentaron avances.'),$texto,$justificado);
-				}
-			}else{
-				if($elemento->cuentaPublica){
-					$section->addText(htmlspecialchars($elemento->cuentaPublica),$texto,$justificado);
-				}else{
-					$section->addText(htmlspecialchars('No hay metas programadas para este trimestre.'),$texto,$justificado);
-				}
-			}
-			$section->addTextBreak();
-			*/
+			$row->addCell(2500,$headerStyle);
+			$row->addCell(4000,$infoStyle)->addText('Total',$titulo,$centrado);
+			$row->addCell(2250,$infoStyle)->addText(number_format($total_programado),$titulo,$centrado);
+			$row->addCell(2250,$infoStyle)->addText(number_format($total_avance),$titulo,$centrado);
+			$row->addCell(1400,$infoStyle)->addText(number_format(($total_avance/$total_programado)*100,2),$titulo,$centrado);
+			$row->addCell(2500,$headerStyle);
 		}
 
 		header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
