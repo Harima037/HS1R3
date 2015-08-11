@@ -65,9 +65,6 @@
 		.footer {
 		    bottom: 0px;
 		}
-		.pagenum:before {
-		    content: counter(page);
-		}
 	</style>
 </head>
 <body class="cuerpo">
@@ -93,8 +90,10 @@
 	</table>
 	<div style="page-break-after:always;"></div>
 	@foreach($datos as $proyecto)
-	<table style="width:100%;">
-		<tr><td colspan="3" height="7">&nbsp;</td></tr>
+	<table>
+		<tr height="2"><td>&nbsp;</td></tr>
+	</table>
+	<table style="page-break-inside:avoid;">
 		<tr>
 			<td colspan="3" class="texto-izquierda">
 				<b>
@@ -121,7 +120,6 @@
 			<td class="texto-derecha">$ {{$proyecto['presupuestoDevengadoModificado']}}</td>
 		</tr>
 	</table>
-	<br>
 	@endforeach
 </body>
 </html>

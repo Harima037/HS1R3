@@ -105,23 +105,34 @@ class ReporteCedulaAvanceController extends BaseController {
 					}else{
 						$rows[$indice]['nivelCumplimientoFisico'] = number_format(0,2);
 					}
+
 					$beneficiarios = NULL;
-					if($row['evaluacion_mes']){
-						if($row['evaluacion_mes']['indicadorResultadoBeneficiarios']){
-							$beneficiarios = intval($row['evaluacion_mes']['indicadorResultadoBeneficiarios']);
-						}
-					}
-					if($beneficiarios === NULL){
-						foreach ($row['registro_avance_beneficiarios'] as $beneficiario) {
-							if(intval($beneficiario['avanceBeneficiario']) > $beneficiarios){
-								$beneficiarios = intval($beneficiario['avanceBeneficiario']);
+					if(count($row['registro_avance_beneficiarios']) > 1){
+						if($row['evaluacion_mes']){
+							if($row['evaluacion_mes']['indicadorResultadoBeneficiarios']){
+								$beneficiarios = intval($row['evaluacion_mes']['indicadorResultadoBeneficiarios']);
+							}else{
+								$sum_avance = 0;
+								foreach ($row['registro_avance_beneficiarios'] as $avance_benef) {
+									$sum_avance += intval($avance_benef['avanceBeneficiario']);
+								}
+								if($sum_avance == 0){ $beneficiarios = 0; }
 							}
+						}else{
+							$beneficiarios = 0;
+						}
+					}else{
+						if(isset($row['registro_avance_beneficiarios'][0])){
+							$beneficiarios = intval($row['registro_avance_beneficiarios'][0]['avanceBeneficiario']);
+						}else{
+							$beneficiarios = 0;
 						}
 					}
-					if($beneficiarios != 0){
+
+					if($beneficiarios !== NULL){
 						$rows[$indice]['totalBeneficiarios'] = number_format($beneficiarios);
 					}else{
-						$rows[$indice]['totalBeneficiarios'] = 0;
+						$rows[$indice]['totalBeneficiarios'] = 'Beneficiario no seleccionado';
 					}
 				}
 
