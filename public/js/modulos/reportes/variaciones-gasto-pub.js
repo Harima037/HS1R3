@@ -13,7 +13,7 @@
 
 // Inicialización General para casi cualquier módulo
 
-var presupuestosIguales = [];
+//var presupuestosIguales = [];
 var moduleResource = new RESTfulRequests(SERVER_HOST+'/v1/variaciones-gasto-pub');
 var moduleDatagrid = new Datagrid("#datagridProyectos",moduleResource,{formatogrid:true,pagina:1,ejercicio:$('#ejercicio').val(),mes:$('#mes').val()});
 moduleDatagrid.init();
@@ -32,8 +32,8 @@ moduleDatagrid.actualizar({
 			item.presupDev = '$ ' + parseFloat(response.data[i].presupuestoDevengadoModificado || 0).format(2);
 			
 			
-			if(item.presupMod == item.presupApr)
-				presupuestosIguales.push(item);
+			/*if(item.presupMod == item.presupApr)
+				presupuestosIguales.push(item);*/
 			
 			if(response.data[i].razonesAprobado)
 				item.razones = '<span class="label label-info">Registradas</span>';
@@ -59,15 +59,16 @@ function editar (e){
 	$('#mes-razones').val($('#mes').val());
 	$('#id').val(e);
 	$('#razones').val('');
+	$('#razones2').val('');
 
 	var parametros = {'mes':$('#mes-razones').val()};
 	
-	for(var i in presupuestosIguales)
+	/*for(var i in presupuestosIguales)
 		if(presupuestosIguales[i].id == e)
 		{
 			MessageManager.show({data:'No es posible escribir razones si los presupuestos aprobado y modificado son iguales.',type:'OK',timer:3});
 			return;
-		}
+		}*/
 	
 	moduleResource.get(e,parametros,{
         _success: function(response){
