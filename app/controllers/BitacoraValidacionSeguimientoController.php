@@ -1,8 +1,13 @@
 <?php
 use SSA\Utilerias\Util;
 
-class CuentaPublicaController extends BaseController {
-	
+class BitacoraValidacionSeguimientoController extends \BaseController {
+
+	/**
+	 * Display a listing of the resource.
+	 *
+	 * @return Response
+	 */
 	public function index(){
 		$mes_actual = Util::obtenerMesActual();
 		if($mes_actual == 0){ $mes_actual = date('n')-1; }
@@ -13,7 +18,6 @@ class CuentaPublicaController extends BaseController {
 						),
 			'mes_actual' => $mes_actual
 		);
-		$datos['datos'] = SysConfiguracionVariable::obtenerVariables(array('clave-institucional','mision','vision'))->lists('valor','variable');
-		return parent::loadIndex('REVISION','CUENTPUB',$datos);
+		return parent::loadIndex('ADMIN','BITVALID',$datos);
 	}
 }

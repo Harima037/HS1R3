@@ -73,7 +73,7 @@ class ReporteCedulaAvanceController extends BaseController {
 
 				if($total<=0){
 					$http_status = 404;
-					$data = array('resultados'=>$total,"data"=>"No se encontraron variables",'code'=>'W00');
+					$data = array('resultados'=>$total,"data"=>"No hay datos",'code'=>'W00');
 				}
 
 				return Response::json($data,$http_status);

@@ -49,6 +49,17 @@
                         </button>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="btn-toolbar pull-right" >
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-success btn-edit-rows">
+                                    <span class="fa fa-pencil"></span> Indicar Número de Beneficiarios
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <table class="table table-striped table-hover">
                 <thead>

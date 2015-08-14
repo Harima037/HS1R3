@@ -20,7 +20,7 @@ use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime,Mail;
 use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionProyectoMes,
-	EvaluacionPlanMejora,ComponenteDesglose,DesgloseMetasMes,Directorio,SysConfiguracionVariable;
+	EvaluacionPlanMejora,ComponenteDesglose,DesgloseMetasMes,Directorio,SysConfiguracionVariable,BitacoraValidacionSeguimiento;
 
 class SeguimientoController extends BaseController {
 	private $reglasBeneficiarios = array(
@@ -487,14 +487,18 @@ class SeguimientoController extends BaseController {
 													'sentryUsers.apellidoPaterno','sentryUsers.apellidoMaterno')
 											->first();
 						if($usuario){
-							$data['usuario'] = $usuario;
-							$data['proyecto'] = $recurso;
-							$data['mes_captura'] = Util::obtenerDescripcionMes(Util::obtenerMesActual());
+							if($usuario->email){
+								$data['usuario'] = $usuario;
+								$data['proyecto'] = $recurso;
+								$data['mes_captura'] = Util::obtenerDescripcionMes(Util::obtenerMesActual());
 
-							Mail::send('emails.rendicion-cuentas.proyecto-a-revision', $data, function($message) use ($usuario){
-								$message->to($usuario->email,$usuario->nombres)->subject('SIRE:: Seguimiento enviado a revisión');
-							});
-							$respuesta['notas'] = 'Con correo enviado';
+								Mail::send('emails.rendicion-cuentas.proyecto-a-revision', $data, function($message) use ($usuario){
+									$message->to($usuario->email,$usuario->nombres)->subject('SIRE:: Seguimiento enviado a revisión');
+								});
+								$respuesta['notas'] = 'Con correo enviado';	
+							}else{
+								$respuesta['notas'] = 'El usuario no tiene un correo electronico asignado';	
+							}
 						}else{
 							$respuesta['notas'] = 'Sin correo enviado';
 						}

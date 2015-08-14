@@ -19,25 +19,47 @@
             <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> {{ $sys_mod_activo->nombre }}</h4></div>
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-lg-6 col-md-6">
-                        <div class="input-group" style="margin:5px">                            
+                    <div class="col-md-5">
+                        <div class="form-group">
                             <input type="text" class="form-control txt-quick-search" placeholder="Buscar">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default btn-quick-search" type="button"><span class="glyphicon glyphicon-search"></span></button>
-                            </span>
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <select class="form-control" id="mes">
+                            @foreach($meses as $clave => $mes)
+                                <option value="{{$clave}}" @if($clave == $mes_actual) selected @endif>
+                                    {{$mes}}
+                                </option>
+                            @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input type="number" class="form-control" id="ejercicio" placeholder="Ejercicio" value="{{date('Y')}}" />
+                        </div>
+                    </div>
+                    <div class="col-sm-1">
+                        <button class="btn btn-default btn-block btn-quick-search" type="button"><span class="fa fa-search"></span></button>
+                    </div>
+                    <div class="col-sm-2">
+                        <button type="button" class="btn btn-info btn-block" id="btn-reporte-cuenta-publica">
+                            <span class="fa fa-file-word-o"></span> Reporte
+                        </button>
+                        <!--button type="button" class="btn btn-info" id="btn-datos-institucionales">
+                            <span class="fa fa-building"></span> Datos Institucionales
+                        </button-->
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
                         <div class="btn-toolbar pull-right" >
-                            <!--button type="button" class="btn btn-info" id="btn-datos-institucionales">
-                                <span class="fa fa-building"></span> Datos Institucionales
-                            </button-->
-                            <button type="button" class="btn btn-info" id="btn-reporte-cuenta-publica">
-                                <span class="fa fa-file-word-o"></span> Reporte
-                            </button>
-                            <button type="button" class="btn btn-success btn-edit-rows">
-                                <span class="fa fa-pencil"></span> Cuenta Pública
-                            </button>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-success btn-edit-rows">
+                                    <span class="fa fa-pencil"></span> Editar Texto de la Cuenta Pública
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
