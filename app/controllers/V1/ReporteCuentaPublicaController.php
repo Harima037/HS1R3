@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, View;
-use Excel, EvaluacionAnalisisFuncional, SysConfiguracionVariable, Proyecto;
+use Excel, EvaluacionAnalisisFuncional, SysConfiguracionVariable, Proyecto, SysGrupoModulo;
 
 class ReporteCuentaPublicaController extends BaseController {
 
@@ -29,6 +29,17 @@ class ReporteCuentaPublicaController extends BaseController {
 	 * @return Response
 	 */
 	public function index(){
+		if(!Sentry::hasAccess('REVISION.CUENTPUB.R')){
+			$datos['usuario'] = Sentry::getUser();
+			$datos['sys_sistemas'] = SysGrupoModulo::all();
+			return Response::view('errors.403', array(
+				'usuario'=>$datos['usuario'],
+				'sys_activo'=>null,
+				'sys_sistemas'=>$datos['sys_sistemas'],
+				'sys_mod_activo'=>null), 403
+			);
+		}
+
 		$phpWord = new \PhpOffice\PhpWord\PhpWord();
 
 		$phpWord->setDefaultFontName('Arial');
@@ -40,9 +51,22 @@ class ReporteCuentaPublicaController extends BaseController {
 		        'spacing'    => 0,
 		    )
 		);
+		$parametros = Input::all();
+		if(isset($parametros['mes'])){
+			$mes = $parametros['mes'];
+		}else{
+			$mes = Util::obtenerMesActual();
+			if($mes == 0){ $mes = date('n') - 1; }
+		}
+		
+		if(isset($parametros['ejercicio'])){
+			$ejercicio = $parametros['ejercicio'];
+		}else{
+			$ejercicio = date('Y');
+		}
 
 		$trimestres = array(1=>'PRIMER',2=>'SEGUNDO',3=>'TERCER',4=>'CUARTO');
-		$trimestre = Util::obtenerTrimestre();
+		$trimestre = Util::obtenerTrimestre($mes);
 
 		$titulo = array('bold' => true);
 		$titulo_tabla = array('bold' => true, 'size'=>10);
@@ -85,7 +109,7 @@ class ReporteCuentaPublicaController extends BaseController {
 		$cell->addTextBreak(0);
 		$cell->addText(htmlspecialchars('SECRETARÍA DE SALUD'),$titulo,$centrado);
 		$cell->addTextBreak(0);
-		$cell->addText(htmlspecialchars('ANÁLISIS FUNCIONAL AL '.$trimestres[$trimestre].' TRIMESTRE DEL '.date('Y')),$titulo,$centrado);
+		$cell->addText(htmlspecialchars('ANÁLISIS FUNCIONAL AL '.$trimestres[$trimestre].' TRIMESTRE DEL '.$ejercicio),$titulo,$centrado);
 		$row->addCell(3000)->addImage('img/LogoInstitucional.png');
 		
 		$table = $header->addTable('TablaClave');
@@ -113,12 +137,7 @@ class ReporteCuentaPublicaController extends BaseController {
 		$section->addText(htmlspecialchars($variables['vision']),$texto,$justificado);
 		//$section->addPageBreak();
 
-		$mes = Util::obtenerMesActual();
-		if($mes == 0){
-			$mes = date('n') - 1;
-		}
-
-		$rows = Proyecto::reporteCuentaPublica($mes,date('Y'));
+		$rows = Proyecto::reporteCuentaPublica($mes,$ejercicio);
 
 		$rows = $rows->with(array(
 		'componentesMetasMes'=>function($query){

@@ -73,7 +73,7 @@ class IndicadorResultadoController extends BaseController {
 
 				if($total<=0){
 					$http_status = 404;
-					$data = array('resultados'=>$total,"data"=>"No se encontraron variables",'code'=>'W00');
+					$data = array('resultados'=>$total,"data"=>"No hay datos",'code'=>'W00');
 				}
 
 				return Response::json($data,$http_status);
@@ -88,7 +88,7 @@ class IndicadorResultadoController extends BaseController {
 
 			if($total<=0){
 				$http_status = 404;
-				$data = array('resultados'=>$total,"data"=>"No se encontraron variables",'code'=>'W00');
+				$data = array('resultados'=>$total,"data"=>"No hay datos",'code'=>'W00');
 			}
 
 			return Response::json($data,$http_status);
@@ -109,13 +109,14 @@ class IndicadorResultadoController extends BaseController {
 		//
 		$http_status = 200;
 		$data = array();
-
+		$parametros = Input::all();
+		
 		try{
-			if(!isset($parametros['mes'])){
+			if(isset($parametros['mes'])){
+				$mes = intval($parametros['mes']);
+			}else{
 				$mes = Util::obtenerMesActual();
 				if($mes == 0){ $mes = date('n')-1; }
-			}else{
-				$mes = intval($parametros['mes']);
 			}
 
 			$recurso = Proyecto::select(

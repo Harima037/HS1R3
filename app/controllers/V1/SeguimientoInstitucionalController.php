@@ -7,7 +7,7 @@ use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime,Mail;
 use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,
 	RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionPlanMejora,EvaluacionComentario,
-	EvaluacionProyectoMes,ComponenteDesglose,Directorio;
+	EvaluacionProyectoMes,ComponenteDesglose,Directorio,BitacoraValidacionSeguimiento;
 
 class SeguimientoInstitucionalController extends BaseController {
 	private $reglasDatosInformacion = array(
@@ -391,6 +391,7 @@ class SeguimientoInstitucionalController extends BaseController {
 					$estatus = 5;
 				}
 			}
+
 			if($estatus == 3 && $mes_actual == 0){
 				$respuesta['http_status'] = 500;
 				$respuesta['data']['data'] = 'El limite de tiempo para capturar avances a terminado, el usuario no podra corregir los errores que se le señalen, por lo tanto se ha desactivo la corrección del avance.';
@@ -415,29 +416,43 @@ class SeguimientoInstitucionalController extends BaseController {
 										->select('sentryUsers.id','sentryUsers.nombres','sentryUsers.email',
 												'sentryUsers.apellidoPaterno','sentryUsers.apellidoMaterno')
 										->first();
+					$avance_mes =  EvaluacionProyectoMes::where('idProyecto','=',$id)
+											->where('mes','=',$mes_actual)->first();
 					if($usuario){
-						$avance_mes =  EvaluacionProyectoMes::where('idProyecto','=',$id)
-														->where('mes','=',$mes_actual)->first();
-						$data['usuario'] = $usuario;
-						$data['proyecto'] = $proyecto;
-						$data['mes_captura'] = Util::obtenerDescripcionMes($mes_actual);
-						$data['estatus'] = $avance_mes->idEstatus;
+						if($usuario->email){
+							$data['usuario'] = $usuario;
+							$data['proyecto'] = $proyecto;
+							$data['mes_captura'] = Util::obtenerDescripcionMes($mes_actual);
+							$data['estatus'] = $avance_mes->idEstatus;
 
-						if($avance_mes->idEstatus == 3){
-							$estatus_label = 'Con errores';
-						}elseif($avance_mes->idEstatus == 4){
-							$estatus_label = 'Registrado';
+							if($avance_mes->idEstatus == 3){
+								$estatus_label = 'Con errores';
+							}elseif($avance_mes->idEstatus == 4){
+								$estatus_label = 'Registrado';
+							}else{
+								$estatus_label = 'Firmado';
+							}
+							
+							Mail::send('emails.rendicion-cuentas.proyecto-revision-respuesta', $data, function($message) use ($usuario,$estatus_label){
+								$message->to($usuario->email,$usuario->nombres)->subject('SIRE:: Avance de Metas revisado ('.$estatus_label.')');
+							});
+							
+							$respuesta['data']['notas'] = 'Con correo enviado';
 						}else{
-							$estatus_label = 'Firmado';
+							$respuesta['data']['notas'] = 'El usuario no cuenta con correo electronico';
 						}
-
-						Mail::send('emails.rendicion-cuentas.proyecto-revision-respuesta', $data, function($message) use ($usuario,$estatus_label){
-							$message->to($usuario->email,$usuario->nombres)->subject('SIRE:: Avance de Metas revisado ('.$estatus_label.')');
-						});
-						$respuesta['notas'] = 'Con correo enviado';
 					}else{
-						$respuesta['notas'] = 'Sin correo enviado';
+						$respuesta['data']['notas'] = 'No hay un usuario asignado a este proyecto';
 					}
+					if($avance_mes->idEstatus != 1){
+		        		$bitacora = new BitacoraValidacionSeguimiento;
+						$bitacora->idUsuario 	= Sentry::getUser()->id;
+						$bitacora->idProyecto 	= $avance_mes->idProyecto;
+						$bitacora->idEstatus 	= $avance_mes->idEstatus;
+						$bitacora->mes 			= $avance_mes->mes;
+						$bitacora->ejercicio 	= $avance_mes->anio;
+						$bitacora->save();
+		        	}
 				}else{
 					$respuesta['http_status'] = 500;
 					$respuesta['data'] = array("data"=>"Ocurrio un error al intentar validar el proyecto.",'code'=>'S01');

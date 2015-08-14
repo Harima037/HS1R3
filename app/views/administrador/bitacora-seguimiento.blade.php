@@ -6,8 +6,7 @@
 @parent
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
-<script src="{{ URL::to('js/modulos/visor-directivo/institucional.js')}}"></script>
-<script src="{{ URL::to('js/modulos/visor-directivo/lista-proyectos.js') }}"></script>
+<script src="{{ URL::to('js/modulos/administrador/bitacora-seguimiento.js')}}"></script>
 @stop
 
 @section('aside')
@@ -16,40 +15,45 @@
 @section('content')
 <div class="row">
     <div class="col-md-12">
-        <div class="panel panel-default datagrid" id="datagridProyectos" data-edit-row="cargar_datos_proyecto" data-trim-activo="{{$trimestre_avance}}" data-mes-activo="{{$mes_avance}}" data-mes-actual="{{$mes_actual}}">
+        <div class="panel panel-default datagrid" id="dataGridModulo" data-edit-row="editar">
             <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> {{ $sys_mod_activo->nombre }}</h4></div>
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-lg-6 col-md-6">
-                        <div class="input-group" style="margin:5px">                            
+                    <div class="col-md-5">
+                        <div class="form-group">
                             <input type="text" class="form-control txt-quick-search" placeholder="Buscar">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default btn-quick-search" type="button"><span class="glyphicon glyphicon-search"></span></button>
-                            </span>
                         </div>
                     </div>
-                    <div class="col-lg-6">
-                        <div class="btn-toolbar pull-right" >
-                            <div class="btn-group" style="margin:5px">
-                                <button type="button" class="btn btn-success btn-edit-rows" id="btn-detalles-proyecto">
-                                    <span class="fa fa-edit"></span> Ver Detalles del Proyecto
-                                </button>
-                            </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <select class="form-control" id="mes">
+                            @foreach($meses as $clave => $mes)
+                                <option value="{{$clave}}" @if($clave == $mes_actual) selected @endif>
+                                    {{$mes}}
+                                </option>
+                            @endforeach
+                            </select>
                         </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input type="number" class="form-control" id="ejercicio" placeholder="Ejercicio" value="{{date('Y')}}" />
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <button class="btn btn-default btn-block btn-quick-search" type="button"><span class="fa fa-search"></span> Listar Proyectos</button>
                     </div>
                 </div>
             </div>
-            <table class="table table-striped table-hover table-condensed">
+            <table class="table table-striped table-hover">
                 <thead>
-                    <tr height="50">
+                    <tr>
                         <th><input type="checkbox" class="check-select-all-rows"></th>
-                        <th width="190">Clave Presupuestaria</th>
+                        <th width="190px">Clave</th>
                         <th>Nombre Técnico</th>
-                        @foreach ($meses as $mes)
-                            <th width="30" class="{{ ($mes[0]['clave'] == $mes_actual)?'bg-info':'' }}"><p class="texto-vertical">{{$mes[0]['abrev']}} </p></th>
-                            <th width="30" class="{{ ($mes[1]['clave'] == $mes_actual)?'bg-info':'' }}"><p class="texto-vertical">{{$mes[1]['abrev']}} </p></th>
-                            <th width="30" class="{{ ($mes[2]['clave'] == $mes_actual)?'bg-info':'' }}"><p class="texto-vertical">{{$mes[2]['abrev']}} </p></th>
-                        @endforeach
+                        <th style="width:120px;">Estatus</th>
+                        <th style="text-align:center; width:100px;"><span class="fa fa-user"></span></th>
+                        <th style="text-align:center; width:150px;"><span class="fa fa-calendar"></span></th>
                     </tr>
                 </thead>
                 <tbody></tbody>

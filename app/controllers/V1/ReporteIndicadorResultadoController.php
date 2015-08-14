@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, View, PDF, Exception;
-use Excel, EvaluacionAnalisisFuncional, SysConfiguracionVariable, Proyecto;
+use Excel, EvaluacionAnalisisFuncional, SysConfiguracionVariable, Proyecto, SysGrupoModulo;
 
 class ReporteIndicadorResultadoController extends BaseController {
 
@@ -30,6 +30,8 @@ class ReporteIndicadorResultadoController extends BaseController {
 	 */
 	public function index(){
 		if(!Sentry::hasAccess('REPORTES.INDIRESULT.R')){
+			$datos['usuario'] = Sentry::getUser();
+			$datos['sys_sistemas'] = SysGrupoModulo::all();
 			return Response::view('errors.403', array(
 				'usuario'=>$datos['usuario'],
 				'sys_activo'=>null,

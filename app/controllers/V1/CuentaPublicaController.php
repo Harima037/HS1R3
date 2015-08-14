@@ -32,7 +32,20 @@ class CuentaPublicaController extends \BaseController {
 			$parametros = Input::all();
 			if(isset($parametros['formatogrid'])){
 
-				$rows = EvaluacionAnalisisFuncional::cuentaPublica(Util::obtenerMesActual(),date('Y'));
+				if(isset($parametros['mes'])){
+					$mes = $parametros['mes'];
+				}else{
+					$mes = Util::obtenerMesActual();
+					if($mes == 0){ $mes = date('n') - 1; }
+				}
+				
+				if(isset($parametros['ejercicio'])){
+					$ejercicio = $parametros['ejercicio'];
+				}else{
+					$ejercicio = date('Y');
+				}
+
+				$rows = EvaluacionAnalisisFuncional::cuentaPublica($mes,$ejercicio);
 
 				$usuario = Sentry::getUser();
 				

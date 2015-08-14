@@ -62,7 +62,8 @@ $('#btn-datos-institucionales').on('click', function () {
 });
 
 $('#btn-reporte-cuenta-publica').on('click', function(){
-    window.open(SERVER_HOST+'/v1/reporte-cuenta-publica');
+    var parametros = '?mes='+$('#mes').val()+'&ejercicio='+$('#ejercicio').val();
+    window.open(SERVER_HOST+'/v1/reporte-cuenta-publica'+parametros);
 });
 
 $('#modalCuentaPublica').on('hidden.bs.modal',function(){
@@ -74,6 +75,26 @@ $('#modalDatosInstitucionales').on('hidden.bs.modal',function(){
     Validation.cleanFormErrors('#form_datos_institucionales');
     $('#form_datos_institucionales').get(0).reset();
 });
+
+$("#datagridCuentaPublica .txt-quick-search").off('keydown');
+$("#datagridCuentaPublica .txt-quick-search").on('keydown', function(event){
+    if (event.which == 13) {
+        realizar_busqueda();
+    }
+});
+
+$('#datagridCuentaPublica .btn-quick-search').off('click');
+$('#datagridCuentaPublica .btn-quick-search').on('click',function(){
+    realizar_busqueda();
+})
+
+function realizar_busqueda(){
+    moduloDatagrid.setPagina(1);
+    moduloDatagrid.parametros.buscar = $('.txt-quick-search').val();
+    moduloDatagrid.parametros.ejercicio = $('#ejercicio').val();
+    moduloDatagrid.parametros.mes = $('#mes').val();
+    moduloDatagrid.actualizar();
+}
 
 function editar(e){
     moduloResource.get(e,null,{

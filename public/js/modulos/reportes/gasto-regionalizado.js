@@ -68,11 +68,13 @@ function realizar_busqueda(){
 /*===================================*/
 // Configuración General para cualquier módulo
 $('#btn-ver-cedulas').on('click',function(){
-    /*var parametros = '?mes='+$('#mes').val()+'&ejercicio='+$('#ejercicio').val();
+    var parametros = '?mes='+$('#mes').val()+'&ejercicio='+$('#ejercicio').val();
+    /*
     if($('.txt-quick-search').val()){
         parametros += '&buscar='+$('.txt-quick-search').val();
-    }*/
-    window.open(SERVER_HOST+'/v1/gasto-regionalizado');
+    }
+    */
+    window.open(SERVER_HOST+'/v1/gasto-regionalizado'+parametros);
 });
 /*===================================*/
 // Funciones adicionales por módulo

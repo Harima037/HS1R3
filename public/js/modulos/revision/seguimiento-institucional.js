@@ -322,7 +322,9 @@ $('#btn-firmar').on('click',function(){
 			
 			moduloResource.put($('#btn-comentar-avance').attr('data-id-proyecto'),parametros,{
 						_success: function(response){
-							window.location = "../revision/segui-proyectos-inst";
+							//window.location = "../revision/segui-proyectos-inst";
+                            moduloDatagrid.actualizar();
+                            $('#modalDatosSeguimiento').modal('hide');
 							MessageManager.show({data:'El programa ha sido ha sido puesto en el estatus de firma',type:'OK',timer:3});					
 						},
 						_error: function(response){

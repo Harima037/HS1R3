@@ -39,6 +39,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('config-seg-metas',array('uses' => 'ConfigurarSeguimientoController@index'));
 		Route::get('purgar-seguimientos',array('uses' => 'PurgarSeguimientoController@index'));
 		Route::get('admin-proyectos',array('uses'=>'AdminProyectosController@index'));
+		Route::get('bitacora-seguimiento',array('uses'=>'BitacoraValidacionSeguimientoController@index'));
 	});
 
 	Route::group(array('prefix'=>'expediente'), function(){
@@ -90,25 +91,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('presupuesto',array('uses'=>'VisorController@indexPresupuesto'));
 		Route::get('presupuesto-meta',array('uses'=>'VisorController@indexPresupuestoMeta'));
 	});
-
-	Route::group(array('prefix'=>'visor-gerencial'),function(){
-		Route::get('proyectos-inst',array('uses'=>'VisorGerencialController@indexInstitucional'));
-		Route::get('proyectos-inv',array('uses'=>'VisorGerencialController@indexInversion'));
-
-		Route::get('ver-avance/{id}',array('uses'=>'VisorGerencialController@rendicionCuentas'));
-		Route::get('general',array('uses'=>'VisorGerencialController@desempenioGeneral'));
-	});
-
-	Route::group(array('prefix'=>'visor-directivo'),function(){
-		Route::get('proyectos-inst',array('uses'=>'VisorDirectivoController@indexInstitucional'));
-		Route::get('proyectos-inv',array('uses'=>'VisorDirectivoController@indexInversion'));
-		Route::get('ver-avance/{id}',array('uses'=>'VisorDirectivoController@rendicionCuentas'));
-
-		Route::get('general',array('uses'=>'VisorDirectivoController@desempenioGeneral'));
-		Route::get('presupuesto',array('uses'=>'VisorDirectivoController@presupuesto'));
-		Route::get('presupuesto-meta',array('uses'=>'VisorDirectivoController@presupuestoMeta'));
-	});
-
+	
 	Route::group(array('prefix'=>'rendicion-cuentas'),function(){
 		Route::get('rend-cuenta-inst',array('uses'=>'SeguimientoController@indexInstitucional'));
 		Route::get('rend-cuenta-inv',array('uses'=>'SeguimientoController@indexInversion'));
@@ -148,6 +131,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('config-seg-metas', 	'V1\ConfigurarSeguimientoController', array('only' => array('store')));
 		Route::resource('purgar-seguimientos',	'V1\PurgarSeguimientoController');
 		Route::resource('admin-proyectos',		'V1\AdminProyectosController', array('only' => array('index','show','update')));
+		Route::resource('bitacora-seguimiento',	'V1\BitacoraValidacionSeguimientoController', array('only' => array('index')));
 		
 		Route::resource('proyectos',		'V1\ProyectosController');
 		Route::resource('inversion',		'V1\InversionController');
@@ -155,8 +139,6 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('fibap',			'V1\FibapController');
 
 		Route::resource('visor', 			'V1\VisorController', array('only' => array('index','show')));
-		Route::resource('visor-gerencial', 	'V1\VisorGerencialController', array('only' => array('index','show')));
-		Route::resource('visor-directivo', 	'V1\VisorDirectivoController', array('only' => array('index','show')));
 
 		Route::resource('rend-cuenta-inst', 	'V1\SeguimientoController');
 		Route::resource('rend-cuenta-inv', 		'V1\SeguimientoController');
