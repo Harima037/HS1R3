@@ -22,6 +22,8 @@ function datos_cargados(){
 }
 
 function cargarGrafica(tipo_grafica){
+	$('#imagen').val('');
+	$('#imagen2').val('');
 	if($('#jurisdiccion').val() != ''){
 		graficaMetasJurisdiccion();
 	}else{
@@ -43,10 +45,14 @@ function graficaMetasJurisdiccion(){
 
 			var options = { 
 				title:'Metas ( '+response.total.format(2)+' )',
-				legend:{position:'bottom'}
+				legend:{position:'bottom'},
+				chartArea:{ width:'80%',height:'80%',left:10,right:0,top:60,bottom:0 }
 			};
 
 			var chart = new google.visualization.PieChart(document.getElementById('left-grafica'));
+			google.visualization.events.addListener(chart, 'ready', function () {
+		      $('#imagen').val(chart.getImageURI());
+		    });
 			chart.draw(data, options);
 
 			var data = google.visualization.arrayToDataTable([
@@ -61,11 +67,15 @@ function graficaMetasJurisdiccion(){
 				slices:{
 					0: {color:'#DC3912'},
 					1: {color:'#AA1505'}
-				}
+				},
+				chartArea:{ width:'80%',height:'80%',left:10,right:0,top:60,bottom:0 }
 			};
 
-			var chart = new google.visualization.PieChart(document.getElementById('right-grafica'));
-			chart.draw(data, options);
+			var chart2 = new google.visualization.PieChart(document.getElementById('right-grafica'));
+			google.visualization.events.addListener(chart2, 'ready', function () {
+		      $('#imagen2').val(chart2.getImageURI());
+		    });
+			chart2.draw(data, options);
 		}
 	});
 }
@@ -92,13 +102,24 @@ function graficaMetasCumplidas(){
 	            vAxis: { title: 'Porcentaje',maxValue:100,minValue:0},
 	            legend:{ position:'none' },
 	            annotations: { alwaysOutside:true },
-	            tooltip: {isHtml: true}
+	            tooltip: {isHtml: true},
+	            chartArea:{ width:'100%',left:60}
 	        };
 	        var chart = new google.visualization.ColumnChart(document.getElementById('area-graficas'));
+	        google.visualization.events.addListener(chart, 'ready', function () {
+		      $('#imagen').val(chart.getImageURI());
+		    });
 	        chart.draw(data, options);
 		}
 	});
 }
+
+$('#btn-imprimir-grafica').on('click',function(){
+	if($('#imagen').val()){
+		$('#form-grafica').attr('action',SERVER_HOST+'/visor/imprimir-grafica');
+		$('#form-grafica').submit();
+	}
+});
 
 /**
  * Number.prototype.format(n, x)

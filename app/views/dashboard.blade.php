@@ -30,7 +30,7 @@
 		<div class="panel panel-primary">
 			<div class="panel-heading"><b>Mes de Captura:</b> {{$mes}} <span class="pull-right">{{date('Y')}}</span></div>
 			<table class="table table-condensed">
-			@if($mes_activo > 0 && (isset($permisos['RENDINST']) || isset($permisos['RENDINV']) ))
+			@if($mes_activo > 0 && (isset($permisos['RENDINST']) || isset($permisos['RENDINV']) || isset($permisos['VIPROYINST']) ))
 				<tr>
 					<td>Captura de Seguimiento de Metas</td>
 					<td>
@@ -82,6 +82,11 @@
 			@endif
 			</table>
 		</div>
+		@if(isset($permisos['VIPROYINST']))
+		<div class="panel panel-primary">
+			<div class="panel-heading"><b>Mes de Información:</b> {{$mes_info}} <span class="pull-right">{{date('Y')}}</span></div>
+		</div>
+		@endif
 	@endif
 	<div class="panel panel-default">
 		    <div class="panel-heading"><h4><span class="fa fa-file"></span> Proyectos</h4></div>

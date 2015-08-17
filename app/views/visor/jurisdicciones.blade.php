@@ -42,6 +42,13 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-sm-12">
+                        <form id="form-grafica" action="" method="POST" target="_blank">
+                            <input type="hidden" value="" name="imagen" id="imagen">
+                            <input type="hidden" value="" name="imagen2" id="imagen2">
+                        </form>
+                        <button type="button" class="btn btn-primary pull-right" id="btn-imprimir-grafica"><span class="fa fa-print"></span> Imprimir</button>
+                    </div>
                 </div>
             </div>
         </div>

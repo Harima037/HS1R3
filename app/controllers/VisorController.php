@@ -225,4 +225,27 @@ class VisorController extends BaseController {
 			);
 		}
 	}
+
+	public function imprimirGrafica(){
+		$parametros = Input::all();
+		$html_content = 'No hay imagen';
+		$html_content_2 = '';
+		if(isset($parametros['imagen'])){
+			$html_content = $parametros['imagen'];
+		}
+		if(isset($parametros['imagen2'])){
+			$html_content_2 = $parametros['imagen2'];
+		}
+		if($html_content_2 != ''){
+			$html = '<div style="width:100%;"><img src="'.$html_content.'" style="width:50%;">';
+			$html .= '<img src="'.$html_content_2.'" style="width:50%;"></div>';
+		}else{
+			$html = '<div style="width:100%"><img src="'.$html_content.'" style="width:100%;"></div>';
+		}
+		$pdf = PDF::setPaper('LETTER')
+					->setOrientation('landscape')
+					->setWarnings(false)
+					->loadHtml($html);
+		return $pdf->stream('Grafica.pdf');
+	}
 }

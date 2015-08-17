@@ -55,8 +55,10 @@ class DashboardController extends \BaseController {
 
 		if($mes){
 			$datos['mes'] = Util::obtenerDescripcionMes($mes);
+			$datos['mes_info'] = Util::obtenerDescripcionMes($mes-1);
 		}else{
 			$datos['mes'] = 'No disponible';
+			$datos['mes_info'] = Util::obtenerDescripcionMes(date('n')-1);
 		}
 		$datos['mes_activo'] = $mes;
 		$datos['mes_trimestre'] = $mes_trimestre;
@@ -72,7 +74,7 @@ class DashboardController extends \BaseController {
 
 		$permisos = array();
 		$grupos = array(
-				'RENDCUENTA.RENDINST.R','RENDCUENTA.RENDINV.R','RENDCUENTA.RENDPROG.R','RENDCUENTA.RENDFASSA.R'
+				'RENDCUENTA.RENDINST.R','RENDCUENTA.RENDINV.R','RENDCUENTA.RENDPROG.R','RENDCUENTA.RENDFASSA.R','VISORGEN.VIPROYINST.R'
 			);
 		if(Sentry::hasAnyAccess($grupos)){
 			foreach ($grupos as $grupo) {

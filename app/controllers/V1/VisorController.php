@@ -72,7 +72,11 @@ class VisorController extends BaseController {
 					break;
 				case 'presupuesto_fuente':
 						$mes_actual = Util::obtenerMesActual();
-						if($mes_actual == 0){ $mes_actual = date('n') -1; }
+						if($mes_actual == 0){ 
+							$mes_actual = date('n')-1; 
+						}else{
+							$mes_actual = $mes_actual-1;
+						}
 
 						$rows = CargaDatosEP01::where('mes','=',$mes_actual);
 
@@ -97,7 +101,11 @@ class VisorController extends BaseController {
 					break;
 				case 'presupuesto_ejercido_capitulo':
 						$mes_actual = Util::obtenerMesActual();
-						if($mes_actual == 0){ $mes_actual = date('n') -1; }
+						if($mes_actual == 0){ 
+							$mes_actual = date('n')-1; 
+						}else{
+							$mes_actual = $mes_actual-1;
+						}
 
 						$rows = CargaDatosEP01::where('mes','=',$mes_actual);
 
@@ -122,9 +130,12 @@ class VisorController extends BaseController {
 					break;
 				case 'presupuesto_ejercido':
 						$mes_actual = Util::obtenerMesActual();
-						if($mes_actual == 0){
-							$mes_actual = date('n') -1;
+						if($mes_actual == 0){ 
+							$mes_actual = date('n')-1; 
+						}else{
+							$mes_actual = $mes_actual-1;
 						}
+
 						$presupuesto = CargaDatosEP01::getModel();
 						$usuario = Sentry::getUser();
 						if($usuario->claveUnidad){
@@ -166,8 +177,10 @@ class VisorController extends BaseController {
 					break;
 				case 'metas_cumplidas':
 						$mes_actual = Util::obtenerMesActual();
-						if($mes_actual == 0){
-							$mes_actual = date('n') -1;
+						if($mes_actual == 0){ 
+							$mes_actual = date('n')-1; 
+						}else{
+							$mes_actual = $mes_actual-1;
 						}
 
 						$componentes = ComponenteMetaMes::getModel();
@@ -838,7 +851,11 @@ class VisorController extends BaseController {
 
 	public function presupuestoEjercidoPorUnidad(){
 		$mes_actual = Util::obtenerMesActual();
-		if($mes_actual == 0){ $mes_actual = date('n') -1; }
+		if($mes_actual == 0){ 
+			$mes_actual = date('n')-1; 
+		}else{
+			$mes_actual = $mes_actual-1;
+		}
 
 		$rows = CargaDatosEP01::getModel();
 
@@ -863,8 +880,10 @@ class VisorController extends BaseController {
 
 	public function metasCumplidasPorUnidad(){
 		$mes_actual = Util::obtenerMesActual();
-		if($mes_actual == 0){
-			$mes_actual = date('n') -1;
+		if($mes_actual == 0){ 
+			$mes_actual = date('n')-1; 
+		}else{
+			$mes_actual = $mes_actual-1;
 		}
 
 		$usuario = Sentry::getUser();
@@ -969,7 +988,11 @@ class VisorController extends BaseController {
 
 	public function metasCumplidasPorJurisdiccion(){
 		$mes_actual = Util::obtenerMesActual();
-		if($mes_actual == 0){ $mes_actual = date('n') -1; }
+		if($mes_actual == 0){ 
+			$mes_actual = date('n')-1; 
+		}else{
+			$mes_actual = $mes_actual-1;
+		}
 
 		$componentes = ComponenteMetaMes::where('mes','<=',$mes_actual)
 						->join('proyectos',function($join){

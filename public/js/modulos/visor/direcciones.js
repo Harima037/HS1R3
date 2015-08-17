@@ -24,6 +24,7 @@ function datos_cargados(){
 }
 
 function cargarGrafica(tipo_grafica){
+	$('#imagen').val('');
 	switch(tipo_grafica){
 		case 'unidad_metas_cumplidas': graficaMetasCumplidas(); break;
 		case 'unidad_persupuesto_ejercido': graficaPresupuestoEjercido(); break;
@@ -52,9 +53,13 @@ function graficaMetasCumplidas(){
 	            vAxis: { title: 'Porcentaje',maxValue:100,minValue:0},
 	            legend:{ position:'none' },
 	            annotations: { textStyle: { fontSize:10 }, alwaysOutside:true },
-	            tooltip: {isHtml: true}
+	            tooltip: {isHtml: true},
+	            chartArea:{ width:'100%',left:60}
 	        };
 	        var chart = new google.visualization.ColumnChart(document.getElementById('area-graficas'));
+	        google.visualization.events.addListener(chart, 'ready', function () {
+		      $('#imagen').val(chart.getImageURI());
+		    });
 	        chart.draw(data, options);
 		}
 	});
@@ -76,14 +81,18 @@ function graficaPresupuestoEjercido(){
 
 			var data = new google.visualization.arrayToDataTable(data_unidades);
 	        var options = {
-	            title: 'Porcentaje de Presupuseto Ejercido por Unidad Responsable',
+	            title: 'Porcentaje de Presupuesto Ejercido por Unidad Responsable',
 	            hAxis: { title: 'Unidad Responsable' },
 	            vAxis: { title: 'Porcentaje',maxValue:100,minValue:0},
 	            legend:{ position:'none' },
 	            annotations: { textStyle: { fontSize:10 }, alwaysOutside:true },
-	            tooltip: {isHtml: true}
+	            tooltip: {isHtml: true},
+	            chartArea:{ width:'100%',left:60}
 	        };
 	        var chart = new google.visualization.ColumnChart(document.getElementById('area-graficas'));
+	        google.visualization.events.addListener(chart, 'ready', function () {
+		      $('#imagen').val(chart.getImageURI());
+		    });
 	        chart.draw(data, options);
 		}
 	});
@@ -128,14 +137,26 @@ function graficaMetasPresupuesto(){
 					minValue:0
 				},
 				tooltip: {isHtml: true},
-				annotations: { alwaysOutside:true }
+				annotations: { alwaysOutside:true },
+				legend:{position:'top'},
+				chartArea:{ width:'100%',left:60}
 			};
 
 			var chart = new google.visualization.ColumnChart(document.getElementById('area-graficas'));
+			google.visualization.events.addListener(chart, 'ready', function () {
+		      $('#imagen').val(chart.getImageURI());
+		    });
 			chart.draw(data, options);
 		}
 	});
 }
+
+$('#btn-imprimir-grafica').on('click',function(){
+	if($('#imagen').val()){
+		$('#form-grafica').attr('action',SERVER_HOST+'/visor/imprimir-grafica');
+		$('#form-grafica').submit();
+	}
+});
 
 /**
  * Number.prototype.format(n, x)

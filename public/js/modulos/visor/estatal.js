@@ -32,6 +32,8 @@ function cargarGrafica(tipo_grafica){
 	$('#filtro-jurisdicciones').addClass('hidden');
 	$('#panel-btn-filtro').addClass('hidden');
 	$('#btn-filtro').attr('data-grafica',tipo_grafica);
+	$('#imagen').val('');
+	$('#imagen2').val('');
 	switch(tipo_grafica){
 		case 'proy_unidad': graficaProyectosDireccion(); break;
 		case 'proy_tipos': graficaProyectosTipo(); break;
@@ -82,10 +84,14 @@ function graficaMetasCumplidas(){
 
 			var options = { 
 				title:'Metas ( '+response.total.format(2)+' )',
-				legend:{position:'bottom'}
+				legend:{position:'bottom'},
+				chartArea:{ width:'80%',height:'80%',left:10,right:0,top:60,bottom:0 }
 			};
 
 			var chart = new google.visualization.PieChart(document.getElementById('left-grafica'));
+			google.visualization.events.addListener(chart, 'ready', function () {
+		      $('#imagen').val(chart.getImageURI());
+		    });
 			chart.draw(data, options);
 
 			var data = google.visualization.arrayToDataTable([
@@ -100,11 +106,15 @@ function graficaMetasCumplidas(){
 				slices:{
 					0: {color:'#DC3912'},
 					1: {color:'#AA1505'}
-				}
+				},
+				chartArea:{ width:'80%',height:'80%',left:10,right:0,top:60,bottom:0 }
 			};
 
-			var chart = new google.visualization.PieChart(document.getElementById('right-grafica'));
-			chart.draw(data, options);
+			var chart2 = new google.visualization.PieChart(document.getElementById('right-grafica'));
+			google.visualization.events.addListener(chart2, 'ready', function () {
+		      $('#imagen2').val(chart2.getImageURI());
+		    });
+			chart2.draw(data, options);
 		}
 	});
 }
@@ -126,10 +136,14 @@ function graficaMetasDireccion(){
 
 			var options = { 
 				title:'Metas Programadas por Dirección ( Total de Metas : ' + (parseFloat(response.total)||0).format(2) + ' )',
-				legend:{position:'right',alignment:'center'}
+				legend:{position:'right',alignment:'center'},
+				chartArea:{ width:'100%',height:'100%',left:0,right:0,top:60,bottom:0 }
 			};
 
 			var chart = new google.visualization.PieChart(document.getElementById('area-graficas'));
+			google.visualization.events.addListener(chart, 'ready', function () {
+		      $('#imagen').val(chart.getImageURI());
+		    });
 			chart.draw(data, options);
 		}
 	});
@@ -162,10 +176,14 @@ function graficaPresupuestoEjercido(){
 
 			var options = { 
 				title:'Presupuesto : $ '+(parseFloat(response.data.presupuestoModificado)||0).format(2),
-				legend:{position:'bottom',alignment:'center'}
+				legend:{position:'right',alignment:'center'},
+				chartArea:{ width:'100%',height:'100%',left:0,right:0,top:60,bottom:0 }
 			};
 
 			var chart = new google.visualization.PieChart(document.getElementById('area-graficas'));
+			google.visualization.events.addListener(chart, 'ready', function () {
+		      $('#imagen').val(chart.getImageURI());
+		    });
 			chart.draw(data, options);
 		}
 	});
@@ -191,10 +209,14 @@ function graficaPresupuestoEjercidoCapitulo(){
 
 			var options = { 
 				title:'Presupuesto : $ '+(parseFloat(response.total)||0).format(2),
-				legend:{position:'right',alignment:'center'}
+				legend:{position:'right',alignment:'center'},
+				chartArea:{ width:'100%',height:'100%',left:0,right:0,top:60,bottom:0 }
 			};
 
 			var chart = new google.visualization.PieChart(document.getElementById('area-graficas'));
+			google.visualization.events.addListener(chart, 'ready', function () {
+		      $('#imagen').val(chart.getImageURI());
+		    });
 			chart.draw(data, options);
 		}
 	});
@@ -225,10 +247,14 @@ function graficaPresupuestoFuente(){
 
 			var options = { 
 				title:'Presupuesto : $ '+(parseFloat(response.total)||0).format(2),
-				legend:{position:'right',alignment:'center'}
+				legend:{position:'right',alignment:'center'},
+				chartArea:{ width:'100%',height:'100%',left:0,right:0,top:60,bottom:0 }
 			};
 
 			var chart = new google.visualization.PieChart(document.getElementById('area-graficas'));
+			google.visualization.events.addListener(chart, 'ready', function () {
+		      $('#imagen').val(chart.getImageURI());
+		    });
 			chart.draw(data, options);
 		}
 	});
@@ -251,11 +277,17 @@ function graficaProyectosDireccion(){
 
 			var options = { 
 				title:'Proyectos Autorizados por Dirección ( Total de Proyectos : ' + (parseFloat(response.total)||0).format(2) + ' )',
-				legend:{position:'right',alignment:'center'}
+				legend:{position:'right',alignment:'center'},
+				chartArea:{ width:'100%',height:'100%',left:0,right:0,top:60,bottom:0 }
 			};
 
 			var chart = new google.visualization.PieChart(document.getElementById('area-graficas'));
-			chart.draw(data, options);
+			
+			google.visualization.events.addListener(chart, 'ready', function () {
+		      $('#imagen').val(chart.getImageURI());
+		    });
+
+		    chart.draw(data, options);
 		}
 	});
 }
@@ -277,14 +309,27 @@ function graficaProyectosTipo(){
 
 			var options = { 
 				title:'Proyectos Autorizados por Tipo ( Total de Proyectos : ' + (parseFloat(response.total)||0).format(2) + ' )',
-				legend:{position:'right',alignment:'center'}
+				legend:{position:'right',alignment:'center'},
+				chartArea:{
+					width:'100%',height:'100%',left:0,right:0,top:60,bottom:0
+				}
 			};
 
 			var chart = new google.visualization.PieChart(document.getElementById('area-graficas'));
+			google.visualization.events.addListener(chart, 'ready', function () {
+		      $('#imagen').val(chart.getImageURI());
+		    });
 			chart.draw(data, options);
 		}
 	});
 }
+
+$('#btn-imprimir-grafica').on('click',function(){
+	if($('#imagen').val()){
+		$('#form-grafica').attr('action',SERVER_HOST+'/visor/imprimir-grafica');
+		$('#form-grafica').submit();
+	}
+});
 
 /**
  * Number.prototype.format(n, x)

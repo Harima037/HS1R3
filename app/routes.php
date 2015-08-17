@@ -90,6 +90,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('general',array('uses'=>'VisorController@indexDesempenioGeneral'));
 		Route::get('presupuesto',array('uses'=>'VisorController@indexPresupuesto'));
 		Route::get('presupuesto-meta',array('uses'=>'VisorController@indexPresupuestoMeta'));
+
+		Route::post('imprimir-grafica',array('uses'=>'VisorController@imprimirGrafica'));
 	});
 	
 	Route::group(array('prefix'=>'rendicion-cuentas'),function(){
