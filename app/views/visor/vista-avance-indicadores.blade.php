@@ -329,6 +329,17 @@
 				</div>
             </div>
             <div class="modal-footer">
+            	<div class="pull-left">
+                        <form id="form-grafica" action="" method="POST" target="_blank">
+                            <input type="hidden" value="" name="grafica-mensual" id="grafica-mensual">
+                            <input type="hidden" value="" name="grafica-jurisdiccional" id="grafica-jurisdiccional">
+                            <input type="hidden" value="" name='nivel' id='nivel'>
+							<input type="hidden" value="detalles-avance-indicador" name='mostrar' id='mostrar'>
+							<input type="hidden" value="" name='jurisdiccion' id='jurisdiccion'>
+							<input type="hidden" value="" name='id-indicador' id='id-indicador'>
+                        </form>
+                        <button type="button" class="btn btn-primary pull-right" id="btn-imprimir-grafica"><span class="fa fa-print"></span> Imprimir</button>
+                    </div>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
             </div>
         </div><!-- /.modal-content -->

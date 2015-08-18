@@ -30,6 +30,10 @@ function datos_cargados(){
 function cargarGrafica(tipo_grafica){
 	$('#filtro-unidades').addClass('hidden');
 	$('#filtro-jurisdicciones').addClass('hidden');
+	$('#unidad').val('');
+	//$('#filtro-unidades').change();
+	$('#jurisdiccion').val('');
+	//$('#filtro-jurisdicciones').change();
 	$('#panel-btn-filtro').addClass('hidden');
 	$('#btn-filtro').attr('data-grafica',tipo_grafica);
 	$('#imagen').val('');

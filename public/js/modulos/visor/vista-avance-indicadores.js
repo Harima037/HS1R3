@@ -39,6 +39,7 @@ $('#btn-proyecto-cancelar').on('click',function(){
 var google_api = false;
 var charts = {};
 var charts_data = {};
+var charts_images = {};
 
 // Load the Visualization API and the piechart package.
 google.load('visualization', '1.0', {'packages':['corechart']});
@@ -81,18 +82,36 @@ accionesDatagrid.actualizar({
     } 
 });
 
+$('#btn-imprimir-grafica').on('click',function(){
+    $('#grafica-mensual').val('');
+    $('#grafica-jurisdiccional').val('');
+
+    $('#grafica-mensual').val(charts_images['mensual']);
+    if(charts_images['jurisdiccion']){
+        $('#grafica-jurisdiccional').val(charts_images['jurisdiccion']);
+    }
+    if($('#grafica-mensual').val()){
+        $('#form-grafica').attr('action',SERVER_HOST+'/visor/imprimir-grafica');
+        $('#form-grafica').submit();
+    }
+});
+
 function seguimiento_metas(e){
     var datos_id = e.split('-');
     if(datos_id[0] == '1'){
         var nivel = 'componente';
+        $('#nivel').val('componente');
     }else{
         var nivel = 'actividad';
+        $('#nivel').val('actividad');
     }
     var parametros = {'mostrar':'detalles-avance-indicador','nivel':nivel};
     if(accionesDatagrid.parametros.jurisdiccion){
         parametros.jurisdiccion = accionesDatagrid.parametros.jurisdiccion;
+        $('#jurisdiccion').val(accionesDatagrid.parametros.jurisdiccion);
     }
     var id = datos_id[1];
+    $('#id-indicador').val(id);
     moduloResource.get(id,parametros,{
         _success: function(response){
             var meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -315,7 +334,7 @@ function seguimiento_metas(e){
                         $('#avance-mes-'+i).text(avance_actual.format(2));
                         $('#avance-total-'+i).text(avance_acumulado.format(2));
                         $('#porcentaje-acumulado-'+i).html('<div class="'+clase+'"><small><span class="fa '+icono+'"></span> '+porcentaje.format(2) + ' %</small></div>');
-                        if(i == mes_actual){ $('#mensaje-alerta').removeClass('hidden'); }
+                        if(i == mes_actual && estatus != 1){ $('#mensaje-alerta').removeClass('hidden'); }
                         else{ $('#mensaje-alerta').addClass('hidden'); }
                     }
                 }
@@ -550,6 +569,7 @@ function resizeCharts (key) {
     }
 }
 function generateCharts(){
+    delete charts_images['mensual'];
     if(charts_data['mensual']){
         var data = new google.visualization.DataTable();
         data.addColumn('string', 'X');
@@ -595,24 +615,37 @@ function generateCharts(){
             },
             legend:{ position:'none' },
             tooltip: {isHtml: true},
-            pointSize:6
+            pointSize:6,
+            chartArea:{ width:'100%',left:60}
         };
         // Instantiate and draw our chart, passing in some options.
         var chart = new google.visualization.LineChart(document.getElementById('grafica_cumplimiento_mensual'));
+        google.visualization.events.addListener(chart, 'ready', function () {
+            if(!charts_images['mensual']){
+                charts_images['mensual'] = charts['mensual'].chart.getImageURI();
+            }
+        });
         charts['mensual']={chart:chart,data:data,options:options};
     }
-    
+    delete charts['jurisdiccion'];
+    delete charts_images['jurisdiccion'];
     if(charts_data['jurisdiccion']){
         var data = new google.visualization.arrayToDataTable(charts_data['jurisdiccion']);
         var options = {
-            title: 'Porcentaje de cumplimiento de metas por Jurisdicción con corte al mes actual',
+            title: 'Porcentaje de cumplimiento de metas por Jurisdicción',
             hAxis: { title: 'Jurisdicciones' },
             vAxis: { title: 'Porcentaje',maxValue:100,minValue:0},
             legend:{ position:'none' },
             annotations: { textStyle: { fontSize:10 }, alwaysOutside:true },
-            tooltip: {isHtml: true}
+            tooltip: {isHtml: true},
+            chartArea:{ width:'100%',left:60}
         };
         var chart = new google.visualization.ColumnChart(document.getElementById('grafica_cumplimiento_jurisdiccion'));
+        google.visualization.events.addListener(chart, 'ready', function () {
+            if(!charts_images['jurisdiccion']){
+                charts_images['jurisdiccion'] = charts['jurisdiccion'].chart.getImageURI();
+            }
+        });
         charts['jurisdiccion']={chart:chart,data:data,options:options};
     }else{
         $('#grafica_cumplimiento_jurisdiccion').html('<div class="alert alert-info">No se tienen avances resgistrados o programados para ninguna Jurisdicción</div>');

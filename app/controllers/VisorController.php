@@ -228,24 +228,53 @@ class VisorController extends BaseController {
 
 	public function imprimirGrafica(){
 		$parametros = Input::all();
-		$html_content = 'No hay imagen';
-		$html_content_2 = '';
-		if(isset($parametros['imagen'])){
-			$html_content = $parametros['imagen'];
-		}
-		if(isset($parametros['imagen2'])){
-			$html_content_2 = $parametros['imagen2'];
-		}
-		if($html_content_2 != ''){
-			$html = '<div style="width:100%;"><img src="'.$html_content.'" style="width:50%;">';
-			$html .= '<img src="'.$html_content_2.'" style="width:50%;"></div>';
+
+		if(isset($parametros['mostrar'])){
+			$request = Request::create('v1/visor/'.$parametros['id-indicador'], 'GET', $parametros);
+			$data = json_decode(Route::dispatch($request)->getContent());
+
+			$meses_capturados = array();
+			foreach ($data->data->meses as $clave => $datos_mes) {
+				$meses_capturados[$clave] = $datos_mes;
+			}
+			$data->data->meses = $meses_capturados;
+
+			$mes_actual = Util::obtenerMesActual();
+			if($mes_actual == 0){ $mes_actual = date('n')-1; }
+			$datos = array(
+				'data' => $data->data,
+				'meses' => array(1=>'Enero',2=>'Febrero',3=>'Marzo',4=>'Abril',5=>'Mayo',6=>'Junio',
+						7=>'Julio',8=>'Agosto',9=>'Septiembre',10=>'Octubre',11=>'Noviembre',12=>'Diciembre'),
+				'mes_clave'=>$mes_actual,
+				'tomar'	=> $data->data->tomar,
+				'srcGraficaMensual' => 'src="'.$parametros['grafica-mensual'].'"',
+				'srcGraficaJurisdiccional' => 'src="'.$parametros['grafica-jurisdiccional'].'"'
+			);
+			
+			$pdf = PDF::setPaper('LETTER')
+						->setOrientation('portrait')
+						->setWarnings(false)
+						->loadView('visor.pdf.reporte-graficas-indicador',$datos);
 		}else{
-			$html = '<div style="width:100%"><img src="'.$html_content.'" style="width:100%;"></div>';
+			$html_content = 'No hay imagen';
+			$html_content_2 = '';
+			if(isset($parametros['imagen'])){
+				$html_content = $parametros['imagen'];
+			}
+			if(isset($parametros['imagen2'])){
+				$html_content_2 = $parametros['imagen2'];
+			}
+			if($html_content_2 != ''){
+				$html = '<div style="width:100%;"><img src="'.$html_content.'" style="width:50%;float:left;">';
+				$html .= '<img src="'.$html_content_2.'" style="width:50%;float:left;"></div>';
+			}else{
+				$html = '<div style="width:100%"><img src="'.$html_content.'" style="width:100%;"></div>';
+			}
+			$pdf = PDF::setPaper('LETTER')
+						->setOrientation('landscape')
+						->setWarnings(false)
+						->loadHtml($html);
 		}
-		$pdf = PDF::setPaper('LETTER')
-					->setOrientation('landscape')
-					->setWarnings(false)
-					->loadHtml($html);
 		return $pdf->stream('Grafica.pdf');
 	}
 }
