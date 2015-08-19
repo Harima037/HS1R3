@@ -239,6 +239,22 @@ class VisorController extends BaseController {
 			}
 			$data->data->meses = $meses_capturados;
 
+			$lista_jurisdicciones = array('0'=>'OFICINA CENTRAL') + Jurisdiccion::all()->lists('nombre','clave');
+			$jurisdicciones = array();
+			foreach ($data->data->jurisdicciones as $clave => $datos_juris) {
+				$jurisdicciones[$clave] = json_decode(json_encode($datos_juris),true);
+			}
+			foreach ($lista_jurisdicciones as $clave => $datos_juris) {
+				if(!isset($jurisdicciones[intval($clave)])){
+					$jurisdicciones[intval($clave)] = array(
+						'nombre'=>$datos_juris,
+						'clave'=>($clave=='0')?'OC':$clave
+					);
+				}
+			}
+			ksort($jurisdicciones);
+			$data->data->jurisdicciones = $jurisdicciones;
+
 			$mes_actual = Util::obtenerMesActual();
 			if($mes_actual == 0){ $mes_actual = date('n')-1; }
 			$datos = array(

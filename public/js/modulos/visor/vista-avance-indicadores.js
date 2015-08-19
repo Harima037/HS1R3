@@ -114,6 +114,8 @@ function seguimiento_metas(e){
     $('#id-indicador').val(id);
     moduloResource.get(id,parametros,{
         _success: function(response){
+            $('#tabs-seguimiento-metas a:first').tab('show');
+
             var meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
             $('#modalEditarAvance').find(".modal-title").html("Estado del Avance de Metas al mes de "+meses[$('#mes').val()-1]);
 
@@ -137,6 +139,12 @@ function seguimiento_metas(e){
                 $('#fecha-notificacion').text(plan_mejora.fechaNotificacion);
             }else{
                 $('#tab-link-plan-mejora').addClass('hidden');
+            }
+
+            if(response.data.planMejora && response.data.tomar == 'meses'){
+                $('#mensaje-alerta').removeClass('hidden');
+            }else{
+                $('#mensaje-alerta').addClass('hidden');
             }
 
             var total_meta_mes = 0;
@@ -334,8 +342,8 @@ function seguimiento_metas(e){
                         $('#avance-mes-'+i).text(avance_actual.format(2));
                         $('#avance-total-'+i).text(avance_acumulado.format(2));
                         $('#porcentaje-acumulado-'+i).html('<div class="'+clase+'"><small><span class="fa '+icono+'"></span> '+porcentaje.format(2) + ' %</small></div>');
-                        if(i == mes_actual && estatus != 1){ $('#mensaje-alerta').removeClass('hidden'); }
-                        else{ $('#mensaje-alerta').addClass('hidden'); }
+                        /*if(i == mes_actual && estatus != 1){ $('#mensaje-alerta').removeClass('hidden'); }
+                        else{ $('#mensaje-alerta').addClass('hidden'); }*/
                     }
                 }
             }
@@ -354,7 +362,6 @@ function seguimiento_metas(e){
                 }
             }
 
-            $('#tabs-seguimiento-metas a:first').tab('show');
             $('#modalEditarAvance').modal('show');
         }
     });    

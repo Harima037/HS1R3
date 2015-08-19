@@ -56,16 +56,16 @@
 					Mes
 				@endif
 				</th>
-    			<th colspan="2" class="color-metas text-center">Meta Programada</th>
-    			<th colspan="3" class="color-avances text-center">Avance</th>
-    			<th rowspan="2" width="75" class="text-center">Porcentaje Acumulado</th>
+    			<th colspan="2" class="color-metas">Meta Programada</th>
+    			<th colspan="3" class="color-avances">Avance</th>
+    			<th rowspan="2" width="75px">Porcentaje Acumulado</th>
 			</tr>
 			<tr>
-				<th width="50px" class="color-metas">Mes</th>
-				<th width="50px" class="color-metas">Acumulada</th>
-				<th width="50px" class="color-avances">Acumulado</th>
-				<th width="50px" class="color-avances">Mes</th>
-				<th width="50px" class="color-avances">Total</th>
+				<th class="color-metas">Mes</th>
+				<th class="color-metas">Acumulada</th>
+				<th class="color-avances">Acumulado</th>
+				<th class="color-avances">Mes</th>
+				<th class="color-avances">Total</th>
 			</tr>
 		</thead>
 		@if($data->tomar == 'jurisdicciones')
@@ -77,20 +77,41 @@
 			<!-- {{$suma['avanceTotal'] = 0;}} -->
 			@foreach ($data->jurisdicciones as $jurisdiccion)
 			<tr>
-				<td class="accion-municipio">
-					<span class=""></span> {{$jurisdiccion->clave}} - {{$jurisdiccion->nombre}}
+				<td nowrap="nowrap">
+					{{$jurisdiccion['clave']}} - {{$jurisdiccion['nombre']}}
 				</td>
-				<td class="valores">			<span>{{number_format($jurisdiccion->metaMes,2)}}</span>	</td>
-				<td class="valores color-metas"><span>{{number_format($jurisdiccion->metaAcumulada,2)}}</span>	</td>
-				<td class="valores">			<span>{{number_format($jurisdiccion->avanceAcumulado,2)}}</span>	</td>
-				<td class="valores">			<span>{{number_format($jurisdiccion->avanceMes,2)}}</span>	</td>
-				<td class="valores color-avances"><span>{{number_format($jurisdiccion->avanceTotal,2)}}</span>	</td>
-				<td class="valores">			<span class="{{($jurisdiccion->estatus == 1)?'color-avance':'color-alto-bajo'}}">{{number_format($jurisdiccion->porcentaje,2)}} %</span>	</td>
-				<!-- {{$suma['metaMes'] += $jurisdiccion->metaMes;}} -->
-				<!-- {{$suma['metaAcumulada'] += $jurisdiccion->metaAcumulada;}} -->
-				<!-- {{$suma['avanceAcumulado'] += $jurisdiccion->avanceAcumulado;}} -->
-				<!-- {{$suma['avanceMes'] += $jurisdiccion->avanceMes;}} -->
-				<!-- {{$suma['avanceTotal'] += $jurisdiccion->avanceTotal;}} -->
+				@if(isset($jurisdiccion['estatus']))
+				<td>
+					<span>{{number_format($jurisdiccion['metaMes'],2)}}</span>
+				</td>
+				<td class="color-metas">
+					<span>{{number_format($jurisdiccion['metaAcumulada'],2)}}</span>
+				</td>
+				<td>
+					<span>{{number_format($jurisdiccion['avanceAcumulado'],2)}}</span>
+				</td>
+				<td>
+					<span>{{number_format($jurisdiccion['avanceMes'],2)}}</span>
+				</td>
+				<td class="color-avances">
+					<span>{{number_format($jurisdiccion['avanceTotal'],2)}}</span>
+				</td>
+				<td>
+					<span class="{{($jurisdiccion['estatus'] == 1)?'color-avance':'color-alto-bajo'}}">{{number_format($jurisdiccion['porcentaje'],2)}} %</span>
+				</td>
+				<!-- {{$suma['metaMes'] += $jurisdiccion['metaMes'];}} -->
+				<!-- {{$suma['metaAcumulada'] += $jurisdiccion['metaAcumulada'];}} -->
+				<!-- {{$suma['avanceAcumulado'] += $jurisdiccion['avanceAcumulado'];}} -->
+				<!-- {{$suma['avanceMes'] += $jurisdiccion['avanceMes'];}} -->
+				<!-- {{$suma['avanceTotal'] += $jurisdiccion['avanceTotal'];}} -->
+				@else
+				<td>0.00</td>
+				<td class="color-metas">0.00</td>
+				<td>0.00</td>
+				<td>0.00</td>
+				<td class="color-avances">0.00</td>
+				<td>0.00 %</td>
+				@endif
 			</tr>
 			@endforeach
 		</tbody>
@@ -112,28 +133,27 @@
 		</tfoot>
 		@else
 		<tbody>
+		<!-- {{$ultimo_acumulado = 0}} -->
 		@foreach($meses as $clave => $mes)
+			<tr {{($mes_clave == $clave)?'style="font-weight:bold;"':''}}>
 			@if(isset($data->meses[$clave]))
-			<tr {{($mes_clave == $clave)?'style="font-weight:bold;"':''}}>
-				<td {{$estilo_linea = ($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} >{{$mes}}</td>
-				<td {{$estilo_linea}} width="50px" class="">{{number_format($data->meses[$clave]->meta,2)}}</td>
-				<td {{$estilo_linea}} width="50px" class="color-metas">{{number_format($data->meses[$clave]->metaAcumulada,2)}}</td>
-				<td {{$estilo_linea}} width="50px" class="">{{($clave <= $mes_clave)?(number_format(((isset($data->meses[$clave]->avanceAcumulado))?$data->meses[$clave]->avanceAcumulado:0)-((isset($data->meses[$clave]->avance))?$data->meses[$clave]->avance:0),2)):''}}</td>
-				<td {{$estilo_linea}} width="50px" class="">{{($clave <= $mes_clave)?((isset($data->meses[$clave]->avance))?number_format($data->meses[$clave]->avance,2):0.00):''}}</td>
-				<td {{$estilo_linea}} width="50px" class="bg-info">{{($clave <= $mes_clave)?((isset($data->meses[$clave]->avanceAcumulado))?number_format($data->meses[$clave]->avanceAcumulado,2):0.00):''}}</td>
-				<td {{$estilo_linea}} class="{{($data->meses[$clave]->estatus == 1)?'color-avance':'color-alto-bajo'}}">{{($clave <= $mes_clave)?number_format($data->meses[$clave]->porcentaje,2) . ' %':''}}</td>
-			</tr>
+				<td width="70px" {{$estilo_linea = ($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} >{{$mes}}</td>
+				<td {{$estilo_linea}} class="">{{number_format($data->meses[$clave]->meta,2)}}</td>
+				<td {{$estilo_linea}} class="color-metas">{{number_format($ultimo_acumulado = $data->meses[$clave]->metaAcumulada,2)}}</td>
+				<td {{$estilo_linea}} class="">{{($clave <= $mes_clave)?(number_format(((isset($data->meses[$clave]->avanceAcumulado))?$data->meses[$clave]->avanceAcumulado:0)-((isset($data->meses[$clave]->avance))?$data->meses[$clave]->avance:0),2)):''}}</td>
+				<td {{$estilo_linea}} class="">{{($clave <= $mes_clave)?((isset($data->meses[$clave]->avance))?number_format($data->meses[$clave]->avance,2):'0.00'):''}}</td>
+				<td {{$estilo_linea}} class="bg-info">{{($clave <= $mes_clave)?((isset($data->meses[$clave]->avanceAcumulado))?number_format($data->meses[$clave]->avanceAcumulado,2):'0.00'):''}}</td>
+				<td width="75px" {{$estilo_linea}} class="{{($data->meses[$clave]->activo)?(($data->meses[$clave]->estatus == 1)?'color-avance':'color-alto-bajo'):''}}">{{($clave <= $mes_clave)?number_format($data->meses[$clave]->porcentaje,2) . ' %':''}}</td>
 			@else
-			<tr {{($mes_clave == $clave)?'style="font-weight:bold;"':''}}>
 				<td {{$estilo_linea = ($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} >{{$mes}}</td>
-				<td {{$estilo_linea}} width="50px" class="">0.00</td>
-				<td {{$estilo_linea}} width="50px" class="color-metas">0.00</td>
-				<td {{$estilo_linea}} width="50px" class="">{{($clave <= $mes_clave)?0.00:''}}</td>
-				<td {{$estilo_linea}} width="50px" class="">{{($clave <= $mes_clave)?0.00:''}}</td>
-				<td {{$estilo_linea}} width="50px" class="bg-info">{{($clave <= $mes_clave)?0.00:''}}</td>
-				<td {{$estilo_linea}} class="">{{($clave <= $mes_clave)?'0.00 %':''}}</td>
-			</tr>
+				<td {{$estilo_linea}} class="">0.00</td>
+				<td {{$estilo_linea}} class="color-metas">{{number_format($ultimo_acumulado,2)}}</td>
+				<td {{$estilo_linea}} class="">{{($clave <= $mes_clave)?'0.00':''}}</td>
+				<td {{$estilo_linea}} class="">{{($clave <= $mes_clave)?'0.00':''}}</td>
+				<td {{$estilo_linea}} class="bg-info">{{($clave <= $mes_clave)?'0.00':''}}</td>
+				<td width="75px" {{$estilo_linea}} class="">{{($clave <= $mes_clave)?'0.00 %':''}}</td>
 			@endif
+			</tr>
 		@endforeach
 		</tbody>
 		@endif		
@@ -142,8 +162,8 @@
 	@if($data->tomar == 'jurisdicciones')
 	<table>
 		<tr align="left">
-			<th>Análisis de Resultados Acumulados</th>
-			<th>Justificación Acumulada</th>
+			<th nowrap="nowrap">Análisis de Resultados Acumulados</th>
+			<th nowrap="nowrap">Justificación Acumulada</th>
 		</tr>
 		<tr align="left" valign="top">
 			<td>{{$data->analisisResultados}}</td>
@@ -167,7 +187,7 @@
 		@endif
 	@endif
 	<br>
-	@if($data->planMejora)
+	@if($data->planMejora && $data->tomar == 'jurisdicciones')
 	<table>
 		<tr align="left">
 			<th colspan="3">Acción de Mejora</th>

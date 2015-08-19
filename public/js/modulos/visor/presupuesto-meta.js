@@ -36,7 +36,7 @@ function cargar_datos() {
         var porcentajePresupuesto = (dato.presupuestoEjercido*100) / dato.presupuestoModificado;
         datos.push(
           [
-            clave,
+            dato.abreviacion,
             porcentajeMetas,porcentajeMetas.format(2)+'%',
             '<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" style="white-space:nowrap;" colspan="2"><big>'+clave+' '+dato.unidadResponsable+'</big></th></tr><tr><td style="white-space:nowrap;">Total Metas: </td><th class="text-center" style="font-weight:bold;">'+(dato.metasTotal.format(2))+'</th></tr><tr><td style="white-space:nowrap;">Metas Cumplidas: </td><th class="text-center" style="font-weight:bold;">'+(dato.metasCumplidas.format(2))+'</th></tr></table>',
             porcentajePresupuesto,porcentajePresupuesto.format(2)+'%',
@@ -55,14 +55,26 @@ function cargar_datos() {
           minValue:0
         },
         tooltip: {isHtml: true},
-        annotations: { alwaysOutside:true }
+        annotations: { alwaysOutside:true },
+        legend:{position:'top'},
+        chartArea:{ width:'100%',left:60}
       };
 
       var chart = new google.visualization.ColumnChart(document.getElementById('grafica-presupuesto-meta'));
+      google.visualization.events.addListener(chart, 'ready', function () {
+        $('#imagen').val(chart.getImageURI());
+      });
       chart.draw(data, options);
     }
   });
 }
+
+$('#btn-imprimir-grafica').on('click',function(){
+  if($('#imagen').val()){
+    $('#form-grafica').attr('action',SERVER_HOST+'/visor/imprimir-grafica');
+    $('#form-grafica').submit();
+  }
+});
 
 /**
  * Number.prototype.format(n, x)

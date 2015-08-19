@@ -36,14 +36,25 @@ function cargar_datos() {
 
       var options = { 
         title:'Presupuesto : $ '+(parseFloat(response.total)||0).format(2),
-        legend:{position:'right',alignment:'center'}
+        legend:{position:'right',alignment:'center'},
+        chartArea:{ width:'100%',height:'100%',left:0,right:0,top:60,bottom:0 }
       };
 
       var chart = new google.visualization.PieChart(document.getElementById('grafica-presupuesto'));
+      google.visualization.events.addListener(chart, 'ready', function () {
+        $('#imagen').val(chart.getImageURI());
+      });
       chart.draw(data, options);
     }
   });
 }
+
+$('#btn-imprimir-grafica').on('click',function(){
+  if($('#imagen').val()){
+    $('#form-grafica').attr('action',SERVER_HOST+'/visor/imprimir-grafica');
+    $('#form-grafica').submit();
+  }
+});
 
 /**
  * Number.prototype.format(n, x)

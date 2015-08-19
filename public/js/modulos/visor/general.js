@@ -28,10 +28,14 @@ function cargar_datos() {
 
       var options = { 
         title:'Metas ( '+response.total.format(2)+' )',
-        legend:{position:'bottom'}
+        legend:{position:'bottom'},
+        chartArea:{ width:'80%',height:'80%',left:10,right:0,top:60,bottom:0 }
       };
 
       var chart = new google.visualization.PieChart(document.getElementById('grafica-general'));
+      google.visualization.events.addListener(chart, 'ready', function () {
+        $('#imagen').val(chart.getImageURI());
+      });
       chart.draw(data, options);
 
       var data = google.visualization.arrayToDataTable([
@@ -46,14 +50,25 @@ function cargar_datos() {
         slices:{
           0: {color:'#DC3912'},
           1: {color:'#AA1505'}
-        }
+        },
+        chartArea:{ width:'80%',height:'80%',left:10,right:0,top:60,bottom:0 }
       };
 
       var chart = new google.visualization.PieChart(document.getElementById('grafica-avance'));
+      google.visualization.events.addListener(chart, 'ready', function () {
+        $('#imagen2').val(chart.getImageURI());
+      });
       chart.draw(data, options);
     }
   });
 }
+
+$('#btn-imprimir-grafica').on('click',function(){
+  if($('#imagen').val()){
+    $('#form-grafica').attr('action',SERVER_HOST+'/visor/imprimir-grafica');
+    $('#form-grafica').submit();
+  }
+});
 
 /**
  * Number.prototype.format(n, x)

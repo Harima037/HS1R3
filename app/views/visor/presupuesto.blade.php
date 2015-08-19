@@ -22,10 +22,16 @@
             <div class="panel-body">
             	<div class="row">
             		<div class="col-sm-12">
-            			<div id="grafica-presupuesto" style="width:100%; height:800px;">
+            			<div id="grafica-presupuesto" style="width:100%; height:600px;">
             				<div class="alert alert-info"><span class="fa fa-spinner fa-spin"></span> Cargando Librerias... Por favor espere... </div>
             			</div>
             		</div>
+                    <div class="col-sm-12">
+                        <form id="form-grafica" action="" method="POST" target="_blank">
+                            <input type="hidden" value="" name="imagen" id="imagen">
+                        </form>
+                        <button type="button" class="btn btn-primary pull-right" id="btn-imprimir-grafica"><span class="fa fa-print"></span> Imprimir</button>
+                    </div>
             	</div>
             </div>
         </div>
