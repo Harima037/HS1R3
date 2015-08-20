@@ -4,7 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<style type="text/css">
 		@page {
-            margin-top: 0.5em;
+            margin-top: 6.5em;
             margin-left: 1.6em;
             margin-right: 0.6em;
             margin-bottom: 1.3em;
@@ -30,9 +30,30 @@
 		.color-avances{ background-color:#D9EDF7; }
 		.color-avance{color:#4D824E;}
 		.color-alto-bajo{color:#AD4D4B;}
+		.header {
+		    width: 100%;
+		    text-align: center;
+		    position: fixed;
+		    top: -15.0em;
+		}
 	</style>
 </head>
 <body class="cuerpo">
+	<div class="header">
+		<table>
+			<tr><td colspan="3" height="10">&nbsp;</td></tr>
+			<tr>
+				<td class="imagen izquierda">
+					<img src="{{ URL::to('img/EscudoGobiernoChiapas.png') }}" width="180">
+				</td>
+				<td height="40" align="center">Instituto de Salud</td>
+				<td class="imagen derecha">
+					<img src="{{ URL::to('img/Marca.png') }}" width="180">
+				</td>
+			</tr>
+			<tr><td colspan="3" height="10">&nbsp;</td></tr>
+		</table>
+	</div>
 	<table>
 		<tr align="left">
 			<th>Indicador</th>

@@ -215,7 +215,11 @@ class Proyecto extends BaseModel
 				$fuenteFinan->join('catalogoFuenteFinanciamiento AS fuente',function($join){
 					$join->on('fuente.id','=','proyectoFinanciamiento.idFuenteFinanciamiento')
 						->whereNull('fuente.borradoAl');
-				})->join('proyectos','proyectos.id','=','proyectoFinanciamiento.idProyecto')
+				})->join('catalogoDestinoGasto AS destinoGasto',function($join){
+					$join->on('destinoGasto.id','=','proyectoFinanciamiento.idDestinoGasto')
+						->whereNull('destinoGasto.borradoAl');
+				})
+				->join('proyectos','proyectos.id','=','proyectoFinanciamiento.idProyecto')
 				->join('cargaDatosEP01 AS ep01',function($join) use ($mes,$ejercicio){
 					$join->on('ep01.UR','=','proyectos.unidadResponsable')
 						->on('ep01.FI','=','proyectos.finalidad')
@@ -228,6 +232,7 @@ class Proyecto extends BaseModel
 						->on('ep01.AI','=','proyectos.actividadInstitucional')
 						->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(proyectos.numeroProyectoEstrategico,3,"0"))'))
 						->on('ep01.FF','=','fuente.clave')
+						->on('ep01.DG','LIKE','destinoGasto.destino')
 						->where('ep01.mes','=',$mes)
 						->where('ep01.CP','=',$ejercicio);
 				})->select(
@@ -236,7 +241,7 @@ class Proyecto extends BaseModel
 						DB::raw('sum(ep01.presupuestoModificado) AS presupuestoModificado'),
 						DB::raw('sum(ep01.presupuestoDevengadoModificado) AS presupuestoDevengado')
 					)
-				->groupBy('proyectoFinanciamiento.id','proyectoFinanciamiento.idProyecto','ep01.FF');
+				->groupBy('proyectoFinanciamiento.idProyecto','ep01.FF');
 			},'beneficiariosDescripcion'=>function($beneficiario) use ($mes){
 				$beneficiario->leftjoin('registroAvancesBeneficiarios as avanceBenef',function($join)use($mes){
 					$join->on('avanceBenef.idProyectoBeneficiario','=','proyectoBeneficiarios.id')

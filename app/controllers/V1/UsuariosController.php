@@ -17,7 +17,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use Illuminate\Database\QueryException, \Exception;
-use BaseController, Input, Response, DB, Sentry;
+use BaseController, Input, Response, DB, Sentry,SentryUser;
 use User, Hash, UsuarioProyecto, Proyecto;
 
 class UsuariosController extends \BaseController {
@@ -583,16 +583,27 @@ class UsuariosController extends \BaseController {
 		try{
 			$ids = Input::get('rows');
 
-			foreach ($ids as $id) {
-				if($id == Sentry::getUser()->id){
-					return Response::json(array('data'=>'No se puede eliminar el usuario.','code'=>'S03'),500);
-				}
+			$respuesta = DB::transaction(function()use($ids){
+				Proyecto::whereIn('idUsuarioValidacionSeg',$ids)->update(array('idUsuarioValidacionSeg'=>NULL));
+				Proyecto::whereIn('idUsuarioRendCuenta',$ids)->update(array('idUsuarioRendCuenta'=>NULL));
+				Proyecto::whereIn('idUsuarioCaptura',$ids)->update(array('idUsuarioCaptura'=>NULL));
+				$idUsuario = Sentry::getUser()->id;
 
-				$user = Sentry::findUserById($id);
-				$user->delete();
-			}
-			
-			$data = array("data"=>"Se han eliminado los recursos.");
+				$ids_borrar = array();
+				foreach ($ids as $id) {
+					if($id != $idUsuario){
+						$ids_borrar[] = $id;
+					}
+				}
+				SentryUser::whereIn('id',$ids_borrar)->update(array('email'=>'borrado@borrado.com'));
+				if(SentryUser::whereIn('id',$ids_borrar)->delete()){
+					return array('data'=>array("data"=>"Se han eliminado los recursos."),'http_status'=>200);
+				}else{
+					return array('data'=>array("data"=>"No Se han eliminado los recursos.",'code'=>'S01'),'http_status'=>500);
+				}
+			});
+			$data = $respuesta['data'];
+			$http_status = $respuesta['http_status'];
 		}catch (\Cartalyst\Sentry\Users\UserNotFoundException $e){
     		$http_status = 404;	
 			$data = array('data' => "Usuario no encontrado",'code'=>'U06');	
