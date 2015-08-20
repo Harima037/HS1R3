@@ -20,6 +20,9 @@ function cargar_datos() {
   var parametros = {grafica:'presupuesto_fuente'};
   moduloResource.get(null,parametros,{
     _success: function(response){
+      $('#titulo').val('Presupuesto por Fuente de Financiamiento');
+      $('#titulo_grafica').text('Presupuesto por Fuente de Financiamiento');
+
       var elementos = [['Fuente Financiamiento', 'Presupuesto Modificado']];
       for(var i in response.data){
         elementos.push(
@@ -35,7 +38,7 @@ function cargar_datos() {
       formatter.format(data, 1);
 
       var options = { 
-        title:'Presupuesto : $ '+(parseFloat(response.total)||0).format(2),
+        title:'Total Presupuesto Aprobado : $ '+(parseFloat(response.total)||0).format(2),
         legend:{position:'right',alignment:'center'},
         chartArea:{ width:'100%',height:'100%',left:0,right:0,top:60,bottom:0 }
       };

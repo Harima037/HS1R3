@@ -22,12 +22,20 @@ function datos_cargados(){
 }
 
 function cargarGrafica(tipo_grafica){
+	var titulo = '';
 	$('#imagen').val('');
 	$('#imagen2').val('');
+	$('#titulo').val('');
 	if($('#jurisdiccion').val() != ''){
 		graficaMetasJurisdiccion();
+		titulo = 'Porcentaje de cumplimiento de metas<br> <small>Jurisdicción:</small> <small><b>'+$('#jurisdiccion option:selected').text()+'</b></small>';
 	}else{
 		graficaMetasCumplidas()
+		titulo = 'Porcentaje de cumplimiento de metas por Jurisdicciones';
+	}
+	if(titulo){
+		$('#titulo').val(titulo);
+		$('#titulo_grafica').html(titulo);
 	}
 }
 
@@ -36,17 +44,19 @@ function graficaMetasJurisdiccion(){
 	moduloResource.get(null,parametros,{
 		_success: function(response){
 			$('#area-graficas').empty();
-			$('#area-graficas').html('<div class="row"><div class="col-sm-6"><div id="left-grafica" style="height:500px;"></div></div><div class="col-sm-6"><div id="right-grafica" style="height:500px;"></div></div></div>')
+			$('#area-graficas').html('<div style="width:100%"><div style="width:60%;float:left;"><div id="left-grafica" style="height:530px;"></div></div><div style="width:40%;float:left;"><div id="right-grafica" style="height:380px;"></div></div></div>')
+			
 			var data = google.visualization.arrayToDataTable([
 				['Tipo', 'Indicadores'],
 				['Metas Cumplidas',response.data.cumplidas],
-				['Metas No Cumplidas',(response.data.bajoAvance + response.data.altoAvance)]
+				['Metas No Cumplidas',(response.data.bajoAvance + response.data.altoAvance)],
+				['Metas Programadas en Meses Posteriores',response.data.posteriores]
 			]);
 
 			var options = { 
 				title:'Metas ( '+response.total.format(2)+' )',
-				legend:{position:'bottom'},
-				chartArea:{ width:'80%',height:'80%',left:10,right:0,top:60,bottom:0 }
+				legend:{position:'right',maxLines:5},
+				chartArea:{ width:'100%',left:5,right:0,top:60,bottom:0 }
 			};
 
 			var chart = new google.visualization.PieChart(document.getElementById('left-grafica'));
@@ -68,7 +78,7 @@ function graficaMetasJurisdiccion(){
 					0: {color:'#DC3912'},
 					1: {color:'#AA1505'}
 				},
-				chartArea:{ width:'80%',height:'80%',left:10,right:0,top:60,bottom:0 }
+				chartArea:{ width:'100%',left:10,right:0,top:60,bottom:0 }
 			};
 
 			var chart2 = new google.visualization.PieChart(document.getElementById('right-grafica'));
@@ -97,7 +107,6 @@ function graficaMetasCumplidas(){
 
 			var data = new google.visualization.arrayToDataTable(data_unidades);
 	        var options = {
-	            title: 'Porcentaje de cumplimiento de metas por Jurisdicciones',
 	            hAxis: { title: 'Jurisdicción' },
 	            vAxis: { title: 'Porcentaje',maxValue:100,minValue:0},
 	            legend:{ position:'none' },

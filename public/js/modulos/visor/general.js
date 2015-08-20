@@ -20,16 +20,20 @@ function cargar_datos() {
   var parametros = {grafica:'metas_cumplidas'};
   moduloResource.get(null,parametros,{
     _success: function(response){
+      $('#titulo').val('Porcentaje de Metas Cumplidas');
+      $('#titulo_grafica').text('Porcentaje de Metas Cumplidas');
+
       var data = google.visualization.arrayToDataTable([
         ['Tipo', 'Indicadores'],
         ['Metas Cumplidas',response.data.cumplidas],
-        ['Metas No Cumplidas',(response.data.bajoAvance + response.data.altoAvance)]
+        ['Metas No Cumplidas',(response.data.bajoAvance + response.data.altoAvance)],
+        ['Metas Programadas en Meses Posteriores',response.data.posteriores]
       ]);
 
       var options = { 
         title:'Metas ( '+response.total.format(2)+' )',
-        legend:{position:'bottom'},
-        chartArea:{ width:'80%',height:'80%',left:10,right:0,top:60,bottom:0 }
+        legend:{position:'right',maxLines:5},
+        chartArea:{ width:'100%',left:5,right:0,top:60,bottom:0 }
       };
 
       var chart = new google.visualization.PieChart(document.getElementById('grafica-general'));
@@ -51,7 +55,7 @@ function cargar_datos() {
           0: {color:'#DC3912'},
           1: {color:'#AA1505'}
         },
-        chartArea:{ width:'80%',height:'80%',left:10,right:0,top:60,bottom:0 }
+        chartArea:{ width:'100%',left:10,right:0,top:60,bottom:0 }
       };
 
       var chart = new google.visualization.PieChart(document.getElementById('grafica-avance'));

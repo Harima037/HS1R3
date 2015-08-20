@@ -116,7 +116,7 @@ class VisorController extends BaseController {
 						}
 
 						$rows = $rows->select(DB::raw('sum(presupuestoEjercidoModificado) AS presupuestoEjercido'),
-											'capitulo.descripcion AS capitulo')
+											'capitulo.descripcion AS capitulo','capitulo.clave')
 									->leftjoin('catalogoObjetosGasto AS objetoGasto','objetoGasto.clave','=','OG')
 									->leftjoin('catalogoObjetosGasto AS partida','partida.id','=','objetoGasto.idPadre')
 									->leftjoin('catalogoObjetosGasto AS concepto','concepto.id','=','partida.idPadre')
@@ -220,55 +220,68 @@ class VisorController extends BaseController {
 							$actividades = $actividades->groupBy('idActividad');
 						}
 						
-						$componentes = $componentes->where('mes','<=',$mes_actual)
+						$componentes = $componentes//->where('mes','<=',$mes_actual)
 														->whereIn('idProyecto',$proyectos_ids)
-														->select('id','idComponente AS idElemento','idProyecto',DB::raw('sum(meta) AS meta'),
-															DB::raw('sum(avance) AS avance'))->get();
+														->select('id','idComponente AS idElemento','idProyecto',
+															DB::raw('sum(if(mes <= '.$mes_actual.' ,meta,0)) AS meta'),
+															DB::raw('sum(if(mes <= '.$mes_actual.' ,avance,0)) AS avance'),
+															DB::raw('min(mes) as mes'))->get();
 						//
-						$actividades = $actividades->where('mes','<=',$mes_actual)
+						$actividades = $actividades//->where('mes','<=',$mes_actual)
 														->whereIn('idProyecto',$proyectos_ids)
-														->select('id','idActividad AS idElemento','idProyecto',DB::raw('sum(meta) AS meta'),
-															DB::raw('sum(avance) AS avance'))->get();
+														->select('id','idActividad AS idElemento','idProyecto',
+															DB::raw('sum(if(mes <= '.$mes_actual.' ,meta,0)) AS meta'),
+															DB::raw('sum(if(mes <= '.$mes_actual.' ,avance,0)) AS avance'),
+															DB::raw('min(mes) as mes'))->get();
 						//
 						$total = count($componentes) + count($actividades);
 
-						$metas = array('cumplidas'=>0,'altoAvance'=>0,'bajoAvance'=>0);
+						$metas = array('cumplidas'=>0,'altoAvance'=>0,'bajoAvance'=>0,'posteriores'=>0);
 						foreach ($componentes as $componente) {
 							$meta = floatval($componente->meta);
 					        $avance = floatval($componente->avance);
 
-					        if($meta > 0){ $porcentaje = ($avance*100) / $meta; }
-					        else{ $porcentaje = ($avance*100); }
+					        if($componente->mes <= $mes_actual){
+					        	if($meta > 0){ $porcentaje = ($avance*100) / $meta; }
+						        else{ $porcentaje = ($avance*100); }
 
-					        $estatus = 1;
-					        if(!($meta == 0 && $avance == 0)){
-								if($porcentaje > 110){ $estatus = 3; }
-								elseif($porcentaje < 90){ $estatus = 2; }
-								elseif($porcentaje > 0 && $meta == 0){ $estatus = 3; }
+						        $estatus = 1;
+						        if(! ($meta == 0 && $avance == 0)){
+									if($porcentaje > 110){ $estatus = 3; }
+									elseif($porcentaje < 90){ $estatus = 2; }
+									elseif($porcentaje > 0 && $meta == 0){ $estatus = 3; }
+						        }
+
+						        if($estatus == 1){ $metas['cumplidas']++; }
+						        elseif($estatus == 2){ $metas['bajoAvance']++; }
+						        else{ $metas['altoAvance']++; }
+					        }else{
+					        	$metas['posteriores']++;
 					        }
-
-					        if($estatus == 1){ $metas['cumplidas']++; }
-					        elseif($estatus == 2){ $metas['bajoAvance']++; }
-					        else{ $metas['altoAvance']++; }
+					        
 						}
 
 						foreach ($actividades as $actividad) {
 							$meta = floatval($actividad->meta);
 					        $avance = floatval($actividad->avance);
 
-					        if($meta > 0){ $porcentaje = ($avance*100) / $meta; }
-					        else{ $porcentaje = ($avance*100); }
+					        if($actividad->mes <= $mes_actual){
+						        if($meta > 0){ $porcentaje = ($avance*100) / $meta; }
+						        else{ $porcentaje = ($avance*100); }
 
-					        $estatus = 1;
-					        if(!($meta == 0 && $avance == 0)){
-								if($porcentaje > 110){ $estatus = 3; }
-								elseif($porcentaje < 90){ $estatus = 2; }
-								elseif($porcentaje > 0 && $meta == 0){ $estatus = 3; }
-					        }
+						        $estatus = 1;
+						        if(!($meta == 0 && $avance == 0)){
+									if($porcentaje > 110){ $estatus = 3; }
+									elseif($porcentaje < 90){ $estatus = 2; }
+									elseif($porcentaje > 0 && $meta == 0){ $estatus = 3; }
+						        }
 
-					        if($estatus == 1){ $metas['cumplidas']++; }
-					        elseif($estatus == 2){ $metas['bajoAvance']++; }
-					        else{ $metas['altoAvance']++; }
+						        if($estatus == 1){ $metas['cumplidas']++; }
+						        elseif($estatus == 2){ $metas['bajoAvance']++; }
+						        else{ $metas['altoAvance']++; }
+						    }else{
+						    	$metas['posteriores']++;
+						    }
 						}
 
 						$data = array('data'=>$metas,'total'=>$total);

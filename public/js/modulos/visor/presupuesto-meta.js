@@ -20,6 +20,9 @@ function cargar_datos() {
   var parametros = {grafica:'presupuesto_vs_metas_unidad'};
   moduloResource.get(null,parametros,{
     _success: function(response){
+      $('#titulo').val('Presupuesto VS Meta');
+      $('#titulo_grafica').text('Presupuesto VS Meta');
+
       var data = new google.visualization.DataTable();
       data.addColumn('string', 'Unidad Responsable');
       data.addColumn('number', 'Metas');
@@ -47,7 +50,6 @@ function cargar_datos() {
       data.addRows(datos);
 
       var options = {
-        title: 'Metas VS Presupuesto',
         hAxis: { title: 'Unidad Responsable' },
         vAxis: {
           title: 'Porcentaje',

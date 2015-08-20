@@ -25,10 +25,25 @@ function datos_cargados(){
 
 function cargarGrafica(tipo_grafica){
 	$('#imagen').val('');
+	$('#titulo').val('');
+	var titulo = '';
 	switch(tipo_grafica){
-		case 'unidad_metas_cumplidas': graficaMetasCumplidas(); break;
-		case 'unidad_persupuesto_ejercido': graficaPresupuestoEjercido(); break;
-		case 'unidad_metas_presupuesto': graficaMetasPresupuesto(); break;
+		case 'unidad_metas_cumplidas': 
+			graficaMetasCumplidas(); 
+			titulo = 'Porcentaje de cumplimiento de metas por Unidad Responsable';
+		break;
+		case 'unidad_persupuesto_ejercido': 
+			graficaPresupuestoEjercido(); 
+			titulo = 'Porcentaje de Presupuesto Ejercido por Unidad Responsable';
+		break;
+		case 'unidad_metas_presupuesto': 
+			graficaMetasPresupuesto(); 
+			titulo = 'Metas VS Presupuesto';
+		break;
+	}
+	if(titulo){
+		$('#titulo').val(titulo);
+		$('#titulo_grafica').text(titulo);
 	}
 }
 
@@ -48,7 +63,6 @@ function graficaMetasCumplidas(){
 
 			var data = new google.visualization.arrayToDataTable(data_unidades);
 	        var options = {
-	            title: 'Porcentaje de cumplimiento de metas por Unidad Responsable',
 	            hAxis: { title: 'Unidad Responsable' },
 	            vAxis: { title: 'Porcentaje',maxValue:100,minValue:0},
 	            legend:{ position:'none' },
@@ -81,7 +95,6 @@ function graficaPresupuestoEjercido(){
 
 			var data = new google.visualization.arrayToDataTable(data_unidades);
 	        var options = {
-	            title: 'Porcentaje de Presupuesto Ejercido por Unidad Responsable',
 	            hAxis: { title: 'Unidad Responsable' },
 	            vAxis: { title: 'Porcentaje',maxValue:100,minValue:0},
 	            legend:{ position:'none' },
@@ -129,7 +142,6 @@ function graficaMetasPresupuesto(){
 			data.addRows(datos);
 
 			var options = {
-				title: 'Metas VS Presupuesto',
 				hAxis: { title: 'Unidad Responsable' },
 				vAxis: {
 					title: 'Porcentaje',

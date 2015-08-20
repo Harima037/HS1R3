@@ -28,28 +28,60 @@ function datos_cargados(){
 }
 
 function cargarGrafica(tipo_grafica){
+	var titulo = '';
 	$('#filtro-unidades').addClass('hidden');
 	$('#filtro-jurisdicciones').addClass('hidden');
 	$('#unidad').val('');
-	//$('#filtro-unidades').change();
 	$('#jurisdiccion').val('');
-	//$('#filtro-jurisdicciones').change();
 	$('#panel-btn-filtro').addClass('hidden');
 	$('#btn-filtro').attr('data-grafica',tipo_grafica);
 	$('#imagen').val('');
 	$('#imagen2').val('');
+	$('#titulo').val('');
 	switch(tipo_grafica){
-		case 'proy_unidad': graficaProyectosDireccion(); break;
-		case 'proy_tipos': graficaProyectosTipo(); break;
-		case 'metas_unidad': graficaMetasDireccion(); break;
-		case 'metas_cumplidas': graficaMetasCumplidas(); break;
-		case 'presup_fuente': graficaPresupuestoFuente(); break;
-		case 'presup_ejercido': graficaPresupuestoEjercido(); break;
-		case 'presup_ejercido_capitulo': graficaPresupuestoEjercidoCapitulo(); break;
+		case 'proy_unidad': 
+			graficaProyectosDireccion(); 
+			titulo = 'Proyectos por Dirección';
+			break;
+		case 'proy_tipos': 
+			graficaProyectosTipo(); 
+			titulo = 'Proyectos por Tipología';
+			break;
+		case 'metas_unidad': 
+			graficaMetasDireccion(); 
+			titulo = 'Metas Programadas por Dirección';
+			break;
+		case 'metas_cumplidas': 
+			graficaMetasCumplidas(); 
+			titulo = 'Porcentaje de Metas Cumplidas';
+			if($('#unidad').val() != ''){
+				titulo += '<br><small>Unidad Responsable:</small> <small><b>'+$('#unidad option:selected').text()+'</b></small>';
+			}
+			if($('#jurisdiccion').val() != ''){
+				titulo += '<br><small>Jurisdicción:</small> <small><b>'+$('#jurisdiccion option:selected').text()+'</b></small>';
+			}
+			break;
+		case 'presup_fuente': 
+			graficaPresupuestoFuente(); 
+			titulo = 'Presupuesto por Fuente de Financiamiento';
+			break;
+		case 'presup_ejercido': 
+			graficaPresupuestoEjercido(); 
+			titulo = 'Presupuesto Ejercido';
+			break;
+		case 'presup_ejercido_capitulo': 
+			graficaPresupuestoEjercidoCapitulo(); 
+			titulo = 'Presupuesto Ejercido por Capitulo';
+			break;
+	}
+	if(titulo){
+		$('#titulo').val(titulo);
+		$('#titulo_grafica').html(titulo);
 	}
 }
 
 $('#btn-filtro').on('click',function (e){
+	var titulo = '';
 	e.preventDefault();
 	var tipo_grafica = $('#btn-filtro').attr('data-grafica');
 	if(tipo_grafica){
@@ -57,11 +89,29 @@ $('#btn-filtro').on('click',function (e){
 			case 'proy_unidad': graficaProyectosDireccion(); break;
 			case 'proy_tipos': graficaProyectosTipo(); break;
 			case 'metas_unidad': graficaMetasDireccion(); break;
-			case 'metas_cumplidas': graficaMetasCumplidas(); break;
-			case 'presup_fuente': graficaPresupuestoFuente(); break;
+			case 'metas_cumplidas': 
+				graficaMetasCumplidas(); 
+				titulo = 'Porcentaje de Metas Cumplidas';
+				if($('#unidad').val() != ''){
+					titulo += '<br><small>Unidad Responsable:</small> <small><b>'+$('#unidad option:selected').text()+'</b></small>';
+				}
+				if($('#jurisdiccion').val() != ''){
+					titulo += '<br><small>Jurisdicción:</small> <small><b>'+$('#jurisdiccion option:selected').text()+'</b></small>';
+				}
+				break;
+			case 'presup_fuente': 
+				graficaPresupuestoFuente(); 
+				if($('#unidad').val() != ''){
+					titulo = 'Presupuesto por Fuente de Financiamiento<br><small>Unidad Responsable:</small> <small><b>'+$('#unidad option:selected').text()+'</b></small>';
+				}
+			break;
 			case 'presup_ejercido': graficaPresupuestoEjercido(); break;
 			case 'presup_ejercido_capitulo': graficaPresupuestoEjercidoCapitulo(); break;
 		}
+	}
+	if(titulo){
+		$('#titulo').val(titulo);
+		$('#titulo_grafica').html(titulo);
 	}
 });
 
@@ -79,17 +129,19 @@ function graficaMetasCumplidas(){
 	moduloResource.get(null,parametros,{
 		_success: function(response){
 			$('#area-graficas').empty();
-			$('#area-graficas').html('<div class="row"><div class="col-sm-6"><div id="left-grafica" style="height:500px;"></div></div><div class="col-sm-6"><div id="right-grafica" style="height:500px;"></div></div></div>')
+			$('#area-graficas').html('<div style="width:100%"><div style="width:60%;float:left;"><div id="left-grafica" style="height:530px;"></div></div><div style="width:40%;float:left;"><div id="right-grafica" style="height:380px;"></div></div></div>')
+			
 			var data = google.visualization.arrayToDataTable([
 				['Tipo', 'Indicadores'],
 				['Metas Cumplidas',response.data.cumplidas],
-				['Metas No Cumplidas',(response.data.bajoAvance + response.data.altoAvance)]
+				['Metas No Cumplidas',(response.data.bajoAvance + response.data.altoAvance)],
+				['Metas Programadas en Meses Posteriores',response.data.posteriores]
 			]);
 
 			var options = { 
 				title:'Metas ( '+response.total.format(2)+' )',
-				legend:{position:'bottom'},
-				chartArea:{ width:'80%',height:'80%',left:10,right:0,top:60,bottom:0 }
+				legend:{position:'right',maxLines:5},
+				chartArea:{ width:'100%',left:5,right:0,top:60,bottom:0 }
 			};
 
 			var chart = new google.visualization.PieChart(document.getElementById('left-grafica'));
@@ -111,7 +163,7 @@ function graficaMetasCumplidas(){
 					0: {color:'#DC3912'},
 					1: {color:'#AA1505'}
 				},
-				chartArea:{ width:'80%',height:'80%',left:10,right:0,top:60,bottom:0 }
+				chartArea:{ width:'100%',left:10,right:0,top:60,bottom:0 }
 			};
 
 			var chart2 = new google.visualization.PieChart(document.getElementById('right-grafica'));
@@ -139,7 +191,7 @@ function graficaMetasDireccion(){
 			var data = google.visualization.arrayToDataTable(elementos);
 
 			var options = { 
-				title:'Metas Programadas por Dirección ( Total de Metas : ' + (parseFloat(response.total)||0).format(2) + ' )',
+				title:'Total de Metas : ' + (parseFloat(response.total)||0).format(2),
 				legend:{position:'right',alignment:'center'},
 				chartArea:{ width:'100%',height:'100%',left:0,right:0,top:60,bottom:0 }
 			};
@@ -179,7 +231,7 @@ function graficaPresupuestoEjercido(){
 			formatter.format(data, 1);
 
 			var options = { 
-				title:'Presupuesto : $ '+(parseFloat(response.data.presupuestoModificado)||0).format(2),
+				title:'Total Presupuesto Aprobado : $ '+(parseFloat(response.data.presupuestoModificado)||0).format(2),
 				legend:{position:'right',alignment:'center'},
 				chartArea:{ width:'100%',height:'100%',left:0,right:0,top:60,bottom:0 }
 			};
@@ -201,7 +253,7 @@ function graficaPresupuestoEjercidoCapitulo(){
 			for(var i in response.data){
 				elementos.push(
 					[
-						response.data[i].capitulo,
+						response.data[i].clave + ' - ' + response.data[i].capitulo,
 						+(parseFloat(response.data[i].presupuestoEjercido) || 0)
 					]
 				);
@@ -212,7 +264,7 @@ function graficaPresupuestoEjercidoCapitulo(){
 			formatter.format(data, 1);
 
 			var options = { 
-				title:'Presupuesto : $ '+(parseFloat(response.total)||0).format(2),
+				title:'Total Presupuesto Ejercido : $ '+(parseFloat(response.total)||0).format(2),
 				legend:{position:'right',alignment:'center'},
 				chartArea:{ width:'100%',height:'100%',left:0,right:0,top:60,bottom:0 }
 			};
@@ -250,7 +302,7 @@ function graficaPresupuestoFuente(){
 			formatter.format(data, 1);
 
 			var options = { 
-				title:'Presupuesto : $ '+(parseFloat(response.total)||0).format(2),
+				title:'Total Presupuesto Aprobado : $ '+(parseFloat(response.total)||0).format(2),
 				legend:{position:'right',alignment:'center'},
 				chartArea:{ width:'100%',height:'100%',left:0,right:0,top:60,bottom:0 }
 			};
@@ -280,7 +332,7 @@ function graficaProyectosDireccion(){
 			var data = google.visualization.arrayToDataTable(elementos);
 
 			var options = { 
-				title:'Proyectos Autorizados por Dirección ( Total de Proyectos : ' + (parseFloat(response.total)||0).format(2) + ' )',
+				title:'Total de Proyectos : ' + (parseFloat(response.total)||0).format(2),
 				legend:{position:'right',alignment:'center'},
 				chartArea:{ width:'100%',height:'100%',left:0,right:0,top:60,bottom:0 }
 			};
@@ -312,7 +364,7 @@ function graficaProyectosTipo(){
 			var data = google.visualization.arrayToDataTable(elementos);
 
 			var options = { 
-				title:'Proyectos Autorizados por Tipo ( Total de Proyectos : ' + (parseFloat(response.total)||0).format(2) + ' )',
+				title:'Total de Proyectos : ' + (parseFloat(response.total)||0).format(2),
 				legend:{position:'right',alignment:'center'},
 				chartArea:{
 					width:'100%',height:'100%',left:0,right:0,top:60,bottom:0

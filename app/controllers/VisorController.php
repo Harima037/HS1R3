@@ -11,10 +11,12 @@ class VisorController extends BaseController {
 		$datos = $this->obtenerDatosAvances();
 		return parent::loadIndex('VISORGEN','VIPROYINST',$datos);
 	}
+	
 	public function indexInversion(){
 		$datos = $this->obtenerDatosAvances();
 		return parent::loadIndex('VISORGEN','VIPROYINV',$datos);
 	}
+
 	public function obtenerDatosAvances(){
 		$datos = array(
 			'meses' => array(
@@ -62,6 +64,7 @@ class VisorController extends BaseController {
 		}
 		return $datos;
 	}
+
 	public function indexDesempenioGeneral(){
 		return parent::loadIndex('VISORGEN','VIDESEMGEN');
 	}
@@ -272,25 +275,30 @@ class VisorController extends BaseController {
 						->setWarnings(false)
 						->loadView('visor.pdf.reporte-graficas-indicador',$datos);
 		}else{
-			$html_content = 'No hay imagen';
-			$html_content_2 = '';
-			if(isset($parametros['imagen'])){
-				$html_content = $parametros['imagen'];
-			}
-			if(isset($parametros['imagen2'])){
-				$html_content_2 = $parametros['imagen2'];
-			}
-			if($html_content_2 != ''){
-				$html = '<div style="width:100%;"><img src="'.$html_content.'" style="width:50%;float:left;">';
-				$html .= '<img src="'.$html_content_2.'" style="width:50%;float:left;"></div>';
+			$datos = array('soloGraficas'=>1);
+			
+			if(isset($parametros['titulo'])){
+				$datos['titulo'] = $parametros['titulo'];
 			}else{
-				$html = '<div style="width:100%"><img src="'.$html_content.'" style="width:100%;"></div>';
+				$datos['titulo'] = 'Gráfica';
 			}
+
+			if($parametros['imagen']){
+				$datos['grafica'] = 'src="'.$parametros['imagen'].'"';
+			}
+
+			if(isset($parametros['imagen2'])){
+				if($parametros['imagen2']){
+					$datos['grafica2'] = 'src="'.$parametros['imagen2'].'"';
+				}
+			}
+
 			$pdf = PDF::setPaper('LETTER')
 						->setOrientation('landscape')
 						->setWarnings(false)
-						->loadHtml($html);
+						->loadView('visor.pdf.reporte-graficas-indicador',$datos);
 		}
 		return $pdf->stream('Grafica.pdf');
 	}
 }
+?>

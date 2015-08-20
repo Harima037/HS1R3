@@ -36,6 +36,9 @@
             <div class="panel-body">
                 <div class="row">
                     <div class="col-sm-12">
+                        <h3 id="titulo_grafica"></h3>
+                    </div>
+                    <div class="col-sm-12">
                         <div id="area-graficas" style="width:100%;height:500px;">
                             <div id="mensaje-carga-librerias" class="alert alert-info">
                                 <span class="fa fa-2x fa-spinner fa-spin"></span> <big>Cargando Librerias... Por favor espere...</big>
@@ -46,6 +49,7 @@
                         <form id="form-grafica" action="" method="POST" target="_blank">
                             <input type="hidden" value="" name="imagen" id="imagen">
                             <input type="hidden" value="" name="imagen2" id="imagen2">
+                            <input type="hidden" value="" name="titulo" id="titulo">
                         </form>
                         <button type="button" class="btn btn-primary pull-right" id="btn-imprimir-grafica"><span class="fa fa-print"></span> Imprimir</button>
                     </div>

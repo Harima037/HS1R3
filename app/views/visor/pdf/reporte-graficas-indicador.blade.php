@@ -30,30 +30,47 @@
 		.color-avances{ background-color:#D9EDF7; }
 		.color-avance{color:#4D824E;}
 		.color-alto-bajo{color:#AD4D4B;}
-		.header {
+		.titulo{
+			font-weight: bold;
+			font-family: arial, sans-serif;
+			font-size: 13;
+		}
+		.imagen{
+			vertical-align: top;
+		}
+		.imagen.izquierda{
+			text-align: left;
+		}
+		.imagen.derecha{
+			text-align: right;
+		}
+		.header{
 		    width: 100%;
 		    text-align: center;
 		    position: fixed;
-		    top: -15.0em;
+		    top: -7.0em;
+		}
+		.pagenum:before {
+		    content: counter(page);
 		}
 	</style>
 </head>
 <body class="cuerpo">
 	<div class="header">
 		<table>
-			<tr><td colspan="3" height="10">&nbsp;</td></tr>
 			<tr>
 				<td class="imagen izquierda">
 					<img src="{{ URL::to('img/EscudoGobiernoChiapas.png') }}" width="180">
 				</td>
-				<td height="40" align="center">Instituto de Salud</td>
+				<td height="40" class="titulo" align="center">Instituto de Salud</td>
 				<td class="imagen derecha">
 					<img src="{{ URL::to('img/Marca.png') }}" width="180">
 				</td>
 			</tr>
-			<tr><td colspan="3" height="10">&nbsp;</td></tr>
+			<tr><td colspan="3" height="5">&nbsp;</td></tr>
 		</table>
 	</div>
+@if(!isset($soloGraficas))
 	<table>
 		<tr align="left">
 			<th>Indicador</th>
@@ -184,10 +201,14 @@
 	<table>
 		<tr align="left">
 			<th nowrap="nowrap">Análisis de Resultados Acumulados</th>
-			<th nowrap="nowrap">Justificación Acumulada</th>
 		</tr>
 		<tr align="left" valign="top">
 			<td>{{$data->analisisResultados}}</td>
+		</tr>
+		<tr align="left">
+			<th nowrap="nowrap">Justificación Acumulada</th>
+		</tr>
+		<tr align="left" valign="top">
 			<td>{{$data->justificacion}}</td>
 		</tr>
 	</table>
@@ -243,5 +264,19 @@
 	<br>
 	<div class="grafica"><img {{$srcGraficaMensual}} /></div>
 	<div class="grafica"><img {{$srcGraficaJurisdiccional}} /></div>
+@else
+	<table>
+		<tr>
+			<th class="titulo" align="center">{{$titulo}}</th>
+		</tr>
+	</table>
+	@if(isset($grafica2))
+		<div style="width:60%; float:left;"><img {{$grafica}} /></div>
+		<div style="width:40%; float:left;"><img {{$grafica2}} /></div>
+		asdfsdaf
+	@else
+		<div style="width:90%;margin-left:auto;margin-right:auto;"><img {{$grafica}} style="width:100%;" /></div>
+	@endif
+@endif
 </body>
 </html>
