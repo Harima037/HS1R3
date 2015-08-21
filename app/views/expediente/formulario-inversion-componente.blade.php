@@ -189,28 +189,92 @@
             </div>
             <div class="row">
                 <div class="col-sm-12">
-                    <table id="tabla-{{$identificador}}-metas-mes" class="table table-condensed table-hover table-striped">
-                        <thead>
-                            <tr>
-                                <th>Mes</th>
-                                @foreach ($meses as $clave => $mes)
-                                    <th>{{$mes}}</th>
-                                @endforeach
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($jurisdicciones as $llave => $jurisdiccion)
-                                <tr>
-                                    <th>{{$jurisdiccion}}</th>
-                                    @foreach ($meses as $clave => $mes)
-                                        <td>
-                                            <input id="mes-{{$identificador}}-{{$llave}}-{{$clave}}" name="mes-{{$identificador}}[{{$llave}}][{{$clave}}]" type="number" class="form-control input-sm metas-mes" data-meta-mes="{{$clave}}" data-meta-jurisdiccion="{{$llave}}" data-meta-identificador="{{$identificador}}" data-meta-id="">
-                                        </td>
-                                    @endforeach
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <div role="tabpanel">
+                    <!-- Nav tabs -->
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active">
+                                <a href="#panel-{{$identificador}}-trim-1" aria-controls="panel-{{$identificador}}-trim-1" role="tab" data-toggle="tab">Trim 1</a>
+                            </li>
+                            <li role="presentation">
+                                <a href="#panel-{{$identificador}}-trim-2" aria-controls="panel-{{$identificador}}-trim-2" role="tab" data-toggle="tab">Trim 2</a>
+                            </li>
+                            <li role="presentation">
+                                <a href="#panel-{{$identificador}}-trim-3" aria-controls="panel-{{$identificador}}-trim-3" role="tab" data-toggle="tab">Trim 3</a>
+                            </li>
+                            <li role="presentation">
+                                <a href="#panel-{{$identificador}}-trim-4" aria-controls="panel-{{$identificador}}-trim-4" role="tab" data-toggle="tab">Trim 4</a>
+                            </li>
+                            <li role="presentation" class="pull-right">
+                                <a href="#panel-{{$identificador}}-csv" aria-controls="panel-{{$identificador}}-csv" role="tab" data-toggle="tab">
+                                    <span class="fa fa-upload"></span> Importar archivo
+                                </a>
+                            </li>
+                        </ul>
+                    <!-- Tab panes -->
+                        <div class="tab-content">
+                            @for ($i = 1; $i <= 4 ; $i++)
+                            <div role="tabpanel" class="tab-pane {{($i == 1)?'active':''}}" id="panel-{{$identificador}}-trim-{{$i}}">
+                                <table id="tabla-{{$identificador}}-metas-mes-{{$i}}" class="table table-condensed table-hover table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Jurisdicción</th>
+                                            @foreach ($meses as $clave => $mes)
+                                            @if(ceil($clave/3) == $i)
+                                                <th>{{$mes}}</th>
+                                            @endif
+                                            @endforeach
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($jurisdicciones as $llave => $jurisdiccion)
+                                            <tr>
+                                                <th>{{$jurisdiccion}}</th>
+                                                @for($clave = ((($i-1)*3)+1) ; $clave <= ($i*3) ; $clave++)
+                                                    <td>
+                                                        <input id="mes-{{$identificador}}-{{$llave}}-{{$clave}}" name="mes-{{$identificador}}[{{$llave}}][{{$clave}}]" type="number" class="form-control input-sm metas-mes" data-meta-mes="{{$clave}}" data-meta-jurisdiccion="{{$llave}}" data-meta-identificador="{{$identificador}}" data-meta-id="" min="0">
+                                                    </td>
+                                                @endfor
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            @endfor
+                            <div role="tabpanel" class="tab-pane" id="panel-{{$identificador}}-csv">
+                                <br>
+                                <div id="panel-importar-csv" class="fileupload ">
+                                    <fieldset>
+                                        <legend>Importar Archivo CSV</legend>
+                                        <span class="help-block">
+                                            Puede importar un archivo en formato csv para llenar los campos en la programación de metas. Se debe tener en cuenta lo siguiente:
+                                            <ul>
+                                                <li>
+                                                    La primer linea del archivo debe contener siempre el siguiente encabezado
+                                                    <ul>
+                                                        <li>JURISDICCION,ENE,FEB,MAR,ABR,MAY,JUN,JUL,AGO,SEP,OCT,NOV,DIC</li>
+                                                    </ul>
+                                                </li>
+                                                <li>
+                                                    Las lineas siguientes deben contener los datos a capturar, una linea por cada jurisdicción, con el orden establecido por el encabezado.
+                                                </li>
+                                                <li>
+                                                    El primer elemento de cada linea (JURISDICCION), debe ser la clave de dicha jurisicción desde la 01 (para la jurisdicción 1) hasta la 10, colocando OC en caso de tratarse de la Oficina Central.
+                                                </li>
+                                                <li>
+                                                    Cada valor debe ir separado con una coma, los valores numericos deben consistir de un máximo de 10 números enteros, no deben tener separadores de miles, y en caso de ser necesario hasta 2 números decimales, llenando con 0 en donde no se requiera un valor, de forma que cada linea debe contener el mismo número de elementos.
+                                                </li>
+                                            </ul>
+                                        </span>
+                                        <input type="file" id="archivo-{{$identificador}}-csv" accept=".csv"  data-identificador="{{$identificador}}"/>
+                                    </fieldset>
+                                </div>
+                                <br>
+                                <div id="mensajes-{{$identificador}}-importar-csv">
+                                </div>
+                                <br>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-sm-6 bg-info">
                     <div class="row">

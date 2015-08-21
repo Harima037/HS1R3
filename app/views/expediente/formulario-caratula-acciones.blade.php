@@ -82,10 +82,12 @@
         <thead>
             <tr>
                 <th><input type="checkbox" class="check-select-all-rows"></th>
-                <th>Entregable</th>
+                <th>Indicador</th>
+                <th>Unidad de Medida</th>
+                <!--th>Entregable</th>
                 <th>Tipo</th>
                 <th>Acción</th>
-                <th>Modalidad</th>
+                <th>Modalidad</th-->
                 <th>Presupuesto</th>
                 <th width="50px"></th>
             </tr>
@@ -122,8 +124,36 @@
                 <div class="col-sm-4">
                     <div class="btn-toolbar pull-right" >
                         <div class="btn-group" style="margin:5px">
+                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="fa fa-file"></span> Importación <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu pull-right">
+                                <li>
+                                    <a href="#" id="lnk-descarga-archivo-metas" target="_blank">
+                                        <span class="fa fa-download"></span> Descargar Archivo para Metas
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" id="lnk-descarga-archivo-presupuesto" target="_blank">
+                                        <span class="fa fa-download"></span> Descargar Archivo para Presupuesto
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" id="lnk-descarga-archivo-beneficiarios" target="_blank">
+                                        <span class="fa fa-download"></span> Descargar Archivo para Beneficiarios
+                                    </a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="#">
+                                        <span class="fa fa-upload"></span> Cargar Archivo de Importación
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="btn-group" style="margin:5px">
                             <button type="button" class="btn btn-info" id="btn-agregar-distribucion">
-                                <span class="glyphicon glyphicon-plus"></span> Agregar Presupuesto
+                                <span class="fa fa-plus"></span> Agregar
                             </button>
                             <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
                                 <span class="caret"></span>
@@ -131,13 +161,13 @@
                             <ul class="dropdown-menu pull-right" role="menu">
                                 <li>
                                     <a href="#" class="btn-edit-rows">
-                                        <span class="glyphicon glyphicon-edit"></span> Editar
+                                        <span class="fa fa-edit"></span> Editar
                                     </a>
                                 </li>
                                 <li class="divider"></li>
                                 <li>
                                     <a href="#" class="btn-delete-rows">
-                                        <span class="glyphicon glyphicon-remove"></span> Eliminar
+                                        <span class="fa fa-times"></span> Eliminar
                                     </a>
                                 </li>
                             </ul>

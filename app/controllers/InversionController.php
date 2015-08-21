@@ -104,4 +104,55 @@ class InversionController extends ProyectosController {
 			);
 		}
 	}
+
+	public function archivoMunicipios($id){
+		$parametros = Input::all();
+		$proyecto = Proyecto::find($id);
+
+		
+		$nombre_archivo = '';
+		if($parametros['tipo-carga'] == 'meta'){
+			$campos = 'null AS enero, null AS febrero, null AS marzo, null AS abril, null AS mayo, null AS junio, null AS julio, null AS agosto, null AS septiembre, null AS octubre, null AS noviembre, null AS diciembre';
+			$nombre_archivo = 'Metas';
+		}elseif($parametros['tipo-carga'] == 'presupuesto'){
+			$campos = 'null AS partida, null AS enero, null AS febrero, null AS marzo, null AS abril, null AS mayo, null AS junio, null AS julio, null AS agosto, null AS septiembre, null AS octubre, null AS noviembre, null AS diciembre';
+			$nombre_archivo = 'Presupuesto';
+		}else{
+			$campos = 'null AS tipoBeneficiario, null AS totalHombres, null AS totalMujeres, null AS total';
+			$nombre_archivo = 'Beneficiarios';
+		}
+		$recurso = Municipio::select('vistaMunicipios.clave AS claveMunicipio',
+										 'vistaMunicipios.nombre AS nombreMunicipio',
+										 'localidad.clave AS claveLocalidad',
+										 'localidad.nombre AS nombreLocalidad',
+										 DB::raw($campos))
+								->join('vistaLocalidades AS localidad',function($join){
+									$join->on('localidad.idMunicipio','=','vistaMunicipios.id')
+										->whereNull('localidad.borradoAl');
+								})
+								->orderBy('claveMunicipio','ASC')
+								->orderBy('claveLocalidad','ASC');
+
+		if($proyecto->idCobertura == 1){ 
+		//Cobertura Estado
+			$recurso = $recurso->get();
+		}elseif($proyecto->idCobertura == 2){ 
+		//Cobertura Municipio
+			$recurso = $recurso->where('vistaMunicipios.clave','=',$proyecto->claveMunicipio)->get();
+		}elseif($proyecto->idCobertura == 3){ 
+		//Cobertura Region
+			$recurso = $recurso->join('vistaRegiones AS region',function($join)use($proyecto){
+									$join->on('vistaMunicipios.idRegion','=','region.id')
+										->where('region.region','=',$proyecto->claveRegion)
+										->whereNull('region.borradoAl');
+								})->get();
+		}
+		//$recurso = $recurso->toArray();
+		Excel::create('ArchivoMunicipios'.$nombre_archivo, function($excel) use ($recurso) {
+		    $excel->sheet('Municipios', function($sheet) use ($recurso) {
+		        $sheet->fromArray($recurso);
+		    });
+		})->download('csv');
+		//return Response::json($recurso,200);
+	}
 }

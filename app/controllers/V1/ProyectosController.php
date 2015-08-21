@@ -1196,21 +1196,22 @@ class ProyectosController extends BaseController {
 		$es_editar = FALSE;
 		$proyecto = NULL;
 		$componente = NULL;
+
 		$reglasAccion = array(
-			'denominador-ind-' . $selector 	=> 'required',
+			//'denominador-ind-' . $selector 	=> 'required',
 			'descripcion-ind-' . $selector 	=> 'required',
-			'descripcion-obj-' . $selector 	=> 'required',
-			'dimension-' . $selector 		=> 'required',
-			'formula-' . $selector 			=> 'required',
-			'frecuencia-' . $selector 		=> 'required',
-			'interpretacion-' . $selector 	=> 'required',
-			'numerador-ind-' . $selector 	=> 'required',
-			'supuestos-' . $selector 		=> 'required',
-			'tipo-ind-' . $selector 		=> 'required',
+			//'descripcion-obj-' . $selector 	=> 'required',
+			//'dimension-' . $selector 		=> 'required',
+			//'formula-' . $selector 			=> 'required',
+			//'frecuencia-' . $selector 		=> 'required',
+			//'interpretacion-' . $selector 	=> 'required',
+			//'numerador-ind-' . $selector 	=> 'required',
+			//'supuestos-' . $selector 		=> 'required',
+			//'tipo-ind-' . $selector 		=> 'required',
 			'anio-base-' . $selector 		=> 'integer|min:0',
 			'linea-base-' . $selector 		=> 'numeric|min:0',
 			'unidad-medida-' . $selector 	=> 'required',
-			'verificacion-' . $selector 	=> 'required'
+			//'verificacion-' . $selector 	=> 'required'
 			//'trim1-componente' 				=> 'numeric',
 			//'trim2-componente' 				=> 'numeric',
 			//'trim3-componente' 				=> 'numeric',
@@ -1267,11 +1268,11 @@ class ProyectosController extends BaseController {
 			}
 		}
 		
-		if($parametros['clasificacion'] == 2 && $selector == 'componente'){
+		/*if($parametros['clasificacion'] == 2 && $selector == 'componente'){
 			$reglasAccion['entregable'] 			= 'required';
 			$reglasAccion['tipo-entregable'] 		= 'required';
 			$reglasAccion['accion-entregable'] 		= 'required';
-		}
+		}*/
 		
 		/*if(isset($parametros['datos_presupuesto'])){
 			$this->reglasComponente['accion-presupuesto-requerido']	= 'required|numeric|min:1';
@@ -1304,6 +1305,11 @@ class ProyectosController extends BaseController {
 			
 			$recurso->lineaBase 			= ($parametros['linea-base-'.$selector])?$parametros['linea-base-'.$selector]:NULL;
 			$recurso->anioBase 				= ($parametros['anio-base-'.$selector])?$parametros['anio-base-'.$selector]:NULL;
+
+			if(!$recurso->idFormula){ $recurso->idFormula = NULL; }
+			if(!$recurso->idDimensionIndicador){ $recurso->idDimensionIndicador = NULL; }
+			if(!$recurso->idFrecuenciaIndicador){ $recurso->idFrecuenciaIndicador = NULL; }
+			if(!$recurso->idTipoIndicador){ $recurso->idTipoIndicador = NULL; }
 
 			if($parametros['clasificacion'] == 2 && $selector == 'componente'){
 				$recurso->idEntregable 		= $parametros['entregable'];

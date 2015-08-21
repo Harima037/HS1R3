@@ -48,6 +48,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		
 		Route::get('inversion',array('uses'=>'InversionController@index'));
 		Route::any('caratula-inversion/{id?}',array('uses'=>'InversionController@caratula'));
+		Route::any('descargar-archivo-municipios/{id}',array('uses'=>'InversionController@archivoMunicipios'));
 		
 		Route::get('fibap',array('uses'=>'FibapController@index'));
 		Route::any('formulario-fibap',array('uses'=>'FibapController@formulario'));

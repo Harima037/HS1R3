@@ -52,20 +52,20 @@ class InversionController extends ProyectosController {
 	);
 
 	private $reglasPresupuesto = array(
-		'total-beneficiarios'		=> 'required',
-		'beneficiarios'				=> 'required|array|min:1',
+		//'total-beneficiarios'		=> 'required',
+		//'beneficiarios'				=> 'required|array|min:1',
 		'jurisdiccion-accion'		=> 'required',
 		'municipio-accion'			=> 'required_if:jurisdiccion-accion,01,02,03,04,05,06,07,08,09,10',
 		'localidad-accion'			=> 'required_if:jurisdiccion-accion,01,02,03,04,05,06,07,08,09,10',
 		'cantidad-meta'				=> 'required|numeric|min:1',
-		'cantidad-presupuesto'		=> 'required|numeric|min:1',
+		//'cantidad-presupuesto'		=> 'required|numeric|min:1',
 		'meta-mes'					=> 'required|array|min:1',
-		'mes'						=> 'required|array|min:1'
+		//'mes'						=> 'required|array|min:1'
 	);
 
 	private $reglasAccionPresupuesto = array(
-		'accion-presupuesto-requerido'	=> 'required|numeric|min:1',
-		'objeto-gasto-presupuesto'		=> 'required|array|min:1'
+		'accion-presupuesto-requerido'	=> 'numeric',
+		'objeto-gasto-presupuesto'		=> 'array'
 	);
 	
 
@@ -726,10 +726,14 @@ class InversionController extends ProyectosController {
 				if($respuesta['http_status'] == 200){
 					$componente = $respuesta['data']['data'];
 					$resultado = $this->guardar_datos_accion_presupuesto($parametros,$componente,$id);
-					if($resultado['data']){
-						$respuesta['data']['data'] = $resultado['data'];
+					if(isset($resultado['http_status'])){
+						$respuesta = $resultado;
+					}else{
+						if($resultado['data']){
+							$respuesta['data']['data'] = $resultado['data'];
+						}
+						$respuesta['data']['acciones'] = $resultado['acciones'];
 					}
-					$respuesta['data']['acciones'] = $resultado['acciones'];
 				}
 			}elseif($parametros['guardar'] == 'actividad'){
 				$parametros['clasificacion'] = 2;
@@ -1382,10 +1386,21 @@ class InversionController extends ProyectosController {
 
 			/******************************      Creación/Edición de elementos del desglose        *******************************/
 			$accion_partidas = $accion->partidas->lists('id','id');
-			$meses_capturados = $parametros['mes'];
+
+			if(isset($parametros['mes'])){
+				$meses_capturados = $parametros['mes'];
+			}else{
+				$meses_capturados = array();
+			}
+			
 
 			if($es_editar){
-				$meses_ids = $parametros['meses-capturados']; //Elementos ya capturados por tanto se actualizaran
+				if(isset($parametros['meses-capturados'])){
+					//Elementos ya capturados por tanto se actualizaran
+					$meses_ids = $parametros['meses-capturados'];
+				}else{
+					$meses_ids = array();
+				}
 			}else{
 				$meses_ids = array();
 			}
@@ -1446,6 +1461,9 @@ class InversionController extends ProyectosController {
 
 			/******************************      Validación de beneficiarios        *******************************/
 			$fibap->load('acciones','proyecto.beneficiarios');
+			if(!isset($parametros['beneficiarios'])){
+				$parametros['beneficiarios'] = array();
+			}
 
 			if($es_editar){
 				$editar_beneficiarios = FALSE;
@@ -1655,7 +1673,11 @@ class InversionController extends ProyectosController {
 	}
 
 	public function guardar_datos_accion_presupuesto($parametros,$componente,$id = NULL){
-		$es_editar = FALSE;
+		if($id){
+			$es_editar = TRUE;
+		}else{
+			$es_editar = FALSE;
+		}
 		$respuesta = array('data'=>NULL);
 		$fibap = FIBAP::find($parametros['id-fibap']);
 		$validacion = Validador::validar(Input::all(), $this->reglasAccionPresupuesto);
@@ -1666,7 +1688,6 @@ class InversionController extends ProyectosController {
 					if($id){
 						$accion = Accion::with('propuestasFinanciamiento','partidas','componente')
 									->where('idComponente','=',$id)->first();
-						$es_editar = TRUE;
 					}else{
 						$accion = new Accion;
 						$accion->idComponente = $componente->id;
@@ -1674,7 +1695,12 @@ class InversionController extends ProyectosController {
 					
 					/********************************       Partidas Presupuestarias       *********************************/
 					
-					$partidas_formulario = $parametros['objeto-gasto-presupuesto'];
+					if(isset($parametros['objeto-gasto-presupuesto'])){
+						$partidas_formulario = $parametros['objeto-gasto-presupuesto'];
+					}else{
+						$partidas_formulario = array();
+					}
+					
 					if($es_editar){
 						$partidas_anteriores = $accion->partidas->lists('id');
 					}else{
@@ -1772,8 +1798,9 @@ class InversionController extends ProyectosController {
 						if(count($partidas['nuevas'])){
 							$accion->partidas()->attach($partidas['nuevas']);
 						}
-						
-						$accion->propuestasFinanciamiento()->saveMany($guardar_origenes);
+						if(count($guardar_origenes)){
+							$accion->propuestasFinanciamiento()->saveMany($guardar_origenes);
+						}
 					}
 				}else{
 					throw new Exception("No se pudo encontrar la FIBAP", 1);
@@ -1783,6 +1810,8 @@ class InversionController extends ProyectosController {
 
 				return $valores_respuesta;
 			});
+		}else{
+			$respuesta = $validacion;
 		}
 		$fibap->load('acciones.datosComponenteDetalle');
 		$fibap->acciones->load('propuestasFinanciamiento');

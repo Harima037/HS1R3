@@ -344,12 +344,14 @@ context.init = function(id,resource){
 
 context.mostrar_datos_presupuesto = function(datos){
     $(modal_presupuesto).find(".modal-title").html("Editar Presupuesto");
-    $('#jurisdiccion-accion').val(datos.calendarizado[0].claveJurisdiccion);
-    $('#jurisdiccion-accion').trigger('chosen:updated');
+    //$('#jurisdiccion-accion').val(datos.calendarizado[0].claveJurisdiccion);
+    //$('#jurisdiccion-accion').trigger('chosen:updated');
 
     llenar_select_municipios(datos.municipios);
 
     var desglose = datos.desglose;
+    $('#jurisdiccion-accion').val(desglose.claveJurisdiccion);
+    $('#jurisdiccion-accion').trigger('chosen:updated');
     if(desglose.claveMunicipio){
         $('#municipio-accion').val(desglose.claveMunicipio);
         $('#municipio-accion').trigger('chosen:updated');
@@ -463,10 +465,14 @@ context.mostrar_datos = function(datos){
     $('#tipo-ind-componente').val(datos.componente.idTipoIndicador);
     $('#unidad-medida-componente').val(datos.componente.idUnidadMedida);
 
-    $('#entregable').val(datos.componente.idEntregable);
-    $('#entregable').chosen().change();
-    $('#tipo-entregable').val(datos.componente.idEntregableTipo || 'NA');
-    $('#accion-entregable').val(datos.componente.idEntregableAccion);
+    if(datos.componente.idEntregable){
+        $('#entregable').val(datos.componente.idEntregable);
+        $('#entregable').chosen().change();
+        $('#tipo-entregable').val(datos.componente.idEntregableTipo || 'NA');
+    }
+    if(datos.componente.idEntregableAccion){
+        $('#accion-entregable').val(datos.componente.idEntregableAccion);
+    }
 
     $(form_accion + ' .chosen-one').trigger('chosen:updated');
 
@@ -501,7 +507,7 @@ context.mostrar_datos = function(datos){
         }
         for(var i in suma_trimestre){
             $('#trim'+i+'-componente').val(suma_trimestre[i]);
-            $('#trim'+i+'-componente-lbl').text(suma_trimestre[i]);
+            $('#trim'+i+'-componente-lbl').text(suma_trimestre[i].format(2));
         }
         $('#numerador-componente').val(suma);
         $('#numerador-componente-lbl').text(suma);
@@ -568,7 +574,10 @@ context.mostrar_detalles = function(id){
         var parametros = {'mostrar':'desglose-componente'};
         fibap_resource.get(id,parametros,{
             _success:function(response){
-                //
+                $('#lnk-descarga-archivo-metas').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=meta');
+                $('#lnk-descarga-archivo-presupuesto').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=presupuesto&id-accion='+id);
+                $('#lnk-descarga-archivo-beneficiarios').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=beneficiarios');
+
                 $('#datagridAcciones > table > tbody > tr.contendor-desechable').remove();
                 llenar_datagrid_distribucion(response.data.idComponente,response.data.presupuestoRequerido);
 
@@ -577,7 +586,7 @@ context.mostrar_detalles = function(id){
                 $('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"] > td > span.boton-detalle > span.fa-plus-square-o').addClass('fa-minus-square-o');
                 $('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"] > td > span.boton-detalle > span.fa-plus-square-o').removeClass('fa-plus-square-o');
                 
-                $('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"]').after('<tr class="contendor-desechable disabled"><td class="disabled bg-info" colspan="7" id="datagrid-contenedor-' + id + '"></td></tr>');
+                $('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"]').after('<tr class="contendor-desechable disabled"><td class="disabled bg-info" colspan="5" id="datagrid-contenedor-' + id + '"></td></tr>');
                 $('#datagridDistribucion').appendTo('#datagrid-contenedor-' + id);
                 $('#datagridDistribucion').attr('data-selected-id',id);
 
@@ -791,16 +800,18 @@ function llenar_datagrid_acciones(datos){
         var presupuesto = parseFloat(datos[indx].presupuestoRequerido);
 
         accion.id = datos[indx].id;
-        accion.entregable = datos[indx].datos_componente_detalle.entregable;
-        accion.tipo = datos[indx].datos_componente_detalle.entregableTipo || 'N / A';
-        accion.accion = datos[indx].datos_componente_detalle.entregableAccion;
-        accion.modalidad = 'pendiente';//datos[indx].cantidad;
-        accion.presupuesto = '$ ' + parseFloat(presupuesto).format(2);
+        //accion.entregable = datos[indx].datos_componente_detalle.entregable;
+        accion.indicador = datos[indx].datos_componente_detalle.indicador;
+        //accion.tipo = datos[indx].datos_componente_detalle.entregableTipo || 'N / A';
+        //accion.accion = datos[indx].datos_componente_detalle.entregableAccion;
+        accion.unidadMedida = datos[indx].datos_componente_detalle.unidadMedida;
+        //accion.modalidad = 'pendiente';//datos[indx].cantidad;
+        accion.presupuesto = '$ ' + (parseFloat(presupuesto) || 0).format(2);
         accion.boton = '<span class="btn-link text-info boton-detalle" onClick="fibapAcciones.mostrar_detalles(' + datos[indx].id + ')"><span class="fa fa-plus-square-o"></span></span>'
 
 
         if(comentarios.componentes[accion.idComponente]){
-            accion.entregable = '<span class="text-warning fa fa-warning comentario-row"></span> ' + accion.entregable;
+            accion.indicador = '<span class="text-warning fa fa-warning comentario-row"></span> ' + accion.indicador;
         }
 
         acciones.push(accion);
@@ -824,7 +835,7 @@ function llenar_datagrid_acciones(datos){
     });
 
     if(datos.length == 0){
-        $('#datagridAcciones > table > tbody').html('<tr><td></td><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
+        $('#datagridAcciones > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
     }else{
         $('#tab-link-acciones-fibap > span.badge').text(acciones.length + ' / 2');
         accionesDatagrid.cargarDatos(acciones);
@@ -1077,6 +1088,44 @@ function actualizar_claves_presupuesto(datos){
 }
 
 function actualizar_tabla_metas_mes(identificador,jurisdicciones){
+    //var meses = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
+    var meses = [];
+    meses[1] = ['ENE','FEB','MAR'];
+    meses[2] = ['ABR','MAY','JUN'];
+    meses[3] = ['JUL','AGO','SEP'];
+    meses[4] = ['OCT','NOV','DIC'];
+
+    for(var j = 1 ; j <= 4 ; j++ ){
+        var tabla_id = '#tabla-'+identificador+'-metas-mes-'+j;
+
+        var html = '';
+        var idx, id_mes;
+
+        for(var i in jurisdicciones){
+            html += '<tr>';
+            html += '<th>'+jurisdicciones[i].clave+'</th>';
+            for(idx in meses[j]){
+                id_mes = parseInt(((j-1)*3)+parseInt(idx)) + 1;
+                html += '<td><input id="mes-'+identificador+'-'+jurisdicciones[i].clave+'-'+id_mes+'" name="mes-'+identificador+'['+jurisdicciones[i].clave+']['+id_mes+']" type="number" class="form-control input-sm metas-mes" data-meta-mes="'+id_mes+'" data-meta-jurisdiccion="'+jurisdicciones[i].clave+'" data-meta-identificador="'+identificador+'" data-meta-id=""></td>';
+            }
+            html += '</tr>';
+        }
+
+        html += '<tr><th>O.C.</th>';
+        for(idx in meses[j]){
+            id_mes = parseInt(((j-1)*3)+parseInt(idx)) + 1;
+            html += '<td><input id="mes-'+identificador+'-OC-'+id_mes+'" name="mes-'+identificador+'[OC]['+id_mes+']" type="number" class="form-control input-sm metas-mes" data-meta-mes="'+id_mes+'" data-meta-jurisdiccion="OC" data-meta-identificador="'+identificador+'" data-meta-id=""></td>';
+        }
+        html += '</tr>';
+
+        $(tabla_id + ' tbody').empty();
+        $(tabla_id + ' tbody').html(html);
+    }
+
+    actualizar_eventos_metas(identificador);
+}
+/*
+function actualizar_tabla_metas_mes(identificador,jurisdicciones){
     var tabla_id = '#tabla-'+identificador+'-metas-mes';
     var meses = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
 
@@ -1104,6 +1153,7 @@ function actualizar_tabla_metas_mes(identificador,jurisdicciones){
     $(tabla_id + ' tbody').html(html);
     actualizar_eventos_metas(identificador);
 }
+*/
 
 function actualizar_eventos_metas(identificador){
     $('.metas-mes[data-meta-identificador="' + identificador + '"]').on('keyup',function(){ $(this).change(); });
