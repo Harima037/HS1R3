@@ -34,6 +34,9 @@ var form_actividad = '#form_actividad';
 var modal_presupuesto = '#modal-presupuesto';
 var form_presupuesto = '#form-presupuesto';
 
+var modal_subir_archivo = '#modal-subir-archivo';
+var form_subir_archivo = '#form-subir-archivo';
+
 var presupuesto_total = 0;
 var presupuesto_origenes = [];
 
@@ -76,6 +79,60 @@ context.init = function(id,resource){
     $('#btn-agregar-distribucion').on('click',function(){
         $(modal_presupuesto).find(".modal-title").html("Nuevo Presupuesto");
         $(modal_presupuesto).modal('show');
+    });
+
+    $('#lnk-mostrar-subir-archivo').on('click',function (e){
+        e.preventDefault();
+        $(modal_subir_archivo).modal('show');
+    });
+
+    $('#btn-subir-archivo').on('click',function(){
+        Validation.cleanFormErrors(form_subir_archivo);
+        var parametros = $(form_subir_archivo).serialize();
+        var cuantosArchivos = document.getElementById("archivo").files.length;  
+        if(cuantosArchivos>0){
+            //parametros += '&guardar=cargar-archivo-desglose&id-accion='+$('#id-accion').val()+'&id-fibap='+id_fibap;
+            var data  = new FormData();
+            var archivo = document.getElementById("archivo").files;
+                
+            $("#loading").fadeIn();
+            data.append('datoscsv', archivo[0]); 
+            data.append('tipo-archivo',$('#tipo-archivo').val());
+            data.append('id-accion', $('#id-accion').val());
+            data.append('id-fibap', id_fibap);
+            data.append('id-proyecto',$('#id').val());
+            data.append('guardar','cargar-archivo-desglose');
+            
+            $.ajax({
+                url: SERVER_HOST+'/v1/inversion', //Url a donde la enviaremos
+                type:'POST', //Metodo que usaremos
+                dataType:'json',
+                contentType:false, //Debe estar en false para que pase el objeto sin procesar
+                data:data, //Le pasamos el objeto que creamos con los archivos
+                processData:false, //Debe estar en false para que JQuery no procese los datos a enviar
+                cache:false, //Para que el formulario no guarde cache,
+                success: function(response){ 
+                    $("#loading").fadeOut();            
+                },
+                error: function( response ){
+                    $("#loading").fadeOut(function(){ 
+                        try{
+                            var json = $.parseJSON(response.responseText);
+                            if(!json.code)
+                                MessageManager.show({code:'S03',timer:10,data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                            else{
+                                MessageManager.show(json);
+                            }
+                            Validation.formValidate(json.data);
+                        }catch(e){
+                            console.log(e);
+                        }
+                    });
+                }   
+            });
+        }else{
+            MessageManager.show({data:'Debe seleccionar un archivo a subir.',timer:10,type:'ERR'});
+        }
     });
 
     $('#btn-agregar-actividad').on('click',function(){
@@ -578,6 +635,8 @@ context.mostrar_detalles = function(id){
                 $('#lnk-descarga-archivo-presupuesto').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=presupuesto&id-accion='+id);
                 $('#lnk-descarga-archivo-beneficiarios').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=beneficiarios');
 
+                $('#id-accion').val(id);
+
                 $('#datagridAcciones > table > tbody > tr.contendor-desechable').remove();
                 llenar_datagrid_distribucion(response.data.idComponente,response.data.presupuestoRequerido);
 
@@ -717,7 +776,7 @@ function llenar_datagrid_distribucion(id_componente,total_presupuesto){
                 var distribucion = [];
                 $('#datagridDistribucion > table > tbody').empty();
                 var total_porcentaje = 0;
-                var total_desglose = response.total_presupuesto;
+                var total_desglose = parseFloat(response.total_presupuesto) || 0;
                 var datos = response.data;
                 for(var indx in datos){
                     var presupuesto = {};
@@ -734,7 +793,7 @@ function llenar_datagrid_distribucion(id_componente,total_presupuesto){
                         presupuesto.jurisdiccion = 'OFICINA CENTRAL';
                     }
                     
-                    presupuesto.monto = '$ ' + parseFloat(datos[indx].presupuesto).format(2);
+                    presupuesto.monto = '$ ' + parseFloat(datos[indx].presupuesto || 0).format(2);
 
                     if(comentarios.desgloses[presupuesto.id]){
                         presupuesto.localidad = '<span class="text-warning fa fa-warning"></span> ' + presupuesto.localidad;
@@ -743,7 +802,7 @@ function llenar_datagrid_distribucion(id_componente,total_presupuesto){
                     distribucion.push(presupuesto);
                 }
 
-                total_porcentaje = (total_desglose * 100) / parseInt(total_presupuesto);
+                total_porcentaje = (total_desglose * 100) / (parseFloat(total_presupuesto) || 1);
 
                 if(distribucion.length == 0){
                     actualiza_porcentaje('#porcentaje_accion',0);

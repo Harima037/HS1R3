@@ -18,7 +18,7 @@
 namespace V1;
 
 use SSA\Utilerias\Validador;
-use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
+use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime, File;
 use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
 	FibapDatosProyecto, Directorio, ComponenteDesglose, AntecedenteFinanciero, DesgloseMetasMes, DistribucionPresupuesto,Accion,
 	PropuestaFinanciamiento, DesgloseBeneficiario, ProyectoFinanciamiento, ProyectoFinanciamientoSubFuente;
@@ -561,6 +561,14 @@ class InversionController extends ProyectosController {
 				*	- Guardar el desglose de metas por mes del componente
 				***/
 				$respuesta = $this->guardar_datos_desglose_presupuesto($parametros);
+			}elseif($parametros['guardar'] == 'cargar-archivo-desglose'){
+				/***
+				*	Carga los datos del desglose del componente ya sea programación de Metas, Beneficiarios o Presupueeto
+				*
+				*	- Si el desglose ya se encuentra capturado lo actualiza.
+				* 	- Si el tipo de archivo es el correcto almacena la programación de metas por mes.
+				***/
+				$respuesta = $this->importar_archivo($parametros);
 			}elseif($parametros['guardar'] == 'financiamiento'){
 				$respuesta = parent::guardar_datos_financiamiento($parametros);
 			}
@@ -595,7 +603,7 @@ class InversionController extends ProyectosController {
 		$respuesta['data'] = array("data"=>'');
 		try{
 			$parametros = Input::all();
-
+			
 			if($parametros['guardar'] == 'validar-proyecto'){
 				$proyecto = Proyecto::find($id);
 				if($proyecto->idEstatusProyecto == 1 || $proyecto->idEstatusProyecto == 3){
@@ -935,6 +943,7 @@ class InversionController extends ProyectosController {
 				$respuesta['data']['data'] = $ex->getMessage();
 			}else{
 				$respuesta['data']['ex'] = $ex->getMessage();
+				$respuesta['data']['line'] = $ex->getLine();
 			}
 			if(!isset($respuesta['data']['code'])){
 				$respuesta['data']['code'] = 'S03';
@@ -1320,6 +1329,246 @@ class InversionController extends ProyectosController {
 		return Response::json($data,$http_status);
 	}
 
+	public function importar_archivo($parametros){
+		$respuesta = array();
+		$respuesta['http_status'] = 200;
+		$respuesta['data'] = array("data"=>'');	
+
+		$usuario = Sentry::getUser();
+		$id_accion = $parametros['id-accion'];
+		$id_fibap = $parametros['id-fibap'];
+
+		if (Input::hasFile('datoscsv')){			
+			$finfo = finfo_open(FILEINFO_MIME_TYPE); 
+			$archivoConDatos = Input::file('datoscsv');
+			$type = finfo_file($finfo, $archivoConDatos); 
+			$archivo_desglose = storage_path().'/archivoscsv/archivo_desglose_'.$usuario->id.'.csv';
+			$archivo_metas = storage_path().'/archivoscsv/archivo_metas_'.$usuario->id.'.csv';
+
+			$conteo_queries = array();
+
+			$idInsertado ='';
+			$numeroRegistros = '';
+
+			//Si el Mime coincide con CSV
+			if($type=="text/plain"){
+				$row = 1;
+				$datos_archivo = array();
+				//Valida que la codificación del archivo sea UTF-8
+				if(mb_detect_encoding(file_get_contents($archivoConDatos), 'UTF-8', true)){
+					if (($handle = fopen($archivoConDatos, "r")) !== FALSE && ($datos_desglose = fopen($archivo_desglose, "w")) !== FALSE && ($datos_metas = fopen($archivo_metas, "w")) !== FALSE) {
+						//
+						$accion = Accion::with(array('desglose'=>function($query){
+								$query->select('*',DB::raw('CONCAT_WS("_",claveMunicipio,claveLocalidad) AS claveCompuesta'));
+							}))->find($id_accion);
+						$desgloses_capturados = $accion->desglose->lists('id','claveCompuesta');
+						if($parametros['tipo-archivo'] == 'metas'){
+							$accion->desglose->load('metasMes');
+						}
+
+						$desgloses_guardar = array();
+						$metas_mes_guardar = array();
+
+						$conteo_queries['finds'] = 0;
+						$conteo_queries['queries'] = 0;
+
+						$queries_inciales = count(DB::getQueryLog());
+						$row = 1;
+						while (($csv_data = fgetcsv($handle, 0, ",")) !== FALSE) {
+							if($row == 1){
+								$row++;
+								continue;
+							}
+
+							$csv_data[0] = str_pad($csv_data[0],2,"0",STR_PAD_LEFT);
+							$csv_data[2] = str_pad($csv_data[2],4,"0",STR_PAD_LEFT);
+
+							if(isset($desgloses_capturados[$csv_data[0].'_'.$csv_data[2]])){
+								$id_desglose = $desgloses_capturados[$csv_data[0].'_'.$csv_data[2]];
+								$desglose = $accion->desglose->find($id_desglose);
+								fputcsv($datos_desglose,[
+									$desglose->id,
+                                    $desglose->idComponente,
+                                    $desglose->idAccion,
+                                    $desglose->claveMunicipio,
+									$desglose->claveLocalidad
+                                ]);
+								if($desglose->metasMes){
+									$metas_mes = $desglose->metasMes->lists('id','mes');
+									for($i = 1; $i <= 12; $i++){
+										if(isset($metas_mes[$i])){
+											$meta_mes = $desglose->metasMes->find($metas_mes[$i]);
+											fputcsv($datos_metas,[
+												$meta_mes->id,
+			                                    $meta_mes->idComponenteDesglose,
+			                                    $meta_mes->idComponente,
+			                                    $meta_mes->claveMunicipio,
+												$meta_mes->claveLocalidad,
+												$meta_mes->mes,
+												$csv_data[(3+$i)]
+			                                ]);
+										}else{
+											if($csv_data[(3+$i)]){
+												fputcsv($datos_metas,[
+													NULL,
+				                                    $desglose->id,
+				                                    NULL,
+				                                    NULL,
+													NULL,
+													$i,
+													($csv_data[(3+$i)])?$csv_data[(3+$i)]:0
+				                                ]);
+											}
+										}
+									}
+								}
+								$conteo_queries['finds']++;
+								$queries = DB::getQueryLog();
+								$conteo_queries['queries'] = count($queries) - $queries_inciales;
+							}else{
+								fputcsv($datos_desglose,[
+									NULL,
+                                    $accion->idComponente,
+                                    $accion->id,
+                                    $csv_data[0],
+									$csv_data[2]
+                                ]);
+
+								for($i = 1; $i <= 12; $i++){
+									if($csv_data[(3+$i)]){
+										fputcsv($datos_metas,[
+											NULL,
+		                                    NULL,
+											$accion->idComponente,
+											$csv_data[0],
+											$csv_data[2],
+											$i,
+											$csv_data[(3+$i)]
+		                                ]);
+									}
+								}
+							}
+							//$desgloses_guardar[] = $desglose;
+						}
+						fclose($datos_desglose);
+						fclose($datos_metas);
+
+						try {
+							DB::connection()->getPdo()->beginTransaction();
+
+							$id_usuario = $usuario->id;
+							
+							$query = sprintf("
+								LOAD DATA local INFILE '%s' REPLACE 
+								INTO TABLE componenteDesglose 
+								FIELDS TERMINATED BY ',' 
+								OPTIONALLY ENCLOSED BY '\"' 
+								ESCAPED BY '\"' 
+								LINES TERMINATED BY '\\n'
+								(
+								@vid,
+								@vidComponente,
+								@vidAccion,
+								@vclaveMunicipio,
+								@vclaveLocalidad
+								)
+								set creadoPor='%s', actualizadoPor='%s',
+								id = nullif(@vid,''),
+								idComponente = @vidComponente,
+								idAccion = @vidAccion,
+								claveMunicipio = @vclaveMunicipio,
+								claveLocalidad = @vclaveLocalidad
+								", addslashes($archivo_desglose),$id_usuario,$id_usuario);
+							DB::connection()->getpdo()->exec($query);
+							
+							$query = sprintf("
+								LOAD DATA local INFILE '%s' REPLACE 
+								INTO TABLE desgloseMetasMes 
+								FIELDS TERMINATED BY ',' 
+								OPTIONALLY ENCLOSED BY '\"' 
+								ESCAPED BY '\"' 
+								LINES TERMINATED BY '\\n'
+								(
+								@vid,
+								@vidComponenteDesglose,
+								@vidComponente,
+								@vclaveMunicipio,
+								@vclaveLocalidad,
+								@vmes,
+								@vmeta
+								)
+								set creadoPor='%s', actualizadoPor='%s',
+								id = nullif(@vid,''),
+								idComponenteDesglose = nullif(@vidComponenteDesglose,''),
+								idComponente = nullif(@vidComponente,''),
+								claveMunicipio = nullif(@vclaveMunicipio,''),
+								claveLocalidad = nullif(@vclaveLocalidad,''),
+								mes = @vmes,
+								meta = @vmeta
+								", addslashes($archivo_metas),$id_usuario,$id_usuario);
+							DB::connection()->getpdo()->exec($query);
+							
+							$query = sprintf("
+								UPDATE desgloseMetasMes, componenteDesglose
+								SET desgloseMetasMes.idComponenteDesglose = componenteDesglose.id
+								WHERE 
+								desgloseMetasMes.idComponente = componenteDesglose.idComponente AND
+								desgloseMetasMes.claveMunicipio = componenteDesglose.claveMunicipio AND
+								desgloseMetasMes.claveLocalidad = componenteDesglose.claveLocalidad
+								");
+							DB::connection()->getpdo()->exec($query);
+							
+							$query = sprintf("
+								UPDATE componenteDesglose, vistaMunicipios, vistaJurisdicciones
+								SET componenteDesglose.claveJurisdiccion = vistaJurisdicciones.clave
+								WHERE 
+								componenteDesglose.claveMunicipio = vistaMunicipios.clave AND
+								vistaMunicipios.idJurisdiccion = vistaJurisdicciones.id AND 
+								componenteDesglose.idAccion = %s
+								", $id_accion);
+							DB::connection()->getpdo()->exec($query);
+							
+							DB::connection()->getPdo()->commit();
+
+							File::delete($archivo_desglose);
+							File::delete($archivo_metas);
+
+							$respuesta['data']['data'] = 'Elementos almacenados con exito';
+							//$respuesta['data']['data'] = array('totalRegistros'=>$total_registros,'idCarga'=>$idCarga);
+							//$respuesta['data'] = array('data'=>$desgloses_guardar,'conteo'=>$conteo_queries,'metas'=>$metas_mes_guardar);
+						}catch (\PDOException $e){
+							File::delete($archivo_desglose);
+							File::delete($archivo_metas);
+							$respuesta['http_status'] = 404;
+							$respuesta['data'] = array("data"=>"Ha ocurrido un error, no se pudieron cargar los datos. Verfique su conexión a Internet.",'code'=>'U06');
+						    DB::connection()->getPdo()->rollBack();
+						    throw $e;
+						}catch(Exception $e){
+							$respuesta['http_status'] = 500;
+							$respuesta['data'] = array("data"=>"",'ex'=>$e->getMessage(),'line'=>$e->getLine(),'code'=>'S02');
+						}
+
+					}else{
+						fclose($datos_desglose);
+						fclose($datos_metas);
+					}
+					fclose($handle);
+				}else{
+					$respuesta['http_status'] = 404;
+					$respuesta['data'] = array("data"=>"La codificación del archivo debe ser UTF-8",'code'=>'U06');
+				}
+			}else{
+				$respuesta['http_status'] = 404;
+				$respuesta['data'] = array("data"=>"Formato de archivo incorrecto.",'code'=>'U06');
+			}
+		}else{
+			$respuesta['http_status'] = 404;
+			$respuesta['data'] = array("data"=>"No se encontró el archivo.",'code'=>'U06');
+		}
+		//return Response::json($respuesta['data'],$respuesta['http_status']);
+		return $respuesta;
+	}
+
 	public function guardar_datos_desglose_presupuesto($parametros,$id = NULL){
 		$respuesta['http_status'] = 200;
 		$respuesta['data'] = array("data"=>'');
@@ -1385,7 +1634,7 @@ class InversionController extends ProyectosController {
 			$mes_final = date("n",strtotime($fibap->periodoEjecucionFinal));
 
 			/******************************      Creación/Edición de elementos del desglose        *******************************/
-			$accion_partidas = $accion->partidas->lists('id','id');
+			$accion_partidas = $accion->partidas->lists('clave','id');
 
 			if(isset($parametros['mes'])){
 				$meses_capturados = $parametros['mes'];
@@ -1420,6 +1669,7 @@ class InversionController extends ProyectosController {
 							$recurso = new DistribucionPresupuesto;
 							$recurso->idFibap = $accion->idFibap;
 							$recurso->idObjetoGasto = $partida;
+							$recurso->claveObjetoGasto = $accion_partidas[$partida];
 							$recurso->mes = $mes;
 						}else{
 							$recurso = FALSE;

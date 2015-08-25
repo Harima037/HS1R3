@@ -143,12 +143,12 @@
                                         <span class="fa fa-download"></span> Descargar Archivo para Beneficiarios
                                     </a>
                                 </li>
-                                <li class="divider"></li>
-                                <li>
-                                    <a href="#">
+                                <!--li class="divider"></li-->
+                                <!--li>
+                                    <a href="#" id="lnk-mostrar-subir-archivo">
                                         <span class="fa fa-upload"></span> Cargar Archivo de Importación
                                     </a>
-                                </li>
+                                </li-->
                             </ul>
                         </div>
                         <div class="btn-group" style="margin:5px">
@@ -404,6 +404,47 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary btn-guardar" id="btn-presupuesto-guardar">Guardar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!--      Modal para subida del archivo de metas, beneficiarios y presupuesto      -->
+
+<div class="modal fade" id="modal-subir-archivo" tabindex="-1" role="dialog" aria-labelledby="modalArchivoLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-85-screen">
+        <div class="modal-content modal-content-85-screen">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="modalArchivoLabel">Cargar Archivo</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form-subir-archivo">
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <div class="form-group">
+                                <label class="control-label" for="tipo-archivo">Tipo de Archivo</label>
+                                <select id="tipo-archivo" name="tipo-archivo" class="form-control">
+                                    <option value="">Selecciona un tipo</option>
+                                    <option value="metas">Archivo para Metas</option>
+                                    <option value="presupuesto">Archivo para Presupuesto</option>
+                                    <option value="beneficiarios">Archivo para Beneficiarios</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-7">
+                            <div class="form-group">
+                                <label class="control-label" for="archivo">Archivo</label>
+                                <input type="file" id="archivo" name="archivo" accept=".csv" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="resultado-carga"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-subir-archivo"><span class="fa fa-upload"></span> Cargar</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
