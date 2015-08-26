@@ -273,9 +273,55 @@
 	@if(isset($grafica2))
 		<div style="width:60%; float:left;"><img {{$grafica}} /></div>
 		<div style="width:40%; float:left;"><img {{$grafica2}} /></div>
-		asdfsdaf
-	@else
+		@if(isset($datos))
+		<div style="page-break-before:always;"></div>
+		@endif
+	@elseif(isset($grafica))
 		<div style="width:90%;margin-left:auto;margin-right:auto;"><img {{$grafica}} style="width:100%;" /></div>
+		@if(isset($datos))
+		<div style="page-break-before:always;"></div>
+		@endif
+	@endif
+
+	@if(isset($datos))
+		<table cellpadding="0" cellspacing="0" class="tabla-datos">
+			<thead>
+				<tr>
+					<th rowspan="2">Dirección ó Unidad</th><th colspan="8">PRESUPUESTO</th>
+				</tr>
+				<tr>
+					<th>Modificado</th><th>Liberado</th><th>Ministrado</th><th>Comprometido</th><th>Devengado</th><th>Ejercido</th><th>Pagado</th><th>Disponible</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach($datos as $dato)
+				<tr>
+					<td style="font-size:smaller;">{{$dato->unidadResponsable}}</td>
+					<td style="font-size:smaller;">{{number_format(floatval($dato->presupuestoModificado),2)}}</td>
+					<td style="font-size:smaller;">{{number_format(floatval($dato->presupuestoLiberado),2)}}</td>
+					<td style="font-size:smaller;">{{number_format(floatval($dato->presupuestoMinistrado),2)}}</td>
+					<td style="font-size:smaller;">{{number_format(floatval($dato->presupuestoComprometidoModificado),2)}}</td>
+					<td style="font-size:smaller;">{{number_format(floatval($dato->presupuestoDevengadoModificado),2)}}</td>
+					<td style="font-size:smaller;">{{number_format(floatval($dato->presupuestoEjercidoModificado),2)}}</td>
+					<td style="font-size:smaller;">{{number_format(floatval($dato->presupuestoPagadoModificado),2)}}</td>
+					<td style="font-size:smaller;">{{number_format(floatval($dato->disponiblePresupuestarioModificado),2)}}</td>
+				</tr>
+				@endforeach
+			</tbody>
+			<tfoot>
+				<tr>
+					<th>TOTAL</th>
+					<th>{{number_format($total['presupuestoModificado'],2)}}</th>
+					<th>{{number_format($total['presupuestoLiberado'],2)}}</th>
+					<th>{{number_format($total['presupuestoMinistrado'],2)}}</th>
+					<th>{{number_format($total['presupuestoComprometidoModificado'],2)}}</th>
+					<th>{{number_format($total['presupuestoDevengadoModificado'],2)}}</th>
+					<th>{{number_format($total['presupuestoEjercidoModificado'],2)}}</th>
+					<th>{{number_format($total['presupuestoPagadoModificado'],2)}}</th>
+					<th>{{number_format($total['disponiblePresupuestarioModificado'],2)}}</th>
+				</tr>
+			</tfoot>
+		</table>
 	@endif
 @endif
 </body>

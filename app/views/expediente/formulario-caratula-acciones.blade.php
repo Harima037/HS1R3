@@ -123,7 +123,7 @@
                 </div>
                 <div class="col-sm-4">
                     <div class="btn-toolbar pull-right" >
-                        <div class="btn-group" style="margin:5px">
+                        <!--div class="btn-group" style="margin:5px">
                             <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="fa fa-file"></span> Importación <span class="caret"></span>
                             </button>
@@ -143,14 +143,14 @@
                                         <span class="fa fa-download"></span> Descargar Archivo para Beneficiarios
                                     </a>
                                 </li>
-                                <!--li class="divider"></li-->
-                                <!--li>
+                                <li class="divider"></li>
+                                <li>
                                     <a href="#" id="lnk-mostrar-subir-archivo">
                                         <span class="fa fa-upload"></span> Cargar Archivo de Importación
                                     </a>
-                                </li-->
+                                </li>
                             </ul>
-                        </div>
+                        </div-->
                         <div class="btn-group" style="margin:5px">
                             <button type="button" class="btn btn-info" id="btn-agregar-distribucion">
                                 <span class="fa fa-plus"></span> Agregar
@@ -411,7 +411,7 @@
 
 <!--      Modal para subida del archivo de metas, beneficiarios y presupuesto      -->
 
-<div class="modal fade" id="modal-subir-archivo" tabindex="-1" role="dialog" aria-labelledby="modalArchivoLabel" aria-hidden="true" data-backdrop="static">
+<!--div class="modal fade" id="modal-subir-archivo" tabindex="-1" role="dialog" aria-labelledby="modalArchivoLabel" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-dialog-85-screen">
         <div class="modal-content modal-content-85-screen">
             <div class="modal-header">
@@ -446,9 +446,9 @@
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary" id="btn-subir-archivo"><span class="fa fa-upload"></span> Cargar</button>
             </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+        </div>
+    </div>
+</div-->
 
 <!--
     Modal para Acción

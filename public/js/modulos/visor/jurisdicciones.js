@@ -56,6 +56,11 @@ function graficaMetasJurisdiccion(){
 			var options = { 
 				title:'Metas ( '+response.total.format(2)+' )',
 				legend:{position:'right',maxLines:5},
+				slices:{
+					0: {color:'#109618'},
+					1: {color:'#DC3912'},
+					2: {color:'#FF9900'}
+				},
 				chartArea:{ width:'100%',left:5,right:0,top:60,bottom:0 }
 			};
 

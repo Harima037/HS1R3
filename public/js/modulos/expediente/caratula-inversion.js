@@ -328,13 +328,15 @@ function guardar_datos_componente(cerrar,selector){
 	            }else{
 	            	fibapAcciones.llenar_datagrid(response.acciones);
 	            }
-
+	            
 	            if(cerrar){
 					$(modal).modal('hide');
 				}else{
 					if(selector == 'actividad'){
 						$(formulario + ' #id-actividad').val(response.data.id);
 					}else{
+						$('#lnk-descarga-archivo-presupuesto').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=presupuesto&id-accion='+response.data.id);
+    					$('#lnk-descarga-archivo-presupuesto').removeClass('disabled');
 						$(formulario + ' #id-componente').val(response.data.idComponente);
 						$(formulario + ' #id-accion').val(response.data.id);
 						$('#tablink-componente-actividades').attr('data-toggle','tab');

@@ -141,7 +141,13 @@ class VisorController extends BaseController {
 						if($usuario->claveUnidad){
 							$unidades = explode('|',$usuario->claveUnidad);
 							$presupuesto = $presupuesto->whereIn('UR',$unidades);
+						}else{
+							if(isset($parametros['unidad'])){
+								$unidad = array($parametros['unidad']);
+								$presupuesto = $presupuesto->where('UR',$unidad);
+							}
 						}
+
 						$presupuesto = $presupuesto->where('mes','=',$mes_actual)
 														->select(DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
 															DB::raw('sum(presupuestoEjercidoModificado) AS presupuestoEjercido'))
@@ -334,11 +340,52 @@ class VisorController extends BaseController {
 				default:
 					break;
 			}
+		}elseif(isset($parametros['tabla'])) {
+			if($parametros['tabla'] == 'resumen_presupuesto'){
+				$mes_actual = Util::obtenerMesActual();
+				if($mes_actual == 0){ 
+					$mes_actual = date('n')-1; 
+				}else{
+					$mes_actual = $mes_actual-1;
+				}
+
+				$rows = CargaDatosEP01::where('mes','=',$mes_actual);
+
+				$usuario = Sentry::getUser();
+				if($usuario->claveUnidad){
+					$unidades = explode('|',$usuario->claveUnidad);
+					$rows = $rows->whereIn('UR',$unidades);
+				}
+
+				$rows = $rows->select('unidades.descripcion AS unidadResponsable',
+								DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
+								DB::raw('sum(presupuestoLiberado) AS presupuestoLiberado'),
+								DB::raw('sum(presupuestoMinistrado) AS presupuestoMinistrado'),
+								DB::raw('sum(presupuestoComprometidoModificado) AS presupuestoComprometidoModificado'),
+								DB::raw('sum(presupuestoDevengadoModificado) AS presupuestoDevengadoModificado'),
+								DB::raw('sum(presupuestoEjercidoModificado) AS presupuestoEjercidoModificado'),
+								DB::raw('sum(presupuestoPagadoModificado) AS presupuestoPagadoModificado'),
+								DB::raw('sum(disponiblePresupuestarioModificado) AS disponiblePresupuestarioModificado')
+							)
+							->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','UR')
+							->groupBy('UR')
+							->get();
+				$total['presupuestoModificado'] = $rows->sum('presupuestoModificado');
+				$total['presupuestoLiberado'] = $rows->sum('presupuestoLiberado');
+				$total['presupuestoMinistrado'] = $rows->sum('presupuestoMinistrado');
+				$total['presupuestoComprometidoModificado'] = $rows->sum('presupuestoComprometidoModificado');
+				$total['presupuestoDevengadoModificado'] = $rows->sum('presupuestoDevengadoModificado');
+				$total['presupuestoEjercidoModificado'] = $rows->sum('presupuestoEjercidoModificado');
+				$total['presupuestoPagadoModificado'] = $rows->sum('presupuestoPagadoModificado');
+				$total['disponiblePresupuestarioModificado'] = $rows->sum('disponiblePresupuestarioModificado');
+
+				$data = array('data'=>$rows,'total'=>$total);
+			}
 		}elseif(isset($parametros['formatogrid'])){
 			if(isset($parametros['clasificacionProyecto'])){
 				$mes_actual = Util::obtenerMesActual();
 				$mes_activo = $mes_actual;
-				if($mes_actual == 0){ $mes_actual = date('n') - 1; }
+				if($mes_actual == 0){ $mes_actual = date('n') - 1; }else{ $mes_actual = $mes_actual - 1; }
 
 				$jurisdiccion = false;
 
@@ -538,6 +585,8 @@ class VisorController extends BaseController {
 				$mes_actual = Util::obtenerMesActual();
 				if($mes_actual == 0){
 					$mes_actual = date('n') -1;
+				}else{ 
+					$mes_actual = $mes_actual - 1; 
 				}
 				
 				$jurisdiccion = false;
@@ -688,7 +737,10 @@ class VisorController extends BaseController {
 				$mes_actual = Util::obtenerMesActual();
 				if($mes_actual == 0){
 					$mes_actual = date('n')-1;
+				}else{
+					$mes_actual = $mes_actual-1;
 				}
+
 				if($parametros['nivel'] == 'componente'){
 					$recurso = Componente::getModel();
 					$tabla = 'componenteMetasMes.';
@@ -800,8 +852,22 @@ class VisorController extends BaseController {
 			        	$idJuris = 0;
 			        }
 					$juris_metas[$idJuris]['metaMes'] = floatval($meta_mes->meta);
-					$juris_metas[$idJuris]['avanceMes'] = floatval($meta_mes->avance);
 					$juris_metas[$idJuris]['avanceAcumulado'] = $juris_metas[$idJuris]['avanceTotal'] - floatval($meta_mes->avance);
+					if(isset($meses_capturados[$meta_mes->mes])){
+						$juris_metas[$idJuris]['avanceMes'] = floatval($meta_mes->avance);
+					}else{
+						$juris_metas[$idJuris]['avanceTotal'] = $juris_metas[$idJuris]['avanceAcumulado'];
+						if($juris_metas[$idJuris]['metaAcumulada'] > 0){ $porcentaje = ($juris_metas[$idJuris]['avanceTotal']*100) / $juris_metas[$idJuris]['metaAcumulada']; }
+			        	else{ $porcentaje = ($juris_metas[$idJuris]['avanceTotal']*100); }
+			        	$juris_metas[$idJuris]['porcentaje'] = $porcentaje;
+			        	$estatus = 1;
+				        if(!($juris_metas[$idJuris]['metaAcumulada'] == 0 && $juris_metas[$idJuris]['avanceTotal'] == 0)){
+							if($porcentaje > 110){ $estatus = 3; }
+							elseif($porcentaje < 90){ $estatus = 2; }
+							elseif($porcentaje > 0 && $meta == 0){ $estatus = 3; }
+				        }
+				        $juris_metas[$idJuris]['estatus'] = $estatus;
+					}
 				}
 				$elemento['jurisdicciones'] = $juris_metas;
 

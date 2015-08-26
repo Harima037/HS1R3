@@ -50,6 +50,46 @@ function cargar_datos() {
       chart.draw(data, options);
     }
   });
+  var parametros = {tabla:'resumen_presupuesto'};
+  moduloResource.get(null,parametros,{
+    _success: function(response){
+      var html = '<table class="table table-condensed table-hover table-bordered table-striped" style="font-size:small;"><thead><tr><th rowspan="2">Dirección ó Unidad</th><th colspan="8">PRESUPUESTO</th></tr><tr><th>Modificado</th><th>Liberado</th><th>Ministrado</th><th>Comprometido</th><th>Devengado</th><th>Ejercido</th><th>Pagado</th><th>Disponible</th></tr></thead>';
+      html += '<tbody>';
+      for(var i in response.data){
+        var datos = response.data[i];
+        var row = '<tr>';
+        row += '<td>'+datos.unidadResponsable+'</td>';
+        row += '<td>'+parseFloat(datos.presupuestoModificado).format(2)+'</td>';
+        row += '<td>'+parseFloat(datos.presupuestoLiberado).format(2)+'</td>';
+        row += '<td>'+parseFloat(datos.presupuestoMinistrado).format(2)+'</td>';
+        row += '<td>'+parseFloat(datos.presupuestoComprometidoModificado).format(2)+'</td>';
+        row += '<td>'+parseFloat(datos.presupuestoDevengadoModificado).format(2)+'</td>';
+        row += '<td>'+parseFloat(datos.presupuestoEjercidoModificado).format(2)+'</td>';
+        row += '<td>'+parseFloat(datos.presupuestoPagadoModificado).format(2)+'</td>';
+        row += '<td>'+parseFloat(datos.disponiblePresupuestarioModificado).format(2)+'</td>';
+        row += '</tr>';
+        html += row;
+      }
+      html += '</tbody>';
+
+      html += '<tfoot>';
+      html += '<tr>';
+      html += '<th>TOTAL</th>';
+      html += '<th>'+parseFloat(response.total.presupuestoModificado).format(2)+'</th>';
+      html += '<th>'+parseFloat(response.total.presupuestoLiberado).format(2)+'</th>';
+      html += '<th>'+parseFloat(response.total.presupuestoMinistrado).format(2)+'</th>';
+      html += '<th>'+parseFloat(response.total.presupuestoComprometidoModificado).format(2)+'</th>';
+      html += '<th>'+parseFloat(response.total.presupuestoDevengadoModificado).format(2)+'</th>';
+      html += '<th>'+parseFloat(response.total.presupuestoEjercidoModificado).format(2)+'</th>';
+      html += '<th>'+parseFloat(response.total.presupuestoPagadoModificado).format(2)+'</th>';
+      html += '<th>'+parseFloat(response.total.disponiblePresupuestarioModificado).format(2)+'</th>';
+      html += '</tr>';
+      html += '</tfoot>';
+
+      html += '</table>';
+      $('#tabla-presupuesto').html(html);
+    }
+  });
 }
 
 $('#btn-imprimir-grafica').on('click',function(){

@@ -81,10 +81,10 @@ context.init = function(id,resource){
         $(modal_presupuesto).modal('show');
     });
 
-    $('#lnk-mostrar-subir-archivo').on('click',function (e){
+    /*$('#lnk-mostrar-subir-archivo').on('click',function (e){
         e.preventDefault();
         $(modal_subir_archivo).modal('show');
-    });
+    });*/
 
     $('#btn-subir-archivo').on('click',function(){
         Validation.cleanFormErrors(form_subir_archivo);
@@ -155,6 +155,10 @@ context.init = function(id,resource){
             $('#tablink-componente-actividades').attr('data-toggle','');
             $('#tablink-componente-actividades').parent().addClass('disabled');
             $('#lista-tabs-componente a:first').tab('show');
+            $('#lnk-descarga-archivo-metas').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=meta');
+            //$('#lnk-descarga-archivo-presupuesto').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=presupuesto&id-accion='+id_accion);
+            $('#lnk-descarga-archivo-presupuesto').addClass('disabled');
+            $('#lnk-descarga-archivo-beneficiarios').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=beneficiarios');
             $(modal_accion).find(".modal-title").html("Nuevo Componente");
             $(modal_accion).modal('show');
         }
@@ -506,6 +510,11 @@ context.mostrar_datos = function(datos){
 
     $(modal_accion).find(".modal-title").html('Editar Componente');
 
+    $('#lnk-descarga-archivo-metas').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=meta');
+    $('#lnk-descarga-archivo-presupuesto').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=presupuesto&id-accion='+datos.id);
+    $('#lnk-descarga-archivo-presupuesto').removeClass('disabled');
+    $('#lnk-descarga-archivo-beneficiarios').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=beneficiarios');
+
     $('#descripcion-obj-componente').val(datos.componente.objetivo);
     $('#verificacion-componente').val(datos.componente.mediosVerificacion);
     $('#supuestos-componente').val(datos.componente.supuestos);
@@ -631,10 +640,6 @@ context.mostrar_detalles = function(id){
         var parametros = {'mostrar':'desglose-componente'};
         fibap_resource.get(id,parametros,{
             _success:function(response){
-                $('#lnk-descarga-archivo-metas').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=meta');
-                $('#lnk-descarga-archivo-presupuesto').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=presupuesto&id-accion='+id);
-                $('#lnk-descarga-archivo-beneficiarios').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=beneficiarios');
-
                 $('#id-accion').val(id);
 
                 $('#datagridAcciones > table > tbody > tr.contendor-desechable').remove();

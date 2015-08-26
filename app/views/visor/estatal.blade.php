@@ -41,6 +41,8 @@
                             <li><a id="lnk-presup-fuente" href="#"><span class="fa fa-pie-chart"></span> Presupuesto por Fuente de Financiamiento</a></li>
                             <li><a id="lnk-presup-ejercido" href="#"><span class="fa fa-pie-chart"></span> Presupuesto Ejercido</a></li>
                             <li><a id="lnk-presup-ejercido-capitulo" href="#"><span class="fa fa-pie-chart"></span> Presupuesto Ejercido Por Capitulo</a></li>
+                            <li class="divider"></li>
+                            <li><a id="lnk-resumen-presupuesto" href="#"><span class="fa fa-table"></span> Resumen del Presupuesto</a></li>
                         </ul>
                     </div>
                 </div>
@@ -74,10 +76,12 @@
                         <h3 id="titulo_grafica"></h3>
                     </div>
                     <div class="col-sm-12">
-                        <div id="area-graficas" style="width:100%;height:600px;">
+                        <div id="area-graficas" style="width:100%;min-height:600px;">
                             <div id="mensaje-carga-librerias" class="alert alert-info">
                                 <span class="fa fa-2x fa-spinner fa-spin"></span> <big>Cargando Librerias... Por favor espere...</big>
                             </div>
+                        </div>
+                        <div id="area-tablas" style="width:100%;overflow:auto;">
                         </div>
                     </div>
                     <div class="col-sm-12">
@@ -85,6 +89,7 @@
                             <input type="hidden" value="" name="imagen" id="imagen">
                             <input type="hidden" value="" name="imagen2" id="imagen2">
                             <input type="hidden" value="" name="titulo" id="titulo">
+                            <input type="hidden" value="" name="tipo" id="tipo">
                         </form>
                         <button type="button" class="btn btn-primary pull-right" id="btn-imprimir-grafica"><span class="fa fa-print"></span> Imprimir</button>
                     </div>

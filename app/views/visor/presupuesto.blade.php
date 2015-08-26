@@ -28,11 +28,14 @@
             			<div id="grafica-presupuesto" style="width:100%; height:600px;">
             				<div class="alert alert-info"><span class="fa fa-spinner fa-spin"></span> Cargando Librerias... Por favor espere... </div>
             			</div>
+                        <div id="tabla-presupuesto" style="width:100%;overflow:auto;">
+                        </div>
             		</div>
                     <div class="col-sm-12">
                         <form id="form-grafica" action="" method="POST" target="_blank">
                             <input type="hidden" value="" name="imagen" id="imagen">
                             <input type="hidden" value="" name="titulo" id="titulo">
+                            <input type="hidden" value="tabla" name="tipo" id="tipo">
                         </form>
                         <button type="button" class="btn btn-primary pull-right" id="btn-imprimir-grafica"><span class="fa fa-print"></span> Imprimir</button>
                     </div>

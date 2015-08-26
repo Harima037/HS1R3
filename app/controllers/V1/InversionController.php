@@ -107,8 +107,8 @@ class InversionController extends ProyectosController {
 					$data['query'] = print_r(end($queries),true);*/
 				}
 				//$totales = $rows;
-				$totales = $totales->select(DB::raw('count(componenteDesglose.id) AS cuantos'),DB::raw('sum(componenteDesglose.presupuesto) AS totalPresupuesto'))->get();
-				$totales = $totales[0];
+				$totales = $totales->select(DB::raw('count(componenteDesglose.id) AS cuantos'),DB::raw('sum(componenteDesglose.presupuesto) AS totalPresupuesto'))->first();
+				//$totales = $totales[0];
 				
 				$total = $totales->cuantos;
 				$recurso['resultados'] = $totales->cuantos;
@@ -116,7 +116,8 @@ class InversionController extends ProyectosController {
 				$recurso['data'] = $rows->orderBy('componenteDesglose.id', 'desc')
 							->skip(($pagina-1)*10)->take(10)
 							->get();
-
+				//$queries = DB::getQueryLog();
+				//var_dump(end($queries),true);die;
 				$data = $recurso;
 			}else{
 				$rows = Proyecto::getModel();
@@ -245,7 +246,7 @@ class InversionController extends ProyectosController {
 							$recurso->fibap->load('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado');
 							$recurso->fibap->distribucionPresupuestoAgrupado->load('objetoGasto');
 						}
-						$recurso->componentes->load('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion','desgloseCompleto');
+						$recurso->componentes->load('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion');
 						foreach ($recurso->componentes as $key => $componente) {
 							$recurso->componentes[$key]->actividades->load('formula','dimension','frecuencia','tipoIndicador','unidadMedida');
 						}
@@ -1412,9 +1413,9 @@ class InversionController extends ProyectosController {
 												fputcsv($datos_metas,[
 													NULL,
 				                                    $desglose->id,
-				                                    NULL,
-				                                    NULL,
-													NULL,
+				                                    $accion->idComponente,
+				                                    $csv_data[0],
+													$csv_data[2],
 													$i,
 													($csv_data[(3+$i)])?$csv_data[(3+$i)]:0
 				                                ]);
@@ -1458,6 +1459,7 @@ class InversionController extends ProyectosController {
 
 							$id_usuario = $usuario->id;
 							
+							//Cargar Archivo de Desgloses
 							$query = sprintf("
 								LOAD DATA local INFILE '%s' REPLACE 
 								INTO TABLE componenteDesglose 
@@ -1481,6 +1483,7 @@ class InversionController extends ProyectosController {
 								", addslashes($archivo_desglose),$id_usuario,$id_usuario);
 							DB::connection()->getpdo()->exec($query);
 							
+							//Cargar Archivo de Metas
 							$query = sprintf("
 								LOAD DATA local INFILE '%s' REPLACE 
 								INTO TABLE desgloseMetasMes 
@@ -1508,26 +1511,88 @@ class InversionController extends ProyectosController {
 								", addslashes($archivo_metas),$id_usuario,$id_usuario);
 							DB::connection()->getpdo()->exec($query);
 							
+							//Actualizar la relacion de los desgloses con las metas
 							$query = sprintf("
 								UPDATE desgloseMetasMes, componenteDesglose
 								SET desgloseMetasMes.idComponenteDesglose = componenteDesglose.id
 								WHERE 
 								desgloseMetasMes.idComponente = componenteDesglose.idComponente AND
 								desgloseMetasMes.claveMunicipio = componenteDesglose.claveMunicipio AND
+								desgloseMetasMes.claveLocalidad = componenteDesglose.claveLocalidad AND 
+								desgloseMetasMes.idComponenteDesglose IS NULL
+								");
+							DB::connection()->getpdo()->exec($query);
+
+							//Actualizar la relacion de los desgloses con las metas
+							$query = sprintf("
+								UPDATE desgloseMetasMes, componenteDesglose
+								SET 
+								desgloseMetasMes.idComponente = componenteDesglose.idComponente,
+								desgloseMetasMes.claveMunicipio = componenteDesglose.claveMunicipio,
 								desgloseMetasMes.claveLocalidad = componenteDesglose.claveLocalidad
+								WHERE 
+								desgloseMetasMes.idComponenteDesglose = componenteDesglose.id AND
+								desgloseMetasMes.idComponente IS NULL
 								");
 							DB::connection()->getpdo()->exec($query);
 							
+							//Colocar la clave de las jurisdicciones correspondientes
 							$query = sprintf("
 								UPDATE componenteDesglose, vistaMunicipios, vistaJurisdicciones
 								SET componenteDesglose.claveJurisdiccion = vistaJurisdicciones.clave
 								WHERE 
 								componenteDesglose.claveMunicipio = vistaMunicipios.clave AND
 								vistaMunicipios.idJurisdiccion = vistaJurisdicciones.id AND 
+								componenteDesglose.claveJurisdiccion Is NULL AND 
 								componenteDesglose.idAccion = %s
 								", $id_accion);
 							DB::connection()->getpdo()->exec($query);
-							
+
+							//Se insertan/reemplazan las metas por mes del componente con los valores importados del archivo
+							$query = sprintf("
+								REPLACE INTO componenteMetasMes
+								SELECT 
+								cMetas.id, comp.idProyecto, desglose.idComponente, desglose.claveJurisdiccion, metasMes.mes, 
+								SUM(metasMes.meta) as meta, cMetas.avance, ifnull(cMetas.creadoPor,%s) AS creadoPor, 
+								ifnull(cMetas.actualizadoPor,%s) AS actualizadoPor, cMetas.creadoAl, cMetas.modificadoAl, 
+								NULL AS borradoAl
+								FROM componenteDesglose AS desglose
+								LEFT JOIN desgloseMetasMes AS metasMes 
+								ON metasMes.claveMunicipio = desglose.claveMunicipio 
+								AND desglose.id = metasMes.idComponenteDesglose
+								AND metasMes.borradoAl IS NULL
+								LEFT JOIN componenteMetasMes AS cMetas
+								ON cMetas.idComponente = desglose.idComponente
+								AND cMetas.claveJurisdiccion = desglose.claveJurisdiccion
+								AND cMetas.mes = metasMes.mes
+								AND cMetas.borradoAl IS NULL
+								JOIN proyectoComponentes AS comp ON comp.id = desglose.idComponente
+								WHERE desglose.idAccion = %s AND desglose.borradoAl IS NULL
+								GROUP BY desglose.claveJurisdiccion, metasMes.mes;
+							",$id_usuario,$id_usuario,$id_accion);
+							DB::connection()->getpdo()->exec($query);
+
+							//Se actualizan las sumas por trimestre en el componente
+							$query = sprintf("
+								UPDATE proyectoComponentes, (
+									SELECT 
+									SUM(IF(mes/3 <= 1,meta,0)) AS meta1,
+									SUM(IF(mes/3 > 1 AND mes/3 <= 2,meta,0)) AS meta2,
+									SUM(IF(mes/3 > 2 AND mes/3 <= 3,meta,0)) AS meta3,
+									SUM(IF(mes/3 > 3 AND mes/3 <= 4,meta,0)) AS meta4
+									FROM componenteMetasMes
+									WHERE idComponente = %s AND borradoAl IS NULL
+								) AS metasTrim
+								SET 
+								numeroTrim1 = metasTrim.meta1,
+								numeroTrim2 = metasTrim.meta2,
+								numeroTrim3 = metasTrim.meta3,
+								numeroTrim4 = metasTrim.meta4,
+								valorNumerador = (metasTrim.meta1 + metasTrim.meta2 + metasTrim.meta3 + metasTrim.meta4)
+								WHERE proyectoComponentes.id = %s
+							",$accion->idComponente,$accion->idComponente);
+							DB::connection()->getpdo()->exec($query);
+
 							DB::connection()->getPdo()->commit();
 
 							File::delete($archivo_desglose);

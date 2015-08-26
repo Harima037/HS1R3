@@ -68,7 +68,7 @@ moduloDatagrid.actualizar({
                     if(proyecto.meses[mes].programado){
                         fondo = 'style="background-color:#DDDDDD"';
                     }
-                    if(proyecto.meses[mes].estatus > 0){
+                    if(proyecto.meses[mes].estatus > 3){
                         if(proyecto.meses[mes].avance > 1){
                             estatus = 'text-danger';
                         }else if(proyecto.meses[mes].avance == 1){

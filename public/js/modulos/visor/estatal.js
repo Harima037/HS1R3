@@ -25,10 +25,18 @@ function datos_cargados(){
 	$('#lnk-presup-ejercido').on('click',function (e){ e.preventDefault(); cargarGrafica('presup_ejercido'); });
 	$('#lnk-presup-ejercido-capitulo').on('click',function (e){ e.preventDefault(); cargarGrafica('presup_ejercido_capitulo'); });
 	$('#lnk-metas-cumplidas').on('click',function (e){ e.preventDefault(); cargarGrafica('metas_cumplidas'); });
+	$('#lnk-resumen-presupuesto').on('click',function (e){ e.preventDefault(); cargarGrafica('resumen_presupuesto'); })
 }
 
 function cargarGrafica(tipo_grafica){
 	var titulo = '';
+	if(tipo_grafica != 'resumen_presupuesto'){
+		$('#tipo').val('grafica');
+	}else{
+		$('#tipo').val('tabla');
+	}
+	$('#area-tablas').empty();
+	$('#area-graficas').removeClass('hidden');
 	$('#filtro-unidades').addClass('hidden');
 	$('#filtro-jurisdicciones').addClass('hidden');
 	$('#unidad').val('');
@@ -68,10 +76,17 @@ function cargarGrafica(tipo_grafica){
 		case 'presup_ejercido': 
 			graficaPresupuestoEjercido(); 
 			titulo = 'Presupuesto Ejercido';
+			if($('#unidad').val() != ''){
+				titulo += '<br><small>Unidad Responsable:</small> <small><b>'+$('#unidad option:selected').text()+'</b></small>';
+			}
 			break;
 		case 'presup_ejercido_capitulo': 
 			graficaPresupuestoEjercidoCapitulo(); 
 			titulo = 'Presupuesto Ejercido por Capitulo';
+			break;
+		case 'resumen_presupuesto':
+			tablaResumenPresupuesto();
+			titulo = 'Resumen del Presupuesto';
 			break;
 	}
 	if(titulo){
@@ -105,7 +120,13 @@ $('#btn-filtro').on('click',function (e){
 					titulo = 'Presupuesto por Fuente de Financiamiento<br><small>Unidad Responsable:</small> <small><b>'+$('#unidad option:selected').text()+'</b></small>';
 				}
 			break;
-			case 'presup_ejercido': graficaPresupuestoEjercido(); break;
+			case 'presup_ejercido': 
+				graficaPresupuestoEjercido(); 
+				titulo = 'Presupuesto Ejercido';
+				if($('#unidad').val() != ''){
+					titulo += '<br><small>Unidad Responsable:</small> <small><b>'+$('#unidad option:selected').text()+'</b></small>';
+				}
+			break;
 			case 'presup_ejercido_capitulo': graficaPresupuestoEjercidoCapitulo(); break;
 		}
 	}
@@ -141,6 +162,11 @@ function graficaMetasCumplidas(){
 			var options = { 
 				title:'Metas ( '+response.total.format(2)+' )',
 				legend:{position:'right',maxLines:5},
+				slices:{
+					0: {color:'#109618'},
+					1: {color:'#DC3912'},
+					2: {color:'#FF9900'}
+				},
 				chartArea:{ width:'100%',left:5,right:0,top:60,bottom:0 }
 			};
 
@@ -205,8 +231,60 @@ function graficaMetasDireccion(){
 	});
 }
 
+function tablaResumenPresupuesto(){
+	var parametros = {tabla:'resumen_presupuesto'};
+	moduloResource.get(null,parametros,{
+		_success: function(response){
+			$('#area-graficas').empty();
+			$('#area-graficas').addClass('hidden');
+			$('#area-tablas').empty();
+			var html = '<table class="table table-condensed table-hover table-bordered table-striped" style="font-size:small;"><thead><tr><th rowspan="2">Dirección ó Unidad</th><th colspan="8">PRESUPUESTO</th></tr><tr><th>Modificado</th><th>Liberado</th><th>Ministrado</th><th>Comprometido</th><th>Devengado</th><th>Ejercido</th><th>Pagado</th><th>Disponible</th></tr></thead>';
+			html += '<tbody>';
+			for(var i in response.data){
+				var datos = response.data[i];
+				var row = '<tr>';
+				row += '<td>'+datos.unidadResponsable+'</td>';
+				row += '<td>'+parseFloat(datos.presupuestoModificado).format(2)+'</td>';
+				row += '<td>'+parseFloat(datos.presupuestoLiberado).format(2)+'</td>';
+				row += '<td>'+parseFloat(datos.presupuestoMinistrado).format(2)+'</td>';
+				row += '<td>'+parseFloat(datos.presupuestoComprometidoModificado).format(2)+'</td>';
+				row += '<td>'+parseFloat(datos.presupuestoDevengadoModificado).format(2)+'</td>';
+				row += '<td>'+parseFloat(datos.presupuestoEjercidoModificado).format(2)+'</td>';
+				row += '<td>'+parseFloat(datos.presupuestoPagadoModificado).format(2)+'</td>';
+				row += '<td>'+parseFloat(datos.disponiblePresupuestarioModificado).format(2)+'</td>';
+				row += '</tr>';
+				html += row;
+			}
+			html += '</tbody>';
+
+			html += '<tfoot>';
+			html += '<tr>';
+			html += '<th>TOTAL</th>';
+			html += '<th>'+parseFloat(response.total.presupuestoModificado).format(2)+'</th>';
+			html += '<th>'+parseFloat(response.total.presupuestoLiberado).format(2)+'</th>';
+			html += '<th>'+parseFloat(response.total.presupuestoMinistrado).format(2)+'</th>';
+			html += '<th>'+parseFloat(response.total.presupuestoComprometidoModificado).format(2)+'</th>';
+			html += '<th>'+parseFloat(response.total.presupuestoDevengadoModificado).format(2)+'</th>';
+			html += '<th>'+parseFloat(response.total.presupuestoEjercidoModificado).format(2)+'</th>';
+			html += '<th>'+parseFloat(response.total.presupuestoPagadoModificado).format(2)+'</th>';
+			html += '<th>'+parseFloat(response.total.disponiblePresupuestarioModificado).format(2)+'</th>';
+			html += '</tr>';
+			html += '</tfoot>';
+
+			html += '</table>';
+			$('#area-tablas').html(html);
+			$('#imagen').val('lol');
+		}
+	});
+}
+
 function graficaPresupuestoEjercido(){
+	$('#filtro-unidades').removeClass('hidden');
+	$('#panel-btn-filtro').removeClass('hidden');
 	var parametros = {grafica:'presupuesto_ejercido'};
+	if($('#unidad').val() != ''){
+		parametros.unidad = $('#unidad').val();
+	}
 	moduloResource.get(null,parametros,{
 		_success: function(response){
 			var elementos = [['Presupuesto', 'Total']];
@@ -231,7 +309,7 @@ function graficaPresupuestoEjercido(){
 			formatter.format(data, 1);
 
 			var options = { 
-				title:'Total Presupuesto Aprobado : $ '+(parseFloat(response.data.presupuestoModificado)||0).format(2),
+				title:'Total Presupuesto Autorizado : $ '+(parseFloat(response.data.presupuestoModificado)||0).format(2),
 				legend:{position:'right',alignment:'center'},
 				chartArea:{ width:'100%',height:'100%',left:0,right:0,top:60,bottom:0 }
 			};
@@ -302,7 +380,7 @@ function graficaPresupuestoFuente(){
 			formatter.format(data, 1);
 
 			var options = { 
-				title:'Total Presupuesto Aprobado : $ '+(parseFloat(response.total)||0).format(2),
+				title:'Total Presupuesto Autorizado : $ '+(parseFloat(response.total)||0).format(2),
 				legend:{position:'right',alignment:'center'},
 				chartArea:{ width:'100%',height:'100%',left:0,right:0,top:60,bottom:0 }
 			};

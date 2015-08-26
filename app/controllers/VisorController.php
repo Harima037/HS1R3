@@ -277,6 +277,55 @@ class VisorController extends BaseController {
 		}else{
 			$datos = array('soloGraficas'=>1);
 			
+			if(isset($parametros['tipo'])){
+				if($parametros['tipo'] == 'tabla'){
+					$mes_actual = Util::obtenerMesActual();
+					if($mes_actual == 0){ 
+						$mes_actual = date('n')-1; 
+					}else{
+						$mes_actual = $mes_actual-1;
+					}
+
+					$rows = CargaDatosEP01::where('mes','=',$mes_actual);
+
+					$usuario = Sentry::getUser();
+					if($usuario->claveUnidad){
+						$unidades = explode('|',$usuario->claveUnidad);
+						$rows = $rows->whereIn('UR',$unidades);
+					}
+
+					$rows = $rows->select('unidades.descripcion AS unidadResponsable',
+									DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
+									DB::raw('sum(presupuestoLiberado) AS presupuestoLiberado'),
+									DB::raw('sum(presupuestoMinistrado) AS presupuestoMinistrado'),
+									DB::raw('sum(presupuestoComprometidoModificado) AS presupuestoComprometidoModificado'),
+									DB::raw('sum(presupuestoDevengadoModificado) AS presupuestoDevengadoModificado'),
+									DB::raw('sum(presupuestoEjercidoModificado) AS presupuestoEjercidoModificado'),
+									DB::raw('sum(presupuestoPagadoModificado) AS presupuestoPagadoModificado'),
+									DB::raw('sum(disponiblePresupuestarioModificado) AS disponiblePresupuestarioModificado')
+								)
+								->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','UR')
+								->groupBy('UR')
+								->get();
+					$total['presupuestoModificado'] = $rows->sum('presupuestoModificado');
+					$total['presupuestoLiberado'] = $rows->sum('presupuestoLiberado');
+					$total['presupuestoMinistrado'] = $rows->sum('presupuestoMinistrado');
+					$total['presupuestoComprometidoModificado'] = $rows->sum('presupuestoComprometidoModificado');
+					$total['presupuestoDevengadoModificado'] = $rows->sum('presupuestoDevengadoModificado');
+					$total['presupuestoEjercidoModificado'] = $rows->sum('presupuestoEjercidoModificado');
+					$total['presupuestoPagadoModificado'] = $rows->sum('presupuestoPagadoModificado');
+					$total['disponiblePresupuestarioModificado'] = $rows->sum('disponiblePresupuestarioModificado');
+
+					$datos['datos'] = $rows;
+					$datos['total'] = $total;
+					/*$pdf = PDF::setPaper('LETTER')
+								->setOrientation('landscape')
+								->setWarnings(false)
+								->loadView('visor.pdf.reporte-resumen-presupuesto',$datos);
+								*/
+				}
+			}
+
 			if(isset($parametros['titulo'])){
 				$datos['titulo'] = $parametros['titulo'];
 			}else{
@@ -284,7 +333,9 @@ class VisorController extends BaseController {
 			}
 
 			if($parametros['imagen']){
-				$datos['grafica'] = 'src="'.$parametros['imagen'].'"';
+				if($parametros['imagen'] != 'lol'){
+					$datos['grafica'] = 'src="'.$parametros['imagen'].'"';
+				}
 			}
 
 			if(isset($parametros['imagen2'])){

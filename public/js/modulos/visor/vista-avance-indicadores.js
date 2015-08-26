@@ -195,7 +195,7 @@ function seguimiento_metas(e){
 
                 datos_jurisdicciones.push([
                     clave,jurisdiccion.porcentaje,estatus,(jurisdiccion.porcentaje.format(2)) + '%',
-                    '<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" style="white-space:nowrap;" colspan="2"><big>'+jurisdiccion.nombre+'</big></th></tr><tr><td style="white-space:nowrap;">Avance: </td><th class="text-center" style="color:'+estatus+';font-weight:bold;">'+(jurisdiccion.porcentaje.format(2))+'%</th></tr></table>'
+                    '<table border="0" cellpadding="0" cellspacing="0"><tr><th class="text-center" style="white-space:nowrap;" colspan="2"><big>'+jurisdiccion.nombre+'</big></th></tr><tr><td style="white-space:nowrap;">Metas Programadas: </td><th class="text-center" style="font-weight:bold;">'+(jurisdiccion.metaAcumulada.format(2))+'</th></tr><tr><td style="white-space:nowrap;">Metas Cumplidas: </td><th class="text-center" style="font-weight:bold;">'+(jurisdiccion.avanceTotal.format(2))+'</th></tr><tr><td style="white-space:nowrap;">Porcentaje de Cumplimiento: </td><th class="text-center" style="color:'+estatus+';font-weight:bold;">'+(jurisdiccion.porcentaje.format(2))+'%</th></tr></table>'
                 ]);
             }
             charts_data['jurisdiccion'] = datos_jurisdicciones;
