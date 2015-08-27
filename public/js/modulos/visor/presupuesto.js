@@ -38,7 +38,7 @@ function cargar_datos() {
       formatter.format(data, 1);
 
       var options = { 
-        title:'Total Presupuesto Aprobado : $ '+(parseFloat(response.total)||0).format(2),
+        title:'Total Presupuesto Autorizado : $ '+(parseFloat(response.total)||0).format(2),
         legend:{position:'right',alignment:'center'},
         chartArea:{ width:'100%',height:'100%',left:0,right:0,top:60,bottom:0 }
       };
