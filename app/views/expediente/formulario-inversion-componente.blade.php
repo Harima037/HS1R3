@@ -290,7 +290,7 @@
                                                 </div>
                                             </div>
                                         </form>
-                                        <!--button type="button" class="btn btn-primary" id="btn-subir-archivo"><span class="fa fa-upload"></span> Cargar Archivo</button-->
+                                        <button type="button" class="btn btn-primary" id="btn-subir-archivo"><span class="fa fa-upload"></span> Cargar Archivo</button>
                                         @else
                                         <span class="help-block">
                                             Puede importar un archivo en formato csv para llenar los campos en la programación de metas. Se debe tener en cuenta lo siguiente:

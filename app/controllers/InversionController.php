@@ -121,17 +121,15 @@ class InversionController extends ProyectosController {
 			$campos = 'null AS tipoBeneficiario, null AS totalHombres, null AS totalMujeres, null AS total';
 			$nombre_archivo = 'Beneficiarios';
 		}
-		$recurso = Municipio::select('vistaMunicipios.clave AS claveMunicipio',
+		$recurso = Municipio::select(DB::raw('CONCAT_WS("_",vistaMunicipios.clave,localidad.clave) AS clave'),
 										 'vistaMunicipios.nombre AS nombreMunicipio',
-										 'localidad.clave AS claveLocalidad',
 										 'localidad.nombre AS nombreLocalidad',
 										 DB::raw($campos))
 								->join('vistaLocalidades AS localidad',function($join){
 									$join->on('localidad.idMunicipio','=','vistaMunicipios.id')
 										->whereNull('localidad.borradoAl');
 								})
-								->orderBy('claveMunicipio','ASC')
-								->orderBy('claveLocalidad','ASC');
+								->orderBy('clave','ASC');
 
 		if($proyecto->idCobertura == 1){ 
 		//Cobertura Estado
@@ -147,12 +145,13 @@ class InversionController extends ProyectosController {
 										->whereNull('region.borradoAl');
 								})->get();
 		}
-		//$recurso = $recurso->toArray();
+		$recurso = $recurso->toArray();
 		Excel::create('ArchivoMunicipios'.$nombre_archivo, function($excel) use ($recurso) {
 		    $excel->sheet('Municipios', function($sheet) use ($recurso) {
 		        $sheet->fromArray($recurso);
 		    });
 		})->download('csv');
+		//return Response::download($recurso, 'output.csv', ['Content-Type: text/cvs']);
 		//return Response::json($recurso,200);
 	}
 }

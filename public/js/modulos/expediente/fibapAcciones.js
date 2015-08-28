@@ -767,6 +767,7 @@ context.llenar_select_responsables = function(datos){
                     Funciones Privadas
 ************************************************************************************************/
 function llenar_datagrid_distribucion(id_componente,total_presupuesto){
+    $('#datagridDistribucion > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-spin fa-spinner"></i> Cargando datos...</td></tr>');
     if(id_componente == 0){
         $("#datagridDistribucion .txt-quick-search").val('');
         actualiza_porcentaje('#porcentaje_accion',0);
@@ -815,6 +816,7 @@ function llenar_datagrid_distribucion(id_componente,total_presupuesto){
                     actualiza_porcentaje('#porcentaje_accion',total_porcentaje);
                 }
                 distribucionDatagrid.cargarDatos(distribucion);
+                distribucionDatagrid.cargarTotalResultados(response.resultados);
                 var total = parseInt(response.resultados/distribucionDatagrid.rxpag); 
                 var plus = parseInt(response.resultados)%distribucionDatagrid.rxpag;
                 if(plus>0) 

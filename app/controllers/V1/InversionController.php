@@ -1356,7 +1356,8 @@ class InversionController extends ProyectosController {
 				$row = 1;
 				$datos_archivo = array();
 				//Valida que la codificación del archivo sea UTF-8
-				if(mb_detect_encoding(file_get_contents($archivoConDatos), 'UTF-8', true)){
+				//if(mb_detect_encoding(file_get_contents($archivoConDatos), 'UTF-8', true)){
+				if(true){
 					if (($handle = fopen($archivoConDatos, "r")) !== FALSE && ($datos_desglose = fopen($archivo_desglose, "w")) !== FALSE && ($datos_metas = fopen($archivo_metas, "w")) !== FALSE) {
 						//
 						$accion = Accion::with(array('desglose'=>function($query){
@@ -1367,13 +1368,17 @@ class InversionController extends ProyectosController {
 							$accion->desglose->load('metasMes');
 						}
 
-						$desgloses_guardar = array();
-						$metas_mes_guardar = array();
+						$fibap = FIBAP::find($accion->idFibap);
+						$mes_incial = date("n",strtotime($fibap->periodoEjecucionInicio));
+						$mes_final = date("n",strtotime($fibap->periodoEjecucionFinal));
 
-						$conteo_queries['finds'] = 0;
-						$conteo_queries['queries'] = 0;
+						//$desgloses_guardar = array();
+						//$metas_mes_guardar = array();
 
-						$queries_inciales = count(DB::getQueryLog());
+						//$conteo_queries['finds'] = 0;
+						//$conteo_queries['queries'] = 0;
+
+						//$queries_inciales = count(DB::getQueryLog());
 						$row = 1;
 						while (($csv_data = fgetcsv($handle, 0, ",")) !== FALSE) {
 							if($row == 1){
@@ -1381,22 +1386,28 @@ class InversionController extends ProyectosController {
 								continue;
 							}
 
-							$csv_data[0] = str_pad($csv_data[0],2,"0",STR_PAD_LEFT);
-							$csv_data[2] = str_pad($csv_data[2],4,"0",STR_PAD_LEFT);
+							$claves = explode('_',$csv_data[0]);
 
-							if(isset($desgloses_capturados[$csv_data[0].'_'.$csv_data[2]])){
-								$id_desglose = $desgloses_capturados[$csv_data[0].'_'.$csv_data[2]];
+							$clave_municipio = str_pad($claves[0],2,"0",STR_PAD_LEFT);
+							$clave_localidad = str_pad($claves[1],4,"0",STR_PAD_LEFT);
+
+							if(isset($desgloses_capturados[$csv_data[0]])){
+								$id_desglose = $desgloses_capturados[$csv_data[0]];
 								$desglose = $accion->desglose->find($id_desglose);
 								fputcsv($datos_desglose,[
 									$desglose->id,
                                     $desglose->idComponente,
                                     $desglose->idAccion,
+                                    $desglose->claveJurisdiccion,
                                     $desglose->claveMunicipio,
-									$desglose->claveLocalidad
+									$desglose->claveLocalidad,
+									$desglose->presupuesto,
+									$desglose->beneficiariosF,
+									$desglose->beneficiariosM
                                 ]);
 								if($desglose->metasMes){
 									$metas_mes = $desglose->metasMes->lists('id','mes');
-									for($i = 1; $i <= 12; $i++){
+									for($i = $mes_incial; $i <= $mes_final; $i++){
 										if(isset($metas_mes[$i])){
 											$meta_mes = $desglose->metasMes->find($metas_mes[$i]);
 											fputcsv($datos_metas,[
@@ -1406,45 +1417,49 @@ class InversionController extends ProyectosController {
 			                                    $meta_mes->claveMunicipio,
 												$meta_mes->claveLocalidad,
 												$meta_mes->mes,
-												$csv_data[(3+$i)]
+												$csv_data[(2+$i)]
 			                                ]);
 										}else{
-											if($csv_data[(3+$i)]){
+											if($csv_data[(2+$i)]){
 												fputcsv($datos_metas,[
 													NULL,
 				                                    $desglose->id,
 				                                    $accion->idComponente,
-				                                    $csv_data[0],
-													$csv_data[2],
+				                                    $clave_municipio,
+													$clave_localidad,
 													$i,
-													($csv_data[(3+$i)])?$csv_data[(3+$i)]:0
+													($csv_data[(2+$i)])?$csv_data[(2+$i)]:0
 				                                ]);
 											}
 										}
 									}
 								}
-								$conteo_queries['finds']++;
-								$queries = DB::getQueryLog();
-								$conteo_queries['queries'] = count($queries) - $queries_inciales;
+								//$conteo_queries['finds']++;
+								//$queries = DB::getQueryLog();
+								//$conteo_queries['queries'] = count($queries) - $queries_inciales;
 							}else{
 								fputcsv($datos_desglose,[
 									NULL,
                                     $accion->idComponente,
                                     $accion->id,
-                                    $csv_data[0],
-									$csv_data[2]
+                                    NULL,
+                                    $clave_municipio,
+									$clave_localidad,
+									NULL,
+									NULL,
+									NULL
                                 ]);
 
-								for($i = 1; $i <= 12; $i++){
-									if($csv_data[(3+$i)]){
+								for($i = $mes_incial; $i <= $mes_final; $i++){
+									if($csv_data[(2+$i)]){
 										fputcsv($datos_metas,[
 											NULL,
 		                                    NULL,
 											$accion->idComponente,
-											$csv_data[0],
-											$csv_data[2],
+											$clave_municipio,
+											$clave_localidad,
 											$i,
-											$csv_data[(3+$i)]
+											$csv_data[(2+$i)]
 		                                ]);
 									}
 								}
@@ -1458,7 +1473,7 @@ class InversionController extends ProyectosController {
 							DB::connection()->getPdo()->beginTransaction();
 
 							$id_usuario = $usuario->id;
-							
+							//trabajando ando
 							//Cargar Archivo de Desgloses
 							$query = sprintf("
 								LOAD DATA local INFILE '%s' REPLACE 
@@ -1471,15 +1486,23 @@ class InversionController extends ProyectosController {
 								@vid,
 								@vidComponente,
 								@vidAccion,
+								@vclaveJurisdiccion,
 								@vclaveMunicipio,
-								@vclaveLocalidad
+								@vclaveLocalidad,
+								@vpresupuesto,
+								@vbeneficiariosF,
+								@vbeneficiariosM
 								)
 								set creadoPor='%s', actualizadoPor='%s',
 								id = nullif(@vid,''),
 								idComponente = @vidComponente,
 								idAccion = @vidAccion,
+								claveJurisdiccion = nullif(@vclaveJurisdiccion,''),
 								claveMunicipio = @vclaveMunicipio,
-								claveLocalidad = @vclaveLocalidad
+								claveLocalidad = @vclaveLocalidad,
+								presupuesto = nullif(@vpresupuesto,''),
+								beneficiariosF = nullif(@vbeneficiariosF,''),
+								beneficiariosM = nullif(@vbeneficiariosM,'')
 								", addslashes($archivo_desglose),$id_usuario,$id_usuario);
 							DB::connection()->getpdo()->exec($query);
 							
@@ -1520,19 +1543,6 @@ class InversionController extends ProyectosController {
 								desgloseMetasMes.claveMunicipio = componenteDesglose.claveMunicipio AND
 								desgloseMetasMes.claveLocalidad = componenteDesglose.claveLocalidad AND 
 								desgloseMetasMes.idComponenteDesglose IS NULL
-								");
-							DB::connection()->getpdo()->exec($query);
-
-							//Actualizar la relacion de los desgloses con las metas
-							$query = sprintf("
-								UPDATE desgloseMetasMes, componenteDesglose
-								SET 
-								desgloseMetasMes.idComponente = componenteDesglose.idComponente,
-								desgloseMetasMes.claveMunicipio = componenteDesglose.claveMunicipio,
-								desgloseMetasMes.claveLocalidad = componenteDesglose.claveLocalidad
-								WHERE 
-								desgloseMetasMes.idComponenteDesglose = componenteDesglose.id AND
-								desgloseMetasMes.idComponente IS NULL
 								");
 							DB::connection()->getpdo()->exec($query);
 							
@@ -1889,7 +1899,6 @@ class InversionController extends ProyectosController {
 			foreach ($parametros['meta-mes'] as $mes => $meta) {
 				if(isset($metas_ids[$mes])){
 					$recurso = $desglose->metasMes->find($metas_ids[$mes]);
-					
 					$metas_anteriores[$mes] = $recurso->meta;
 					$recurso->meta = $meta;
 
@@ -1968,6 +1977,13 @@ class InversionController extends ProyectosController {
 
 				if(count($metas_mes)){
 					$desglose->metasMes()->saveMany($metas_mes);
+					DesgloseMetasMes::where('idComponenteDesglose',$desglose->id)
+									->whereNull('idComponente')
+									->update(array(
+										'idComponente'=>$desglose->idComponente,
+										'claveMunicipio'=>$desglose->claveMunicipio,
+										'claveLocalidad'=>$desglose->claveLocalidad
+									));
 				}
 
 				if(count($beneficiarios_desglose)){
