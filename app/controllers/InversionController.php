@@ -107,28 +107,38 @@ class InversionController extends ProyectosController {
 
 	public function archivoMunicipios($id){
 		$parametros = Input::all();
-		$proyecto = Proyecto::find($id);
-
+		$proyecto = Proyecto::select('id','claveMunicipio','claveRegion','idCobertura')->where('id',$id)->first();
+		
+		$recurso = Municipio::join('vistaLocalidades AS localidad',function($join){
+									$join->on('localidad.idMunicipio','=','vistaMunicipios.id')
+										->whereNull('localidad.borradoAl');
+								});
 		
 		$nombre_archivo = '';
 		if($parametros['tipo-carga'] == 'meta'){
-			$campos = 'null AS enero, null AS febrero, null AS marzo, null AS abril, null AS mayo, null AS junio, null AS julio, null AS agosto, null AS septiembre, null AS octubre, null AS noviembre, null AS diciembre';
+			$encabezados = array('1','2','3','enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre');
+			$campos = 'null AS enero';
 			$nombre_archivo = 'Metas';
 		}elseif($parametros['tipo-carga'] == 'presupuesto'){
-			$campos = 'null AS partida, null AS enero, null AS febrero, null AS marzo, null AS abril, null AS mayo, null AS junio, null AS julio, null AS agosto, null AS septiembre, null AS octubre, null AS noviembre, null AS diciembre';
+			$encabezados = array('1','2','3','4','enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre');
+			$campos = 'objetosGasto.clave AS partida';
 			$nombre_archivo = 'Presupuesto';
+			$recurso = $recurso->join('relAccionesPartidas AS partidas','partidas.idAccion','=',DB::raw($parametros['id-accion']))
+							->leftjoin('catalogoObjetosGasto as objetosGasto','objetosGasto.id','=','partidas.idObjetoGasto')
+							->groupBy('clave','partidas.id');
 		}else{
-			$campos = 'null AS tipoBeneficiario, null AS totalHombres, null AS totalMujeres, null AS total';
+			$encabezados = array('1','2','3','4','5','totalMujeres','totalHombres');
+			$campos = 'tiposBenef.id AS idBeneficiario, tiposBenef.descripcion AS tipoBeneficiario';
 			$nombre_archivo = 'Beneficiarios';
-		}
-		$recurso = Municipio::select(DB::raw('CONCAT_WS("_",vistaMunicipios.clave,localidad.clave) AS clave'),
-										 'vistaMunicipios.nombre AS nombreMunicipio',
-										 'localidad.nombre AS nombreLocalidad',
-										 DB::raw($campos))
-								->join('vistaLocalidades AS localidad',function($join){
-									$join->on('localidad.idMunicipio','=','vistaMunicipios.id')
-										->whereNull('localidad.borradoAl');
+			$recurso = $recurso->join('proyectoBeneficiarios AS proyectoBenef',function($join)use($id){
+									$join->whereNull('proyectoBenef.borradoAl')
+										->where('proyectoBenef.idProyecto','=',$id);
 								})
+								->leftjoin('catalogoTiposBeneficiarios AS tiposBenef','tiposBenef.id','=','proyectoBenef.idTipoBeneficiario')
+								->groupBy('clave','tiposBenef.id');
+		}
+		$recurso = $recurso->select(DB::raw('CONCAT_WS("_",vistaMunicipios.clave,localidad.clave) AS clave'),
+									'vistaMunicipios.nombre AS nombreMunicipio','localidad.nombre AS nombreLocalidad',DB::raw($campos))
 								->orderBy('clave','ASC');
 
 		if($proyecto->idCobertura == 1){ 
@@ -145,12 +155,41 @@ class InversionController extends ProyectosController {
 										->whereNull('region.borradoAl');
 								})->get();
 		}
-		$recurso = $recurso->toArray();
+		//$queries = DB::getQueryLog();
+		//var_dump(end($queries));die;
+		if(count($recurso) == 0){
+			$recurso = array(0=>array('nombre'=>'Faltan los recursos necesarios para generar esta lista.'));
+		}else{
+			$recurso = $recurso->toArray();
+		}
+		
+		$headers = [
+				'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0'
+			,   'Content-type'        => 'text/csv'
+			,   'Content-Disposition' => 'attachment; filename=ArchivoMunicipios'.$nombre_archivo.'.csv'
+			,   'Expires'             => '0'
+			,   'Pragma'              => 'public'
+		];
+		
+		# add headers for each column in the CSV download
+		$cabeceras = array_keys($recurso[0]) + $encabezados;
+		array_unshift($recurso, $cabeceras);
+		$callback = function() use ($recurso){
+			$FH = fopen('php://output', 'w');
+			foreach ($recurso as $row) { 
+				fputcsv($FH, $row);
+			}
+			fclose($FH);
+		};
+	
+		return Response::stream($callback, 200, $headers);
+		/*
 		Excel::create('ArchivoMunicipios'.$nombre_archivo, function($excel) use ($recurso) {
 		    $excel->sheet('Municipios', function($sheet) use ($recurso) {
 		        $sheet->fromArray($recurso);
 		    });
 		})->download('csv');
+		*/
 		//return Response::download($recurso, 'output.csv', ['Content-Type: text/cvs']);
 		//return Response::json($recurso,200);
 	}

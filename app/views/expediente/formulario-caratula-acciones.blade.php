@@ -19,7 +19,7 @@
                     <tr class="bg-success">
                         <th width="100px">Partida</th>
                         <th>Descripción</th>
-                        <th width="100px">Monto</th>
+                        <th width="150px">Monto</th>
                         <th width="90px">Porcentaje</th>
                     </tr>
                 </thead>
@@ -123,34 +123,11 @@
                 </div>
                 <div class="col-sm-4">
                     <div class="btn-toolbar pull-right" >
-                        <!--div class="btn-group" style="margin:5px">
-                            <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="fa fa-file"></span> Importación <span class="caret"></span>
+                        <div class="btn-group" style="margin:5px">
+                            <button type="button" class="btn btn-success" id="btn-mostrar-subir-archivo">
+                                <span class="fa fa-upload"></span> Importación
                             </button>
-                            <ul class="dropdown-menu pull-right">
-                                <li>
-                                    <a href="#" id="lnk-descarga-archivo-metas" target="_blank">
-                                        <span class="fa fa-download"></span> Descargar Archivo para Metas
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" id="lnk-descarga-archivo-presupuesto" target="_blank">
-                                        <span class="fa fa-download"></span> Descargar Archivo para Presupuesto
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" id="lnk-descarga-archivo-beneficiarios" target="_blank">
-                                        <span class="fa fa-download"></span> Descargar Archivo para Beneficiarios
-                                    </a>
-                                </li>
-                                <li class="divider"></li>
-                                <li>
-                                    <a href="#" id="lnk-mostrar-subir-archivo">
-                                        <span class="fa fa-upload"></span> Cargar Archivo de Importación
-                                    </a>
-                                </li>
-                            </ul>
-                        </div-->
+                        </div>
                         <div class="btn-group" style="margin:5px">
                             <button type="button" class="btn btn-info" id="btn-agregar-distribucion">
                                 <span class="fa fa-plus"></span> Agregar
@@ -183,7 +160,7 @@
                     <th>Localidad</th>
                     <th>Municipio</th>
                     <th>Jurisdicción</th>
-                    <th width="100px">Monto</th>
+                    <th width="145px">Monto</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -207,6 +184,9 @@
                             </ul>
                         </div>
                     </div>
+                </div>
+                <div class="form-group pull-right">
+                    <b>Total Distribuido: </b>$ <span id="total-grid-presupuesto"></span>
                 </div>
             </div>
         </div>
@@ -410,45 +390,70 @@
 </div><!-- /.modal -->
 
 <!--      Modal para subida del archivo de metas, beneficiarios y presupuesto      -->
-
-<!--div class="modal fade" id="modal-subir-archivo" tabindex="-1" role="dialog" aria-labelledby="modalArchivoLabel" aria-hidden="true" data-backdrop="static">
+<div class="modal fade" id="modal-subir-archivo" tabindex="-1" role="dialog" aria-labelledby="modalArchivoLabel" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-dialog-85-screen">
         <div class="modal-content modal-content-85-screen">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="modalArchivoLabel">Cargar Archivo</h4>
+                <h4 class="modal-title" id="modalArchivoLabel">Importar Archivo CSV</h4>
             </div>
             <div class="modal-body">
-                <form id="form-subir-archivo">
-                    <div class="row">
-                        <div class="col-sm-5">
-                            <div class="form-group">
-                                <label class="control-label" for="tipo-archivo">Tipo de Archivo</label>
-                                <select id="tipo-archivo" name="tipo-archivo" class="form-control">
-                                    <option value="">Selecciona un tipo</option>
-                                    <option value="metas">Archivo para Metas</option>
-                                    <option value="presupuesto">Archivo para Presupuesto</option>
-                                    <option value="beneficiarios">Archivo para Beneficiarios</option>
-                                </select>
+                <div id="panel-importar-csv" class="fileupload ">
+                    <fieldset>
+                        <span class="help-block">
+                            Para importar un archivo csv con los datos de la programación, baje uno de los siguientes archivos, dependiendo del tipo de información que desee importar.
+                        </span>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <a href="#" class="btn btn-link" id="lnk-descarga-archivo-metas" target="_blank">
+                                    <span class="fa fa-download"></span> Descargar Archivo para Metas
+                                </a>
+                            </div>
+                            <div class="col-sm-4">
+                                <a href="#" class="btn btn-link" id="lnk-descarga-archivo-beneficiarios" target="_blank">
+                                    <span class="fa fa-download"></span> Descargar Archivo para Beneficiarios
+                                </a>
+                            </div>
+                            <div class="col-sm-4">
+                                <a href="#" class="btn btn-link" id="lnk-descarga-archivo-presupuesto" target="_blank">
+                                    <span class="fa fa-download"></span> Descargar Archivo para Presupuesto
+                                </a>
                             </div>
                         </div>
-                        <div class="col-sm-7">
-                            <div class="form-group">
-                                <label class="control-label" for="archivo">Archivo</label>
-                                <input type="file" id="archivo" name="archivo" accept=".csv" class="form-control">
+                        <span class="help-block">
+                            Llene la información requerida en el archivo descargado, y vuelva a subirlo mediante el siguiente formulario.
+                        </span>
+                        <form id="form-subir-archivo">
+                            <div class="row">
+                                <div class="col-sm-5">
+                                    <div class="form-group">
+                                        <label class="control-label" for="tipo-archivo">Tipo de Archivo</label>
+                                        <select id="tipo-archivo" name="tipo-archivo" class="form-control">
+                                            <option value="">Selecciona un tipo</option>
+                                            <option value="metas">Archivo para Metas</option>
+                                            <option value="presupuesto">Archivo para Presupuesto</option>
+                                            <option value="beneficiarios">Archivo para Beneficiarios</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-7">
+                                    <div class="form-group">
+                                        <label class="control-label" for="archivo">Archivo</label>
+                                        <input type="file" id="archivo" name="archivo" accept=".csv" class="form-control">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div id="resultado-carga"></div>
-                </form>
+                        </form>
+                        <button type="button" class="btn btn-primary" id="btn-subir-archivo"><span class="fa fa-upload"></span> Cargar Datos del Archivo</button>
+                    </fieldset>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btn-subir-archivo"><span class="fa fa-upload"></span> Cargar</button>
             </div>
         </div>
     </div>
-</div-->
+</div>
 
 <!--
     Modal para Acción

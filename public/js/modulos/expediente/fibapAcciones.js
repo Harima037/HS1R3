@@ -37,8 +37,8 @@ var form_presupuesto = '#form-presupuesto';
 var modal_subir_archivo = '#modal-subir-archivo';
 var form_subir_archivo = '#form-subir-archivo';
 
-var presupuesto_total = 0;
-var presupuesto_origenes = [];
+//var presupuesto_total = 0;
+//var presupuesto_origenes = [];
 
 var ejecucion_fecha_inicio;
 var ejecucion_fecha_fin;
@@ -81,16 +81,22 @@ context.init = function(id,resource){
         $(modal_presupuesto).modal('show');
     });
 
-    /*$('#lnk-mostrar-subir-archivo').on('click',function (e){
+    $('#btn-mostrar-subir-archivo').on('click',function (e){
         e.preventDefault();
         $(modal_subir_archivo).modal('show');
-    });*/
+    });
 
     $('#btn-subir-archivo').on('click',function(){
-        Validation.cleanFormErrors(form_subir_archivo);
-        var parametros = $(form_subir_archivo).serialize();
-        var cuantosArchivos = document.getElementById("archivo").files.length;  
+        //Validation.cleanFormErrors(form_subir_archivo);
+        Validation.cleanFieldErrors('tipo-archivo');
+        Validation.cleanFieldErrors('archivo');
+        var cuantosArchivos = document.getElementById("archivo").files.length;
+        if($('#tipo-archivo').val() == ''){
+            Validation.printFieldsErrors('tipo-archivo','Debe seleccionar un tipo de archivo a subir.');
+            return false;
+        }
         if(cuantosArchivos>0){
+            //var parametros = $(form_subir_archivo).serialize();
             //parametros += '&guardar=cargar-archivo-desglose&id-accion='+$('#id-accion').val()+'&id-fibap='+id_fibap;
             var data  = new FormData();
             var archivo = document.getElementById("archivo").files;
@@ -112,7 +118,10 @@ context.init = function(id,resource){
                 processData:false, //Debe estar en false para que JQuery no procese los datos a enviar
                 cache:false, //Para que el formulario no guarde cache,
                 success: function(response){ 
-                    $("#loading").fadeOut();            
+                    distribucionDatagrid.actualizar(); //falta probar
+                    if(response.extras.distribucion_total){
+                        llenar_tabla_distribucion(response.extras.distribucion_total);
+                    }
                 },
                 error: function( response ){
                     $("#loading").fadeOut(function(){ 
@@ -131,7 +140,8 @@ context.init = function(id,resource){
                 }   
             });
         }else{
-            MessageManager.show({data:'Debe seleccionar un archivo a subir.',timer:10,type:'ERR'});
+            Validation.printFieldsErrors('archivo','Debe seleccionar un archivo a subir.');
+            //MessageManager.show({data:'Debe seleccionar un archivo a subir.',timer:10,type:'ERR'});
         }
     });
 
@@ -155,10 +165,6 @@ context.init = function(id,resource){
             $('#tablink-componente-actividades').attr('data-toggle','');
             $('#tablink-componente-actividades').parent().addClass('disabled');
             $('#lista-tabs-componente a:first').tab('show');
-            $('#lnk-descarga-archivo-metas').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=meta');
-            //$('#lnk-descarga-archivo-presupuesto').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=presupuesto&id-accion='+id_accion);
-            $('#lnk-descarga-archivo-presupuesto').addClass('disabled');
-            $('#lnk-descarga-archivo-beneficiarios').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=beneficiarios');
             $(modal_accion).find(".modal-title").html("Nuevo Componente");
             $(modal_accion).modal('show');
         }
@@ -331,7 +337,8 @@ context.init = function(id,resource){
     });
 
     $(modal_accion).on('hide.bs.modal',function(e){ reset_modal_form(form_accion); });
-
+    $(modal_subir_archivo).on('hide.bs.modal',function(e){ reset_modal_form(form_subir_archivo); });
+    
     $(modal_presupuesto).on('hide.bs.modal',function(e){
         $(modal_presupuesto).find(".modal-title").html("Nuevo");
         reset_modal_form(form_presupuesto);
@@ -509,12 +516,7 @@ context.mostrar_datos = function(datos){
     ocultar_detalles(true);
 
     $(modal_accion).find(".modal-title").html('Editar Componente');
-
-    $('#lnk-descarga-archivo-metas').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=meta');
-    $('#lnk-descarga-archivo-presupuesto').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=presupuesto&id-accion='+datos.id);
-    $('#lnk-descarga-archivo-presupuesto').removeClass('disabled');
-    $('#lnk-descarga-archivo-beneficiarios').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=beneficiarios');
-
+    
     $('#descripcion-obj-componente').val(datos.componente.objetivo);
     $('#verificacion-componente').val(datos.componente.mediosVerificacion);
     $('#supuestos-componente').val(datos.componente.supuestos);
@@ -644,7 +646,11 @@ context.mostrar_detalles = function(id){
 
                 $('#datagridAcciones > table > tbody > tr.contendor-desechable').remove();
                 llenar_datagrid_distribucion(response.data.idComponente,response.data.presupuestoRequerido);
-
+                
+                $('#lnk-descarga-archivo-metas').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=meta');
+                $('#lnk-descarga-archivo-presupuesto').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=presupuesto&id-accion='+id);
+                $('#lnk-descarga-archivo-beneficiarios').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=beneficiarios');
+                
                 $('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"]').addClass('bg-info');
                 $('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"]').addClass('text-primary');
                 $('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"] > td > span.boton-detalle > span.fa-plus-square-o').addClass('fa-minus-square-o');
@@ -768,6 +774,8 @@ context.llenar_select_responsables = function(datos){
 ************************************************************************************************/
 function llenar_datagrid_distribucion(id_componente,total_presupuesto){
     $('#datagridDistribucion > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-spin fa-spinner"></i> Cargando datos...</td></tr>');
+    $('#total-grid-presupuesto').text(0);
+    actualiza_porcentaje('#porcentaje_accion',0);
     if(id_componente == 0){
         $("#datagridDistribucion .txt-quick-search").val('');
         actualiza_porcentaje('#porcentaje_accion',0);
@@ -777,6 +785,7 @@ function llenar_datagrid_distribucion(id_componente,total_presupuesto){
     }else{
         distribucionDatagrid = new Datagrid("#datagridDistribucion",fibap_resource,{ desglosegrid:true, pagina: 1, idComponente: id_componente}); 
         distribucionDatagrid.init();
+        distribucionDatagrid.cargarTotalResultados(0);
         distribucionDatagrid.actualizar({ 
             _success: function(response){ 
                 var distribucion = [];
@@ -799,7 +808,7 @@ function llenar_datagrid_distribucion(id_componente,total_presupuesto){
                         presupuesto.jurisdiccion = 'OFICINA CENTRAL';
                     }
                     
-                    presupuesto.monto = '$ ' + parseFloat(datos[indx].presupuesto || 0).format(2);
+                    presupuesto.monto = '$ <span class="pull-right">' + parseFloat(datos[indx].presupuesto || 0).format(2) + '</span>';
 
                     if(comentarios.desgloses[presupuesto.id]){
                         presupuesto.localidad = '<span class="text-warning fa fa-warning"></span> ' + presupuesto.localidad;
@@ -817,6 +826,7 @@ function llenar_datagrid_distribucion(id_componente,total_presupuesto){
                 }
                 distribucionDatagrid.cargarDatos(distribucion);
                 distribucionDatagrid.cargarTotalResultados(response.resultados);
+                $('#total-grid-presupuesto').text(total_desglose.format(2));
                 var total = parseInt(response.resultados/distribucionDatagrid.rxpag); 
                 var plus = parseInt(response.resultados)%distribucionDatagrid.rxpag;
                 if(plus>0) 
@@ -911,7 +921,7 @@ function llenar_datagrid_acciones(datos){
 function llenar_datagrid_actividades(datos){
     $('#datagridActividades > table > tbody').empty();
     var actividades = [];
-    for(indx in datos){
+    for(var indx in datos){
         var actividad = {};
 
         actividad.id = datos[indx].id;
@@ -993,7 +1003,7 @@ function linea_tabla_partidas(datos_partida){
 }
 
 function actualiza_porcentaje(selector,porcentaje){
-    $(selector).text(porcentaje + ' %');
+    $(selector).text(porcentaje.format(2) + ' %');
     $(selector).attr('aria-valuenow',porcentaje);
     $(selector).attr('style','width:'+porcentaje + '%;');
     if(porcentaje > 100){
@@ -1402,7 +1412,14 @@ function mostrar_comentarios(datos){
  */
 Number.prototype.format = function(n, x) {
     var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\.' : '$') + ')';
-    return this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+    //return this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+    var formateado = this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+    var partes = formateado.split('.');
+    if(parseInt(partes[1]) == 0){
+        return partes[0];
+    }else{
+        return formateado;
+    }
 };
 
 })(fibapAcciones);

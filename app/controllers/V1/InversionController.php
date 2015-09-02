@@ -1344,7 +1344,7 @@ class InversionController extends ProyectosController {
 			$archivoConDatos = Input::file('datoscsv');
 			$type = finfo_file($finfo, $archivoConDatos); 
 			$archivo_desglose = storage_path().'/archivoscsv/archivo_desglose_'.$usuario->id.'.csv';
-			$archivo_metas = storage_path().'/archivoscsv/archivo_metas_'.$usuario->id.'.csv';
+			$archivo_mes = storage_path().'/archivoscsv/archivo_mes_'.$usuario->id.'.csv';
 
 			$conteo_queries = array();
 
@@ -1355,62 +1355,165 @@ class InversionController extends ProyectosController {
 			if($type=="text/plain"){
 				$row = 1;
 				$datos_archivo = array();
-				//Valida que la codificación del archivo sea UTF-8
+				//Valida que la codificación del archivo sea UTF-8 - No se necesita ya que no se capturara texto
 				//if(mb_detect_encoding(file_get_contents($archivoConDatos), 'UTF-8', true)){
-				if(true){
-					if (($handle = fopen($archivoConDatos, "r")) !== FALSE && ($datos_desglose = fopen($archivo_desglose, "w")) !== FALSE && ($datos_metas = fopen($archivo_metas, "w")) !== FALSE) {
-						//
+					if (($handle = fopen($archivoConDatos, "r")) !== FALSE && ($datos_desglose = fopen($archivo_desglose, "w")) !== FALSE && ($datos_mes = fopen($archivo_mes, "w")) !== FALSE) {
+						
 						$accion = Accion::with(array('desglose'=>function($query){
 								$query->select('*',DB::raw('CONCAT_WS("_",claveMunicipio,claveLocalidad) AS claveCompuesta'));
 							}))->find($id_accion);
-						$desgloses_capturados = $accion->desglose->lists('id','claveCompuesta');
+						
+						$desgloses_capturados = array();
+						foreach($accion->desglose as $desglose){
+							$desgloses_capturados[$desglose->claveCompuesta] = $desglose;
+						}
+						
 						if($parametros['tipo-archivo'] == 'metas'){
 							$accion->desglose->load('metasMes');
+						}elseif($parametros['tipo-archivo'] == 'presupuesto'){
+							$accion->load(array('distribucionPresupuesto'=>function($query){
+								$query->select(
+									'id','idAccion','idObjetoGasto',
+									'claveJurisdiccion',
+									'creadoPor','creadoAl',
+									DB::raw('CONCAT_WS("_",claveMunicipio,claveLocalidad,claveObjetoGasto,mes) AS claveCompuesta'));
+							}));
+							$distribucion_guardada = array();
+							foreach($accion->distribucionPresupuesto as $presupuesto){
+								$distribucion_guardada[$presupuesto->claveCompuesta] = $presupuesto->toArray();
+							}
+						}elseif($parametros['tipo-archivo'] == 'beneficiarios'){
+							$accion->desglose->load(array('beneficiarios'=>function($query){
+								$query->select('id','idComponenteDesglose','creadoPor','creadoAl',
+										DB::raw('CONCAT_WS("_",claveMunicipio,claveLocalidad,idTipoBeneficiario) AS claveCompuesta'));
+							}));
 						}
-
-						$fibap = FIBAP::find($accion->idFibap);
-						$mes_incial = date("n",strtotime($fibap->periodoEjecucionInicio));
-						$mes_final = date("n",strtotime($fibap->periodoEjecucionFinal));
-
-						//$desgloses_guardar = array();
-						//$metas_mes_guardar = array();
-
-						//$conteo_queries['finds'] = 0;
-						//$conteo_queries['queries'] = 0;
-
-						//$queries_inciales = count(DB::getQueryLog());
+						//Agregar tambien para partidas y tipos de beneficiarios
+						$localidades_validas = array();
+						$proyecto = Proyecto::find($parametros['id-proyecto']);	
+						if($proyecto->idCobertura != 1){
+							$recurso = Municipio::join('vistaLocalidades AS localidad',function($join){
+													$join->on('localidad.idMunicipio','=','vistaMunicipios.id')
+															->whereNull('localidad.borradoAl');
+													})
+													->select(DB::raw('CONCAT_WS("_",vistaMunicipios.clave,localidad.clave) AS claveCompuesta'),
+														'vistaMunicipios.id AS valido')
+													->orderBy('claveCompuesta','ASC');
+							if($proyecto->idCobertura == 2){ 
+							//Cobertura Municipio
+								$recurso = $recurso->where('vistaMunicipios.clave','=',$proyecto->claveMunicipio)->get();
+							}elseif($proyecto->idCobertura == 3){ 
+							//Cobertura Region
+								$recurso = $recurso->join('vistaRegiones AS region',function($join)use($proyecto){
+														$join->on('vistaMunicipios.idRegion','=','region.id')
+															->where('region.region','=',$proyecto->claveRegion)
+															->whereNull('region.borradoAl');
+													})->get();
+							}
+							$localidades_validas = $recurso->lists('valido','claveCompuesta');
+							$recurso = NULL;
+						}
+						$proyecto = NULL;
+						
+						if($parametros['tipo-archivo'] != 'beneficiarios'){
+							$fibap = FIBAP::select('id','periodoEjecucionInicio','periodoEjecucionFinal')->where('id',$accion->idFibap)->first();
+							$mes_incial = date("n",strtotime($fibap->periodoEjecucionInicio));
+							$mes_final = date("n",strtotime($fibap->periodoEjecucionFinal));
+						}else{
+							$beneficiarios = array('id'=>0,'datos'=>array());
+						}
+						
+						$desgloses_agregados = array();
+						$nuevos_desgloses = array();
 						$row = 1;
 						while (($csv_data = fgetcsv($handle, 0, ",")) !== FALSE) {
 							if($row == 1){
 								$row++;
 								continue;
 							}
-
+							
+							if(count($localidades_validas)){
+								if(!isset($localidades_validas[$csv_data[0]])){
+									continue;
+								}
+							}
+							
 							$claves = explode('_',$csv_data[0]);
 
 							$clave_municipio = str_pad($claves[0],2,"0",STR_PAD_LEFT);
 							$clave_localidad = str_pad($claves[1],4,"0",STR_PAD_LEFT);
-
+							
+							if($parametros['tipo-archivo'] == 'presupuesto'){
+								for($i = $mes_incial; $i <= $mes_final; $i++){
+									if(isset($distribucion_guardada[$csv_data[0].'_'.$csv_data[3].'_'.$i])){
+										$presupuesto = $distribucion_guardada[$csv_data[0].'_'.$csv_data[3].'_'.$i];
+										if($presupuesto){
+											$distribucion_guardada[$csv_data[0].'_'.$csv_data[3].'_'.$i] = NULL;
+											fputcsv($datos_mes,[
+												$presupuesto['id'],
+												$id_fibap,
+												$presupuesto['idAccion'],
+												$presupuesto['idObjetoGasto'],
+												$csv_data[3],
+												$presupuesto['claveJurisdiccion'],
+												$clave_municipio,
+												$clave_localidad,
+												$i,
+												$csv_data[(3+$i)],
+												$presupuesto['creadoPor'],
+												$presupuesto['creadoAl']
+											]);
+										}
+									}else{
+										if($csv_data[(3+$i)]){
+											fputcsv($datos_mes,[
+												NULL,
+												$id_fibap,
+												$id_accion,
+												NULL,
+												$csv_data[3],
+												NULL,
+												$clave_municipio,
+												$clave_localidad,
+												$i,
+												$csv_data[(3+$i)],
+												NULL,
+												NULL
+											]);
+										}
+									}
+								}
+							}
+							
 							if(isset($desgloses_capturados[$csv_data[0]])){
-								$id_desglose = $desgloses_capturados[$csv_data[0]];
-								$desglose = $accion->desglose->find($id_desglose);
-								fputcsv($datos_desglose,[
-									$desglose->id,
-                                    $desglose->idComponente,
-                                    $desglose->idAccion,
-                                    $desglose->claveJurisdiccion,
-                                    $desglose->claveMunicipio,
-									$desglose->claveLocalidad,
-									$desglose->presupuesto,
-									$desglose->beneficiariosF,
-									$desglose->beneficiariosM
-                                ]);
-								if($desglose->metasMes){
-									$metas_mes = $desglose->metasMes->lists('id','mes');
+								$desglose = $desgloses_capturados[$csv_data[0]];
+								
+								if(!isset($desgloses_agregados[$desglose->id])){
+									$desgloses_agregados[$desglose->id] = 'agregado';
+									fputcsv($datos_desglose,[
+										$desglose->id,
+										$desglose->idComponente,
+										$desglose->idAccion,
+										$desglose->claveJurisdiccion,
+										$desglose->claveMunicipio,
+										$desglose->claveLocalidad,
+										$desglose->presupuesto,
+										$desglose->beneficiariosF,
+										$desglose->beneficiariosM,
+										$desglose->creadoPor,
+										$desglose->creadoAl
+									]);
+								}
+								
+								if($parametros['tipo-archivo'] == 'metas'){
+									$metas_mes = array();
+									foreach($desglose->metasMes as $metas){
+										$metas_mes[$metas->mes] = $metas;
+									}
 									for($i = $mes_incial; $i <= $mes_final; $i++){
 										if(isset($metas_mes[$i])){
-											$meta_mes = $desglose->metasMes->find($metas_mes[$i]);
-											fputcsv($datos_metas,[
+											$meta_mes = $metas_mes[$i];
+											fputcsv($datos_mes,[
 												$meta_mes->id,
 			                                    $meta_mes->idComponenteDesglose,
 			                                    $meta_mes->idComponente,
@@ -1421,7 +1524,7 @@ class InversionController extends ProyectosController {
 			                                ]);
 										}else{
 											if($csv_data[(2+$i)]){
-												fputcsv($datos_metas,[
+												fputcsv($datos_mes,[
 													NULL,
 				                                    $desglose->id,
 				                                    $accion->idComponente,
@@ -1433,47 +1536,110 @@ class InversionController extends ProyectosController {
 											}
 										}
 									}
-								}
-								//$conteo_queries['finds']++;
-								//$queries = DB::getQueryLog();
-								//$conteo_queries['queries'] = count($queries) - $queries_inciales;
-							}else{
-								fputcsv($datos_desglose,[
-									NULL,
-                                    $accion->idComponente,
-                                    $accion->id,
-                                    NULL,
-                                    $clave_municipio,
-									$clave_localidad,
-									NULL,
-									NULL,
-									NULL
-                                ]);
-
-								for($i = $mes_incial; $i <= $mes_final; $i++){
-									if($csv_data[(2+$i)]){
-										fputcsv($datos_metas,[
-											NULL,
-		                                    NULL,
+								}elseif($parametros['tipo-archivo'] == 'beneficiarios'){
+									
+									if($beneficiarios['id'] != $desglose->id){
+										$beneficiarios['id'] = $desglose->id;
+										$beneficiarios['datos'] = array();
+										foreach($desglose->beneficiarios as $beneficiario){
+											$beneficiarios['datos'][$beneficiario->claveCompuesta] = $beneficiario->toArray();
+										}
+									}
+									
+									if(isset($beneficiarios['datos'][$csv_data[0].'_'.$csv_data[3]])){
+										$beneficiario = $beneficiarios['datos'][$csv_data[0].'_'.$csv_data[3]];
+										fputcsv($datos_mes,[
+											$beneficiario['id'],
+											$beneficiario['idComponenteDesglose'],
 											$accion->idComponente,
 											$clave_municipio,
 											$clave_localidad,
-											$i,
-											$csv_data[(2+$i)]
-		                                ]);
+											$csv_data[3],
+											$csv_data[5],
+											$csv_data[6],
+											$beneficiario['creadoPor'],
+											$beneficiario['creadoAl']
+										]);
+									}else{
+										if($csv_data[5] || $csv_data[6]){
+											fputcsv($datos_mes,[
+												NULL,
+												$desglose->id,
+												$accion->idComponente,
+												$clave_municipio,
+												$clave_localidad,
+												$csv_data[3],
+												$csv_data[5],
+												$csv_data[6],
+												NULL,
+												NULL
+											]);
+										}
+									}
+								}
+							}else{
+								if(!isset($nuevos_desgloses[$csv_data[0]])){
+									$nuevos_desgloses[$csv_data[0]] = 'registrado';
+									fputcsv($datos_desglose,[
+										NULL,
+										$accion->idComponente,
+										$accion->id,
+										NULL,
+										$clave_municipio,
+										$clave_localidad,
+										NULL,
+										NULL,
+										NULL,
+										NULL,
+										NULL
+									]);
+								}
+								
+								if($parametros['tipo-archivo'] == 'metas'){
+									for($i = $mes_incial; $i <= $mes_final; $i++){
+										if($csv_data[(2+$i)]){
+											fputcsv($datos_mes,[
+												NULL,
+												NULL,
+												$accion->idComponente,
+												$clave_municipio,
+												$clave_localidad,
+												$i,
+												$csv_data[(2+$i)]
+											]);
+										}
+									}
+								}elseif($parametros['tipo-archivo'] == 'beneficiarios'){
+									if($csv_data[5] || $csv_data[6]){
+										fputcsv($datos_mes,[
+											NULL,
+											NULL,
+											$accion->idComponente,
+											$clave_municipio,
+											$clave_localidad,
+											$csv_data[3],
+											$csv_data[5],
+											$csv_data[6],
+											NULL,
+											NULL
+										]);
 									}
 								}
 							}
-							//$desgloses_guardar[] = $desglose;
 						}
 						fclose($datos_desglose);
-						fclose($datos_metas);
-
+						fclose($datos_mes);
+						$distribucion_guardada = NULL;
+						$desgloses_capturados = NULL;
+						$beneficiarios = NULL;
+						$desgloses_agregados = NULL;
+						$nuevos_desgloses = NULL;
+						
 						try {
 							DB::connection()->getPdo()->beginTransaction();
 
 							$id_usuario = $usuario->id;
-							//trabajando ando
+							
 							//Cargar Archivo de Desgloses
 							$query = sprintf("
 								LOAD DATA local INFILE '%s' REPLACE 
@@ -1491,9 +1657,11 @@ class InversionController extends ProyectosController {
 								@vclaveLocalidad,
 								@vpresupuesto,
 								@vbeneficiariosF,
-								@vbeneficiariosM
+								@vbeneficiariosM,
+								@vcreadoPor,
+								@vcreadoAl
 								)
-								set creadoPor='%s', actualizadoPor='%s',
+								set actualizadoPor='%s', modificadoAl = CURRENT_TIMESTAMP,
 								id = nullif(@vid,''),
 								idComponente = @vidComponente,
 								idAccion = @vidAccion,
@@ -1502,48 +1670,10 @@ class InversionController extends ProyectosController {
 								claveLocalidad = @vclaveLocalidad,
 								presupuesto = nullif(@vpresupuesto,''),
 								beneficiariosF = nullif(@vbeneficiariosF,''),
-								beneficiariosM = nullif(@vbeneficiariosM,'')
+								beneficiariosM = nullif(@vbeneficiariosM,''),
+								creadoPor = ifnull(nullif(@vcreadoPor,''),%s),
+								creadoAl = ifnull(nullif(@vcreadoAl,''),CURRENT_TIMESTAMP)
 								", addslashes($archivo_desglose),$id_usuario,$id_usuario);
-							DB::connection()->getpdo()->exec($query);
-							
-							//Cargar Archivo de Metas
-							$query = sprintf("
-								LOAD DATA local INFILE '%s' REPLACE 
-								INTO TABLE desgloseMetasMes 
-								FIELDS TERMINATED BY ',' 
-								OPTIONALLY ENCLOSED BY '\"' 
-								ESCAPED BY '\"' 
-								LINES TERMINATED BY '\\n'
-								(
-								@vid,
-								@vidComponenteDesglose,
-								@vidComponente,
-								@vclaveMunicipio,
-								@vclaveLocalidad,
-								@vmes,
-								@vmeta
-								)
-								set creadoPor='%s', actualizadoPor='%s',
-								id = nullif(@vid,''),
-								idComponenteDesglose = nullif(@vidComponenteDesglose,''),
-								idComponente = nullif(@vidComponente,''),
-								claveMunicipio = nullif(@vclaveMunicipio,''),
-								claveLocalidad = nullif(@vclaveLocalidad,''),
-								mes = @vmes,
-								meta = @vmeta
-								", addslashes($archivo_metas),$id_usuario,$id_usuario);
-							DB::connection()->getpdo()->exec($query);
-							
-							//Actualizar la relacion de los desgloses con las metas
-							$query = sprintf("
-								UPDATE desgloseMetasMes, componenteDesglose
-								SET desgloseMetasMes.idComponenteDesglose = componenteDesglose.id
-								WHERE 
-								desgloseMetasMes.idComponente = componenteDesglose.idComponente AND
-								desgloseMetasMes.claveMunicipio = componenteDesglose.claveMunicipio AND
-								desgloseMetasMes.claveLocalidad = componenteDesglose.claveLocalidad AND 
-								desgloseMetasMes.idComponenteDesglose IS NULL
-								");
 							DB::connection()->getpdo()->exec($query);
 							
 							//Colocar la clave de las jurisdicciones correspondientes
@@ -1557,63 +1687,235 @@ class InversionController extends ProyectosController {
 								componenteDesglose.idAccion = %s
 								", $id_accion);
 							DB::connection()->getpdo()->exec($query);
-
-							//Se insertan/reemplazan las metas por mes del componente con los valores importados del archivo
-							$query = sprintf("
-								REPLACE INTO componenteMetasMes
-								SELECT 
-								cMetas.id, comp.idProyecto, desglose.idComponente, desglose.claveJurisdiccion, metasMes.mes, 
-								SUM(metasMes.meta) as meta, cMetas.avance, ifnull(cMetas.creadoPor,%s) AS creadoPor, 
-								ifnull(cMetas.actualizadoPor,%s) AS actualizadoPor, cMetas.creadoAl, cMetas.modificadoAl, 
-								NULL AS borradoAl
-								FROM componenteDesglose AS desglose
-								LEFT JOIN desgloseMetasMes AS metasMes 
-								ON metasMes.claveMunicipio = desglose.claveMunicipio 
-								AND desglose.id = metasMes.idComponenteDesglose
-								AND metasMes.borradoAl IS NULL
-								LEFT JOIN componenteMetasMes AS cMetas
-								ON cMetas.idComponente = desglose.idComponente
-								AND cMetas.claveJurisdiccion = desglose.claveJurisdiccion
-								AND cMetas.mes = metasMes.mes
-								AND cMetas.borradoAl IS NULL
-								JOIN proyectoComponentes AS comp ON comp.id = desglose.idComponente
-								WHERE desglose.idAccion = %s AND desglose.borradoAl IS NULL
-								GROUP BY desglose.claveJurisdiccion, metasMes.mes;
-							",$id_usuario,$id_usuario,$id_accion);
-							DB::connection()->getpdo()->exec($query);
-
-							//Se actualizan las sumas por trimestre en el componente
-							$query = sprintf("
-								UPDATE proyectoComponentes, (
+							
+							if($parametros['tipo-archivo'] == 'presupuesto'){
+								//Cargar Archivo de Presupuesto x mes
+								$query = sprintf("
+									LOAD DATA local INFILE '%s' REPLACE 
+									INTO TABLE fibapDistribucionPresupuesto 
+									FIELDS TERMINATED BY ',' 
+									OPTIONALLY ENCLOSED BY '\"' 
+									ESCAPED BY '\"' 
+									LINES TERMINATED BY '\\n'
+									(
+									@vid,
+									@vidFibap,
+									@vidAccion,
+									@vidObjetoGasto,
+									@vclaveObjetoGasto,
+									@vclaveJurisdiccion,
+									@vclaveMunicipio,
+									@vclaveLocalidad,
+									@vmes,
+									@vcantidad,
+									@vcreadoPor,
+									@vcreadoAl
+									)
+									set actualizadoPor='%s', modificadoAl = CURRENT_TIMESTAMP, 
+									id = nullif(@vid,''),
+									idFibap = @vidFibap,
+									idAccion = @vidAccion,
+									idObjetoGasto = nullif(@vidObjetoGasto,''),
+									claveObjetoGasto = @vclaveObjetoGasto,
+									claveJurisdiccion = nullif(@vclaveJurisdiccion,''),
+									claveMunicipio = @vclaveMunicipio,
+									claveLocalidad = @vclaveLocalidad,
+									mes = @vmes,
+									cantidad = @vcantidad,
+									creadoPor = ifnull(nullif(@vcreadoPor,''),%s),
+									creadoAl = ifnull(nullif(@vcreadoAl,''),CURRENT_TIMESTAMP)
+									", addslashes($archivo_mes),$id_usuario,$id_usuario);
+								DB::connection()->getpdo()->exec($query);
+								
+								//Actualizar los ids de los objetos del gasto (partidas)
+								$query = sprintf("
+									UPDATE fibapDistribucionPresupuesto, catalogoObjetosGasto
+									SET fibapDistribucionPresupuesto.idObjetoGasto = catalogoObjetosGasto.id
+									WHERE 
+									fibapDistribucionPresupuesto.claveObjetoGasto = catalogoObjetosGasto.clave AND
+									fibapDistribucionPresupuesto.idObjetoGasto IS NULL AND 
+									fibapDistribucionPresupuesto.idAccion = %s
+									",$id_accion);
+								DB::connection()->getpdo()->exec($query);
+								
+								//Actualizar las claves de jurisdiccion
+								$query = sprintf("
+									UPDATE fibapDistribucionPresupuesto, componenteDesglose
+									SET fibapDistribucionPresupuesto.claveJurisdiccion = componenteDesglose.claveJurisdiccion
+									WHERE 
+									fibapDistribucionPresupuesto.claveMunicipio = componenteDesglose.claveMunicipio AND
+									fibapDistribucionPresupuesto.claveLocalidad = componenteDesglose.claveLocalidad AND
+									fibapDistribucionPresupuesto.idAccion = componenteDesglose.idAccion AND
+									fibapDistribucionPresupuesto.claveJurisdiccion IS NULL AND 
+									fibapDistribucionPresupuesto.idAccion = %s
+									",$id_accion);
+								DB::connection()->getpdo()->exec($query);
+								
+								//Limpiar el presupuesto del desglose para poder actualizar
+								$query = sprintf("
+									UPDATE componenteDesglose
+									SET componenteDesglose.presupuesto = NULL, actualizadoPor = %s, modificadoAl = CURRENT_TIMESTAMP
+									WHERE 
+									componenteDesglose.idAccion = %s AND componenteDesglose.borradoAl IS NULL 
+									",$id_usuario,$id_accion);
+								DB::connection()->getpdo()->exec($query);
+								
+								//Actualizar las cantidades del presupuesto en el desglose
+								$query = sprintf("
+									UPDATE componenteDesglose,
+									(
+										SELECT claveMunicipio, claveLocalidad, sum(cantidad) AS presupuesto
+										FROM fibapDistribucionPresupuesto
+										WHERE idAccion = %s AND borradoAl IS NULL
+										GROUP BY claveMunicipio, claveLocalidad
+									) AS sumasPresupuesto
+									SET componenteDesglose.presupuesto = sumasPresupuesto.presupuesto, 
+										componenteDesglose.actualizadoPor = %s, 
+										componenteDesglose.modificadoAl = CURRENT_TIMESTAMP
+									WHERE 
+									componenteDesglose.claveMunicipio = sumasPresupuesto.claveMunicipio AND
+									componenteDesglose.claveLocalidad = sumasPresupuesto.claveLocalidad AND
+									componenteDesglose.idAccion = %s AND 
+									componenteDesglose.borradoAl IS NULL 
+									",$id_accion,$id_usuario,$id_accion);
+								DB::connection()->getpdo()->exec($query);
+								
+							}elseif($parametros['tipo-archivo'] == 'metas'){
+								//Cargar Archivo de Metas x mes
+								$query = sprintf("
+									LOAD DATA local INFILE '%s' REPLACE 
+									INTO TABLE desgloseMetasMes 
+									FIELDS TERMINATED BY ',' 
+									OPTIONALLY ENCLOSED BY '\"' 
+									ESCAPED BY '\"' 
+									LINES TERMINATED BY '\\n'
+									(
+									@vid,
+									@vidComponenteDesglose,
+									@vidComponente,
+									@vclaveMunicipio,
+									@vclaveLocalidad,
+									@vmes,
+									@vmeta
+									)
+									set creadoPor='%s', actualizadoPor='%s',
+									id = nullif(@vid,''),
+									idComponenteDesglose = nullif(@vidComponenteDesglose,''),
+									idComponente = nullif(@vidComponente,''),
+									claveMunicipio = nullif(@vclaveMunicipio,''),
+									claveLocalidad = nullif(@vclaveLocalidad,''),
+									mes = @vmes,
+									meta = @vmeta
+									", addslashes($archivo_mes),$id_usuario,$id_usuario);
+								DB::connection()->getpdo()->exec($query);
+								
+								//Actualizar la relacion de los desgloses con las metas
+								$query = sprintf("
+									UPDATE desgloseMetasMes, componenteDesglose
+									SET desgloseMetasMes.idComponenteDesglose = componenteDesglose.id
+									WHERE 
+									desgloseMetasMes.idComponente = componenteDesglose.idComponente AND
+									desgloseMetasMes.claveMunicipio = componenteDesglose.claveMunicipio AND
+									desgloseMetasMes.claveLocalidad = componenteDesglose.claveLocalidad AND 
+									desgloseMetasMes.idComponenteDesglose IS NULL
+									");
+								DB::connection()->getpdo()->exec($query);
+								
+								//Se insertan/reemplazan las metas por mes del componente con los valores importados del archivo
+								$query = sprintf("
+									REPLACE INTO componenteMetasMes
 									SELECT 
-									SUM(IF(mes/3 <= 1,meta,0)) AS meta1,
-									SUM(IF(mes/3 > 1 AND mes/3 <= 2,meta,0)) AS meta2,
-									SUM(IF(mes/3 > 2 AND mes/3 <= 3,meta,0)) AS meta3,
-									SUM(IF(mes/3 > 3 AND mes/3 <= 4,meta,0)) AS meta4
-									FROM componenteMetasMes
-									WHERE idComponente = %s AND borradoAl IS NULL
-								) AS metasTrim
-								SET 
-								numeroTrim1 = metasTrim.meta1,
-								numeroTrim2 = metasTrim.meta2,
-								numeroTrim3 = metasTrim.meta3,
-								numeroTrim4 = metasTrim.meta4,
-								valorNumerador = (metasTrim.meta1 + metasTrim.meta2 + metasTrim.meta3 + metasTrim.meta4)
-								WHERE proyectoComponentes.id = %s
-							",$accion->idComponente,$accion->idComponente);
-							DB::connection()->getpdo()->exec($query);
-
+									cMetas.id, comp.idProyecto, desglose.idComponente, desglose.claveJurisdiccion, metasMes.mes, 
+									SUM(metasMes.meta) as meta, cMetas.avance, ifnull(cMetas.creadoPor,%s) AS creadoPor, 
+									ifnull(cMetas.actualizadoPor,%s) AS actualizadoPor, cMetas.creadoAl, cMetas.modificadoAl, 
+									NULL AS borradoAl
+									FROM componenteDesglose AS desglose
+									LEFT JOIN desgloseMetasMes AS metasMes 
+									ON metasMes.claveMunicipio = desglose.claveMunicipio 
+									AND desglose.id = metasMes.idComponenteDesglose
+									AND metasMes.borradoAl IS NULL
+									LEFT JOIN componenteMetasMes AS cMetas
+									ON cMetas.idComponente = desglose.idComponente
+									AND cMetas.claveJurisdiccion = desglose.claveJurisdiccion
+									AND cMetas.mes = metasMes.mes
+									AND cMetas.borradoAl IS NULL
+									JOIN proyectoComponentes AS comp ON comp.id = desglose.idComponente
+									WHERE desglose.idAccion = %s AND desglose.borradoAl IS NULL
+									GROUP BY desglose.claveJurisdiccion, metasMes.mes;
+								",$id_usuario,$id_usuario,$id_accion);
+								DB::connection()->getpdo()->exec($query);
+	
+								//Se actualizan las sumas por trimestre en el componente
+								$query = sprintf("
+									UPDATE proyectoComponentes, (
+										SELECT 
+										SUM(IF(mes/3 <= 1,meta,0)) AS meta1,
+										SUM(IF(mes/3 > 1 AND mes/3 <= 2,meta,0)) AS meta2,
+										SUM(IF(mes/3 > 2 AND mes/3 <= 3,meta,0)) AS meta3,
+										SUM(IF(mes/3 > 3 AND mes/3 <= 4,meta,0)) AS meta4
+										FROM componenteMetasMes
+										WHERE idComponente = %s AND borradoAl IS NULL
+									) AS metasTrim
+									SET 
+									numeroTrim1 = metasTrim.meta1,
+									numeroTrim2 = metasTrim.meta2,
+									numeroTrim3 = metasTrim.meta3,
+									numeroTrim4 = metasTrim.meta4,
+									valorNumerador = (metasTrim.meta1 + metasTrim.meta2 + metasTrim.meta3 + metasTrim.meta4)
+									WHERE proyectoComponentes.id = %s
+								",$accion->idComponente,$accion->idComponente);
+								DB::connection()->getpdo()->exec($query);
+							}elseif($parametros['tipo-archivo'] == 'beneficiarios'){
+								//Cargar Archivo de Beneficiarios por tipo
+								$query = sprintf("
+									LOAD DATA local INFILE '%s' REPLACE 
+									INTO TABLE desgloseBeneficiarios 
+									FIELDS TERMINATED BY ',' 
+									OPTIONALLY ENCLOSED BY '\"' 
+									ESCAPED BY '\"' 
+									LINES TERMINATED BY '\\n'
+									(
+									@vid,
+									@vidComponenteDesglose,
+									@vidComponente,
+									@vclaveMunicipio,
+									@vclaveLocalidad,
+									@vidTipoBeneficiario,
+									@vtotalF,
+									@vtotalM,
+									@vcreadoPor,
+									@vcreadoAl
+									)
+									set actualizadoPor='%s', modificadoAl = CURRENT_TIMESTAMP, 
+									id = nullif(@vid,''),
+									idComponenteDesglose = nullif(@vidComponenteDesglose,''),
+									idComponente = nullif(@vidComponente,''),
+									claveMunicipio = nullif(@vclaveMunicipio,''),
+									claveLocalidad = nullif(@vclaveLocalidad,''),
+									idTipoBeneficiario = @vidTipoBeneficiario,
+									totalF = nullif(@vtotalF,''),
+									totalM = nullif(@vtotalM,''),
+									creadoPor = ifnull(nullif(@vcreadoPor,''),%s),
+									creadoAl = ifnull(nullif(@vcreadoAl,''),CURRENT_TIMESTAMP)
+									", addslashes($archivo_mes),$id_usuario,$id_usuario);
+								DB::connection()->getpdo()->exec($query);
+							}
+							
 							DB::connection()->getPdo()->commit();
 
 							File::delete($archivo_desglose);
-							File::delete($archivo_metas);
+							File::delete($archivo_mes);
 
 							$respuesta['data']['data'] = 'Elementos almacenados con exito';
+							if($parametros['tipo-archivo'] == 'presupuesto'){
+								$fibap->load('distribucionPresupuestoAgrupado.objetoGasto');
+								$respuesta['data']['extras']['distribucion_total'] = $fibap->distribucionPresupuestoAgrupado; 
+							}
 							//$respuesta['data']['data'] = array('totalRegistros'=>$total_registros,'idCarga'=>$idCarga);
 							//$respuesta['data'] = array('data'=>$desgloses_guardar,'conteo'=>$conteo_queries,'metas'=>$metas_mes_guardar);
 						}catch (\PDOException $e){
 							File::delete($archivo_desglose);
-							File::delete($archivo_metas);
+							File::delete($archivo_mes);
 							$respuesta['http_status'] = 404;
 							$respuesta['data'] = array("data"=>"Ha ocurrido un error, no se pudieron cargar los datos. Verfique su conexión a Internet.",'code'=>'U06');
 						    DB::connection()->getPdo()->rollBack();
@@ -1622,16 +1924,15 @@ class InversionController extends ProyectosController {
 							$respuesta['http_status'] = 500;
 							$respuesta['data'] = array("data"=>"",'ex'=>$e->getMessage(),'line'=>$e->getLine(),'code'=>'S02');
 						}
-
 					}else{
 						fclose($datos_desglose);
-						fclose($datos_metas);
+						fclose($datos_mes);
 					}
 					fclose($handle);
-				}else{
+				/*}else{
 					$respuesta['http_status'] = 404;
 					$respuesta['data'] = array("data"=>"La codificación del archivo debe ser UTF-8",'code'=>'U06');
-				}
+				}*/
 			}else{
 				$respuesta['http_status'] = 404;
 				$respuesta['data'] = array("data"=>"Formato de archivo incorrecto.",'code'=>'U06');
@@ -1834,6 +2135,7 @@ class InversionController extends ProyectosController {
 															->select('idTipoBeneficiario',DB::raw('sum(totalF) AS totalF'),DB::raw('sum(totalM) AS totalM'))
 															->groupBy('idTipoBeneficiario')
 															->get();
+					
 					foreach ($beneficiarios_raw as $beneficiario) {
 						$suma_benef[$beneficiario->idTipoBeneficiario]['f'] = $beneficiario->totalF;
 						$suma_benef[$beneficiario->idTipoBeneficiario]['m'] = $beneficiario->totalM;
@@ -1877,11 +2179,19 @@ class InversionController extends ProyectosController {
 					if(!$desglose_benef){
 						$desglose_benef = new DesgloseBeneficiario;
 						$desglose_benef->idTipoBeneficiario = $tipo_beneficiario;
+						$nuevo_desglose = true;
+					}else{
+						$nuevo_desglose = false;
 					}
+					$desglose_benef->idComponente = $accion->idComponente;
+					$desglose_benef->claveMunicipio = $clave_municipio;
+					$desglose_benef->claveLocalidad = $clave_localidad;
 					$desglose_benef->totalF = $desglose_sexo['f'];
 					$desglose_benef->totalM = $desglose_sexo['m'];
-
-					$beneficiarios_desglose[] = $desglose_benef;
+					
+					if(!$nuevo_desglose || ($desglose_sexo['f'] || $desglose_sexo['m'])){
+						$beneficiarios_desglose[] = $desglose_benef;
+					}
 				}
 			}
 

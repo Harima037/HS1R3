@@ -246,7 +246,10 @@
                                     <fieldset>
                                         <legend>Importar Archivo CSV</legend>
                                         @if (isset($lista_actividades) && $clasificacion_proyecto == 2)
-                                        <span class="help-block">
+                                        <span class="help-block text-muted">
+                                            La importación de archivos csv para la captura de la programación de metas, no se encuentra disponible en esta sección para los proyectos de inversión. 
+                                        </span>
+                                        <!--span class="help-block">
                                             Para importar un archivo csv con los datos de la programación, baje uno de los siguientes archivos, dependiendo del tipo de información que desee importar.
                                         </span>
                                         <div class="row">
@@ -290,7 +293,7 @@
                                                 </div>
                                             </div>
                                         </form>
-                                        <button type="button" class="btn btn-primary" id="btn-subir-archivo"><span class="fa fa-upload"></span> Cargar Archivo</button>
+                                        <button type="button" class="btn btn-primary" id="btn-subir-archivo"><span class="fa fa-upload"></span> Cargar Archivo</button-->
                                         @else
                                         <span class="help-block">
                                             Puede importar un archivo en formato csv para llenar los campos en la programación de metas. Se debe tener en cuenta lo siguiente:
