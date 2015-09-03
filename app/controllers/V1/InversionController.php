@@ -1452,8 +1452,8 @@ class InversionController extends ProyectosController {
 							
 							$claves = explode('_',$csv_data[0]);
 
-							$clave_municipio = str_pad($claves[0],2,"0",STR_PAD_LEFT);
-							$clave_localidad = str_pad($claves[1],4,"0",STR_PAD_LEFT);
+							$clave_municipio = $claves[0];
+							$clave_localidad = $claves[1];
 							
 							if($parametros['tipo-archivo'] == 'presupuesto'){
 								for($i = $mes_incial; $i <= $mes_final; $i++){
