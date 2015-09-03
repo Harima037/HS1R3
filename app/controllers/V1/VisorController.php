@@ -878,7 +878,7 @@ class VisorController extends BaseController {
 					$meta_acumulada += floatval($meta_mes->meta);
 					$mes_metas[$meta_mes->mes] = array(
 						'meta' => floatval($meta_mes->meta),
-						'metaAcumulada' => $meta_acumulada,
+						'metaAcumulada' => $meta_acumulada,'avance'=>0,'avanceAcumulado'=>0,
 						'estatus' => 0, 'activo'=>false, 'porcentaje'=>0
 					);
 
@@ -887,6 +887,11 @@ class VisorController extends BaseController {
 						$mes_metas[$meta_mes->mes]['avance'] = floatval($meta_mes->avance);
 						$mes_metas[$meta_mes->mes]['avanceAcumulado'] = $avance_acumulado;
 						$mes_metas[$meta_mes->mes]['activo'] = true;
+					}else{
+						if($meta_mes->mes > 4){
+							$mes_metas[$meta_mes->mes]['avanceAcumulado'] = $avance_acumulado;
+							$mes_metas[$meta_mes->mes]['activo'] = true;
+						}
 					}
 
 					if($meta_acumulada > 0){ $porcentaje = ($avance_acumulado*100) / $meta_acumulada; }

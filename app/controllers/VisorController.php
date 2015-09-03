@@ -266,6 +266,7 @@ class VisorController extends BaseController {
 						7=>'Julio',8=>'Agosto',9=>'Septiembre',10=>'Octubre',11=>'Noviembre',12=>'Diciembre'),
 				'mes_clave'=>$mes_actual,
 				'tomar'	=> $data->data->tomar,
+				'ultimo_avance' => array('acumulado'=>0,'porcentaje'=>0,'estatus'=>0,'activo'=>0),
 				'srcGraficaMensual' => 'src="'.$parametros['grafica-mensual'].'"',
 				'srcGraficaJurisdiccional' => 'src="'.$parametros['grafica-jurisdiccional'].'"'
 			);

@@ -328,7 +328,7 @@
                                                     <div class="form-group">
                                                         <div class="input-group">
                                                             <span class="input-group-addon">{{$mes}}</span>
-                                                            <input id="meta-mes-{{$clave}}" name="meta-mes[{{$clave}}]" type="number" class="form-control input-sm meta-mes" data-meta-mes="{{$clave}}" data-meta-id="">
+                                                            <input id="meta-mes-{{$clave}}" name="meta-mes[{{$clave}}]" type="number" class="form-control input-sm meta-mes" data-meta-mes="{{$clave}}" data-meta-id="" min="0">
                                                         </div>
                                                     </div>
                                                 </div>

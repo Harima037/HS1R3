@@ -704,8 +704,8 @@ context.actualizar_lista_beneficiarios = function(datos){
     for(var i in beneficiarios){
         html += '<tr>';
         html += '<td>' + beneficiarios[i].tipoBeneficiario + '</td>';
-        html += '<td><div class="form-group"><input type="number" class="form-control benef-totales-accion" name="beneficiarios[' + beneficiarios[i].id + '][f]" id="beneficiarios-' + beneficiarios[i].id + '-f" data-tipo-beneficiario="' + beneficiarios[i].id + '"></div></td>';
-        html += '<td><div class="form-group"><input type="number" class="form-control benef-totales-accion" name="beneficiarios[' + beneficiarios[i].id + '][m]" id="beneficiarios-' + beneficiarios[i].id + '-m" data-tipo-beneficiario="' + beneficiarios[i].id + '"></div></td>';
+        html += '<td><div class="form-group"><input type="number" min="0" class="form-control benef-totales-accion" name="beneficiarios[' + beneficiarios[i].id + '][f]" id="beneficiarios-' + beneficiarios[i].id + '-f" data-tipo-beneficiario="' + beneficiarios[i].id + '"></div></td>';
+        html += '<td><div class="form-group"><input type="number" min="0" class="form-control benef-totales-accion" name="beneficiarios[' + beneficiarios[i].id + '][m]" id="beneficiarios-' + beneficiarios[i].id + '-m" data-tipo-beneficiario="' + beneficiarios[i].id + '"></div></td>';
         html += '<td><span id="beneficiarios-' + beneficiarios[i].id + '-total">0</span></td>';
         html += '</tr>';
     }
@@ -1144,7 +1144,7 @@ function actualizar_claves_presupuesto(datos){
         for(var i in datos){
             html += '<div class="input-group grupo-partida-presupuestal">';
             html += '<span class="input-group-addon" title="' + datos[i].descripcion + '">' + datos[i].clave + '</span>';
-            html += '<input id="mes-' + mes + '-' + datos[i].id + '" name="mes[' + mes + '][' + datos[i].id + ']" type="number" class="form-control input-sm presupuesto-mes" data-presupuesto-partida="' + datos[i].id + '" data-presupuesto-mes="' + mes + '" data-presupuesto-id="">';
+            html += '<input id="mes-' + mes + '-' + datos[i].id + '" name="mes[' + mes + '][' + datos[i].id + ']" type="number" class="form-control input-sm presupuesto-mes" data-presupuesto-partida="' + datos[i].id + '" data-presupuesto-mes="' + mes + '" data-presupuesto-id="" min="0">';
             html += '</div>';
         }
         $(this).append(html);

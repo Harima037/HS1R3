@@ -25,6 +25,7 @@ use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, Act
 
 class InversionController extends ProyectosController {
 	private $reglasFibap = array(
+		/*
 		'organismo-publico'			=> 'required',
 		'sector'					=> 'required',
 		'subcomite'					=> 'required',
@@ -32,11 +33,11 @@ class InversionController extends ProyectosController {
 		'justificacion-proyecto'	=> 'required',
 		'descripcion-proyecto'		=> 'required',
 		'objetivo-proyecto'			=> 'required',
-		'alineacion-especifica'		=> 'required',
+		'alineacion-especifica'		=> 'required',*/
 		'presupuesto-requerido'		=> 'required',
 		'periodo-ejecucion-inicio'	=> 'required',
-		'periodo-ejecucion-final'	=> 'required',
-		'documento-soporte'			=> 'required|array|min:1'
+		'periodo-ejecucion-final'	=> 'required'
+		//'documento-soporte'			=> 'required|array|min:1'
 	);
 
 	private $reglasFibapAntecedentes = array(
@@ -57,7 +58,7 @@ class InversionController extends ProyectosController {
 		'jurisdiccion-accion'		=> 'required',
 		'municipio-accion'			=> 'required_if:jurisdiccion-accion,01,02,03,04,05,06,07,08,09,10',
 		'localidad-accion'			=> 'required_if:jurisdiccion-accion,01,02,03,04,05,06,07,08,09,10',
-		'cantidad-meta'				=> 'required|numeric|min:1',
+		'cantidad-meta'				=> 'required|numeric|min:0.001',
 		//'cantidad-presupuesto'		=> 'required|numeric|min:1',
 		'meta-mes'					=> 'required|array|min:1',
 		//'mes'						=> 'required|array|min:1'
@@ -503,12 +504,18 @@ class InversionController extends ProyectosController {
 					$recurso->periodoEjecucionFinal  = $fechas['fin'];
 					$recurso->presupuestoRequerido 	 = $parametros['presupuesto-requerido'];
 					$recurso->idProyecto 			 = $parametros['id-proyecto'];
-
-					$documentos = $parametros['documento-soporte'];
-
+					
+					if(isset($parametros['documento-soporte'])){
+						$documentos = $parametros['documento-soporte'];
+					}else{
+						$documentos = array();
+					}
+					
 					$respuesta['data'] = DB::transaction(function() use ($recurso, $documentos){
 						if($recurso->save()){
-							$recurso->documentos()->attach($documentos);
+							if(count($documentos)){
+								$recurso->documentos()->attach($documentos);
+							}
 							return array('data'=>$recurso);
 						}else{
 							//No se pudieron guardar los datos del proyecto
@@ -785,8 +792,13 @@ class InversionController extends ProyectosController {
 					$recurso->periodoEjecucionInicio = $fechas['inicio'];
 					$recurso->periodoEjecucionFinal  = $fechas['fin'];
 					$recurso->presupuestoRequerido 	 = $parametros['presupuesto-requerido'];
-
-					$documentos = $parametros['documento-soporte'];
+					
+					if(isset($parametros['documento-soporte'])){
+						$documentos = $parametros['documento-soporte'];
+					}else{
+						$documentos = array();
+					}
+					
 					$documentos_anteriores = $recurso->documentos->lists('id');
 
 					$docs['nuevos'] = array_diff($documentos, $documentos_anteriores);
@@ -1756,7 +1768,8 @@ class InversionController extends ProyectosController {
 									UPDATE componenteDesglose
 									SET componenteDesglose.presupuesto = NULL, actualizadoPor = %s, modificadoAl = CURRENT_TIMESTAMP
 									WHERE 
-									componenteDesglose.idAccion = %s AND componenteDesglose.borradoAl IS NULL 
+									componenteDesglose.idAccion = %s AND 
+									componenteDesglose.borradoAl IS NULL 
 									",$id_usuario,$id_accion);
 								DB::connection()->getpdo()->exec($query);
 								
@@ -2053,13 +2066,8 @@ class InversionController extends ProyectosController {
 
 						if($recurso){
 							$recurso->claveJurisdiccion = $clave_jurisdiccion;
-							if($clave_jurisdiccion != 'OC'){
-								$recurso->claveMunicipio = $clave_municipio;
-								$recurso->claveLocalidad = $clave_localidad;
-							}else{
-								$recurso->claveMunicipio = NULL;
-								$recurso->claveLocalidad = NULL;
-							}
+							$recurso->claveMunicipio = $clave_municipio;
+							$recurso->claveLocalidad = $clave_localidad;
 							$recurso->cantidad = $cantidad;
 							$distribucion[] = $recurso;
 							$suma_presupuesto += $cantidad;

@@ -294,7 +294,8 @@ function seguimiento_metas(e){
                         clase = 'text-success';
                     }
                     
-                    if(!hay_captura){
+                    //if(!hay_captura){
+                    if(i < 5){
                         clase = 'text-muted';
                     }
 

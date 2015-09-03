@@ -180,16 +180,20 @@
 				<td {{$estilo_linea}} class="color-metas">{{number_format($ultimo_acumulado = $data->meses[$clave]->metaAcumulada,2)}}</td>
 				<td {{$estilo_linea}} class="">{{($clave <= $mes_clave)?(number_format(((isset($data->meses[$clave]->avanceAcumulado))?$data->meses[$clave]->avanceAcumulado:0)-((isset($data->meses[$clave]->avance))?$data->meses[$clave]->avance:0),2)):''}}</td>
 				<td {{$estilo_linea}} class="">{{($clave <= $mes_clave)?((isset($data->meses[$clave]->avance))?number_format($data->meses[$clave]->avance,2):'0.00'):''}}</td>
-				<td {{$estilo_linea}} class="bg-info">{{($clave <= $mes_clave)?((isset($data->meses[$clave]->avanceAcumulado))?number_format($data->meses[$clave]->avanceAcumulado,2):'0.00'):''}}</td>
-				<td width="75px" {{$estilo_linea}} class="{{($data->meses[$clave]->activo)?(($data->meses[$clave]->estatus == 1)?'color-avance':'color-alto-bajo'):''}}">{{($clave <= $mes_clave)?number_format($data->meses[$clave]->porcentaje,2) . ' %':''}}</td>
+				<td {{$estilo_linea}} class="bg-info">{{($clave <= $mes_clave)?((isset($data->meses[$clave]->avanceAcumulado))?number_format($ultimo_avance['acumulado'] = $data->meses[$clave]->avanceAcumulado,2):'0.00'):''}}</td>
+				<td width="75px" {{$estilo_linea}} class="{{($data->meses[$clave]->activo && $clave > 4)?((($ultimo_avance['estatus'] = $data->meses[$clave]->estatus) == 1)?'color-avance':'color-alto-bajo'):''}}">
+					{{($clave <= $mes_clave)?number_format($ultimo_avance['porcentaje'] = $data->meses[$clave]->porcentaje,2) . ' %':''}}
+				</td>
 			@else
 				<td {{$estilo_linea = ($mes_clave == $clave)?'style="border-bottom:3px solid black;"':''}} >{{$mes}}</td>
 				<td {{$estilo_linea}} class="">0.00</td>
 				<td {{$estilo_linea}} class="color-metas">{{number_format($ultimo_acumulado,2)}}</td>
+				<td {{$estilo_linea}} class="">{{($clave <= $mes_clave)?number_format($ultimo_avance['acumulado'],2):''}}</td>
 				<td {{$estilo_linea}} class="">{{($clave <= $mes_clave)?'0.00':''}}</td>
-				<td {{$estilo_linea}} class="">{{($clave <= $mes_clave)?'0.00':''}}</td>
-				<td {{$estilo_linea}} class="bg-info">{{($clave <= $mes_clave)?'0.00':''}}</td>
-				<td width="75px" {{$estilo_linea}} class="">{{($clave <= $mes_clave)?'0.00 %':''}}</td>
+				<td {{$estilo_linea}} class="bg-info">{{($clave <= $mes_clave)?number_format($ultimo_avance['acumulado'],2):''}}</td>
+				<td width="75px" {{$estilo_linea}} class="{{($clave > 4)?(($ultimo_avance['estatus'] == 1)?'color-avance':'color-alto-bajo'):''}}">
+					{{($clave <= $mes_clave)?number_format($ultimo_avance['porcentaje'],2).' %':''}}
+				</td>
 			@endif
 			</tr>
 		@endforeach
