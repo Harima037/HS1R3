@@ -1312,11 +1312,15 @@ class ProyectosController extends BaseController {
 			if(!$recurso->idTipoIndicador){ $recurso->idTipoIndicador = NULL; }
 
 			if($parametros['clasificacion'] == 2 && $selector == 'componente'){
-				$recurso->idEntregable 		= $parametros['entregable'];
-				if($parametros['tipo-entregable'] != 'NA'){
+				if($parametros['entregable']){
+					$recurso->idEntregable 		= $parametros['entregable'];
+				}
+				if($parametros['tipo-entregable'] != 'NA' && $parametros['tipo-entregable'] != ''){
 					$recurso->idEntregableTipo	= $parametros['tipo-entregable'] ;
 				}
-				$recurso->idEntregableAccion	= $parametros['accion-entregable'];
+				if($parametros['accion-entregable']){
+					$recurso->idEntregableAccion	= $parametros['accion-entregable'];
+				}
 			}
 
 			if($selector == 'actividad'){

@@ -338,9 +338,13 @@ class InversionController extends ProyectosController {
 							$query->select('idMunicipio','idEntidad','id','clave','nombre')
 									->where('idMunicipio','=',$municipio->id);
 						}))->where('clave','=',$desglose->claveJurisdiccion)->first();
-
-						$recurso['municipios'] = $jurisdiccion->municipios;
-
+						
+						if($jurisdiccion){
+							$recurso['municipios'] = $jurisdiccion->municipios;
+						}else{
+							$recurso['municipios'] = array();
+						}
+						
 					}elseif($proyecto->idCobertura == 2){ 
 
 					//Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
@@ -354,15 +358,20 @@ class InversionController extends ProyectosController {
 
 					//Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
 						$jurisdiccion = Jurisdiccion::where('clave','=',$desglose->claveJurisdiccion)->first();
-
-						$region = Region::with(array('municipios'=>function($query) use ($jurisdiccion){
-							$query->select('idJurisdiccion','idEntidad','idRegion','id','clave','nombre')
-									->where('idJurisdiccion','=',$jurisdiccion->id);
-						},'municipios.localidades'=>function($query) use ($municipio){
-							$query->select('idMunicipio','idEntidad','id','clave','nombre')
-									->where('idMunicipio','=',$municipio->id);
-						}))->where('region','=',$proyecto->claveRegion)->first();
-						$recurso['municipios'] = $region->municipios;
+						
+						if($jurisdiccion){
+							$region = Region::with(array('municipios'=>function($query) use ($jurisdiccion){
+								$query->select('idJurisdiccion','idEntidad','idRegion','id','clave','nombre')
+										->where('idJurisdiccion','=',$jurisdiccion->id);
+							},'municipios.localidades'=>function($query) use ($municipio){
+								$query->select('idMunicipio','idEntidad','id','clave','nombre')
+										->where('idMunicipio','=',$municipio->id);
+							}))->where('region','=',$proyecto->claveRegion)->first();
+							$recurso['municipios'] = $region->municipios;
+						}else{
+							$recurso['municipios'] = array();
+						}
+						
 					}
 				}
 			}elseif(isset($parametros['ver'])){

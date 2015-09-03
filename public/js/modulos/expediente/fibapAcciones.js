@@ -118,9 +118,11 @@ context.init = function(id,resource){
                 processData:false, //Debe estar en false para que JQuery no procese los datos a enviar
                 cache:false, //Para que el formulario no guarde cache,
                 success: function(response){ 
-                    distribucionDatagrid.actualizar(); //falta probar
-                    if(response.extras.distribucion_total){
-                        llenar_tabla_distribucion(response.extras.distribucion_total);
+                    distribucionDatagrid.actualizar();
+                    if(response.extras){
+                        if(response.extras.distribucion_total){
+                            llenar_tabla_distribucion(response.extras.distribucion_total);
+                        }
                     }
                 },
                 error: function( response ){
@@ -420,7 +422,7 @@ context.mostrar_datos_presupuesto = function(datos){
     var desglose = datos.desglose;
     $('#jurisdiccion-accion').val(desglose.claveJurisdiccion);
     $('#jurisdiccion-accion').trigger('chosen:updated');
-    if(desglose.claveMunicipio){
+    if(desglose.claveMunicipio && desglose.claveJurisdiccion != 'OC'){
         $('#municipio-accion').val(desglose.claveMunicipio);
         $('#municipio-accion').trigger('chosen:updated');
 
