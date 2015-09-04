@@ -149,6 +149,11 @@
                             </a>
                         </li>
                         @endif
+                        <li>
+                            <a href="#tab-progras-mas" role="tab" data-toggle="tab">
+                                <span class="fa fa-file"></span> Extras
+                            </a>
+                        </li>
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="tab-datos">
@@ -368,9 +373,64 @@
                             <button type="button" class="btn btn-danger" id="btn-limpiar-caratulas">
                                 <span class="fa fa-trash"></span> Quitar todos
                             </button>
-
                         </div>
-                    </div>      
+                        <div class="tab-pane" id="tab-progras-mas">
+                            <br>
+                            <label class="control-label">
+                                <span class="fa fa-search"></span> Buscar Programa
+                            </label>
+                            <span id="estatus-busqueda-programa" class="pull-right"></span>
+                            <input type="text" class="form-control" id="buscar-programa" autocomplete="off">
+                            <table id="tabla-lista-programas" class="table table-hover table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>Programa Presupuestario</th>
+                                        <th width="55">Quitar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="programas-vacio">
+                                        <td colspan="3"><span class="fa fa-info-circle"></span> No hay programas asignados</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div>
+                                <span class="pull-right">
+                                    <span class="badge" id="conteo-programas-seleccionados">0</span> Progamas(s) seleccionados
+                                </span>
+                            </div>
+                            <button type="button" class="btn btn-danger" id="btn-limpiar-programas">
+                                <span class="fa fa-trash"></span> Quitar todos
+                            </button>
+                            <br><br>
+                            <label class="control-label">
+                                <span class="fa fa-search"></span> Buscar Indicador FASSA
+                            </label>
+                            <span id="estatus-busqueda-indicador" class="pull-right"></span>
+                            <input type="text" class="form-control" id="buscar-indicador" autocomplete="off">
+                            <table id="tabla-lista-indicadores" class="table table-hover table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>Indicador</th>
+                                        <th width="55">Quitar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="indicadores-vacio">
+                                        <td colspan="3"><span class="fa fa-info-circle"></span> No hay indicadores asignados</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div>
+                                <span class="pull-right">
+                                    <span class="badge" id="conteo-indicadores-seleccionados">0</span> Indicadores(s) seleccionados
+                                </span>
+                            </div>
+                            <button type="button" class="btn btn-danger" id="btn-limpiar-indicadores">
+                                <span class="fa fa-trash"></span> Quitar todos
+                            </button>
+                        </div>
+                    </div>
                     <input type="hidden" id="id" name="id">
                     <!--button type="submit" class="btn btn-primary btn-guardar">Guardar</button-->
                 </form>
