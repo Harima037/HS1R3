@@ -1432,9 +1432,11 @@ class InversionController extends ProyectosController {
 													})->get();
 							}
 							$localidades_validas = $recurso->lists('valido','claveCompuesta');
-							$recurso = NULL;
+							//$recurso = NULL;
+							unset($recurso);
 						}
-						$proyecto = NULL;
+						//$proyecto = NULL;
+						unset($proyecto);
 						
 						if($parametros['tipo-archivo'] != 'beneficiarios'){
 							$fibap = FIBAP::select('id','periodoEjecucionInicio','periodoEjecucionFinal')->where('id',$accion->idFibap)->first();
@@ -1469,7 +1471,7 @@ class InversionController extends ProyectosController {
 									if(isset($distribucion_guardada[$csv_data[0].'_'.$csv_data[3].'_'.$i])){
 										$presupuesto = $distribucion_guardada[$csv_data[0].'_'.$csv_data[3].'_'.$i];
 										if($presupuesto){
-											$distribucion_guardada[$csv_data[0].'_'.$csv_data[3].'_'.$i] = NULL;
+											//$distribucion_guardada[$csv_data[0].'_'.$csv_data[3].'_'.$i] = NULL;
 											fputcsv($datos_mes,[
 												$presupuesto['id'],
 												$id_fibap,
@@ -1484,6 +1486,8 @@ class InversionController extends ProyectosController {
 												$presupuesto['creadoPor'],
 												$presupuesto['creadoAl']
 											]);
+											unset($distribucion_guardada[$csv_data[0].'_'.$csv_data[3].'_'.$i]);
+											unset($presupuesto);
 										}
 									}else{
 										if($csv_data[(3+$i)]){
@@ -1543,6 +1547,8 @@ class InversionController extends ProyectosController {
 												$meta_mes->mes,
 												$csv_data[(2+$i)]
 			                                ]);
+											unset($meta_mes);
+											unset($metas_mes[$i]);
 										}else{
 											if($csv_data[(2+$i)]){
 												fputcsv($datos_mes,[
@@ -1557,6 +1563,7 @@ class InversionController extends ProyectosController {
 											}
 										}
 									}
+									unset($metas_mes);
 								}elseif($parametros['tipo-archivo'] == 'beneficiarios'){
 									
 									if($beneficiarios['id'] != $desglose->id){
@@ -1650,11 +1657,18 @@ class InversionController extends ProyectosController {
 						}
 						fclose($datos_desglose);
 						fclose($datos_mes);
+						/*
 						$distribucion_guardada = NULL;
 						$desgloses_capturados = NULL;
 						$beneficiarios = NULL;
 						$desgloses_agregados = NULL;
 						$nuevos_desgloses = NULL;
+						*/
+						unset($distribucion_guardada);
+						unset($desgloses_capturados);
+						unset($beneficiarios);
+						unset($desgloses_agregados);
+						unset($nuevos_desgloses);
 						
 						try {
 							DB::connection()->getPdo()->beginTransaction();

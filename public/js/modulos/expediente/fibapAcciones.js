@@ -119,6 +119,7 @@ context.init = function(id,resource){
                 cache:false, //Para que el formulario no guarde cache,
                 success: function(response){ 
                     distribucionDatagrid.actualizar();
+                    MessageManager.show({timer:10,data:response.data,type:'OK'});
                     if(response.extras){
                         if(response.extras.distribucion_total){
                             llenar_tabla_distribucion(response.extras.distribucion_total);
@@ -130,7 +131,7 @@ context.init = function(id,resource){
                         try{
                             var json = $.parseJSON(response.responseText);
                             if(!json.code)
-                                MessageManager.show({code:'S03',timer:10,data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                                MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
                             else{
                                 MessageManager.show(json);
                             }

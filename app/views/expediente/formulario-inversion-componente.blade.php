@@ -249,51 +249,6 @@
                                         <span class="help-block text-muted">
                                             La importación de archivos csv para la captura de la programación de metas, no se encuentra disponible en esta sección para los proyectos de inversión. 
                                         </span>
-                                        <!--span class="help-block">
-                                            Para importar un archivo csv con los datos de la programación, baje uno de los siguientes archivos, dependiendo del tipo de información que desee importar.
-                                        </span>
-                                        <div class="row">
-                                            <div class="col-sm-4">
-                                                <a href="#" class="btn btn-link" id="lnk-descarga-archivo-metas" target="_blank">
-                                                    <span class="fa fa-download"></span> Descargar Archivo para Metas
-                                                </a>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <a href="#" class="btn btn-link" id="lnk-descarga-archivo-beneficiarios" target="_blank">
-                                                    <span class="fa fa-download"></span> Descargar Archivo para Beneficiarios
-                                                </a>
-                                            </div>
-                                            <div class="col-sm-4">
-                                                <a href="#" class="btn btn-link" id="lnk-descarga-archivo-presupuesto" target="_blank">
-                                                    <span class="fa fa-download"></span> Descargar Archivo para Presupuesto
-                                                </a>
-                                            </div>
-                                        </div>
-                                        <span class="help-block">
-                                            Llene la información requerida en el archivo descargado, y vuelva a subirlo mediante el siguiente formulario.
-                                        </span>
-                                        <form id="form-subir-archivo">
-                                            <div class="row">
-                                                <div class="col-sm-5">
-                                                    <div class="form-group">
-                                                        <label class="control-label" for="tipo-archivo">Tipo de Archivo</label>
-                                                        <select id="tipo-archivo" name="tipo-archivo" class="form-control">
-                                                            <option value="">Selecciona un tipo</option>
-                                                            <option value="metas">Archivo para Metas</option>
-                                                            <option value="presupuesto">Archivo para Presupuesto</option>
-                                                            <option value="beneficiarios">Archivo para Beneficiarios</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-7">
-                                                    <div class="form-group">
-                                                        <label class="control-label" for="archivo">Archivo</label>
-                                                        <input type="file" id="archivo" name="archivo" accept=".csv" class="form-control">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                        <button type="button" class="btn btn-primary" id="btn-subir-archivo"><span class="fa fa-upload"></span> Cargar Archivo</button-->
                                         @else
                                         <span class="help-block">
                                             Puede importar un archivo en formato csv para llenar los campos en la programación de metas. Se debe tener en cuenta lo siguiente:

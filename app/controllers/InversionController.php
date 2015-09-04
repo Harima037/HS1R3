@@ -119,23 +119,41 @@ class InversionController extends ProyectosController {
 			$encabezados = array('1','2','3','enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre');
 			$campos = 'null AS enero';
 			$nombre_archivo = 'Metas';
+			$campos_extras = array();
 		}elseif($parametros['tipo-carga'] == 'presupuesto'){
 			$encabezados = array('1','2','3','4','enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre');
-			$campos = 'objetosGasto.clave AS partida';
+			//$campos = 'objetosGasto.clave AS partida';
+			$campos = 'NULL AS partida';
 			$nombre_archivo = 'Presupuesto';
-			$recurso = $recurso->join('relAccionesPartidas AS partidas','partidas.idAccion','=',DB::raw($parametros['id-accion']))
+			$campos_extras = DB::table('relAccionesPartidas AS partidas')->where('partidas.idAccion','=',$parametros['id-accion'])
+								->leftjoin('catalogoObjetosGasto as objetosGasto','objetosGasto.id','=','partidas.idObjetoGasto')
+								->select('objetosGasto.clave AS valor',DB::raw('"partida" AS campo'))
+								->groupBy('clave','partidas.id')->get();
+			/*$recurso = $recurso->join('relAccionesPartidas AS partidas','partidas.idAccion','=',DB::raw($parametros['id-accion']))
 							->leftjoin('catalogoObjetosGasto as objetosGasto','objetosGasto.id','=','partidas.idObjetoGasto')
-							->groupBy('clave','partidas.id');
+							->groupBy('clave','partidas.id');*/
 		}else{
 			$encabezados = array('1','2','3','4','5','totalMujeres','totalHombres');
-			$campos = 'tiposBenef.id AS idBeneficiario, tiposBenef.descripcion AS tipoBeneficiario';
+			//$campos = 'tiposBenef.id AS idBeneficiario, tiposBenef.descripcion AS tipoBeneficiario';
+			$campos = 'NULL AS idBeneficiario, NULL AS tipoBeneficiario';
 			$nombre_archivo = 'Beneficiarios';
+			$campos_extras = Beneficiario::conDescripcion()
+								->select(
+									DB::raw('"idBeneficiario" AS campo'),
+									'tipoBeneficiario.id AS valor',
+									DB::raw('"tipoBeneficiario" AS campo1'),
+									'tipoBeneficiario.descripcion AS valor1')
+								->where('proyectoBeneficiarios.idProyecto','=',$id)
+								->groupBy('clave','tipoBeneficiario.id')
+								->get();
+			/*
 			$recurso = $recurso->join('proyectoBeneficiarios AS proyectoBenef',function($join)use($id){
 									$join->whereNull('proyectoBenef.borradoAl')
 										->where('proyectoBenef.idProyecto','=',$id);
 								})
 								->leftjoin('catalogoTiposBeneficiarios AS tiposBenef','tiposBenef.id','=','proyectoBenef.idTipoBeneficiario')
 								->groupBy('clave','tiposBenef.id');
+			*/
 		}
 		$recurso = $recurso->select(DB::raw('CONCAT_WS("_",vistaMunicipios.clave,localidad.clave) AS clave'),
 									'vistaMunicipios.nombre AS nombreMunicipio','localidad.nombre AS nombreLocalidad',DB::raw($campos))
@@ -156,41 +174,53 @@ class InversionController extends ProyectosController {
 								})->get();
 		}
 		//$queries = DB::getQueryLog();
-		//var_dump(end($queries));die;
+		//var_dump($recurso);die;
 		if(count($recurso) == 0){
-			$recurso = array(0=>array('nombre'=>'Faltan los recursos necesarios para generar esta lista.'));
+			$encabezados = array();
+			$recurso = array(0=>array('error'=>'Faltan los recursos necesarios para generar esta lista.'));
 		}else{
 			$recurso = $recurso->toArray();
 		}
-		
-		$headers = [
-				'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0'
-			,   'Content-type'        => 'text/csv'
-			,   'Content-Disposition' => 'attachment; filename=ArchivoMunicipios'.$nombre_archivo.'.csv'
-			,   'Expires'             => '0'
-			,   'Pragma'              => 'public'
-		];
-		
-		# add headers for each column in the CSV download
-		$cabeceras = array_keys($recurso[0]) + $encabezados;
-		array_unshift($recurso, $cabeceras);
-		$callback = function() use ($recurso){
-			$FH = fopen('php://output', 'w');
-			foreach ($recurso as $row) { 
-				fputcsv($FH, $row);
+		if($parametros['tipo-carga'] != 'meta'){
+			if(count($campos_extras) == 0){
+				$encabezados = array();
+				$recurso = array(0=>array('error'=>'Faltan los recursos necesarios para generar esta lista.'));
 			}
-			fclose($FH);
-		};
-	
+		}
+		
+		try{
+			$headers = [
+					'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0'
+				,   'Content-type'        => 'text/csv'
+				,   'Content-Disposition' => 'attachment; filename=ArchivoMunicipios'.$nombre_archivo.'.csv'
+				,   'Expires'             => '0'
+				,   'Pragma'              => 'public'
+			];
+			
+			# add headers for each column in the CSV download
+			$cabeceras = array_keys($recurso[0]) + $encabezados;
+			array_unshift($recurso, $cabeceras);
+			$callback = function() use ($recurso,$campos_extras){
+				$FH = fopen('php://output', 'w');
+				foreach ($recurso as $key => $row) {
+					if($key == 0){ unset($recurso); }//Se elimina el array original, dado que genera mucha memoria ocupada
+					if(count($campos_extras) && $key > 0){
+						foreach($campos_extras AS $item){
+							$row[$item->campo] = $item->valor;
+							if(isset($item->campo1)){
+								$row[$item->campo1] = $item->valor1;
+							}
+							fputcsv($FH, $row);
+						}
+					}else{
+						fputcsv($FH, $row);
+					}
+				}
+				fclose($FH);
+			};
+		}catch(Exception $ex){
+			return Response::json(array('data'=>$ex->getMessage(),'line'=>$ex->getLine()),500);
+		}
 		return Response::stream($callback, 200, $headers);
-		/*
-		Excel::create('ArchivoMunicipios'.$nombre_archivo, function($excel) use ($recurso) {
-		    $excel->sheet('Municipios', function($sheet) use ($recurso) {
-		        $sheet->fromArray($recurso);
-		    });
-		})->download('csv');
-		*/
-		//return Response::download($recurso, 'output.csv', ['Content-Type: text/cvs']);
-		//return Response::json($recurso,200);
 	}
 }

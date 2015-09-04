@@ -171,10 +171,10 @@
                     <button class="btn btn-default btn-back-rows"><i class="glyphicon glyphicon-arrow-left"></i></button>
                     <button class="btn btn-default btn-next-rows"><i class="glyphicon glyphicon-arrow-right"></i></button>
                 </div>
-                <div class="btn-group pull-right " style="width:200px; ">   
+                <div class="btn-group pull-right " style="width:255px; ">   
                     <div class="input-group" > 
                         <span class="input-group-addon">Pág.</span> 
-                        <input type="text" class="txt-go-page form-control" style="text-align:center" value="1" >     
+                        <input type="text" class="txt-go-page form-control" style="text-align:center;width:100px;" value="1">     
                         <span class="input-group-addon btn-total-paginas" data-pages="0">de 0</span> 
                         <div class="input-group-btn dropup">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>

@@ -47,7 +47,7 @@ class IndicadorFASSAMeta extends BaseModel
 	}
 	
 	public function comentario(){
-		return $this->hasMany('indicadorFASSAMetaComentarios','idIndicadorFASSAMeta','id');
+		return $this->hasMany('IndicadorFASSAMetaComentarios','idIndicadorFASSAMeta','id');
 	}
 	
 	
