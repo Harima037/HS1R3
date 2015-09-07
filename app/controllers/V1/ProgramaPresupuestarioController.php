@@ -135,7 +135,7 @@ class ProgramaPresupuestarioController extends BaseController {
 				if(Sentry::getUser()->claveProgramaPresupuestario){
 					$rows = $rows->where('claveProgramaPresupuestario','=',Sentry::getUser()->claveProgramaPresupuestario);
 				}
-
+				
 				if(Sentry::getUser()->claveUnidad){
 					$unidades = explode('|',Sentry::getUser()->claveUnidad);
 					$rows = $rows->whereIn('claveUnidadResponsable',$unidades);
@@ -168,6 +168,51 @@ class ProgramaPresupuestarioController extends BaseController {
 				$data = array('resultados'=>$total,"data"=>"No hay datos",'code'=>'W00');
 			}
 
+		}elseif(isset($parametros['typeahead'])){
+			$rows = Programa::getModel();
+
+			if(isset($parametros['buscar'])){				
+				$rows = $rows->where(function($query)use($parametros){
+						$query->where('programaPresupuestal.descripcion','like','%'.$parametros['buscar'].'%')
+							->orWhere('programa.claveProgramaPresupuestario','like','%'.$parametros['buscar'].'%');
+					});
+			}
+
+			if(isset($parametros['unidades'])){
+				$unidades = explode(',',$parametros['unidades']);
+				$rows = $rows->whereIn('programa.claveUnidadResponsable',$unidades);
+			}
+			$rows = $rows->where('programa.idEstatus','=',5);
+
+			if(isset($parametros['departamento'])){
+				if(isset($parametros['usuario'])){
+					$id_usuario = $parametros['usuario'];
+				}else{
+					$id_usuario = 0;
+				}
+				
+				if($parametros['departamento'] == 2){
+					$rows = $rows->where(function($query)use($id_usuario){
+						$query->whereNull('programa.idUsuarioValidacionSeg')
+							->orWhere('programa.idUsuarioValidacionSeg','=',$id_usuario);
+					});
+				}else{
+					$rows = $rows->where(function($query)use($id_usuario){
+						$query->whereNull('programa.idUsuarioRendCuenta')
+							->orWhere('programa.idUsuarioRendCuenta','=',$id_usuario);
+					});
+				}
+			}
+			//var_dump($proyectos_asignados);die;
+			//throw new Exception("Error:: " + print_r($proyectos_asignados,true), 1);
+			
+			$rows = $rows->contenidoSuggester()->get();
+
+			if(count($rows)<=0){
+	          $data = array('resultados'=>0,"data"=>array());
+	        }else{
+	          $data = array('resultados'=>count($rows),'data'=>$rows);
+	        }
 		}else{
 			$rows = Programa::all();
 

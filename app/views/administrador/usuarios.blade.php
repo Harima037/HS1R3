@@ -389,7 +389,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr id="programas-vacio">
+                                    <tr id="tr-programas-vacio">
                                         <td colspan="3"><span class="fa fa-info-circle"></span> No hay programas asignados</td>
                                     </tr>
                                 </tbody>
@@ -416,7 +416,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr id="indicadores-vacio">
+                                    <tr id="tr-indicadores-vacio">
                                         <td colspan="3"><span class="fa fa-info-circle"></span> No hay indicadores asignados</td>
                                     </tr>
                                 </tbody>

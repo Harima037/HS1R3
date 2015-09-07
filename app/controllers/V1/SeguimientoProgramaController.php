@@ -47,6 +47,13 @@ class SeguimientoProgramaController extends BaseController {
 				$rows = $rows->where('programa.idEstatus','=',5);
 				//$rows = $rows->wherein('Eval.idEstatus',array(2,4));
 				
+				$usuario = Sentry::getUser();
+				if($usuario->idDepartamento == 2){
+					$rows = $rows->where('idUsuarioValidacionSeg','=',$usuario->id);
+				}else{
+					$rows = $rows->where('idUsuarioRendCuenta','=',$usuario->id);
+				}
+				
 				$rows = $rows->with(array('registroAvance'=>function($query){
 					$query->select('id','idPrograma','trimestre',DB::raw('sum(justificacion) AS justificacion'),
 									DB::raw('count(idIndicador) AS registros'))->groupBy('idPrograma','trimestre');

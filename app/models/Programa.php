@@ -7,6 +7,17 @@ class Programa extends BaseModel
 	protected $dates = ['borradoAl'];
 	protected $table = "programa";
 
+	public function scopeContenidoSuggester($query){
+		$query->select('programa.id','programa.claveProgramaPresupuestario','programa.claveUnidadResponsable','programa.idEstatus',
+				DB::raw('concat_ws(" ",programaPresupuestal.clave,programaPresupuestal.descripcion) as programaPresupuestario'),
+				DB::raw('concat_ws(" ",programa.claveUnidadResponsable,unidadResponsable.descripcion) AS unidadResponsable'),
+				'estatus.descripcion AS estatus','programa.idUsuarioValidacionSeg','programa.idUsuarioRendCuenta'
+			)
+			->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestal','programaPresupuestal.clave','=','programa.claveProgramaPresupuestario')
+			->leftjoin('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','programa.claveUnidadResponsable')
+			->leftjoin('catalogoEstatusProyectos AS estatus','estatus.id','=','programa.idEstatus');
+	}
+
 	public function scopeContenidoDetalle($query){
 		$query->select('programa.*',
 			DB::raw('concat_ws(" ",programaPresupuestal.clave,programaPresupuestal.descripcion) as programaPresupuestarioDescripcion'),

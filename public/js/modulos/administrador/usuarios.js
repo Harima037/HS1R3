@@ -21,6 +21,8 @@ moduloDatagrid.actualizar();
 
 var ids_proyectos_seleccionados = {};
 var ids_caratulas_seleccionados = {};
+var ids_programas_seleccionados = {};
+var ids_indicadores_seleccionados = {};
 
 $('.chosen-one').chosen({width:'100%'});
 
@@ -84,10 +86,6 @@ function editar (e){
 
     moduloResource.get(e,null,{
         _success: function(response){
-
-            //$('#formModulo').data('bootstrapValidator').enableFieldValidators('password',false);
-            //$('#formModulo').data('bootstrapValidator').enableFieldValidators('password_confirm',false);
-
             $('#formModulo #id').val(response.data.id);
             $('#formModulo #username').val(response.data.username);
             $('#formModulo #nombres').val(response.data.nombres);
@@ -125,6 +123,14 @@ function editar (e){
                     llenar_lista_caratulas(response.data.caratulas);
                 }else{
                     $('#conteo-caratulas-seleccionados').text('0');
+                }
+            }
+            
+            if(response.data.programas){
+                if(response.data.programas.length){
+                    llenar_lista_programas(response.data.programas);
+                }else{
+                    $('#conteo-programas-seleccionados').text('0');
                 }
             }
 
@@ -251,11 +257,13 @@ function resetModalModuloForm(){
     $('#formModulo .chosen-one').trigger('chosen:updated');
     limpiar_lista_proyectos();
     limpiar_lista_caratulas();
+    limpiar_lista_programas();
     reset_busqueda();
     proyectoTypeAhead.clearRemoteCache();
     caratulaTypeAhead.clearRemoteCache();
     ids_proyectos_seleccionados = {};
     ids_caratulas_seleccionados = {};
+    ids_programas_seleccionados = {};
 }
 
 // Funciones de permisos
@@ -273,6 +281,11 @@ $('#modalModulo #btn-limpiar-proyectos').on('click',function(e){
 $('#modalModulo #btn-limpiar-caratulas').on('click',function(e){
     e.preventDefault();
     limpiar_lista_caratulas();
+});
+
+$('#modalModulo #btn-limpiar-programas').on('click',function(e){
+    e.preventDefault();
+    limpiar_lista_programas();
 });
 
 $('#btn-cargar-cat-permisos').click(function(){
@@ -313,21 +326,34 @@ $('#unidad').on('change',function(){
         var id = $(this).attr('data-id');
         delete ids_caratulas_seleccionados[id];
     });
+    $('#tabla-lista-programas tbody tr'+condicion).each(function(){
+        var id = $(this).attr('data-id');
+        delete ids_programas_seleccionados[id];
+    });
     $('#tabla-lista-proyectos tbody tr'+condicion).remove();
     $('#tabla-lista-caratulas tbody tr'+condicion).remove();
+    $('#tabla-lista-programas tbody tr'+condicion).remove();
+    
     if(!$('#tabla-lista-proyectos tbody tr').length){
         $('#tabla-lista-proyectos tbody').html('<tr id="tr-proyectos-vacio"><td colspan="3"><span class="fa fa-info-circle"></span> No hay proyectos asignados</td></tr>');
         $('#conteo-proyectos-seleccionados').text('0');
     }else{
         $('#conteo-proyectos-seleccionados').text($('#tabla-lista-proyectos tbody tr').length);
     }
+    
     if(!$('#tabla-lista-caratulas tbody tr').length){
         $('#tabla-lista-caratulas tbody').html('<tr id="tr-caratulas-vacio"><td colspan="3"><span class="fa fa-info-circle"></span> No hay caratulas asignadas</td></tr>');
         $('#conteo-caratulas-seleccionados').text('0');
     }else{
         $('#conteo-caratulas-seleccionados').text($('#tabla-lista-caratulas tbody tr').length);
     }
-
+    
+    if(!$('#tabla-lista-programas tbody tr').length){
+        $('#tabla-lista-programas tbody').html('<tr id="tr-programas-vacio"><td colspan="3"><span class="fa fa-info-circle"></span> No hay programas asignados</td></tr>');
+        $('#conteo-programas-seleccionados').text('0');
+    }else{
+        $('#conteo-programas-seleccionados').text($('#tabla-lista-programas tbody tr').length);
+    }
 });
 
 function cleanPermissionPanel(){
@@ -339,7 +365,7 @@ function buildPermissionPanel(permisos){
     var html_hiddens = '';
     var html_permissions = '<tbody>';
 
-    for(i in permisos){
+    for(var i in permisos){
 
         html_permissions += '<tr><th colspan="2">'+i+'</th></tr>';
         if(permisos[i]['R'] == 1){
@@ -348,21 +374,21 @@ function buildPermissionPanel(permisos){
         }
      
         if(permisos[i]){
-            for (j in permisos[i]) {
+            for (var j in permisos[i]) {
                 html_permissions +=         '<tr><td>'+j+"</td>";
                 html_permissions +=         '<td style="text-align:right;">';
 
-                for(k in permisos[i][j]){
-                    label_class = 'default'; //inherit
+                for(var k in permisos[i][j]){
+                    var label_class = 'default'; //inherit
                     if(permisos[i][j][k] != 0){ // 1 = allowed, 0 = inherit, -1 = deny
-                        value = permisos[i][j][k];
+                        var value = permisos[i][j][k];
                         if(value == 1){
                             label_class = 'success'; //allowed
                         }else{
                             label_class = 'danger'; //deny
                         }
                         
-                        id = i + '.' + j + '.' + k; //SIS.MOD.[C|R|U|D]
+                        var id = i + '.' + j + '.' + k; //SIS.MOD.[C|R|U|D]
                         html_hiddens += '<input type="hidden" id="'+id+'" name="permissions['+id+']" value="'+value+'">';
                     }
                     html_permissions += '<span class="label label-' + label_class + '">';
@@ -529,6 +555,8 @@ function reset_busqueda(){
     $('#estatus-busqueda-proyecto').html('');
     $('#buscar-caratula').typeahead('val','');
     $('#estatus-busqueda-caratula').html('');
+    $('#buscar-programa').typeahead('val','');
+    $('#estatus-busqueda-programa').html('');
 }
 
 /*
@@ -675,4 +703,290 @@ function crear_objeto_caratula(datos){
     });
 }
 
+/*
+
+        Funciones para la busqueda de Programas Presupuestarios por medio del suggester (Typeahead)
+
+*/
+var programaTypeAhead = new Bloodhound({
+    datumTokenizer: function (d) { return Bloodhound.tokenizers.whitespace(d.text); },
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    limit: 100,
+    remote: {
+        url: SERVER_HOST+'/v1/programas-presupuestarios?typeahead=1&buscar=%QUERY',
+        filter: function ( response ) {
+            return crear_objeto_programa(response.data);
+        },
+        ajax:{
+            beforeSend: function(jqXHR,settings){
+                if($('#unidad').val()){
+                    settings.url = settings.url + '&unidades='+$('#unidad').val();
+                }
+                if($('#departamento').val()){
+                    settings.url = settings.url + '&departamento='+$('#departamento').val();
+                }
+                if($('#id').val()){
+                    settings.url = settings.url + '&usuario='+$('#id').val();
+                }
+                $('#estatus-busqueda-programa').html('Buscando... <span class="fa fa-spinner fa-spin"></span>');
+            },
+            complete: function(jqXHR,textStatus){
+                $('#estatus-busqueda-programa').html(jqXHR.responseJSON.resultados + ' Programas Encontrados');
+                programaTypeAhead.clearRemoteCache();
+            }
+        }
+    }
+});
+programaTypeAhead.initialize();
+
+$('#buscar-programa').typeahead(null,{
+    minLength: 3,
+    displayKey: 'programaPresupuestario',
+    source: programaTypeAhead.ttAdapter(),
+    templates: { 
+        empty: '<div class="empty-result">No se encontraron Programas</div>',
+        suggestion: obtener_template_programa()
+    }
+}).on('typeahead:selected', function (object, datum) {
+    if(!$('#tabla-lista-programas tbody tr[data-id="'+datum.id+'"]').length){
+        var html_row = obtener_html_tabla_programas(datum);
+        if($('#tr-programas-vacio').length){
+            $('#tr-programas-vacio').remove();
+        }
+        $('#tabla-lista-programas tbody').append(html_row);
+        $('#conteo-programas-seleccionados').text($('#tabla-lista-programas tbody tr').length);
+    }
+    reset_busqueda();
+    programaTypeAhead.clearRemoteCache();
+    ids_programas_seleccionados[datum.id] = 1;
+}).on('typeahead:cursorchanged', function (object, datum){
+    $('.tt-suggestion.tt-suggestion-selected').removeClass('tt-suggestion-selected');
+    $('#suggest_'+datum.id).parents('.tt-suggestion').addClass('tt-suggestion-selected');
+});
+
+function quitar_programa(id){
+    $('#tabla-lista-programas tbody tr[data-id="'+id+'"]').remove();
+    if(!$('#tabla-lista-programas tbody tr').length){
+        $('#tabla-lista-programas tbody').html('<tr id="tr-programas-vacio"><td colspan="3"><span class="fa fa-info-circle"></span> No hay programas asignados</td></tr>');
+        $('#conteo-programas-seleccionados').text('0');
+    }else{
+        $('#conteo-programas-seleccionados').text($('#tabla-lista-programas tbody tr').length);
+    }
+    delete ids_programas_seleccionados[id];
+}
+
+function limpiar_lista_programas(){
+    $('#tabla-lista-programas tbody').empty();
+    $('#tabla-lista-programas tbody').html('<tr id="tr-programas-vacio"><td colspan="3"><span class="fa fa-info-circle"></span> No hay programas asignados</td></tr>');
+    $('#conteo-programas-seleccionados').text('0');
+    ids_programas_seleccionados = {};
+}
+
+function llenar_lista_programas(datos){
+    var lista_programas = '';
+    var programas = crear_objeto_programa(datos);
+    for(var i in programas){
+        lista_programas += obtener_html_tabla_programas(programas[i]);
+        ids_programas_seleccionados[programas[i].id] = 1;
+    }
+    if($('#tr-programas-vacio').length){
+        $('#tr-programas-vacio').remove();
+    }
+    $('#tabla-lista-programas tbody').append(lista_programas);
+    $('#conteo-programas-seleccionados').text(datos.length);
+}
+
+function obtener_html_tabla_programas(programa){
+    var html_row = '<tr data-id="'+programa.id+'" data-clave-unidad="'+programa.claveUnidadResponsable+'">';
+    html_row += '<td><input type="hidden" name="programas[]" value="'+programa.id+'">'+programa.programaPresupuestario+'</td>';
+    html_row += '<td><button type="button" class="btn btn-danger btn-block" onClick="quitar_programa('+programa.id+')"><span class="fa fa-trash"></span></button></td>';
+    html_row += '</tr>';
+    return html_row;
+}
+
+function programa_seleccionado(programa){
+    var template = obtener_template_programa();
+    return template(programa);
+}
+
+function obtener_template_programa(){
+    return Handlebars.compile('<div id="suggest_{{id}}" class="item">'+
+            '<table width="100%" border="0" cellpadding="0" cellspacing="0">'+
+                '<tr>'+
+                    '<td class="text-{{claseEstatus}}" ></td>'+
+                    '<td width="100px" class="label-{{claseEstatus}}"><span class="label">{{estatus}}</span></td>'+
+                '</tr>'+
+                '<tr>'+
+                    '<td colspan="2" class="text-{{claseEstatus}}" ><b>{{programaPresupuestario}}</b></td>'+
+                '</tr>'+
+                '<tr>'+
+                    '<td colspan="2"><span class="text-muted"><small>{{unidadResponsable}}</small></span>'+
+                    '<span class="pull-right"><small><span class="{{seleccionado}}"></span> {{seleccionadoLabel}}</small></span>'+
+                    '</td>'+
+                '</tr>'+
+            '</table>'+
+        '</div>');
+}
+
+function crear_objeto_programa(datos){
+    var clasesEstatus = {1:'info',2:'warning',3:'danger',4:'primary',5:'success'};
+    return $.map(datos, function (object) {
+        return {
+            claveProgramaPresupuestario: object.claveProgramaPresupuestario,
+            claveUnidadResponsable: object.claveUnidadResponsable,
+            programaPresupuestario: object.programaPresupuestario,
+            unidadResponsable: object.unidadResponsable,
+            claseEstatus: clasesEstatus[object.idEstatus],
+            estatus: object.estatus,
+            seleccionado: (ids_programas_seleccionados[object.id])?'fa fa-check':'',
+            seleccionadoLabel: (ids_programas_seleccionados[object.id])?'Seleccionado':'',
+            id: object.id
+        };
+    });
+}
+
+/*
+
+        Funciones para la busqueda de Indicadores de FASSA por medio del suggester (Typeahead)
+
+*/
+/*
+var indicadorTypeAhead = new Bloodhound({
+    datumTokenizer: function (d) { return Bloodhound.tokenizers.whitespace(d.text); },
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    limit: 100,
+    remote: {
+        url: SERVER_HOST+'/v1/indicadores-fassa?typeahead=1&buscar=%QUERY',
+        filter: function ( response ) {
+            return crear_objeto_indicador(response.data);
+        },
+        ajax:{
+            beforeSend: function(jqXHR,settings){
+                if($('#unidad').val()){
+                    settings.url = settings.url + '&unidades='+$('#unidad').val();
+                }
+                if($('#departamento').val()){
+                    settings.url = settings.url + '&departamento='+$('#departamento').val();
+                }
+                if($('#id').val()){
+                    settings.url = settings.url + '&usuario='+$('#id').val();
+                }
+                $('#estatus-busqueda-indicador').html('Buscando... <span class="fa fa-spinner fa-spin"></span>');
+            },
+            complete: function(jqXHR,textStatus){
+                $('#estatus-busqueda-indicador').html(jqXHR.responseJSON.resultados + ' Indicadores Encontrados');
+                indicadorTypeAhead.clearRemoteCache();
+            }
+        }
+    }
+});
+indicadorTypeAhead.initialize();
+
+$('#buscar-indicador').typeahead(null,{
+    minLength: 3,
+    displayKey: 'indicador',
+    source: indicadorTypeAhead.ttAdapter(),
+    templates: { 
+        empty: '<div class="empty-result">No se encontraron Indicadores</div>',
+        suggestion: obtener_template_indicador()
+    }
+}).on('typeahead:selected', function (object, datum) {
+    if(!$('#tabla-lista-indicadores tbody tr[data-id="'+datum.id+'"]').length){
+        var html_row = obtener_html_tabla_indicadores(datum);
+        if($('#tr-indicadores-vacio').length){
+            $('#tr-indicadores-vacio').remove();
+        }
+        $('#tabla-lista-indicadores tbody').append(html_row);
+        $('#conteo-indicadores-seleccionados').text($('#tabla-lista-indicadores tbody tr').length);
+    }
+    reset_busqueda();
+    indicadorTypeAhead.clearRemoteCache();
+    ids_indicadores_seleccionados[datum.id] = 1;
+}).on('typeahead:cursorchanged', function (object, datum){
+    $('.tt-suggestion.tt-suggestion-selected').removeClass('tt-suggestion-selected');
+    $('#suggest_'+datum.id).parents('.tt-suggestion').addClass('tt-suggestion-selected');
+});
+
+function quitar_indicador(id){
+    $('#tabla-lista-indicadores tbody tr[data-id="'+id+'"]').remove();
+    if(!$('#tabla-lista-indicadores tbody tr').length){
+        $('#tabla-lista-indicadores tbody').html('<tr id="tr-indicadores-vacio"><td colspan="3"><span class="fa fa-info-circle"></span> No hay indicadores asignados</td></tr>');
+        $('#conteo-indicadores-seleccionados').text('0');
+    }else{
+        $('#conteo-indicadores-seleccionados').text($('#tabla-lista-indicadores tbody tr').length);
+    }
+    delete ids_indicadores_seleccionados[id];
+}
+
+function limpiar_lista_indicadores(){
+    $('#tabla-lista-indicadores tbody').empty();
+    $('#tabla-lista-indicadores tbody').html('<tr id="tr-indicadores-vacio"><td colspan="3"><span class="fa fa-info-circle"></span> No hay indicadores asignados</td></tr>');
+    $('#conteo-indicadores-seleccionados').text('0');
+    ids_indicadores_seleccionados = {};
+}
+
+function llenar_lista_indicadores(datos){
+    var lista_indicadores = '';
+    var indicadores = crear_objeto_indicador(datos);
+    for(var i in indicadores){
+        lista_indicadores += obtener_html_tabla_indicadores(indicadores[i]);
+        ids_indicadores_seleccionados[indicadores[i].id] = 1;
+    }
+    if($('#tr-indicadores-vacio').length){
+        $('#tr-indicadores-vacio').remove();
+    }
+    $('#tabla-lista-indicadores tbody').append(lista_indicadores);
+    $('#conteo-indicadores-seleccionados').text(datos.length);
+}
+
+function obtener_html_tabla_indicadores(indicador){
+    var html_row = '<tr data-id="'+indicador.id+'" data-clave-nivel="'+indicador.claveNivel+'">';
+    html_row += '<td><input type="hidden" name="indicadores[]" value="'+indicador.id+'">'+indicador.nivel+'</td>';
+    html_row += '<td>'+indicador.indicador+'</td>';
+    html_row += '<td><button type="button" class="btn btn-danger btn-block" onClick="quitar_indicador('+indicador.id+')"><span class="fa fa-trash"></span></button></td>';
+    html_row += '</tr>';
+    return html_row;
+}
+
+function programa_seleccionado(programa){
+    var template = obtener_template_indicador();
+    return template(programa);
+}
+
+function obtener_template_indicador(){
+    return Handlebars.compile('<div id="suggest_{{id}}" class="item">'+
+            '<table width="100%" border="0" cellpadding="0" cellspacing="0">'+
+                '<tr>'+
+                    '<td class="text-{{claseEstatus}}" ></td>'+
+                    '<td width="100px" class="label-{{claseEstatus}}"><span class="label">{{estatus}}</span></td>'+
+                '</tr>'+
+                '<tr>'+
+                    '<td colspan="2" class="text-{{claseEstatus}}" ><b>{{programaPresupuestario}}</b></td>'+
+                '</tr>'+
+                '<tr>'+
+                    '<td colspan="2"><span class="text-muted"><small>{{unidadResponsable}}</small></span>'+
+                    '<span class="pull-right"><small><span class="{{seleccionado}}"></span> {{seleccionadoLabel}}</small></span>'+
+                    '</td>'+
+                '</tr>'+
+            '</table>'+
+        '</div>');
+}
+
+function crear_objeto_indicador(datos){
+    var clasesEstatus = {1:'info',2:'warning',3:'danger',4:'primary',5:'success'};
+    return $.map(datos, function (object) {
+        return {
+            claveProgramaPresupuestario: object.claveProgramaPresupuestario,
+            claveUnidadResponsable: object.claveUnidadResponsable,
+            programaPresupuestario: object.programaPresupuestario,
+            unidadResponsable: object.unidadResponsable,
+            claseEstatus: clasesEstatus[object.idEstatus],
+            estatus: object.estatus,
+            seleccionado: (ids_indicadores_seleccionados[object.id])?'fa fa-check':'',
+            seleccionadoLabel: (ids_indicadores_seleccionados[object.id])?'Seleccionado':'',
+            id: object.id
+        };
+    });
+}
+*/
 $('.popover-dismiss').popover({ placement:'top', trigger:'hover' });
