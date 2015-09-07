@@ -47,6 +47,15 @@ class RendicionFassaController extends \BaseController {
 				$rows = IndicadorFASSAMeta::getModel();
 				$rows = $rows->with('registroAvance');
 				$rows = $rows->indicadoresEjercicio()->where('ejercicio','=',$ejercicio_actual);
+				
+				$usuario = Sentry::getUser();
+				if($usuario->idDepartamento == 2){
+					if($usuario->filtrarIndicadores){
+						$rows = $rows->where('idUsuarioValidacionSeg','=',$usuario->id);
+					}
+				}else{
+					$rows = $rows->where('idUsuarioRendCuenta','=',$usuario->id);
+				}
 
 				if(isset($parametros['buscar'])){
 					if($parametros['buscar']){

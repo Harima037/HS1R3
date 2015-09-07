@@ -79,6 +79,46 @@ class IndicadorFassaController extends \BaseController {
 			}elseif(isset($parametros['cargar-responsables'])){
 				$responsables = Directorio::responsablesActivos($parametros['unidad-responsable'])->get();
 				$respuesta['data'] = array('data'=>$responsables);
+			}elseif(isset($parametros['typeahead'])){
+				$rows = IndicadorFASSA::getModel();
+	
+				if(isset($parametros['buscar'])){				
+					$rows = $rows->where(function($query)use($parametros){
+							$query->where('indicador','like','%'.$parametros['buscar'].'%');
+						});
+				}
+				
+				//$rows = $rows->where('indicadorFASSA.idEstatus','=',1);
+	
+				if(isset($parametros['departamento'])){
+					if(isset($parametros['usuario'])){
+						$id_usuario = $parametros['usuario'];
+					}else{
+						$id_usuario = 0;
+					}
+					
+					if($parametros['departamento'] == 2){
+						$rows = $rows->where(function($query)use($id_usuario){
+							$query->whereNull('indicadorFASSA.idUsuarioValidacionSeg')
+								->orWhere('indicadorFASSA.idUsuarioValidacionSeg','=',$id_usuario);
+						});
+					}else{
+						$rows = $rows->where(function($query)use($id_usuario){
+							$query->whereNull('indicadorFASSA.idUsuarioRendCuenta')
+								->orWhere('indicadorFASSA.idUsuarioRendCuenta','=',$id_usuario);
+						});
+					}
+				}
+				//var_dump($proyectos_asignados);die;
+				//throw new Exception("Error:: " + print_r($proyectos_asignados,true), 1);
+				
+				$rows = $rows->contenidoSuggester()->get();
+	
+				if(count($rows)<=0){
+					$respuesta['data'] = array('resultados'=>0,"data"=>array());
+				}else{
+					$respuesta['data'] = array('resultados'=>count($rows),'data'=>$rows);
+				}
 			}else{
 				$rows = IndicadorFASSA::all();
 				if(count($rows) == 0){

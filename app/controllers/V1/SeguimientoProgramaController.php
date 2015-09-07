@@ -49,7 +49,9 @@ class SeguimientoProgramaController extends BaseController {
 				
 				$usuario = Sentry::getUser();
 				if($usuario->idDepartamento == 2){
-					$rows = $rows->where('idUsuarioValidacionSeg','=',$usuario->id);
+					if($usuario->filtrarProgramas){
+						$rows = $rows->where('idUsuarioValidacionSeg','=',$usuario->id);
+					}
 				}else{
 					$rows = $rows->where('idUsuarioRendCuenta','=',$usuario->id);
 				}

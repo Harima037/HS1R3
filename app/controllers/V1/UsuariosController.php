@@ -18,7 +18,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use Illuminate\Database\QueryException, \Exception;
 use BaseController, Input, Response, DB, Sentry,SentryUser;
-use User, Hash, UsuarioProyecto, Proyecto, Programa;
+use User, Hash, UsuarioProyecto, Proyecto, Programa, IndicadorFASSA;
 
 class UsuariosController extends \BaseController {
 	private $reglas = array(
@@ -176,6 +176,7 @@ class UsuariosController extends \BaseController {
 				$recurso->load('caratulas');
 				$recurso->load('proyectos');
 				$recurso->load('programas');
+				$recurso->load('indicadores');
 				//$queries = DB::getQueryLog();
 				//var_dump(end($queries));die;
 
@@ -306,6 +307,19 @@ class UsuariosController extends \BaseController {
 								->update(array('idUsuarioValidacionSeg'=>$recurso->id));
 					}else{
 						Programa::whereIn('id',$programas)
+								->whereNull('idUsuarioRendCuenta')
+								->update(array('idUsuarioRendCuenta'=>$recurso->id));
+					}
+				}
+				
+				if(count(Input::get('indicadores'))){
+					$indicadores = Input::get('indicadores');
+					if($recurso->idDepartamento == 2){
+						IndicadorFASSA::whereIn('id',$indicadores)
+								->whereNull('idUsuarioValidacionSeg')
+								->update(array('idUsuarioValidacionSeg'=>$recurso->id));
+					}else{
+						IndicadorFASSA::whereIn('id',$indicadores)
 								->whereNull('idUsuarioRendCuenta')
 								->update(array('idUsuarioRendCuenta'=>$recurso->id));
 					}
@@ -471,10 +485,23 @@ class UsuariosController extends \BaseController {
 				}else{
 					$recurso->filtrarProyectos = NULL;
 				}
+				
+				if(count(Input::get('programas'))){
+					$recurso->filtrarProgramas = 1;
+				}else{
+					$recurso->filtrarProgramas = NULL;
+				}
+				
+				if(count(Input::get('indicadores'))){
+					$recurso->filtrarIndicadores = 1;
+				}else{
+					$recurso->filtrarIndicadores = NULL;
+				}
 
 				$caratulas = $recurso->caratulas()->lists('id');
 				$proyectos = $recurso->proyectos()->lists('id');
 				$programas = $recurso->programas()->lists('id');
+				$indicadores = $recurso->indicadores()->lists('id');
 				
 				if(Input::get('caratulas')){ $nuevas_caratulas = Input::get('caratulas'); }
 				else{ $nuevas_caratulas = array(); }
@@ -490,6 +517,11 @@ class UsuariosController extends \BaseController {
 				else{ $nuevos_programas = array(); }
 				$array_programas['nuevos'] = array_diff($nuevos_programas, $programas);
 				$array_programas['borrar'] = array_diff($programas, $nuevos_programas);
+				
+				if(Input::get('indicadores')){ $nuevos_indicadores = Input::get('indicadores'); }
+				else{ $nuevos_indicadores = array(); }
+				$array_indicadores['nuevos'] = array_diff($nuevos_indicadores, $indicadores);
+				$array_indicadores['borrar'] = array_diff($indicadores, $nuevos_indicadores);
 				
 				/*$recurso->load('proyectosAsignados');
 				$proyectos_asignados = NULL;
@@ -511,7 +543,7 @@ class UsuariosController extends \BaseController {
 					$recurso->proyectosAsignados()->save($proyectos_asignados);
 				}*/
 
-				$respuesta = DB::transaction(function() use ($recurso,$array_proyectos,$array_caratulas,$array_programas){
+				$respuesta = DB::transaction(function() use ($recurso,$array_proyectos,$array_caratulas,$array_programas,$array_indicadores){
 					$respuesta_transac = array();
 					if($recurso->save()){
 						if(count($array_caratulas['nuevas'])){
@@ -566,6 +598,29 @@ class UsuariosController extends \BaseController {
 										->update(array('idUsuarioValidacionSeg'=>NULL));
 							}else{
 								Programa::whereIn('id',$array_programas['borrar'])
+										->where('idUsuarioRendCuenta','=',$recurso->id)
+										->update(array('idUsuarioRendCuenta'=>NULL));
+							}
+						}
+						
+						if(count($array_indicadores['nuevos'])){
+							if($recurso->idDepartamento == 2){
+								IndicadorFASSA::whereIn('id',$array_indicadores['nuevos'])
+										->whereNull('idUsuarioValidacionSeg')
+										->update(array('idUsuarioValidacionSeg'=>$recurso->id));
+							}else{
+								IndicadorFASSA::whereIn('id',$array_indicadores['nuevos'])
+										->whereNull('idUsuarioRendCuenta')
+										->update(array('idUsuarioRendCuenta'=>$recurso->id));
+							}
+						}
+						if(count($array_indicadores['borrar'])){
+							if($recurso->idDepartamento == 2){
+								IndicadorFASSA::whereIn('id',$array_indicadores['borrar'])
+										->where('idUsuarioValidacionSeg','=',$recurso->id)
+										->update(array('idUsuarioValidacionSeg'=>NULL));
+							}else{
+								IndicadorFASSA::whereIn('id',$array_indicadores['borrar'])
 										->where('idUsuarioRendCuenta','=',$recurso->id)
 										->update(array('idUsuarioRendCuenta'=>NULL));
 							}

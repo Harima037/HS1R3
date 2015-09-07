@@ -411,6 +411,7 @@
                             <table id="tabla-lista-indicadores" class="table table-hover table-condensed">
                                 <thead>
                                     <tr>
+                                        <th width="100">Nivel</th>
                                         <th>Indicador</th>
                                         <th width="55">Quitar</th>
                                     </tr>

@@ -133,6 +133,14 @@ function editar (e){
                     $('#conteo-programas-seleccionados').text('0');
                 }
             }
+            
+            if(response.data.indicadores){
+                if(response.data.indicadores.length){
+                    llenar_lista_indicadores(response.data.indicadores);
+                }else{
+                    $('#conteo-indicadores-seleccionados').text('0');
+                }
+            }
 
             if(response.data.permissions.superuser){
                 $("#btn-cargar-cat-permisos").hide();
@@ -258,12 +266,16 @@ function resetModalModuloForm(){
     limpiar_lista_proyectos();
     limpiar_lista_caratulas();
     limpiar_lista_programas();
+    limpiar_lista_indicadores();
     reset_busqueda();
     proyectoTypeAhead.clearRemoteCache();
     caratulaTypeAhead.clearRemoteCache();
+    programaTypeAhead.clearRemoteCache();
+    indicadorTypeAhead.clearRemoteCache();
     ids_proyectos_seleccionados = {};
     ids_caratulas_seleccionados = {};
     ids_programas_seleccionados = {};
+    ids_indicadores_seleccionados = {};
 }
 
 // Funciones de permisos
@@ -286,6 +298,11 @@ $('#modalModulo #btn-limpiar-caratulas').on('click',function(e){
 $('#modalModulo #btn-limpiar-programas').on('click',function(e){
     e.preventDefault();
     limpiar_lista_programas();
+});
+
+$('#modalModulo #btn-limpiar-indicadores').on('click',function(e){
+    e.preventDefault();
+    limpiar_lista_indicadores();
 });
 
 $('#btn-cargar-cat-permisos').click(function(){
@@ -557,6 +574,8 @@ function reset_busqueda(){
     $('#estatus-busqueda-caratula').html('');
     $('#buscar-programa').typeahead('val','');
     $('#estatus-busqueda-programa').html('');
+    $('#buscar-indicador').typeahead('val','');
+    $('#estatus-busqueda-indicador').html('');
 }
 
 /*
@@ -850,7 +869,7 @@ function crear_objeto_programa(datos){
         Funciones para la busqueda de Indicadores de FASSA por medio del suggester (Typeahead)
 
 */
-/*
+
 var indicadorTypeAhead = new Bloodhound({
     datumTokenizer: function (d) { return Bloodhound.tokenizers.whitespace(d.text); },
     queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -862,9 +881,6 @@ var indicadorTypeAhead = new Bloodhound({
         },
         ajax:{
             beforeSend: function(jqXHR,settings){
-                if($('#unidad').val()){
-                    settings.url = settings.url + '&unidades='+$('#unidad').val();
-                }
                 if($('#departamento').val()){
                     settings.url = settings.url + '&departamento='+$('#departamento').val();
                 }
@@ -948,9 +964,9 @@ function obtener_html_tabla_indicadores(indicador){
     return html_row;
 }
 
-function programa_seleccionado(programa){
+function indicador_seleccionado(indicador){
     var template = obtener_template_indicador();
-    return template(programa);
+    return template(indicador);
 }
 
 function obtener_template_indicador(){
@@ -961,10 +977,10 @@ function obtener_template_indicador(){
                     '<td width="100px" class="label-{{claseEstatus}}"><span class="label">{{estatus}}</span></td>'+
                 '</tr>'+
                 '<tr>'+
-                    '<td colspan="2" class="text-{{claseEstatus}}" ><b>{{programaPresupuestario}}</b></td>'+
+                    '<td colspan="2" class="text-{{claseEstatus}}" ><b>{{indicador}}</b></td>'+
                 '</tr>'+
                 '<tr>'+
-                    '<td colspan="2"><span class="text-muted"><small>{{unidadResponsable}}</small></span>'+
+                    '<td colspan="2"><span class="text-muted"><small>{{nivel}}</small></span>'+
                     '<span class="pull-right"><small><span class="{{seleccionado}}"></span> {{seleccionadoLabel}}</small></span>'+
                     '</td>'+
                 '</tr>'+
@@ -974,12 +990,12 @@ function obtener_template_indicador(){
 
 function crear_objeto_indicador(datos){
     var clasesEstatus = {1:'info',2:'warning',3:'danger',4:'primary',5:'success'};
+    var niveles =  {'F':'Fin','P':'Propósito','C':'Componente','A':'Actividad'};
     return $.map(datos, function (object) {
         return {
-            claveProgramaPresupuestario: object.claveProgramaPresupuestario,
-            claveUnidadResponsable: object.claveUnidadResponsable,
-            programaPresupuestario: object.programaPresupuestario,
-            unidadResponsable: object.unidadResponsable,
+            claveNivel: object.claveNivel,
+            nivel: niveles[object.claveNivel],
+            indicador: object.indicador,
             claseEstatus: clasesEstatus[object.idEstatus],
             estatus: object.estatus,
             seleccionado: (ids_indicadores_seleccionados[object.id])?'fa fa-check':'',
@@ -988,5 +1004,5 @@ function crear_objeto_indicador(datos){
         };
     });
 }
-*/
+
 $('.popover-dismiss').popover({ placement:'top', trigger:'hover' });

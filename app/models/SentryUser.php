@@ -41,6 +41,14 @@ class SentryUser extends SentryModel {
             return $this->hasMany('Programa','idUsuarioRendCuenta')->contenidoSuggester();
         }
     }
+    
+    public function indicadores(){
+        if($this->idDepartamento == 2){
+            return $this->hasMany('IndicadorFASSA','idUsuarioValidacionSeg')->contenidoSuggester();
+        }else{
+            return $this->hasMany('IndicadorFASSA','idUsuarioRendCuenta')->contenidoSuggester();
+        }
+    }
 
     public function scopeUsuariosProyectos($query){
         return $query->select('sentryUsers.id','sentryUsers.idDepartamento','usuariosProyectos.proyectos','usuariosProyectos.ejercicio')

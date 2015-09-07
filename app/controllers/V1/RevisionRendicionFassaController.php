@@ -49,6 +49,16 @@ class RevisionRendicionFassaController extends \BaseController {
 				$ejercicio_actual = date('Y');
 				//$rows = IndicadorFASSA::getModel();
 				$rows = IndicadorFASSAMeta::getModel();
+				
+				$usuario = Sentry::getUser();
+				if($usuario->idDepartamento == 2){
+					if($usuario->filtrarIndicadores){
+						$rows = $rows->where('idUsuarioValidacionSeg','=',$usuario->id);
+					}
+				}else{
+					$rows = $rows->where('idUsuarioRendCuenta','=',$usuario->id);
+				}
+				
 				$rows = $rows->with('registroAvance');
 				$rows = $rows->indicadoresEjercicio()->where('ejercicio','=',$ejercicio_actual);
 
