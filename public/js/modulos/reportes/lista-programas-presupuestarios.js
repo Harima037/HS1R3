@@ -21,8 +21,6 @@ moduloDatagrid.actualizar({
         moduloDatagrid.limpiar();
         var datos_grid = [];
         
-        //var trimestre = $('#datagridProgramas').attr('data-trimestre');
-
         for(var i in response.data){
             var item = {};
 
@@ -33,6 +31,17 @@ moduloDatagrid.actualizar({
             item.trim2 = '<span class="fa fa-times"></span>';
             item.trim3 = '<span class="fa fa-times"></span>';
             item.trim4 = '<span class="fa fa-times"></span>';
+            
+            if(response.data[i].evaluacion_trimestre){
+                for(var j in response.data[i].evaluacion_trimestre){
+                    var eval = response.data[i].evaluacion_trimestre[j];
+                    if(eval.idEstatus == 4){
+                        item['trim'+eval.trimestre] = '<button onClick="cargarReporte('+item.id+','+eval.trimestre+')" class="btn btn-primary" type="button"><span class="fa fa-check"></span></button>';
+                    }else{
+                        item['trim'+eval.trimestre] = '<button onClick="cargarReporte('+item.id+','+eval.trimestre+')" class="btn btn-success" type="button"><span class="fa fa-pencil"></span></button>';
+                    }
+                }
+            }
             datos_grid.push(item);
         }
         moduloDatagrid.cargarDatos(datos_grid);                         
@@ -47,7 +56,7 @@ moduloDatagrid.actualizar({
 
 function cargarReporte(id,trimestre){
     var parametros = id + '?trimestre='+trimestre;
-    window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
+    window.open(SERVER_HOST+'/v1/reporte-programa/'+parametros);
 }
 
 /*             Extras               */

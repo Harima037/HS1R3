@@ -31,8 +31,14 @@ class ReporteEvaluacionProgramaController extends BaseController {
 	 */
 	public function show($id){
 		$nombreArchivo = 'ProgramaPresupuestario';
-		$trimestre_actual = Util::obtenerTrimestre();
-
+		$parametros =Input::all();
+		 
+		if(isset($parametros['trimestre'])){
+			$trimestre_actual = $parametros['trimestre'];
+		}else{
+			$trimestre_actual = Util::obtenerTrimestre();
+		}
+		
 		$recurso = Programa::with(array('indicadores.registroAvance'=>function($query) use ($trimestre_actual){
 			$query->where('trimestre','<=',$trimestre_actual);
 		}))->select('programa.*','programaPresupuestal.descripcion as programaPresupuestario','titular.nombre as liderPrograma',
