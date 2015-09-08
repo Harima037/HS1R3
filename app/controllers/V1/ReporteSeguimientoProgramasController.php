@@ -19,8 +19,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime,Mail;
-use Programa,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionProyectoMes,
-	EvaluacionPlanMejora,ComponenteDesglose,DesgloseMetasMes,Directorio,SysConfiguracionVariable;
+use Programa;
 
 class ReporteSeguimientoProgramasController extends BaseController {
 	/**

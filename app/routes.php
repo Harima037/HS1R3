@@ -176,6 +176,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 
 		Route::resource('reporte-evaluacion',	'V1\ReporteEvaluacionController', 			array('only'=>array('show')));
 		Route::resource('reporte-programa',		'V1\ReporteEvaluacionProgramaController', 	array('only'=>array('show')));
+		Route::resource('reporte-fassa',		'V1\ReporteEvaluacionFASSAController', 		array('only'=>array('show')));
 
 		Route::resource('reporte-ep-01',			'V1\EP01Controller');
 		Route::resource('reporte-regionalizado',	'V1\EPRegionalizadoController');

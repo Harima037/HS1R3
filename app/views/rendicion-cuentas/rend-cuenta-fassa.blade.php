@@ -168,6 +168,7 @@
                 </form>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-info pull-left hidden" id="btn-imprimir-reporte"><span class="fa fa-file"></span> Imprimir Reporte</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary" id="btn-guardar-indicador"><span class="fa fa-save"></span> Guardar</button>
                 <button type="button" class="btn btn-success" id="btn-guardar-validar-indicador">

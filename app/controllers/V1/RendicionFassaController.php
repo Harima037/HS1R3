@@ -115,7 +115,7 @@ class RendicionFassaController extends \BaseController {
 
 				$recurso->load(array('registroAvance'=>function($query)use($mes_actual){
 					return $query->where('mes','<=',$mes_actual);
-				}));
+				},'comentario'));
 
 				$recurso['mes_actual'] = $mes_actual;
 				$data['data'] = $recurso;
