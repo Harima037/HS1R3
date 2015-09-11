@@ -66,7 +66,7 @@
                     </li>
                     <li role="presentation" class="disabled">
                         <a href="#acciones-fibap" aria-controls="acciones-fibap" role="tab" data-toggle="" id="tab-link-acciones-fibap">
-                            <span class="fa fa-square-o"></span> Componentes <span class="badge">0 / 2</span>
+                            <span class="fa fa-square-o"></span> Acciones <span class="badge">0</span>
                         </a>
                     </li>
                 </ul>

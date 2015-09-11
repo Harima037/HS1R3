@@ -76,12 +76,15 @@ class InversionController extends ProyectosController {
 			'meses'						=> $meses
 		);
 
-		$datos_acciones_formulario['identificador'] = 'actividad'; //El identificador se agrega al id de los elementos del formulario
-		$datos_acciones['formulario_actividad'] = View::make('expediente.formulario-inversion-componente',$datos_acciones_formulario);
+		//$datos_acciones_formulario['identificador'] = 'actividad'; //El identificador se agrega al id de los elementos del formulario
+		//$datos_acciones['formulario_actividad'] = View::make('expediente.formulario-inversion-componente',$datos_acciones_formulario);
+		//$datos_acciones['formulario_actividad'] = '';
 
 		//Cargar el formulario para dar de alta compoenentes
-		$datos_acciones_formulario['lista_actividades'] = View::make('expediente.listado-actividades');
-		$datos_acciones_formulario['identificador'] = 'componente';
+		//$datos_acciones_formulario['lista_actividades'] = View::make('expediente.listado-actividades');
+		//$datos_acciones_formulario['identificador'] = 'componente';
+		$datos_acciones_formulario['identificador'] = 'accion';
+		$datos_acciones_formulario['hidden_list'] = array('id-componente','id-actividad');
 		$datos_acciones['formulario_componente'] = View::make('expediente.formulario-inversion-componente',$datos_acciones_formulario);
 		
 		$datos['formulario_acciones'] = View::make('expediente.formulario-caratula-acciones',$datos_acciones);

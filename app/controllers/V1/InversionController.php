@@ -21,7 +21,8 @@ use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime, File;
 use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
 	FibapDatosProyecto, Directorio, ComponenteDesglose, AntecedenteFinanciero, DesgloseMetasMes, DistribucionPresupuesto,Accion,
-	PropuestaFinanciamiento, DesgloseBeneficiario, ProyectoFinanciamiento, ProyectoFinanciamientoSubFuente;
+	PropuestaFinanciamiento, DesgloseBeneficiario, ProyectoFinanciamiento, ProyectoFinanciamientoSubFuente, 
+	ActividadDesglose, ActividadDesgloseBeneficiario, ActividadDesgloseMetasMes;
 
 class InversionController extends ProyectosController {
 	private $reglasFibap = array(
@@ -88,10 +89,16 @@ class InversionController extends ProyectosController {
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				
 				$pagina = $parametros['pagina'];
-
-				//$rows = ComponenteDesglose::listarDatos()->where('idComponente','=',$parametros['id-componente']);
-				$rows = ComponenteDesglose::listarDatos()->where('idComponente','=',$parametros['idComponente']);
-				$totales = ComponenteDesglose::listarDatos()->where('idComponente','=',$parametros['idComponente']);
+				if($parametros['nivel'] == 'componente'){
+					$rows = ComponenteDesglose::listarDatos()->where('idAccion','=',$parametros['idAccion']);
+					$totales = ComponenteDesglose::listarDatos()->where('idAccion','=',$parametros['idAccion']);
+					$table = 'componenteDesglose';
+				}else{
+					$rows = ActividadDesglose::listarDatos()->where('idAccion','=',$parametros['idAccion']);
+					$totales = ActividadDesglose::listarDatos()->where('idAccion','=',$parametros['idAccion']);
+					$table = 'actividadDesglose';
+				}
+				
 				if(isset($parametros['buscar'])){
 					$rows = $rows->where(function($query) use ($parametros){
 									$query->where('jurisdiccion.nombre','like','%'.$parametros['buscar'].'%')
@@ -108,13 +115,13 @@ class InversionController extends ProyectosController {
 					$data['query'] = print_r(end($queries),true);*/
 				}
 				//$totales = $rows;
-				$totales = $totales->select(DB::raw('count(componenteDesglose.id) AS cuantos'),DB::raw('sum(componenteDesglose.presupuesto) AS totalPresupuesto'))->first();
+				$totales = $totales->select(DB::raw('count('.$table.'.id) AS cuantos'),DB::raw('sum('.$table.'.presupuesto) AS totalPresupuesto'))->first();
 				//$totales = $totales[0];
 				
 				$total = $totales->cuantos;
 				$recurso['resultados'] = $totales->cuantos;
 				$recurso['total_presupuesto'] = $totales->totalPresupuesto;
-				$recurso['data'] = $rows->orderBy('componenteDesglose.id', 'desc')
+				$recurso['data'] = $rows->orderBy($table.'.id', 'desc')
 							->skip(($pagina-1)*10)->take(10)
 							->get();
 				//$queries = DB::getQueryLog();
@@ -263,8 +270,8 @@ class InversionController extends ProyectosController {
 						$recurso->load('comentarios');
 					}
 					if($recurso->fibap){
-						$recurso->fibap->load('antecedentesFinancieros','acciones.datosComponenteDetalle','distribucionPresupuestoAgrupado.objetoGasto');
-						$recurso->fibap->acciones->load('propuestasFinanciamiento');
+						$recurso->fibap->load('antecedentesFinancieros','acciones','distribucionPresupuestoAgrupado.objetoGasto');
+						$recurso->fibap->acciones->load('propuestasFinanciamiento','datosComponenteDetalle','datosActividadDetalle');
 					}
 					if(!is_null($recurso)){
 						$extras = array();
@@ -287,12 +294,17 @@ class InversionController extends ProyectosController {
 											->where('idTipoBeneficiario','=',$id)->get();
 				}elseif ($parametros['mostrar'] == 'editar-antecedente') {
 					$recurso = AntecedenteFinanciero::find($id);
-				}elseif ($parametros['mostrar'] == 'editar-componente') {
-					$recurso = Accion::with('componente.actividades.unidadMedida','componente.metasMes','partidas','propuestasFinanciamiento')->find($id);
-				}elseif ($parametros['mostrar'] == 'editar-actividad') {
+				}elseif ($parametros['mostrar'] == 'editar-accion') {
+					//$recurso = Accion::with('componente.actividades.unidadMedida','componente.metasMes','partidas','propuestasFinanciamiento')->find($id);
+					$recurso = Accion::with('componente.metasMes','actividad.metasMes','partidas','propuestasFinanciamiento')->find($id);
+				}
+				/*
+				elseif ($parametros['mostrar'] == 'editar-actividad') {
 					$recurso = Actividad::with('metasMes')->find($id);
-				}elseif ($parametros['mostrar'] == 'desglose-componente') {
-					$recurso = Accion::with('datosComponenteDetalle','partidas')->find($id);
+				}
+				*/
+				elseif ($parametros['mostrar'] == 'desglose-accion') {
+					$recurso = Accion::with('datosComponenteDetalle','datosActividadDetalle','partidas')->find($id);
 				}elseif ($parametros['mostrar'] == 'editar-presupuesto'){
 					/***
 					*	Obtiene los datos del desglose del presupuesto de la Accion (GET)
@@ -305,7 +317,12 @@ class InversionController extends ProyectosController {
 					*	- Obtiene la lista de localiades del municipio seleccionado (Para llenar los selects)
 					*
 					***/
-					$desglose = ComponenteDesglose::with('metasMes','beneficiarios')->find($id);
+					if($parametros['nivel'] == 'componente'){
+						$desglose = ComponenteDesglose::with('metasMes','beneficiarios')->find($id);
+					}else{
+						$desglose = ActividadDesglose::with('metasMes','beneficiarios')->find($id);
+					}
+					
 
 					$recurso = Accion::with('partidas')->find($desglose->idAccion);
 					
@@ -468,26 +485,44 @@ class InversionController extends ProyectosController {
 					$respuesta['data']['extras'] = $extras;
 					$recurso['liderProyecto'] = $respuesta['data']['nombre-lider-proyecto'];
 				}
-			}elseif($parametros['guardar'] == 'componente'){
+			}elseif($parametros['guardar'] == 'accion'){
 				$parametros['clasificacion'] = 2;
-				$respuesta = parent::guardar_datos_componente('componente',$parametros);
+				$respuesta = parent::guardar_datos_componente('accion',$parametros);
 				//
 				if($respuesta['http_status'] == 200){
-					$componente = $respuesta['data']['data'];
-					$resultado = $this->guardar_datos_accion_presupuesto($parametros,$componente,$componente->id);
+					$elemento_accion = $respuesta['data']['data']; //Puede ser actividad o componente
+					$resultado = $this->guardar_datos_accion_presupuesto($parametros,$elemento_accion->id);
 					if($resultado['data']){
 						$respuesta['data']['data'] = $resultado['data'];
 					}
 					$respuesta['data']['acciones'] = $resultado['acciones'];
 				}
-			}elseif($parametros['guardar'] == 'actividad'){
+				//Actualización
+				/*
+				$parametros['clasificacion'] = 2;
+				$respuesta = parent::guardar_datos_componente('componente',$parametros);
+				if($respuesta['http_status'] == 200){
+					$componente = $respuesta['data']['data'];
+					//$resultado = $this->guardar_datos_accion_presupuesto($parametros,$componente,$componente->id);
+					$resultado = $this->guardar_datos_accion_presupuesto($parametros,$componente->id);
+					if($resultado['data']){
+						$respuesta['data']['data'] = $resultado['data'];
+					}
+					$respuesta['data']['acciones'] = $resultado['acciones'];
+				}
+				*/
+			}
+			/*
+			elseif($parametros['guardar'] == 'actividad'){
 				$parametros['clasificacion'] = 2;
 				$respuesta = parent::guardar_datos_componente('actividad',$parametros);
 				if($respuesta['http_status'] == 200){
 					$componente = Componente::with('actividades.unidadMedida')->find($parametros['id-componente']);
 					$respuesta['data']['extras']['actividades'] = $componente->actividades;
 				}
-			}elseif($parametros['guardar'] == 'proyecto-beneficiario'){
+			}
+			*/
+			elseif($parametros['guardar'] == 'proyecto-beneficiario'){
 				$respuesta = parent::guardar_datos_beneficiario($parametros);
 			}elseif ($parametros['guardar'] == 'datos-fibap') {
 				//Guardar nuevo FIBAP
@@ -744,13 +779,32 @@ class InversionController extends ProyectosController {
 				$respuesta = parent::guardar_fuente_informacion($parametros,$id);
 			}elseif($parametros['guardar'] == 'proyecto-beneficiario'){
 				$respuesta = parent::guardar_datos_beneficiario($parametros,$id);
-			}elseif($parametros['guardar'] == 'componente'){
+			}elseif($parametros['guardar'] == 'accion'){
+				$parametros['clasificacion'] = 2;
+				if($parametros['nivel'] == 'componente'){
+					$id_elemento = $parametros['id-componente']; 
+				}else{
+					$id_elemento = $parametros['id-actividad'];
+				}
+				$respuesta = parent::guardar_datos_componente('accion',$parametros,$id_elemento);
+				//
+				if($respuesta['http_status'] == 200){
+					$elemento_accion = $respuesta['data']['data']; //Puede ser actividad o componente
+					$resultado = $this->guardar_datos_accion_presupuesto($parametros,$elemento_accion->id);
+					if($resultado['data']){
+						$respuesta['data']['data'] = $resultado['data'];
+					}
+					$respuesta['data']['acciones'] = $resultado['acciones'];
+				}
+				//Actualización
+				/*
 				$parametros['clasificacion'] = 2;
 				$respuesta = parent::guardar_datos_componente('componente',$parametros,$parametros['id-componente']);
 				//Llenar datos adicionales
 				if($respuesta['http_status'] == 200){
 					$componente = $respuesta['data']['data'];
-					$resultado = $this->guardar_datos_accion_presupuesto($parametros,$componente,$id);
+					//$resultado = $this->guardar_datos_accion_presupuesto($parametros,$componente,$id);
+					$resultado = $this->guardar_datos_accion_presupuesto($parametros,$id);
 					if(isset($resultado['http_status'])){
 						$respuesta = $resultado;
 					}else{
@@ -760,7 +814,10 @@ class InversionController extends ProyectosController {
 						$respuesta['data']['acciones'] = $resultado['acciones'];
 					}
 				}
-			}elseif($parametros['guardar'] == 'actividad'){
+				*/
+			}
+			/*
+			elseif($parametros['guardar'] == 'actividad'){
 				$parametros['clasificacion'] = 2;
 				$respuesta = parent::guardar_datos_componente('actividad',$parametros,$parametros['id-actividad']);
 				//Llenar datos adicionales
@@ -768,7 +825,9 @@ class InversionController extends ProyectosController {
 					$componente = Componente::with('actividades.unidadMedida')->find($parametros['id-componente']);
 					$respuesta['data']['extras']['actividades'] = $componente->actividades;
 				}
-			}elseif($parametros['guardar'] == 'datos-fibap'){
+			}
+			*/
+			elseif($parametros['guardar'] == 'datos-fibap'){
 				/***
 				*	Editar datos generales de la FIBAP (PUT)
 				*
@@ -852,16 +911,26 @@ class InversionController extends ProyectosController {
 														})->get();
 								if(count($distribucion_borrada) && count($recurso->acciones)){
 									//Obtenemos los desgloses
-									$desgloses_completo = ComponenteDesglose::whereIn('idAccion',$recurso->acciones->lists('id'))->get();
-									
-									if(count($desgloses_completo)){
-										//Eliminamos las metas por mes
-										DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses_completo->lists('id'))
+									$desgloses_completo_componente = ComponenteDesglose::whereIn('idAccion',$recurso->acciones->lists('id'))->get();
+									if(count($desgloses_completo_componente)){
+										//Eliminamos las metas por mes del desglose de los componentes
+										DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses_completo_componente->lists('id'))
 														->where(function($query) use ($mes){
 															$query->where('mes','<',$mes['inicio'])
 																->orWhere('mes','>',$mes['fin']);
 														})->delete();
 									}
+									
+									$desgloses_completo_actividad = ActividadDesglose::whereIn('idAccion',$recurso->acciones->lists('id'))->get();
+									if(count($desgloses_completo_actividad)){
+										//Eliminamos las metas por mes del desglose de las actividades
+										ActividadDesgloseMetasMes::whereIn('idActividadDesglose',$desgloses_completo_actividad->lists('id'))
+														->where(function($query) use ($mes){
+															$query->where('mes','<',$mes['inicio'])
+																->orWhere('mes','>',$mes['fin']);
+														})->delete();
+									}
+									
 									$cantidades_desglose = array();
 									foreach ($distribucion_borrada as $distribucion) {
 										if($distribucion->claveJurisdiccion != 'OC'){
@@ -877,12 +946,23 @@ class InversionController extends ProyectosController {
 										}
 									}
 									//$actualizar_desglose = array();
-									foreach ($desgloses_completo as $desglose) {
+									$suma_presupuesto_eliminado = 0;
+									foreach ($desgloses_completo_componente as $desglose) {
 										if(isset($cantidades_desglose[$desglose->idAccion.'.'.$desglose->claveJurisdiccion.'.'.$desglose->claveMunicipio.'.'.$desglose->claveLocalidad])){
-											$desglose->presupuesto -= $cantidades_desglose[$desglose->idAccion.'.'.$desglose->claveJurisdiccion.'.'.$desglose->claveMunicipio.'.'.$desglose->claveLocalidad];
-											$desglose->save();
+											$suma_presupuesto_eliminado += $cantidades_desglose[$desglose->idAccion.'.'.$desglose->claveJurisdiccion.'.'.$desglose->claveMunicipio.'.'.$desglose->claveLocalidad]; 
+											//$desglose->presupuesto -= $cantidades_desglose[$desglose->idAccion.'.'.$desglose->claveJurisdiccion.'.'.$desglose->claveMunicipio.'.'.$desglose->claveLocalidad];
+											//$desglose->save();
 										}
 									}
+									foreach ($desgloses_completo_actividad as $desglose) {
+										if(isset($cantidades_desglose[$desglose->idAccion.'.'.$desglose->claveJurisdiccion.'.'.$desglose->claveMunicipio.'.'.$desglose->claveLocalidad])){
+											$suma_presupuesto_eliminado += $cantidades_desglose[$desglose->idAccion.'.'.$desglose->claveJurisdiccion.'.'.$desglose->claveMunicipio.'.'.$desglose->claveLocalidad];
+											//$desglose->presupuesto -= $cantidades_desglose[$desglose->idAccion.'.'.$desglose->claveJurisdiccion.'.'.$desglose->claveMunicipio.'.'.$desglose->claveLocalidad];
+											//$desglose->save();
+										}
+									}
+									$desglose->presupuesto -= $suma_presupuesto_eliminado; 
+									$desglose->save();
 									//ComponenteDesglose::saveMany($actualizar_desglose);
 									$distribucion_borrada = DistribucionPresupuesto::where('idFibap','=',$recurso->id)
 															->where(function($query) use ($mes){
@@ -984,7 +1064,7 @@ class InversionController extends ProyectosController {
 	{
 		//
 		$http_status = 200;
-		$data = array();
+		$data = array('data'=>'');
 
 		try{
 
@@ -1026,48 +1106,90 @@ class InversionController extends ProyectosController {
 					*
 					*	- Borrar datos de una acción
 					*	- Borrar la relación de la acción con las partidas prespuestarias
-					* 	- Borrar los componetes asociados y el desglose de metas por mes
+					* 	- Borrar los componentes y actividades asociados 
 					*	- Borrar la propuesta de financiamiento
 					*	- Borrar la distribución del presupuesto
-					* 	- Borrar datos del desglose del componete (Metas,Beneficiarios,Localidad)
-					*	- Borrar las actividades del componente y el desglose de metas por mes
+					* 	- Borrar datos del desglose del componete y actividades (Metas,Beneficiarios,Localidad)
 					*
 					***/
 					$id_padre = $parametros['id-fibap'];
 					$rows = DB::transaction(function() use ($ids){
 						$acciones = Accion::whereIn('id',$ids)->get();
-						$id_componentes = $acciones->lists('idComponente');
-
+						
+						$ids_componentes = $acciones->lists('idComponente');
+						$ids_actividades = $acciones->lists('idActividad');
+						
+						if(count($ids_componentes)){
+							//Eliminamos las metas de los componentes
+							ComponenteMetaMes::whereIn('idComponente',$ids_componentes)->delete();
+							//Eliminamos los componenetes
+							Componente::whereIn('id',$ids_componentes)->delete();
+							//Eliminamos el desglose de los componentes
+							$desgloses = ComponenteDesglose::whereIn('idComponente',$ids_componentes)->lists('id');
+							if(count($desgloses) > 0){
+								DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses)->delete();
+								DesgloseBeneficiario::whereIn('idComponenteDesglose',$desgloses)->delete();
+							}
+							ComponenteDesglose::whereIn('idComponente',$ids_componentes)->delete();
+							
+							//Quitamos la relación de las actividades asignadas a los componentes eliminados
+							Actividad::whereIn('idComponente',$ids_componentes)->update(array('idComponente'=>null));
+						}
+						
+						if(count($ids_actividades)){
+							//Eliminamos las metas de las actividades
+							ActividadMetaMes::whereIn('idActividad',$ids_actividades)->delete();
+							//Eliminamos las actividades
+							Actividad::whereIn('id',$ids_actividades)->delete();
+							//Eliminamos el desglose de las actividades
+							$desgloses = ActividadDesglose::whereIn('idActividad',$ids_actividades)->lists('id');
+							if(count($desgloses) > 0){
+								ActividadDesgloseMetasMes::whereIn('idActividadDesglose',$desgloses)->delete();
+								ActividadDesgloseBeneficiario::whereIn('idActividadDesglose',$desgloses)->delete();
+							}
+							ActividadDesglose::whereIn('idActividad',$ids_actividades)->delete();
+						}
+						
+						PropuestaFinanciamiento::whereIn('idAccion',$ids)->delete();
+						DistribucionPresupuesto::whereIn('idAccion',$ids)->delete();
+						
+						foreach ($acciones as $accion) {
+							$accion->partidas()->detach();
+						}
+						return Accion::whereIn('id',$ids)->delete();
+						//Pueden ser actividades o componentes <-----
+						//$id_componentes = $acciones->lists('idComponente');
+						/*
 						$actividades = Actividad::whereIn('idComponente',$id_componentes)->lists('id');
 						if(count($actividades) > 0){
 							//Eliminamos las metas de dichas actividades
 							ActividadMetaMes::whereIn('idActividad',$actividades)->delete();
 							//Eliminamos las actividades de los componentes
 							Actividad::whereIn('idComponente',$id_componentes)->delete();
+							//Eliminamos el desglose de las actividades
+							$desgloses = ActividadDesglose::whereIn('idAccion',$ids)->get();
+							if(count($desgloses) > 0){
+								ActividadDesgloseMetasMes::whereIn('idActividadDesglose',$desgloses->lists('id'))->delete();
+								ActividadDesgloseBeneficiario::whereIn('idActividadDesglose',$desgloses->lists('id'))->delete();
+							}
+							ActividadDesglose::whereIn('idAccion',$ids)->delete();
 						}
 						//Eliminamos las metas de los componentes
 						ComponenteMetaMes::whereIn('idComponente',$id_componentes)->delete();
 						//Eliminamos los componenetes
 						Componente::whereIn('id',$id_componentes)->delete();
-
-						PropuestaFinanciamiento::whereIn('idAccion',$ids)->delete();
-						DistribucionPresupuesto::whereIn('idAccion',$ids)->delete();
-
+						//Eliminamos el desglose de los componentes
 						$desgloses = ComponenteDesglose::whereIn('idAccion',$ids)->get();
-
 						if(count($desgloses) > 0){
 							DesgloseMetasMes::whereIn('idComponenteDesglose',$desgloses->lists('id'))->delete();
 							DesgloseBeneficiario::whereIn('idComponenteDesglose',$desgloses->lists('id'))->delete();
 						}
-						
 						ComponenteDesglose::whereIn('idAccion',$ids)->delete();
+						*/
 						//$acciones->partidas->detach();
-						foreach ($acciones as $accion) {
-							$accion->partidas()->detach();
-						}
-						return Accion::whereIn('id',$ids)->delete();
 					});
-				}elseif($parametros['eliminar'] == 'actividad'){
+				}
+				//elseif($parametros['eliminar'] == 'actividad'){
 					/***
 					*	Eliminar actividad de un Componente (Accion) (DELETE)
 					*
@@ -1075,6 +1197,7 @@ class InversionController extends ProyectosController {
 					*	- Borrar la distribución de metas por mes
 					*
 					***/
+					/*
 					$id_padre = $parametros['id-componente'];
 					$rows = DB::transaction(function() use ($ids){
 						//Eliminamos las metas de las actividades seleccionadas
@@ -1082,67 +1205,96 @@ class InversionController extends ProyectosController {
 						//Eliminamos las actividades
 						return Actividad::whereIn('id',$ids)->delete();
 					});
-				}elseif($parametros['eliminar'] == 'desglose-presupuesto'){ //Eliminar Distribucion del Presupuesto
+					*/
+				//}
+				elseif($parametros['eliminar'] == 'desglose-presupuesto'){ //Eliminar Distribucion del Presupuesto
 					/***
 					*	Eliminar desglose del presupuesto de la Accion (DELETE)
 					*
-					* 	- Borrar datos del desglose del componete (Metas,Beneficiarios,Localidad)
+					* 	- Borrar datos del desglose del componete o actividad (Metas,Beneficiarios,Localidad)
 					*	- Borrar la distribución de presupuesto por mes y partida
-					*	- Borrar el desglose de metas por mes del componente
-					*	- Borrar el desglose de beneficiarios del componente
-					*	- Actualiza las metas por mes del componente
+					*	- Borrar el desglose de metas por mes del componete o actividad
+					*	- Borrar el desglose de beneficiarios del componete o actividad
+					*	- Actualiza las metas por mes del componete o actividad
 					***/
 
 					$id_padre = $parametros['id-accion'];
-					$rows = DB::transaction(function() use ($ids){
-
-						$desgloses_eliminar = ComponenteDesglose::with('metasMes')->whereIn('id',$ids)->get();
-
+					$rows = DB::transaction(function() use ($ids,$parametros){
+						$rows = 0;
+						$desgloses_eliminar = array();
+						
+						if($parametros['nivel'] == 'componente'){
+							$desgloses_eliminar = ComponenteDesglose::with('metasMes')->whereIn('id',$ids)->get();
+						}elseif($parametros['nivel'] == 'actividad'){
+							$desgloses_eliminar = ActividadDesglose::with('metasMes')->whereIn('id',$ids)->get();
+						}
+						
 						$datos_jurisdiccion_metas = array();
-						$distribucion_eliminar = DistribucionPresupuesto::getModel();
-						//Añadir idComponenteDesglose a la tabla
-						foreach ($desgloses_eliminar as $key => $desglose) {
-							foreach ($desglose->metasMes as $meta_mes) {
-								if(!isset($datos_jurisdiccion_metas[$desglose->claveJurisdiccion][$meta_mes->mes])){
-									$datos_jurisdiccion_metas[$desglose->claveJurisdiccion][$meta_mes->mes] = $meta_mes->meta;
+						
+						if(count($desgloses_eliminar)){
+							$distribucion_eliminar = DistribucionPresupuesto::getModel();
+							//Añadir idComponenteDesglose a la tabla
+							foreach ($desgloses_eliminar as $key => $desglose) {
+								foreach ($desglose->metasMes as $meta_mes) {
+									if(!isset($datos_jurisdiccion_metas[$desglose->claveJurisdiccion][$meta_mes->mes])){
+										$datos_jurisdiccion_metas[$desglose->claveJurisdiccion][$meta_mes->mes] = $meta_mes->meta;
+									}else{
+										$datos_jurisdiccion_metas[$desglose->claveJurisdiccion][$meta_mes->mes] += $meta_mes->meta;
+									}
+								}
+	
+								if($key == 0){
+									$distribucion_eliminar = $distribucion_eliminar->where(function($query) use ($desglose){
+										$query->where('idAccion','=',$desglose->idAccion)
+												->where('claveJurisdiccion','=',$desglose->claveJurisdiccion)
+												->where('claveMunicipio','=',$desglose->claveMunicipio)
+												->where('claveLocalidad','=',$desglose->claveLocalidad);
+									});
 								}else{
-									$datos_jurisdiccion_metas[$desglose->claveJurisdiccion][$meta_mes->mes] += $meta_mes->meta;
+									$distribucion_eliminar = $distribucion_eliminar->orWhere(function($query) use ($desglose){
+										$query->where('idAccion','=',$desglose->idAccion)
+												->where('claveJurisdiccion','=',$desglose->claveJurisdiccion)
+												->where('claveMunicipio','=',$desglose->claveMunicipio)
+												->where('claveLocalidad','=',$desglose->claveLocalidad);
+									});
 								}
 							}
-
-							if($key == 0){
-								$distribucion_eliminar = $distribucion_eliminar->where(function($query) use ($desglose){
-									$query->where('idAccion','=',$desglose->idAccion)
-											->where('claveJurisdiccion','=',$desglose->claveJurisdiccion)
-											->where('claveMunicipio','=',$desglose->claveMunicipio)
-											->where('claveLocalidad','=',$desglose->claveLocalidad);
-								});
-							}else{
-								$distribucion_eliminar = $distribucion_eliminar->orWhere(function($query) use ($desglose){
-									$query->where('idAccion','=',$desglose->idAccion)
-											->where('claveJurisdiccion','=',$desglose->claveJurisdiccion)
-											->where('claveMunicipio','=',$desglose->claveMunicipio)
-											->where('claveLocalidad','=',$desglose->claveLocalidad);
-								});
+							$distribucion_eliminar->delete();
+							//$desgloses_ids = $desgloses_eliminar->get();
+							
+							if($parametros['nivel'] == 'componente'){
+								$id_componente = $desgloses_eliminar[0]->idComponente;
+								$componente_metas_mes = Componente::with('metasMes')->find($id_componente);
+								$actualizar_metas_mes = array();
+								foreach ($componente_metas_mes->metasMes as $metas_mes) {
+									if(isset($datos_jurisdiccion_metas[$metas_mes->claveJurisdiccion][$metas_mes->mes])){
+										$metas_mes->meta -= $datos_jurisdiccion_metas[$metas_mes->claveJurisdiccion][$metas_mes->mes];
+										$actualizar_metas_mes[] = $metas_mes;
+									}
+								}
+								$componente_metas_mes->metasMes()->saveMany($actualizar_metas_mes);
+								
+								DesgloseBeneficiario::whereIn('idComponenteDesglose',$ids)->delete();
+								DesgloseMetasMes::whereIn('idComponenteDesglose',$ids)->delete();
+								$rows = ComponenteDesglose::whereIn('id',$ids)->delete();
+							}elseif($parametros['nivel'] == 'actividad'){
+								$id_actividad = $desgloses_eliminar[0]->idActividad;
+								$actividad_metas_mes = Actividad::with('metasMes')->find($id_actividad);
+								$actualizar_metas_mes = array();
+								foreach ($actividad_metas_mes->metasMes as $metas_mes) {
+									if(isset($datos_jurisdiccion_metas[$metas_mes->claveJurisdiccion][$metas_mes->mes])){
+										$metas_mes->meta -= $datos_jurisdiccion_metas[$metas_mes->claveJurisdiccion][$metas_mes->mes];
+										$actualizar_metas_mes[] = $metas_mes;
+									}
+								}
+								$actividad_metas_mes->metasMes()->saveMany($actualizar_metas_mes);
+								
+								ActividadDesgloseBeneficiario::whereIn('idActividadDesglose',$ids)->delete();
+								ActividadDesgloseMetasMes::whereIn('idActividadDesglose',$ids)->delete();
+								$rows = ActividadDesglose::whereIn('id',$ids)->delete();
 							}
 						}
-						$distribucion_eliminar->delete();
-						//$desgloses_ids = $desgloses_eliminar->get();
-
-						$id_componente = $desgloses_eliminar[0]->idComponente;
-						$componente_metas_mes = Componente::with('metasMes')->find($id_componente);
-						$actualizar_metas_mes = array();
-						foreach ($componente_metas_mes->metasMes as $metas_mes) {
-							if(isset($datos_jurisdiccion_metas[$metas_mes->claveJurisdiccion][$metas_mes->mes])){
-								$metas_mes->meta -= $datos_jurisdiccion_metas[$metas_mes->claveJurisdiccion][$metas_mes->mes];
-								$actualizar_metas_mes[] = $metas_mes;
-							}
-						}
-						$componente_metas_mes->metasMes()->saveMany($actualizar_metas_mes);
-
-						DesgloseBeneficiario::whereIn('idComponenteDesglose',$ids)->delete();
-						DesgloseMetasMes::whereIn('idComponenteDesglose',$ids)->delete();
-						return ComponenteDesglose::whereIn('id',$ids)->delete();
+						return $rows;
 					});
 				}elseif($parametros['eliminar'] == 'proyecto-beneficiario'){
 					/***
@@ -1156,12 +1308,26 @@ class InversionController extends ProyectosController {
 					$id_padre = $parametros['id-proyecto'];
 
 					$rows = DB::transaction(function() use ($ids,$id_padre){
-						$componentes = Componente::where('idProyecto','=',$id_padre)->get();
-						$desgloses = ComponenteDesglose::whereIn('idComponente',$componentes->lists('id'))->get();
+						$componentes = Componente::where('idProyecto','=',$id_padre)->lists('id');
+						$actividades = Actividad::where('idProyecto','=',$id_padre)->lists('id');
 						
+						$componente_desgloses = ComponenteDesglose::whereIn('idComponente',$componentes)->lists('id');
+						$actividad_desgloses = ActividadDesglose::whereIn('idActividad',$actividades)->lists('id');
+						
+						DesgloseBeneficiario::whereIn('idComponenteDesglose',$componente_desgloses)
+											->whereIn('idTipoBeneficiario',$ids)
+											->delete();
+						ActividadDesgloseBeneficiario::whereIn('idActividadDesglose',$actividad_desgloses)
+											->whereIn('idTipoBeneficiario',$ids)
+											->delete();
+						return Beneficiario::whereIn('idTipoBeneficiario',$ids)
+									->where('idProyecto','=',$id_padre)
+									->delete();
+						/*
 						$beneficiarios_borrar = DesgloseBeneficiario::whereIn('idComponenteDesglose',$desgloses->lists('id'))
 																	->whereIn('idTipoBeneficiario',$ids)->get();
-						//
+						*/
+						/*
 						$ajuste_totales = array();
 						foreach ($beneficiarios_borrar as $item) {
 							if(!isset($ajuste_totales[$item->idComponenteDesglose])){
@@ -1173,7 +1339,9 @@ class InversionController extends ProyectosController {
 								$ajuste_totales[$item->idComponenteDesglose]['m'] += $item->totalM;
 							}
 						}
+						*/
 						//$actualizar_desgloses = array();
+						/*
 						foreach ($desgloses as $desglose) {
 							if(isset($ajuste_totales[$desglose->id])){
 								$desglose->beneficiariosF -= $ajuste_totales[$desglose->id]['f'];
@@ -1182,14 +1350,7 @@ class InversionController extends ProyectosController {
 								//$actualizar_desgloses[] = $desglose;
 							}
 						}
-
-						DesgloseBeneficiario::whereIn('idComponenteDesglose',$desgloses->lists('id'))
-											->whereIn('idTipoBeneficiario',$ids)
-											->delete();
-						//
-						return Beneficiario::whereIn('idTipoBeneficiario',$ids)
-									->where('idProyecto','=',$id_padre)
-									->delete();
+						*/
 					});
 				}elseif($parametros['eliminar'] == 'antecedente'){ //Eliminar Antecedente(s)
 					/***
@@ -1223,9 +1384,9 @@ class InversionController extends ProyectosController {
 				*	- Borrar las propuestas de financiamiento
 				*	- Borrar las acciones de las FIBAPs -
 				*	- Borrar la relación de la acción con las partidas prespuestarias
-				* 	- Borrar datos del desglose del componete (Metas,Beneficiarios,Localidad)
-				*	- Borrar el desglose de metas por mes del componente
-				*	- Borrar el desglose de beneficiarios del componente
+				* 	- Borrar datos del desglose de los componentes y actividades (Metas,Beneficiarios,Localidad)
+				*	- Borrar el desglose de metas por mes de los componentes y actividades
+				*	- Borrar el desglose de beneficiarios de los componentes y actividades
 				*
 				*	-> Proyecto de Inversión
 				*	- Borrar las metas por mes de los componentes del proyecto
@@ -1262,6 +1423,13 @@ class InversionController extends ProyectosController {
 							DesgloseBeneficiario::whereIn('idComponenteDesglose',$desgloses->lists('id'))->delete();
 						}
 						ComponenteDesglose::whereIn('idAccion',$acciones->lists('id'))->delete();
+						
+						$desgloses = ActividadDesglose::whereIn('idAccion',$acciones->lists('id'))->get();
+						if(count($desgloses) > 0){
+							ActividadDesgloseMetasMes::whereIn('idActividadDesglose',$desgloses->lists('id'))->delete();
+							ActividadDesgloseBeneficiario::whereIn('idActividadDesglose',$desgloses->lists('id'))->delete();
+						}
+						ActividadDesglose::whereIn('idAccion',$acciones->lists('id'))->delete();
 					}
 					Accion::whereIn('idFibap',$ids_fibaps)->delete();
 
@@ -1270,13 +1438,15 @@ class InversionController extends ProyectosController {
 					//Eliminamos las metas por mes de los componentes y actividades
 					ComponenteMetaMes::whereIn('idProyecto',$ids)->delete();
 					ActividadMetaMes::whereIn('idProyecto',$ids)->delete();
-
+					/*
 					$ids_componentes = Componente::whereIn('idProyecto',$ids)->lists('id');
 					if(count($ids_componentes) > 0){
 						Actividad::whereIn('idComponente',$ids_componentes)->delete();
 					}
-					
+					*/
+					//Eliminamos componentes, actividades y beneficiarios
 					Componente::whereIn('idProyecto',$ids)->delete();
+					Actividad::whereIn('idProyecto',$ids)->delete();
 					Beneficiario::whereIn('idProyecto',$ids)->delete();
 
 					$fuentes_financiamiento = ProyectoFinanciamiento::whereIn('idProyecto',$ids)->get();
@@ -1297,7 +1467,7 @@ class InversionController extends ProyectosController {
 						*	Eliminar Actividad (DELETE)
 						* 	- Se regresa lista de actividades
 						***/
-						$data['actividades'] = Actividad::with('usuario')->where('idComponente',$id_padre)->get();
+						//$data['actividades'] = Actividad::with('usuario')->where('idComponente',$id_padre)->get();
 					}elseif($parametros['eliminar'] == 'proyecto-beneficiario'){
 						/***
 						*	Eliminar Beneficiario (DELETE)
@@ -1309,9 +1479,13 @@ class InversionController extends ProyectosController {
 						*	Eliminar Desglose del Componente (DELETE)
 						* 	- Se regresa el desglose del componente, la distribucion total del presupuesto por partida y el presupuesto requerido de la Accion(Componente)
 						***/
-						$accion = Accion::with('fibap.distribucionPresupuestoAgrupado.objetoGasto','desglosePresupuesto')
+						$accion = Accion::with('fibap.distribucionPresupuestoAgrupado.objetoGasto')
 										->find($id_padre);
-						$data['id_componete'] = $accion->idComponente;
+						if($accion->idComponente){
+							$data['id_componente'] = $accion->idComponente;
+						}else{
+							$data['id_actividad'] = $accion->idActividad;
+						}
 						//$data['desglose_presupuesto'] = $accion->desglosePresupuesto;
 						$data['distribucion_total'] = $accion->fibap->distribucionPresupuestoAgrupado;
 						$data['presupuesto_requerido'] = $accion->presupuestoRequerido;
@@ -1327,7 +1501,7 @@ class InversionController extends ProyectosController {
 						* 	- Se regresa la lista de Acciones(Componentes), la distribucion total del presupuesto por partida
 						***/
 						$fibap = FIBAP::with('acciones','distribucionPresupuestoAgrupado.objetoGasto')->find($id_padre);
-						$fibap->acciones->load('datosComponenteDetalle','propuestasFinanciamiento');
+						$fibap->acciones->load('datosComponenteDetalle','datosActividadDetalle','propuestasFinanciamiento');
 						$data['acciones'] = $fibap->acciones;
 						$data['distribucion_total'] = $fibap->distribucionPresupuestoAgrupado;
 					}elseif($parametros['eliminar'] == 'financiamiento'){
@@ -1343,6 +1517,7 @@ class InversionController extends ProyectosController {
 			$http_status = 500;	
 			$data['code'] = 'S03';
 			$data['ex'] = $ex->getMessage();
+			$data['line'] = $ex->getLine();
 			if($data['data'] == ''){
 				$data['data'] = "No se pueden borrar los registros";
 			}
@@ -1355,7 +1530,21 @@ class InversionController extends ProyectosController {
 		$respuesta = array();
 		$respuesta['http_status'] = 200;
 		$respuesta['data'] = array("data"=>'');	
-
+		
+		if($parametros['nivel'] == 'componente'){
+			$idElemento = 'idComponente';
+			$elemento = 'componente';
+			$tablaElemento = 'proyectoComponentes';
+			$tablaMetasMes = 'desgloseMetasMes';
+			$tablaBeneficiarios = 'desgloseBeneficiarios';
+		}else{
+			$idElemento = 'idActividad';
+			$elemento = 'actividad';
+			$tablaElemento = 'componenteActividades';
+			$tablaMetasMes = 'actividadDesgloseMetasMes';
+			$tablaBeneficiarios = 'actividadDesgloseBeneficiarios';
+		}
+		
 		$usuario = Sentry::getUser();
 		$id_accion = $parametros['id-accion'];
 		$id_fibap = $parametros['id-fibap'];
@@ -1379,10 +1568,27 @@ class InversionController extends ProyectosController {
 				//Valida que la codificación del archivo sea UTF-8 - No se necesita ya que no se capturara texto
 				//if(mb_detect_encoding(file_get_contents($archivoConDatos), 'UTF-8', true)){
 					if (($handle = fopen($archivoConDatos, "r")) !== FALSE && ($datos_desglose = fopen($archivo_desglose, "w")) !== FALSE && ($datos_mes = fopen($archivo_mes, "w")) !== FALSE) {
-						
-						$accion = Accion::with(array('desglose'=>function($query){
-								$query->select('*',DB::raw('CONCAT_WS("_",claveMunicipio,claveLocalidad) AS claveCompuesta'));
-							}))->find($id_accion);
+						if($parametros['nivel'] == 'componente'){
+							$accion = Accion::with(array('desgloseComponente'=>function($query){
+									$query->select('*',DB::raw('CONCAT_WS("_",claveMunicipio,claveLocalidad) AS claveCompuesta'));
+								}))->find($id_accion);
+							$accion->desglose = $accion->desgloseComponente;
+							/*
+							$desgloses_capturados = array();
+							foreach($accion->desgloseComponente as $desglose){
+								$desgloses_capturados[$desglose->claveCompuesta] = $desglose;
+							}*/
+						}else{
+							$accion = Accion::with(array('desgloseActividad'=>function($query){
+									$query->select('*',DB::raw('CONCAT_WS("_",claveMunicipio,claveLocalidad) AS claveCompuesta'));
+								}))->find($id_accion);
+							$accion->desglose = $accion->desgloseActividad;
+							/*
+							$desgloses_capturados = array();
+							foreach($accion->desgloseActividad as $desglose){
+								$desgloses_capturados[$desglose->claveCompuesta] = $desglose;
+							}*/
+						}
 						
 						$desgloses_capturados = array();
 						foreach($accion->desglose as $desglose){
@@ -1405,7 +1611,7 @@ class InversionController extends ProyectosController {
 							}
 						}elseif($parametros['tipo-archivo'] == 'beneficiarios'){
 							$accion->desglose->load(array('beneficiarios'=>function($query){
-								$query->select('id','idComponenteDesglose','creadoPor','creadoAl',
+								$query->select('id',$idElemento.'Desglose','creadoPor','creadoAl',
 										DB::raw('CONCAT_WS("_",claveMunicipio,claveLocalidad,idTipoBeneficiario) AS claveCompuesta'));
 							}));
 						}
@@ -1517,7 +1723,7 @@ class InversionController extends ProyectosController {
 									$desgloses_agregados[$desglose->id] = 'agregado';
 									fputcsv($datos_desglose,[
 										$desglose->id,
-										$desglose->idComponente,
+										($desglose->idComponente)?$desglose->idComponente:$desglose->idActividad,
 										$desglose->idAccion,
 										$desglose->claveJurisdiccion,
 										$desglose->claveMunicipio,
@@ -1540,8 +1746,8 @@ class InversionController extends ProyectosController {
 											$meta_mes = $metas_mes[$i];
 											fputcsv($datos_mes,[
 												$meta_mes->id,
-			                                    $meta_mes->idComponenteDesglose,
-			                                    $meta_mes->idComponente,
+			                                    ($meta_mes->idComponenteDesglose)?$meta_mes->idComponenteDesglose:$meta_mes->idActividadDesglose,
+			                                    ($meta_mes->idComponente)?$meta_mes->idComponente:$meta_mes->idActividad,
 			                                    $meta_mes->claveMunicipio,
 												$meta_mes->claveLocalidad,
 												$meta_mes->mes,
@@ -1554,7 +1760,7 @@ class InversionController extends ProyectosController {
 												fputcsv($datos_mes,[
 													NULL,
 				                                    $desglose->id,
-				                                    $accion->idComponente,
+				                                    ($accion->idComponente)?$accion->idComponente:$accion->idActividad,
 				                                    $clave_municipio,
 													$clave_localidad,
 													$i,
@@ -1578,8 +1784,8 @@ class InversionController extends ProyectosController {
 										$beneficiario = $beneficiarios['datos'][$csv_data[0].'_'.$csv_data[3]];
 										fputcsv($datos_mes,[
 											$beneficiario['id'],
-											$beneficiario['idComponenteDesglose'],
-											$accion->idComponente,
+											$beneficiario[$idElemento.'Desglose'],
+											($accion->idComponente)?$accion->idComponente:$accion->idActividad,
 											$clave_municipio,
 											$clave_localidad,
 											$csv_data[3],
@@ -1593,7 +1799,7 @@ class InversionController extends ProyectosController {
 											fputcsv($datos_mes,[
 												NULL,
 												$desglose->id,
-												$accion->idComponente,
+												($accion->idComponente)?$accion->idComponente:$accion->idActividad,
 												$clave_municipio,
 												$clave_localidad,
 												$csv_data[3],
@@ -1610,7 +1816,7 @@ class InversionController extends ProyectosController {
 									$nuevos_desgloses[$csv_data[0]] = 'registrado';
 									fputcsv($datos_desglose,[
 										NULL,
-										$accion->idComponente,
+										($accion->idComponente)?$accion->idComponente:$accion->idActividad,
 										$accion->id,
 										NULL,
 										$clave_municipio,
@@ -1629,7 +1835,7 @@ class InversionController extends ProyectosController {
 											fputcsv($datos_mes,[
 												NULL,
 												NULL,
-												$accion->idComponente,
+												($accion->idComponente)?$accion->idComponente:$accion->idActividad,
 												$clave_municipio,
 												$clave_localidad,
 												$i,
@@ -1642,7 +1848,7 @@ class InversionController extends ProyectosController {
 										fputcsv($datos_mes,[
 											NULL,
 											NULL,
-											$accion->idComponente,
+											($accion->idComponente)?$accion->idComponente:$accion->idActividad,
 											$clave_municipio,
 											$clave_localidad,
 											$csv_data[3],
@@ -1678,14 +1884,14 @@ class InversionController extends ProyectosController {
 							//Cargar Archivo de Desgloses
 							$query = sprintf("
 								LOAD DATA local INFILE '%s' REPLACE 
-								INTO TABLE componenteDesglose 
+								INTO TABLE ".$elemento."Desglose 
 								FIELDS TERMINATED BY ',' 
 								OPTIONALLY ENCLOSED BY '\"' 
 								ESCAPED BY '\"' 
 								LINES TERMINATED BY '\\n'
 								(
 								@vid,
-								@vidComponente,
+								@v".$idElemento.",
 								@vidAccion,
 								@vclaveJurisdiccion,
 								@vclaveMunicipio,
@@ -1698,7 +1904,7 @@ class InversionController extends ProyectosController {
 								)
 								set actualizadoPor='%s', modificadoAl = CURRENT_TIMESTAMP,
 								id = nullif(@vid,''),
-								idComponente = @vidComponente,
+								".$idElemento." = @v".$idElemento.",
 								idAccion = @vidAccion,
 								claveJurisdiccion = nullif(@vclaveJurisdiccion,''),
 								claveMunicipio = @vclaveMunicipio,
@@ -1713,13 +1919,13 @@ class InversionController extends ProyectosController {
 							
 							//Colocar la clave de las jurisdicciones correspondientes
 							$query = sprintf("
-								UPDATE componenteDesglose, vistaMunicipios, vistaJurisdicciones
-								SET componenteDesglose.claveJurisdiccion = vistaJurisdicciones.clave
+								UPDATE ".$elemento."Desglose, vistaMunicipios, vistaJurisdicciones
+								SET ".$elemento."Desglose.claveJurisdiccion = vistaJurisdicciones.clave
 								WHERE 
-								componenteDesglose.claveMunicipio = vistaMunicipios.clave AND
+								".$elemento."Desglose.claveMunicipio = vistaMunicipios.clave AND
 								vistaMunicipios.idJurisdiccion = vistaJurisdicciones.id AND 
-								componenteDesglose.claveJurisdiccion Is NULL AND 
-								componenteDesglose.idAccion = %s
+								".$elemento."Desglose.claveJurisdiccion Is NULL AND 
+								".$elemento."Desglose.idAccion = %s
 								", $id_accion);
 							DB::connection()->getpdo()->exec($query);
 							
@@ -1775,12 +1981,12 @@ class InversionController extends ProyectosController {
 								
 								//Actualizar las claves de jurisdiccion
 								$query = sprintf("
-									UPDATE fibapDistribucionPresupuesto, componenteDesglose
-									SET fibapDistribucionPresupuesto.claveJurisdiccion = componenteDesglose.claveJurisdiccion
+									UPDATE fibapDistribucionPresupuesto, ".$elemento."Desglose
+									SET fibapDistribucionPresupuesto.claveJurisdiccion = ".$elemento."Desglose.claveJurisdiccion
 									WHERE 
-									fibapDistribucionPresupuesto.claveMunicipio = componenteDesglose.claveMunicipio AND
-									fibapDistribucionPresupuesto.claveLocalidad = componenteDesglose.claveLocalidad AND
-									fibapDistribucionPresupuesto.idAccion = componenteDesglose.idAccion AND
+									fibapDistribucionPresupuesto.claveMunicipio = ".$elemento."Desglose.claveMunicipio AND
+									fibapDistribucionPresupuesto.claveLocalidad = ".$elemento."Desglose.claveLocalidad AND
+									fibapDistribucionPresupuesto.idAccion = ".$elemento."Desglose.idAccion AND
 									fibapDistribucionPresupuesto.claveJurisdiccion IS NULL AND 
 									fibapDistribucionPresupuesto.idAccion = %s
 									",$id_accion);
@@ -1788,31 +1994,31 @@ class InversionController extends ProyectosController {
 								
 								//Limpiar el presupuesto del desglose para poder actualizar
 								$query = sprintf("
-									UPDATE componenteDesglose
-									SET componenteDesglose.presupuesto = NULL, actualizadoPor = %s, modificadoAl = CURRENT_TIMESTAMP
+									UPDATE ".$elemento."Desglose
+									SET ".$elemento."Desglose.presupuesto = NULL, actualizadoPor = %s, modificadoAl = CURRENT_TIMESTAMP
 									WHERE 
-									componenteDesglose.idAccion = %s AND 
-									componenteDesglose.borradoAl IS NULL 
+									".$elemento."Desglose.idAccion = %s AND 
+									".$elemento."Desglose.borradoAl IS NULL 
 									",$id_usuario,$id_accion);
 								DB::connection()->getpdo()->exec($query);
 								
 								//Actualizar las cantidades del presupuesto en el desglose
 								$query = sprintf("
-									UPDATE componenteDesglose,
+									UPDATE ".$elemento."Desglose,
 									(
 										SELECT claveMunicipio, claveLocalidad, sum(cantidad) AS presupuesto
 										FROM fibapDistribucionPresupuesto
 										WHERE idAccion = %s AND borradoAl IS NULL
 										GROUP BY claveMunicipio, claveLocalidad
 									) AS sumasPresupuesto
-									SET componenteDesglose.presupuesto = sumasPresupuesto.presupuesto, 
-										componenteDesglose.actualizadoPor = %s, 
-										componenteDesglose.modificadoAl = CURRENT_TIMESTAMP
+									SET ".$elemento."Desglose.presupuesto = sumasPresupuesto.presupuesto, 
+										".$elemento."Desglose.actualizadoPor = %s, 
+										".$elemento."Desglose.modificadoAl = CURRENT_TIMESTAMP
 									WHERE 
-									componenteDesglose.claveMunicipio = sumasPresupuesto.claveMunicipio AND
-									componenteDesglose.claveLocalidad = sumasPresupuesto.claveLocalidad AND
-									componenteDesglose.idAccion = %s AND 
-									componenteDesglose.borradoAl IS NULL 
+									".$elemento."Desglose.claveMunicipio = sumasPresupuesto.claveMunicipio AND
+									".$elemento."Desglose.claveLocalidad = sumasPresupuesto.claveLocalidad AND
+									".$elemento."Desglose.idAccion = %s AND 
+									".$elemento."Desglose.borradoAl IS NULL 
 									",$id_accion,$id_usuario,$id_accion);
 								DB::connection()->getpdo()->exec($query);
 								
@@ -1820,15 +2026,15 @@ class InversionController extends ProyectosController {
 								//Cargar Archivo de Metas x mes
 								$query = sprintf("
 									LOAD DATA local INFILE '%s' REPLACE 
-									INTO TABLE desgloseMetasMes 
+									INTO TABLE ".$tablaMetasMes." 
 									FIELDS TERMINATED BY ',' 
 									OPTIONALLY ENCLOSED BY '\"' 
 									ESCAPED BY '\"' 
 									LINES TERMINATED BY '\\n'
 									(
 									@vid,
-									@vidComponenteDesglose,
-									@vidComponente,
+									@v".$idElemento."Desglose,
+									@v".$idElemento.",
 									@vclaveMunicipio,
 									@vclaveLocalidad,
 									@vmes,
@@ -1836,8 +2042,8 @@ class InversionController extends ProyectosController {
 									)
 									set creadoPor='%s', actualizadoPor='%s',
 									id = nullif(@vid,''),
-									idComponenteDesglose = nullif(@vidComponenteDesglose,''),
-									idComponente = nullif(@vidComponente,''),
+									".$idElemento."Desglose = nullif(@v".$idElemento."Desglose,''),
+									".$idElemento." = nullif(@v".$idElemento.",''),
 									claveMunicipio = nullif(@vclaveMunicipio,''),
 									claveLocalidad = nullif(@vclaveLocalidad,''),
 									mes = @vmes,
@@ -1847,35 +2053,35 @@ class InversionController extends ProyectosController {
 								
 								//Actualizar la relacion de los desgloses con las metas
 								$query = sprintf("
-									UPDATE desgloseMetasMes, componenteDesglose
-									SET desgloseMetasMes.idComponenteDesglose = componenteDesglose.id
+									UPDATE ".$tablaMetasMes.", ".$elemento."Desglose
+									SET ".$tablaMetasMes.".".$idElemento."Desglose = ".$elemento."Desglose.id
 									WHERE 
-									desgloseMetasMes.idComponente = componenteDesglose.idComponente AND
-									desgloseMetasMes.claveMunicipio = componenteDesglose.claveMunicipio AND
-									desgloseMetasMes.claveLocalidad = componenteDesglose.claveLocalidad AND 
-									desgloseMetasMes.idComponenteDesglose IS NULL
+									".$tablaMetasMes.".".$idElemento." = ".$elemento."Desglose.".$idElemento." AND
+									".$tablaMetasMes.".claveMunicipio = ".$elemento."Desglose.claveMunicipio AND
+									".$tablaMetasMes.".claveLocalidad = ".$elemento."Desglose.claveLocalidad AND 
+									".$tablaMetasMes.".".$idElemento."Desglose IS NULL
 									");
 								DB::connection()->getpdo()->exec($query);
 								
 								//Se insertan/reemplazan las metas por mes del componente con los valores importados del archivo
 								$query = sprintf("
-									REPLACE INTO componenteMetasMes
+									REPLACE INTO ".$elemento."MetasMes
 									SELECT 
-									cMetas.id, comp.idProyecto, desglose.idComponente, desglose.claveJurisdiccion, metasMes.mes, 
+									cMetas.id, comp.idProyecto, desglose.".$idElemento.", desglose.claveJurisdiccion, metasMes.mes, 
 									SUM(metasMes.meta) as meta, cMetas.avance, ifnull(cMetas.creadoPor,%s) AS creadoPor, 
 									ifnull(cMetas.actualizadoPor,%s) AS actualizadoPor, cMetas.creadoAl, cMetas.modificadoAl, 
 									NULL AS borradoAl
-									FROM componenteDesglose AS desglose
-									LEFT JOIN desgloseMetasMes AS metasMes 
+									FROM ".$elemento."Desglose AS desglose
+									LEFT JOIN ".$tablaMetasMes." AS metasMes 
 									ON metasMes.claveMunicipio = desglose.claveMunicipio 
-									AND desglose.id = metasMes.idComponenteDesglose
+									AND desglose.id = metasMes.".$idElemento."Desglose
 									AND metasMes.borradoAl IS NULL
-									LEFT JOIN componenteMetasMes AS cMetas
-									ON cMetas.idComponente = desglose.idComponente
+									LEFT JOIN ".$elemento."MetasMes AS cMetas
+									ON cMetas.".$idElemento." = desglose.".$idElemento."
 									AND cMetas.claveJurisdiccion = desglose.claveJurisdiccion
 									AND cMetas.mes = metasMes.mes
 									AND cMetas.borradoAl IS NULL
-									JOIN proyectoComponentes AS comp ON comp.id = desglose.idComponente
+									JOIN ".$tablaElemento." AS comp ON comp.id = desglose.".$idElemento."
 									WHERE desglose.idAccion = %s AND desglose.borradoAl IS NULL
 									GROUP BY desglose.claveJurisdiccion, metasMes.mes;
 								",$id_usuario,$id_usuario,$id_accion);
@@ -1883,14 +2089,14 @@ class InversionController extends ProyectosController {
 	
 								//Se actualizan las sumas por trimestre en el componente
 								$query = sprintf("
-									UPDATE proyectoComponentes, (
+									UPDATE ".$tablaElemento.", (
 										SELECT 
 										SUM(IF(mes/3 <= 1,meta,0)) AS meta1,
 										SUM(IF(mes/3 > 1 AND mes/3 <= 2,meta,0)) AS meta2,
 										SUM(IF(mes/3 > 2 AND mes/3 <= 3,meta,0)) AS meta3,
 										SUM(IF(mes/3 > 3 AND mes/3 <= 4,meta,0)) AS meta4
-										FROM componenteMetasMes
-										WHERE idComponente = %s AND borradoAl IS NULL
+										FROM ".$elemento."MetasMes
+										WHERE ".$idElemento." = %s AND borradoAl IS NULL
 									) AS metasTrim
 									SET 
 									numeroTrim1 = metasTrim.meta1,
@@ -1898,22 +2104,22 @@ class InversionController extends ProyectosController {
 									numeroTrim3 = metasTrim.meta3,
 									numeroTrim4 = metasTrim.meta4,
 									valorNumerador = (metasTrim.meta1 + metasTrim.meta2 + metasTrim.meta3 + metasTrim.meta4)
-									WHERE proyectoComponentes.id = %s
-								",$accion->idComponente,$accion->idComponente);
+									WHERE ".$tablaElemento.".id = %s
+								",($accion->idComponente)?$accion->idComponente:$accion->idActividad,($accion->idComponente)?$accion->idComponente:$accion->idActividad);
 								DB::connection()->getpdo()->exec($query);
 							}elseif($parametros['tipo-archivo'] == 'beneficiarios'){
 								//Cargar Archivo de Beneficiarios por tipo
 								$query = sprintf("
 									LOAD DATA local INFILE '%s' REPLACE 
-									INTO TABLE desgloseBeneficiarios 
+									INTO TABLE ".$tablaBeneficiarios." 
 									FIELDS TERMINATED BY ',' 
 									OPTIONALLY ENCLOSED BY '\"' 
 									ESCAPED BY '\"' 
 									LINES TERMINATED BY '\\n'
 									(
 									@vid,
-									@vidComponenteDesglose,
-									@vidComponente,
+									@v".$idElemento."Desglose,
+									@v".$idElemento.",
 									@vclaveMunicipio,
 									@vclaveLocalidad,
 									@vidTipoBeneficiario,
@@ -1924,8 +2130,8 @@ class InversionController extends ProyectosController {
 									)
 									set actualizadoPor='%s', modificadoAl = CURRENT_TIMESTAMP, 
 									id = nullif(@vid,''),
-									idComponenteDesglose = nullif(@vidComponenteDesglose,''),
-									idComponente = nullif(@vidComponente,''),
+									".$idElemento."Desglose = nullif(@v".$idElemento."Desglose,''),
+									".$idElemento." = nullif(@v".$idElemento.",''),
 									claveMunicipio = nullif(@vclaveMunicipio,''),
 									claveLocalidad = nullif(@vclaveLocalidad,''),
 									idTipoBeneficiario = @vidTipoBeneficiario,
@@ -1999,13 +2205,21 @@ class InversionController extends ProyectosController {
 				$clave_municipio = '0';
 				$clave_localidad = '0';
 			}
-
+			
 			if($id){
 				$es_editar = TRUE;
-				$desglose = ComponenteDesglose::with('metasMes','beneficiarios')->find($id);
+				if($parametros['nivel-desglose'] == 'componente'){
+					$desglose = ComponenteDesglose::with('metasMes','beneficiarios')->find($id);
+				}else{
+					$desglose = ActividadDesglose::with('metasMes','beneficiarios')->find($id);
+				}
 				$accion_id = $desglose->idAccion;
 			}else{
-				$desglose = new ComponenteDesglose;
+				if($parametros['nivel-desglose'] == 'componente'){
+					$desglose = new ComponenteDesglose;
+				}else{
+					$desglose = new ActividadDesglose;
+				}
 				$accion_id = $parametros['id-accion'];
 				$desglose->claveMunicipio = '0';
 				$desglose->claveLocalidad = '0';
@@ -2147,13 +2361,62 @@ class InversionController extends ProyectosController {
 
 			$beneficiarios_desglose = array();
 			if($editar_beneficiarios){
+				//Obtener todos los beneficiarios ya capturados
+				$beneficiarios_componentes = DesgloseBeneficiario::whereIn('idComponente',$fibap->acciones->lists('idComponente'))
+												->where('claveLocalidad','!=',$clave_localidad)->where('claveMunicipio','!=',$clave_municipio)
+												->select('idTipoBeneficiario',DB::raw('sum(totalF) AS totalF'),DB::raw('sum(totalM) AS totalM'))
+												->groupBy('idTipoBeneficiario')
+												->get();
+				$beneficiarios_actividades = ActividadDesgloseBeneficiario::whereIn('idActividad',$fibap->acciones->lists('idActividad'))
+												->where('claveLocalidad','!=',$clave_localidad)->where('claveMunicipio','!=',$clave_municipio)
+												->select('idTipoBeneficiario',DB::raw('sum(totalF) AS totalF'),DB::raw('sum(totalM) AS totalM'))
+												->groupBy('idTipoBeneficiario')
+												->get();
+				
+				$suma_benef = array();
+				//$suma_total = array('f'=>0,'m'=>0);
+				foreach ($beneficiarios_componentes as $beneficiario) {
+					if(!isset($suma_benef[$beneficiario->idTipoBeneficiario])){
+						$suma_benef[$beneficiario->idTipoBeneficiario] = array('f'=>0,'m'=>0);
+					}
+					$suma_benef[$beneficiario->idTipoBeneficiario]['f'] += $beneficiario->totalF;
+					$suma_benef[$beneficiario->idTipoBeneficiario]['m'] += $beneficiario->totalM;
+				}
+				foreach ($beneficiarios_actividades as $beneficiario) {
+					if(!isset($suma_benef[$beneficiario->idTipoBeneficiario])){
+						$suma_benef[$beneficiario->idTipoBeneficiario] = array('f'=>0,'m'=>0);
+					}
+					$suma_benef[$beneficiario->idTipoBeneficiario]['f'] += $beneficiario->totalF;
+					$suma_benef[$beneficiario->idTipoBeneficiario]['m'] += $beneficiario->totalM;
+				}
+				
+				foreach ($parametros['beneficiarios'] as $tipo_beneficiario => $desglose_sexo) {
+					if(isset($suma_benef[$tipo_beneficiario])){
+						$suma_benef[$tipo_beneficiario]['f'] += $desglose_sexo['f'];
+						$suma_benef[$tipo_beneficiario]['m'] += $desglose_sexo['m'];
+						//$suma_total['f'] += $desglose_sexo['f'];
+						//$suma_total['m'] += $desglose_sexo['m'];
+					}else{
+						$suma_benef[$tipo_beneficiario]['f'] = 0;
+						$suma_benef[$tipo_beneficiario]['m'] = 0;
+					}
+				}
+				
+				foreach ($fibap->proyecto->beneficiarios as $beneficiario) {
+					if($suma_benef[$beneficiario->idTipoBeneficiario][$beneficiario->sexo] > $beneficiario->total){
+						//var_dump($suma_benef[$beneficiario->idTipoBeneficiario][$beneficiario->sexo]);
+						//var_dump($beneficiario->toArray);die;
+						throw new Exception('{"field":"beneficiarios-'.$beneficiario->idTipoBeneficiario.'-'.$beneficiario->sexo.'","error":"La cantidad especificada sobrepasa al limite de beneficiarios especificados para el proyecto."}', 1);
+					}
+				}
+				/*
 				//Se obtienen todos los beneficiarios capturados para el proyecto
 				$beneficiarios_capturados = ComponenteDesglose::whereIn('idAccion',$fibap->acciones->lists('id'))
 											->groupBy('claveLocalidad','claveMunicipio');
+				
 				//Se filtran por localidad o jurisdicción, para obtener los beneficiarios de las diferentes localidades capturadas
 				if($clave_jurisdiccion != 'OC'){
-					$beneficiarios_capturados = $beneficiarios_capturados->where('claveLocalidad','!=',$clave_localidad)
-																		->where('claveMunicipio','!=',$clave_municipio);
+					$beneficiarios_capturados = $beneficiarios_capturados->where('claveLocalidad','!=',$clave_localidad)->where('claveMunicipio','!=',$clave_municipio);
 				}else{
 					$beneficiarios_capturados = $beneficiarios_capturados->where('claveJurisdiccion','!=',$clave_jurisdiccion);
 				}
@@ -2182,19 +2445,19 @@ class InversionController extends ProyectosController {
 					if(isset($suma_benef[$tipo_beneficiario])){
 						$suma_benef[$tipo_beneficiario]['f'] += $desglose_sexo['f'];
 						$suma_benef[$tipo_beneficiario]['m'] += $desglose_sexo['m'];
-						$suma_total['f'] += $desglose_sexo['f'];
-						$suma_total['m'] += $desglose_sexo['m'];
+						//$suma_total['f'] += $desglose_sexo['f'];
+						//$suma_total['m'] += $desglose_sexo['m'];
 					}else{
 						$suma_benef[$tipo_beneficiario]['f'] = 0;
 						$suma_benef[$tipo_beneficiario]['m'] = 0;
 					}
 				}
-
 				foreach ($fibap->proyecto->beneficiarios as $beneficiario) {
 					if($suma_benef[$beneficiario->idTipoBeneficiario][$beneficiario->sexo] > $beneficiario->total){
 						throw new Exception('{"field":"beneficiarios-'.$beneficiario->idTipoBeneficiario.'-'.$beneficiario->sexo.'","error":"La cantidad especificada sobrepasa al limite de beneficiarios especificados para el proyecto."}', 1);
 					}
 				}
+				*/
 
 				/******************************      Fin validación de beneficiarios        *******************************/
 
@@ -2203,18 +2466,25 @@ class InversionController extends ProyectosController {
 						$desglose_benef = $desglose->beneficiarios->filter(function($item) use ($tipo_beneficiario){
 							if($item->idTipoBeneficiario == $tipo_beneficiario){ return true; }
 						})->first();
-						//$desglose_benef = $desglose_benef[0];
 					}else{
 						$desglose_benef = FALSE;
 					}
 					if(!$desglose_benef){
-						$desglose_benef = new DesgloseBeneficiario;
+						if($parametros['nivel-desglose'] == 'componente'){
+							$desglose_benef = new DesgloseBeneficiario;
+						}else{
+							$desglose_benef = new ActividadDesgloseBeneficiario;
+						}
 						$desglose_benef->idTipoBeneficiario = $tipo_beneficiario;
 						$nuevo_desglose = true;
 					}else{
 						$nuevo_desglose = false;
 					}
-					$desglose_benef->idComponente = $accion->idComponente;
+					if($parametros['nivel-desglose'] == 'componente'){
+						$desglose_benef->idComponente = $accion->idComponente;
+					}else{
+						$desglose_benef->idActividad = $accion->idActividad;
+					}
 					$desglose_benef->claveMunicipio = $clave_municipio;
 					$desglose_benef->claveLocalidad = $clave_localidad;
 					$desglose_benef->totalF = $desglose_sexo['f'];
@@ -2247,7 +2517,11 @@ class InversionController extends ProyectosController {
 					$trimestres[ceil(($mes/3))] += $meta;
 					$suma_metas += $meta;
 				}elseif($meta > 0 ){
-					$recurso = new DesgloseMetasMes;
+					if($parametros['nivel-desglose'] == 'componente'){
+						$recurso = new DesgloseMetasMes;
+					}else{
+						$recurso = new ActividadDesgloseMetasMes;
+					}
 					$recurso->mes = $mes;
 					$recurso->meta = $meta;
 
@@ -2256,18 +2530,30 @@ class InversionController extends ProyectosController {
 					$suma_metas += $meta;
 				}
 			}
-
-			$componente = $accion->componente;
+			
+			if($parametros['nivel-desglose'] == 'componente'){
+				$componente = $accion->componente;
+			}else{
+				$componente = $accion->actividad;
+			}
+			
 			$componente->valorNumerador = $suma_metas;
 			$componente->numeroTrim1 = $trimestres[1];
 			$componente->numeroTrim2 = $trimestres[2];
 			$componente->numeroTrim3 = $trimestres[3];
 			$componente->numeroTrim4 = $trimestres[4];
 
-			//Obtenemos las metas por mes del componente de la jurisdicción a capturar, estos serían el concentrado de mestas del desglose
-			$componente_metas_mes_capturados = ComponenteMetaMes::where('idComponente','=',$accion->idComponente)
+			//Obtenemos las metas por mes del componente de la jurisdicción a capturar, estos serían el concentrado de metas del desglose
+			if($parametros['nivel-desglose'] == 'componente'){
+				$componente_metas_mes_capturados = ComponenteMetaMes::where('idComponente','=',$accion->idComponente)
 																->where('claveJurisdiccion','=',$clave_jurisdiccion)
 																->get();
+			}else{
+				$componente_metas_mes_capturados = ActividadMetaMes::where('idActividad','=',$accion->idActividad)
+																->where('claveJurisdiccion','=',$clave_jurisdiccion)
+																->get();
+			}
+			
 			$componente_metas_mes = array();
 			if(count($componente_metas_mes_capturados)){
 				//Con las metas por mes ya capturadas, buscamos las que vienen del formulario para actualizar
@@ -2282,7 +2568,11 @@ class InversionController extends ProyectosController {
 			foreach ($metas_mes as $meta) {
 				//las que no se hayan actualizado se crean
 				if(!isset($componente_metas_mes[$meta->mes])){
-					$meta_mes = new ComponenteMetaMes;
+					if($parametros['nivel-desglose'] == 'componente'){
+						$meta_mes = new ComponenteMetaMes;
+					}else{
+						$meta_mes = new ActividadMetaMes;
+					}
 					$meta_mes->idProyecto = $fibap->proyecto->id;
 					$meta_mes->mes = $meta->mes;
 					$meta_mes->meta = $meta->meta;
@@ -2290,41 +2580,54 @@ class InversionController extends ProyectosController {
 
 					$componente_metas_mes[$meta->mes] = $meta_mes;
 				}
-				
 			}
 			
 			$desglose->idAccion = $accion->id;
 			$desglose->claveJurisdiccion = $clave_jurisdiccion;
-			if($clave_jurisdiccion != 'OC'){
-				$desglose->claveMunicipio 	= $clave_municipio;
-				$desglose->claveLocalidad 	= $clave_localidad;
-			}
+			$desglose->claveMunicipio 	= $clave_municipio;
+			$desglose->claveLocalidad 	= $clave_localidad;
 			$desglose->presupuesto 		= $suma_presupuesto;
+			/*
 			if($editar_beneficiarios){
 				$desglose->beneficiariosF 	= $suma_total['f'];
 				$desglose->beneficiariosM 	= $suma_total['m'];
 			}
-			
-			$respuesta['data'] = DB::transaction(function() use ($accion,$distribucion,$desglose,$metas_mes,$beneficiarios_desglose,$componente_metas_mes,$componente){
+			*/
+			$nivel_desglose = $parametros['nivel-desglose'];
+			$respuesta['data'] = DB::transaction(function() use ($accion,$distribucion,$desglose,$metas_mes,$beneficiarios_desglose,$componente_metas_mes,$componente,$nivel_desglose){
 				$componente->save();
-
-				$accion->componente->desglose()->save($desglose);
-
-				$accion->componente->metasMes()->saveMany($componente_metas_mes);
-
+				
+				if($nivel_desglose == 'componente'){
+					$accion->componente->desglose()->save($desglose);
+					$accion->componente->metasMes()->saveMany($componente_metas_mes);
+				}else{
+					$accion->actividad->desglose()->save($desglose);
+					$accion->actividad->metasMes()->saveMany($componente_metas_mes);
+				}
+				
 				if(count($distribucion)){
 					$accion->distribucionPresupuesto()->saveMany($distribucion);
 				}
 
 				if(count($metas_mes)){
 					$desglose->metasMes()->saveMany($metas_mes);
-					DesgloseMetasMes::where('idComponenteDesglose',$desglose->id)
-									->whereNull('idComponente')
-									->update(array(
-										'idComponente'=>$desglose->idComponente,
-										'claveMunicipio'=>$desglose->claveMunicipio,
-										'claveLocalidad'=>$desglose->claveLocalidad
-									));
+					if($nivel_desglose == 'componente'){
+						DesgloseMetasMes::where('idComponenteDesglose',$desglose->id)
+										->whereNull('idComponente')
+										->update(array(
+											'idComponente'=>$desglose->idComponente,
+											'claveMunicipio'=>$desglose->claveMunicipio,
+											'claveLocalidad'=>$desglose->claveLocalidad
+										));
+					}else{
+						ActividadDesgloseMetasMes::where('idActividadDesglose',$desglose->id)
+												->whereNull('idActividad')
+												->update(array(
+													'idActividad'=>$desglose->idActividad,
+													'claveMunicipio'=>$desglose->claveMunicipio,
+													'claveLocalidad'=>$desglose->claveLocalidad
+												));
+					}
 				}
 
 				if(count($beneficiarios_desglose)){
@@ -2344,7 +2647,8 @@ class InversionController extends ProyectosController {
 		return $respuesta;
 	}
 
-	public function guardar_datos_accion_presupuesto($parametros,$componente,$id = NULL){
+	//public function guardar_datos_accion_presupuesto($parametros,$componente,$id = NULL){
+	public function guardar_datos_accion_presupuesto($parametros,$id = NULL){
 		if($id){
 			$es_editar = TRUE;
 		}else{
@@ -2354,15 +2658,26 @@ class InversionController extends ProyectosController {
 		$fibap = FIBAP::find($parametros['id-fibap']);
 		$validacion = Validador::validar(Input::all(), $this->reglasAccionPresupuesto);
 		if($validacion === TRUE){
-			$respuesta = DB::transaction(function() use ($fibap,$parametros,$componente,$id,$es_editar){
+			//$respuesta = DB::transaction(function() use ($fibap,$parametros,$componente,$id,$es_editar){
+			$respuesta = DB::transaction(function() use ($fibap,$parametros,$id,$es_editar){
+				$selector = $parametros['nivel'];
 				$valores_respuesta = array();
 				if($fibap){
 					if($id){
-						$accion = Accion::with('propuestasFinanciamiento','partidas','componente')
+						if($selector == 'componente'){
+							$accion = Accion::with('propuestasFinanciamiento','partidas','componente')
 									->where('idComponente','=',$id)->first();
+						}else{
+							$accion = Accion::with('propuestasFinanciamiento','partidas','actividad')
+									->where('idActividad','=',$id)->first();
+						}
 					}else{
 						$accion = new Accion;
-						$accion->idComponente = $componente->id;
+						if($selector == 'componente'){
+							$accion->idComponente = $parametros['id-componente'];
+						}else{
+							$accion->idActividad = $parametros['id-actividad'];
+						}
 					}
 					
 					/********************************       Partidas Presupuestarias       *********************************/
@@ -2449,7 +2764,13 @@ class InversionController extends ProyectosController {
 										$restar_de_distribucion[$distribucion->claveMunicipio][$distribucion->claveLocalidad] = $distribucion->cantidad;
 									}
 								}
-								$desgloses = ComponenteDesglose::where('idAccion','=',$accion->id)->get();
+								
+								if($selector == 'componente'){
+									$desgloses = ComponenteDesglose::where('idAccion','=',$accion->id)->get();
+								}else{
+									$desgloses = ActividadDesglose::where('idAccion','=',$accion->id)->get();
+								}
+								
 								$desgloses_editar = array();
 								foreach ($desgloses as $desglose) {
 									if(isset($restar_de_distribucion[$desglose->claveMunicipio][$desglose->claveLocalidad])){
@@ -2457,8 +2778,13 @@ class InversionController extends ProyectosController {
 										$desgloses_editar[] = $desglose;
 									}
 								}
-
-								$accion->componente->desglose()->saveMany($desgloses_editar);
+								
+								if($selector == 'componente'){
+									$accion->componente->desglose()->saveMany($desgloses_editar);
+								}else{
+									$accion->actividad->desglose()->saveMany($desgloses_editar);
+								}
+								
 								$accion->distribucionPresupuesto()->whereIn('idObjetoGasto',$partidas['borrar'])->delete();
 
 								$fibap->load('distribucionPresupuestoAgrupado.objetoGasto');
@@ -2485,7 +2811,7 @@ class InversionController extends ProyectosController {
 		}else{
 			$respuesta = $validacion;
 		}
-		$fibap->load('acciones.datosComponenteDetalle');
+		$fibap->load('acciones.datosComponenteDetalle','acciones.datosActividadDetalle');
 		$fibap->acciones->load('propuestasFinanciamiento');
 		$respuesta['acciones'] = $fibap->acciones;
 		return $respuesta;

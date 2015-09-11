@@ -8,7 +8,8 @@ class Accion extends BaseModel
 	protected $table = "fibapAcciones";
 
     public function scopeContenidoCompleto($query){
-        return $query->with('desglosePresupuesto.metasMes','desglosePresupuesto.beneficiarios.tipoBeneficiario')
+        if($this->idComponente){
+            return $query->with('desglosePresupuesto.metasMes','desglosePresupuesto.beneficiarios.tipoBeneficiario')
                     ->select('fibapAcciones.*','componente.*','unidadesMedida.descripcion AS unidadMedida','entregables.descripcion AS entregable'
                         ,'entregablesAcciones.descripcion AS entregableAccion','entregablesTipos.descripcion AS entregableTipo')
                     ->leftjoin('proyectoComponentes AS componente','componente.id','=','fibapAcciones.idComponente')
@@ -16,10 +17,17 @@ class Accion extends BaseModel
                     ->leftjoin('catalogoEntregables AS entregables','entregables.id','=','componente.idEntregable')
                     ->leftjoin('catalogoEntregablesAcciones As entregablesAcciones','entregablesAcciones.id','=','componente.idEntregableAccion')
                     ->leftjoin('catalogoEntregablesTipos AS entregablesTipos','entregablesTipos.id','=','componente.idEntregableTipo');
+        }else{
+            return $query->with('desglosePresupuesto.metasMes','desglosePresupuesto.beneficiarios.tipoBeneficiario')
+                    ->select('fibapAcciones.*','actividad.*','unidadesMedida.descripcion AS unidadMedida')
+                    ->leftjoin('componenteActividades AS actividad','actividad.id','=','fibapAcciones.idActividad')
+                    ->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','actividad.idUnidadMedida');
+        }
     }
 
     public function scopeCompletoConDescripcion($query){
-        return $query->select('fibapAcciones.*',
+        if($this->idComponente){
+            return $query->select('fibapAcciones.*',
                         'componente.objetivo','componente.indicador','componente.idUnidadMedida','componente.idEntregable','componente.idEntregableTipo',
                         'componente.idEntregableAccion','componente.numeroTrim1','componente.numeroTrim2','componente.numeroTrim3','componente.numeroTrim4',
                         'componente.valorNumerador',
@@ -30,6 +38,13 @@ class Accion extends BaseModel
                     ->leftjoin('catalogoEntregables AS entregables','entregables.id','=','componente.idEntregable')
                     ->leftjoin('catalogoEntregablesAcciones As entregablesAcciones','entregablesAcciones.id','=','componente.idEntregableAccion')
                     ->leftjoin('catalogoEntregablesTipos AS entregablesTipos','entregablesTipos.id','=','componente.idEntregableTipo');
+        }else{
+            return $query->select('fibapAcciones.*','actividad.objetivo','actividad.indicador','actividad.idUnidadMedida',
+                        'actividad.numeroTrim1','actividad.numeroTrim2','actividad.numeroTrim3','actividad.numeroTrim4',
+                        'actividad.valorNumerador','unidadesMedida.descripcion AS unidadMedida')
+                    ->leftjoin('componenteActividades AS actividad','actividad.id','=','fibapAcciones.idActividad')
+                    ->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','componente.idUnidadMedida');
+        }
     }
 
     public function fibap(){
@@ -39,23 +54,31 @@ class Accion extends BaseModel
     public function partidas(){
         return $this->belongsToMany('ObjetoGasto','relAccionesPartidas','idAccion','idObjetoGasto');
     }
-
-	public function componente(){
-        return $this->belongsTo('Componente','idComponente');
-    }
-
+    
+    /*
     public function datosComponente(){
     	return $this->hasOne('FibapDatosComponente','idAccion');
     }
-
     public function datosComponenteListado(){
         return $this->hasOne('FibapDatosComponente','idAccion')->mostrarDatos();
     }
-
+    */
+    
+    public function componente(){
+        return $this->belongsTo('Componente','idComponente');
+    }
+    public function actividad(){
+        return $this->belongsTo('Actividad','idActividad');
+    }
+    
+    //Estas dos parar listar varias acciones
     public function datosComponenteDetalle(){
         return $this->belongsTo('Componente','idComponente')->mostrarDatos();
     }
-
+    public function datosActividadDetalle(){
+        return $this->belongsTo('Actividad','idActividad')->mostrarDatos();
+    }
+    
 	public function propuestasFinanciamiento(){
 		return $this->hasMany('PropuestaFinanciamiento','idAccion');
 	}
@@ -64,7 +87,7 @@ class Accion extends BaseModel
         return $this->hasMany('DistribucionPresupuesto','idAccion');
     }
 
-    public function distribucionPresupustoPartidaDescripcion(){
+    public function distribucionPresupuestoPartidaDescripcion(){
         return $this->hasMany('DistribucionPresupuesto','idAccion')->agruparMesCompleto();
     }
 
@@ -72,15 +95,25 @@ class Accion extends BaseModel
         return $this->hasMany('DistribucionPresupuesto','idAccion')->agruparPorLocalidad();
     }
 
-    public function desglose(){
+    public function desgloseComponente(){
         return $this->hasMany('ComponenteDesglose','idComponente','idComponente');
     }
-
-    public function desglosePresupuesto(){
-        return $this->hasMany('ComponenteDesglose','idComponente','idComponente')->listarDatos();
+    public function desgloseActividad(){
+        return $this->hasMany('ActividadDesglose','idActividad','idActividad');
     }
 
-    public function desglosePresupuestoCompleto(){
+    public function desglosePresupuestoComponente(){
+        return $this->hasMany('ComponenteDesglose','idComponente','idComponente')->listarDatos();
+    }
+    public function desglosePresupuestoActividad(){
+        return $this->hasMany('ActividadDesglose','idActividad','idActividad')->listarDatos();
+    }
+
+    public function desglosePresupuestoCompletoComponente(){
         return $this->hasMany('ComponenteDesglose','idComponente','idComponente')->listarDatos()->with('metasMes','beneficiariosDescripcion');
+    }
+    
+    public function desglosePresupuestoCompletoActividad(){
+        return $this->hasMany('ActividadDesglose','idActividad','idActividad')->listarDatos()->with('metasMes','beneficiariosDescripcion');
     }
 }

@@ -1,5 +1,5 @@
 <form action="" id="form_{{$identificador}}">
-    <ul class="nav {{(isset($lista_actividades))?'nav-tabs':'nav-pills'}}" role="tablist" id="lista-tabs-{{$identificador}}">
+    <ul class="nav nav-tabs" role="tablist" id="lista-tabs-{{$identificador}}">
         <li role="presentation" class="active">
             <a href="#objetivos_{{$identificador}}" role="tab" data-toggle="tab">
                 <span class="fa fa-crosshairs"></span> Objetivo
@@ -16,7 +16,7 @@
             </a>
         </li>
         
-        @if (isset($lista_actividades) && $clasificacion_proyecto == 2)
+        @if($clasificacion_proyecto == 2)
         <li role="presentation">
             <a id="tablink-{{$identificador}}-presupuesto"  href="#presupuesto_{{$identificador}}" role="tab" data-toggle="tab">
                 <span class="fa fa-usd"></span> Presupuesto
@@ -36,7 +36,7 @@
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane active" id="objetivos_{{$identificador}}">
             <br>
-            @if (isset($lista_actividades) && $clasificacion_proyecto == 2)
+            @if($clasificacion_proyecto == 2)
                 <div class="row">
                     <div class="col-sm-4">
                         <div class="form-group">
@@ -245,7 +245,7 @@
                                 <div id="panel-importar-csv" class="fileupload ">
                                     <fieldset>
                                         <legend>Importar Archivo CSV</legend>
-                                        @if (isset($lista_actividades) && $clasificacion_proyecto == 2)
+                                        @if ($clasificacion_proyecto == 2)
                                         <span class="help-block text-muted">
                                             La importación de archivos csv para la captura de la programación de metas, no se encuentra disponible en esta sección para los proyectos de inversión. 
                                         </span>
@@ -336,7 +336,12 @@
                 </div>
             </div>
         </div>
-        <input type="hidden" id="id-accion" name="id-accion">
+        <!--input type="hidden" id="id-accion" name="id-accion"-->
+        @if(isset($hidden_list))
+            @foreach($hidden_list as $hidden_id)
+                <input type="hidden" id="{{$hidden_id}}" name="{{$hidden_id}}">
+            @endforeach
+        @endif
         <input type="hidden" id="id-{{$identificador}}" name="id-{{$identificador}}">
         @if(isset($lista_actividades))
         <div role="tabpanel" class="tab-pane" id="actividades_{{$identificador}}">
@@ -344,7 +349,7 @@
             {{$lista_actividades}}
         </div>
         @endif
-        @if($clasificacion_proyecto == 2 && isset($lista_actividades))
+        @if($clasificacion_proyecto == 2)
         <div role="tabpanel" class="tab-pane" id="presupuesto_{{$identificador}}">
             <br>
             <label for="objeto-gasto" class="control-label">Partida(s) a capturar</label>
@@ -389,7 +394,7 @@
                     </div>
                 </div>
                 <div class="col-sm-12">
-                    <div class="panel panel-default" id="tabla_componente_partidas">
+                    <div class="panel panel-default" id="tabla_{{$identificador}}_partidas">
                         <table class="table table-striped table-hover table-condensed">
                             <thead>
                                 <tr>

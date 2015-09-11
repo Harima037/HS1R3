@@ -55,7 +55,7 @@
                 <div class="btn-toolbar pull-right" >
                     <div class="btn-group" style="margin:5px">
                         <button type="button" class="btn btn-primary" id="btn-agregar-accion">
-                            <span class="glyphicon glyphicon-plus"></span> Agregar Componente
+                            <span class="glyphicon glyphicon-plus"></span> Agregar Acción
                         </button>
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
                             <span class="caret"></span>
@@ -82,13 +82,10 @@
         <thead>
             <tr>
                 <th><input type="checkbox" class="check-select-all-rows"></th>
+                <th width="70px">Nivel</th>
                 <th>Indicador</th>
                 <th>Unidad de Medida</th>
-                <!--th>Entregable</th>
-                <th>Tipo</th>
-                <th>Acción</th>
-                <th>Modalidad</th-->
-                <th>Presupuesto</th>
+                <th width="150px">Presupuesto</th>
                 <th width="50px"></th>
             </tr>
         </thead>
@@ -187,6 +184,7 @@
                 </div>
                 <div class="form-group pull-right">
                     <b>Total Distribuido: </b>$ <span id="total-grid-presupuesto"></span>
+                    <input type="hidden" name="nivel-desglose" id="nivel-desglose">
                 </div>
             </div>
         </div>
@@ -459,26 +457,45 @@
     Modal para Acción
 -->
 
-<div class="modal fade" id="modal-componente" tabindex="-1" role="dialog" aria-labelledby="modalCompLabel" aria-hidden="true" data-backdrop="static">
+<div class="modal fade" id="modal-accion" tabindex="-1" role="dialog" aria-labelledby="modalAccionLabel" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-dialog-85-screen">
         <div class="modal-content modal-content-85-screen">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="modalCompLabel">Nuevo</h4>
+                <h4 class="modal-title" id="modalAccionLabel">Nuevo</h4>
             </div>
             <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label class="control-label">Nivel</label>
+                            <select class="form-control" id="nivel-accion">
+                                <option value="componente">Componente</option>
+                                <option value="actividad">Actividad</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-9 hidden" id="seleccion-componente">
+                        <div class="form-group">
+                            <label class="control-label">Componente</label>
+                            <select class="form-control" id="componente-seleccionado">
+                                <option value="">Seleccione un Componente</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 {{$formulario_componente}}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary btn-grupo-guardar" id="btn-componente-guardar-salir">Guardar</button>
-                <button type="button" class="btn btn-success btn-grupo-guardar" id="btn-componente-guardar">Guardar y Agregar Actividades</button>
+                <button type="button" class="btn btn-primary btn-grupo-guardar" id="btn-componente-guardar-salir">Guardar y Cerrar</button>
+                <button type="button" class="btn btn-success btn-grupo-guardar" id="btn-componente-guardar">Guardar y Continuar</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<div class="modal fade" id="modal-actividad" tabindex="-1" role="dialog" aria-labelledby="modalActLabel" aria-hidden="true" data-backdrop="static">
+<!--div class="modal fade" id="modal-actividad" tabindex="-1" role="dialog" aria-labelledby="modalActLabel" aria-hidden="true" data-backdrop="static">
     <div class="modal-dialog modal-dialog-85-screen">
         <div class="modal-content modal-content-85-screen">
             <div class="modal-header">
@@ -486,12 +503,11 @@
                 <h4 class="modal-title" id="modalActLabel">Nuevo</h4>
             </div>
             <div class="modal-body">
-                {{$formulario_actividad}}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary btn-guardar" id="btn-actividad-guardar">Guardar</button>
             </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+        </div>
+    </div>
+</div--><!-- /.modal -->

@@ -24,16 +24,17 @@ var form_fibap = '#form-fibap-datos';
 var form_fibap_antecentes = '#form-fibap-antecedentes';
 var form_antecedente = '#form-antecedente';
 var form_beneficiario = '#form_beneficiario';
-var form_componente = '#form_componente';
-var form_actividad = '#form_actividad';
+var form_accion = '#form_accion';
+//var form_componente = '#form_componente';
+//var form_actividad = '#form_actividad';
 var form_presupuesto = '#form-presupuesto';
 
 var modal_antecedente = '#modal-antecedente';
 var modal_presupuesto = '#modal-presupuesto';
-var modal_accion  = '#modal-accion';
+var modal_accion  = '#modal-componente';
 var modal_beneficiario = '#modalBeneficiario';
-var modal_componente = '#modal-componente';
-var modal_actividad = '#modal-actividad';
+//var modal_componente = '#modal-componente';
+//var modal_actividad = '#modal-actividad';
 
 $('.chosen-one').chosen({width:'100%'});
 
@@ -159,14 +160,14 @@ function editar_beneficiario(e){
 }
 
 function editar_accion(e){
-	var parametros = {'mostrar':'editar-componente'};
+	var parametros = {'mostrar':'editar-accion'};
 	proyectoResource.get(e,parametros,{
 		_success: function(response){
 			fibapAcciones.mostrar_datos(response.data);
 		}
 	});
 }
-
+/*
 function editar_actividad(e){
 	var parametros = {'mostrar':'editar-actividad'};
 	proyectoResource.get(e,parametros,{
@@ -175,6 +176,7 @@ function editar_actividad(e){
 		}
 	});
 }
+*/
 
 function editar_presupuesto(e){
 	if($(modal_presupuesto).find(".modal-title").html() == "Editar Presupuesto"){
@@ -182,7 +184,7 @@ function editar_presupuesto(e){
 	}
 	$(modal_presupuesto).find(".modal-title").html("Editar Presupuesto");
 	
-	var parametros = {'mostrar':'editar-presupuesto','id-proyecto':$('#id').val()};
+	var parametros = {'mostrar':'editar-presupuesto','id-proyecto':$('#id').val(),'nivel':$('#nivel-desglose').val()};
 	proyectoResource.get(e,parametros,{
 		_success: function(response){
 			fibapAcciones.mostrar_datos_presupuesto(response.data);
@@ -232,18 +234,22 @@ $('#btn-enviar-proyecto').on('click',function(){
 });
 
 $('#btn-componente-guardar-salir').on('click',function(){
-	guardar_datos_componente(true,'componente');
+	guardar_datos_accion(true);
 });
 
 $('#btn-componente-guardar').on('click',function(){
-	guardar_datos_componente(false,'componente');
+	guardar_datos_accion(false);
 });
 
+/*
 $('#btn-actividad-guardar').on('click',function(){
-	guardar_datos_componente(true,'actividad');
+	guardar_datos_accion(true,'actividad');
 });
+*/
 
-function guardar_datos_componente(cerrar,selector){
+function guardar_datos_accion(cerrar){
+	var nivel = $('#nivel-accion').val();
+	/*
 	if(selector == 'actividad'){
 		var formulario = form_actividad;
 		var modal = modal_actividad;
@@ -251,40 +257,46 @@ function guardar_datos_componente(cerrar,selector){
 		var formulario = form_componente;
 		var modal = modal_componente;
 	}
-	
-	Validation.cleanFormErrors(formulario);
-	var parametros = $(formulario).serialize();
-	parametros += '&guardar='+selector;
+	*/
+	Validation.cleanFormErrors(form_accion);
+	var parametros = $(form_accion).serialize();
+	parametros += '&guardar=accion';
 	parametros += '&id-fibap=' + $('#id-fibap').val();
 	parametros += '&id-proyecto=' + $('#id').val();
-	if(selector == 'actividad'){
-		parametros += '&id-componente=' + $('#id-componente').val();
+	parametros += '&nivel='+nivel;
+	if(nivel == 'actividad'){
+		parametros += '&id-nuevo-componente=' + $('#componente-seleccionado').val();
 	}
 	//parametros = parametros + '&clasificacion='+$('#clasificacionproyecto').val();
 
-	if($('#id-'+selector).val()){
+	if($('#id-accion').val()){
 		var cadena_metas = '';
-		$(formulario + ' .metas-mes').each(function(){
+		$(form_accion + ' .metas-mes').each(function(){
 			if($(this).attr('data-meta-id')){
-				cadena_metas = cadena_metas + '&mes-'+selector+'-id['+$(this).attr('data-meta-jurisdiccion')+']['+$(this).attr('data-meta-mes')+']='+$(this).attr('data-meta-id');
+				cadena_metas = cadena_metas + '&mes-accion-id['+$(this).attr('data-meta-jurisdiccion')+']['+$(this).attr('data-meta-mes')+']='+$(this).attr('data-meta-id');
 			}
 		});
 		parametros += cadena_metas;
 
-		if(selector == 'componente'){
-			var lista_origenes_id = '';
-			$('.accion-origen-financiamiento').each(function(){
-				if($(this).attr('data-captura-id')){
-					lista_origenes_id += '&origen-captura-id[' + $(this).attr('data-origen-id') + ']=' + $(this).attr('data-captura-id');
-				}
-			});
-			parametros += lista_origenes_id;
-		}
+		//if(selector == 'componente'){
+		var lista_origenes_id = '';
+		$('.accion-origen-financiamiento').each(function(){
+			if($(this).attr('data-captura-id')){
+				lista_origenes_id += '&origen-captura-id[' + $(this).attr('data-origen-id') + ']=' + $(this).attr('data-captura-id');
+			}
+		});
+		parametros += lista_origenes_id;
+		//}
 
-		proyectoResource.put($('#id-'+selector).val(),parametros,{
+		proyectoResource.put($('#id-accion').val(),parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Datos de la acción almacenados con éxito',type:'OK',timer:3});
-	            if(selector == 'actividad'){
+				fibapAcciones.llenar_datagrid(response.acciones);
+				if(response.distribucion_total){
+					fibapAcciones.llenar_tabla_distribucion_general(response.distribucion_total);
+				}
+				/*
+	            if(nivel == 'actividad'){
 	            	fibapAcciones.llenar_datagrid_actividades(response.extras.actividades);
 	            }else{
 	            	fibapAcciones.llenar_datagrid(response.acciones);
@@ -292,16 +304,18 @@ function guardar_datos_componente(cerrar,selector){
 						fibapAcciones.llenar_tabla_distribucion_general(response.distribucion_total);
 					}
 	            }
+				*/
 
 	            if(cerrar){
-					$(modal).modal('hide');
+					$(modal_accion).modal('hide');
 				}else{
+					/*
 					if(selector == 'componente'){
 						$('#tablink-componente-actividades').tab('show');
 					}
-					
+					*/
 					if(response.metas){
-						fibapAcciones.actualizar_metas_ids(selector,response.metas);
+						fibapAcciones.actualizar_metas_ids('accion',response.metas);
 					}
 				}
 	        },
@@ -323,29 +337,36 @@ function guardar_datos_componente(cerrar,selector){
 		proyectoResource.post(parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Datos de la acción almacenados con éxito',type:'OK',timer:3});
-	            if(selector == 'actividad'){
+				fibapAcciones.llenar_datagrid(response.acciones);
+				/*
+	            if(nivel == 'actividad'){
 	            	fibapAcciones.llenar_datagrid_actividades(response.extras.actividades);
 	            }else{
 	            	fibapAcciones.llenar_datagrid(response.acciones);
 	            }
-	            
+	            */
 	            if(cerrar){
-					$(modal).modal('hide');
+					$(modal_accion).modal('hide');
 				}else{
-					if(selector == 'actividad'){
-						$(formulario + ' #id-actividad').val(response.data.id);
+					/*
+					if(nivel == 'actividad'){
+						$(form_accion + ' #id-actividad').val(response.data.id);
 					}else{
-						$('#lnk-descarga-archivo-presupuesto').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=presupuesto&id-accion='+response.data.id);
-    					$('#lnk-descarga-archivo-presupuesto').removeClass('disabled');
-						$(formulario + ' #id-componente').val(response.data.idComponente);
-						$(formulario + ' #id-accion').val(response.data.id);
-						$('#tablink-componente-actividades').attr('data-toggle','tab');
-						$('#tablink-componente-actividades').parent().removeClass('disabled');
-						$('#tablink-componente-actividades').tab('show');
+					*/
+					$('#lnk-descarga-archivo-presupuesto').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=presupuesto&id-accion='+response.data.id);
+					$('#lnk-descarga-archivo-presupuesto').removeClass('disabled');
+					if(response.data.idComponente){
+						$(form_accion + ' #id-componente').val(response.data.idComponente);
+					}else{
+						$(form_accion + ' #id-actividad').val(response.data.idActividad);
 					}
-
+					$(form_accion + ' #id-accion').val(response.data.id);
+					//$('#tablink-componente-actividades').attr('data-toggle','tab');
+					//$('#tablink-componente-actividades').parent().removeClass('disabled');
+					//$('#tablink-componente-actividades').tab('show');
+					//}
 					if(response.metas){
-						fibapAcciones.actualizar_metas_ids(selector,response.metas);
+						fibapAcciones.actualizar_metas_ids('accion',response.metas);
 					}
 				}
 				cambiar_icono_tabs('#tab-link-acciones-fibap','fa-check-square-o');
@@ -567,6 +588,7 @@ $('#btn-presupuesto-guardar').on('click',function(){
 	var parametros = $(form_presupuesto).serialize();
 	parametros += '&guardar=desglose-presupuesto&id-fibap=' + $('#id-fibap').val();
 	parametros += '&id-proyecto=' + $('#id').val();
+	parametros += '&nivel-desglose=' + $('#nivel-desglose').val();
 	//Obtenemos el id de la Acción, la cual esta en un atributo en el datagrid
 	var accion_id = $('#datagridDistribucion').attr('data-selected-id');
 	parametros += '&id-accion='+accion_id;
@@ -595,8 +617,13 @@ $('#btn-presupuesto-guardar').on('click',function(){
 		proyectoResource.put($('#id-desglose').val(),parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Cambios almacenados con éxito',type:'OK',timer:3});
-	            //fibapAcciones.llenar_datagrid_distribucion(response.data.desglose_presupuesto,response.data.presupuestoRequerido);
-	            fibapAcciones.llenar_datagrid_distribucion(response.data.idComponente,response.data.presupuestoRequerido);
+				var nivel = '';
+				if(response.data.idComponente){
+					nivel = 'componente';
+				}else{
+					nivel = 'actividad';
+				}
+	            fibapAcciones.llenar_datagrid_distribucion(response.data.id,response.data.presupuestoRequerido,nivel);
 	            fibapAcciones.llenar_tabla_distribucion_general(response.extras.distribucion_total);
 	            $(modal_presupuesto).modal('hide');
 	        },
@@ -618,8 +645,13 @@ $('#btn-presupuesto-guardar').on('click',function(){
 		proyectoResource.post(parametros,{
 	        _success: function(response){
 	            MessageManager.show({data:'Presupuesto almacenado con éxito',type:'OK',timer:3});
-	            //fibapAcciones.llenar_datagrid_distribucion(response.data.desglose_presupuesto,response.data.presupuestoRequerido);
-	            fibapAcciones.llenar_datagrid_distribucion(response.data.idComponente,response.data.presupuestoRequerido);
+				var nivel = '';
+				if(response.data.idComponente){
+					nivel = 'componente';
+				}else{
+					nivel = 'actividad';
+				}
+	            fibapAcciones.llenar_datagrid_distribucion(response.data.id,response.data.presupuestoRequerido,nivel);
 	            fibapAcciones.llenar_tabla_distribucion_general(response.extras.distribucion_total);
 	            $(modal_presupuesto).modal('hide');
 	        },

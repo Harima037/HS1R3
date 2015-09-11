@@ -20,16 +20,15 @@ var comentarios = { componentes:{}, actividades:{}, desgloses:{} };
 var id_fibap;
 var fibap_resource;
 var accionesDatagrid;
-var actividadDatagrid;
+//var actividadDatagrid;
 var distribucionDatagrid;
 var tabla_presupuesto_partida = '#tabla_presupuesto_partida';
-var tabla_componente_partidas = '#tabla_componente_partidas';
-//var modal_accion = '#modal-accion';
-var modal_accion = '#modal-componente'
-var form_accion = '#form_componente';
+var tabla_componente_partidas = '#tabla_accion_partidas';
+var modal_accion = '#modal-accion'
+var form_accion = '#form_accion';
 
-var modal_actividad = '#modal-actividad'
-var form_actividad = '#form_actividad';
+//var modal_actividad = '#modal-actividad'
+//var form_actividad = '#form_actividad';
 
 var modal_presupuesto = '#modal-presupuesto';
 var form_presupuesto = '#form-presupuesto';
@@ -66,18 +65,18 @@ context.init = function(id,resource){
     fibap_resource = resource;
 
     //Inicializacion de los DataGrids
-    actividadDatagrid = new Datagrid('#datagridActividades',fibap_resource);
-    actividadDatagrid.init();
+    //actividadDatagrid = new Datagrid('#datagridActividades',fibap_resource);
+    //actividadDatagrid.init();
 
     accionesDatagrid = new Datagrid("#datagridAcciones",fibap_resource);
     accionesDatagrid.init();
 
     llenar_datagrid_acciones([]);
-    llenar_datagrid_actividades([]);
+    //llenar_datagrid_actividades([]);
     llenar_tabla_distribucion([]);
 
     $('#btn-agregar-distribucion').on('click',function(){
-        $(modal_presupuesto).find(".modal-title").html("Nuevo Presupuesto");
+        $(modal_presupuesto).find(".modal-title").html("Nuevo Desglose");
         $(modal_presupuesto).modal('show');
     });
 
@@ -108,6 +107,7 @@ context.init = function(id,resource){
             data.append('id-fibap', id_fibap);
             data.append('id-proyecto',$('#id').val());
             data.append('guardar','cargar-archivo-desglose');
+            data.append('nivel',$('#nivel-desglose').val());
             
             $.ajax({
                 url: SERVER_HOST+'/v1/inversion', //Url a donde la enviaremos
@@ -147,7 +147,7 @@ context.init = function(id,resource){
             //MessageManager.show({data:'Debe seleccionar un archivo a subir.',timer:10,type:'ERR'});
         }
     });
-
+    /*
     $('#btn-agregar-actividad').on('click',function(){
         var actividades = $('#conteo-actividades').text().split('/');
 
@@ -158,19 +158,30 @@ context.init = function(id,resource){
             $(modal_actividad).modal('show');
         }
     });
-
+    */
     $('#btn-agregar-accion').on('click',function(){
-        var componentes = $('#tab-link-acciones-fibap > span.badge').text().split('/');
-
-        if(parseInt(componentes[0]) >= parseInt(componentes[1])){
-            MessageManager.show({code:'S03',data:"Los componentes para este proyecto ya estan completos.",timer:2});
+        $('#tablink-componente-actividades').attr('data-toggle','');
+        $('#tablink-componente-actividades').parent().addClass('disabled');
+        $('#lista-tabs-componente a:first').tab('show');
+        $(modal_accion).find(".modal-title").html("Nueva Acción");
+        $(modal_accion).modal('show');
+    });
+    
+    $('#nivel-accion').on('change',function(){
+        if($(this).val() == 'actividad'){
+            $('#seleccion-componente').removeClass('hidden');
+            $('#entregable').prop('disabled',true);
+            $('#tipo-entregable').prop('disabled',true);
+            $('#accion-entregable').prop('disabled',true);
         }else{
-            $('#tablink-componente-actividades').attr('data-toggle','');
-            $('#tablink-componente-actividades').parent().addClass('disabled');
-            $('#lista-tabs-componente a:first').tab('show');
-            $(modal_accion).find(".modal-title").html("Nuevo Componente");
-            $(modal_accion).modal('show');
+            $('#seleccion-componente').addClass('hidden');
+            $('#entregable').prop('disabled',false);
+            $('#tipo-entregable').prop('disabled',false);
+            $('#accion-entregable').prop('disabled',false);
         }
+        $('#entregable').trigger('chosen:updated');
+        $('#tipo-entregable').trigger('chosen:updated');
+        $('#accion-entregable').trigger('chosen:updated');
     });
 
     $('#btn-agregar-partida').on('click',function(){
@@ -329,7 +340,7 @@ context.init = function(id,resource){
             });
         }
     });
-
+    /*
     $(modal_accion + ' #lista-tabs-componente').on('show.bs.tab',function(event){
         var id = event.target.id;
         if(id == 'tablink-componente-actividades'){
@@ -338,7 +349,7 @@ context.init = function(id,resource){
             $('.btn-grupo-guardar').show();
         }
     });
-
+    */
     $(modal_accion).on('hide.bs.modal',function(e){ reset_modal_form(form_accion); });
     $(modal_subir_archivo).on('hide.bs.modal',function(e){ reset_modal_form(form_subir_archivo); });
     
@@ -347,8 +358,8 @@ context.init = function(id,resource){
         reset_modal_form(form_presupuesto);
     });
 
-    $(modal_actividad).on('hide.bs.modal',function(e){ reset_modal_form(form_actividad); });
-
+    //$(modal_actividad).on('hide.bs.modal',function(e){ reset_modal_form(form_actividad); });
+    /*
     $("#datagridActividades .btn-delete-rows").unbind('click');
     $("#datagridActividades .btn-delete-rows").on('click',function(e){
         e.preventDefault();
@@ -383,7 +394,8 @@ context.init = function(id,resource){
             MessageManager.show({data:'No has seleccionado ningún registro.',type:'ADV',timer:3});
         }
     });
-
+    */
+    
     $("#datagridAcciones .btn-delete-rows").unbind('click');
     $("#datagridAcciones .btn-delete-rows").on('click',function(e){
         e.preventDefault();
@@ -414,7 +426,7 @@ context.init = function(id,resource){
 };
 
 context.mostrar_datos_presupuesto = function(datos){
-    $(modal_presupuesto).find(".modal-title").html("Editar Presupuesto");
+    $(modal_presupuesto).find(".modal-title").html("Editar Desglose");
     //$('#jurisdiccion-accion').val(datos.calendarizado[0].claveJurisdiccion);
     //$('#jurisdiccion-accion').trigger('chosen:updated');
 
@@ -461,7 +473,7 @@ context.mostrar_datos_presupuesto = function(datos){
 
     $(modal_presupuesto).modal('show');
 };
-
+/*
 context.mostrar_datos_actividad = function(datos){
     $(modal_actividad).find(".modal-title").html('Editar Actividad');
 
@@ -514,43 +526,58 @@ context.mostrar_datos_actividad = function(datos){
 
     $(modal_actividad).modal('show');
 }
-
+*/
 context.mostrar_datos = function(datos){
+    var elemento;
+    
     ocultar_detalles(true);
 
-    $(modal_accion).find(".modal-title").html('Editar Componente');
+    $(modal_accion).find(".modal-title").html('Editar Acción');
     
-    $('#descripcion-obj-componente').val(datos.componente.objetivo);
-    $('#verificacion-componente').val(datos.componente.mediosVerificacion);
-    $('#supuestos-componente').val(datos.componente.supuestos);
-    $('#descripcion-ind-componente').val(datos.componente.indicador);
-    $('#numerador-ind-componente').val(datos.componente.numerador);
-    $('#denominador-ind-componente').val(datos.componente.denominador);
-    $('#interpretacion-componente').val(datos.componente.interpretacion);
-    $('#denominador-componente').val(datos.componente.valorDenominador).change();
-    $('#linea-base-componente').val(datos.componente.lineaBase);
-    $('#anio-base-componente').val(datos.componente.anioBase);
-    $('#formula-componente').val(datos.componente.idFormula);
-    $('#dimension-componente').val(datos.componente.idDimensionIndicador);
-    $('#frecuencia-componente').val(datos.componente.idFrecuenciaIndicador);
-    $('#tipo-ind-componente').val(datos.componente.idTipoIndicador);
-    $('#unidad-medida-componente').val(datos.componente.idUnidadMedida);
-
-    if(datos.componente.idEntregable){
-        $('#entregable').val(datos.componente.idEntregable);
-        $('#entregable').chosen().change();
-        $('#tipo-entregable').val(datos.componente.idEntregableTipo || 'NA');
+    if(datos.componente){
+        elemento = datos.componente;
+        $('#id-componente').val(datos.componente.id);
+        $('#nivel-accion').val('componente').change();
+    }else{
+        elemento = datos.actividad;
+        $('#id-actividad').val(datos.actividad.id);
+        //$('#id-componente').val(datos.actividad.idComponente);
+        $('#nivel-accion').val('actividad').change();
+        $('#componente-seleccionado').val(elemento.idComponente);
     }
-    if(datos.componente.idEntregableAccion){
-        $('#accion-entregable').val(datos.componente.idEntregableAccion);
+    $('#nivel-accion').prop('disabled',true);
+    
+    $('#descripcion-obj-accion').val(elemento.objetivo);
+    $('#verificacion-accion').val(elemento.mediosVerificacion);
+    $('#supuestos-accion').val(elemento.supuestos);
+    $('#descripcion-ind-accion').val(elemento.indicador);
+    $('#numerador-ind-accion').val(elemento.numerador);
+    $('#denominador-ind-accion').val(elemento.denominador);
+    $('#interpretacion-accion').val(elemento.interpretacion);
+    $('#denominador-accion').val(elemento.valorDenominador).change();
+    $('#linea-base-accion').val(elemento.lineaBase);
+    $('#anio-base-accion').val(elemento.anioBase);
+    $('#formula-accion').val(elemento.idFormula);
+    $('#dimension-accion').val(elemento.idDimensionIndicador);
+    $('#frecuencia-accion').val(elemento.idFrecuenciaIndicador);
+    $('#tipo-ind-accion').val(elemento.idTipoIndicador);
+    $('#unidad-medida-accion').val(elemento.idUnidadMedida);
+    
+    if(elemento.idEntregable){
+        $('#entregable').val(elemento.idEntregable);
+        $('#entregable').chosen().change();
+        $('#tipo-entregable').val(elemento.idEntregableTipo || 'NA');
+    }
+    if(elemento.idEntregableAccion){
+        $('#accion-entregable').val(elemento.idEntregableAccion);
     }
 
     $(form_accion + ' .chosen-one').trigger('chosen:updated');
 
     $('#id-accion').val(datos.id);
-    $('#id-componente').val(datos.componente.id);
-    $('#tablink-componente-actividades').attr('data-toggle','tab');
-    $('#tablink-componente-actividades').parent().removeClass('disabled');
+    
+    //$('#tablink-componente-actividades').attr('data-toggle','tab');
+    //$('#tablink-componente-actividades').parent().removeClass('disabled');
 
     $('#accion-presupuesto-requerido').val(datos.presupuestoRequerido);
     $('#accion-presupuesto-requerido-lbl').text('$ ' + parseFloat(datos.presupuestoRequerido).format(2));
@@ -561,34 +588,41 @@ context.mostrar_datos = function(datos){
     }
     
     llenar_tabla_componente_partidas(datos.partidas);
-    llenar_datagrid_actividades(datos.componente.actividades);
+    //llenar_datagrid_actividades(datos.componente.actividades);
 
-    if(datos.componente.metas_mes){
+    if(elemento.metas_mes){
         var suma = 0;
         var suma_trimestre = {'1':0,'2':0,'3':0,'4':0};
         var trimestre = 0;
-        for(var i in datos.componente.metas_mes){
-            var meta = datos.componente.metas_mes[i];
+        for(var i in elemento.metas_mes){
+            var meta = elemento.metas_mes[i];
 
             trimestre = Math.ceil(meta.mes/3);
             suma_trimestre[trimestre] += parseFloat(meta.meta);
             suma += parseFloat(meta.meta);
-            $('#mes-componente-' + meta.claveJurisdiccion + '-' + meta.mes).val(parseFloat(meta.meta));
-            $('#mes-componente-' + meta.claveJurisdiccion + '-' + meta.mes).attr('data-meta-id',meta.id);
+            $('#mes-accion-' + meta.claveJurisdiccion + '-' + meta.mes).val(parseFloat(meta.meta));
+            $('#mes-accion-' + meta.claveJurisdiccion + '-' + meta.mes).attr('data-meta-id',meta.id);
         }
         for(var i in suma_trimestre){
-            $('#trim'+i+'-componente').val(suma_trimestre[i]);
-            $('#trim'+i+'-componente-lbl').text(suma_trimestre[i].format(2));
+            $('#trim'+i+'-accion').val(suma_trimestre[i]);
+            $('#trim'+i+'-accion-lbl').text(suma_trimestre[i].format(2));
         }
-        $('#numerador-componente').val(suma);
-        $('#numerador-componente-lbl').text(suma);
-        ejecutar_formula('componente');
+        $('#numerador-accion').val(suma);
+        $('#numerador-accion-lbl').text(suma);
+        ejecutar_formula('accion');
     }
 
     //actualizar_metas_ids(datos.componente.metas_mes);
-    if(comentarios.componentes[datos.componente.id]){
-        mostrar_comentarios(comentarios.componentes[datos.componente.id]);
+    if(datos.componente){
+        if(comentarios.componentes[datos.componente.id]){
+            mostrar_comentarios(comentarios.componentes[datos.componente.id]);
+        }
+    }else{
+        if(comentarios.actividades[datos.actividad.id]){
+            mostrar_comentarios(comentarios.actividades[datos.actividad.id]);
+        }
     }
+    
     //
 
     $(modal_accion).modal('show');
@@ -606,10 +640,10 @@ context.quitar_partida_componente = function(id){
 };
 
 context.actualizar_metas_mes = function(jurisdicciones){
-    actualizar_tabla_metas_mes('componente',jurisdicciones);
-    actualizar_tabla_metas_mes('actividad',jurisdicciones);
+    actualizar_tabla_metas_mes('accion',jurisdicciones);
+    //actualizar_tabla_metas_mes('actividad',jurisdicciones);
     if(ejecucion_fecha_inicio){
-        habilitar_meses_metas('actividad', ejecucion_fecha_inicio, ejecucion_fecha_fin);
+        //habilitar_meses_metas('actividad', ejecucion_fecha_inicio, ejecucion_fecha_fin);
         $(form_accion + ' .metas-mes').prop('disabled',true);
     }
 };
@@ -621,11 +655,11 @@ context.mostrarComentarios = function(datos){
 context.llenar_datagrid = function(datos){
     llenar_datagrid_acciones(datos);
 };
-
+/*
 context.llenar_datagrid_actividades = function(datos){
     llenar_datagrid_actividades(datos);
 };
-
+*/
 context.actualizar_metas_ids = function(identificador,metas){
     var indx;
     for(indx in metas){
@@ -640,15 +674,27 @@ context.mostrar_detalles = function(id){
 
     if($('#datagrid-contenedor-' + id).length){
         $('#datagridAcciones > table > tbody > tr.contendor-desechable').remove();
-        llenar_datagrid_distribucion(0,0);
+        llenar_datagrid_distribucion(0,0,null);
     }else{
-        var parametros = {'mostrar':'desglose-componente'};
+        var parametros = {'mostrar':'desglose-accion'};
         fibap_resource.get(id,parametros,{
             _success:function(response){
+                var nivel = '';
+                if(response.data.idComponente){
+                    nivel = 'componente';
+                    $('#nivel-desglose').val('componente');
+                    $('#indicador_texto').text(response.data.datos_componente_detalle.indicador);
+                    $('#unidad_medida_texto').text(response.data.datos_componente_detalle.unidadMedida);
+                }else{
+                    nivel = 'actividad';
+                    $('#nivel-desglose').val('actividad');
+                    $('#indicador_texto').text(response.data.datos_actividad_detalle.indicador);
+                    $('#unidad_medida_texto').text(response.data.datos_actividad_detalle.unidadMedida);
+                }
                 $('#id-accion').val(id);
-
+                
                 $('#datagridAcciones > table > tbody > tr.contendor-desechable').remove();
-                llenar_datagrid_distribucion(response.data.idComponente,response.data.presupuestoRequerido);
+                llenar_datagrid_distribucion(response.data.id,response.data.presupuestoRequerido,nivel);
                 
                 $('#lnk-descarga-archivo-metas').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=meta');
                 $('#lnk-descarga-archivo-presupuesto').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=presupuesto&id-accion='+id);
@@ -659,21 +705,18 @@ context.mostrar_detalles = function(id){
                 $('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"] > td > span.boton-detalle > span.fa-plus-square-o').addClass('fa-minus-square-o');
                 $('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"] > td > span.boton-detalle > span.fa-plus-square-o').removeClass('fa-plus-square-o');
                 
-                $('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"]').after('<tr class="contendor-desechable disabled"><td class="disabled bg-info" colspan="5" id="datagrid-contenedor-' + id + '"></td></tr>');
+                $('#datagridAcciones > table > tbody > tr[data-id="' +  id+ '"]').after('<tr class="contendor-desechable disabled"><td class="disabled bg-info" colspan="6" id="datagrid-contenedor-' + id + '"></td></tr>');
                 $('#datagridDistribucion').appendTo('#datagrid-contenedor-' + id);
                 $('#datagridDistribucion').attr('data-selected-id',id);
-
-                $('#indicador_texto').text(response.data.datos_componente_detalle.indicador);
-                $('#unidad_medida_texto').text(response.data.datos_componente_detalle.unidadMedida);
-
+                
                 actualizar_claves_presupuesto(response.data.partidas);
             }
         });
     }
 };
 
-context.llenar_datagrid_distribucion = function(id_componente,total_presupuesto){
-    llenar_datagrid_distribucion(id_componente,total_presupuesto);
+context.llenar_datagrid_distribucion = function(id_accion,total_presupuesto,nivel){
+    llenar_datagrid_distribucion(id_accion,total_presupuesto,nivel);
 };
 
 context.llenar_tabla_distribucion_general = function(datos){
@@ -775,18 +818,18 @@ context.llenar_select_responsables = function(datos){
 /***********************************************************************************************
                     Funciones Privadas
 ************************************************************************************************/
-function llenar_datagrid_distribucion(id_componente,total_presupuesto){
+function llenar_datagrid_distribucion(id_accion,total_presupuesto,nivel){
     $('#datagridDistribucion > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-spin fa-spinner"></i> Cargando datos...</td></tr>');
     $('#total-grid-presupuesto').text(0);
     actualiza_porcentaje('#porcentaje_accion',0);
-    if(id_componente == 0){
+    if(id_accion == 0){
         $("#datagridDistribucion .txt-quick-search").val('');
         actualiza_porcentaje('#porcentaje_accion',0);
         $('#datagridDistribucion > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
         distribucionDatagrid.paginacion(1);
         distribucionDatagrid.setPagina(1);
     }else{
-        distribucionDatagrid = new Datagrid("#datagridDistribucion",fibap_resource,{ desglosegrid:true, pagina: 1, idComponente: id_componente}); 
+        distribucionDatagrid = new Datagrid("#datagridDistribucion",fibap_resource,{ desglosegrid:true, pagina: 1, idAccion: id_accion, nivel: nivel}); 
         distribucionDatagrid.init();
         distribucionDatagrid.cargarTotalResultados(0);
         distribucionDatagrid.actualizar({ 
@@ -837,6 +880,7 @@ function llenar_datagrid_distribucion(id_componente,total_presupuesto){
                 distribucionDatagrid.paginacion(total);
             }
         });
+        
         $("#datagridDistribucion .btn-delete-rows").unbind('click');
         $("#datagridDistribucion .btn-delete-rows").on('click',function(e){
             e.preventDefault();
@@ -852,9 +896,8 @@ function llenar_datagrid_distribucion(id_componente,total_presupuesto){
                         titulo:"Eliminar presupuesto",
                         mensaje: "¿Estás seguro que deseas eliminar los presupuestos seleccionados?",
                         callback: function(){
-                            fibap_resource.delete(rows,{'rows': rows, 'eliminar': 'desglose-presupuesto', 'id-accion': id_accion, 'id-proyecto': $('#id').val()},{
+                            fibap_resource.delete(rows,{'rows': rows, 'eliminar': 'desglose-presupuesto', 'id-accion': id_accion, 'id-proyecto': $('#id').val(), 'nivel':$('#nivel-desglose').val() },{
                                 _success: function(response){
-                                    //llenar_datagrid_distribucion(response.id_componente,response.presupuesto_requerido);
                                     distribucionDatagrid.actualizar();
                                     llenar_tabla_distribucion(response.distribucion_total);
                                     MessageManager.show({data:'Presupuesto(s) eliminado(s) con éxito.',timer:3});
@@ -872,35 +915,72 @@ function llenar_datagrid_acciones(datos){
     $('#datagridAcciones > table > tbody').empty();
     var acciones = [];
     var sumas_origenes = [];
-
+    var listado_componentes = '';
+    
+    var componentes = {};
+    
     for(var indx in datos){
         var accion = {};
 
         var presupuesto = parseFloat(datos[indx].presupuestoRequerido);
 
         accion.id = datos[indx].id;
-        //accion.entregable = datos[indx].datos_componente_detalle.entregable;
-        accion.indicador = datos[indx].datos_componente_detalle.indicador;
-        //accion.tipo = datos[indx].datos_componente_detalle.entregableTipo || 'N / A';
-        //accion.accion = datos[indx].datos_componente_detalle.entregableAccion;
-        accion.unidadMedida = datos[indx].datos_componente_detalle.unidadMedida;
-        //accion.modalidad = 'pendiente';//datos[indx].cantidad;
+        if(datos[indx].idComponente){
+            accion.nivel = 'C';//+contador_componentes;
+            accion.indicador = datos[indx].datos_componente_detalle.indicador;
+            accion.unidadMedida = datos[indx].datos_componente_detalle.unidadMedida;
+            listado_componentes += '<option value="'+datos[indx].idComponente+'">'+datos[indx].datos_componente_detalle.indicador+'</option>';
+        }else{
+            accion.nivel = 'A';
+            accion.indicador = datos[indx].datos_actividad_detalle.indicador;
+            accion.unidadMedida = datos[indx].datos_actividad_detalle.unidadMedida;
+        }
         accion.presupuesto = '$ ' + (parseFloat(presupuesto) || 0).format(2);
         accion.boton = '<span class="btn-link text-info boton-detalle" onClick="fibapAcciones.mostrar_detalles(' + datos[indx].id + ')"><span class="fa fa-plus-square-o"></span></span>'
-
-
+        
         if(comentarios.componentes[accion.idComponente]){
             accion.indicador = '<span class="text-warning fa fa-warning comentario-row"></span> ' + accion.indicador;
         }
-
-        acciones.push(accion);
-
+        
+        if(datos[indx].idComponente){
+            if(!componentes[datos[indx].idComponente]){
+                componentes[datos[indx].idComponente] = {componente:{},actividades:[]};
+            }
+            componentes[datos[indx].idComponente].componente = accion;
+        }else{
+            if(!componentes[datos[indx].datos_actividad_detalle.idComponente]){
+                componentes[datos[indx].datos_actividad_detalle.idComponente] = {componente:{},actividades:[]};
+            }
+            componentes[datos[indx].datos_actividad_detalle.idComponente].actividades.push(accion);
+        }
+        
         for(var i in datos[indx].propuestas_financiamiento){
             var origen = datos[indx].propuestas_financiamiento[i];
             if(!sumas_origenes[origen.idOrigenFinanciamiento]){
                 sumas_origenes[origen.idOrigenFinanciamiento] = 0;
             }
             sumas_origenes[origen.idOrigenFinanciamiento] += parseFloat(origen.cantidad);
+        }
+    }
+    
+    var contador_componentes = 0;
+    var contador_actividades = 0;
+    for(var i in componentes){
+        if(componentes[i].componente.nivel){
+            contador_componentes++;
+            contador_actividades = 0;
+            componentes[i].componente.nivel = 'C ' + contador_componentes;
+            acciones.push(componentes[i].componente);
+        }
+        for(var j in componentes[i].actividades){
+            contador_actividades++;
+            if(componentes[i].componente.nivel){
+                componentes[i].actividades[j].nivel = 'A ' + contador_componentes + '.' + contador_actividades;
+            }else{
+                componentes[i].actividades[j].nivel = 'A -.-';
+            }
+            
+            acciones.push(componentes[i].actividades[j]);
         }
     }
     
@@ -916,11 +996,18 @@ function llenar_datagrid_acciones(datos){
     if(datos.length == 0){
         $('#datagridAcciones > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
     }else{
-        $('#tab-link-acciones-fibap > span.badge').text(acciones.length + ' / 2');
+        $('#tab-link-acciones-fibap > span.badge').text(acciones.length);
         accionesDatagrid.cargarDatos(acciones);
+    }
+    
+    if(listado_componentes != ''){
+        var id_componente = $('#componente-seleccionado').val();
+        $('#componente-seleccionado').html('<option value="">Seleccione un Componente</option>'+listado_componentes);
+        $('#componente-seleccionado').val(id_componente);
     }
 }
 
+/*
 function llenar_datagrid_actividades(datos){
     $('#datagridActividades > table > tbody').empty();
     var actividades = [];
@@ -949,6 +1036,7 @@ function llenar_datagrid_actividades(datos){
         actividadDatagrid.cargarDatos(actividades);
     }
 }
+*/
 
 function llenar_tabla_distribucion(datos){
     var distribucion = '';
@@ -985,7 +1073,7 @@ function llenar_tabla_distribucion(datos){
 }
 
 function llenar_tabla_componente_partidas(datos){
-    $('#tabla_componente_partidas' + ' > table > tbody').empty();
+    $(tabla_componente_partidas + ' > table > tbody').empty();
     var partidas = '';
     var ocultos = '';
     for(var indx in datos){
@@ -1082,7 +1170,7 @@ function habilitar_meses_presupuesto(fechaInicio, fechaFinal){
         }
     });
 }
-
+/*
 function habilitar_meses_metas(selector, fechaInicio, fechaFinal){
     if(typeof(fechaInicio) == 'string'){
         var inicio = fechaInicio;
@@ -1110,7 +1198,7 @@ function habilitar_meses_metas(selector, fechaInicio, fechaFinal){
         }
     });
 }
-
+*/
 function habilitar_meses_captura(fechaInicio, fechaFinal){
     if(typeof(fechaInicio) == 'string'){
         var inicio = fechaInicio;
@@ -1123,7 +1211,7 @@ function habilitar_meses_captura(fechaInicio, fechaFinal){
     ejecucion_fecha_inicio = inicio;
     ejecucion_fecha_fin = fin;
 
-    habilitar_meses_metas('actividad', inicio, fin);
+    //habilitar_meses_metas('actividad', inicio, fin);
     $(form_accion + ' .metas-mes').prop('disabled',true);
     
     var primer_mes = parseInt(inicio.substring(5,7));
@@ -1167,7 +1255,6 @@ function actualizar_claves_presupuesto(datos){
 }
 
 function actualizar_tabla_metas_mes(identificador,jurisdicciones){
-    //var meses = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
     var meses = [];
     meses[1] = ['ENE','FEB','MAR'];
     meses[2] = ['ABR','MAY','JUN'];
@@ -1203,36 +1290,6 @@ function actualizar_tabla_metas_mes(identificador,jurisdicciones){
 
     actualizar_eventos_metas(identificador);
 }
-/*
-function actualizar_tabla_metas_mes(identificador,jurisdicciones){
-    var tabla_id = '#tabla-'+identificador+'-metas-mes';
-    var meses = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SEP','OCT','NOV','DIC'];
-
-    var html = '';
-    var indx,idx;
-
-    for(var i in jurisdicciones){
-        html += '<tr>';
-        html += '<th>'+jurisdicciones[i].clave+'</th>';
-        for(idx in meses){
-            id_mes = parseInt(idx) + 1;
-            html += '<td><input id="mes-'+identificador+'-'+jurisdicciones[i].clave+'-'+id_mes+'" name="mes-'+identificador+'['+jurisdicciones[i].clave+']['+id_mes+']" type="number" class="form-control input-sm metas-mes" data-meta-mes="'+id_mes+'" data-meta-jurisdiccion="'+jurisdicciones[i].clave+'" data-meta-identificador="'+identificador+'" data-meta-id=""></td>';
-        }
-        html += '</tr>';
-    }
-
-    html += '<tr><th>O.C.</th>';
-    for(idx in meses){
-        id_mes = parseInt(idx) + 1;
-        html += '<td><input id="mes-'+identificador+'-OC-'+id_mes+'" name="mes-'+identificador+'[OC]['+id_mes+']" type="number" class="form-control input-sm metas-mes" data-meta-mes="'+id_mes+'" data-meta-jurisdiccion="OC" data-meta-identificador="'+identificador+'" data-meta-id=""></td>';
-    }
-    html += '</tr>';
-
-    $(tabla_id + ' tbody').empty();
-    $(tabla_id + ' tbody').html(html);
-    actualizar_eventos_metas(identificador);
-}
-*/
 
 function actualizar_eventos_metas(identificador){
     $('.metas-mes[data-meta-identificador="' + identificador + '"]').on('keyup',function(){ $(this).change(); });
@@ -1340,8 +1397,9 @@ function reset_modal_form(form){
         $(modal_accion + ' .alert').remove();
         $('#entregable').chosen().change();
         $('#id-componente').val('');
+        $('#id-actividad').val('');
         $('#id-accion').val('');
-        $('#tabla_componente_partidas > table > tbody').empty();
+        $(tabla_componente_partidas + ' > table > tbody').empty();
         $('.ocultos-partidas-componente').remove();
         $('#accion-presupuesto-requerido-lbl').text('');
         $('#trim1-componente-lbl').text('');
@@ -1353,6 +1411,9 @@ function reset_modal_form(form){
         $(form_accion + ' input[type="hidden"]').val('');
         $(form_accion + ' .accion-origen-financiamiento').attr('data-captura-id','');
         $(form_accion + ' .metas-mes').attr('data-meta-id','');
+        $('#nivel-accion').val('componente').change();
+        $('#nivel-accion').prop('disabled',false);
+        Validation.cleanFieldErrors('componente-seleccionado');
     }else if(form == form_presupuesto){
         $(modal_presupuesto + ' .alert').remove();
         $('#id-desglose').val('');
@@ -1367,7 +1428,9 @@ function reset_modal_form(form){
         $(form_presupuesto + ' .meta-mes').attr('data-meta-id','');
         $(form_presupuesto + ' .presupuesto-mes').attr('data-presupuesto-id','');
         $(form_presupuesto + ' input[type="hidden"]').val('');
-    }else if(form == form_actividad){
+    }
+    /*
+    else if(form == form_actividad){
         $(modal_actividad + ' .alert').remove();
         $('#id-actividad').val('');
         $(modal_actividad + ' .metas-mes').attr('data-meta-id','');
@@ -1378,7 +1441,7 @@ function reset_modal_form(form){
         $('#numerador-actividad-lbl').text('');
         $('#meta-actividad-lbl').text('');
         $(form_actividad + ' input[type="hidden"]').val('');
-    }
+    }*/
 }
 
 function mostrar_comentario(comentario){
@@ -1394,8 +1457,8 @@ function mostrar_comentarios(datos){
         
         if(tipo_comentario == 1){
             if(id_campo.substring(0,8) == 'partidas'){
-                $('#tabla_componente_partidas').addClass('has-warning');
-                $('#tabla_componente_partidas').prepend('<p class="help-block texto-comentario"><span class="fa fa-warning"></span> '+observacion+'</p>');
+                $(tabla_componente_partidas).addClass('has-warning');
+                $(tabla_componente_partidas).prepend('<p class="help-block texto-comentario"><span class="fa fa-warning"></span> '+observacion+'</p>');
             }else{
                 if($('#'+id_campo).length){
                     $('label[for="' + id_campo + '"]').prepend('<span class="fa fa-warning texto-comentario"></span> ');

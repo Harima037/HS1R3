@@ -1196,6 +1196,12 @@ class ProyectosController extends BaseController {
 		$es_editar = FALSE;
 		$proyecto = NULL;
 		$componente = NULL;
+		
+		if(isset($parametros['nivel'])){
+			$selector_nivel = $parametros['nivel'];
+		}else{
+			$selector_nivel = $selector;
+		}
 
 		$reglasAccion = array(
 			//'denominador-ind-' . $selector 	=> 'required',
@@ -1221,27 +1227,35 @@ class ProyectosController extends BaseController {
 			//'meta-componente' 				=> 'required|numeric|min:0',
 		);
 
-		if($selector == 'componente'){
+		if($selector_nivel == 'componente'){
 			$proyecto = Proyecto::find($parametros['id-proyecto']);
 			if(!$proyecto){
 				throw new Exception("No se pudo encontrar el proyecto al que pertenece este componente", 1);
 			}
 		}else{
-			$componente = Componente::find($parametros['id-componente']);
+			if(isset($parametros['id-nuevo-componente'])){
+				$componente_id = $parametros['id-nuevo-componente'];
+			}else{
+				$componente_id = $parametros['id-componente'];
+			}
+			
+			$componente = Componente::find($componente_id);
 			if(!$componente){
-				throw new Exception("No se pudo encontrar el componente al que pertenece esta actividad", 1);
+				//componente-seleccionado
+				throw new Exception('{"field":"componente-seleccionado","error":"No se pudo encontrar el componente al que pertenece esta actividad."}', 1);
+				//throw new Exception("No se pudo encontrar el componente al que pertenece esta actividad", 1);
 			}
 		}
 		
 		if($id){
 			$es_editar = TRUE;
-			if($selector == 'componente'){
+			if($selector_nivel == 'componente'){
 				$recurso = Componente::find($id);
 			}else{
 				$recurso = Actividad::find($id);
 			}
 		}else{
-			if($selector == 'componente'){
+			if($selector_nivel == 'componente'){
 				$recurso = new Componente;
 			}else{
 				$recurso = new Actividad;
@@ -1250,35 +1264,23 @@ class ProyectosController extends BaseController {
 		}
 		
 		if(!$es_editar){
-			if($selector == 'componente'){
+			if($selector_nivel == 'componente'){
 				$proyecto->load('componentes');
-
 				if(count($proyecto->componentes) == 2){
 					$respuesta['data']['data'] = 'El proyecto no puede tener mas de 2 componentes.';
 					throw new Exception("No esta permitido guardar mas de 2 componentes por cada proyecto", 1);
 				}
-			}else{
+			}//else{
 				//$componente->load('actividades');
-				/*
+				/* Que siempre no, que si se puede tener mas de 5 actividades por componente
 				if(count($componente->actividades) == 5){
 					$respuesta['data']['data'] = 'El componente no puede tener mas de 5 acciones.';
 					throw new Exception("No esta permitido guardar mas de 5 acciones por cada componente", 1);
 				}
 				*/
-			}
+			//}
 		}
 		
-		/*if($parametros['clasificacion'] == 2 && $selector == 'componente'){
-			$reglasAccion['entregable'] 			= 'required';
-			$reglasAccion['tipo-entregable'] 		= 'required';
-			$reglasAccion['accion-entregable'] 		= 'required';
-		}*/
-		
-		/*if(isset($parametros['datos_presupuesto'])){
-			$this->reglasComponente['accion-presupuesto-requerido']	= 'required|numeric|min:1';
-			$this->reglasComponente['objeto-gasto-presupuesto']		= 'required|array|min:1';
-		}*/
-
 		$validacion = Validador::validar(Input::all(), $reglasAccion);
 
 		if($validacion === TRUE){
@@ -1311,7 +1313,7 @@ class ProyectosController extends BaseController {
 			if(!$recurso->idFrecuenciaIndicador){ $recurso->idFrecuenciaIndicador = NULL; }
 			if(!$recurso->idTipoIndicador){ $recurso->idTipoIndicador = NULL; }
 
-			if($parametros['clasificacion'] == 2 && $selector == 'componente'){
+			if($parametros['clasificacion'] == 2 && $selector_nivel == 'componente'){
 				if($parametros['entregable']){
 					$recurso->idEntregable 		= $parametros['entregable'];
 				}
@@ -1323,21 +1325,25 @@ class ProyectosController extends BaseController {
 				}
 			}
 
-			if($selector == 'actividad'){
+			if($selector_nivel == 'actividad'){
 				$recurso->idProyecto = $componente->idProyecto;
 			}
 
-			$respuesta['data'] = DB::transaction(function() use ($parametros, $proyecto, $componente, $recurso, $selector, $es_editar){
-				if($selector == 'componente'){
+			$respuesta['data'] = DB::transaction(function() use ($parametros, $proyecto, $componente, $recurso, $selector, $selector_nivel, $es_editar){
+				if($selector_nivel == 'componente'){
 					$guardado = $proyecto->componentes()->save($recurso);
 				}else{
 					$guardado = $componente->actividades()->save($recurso);
 				}
 
 				if($guardado){
-					if($parametros['clasificacion'] == 2 && $selector == 'componente' && !$es_editar){
+					if($parametros['clasificacion'] == 2 && !$es_editar){
 						$accion = new Accion;
-						$accion->idComponente = $recurso->id;
+						if($selector_nivel == 'componente'){
+							$accion->idComponente = $recurso->id;
+						}else{
+							$accion->idActividad = $recurso->id;
+						}
 						$accion->idFibap = $parametros['id-fibap'];
 						$accion->presupuestoRequerido = 0;
 						$accion->save();
@@ -1365,7 +1371,7 @@ class ProyectosController extends BaseController {
 									$meta->meta = ($valor)?$valor:0;
 									$metasMes[] = $meta;
 								}elseif($valor > 0){
-									if($selector == 'componente'){
+									if($selector_nivel == 'componente'){
 										$meta = new ComponenteMetaMes;
 										$meta->idProyecto = $recurso->idProyecto;
 									}else{

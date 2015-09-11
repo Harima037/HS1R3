@@ -21,7 +21,13 @@ class Actividad extends BaseModel
     					'frecuencia.descripcion AS frecuencia','tipoIndicador.descripcion AS tipoIndicador',
     					'unidadMedida.descripcion AS unidadMedida');
 	}
-
+	
+	public function scopeMostrarDatos($query){
+    	$query->select('componenteActividades.id','idUnidadMedida','indicador',
+						'unidadMedida.descripcion AS unidadMedida','componenteActividades.idComponente')
+    			->leftjoin('catalogoUnidadesMedida AS unidadMedida','unidadMedida.id','=','idUnidadMedida');
+    }
+	
 	public function registroAvance(){
     	return $this->hasMany('RegistroAvanceMetas','idNivel')->where('nivel','=',2);
     }
@@ -29,6 +35,22 @@ class Actividad extends BaseModel
     public function planMejora(){
     	return $this->hasMany('EvaluacionPlanMejora','idNivel')->where('nivel','=',2);
     }
+	
+	public function desglose(){
+		return $this->hasMany('ActividadDesglose','idActividad');
+	}
+
+	public function desgloseMunicipios(){
+		return $this->hasMany('ActividadDesglose','idActividad')->listarMunicipios();
+	}
+	
+	public function desgloseConDatos(){
+		return $this->hasMany('ActividadDesglose','idActividad')->listarDatos();
+	}
+
+	public function desgloseCompleto(){
+		return $this->hasMany('ActividadDesglose','idActividad')->listarDatos()->with('metasMes');
+	}
 
 	public function metasMes(){
 		return $this->hasMany('ActividadMetaMes','idActividad');

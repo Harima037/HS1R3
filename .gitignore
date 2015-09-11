@@ -14,3 +14,4 @@ app/storage/meta/*
 app/storage/sessions/*
 app/storage/views/*
 app/storage/archivoscsv/*
+typings/*

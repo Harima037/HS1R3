@@ -16,7 +16,7 @@ var Validation = {
 		$('input','.has-error').first().focus();
 	},
 	printFieldsErrors:function(form_field,error_message){
-		$field_parents = $('#'+form_field.replace(" ","_")).closest('div[class*="form-group"]'); //Se optiene el contenedor del campo
+		var $field_parents = $('#'+form_field.replace(" ","_")).closest('div[class*="form-group"]'); //Se optiene el contenedor del campo
 		if($field_parents.hasClass('has-success')){
 			$field_parents.removeClass('has-success');
 		}
