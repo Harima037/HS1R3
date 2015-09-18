@@ -749,6 +749,14 @@ class InversionController extends ProyectosController {
 			}elseif($parametros['guardar'] == 'proyecto-beneficiario'){
 				$respuesta = parent::guardar_datos_beneficiario($parametros,$id);
 			}elseif($parametros['guardar'] == 'accion'){
+				/***
+				*	Editar datos generales de un acción (Componente o Actividad) (PUT)
+				*
+				*	- Actualiza datos del componente o de la actividad
+				*	- Actualiza datos de la acción
+				*	- En caso de eliminar partidas se recalculan los montos capturados en el desglose y se eliminana aquellos asignados a dichas partidas
+				*
+				***/
 				$parametros['clasificacion'] = 2;
 				if($parametros['nivel'] == 'componente'){
 					$id_elemento = $parametros['id-componente']; 
@@ -764,6 +772,9 @@ class InversionController extends ProyectosController {
 						$respuesta['data']['data'] = $resultado['data'];
 					}
 					$respuesta['data']['acciones'] = $resultado['acciones'];
+					if(isset($resultado['distribucion_total'])){
+						$respuesta['data']['distribucion_total'] = $resultado['distribucion_total'];
+					}
 				}
 			}elseif($parametros['guardar'] == 'datos-fibap'){
 				/***

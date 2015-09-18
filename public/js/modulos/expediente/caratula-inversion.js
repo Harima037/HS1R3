@@ -25,16 +25,12 @@ var form_fibap_antecentes = '#form-fibap-antecedentes';
 var form_antecedente = '#form-antecedente';
 var form_beneficiario = '#form_beneficiario';
 var form_accion = '#form_accion';
-//var form_componente = '#form_componente';
-//var form_actividad = '#form_actividad';
 var form_presupuesto = '#form-presupuesto';
 
 var modal_antecedente = '#modal-antecedente';
 var modal_presupuesto = '#modal-presupuesto';
 var modal_accion  = '#modal-accion';
 var modal_beneficiario = '#modalBeneficiario';
-//var modal_componente = '#modal-componente';
-//var modal_actividad = '#modal-actividad';
 
 $('.chosen-one').chosen({width:'100%'});
 
@@ -167,16 +163,6 @@ function editar_accion(e){
 		}
 	});
 }
-/*
-function editar_actividad(e){
-	var parametros = {'mostrar':'editar-actividad'};
-	proyectoResource.get(e,parametros,{
-		_success: function(response){
-			fibapAcciones.mostrar_datos_actividad(response.data);
-		}
-	});
-}
-*/
 
 function editar_presupuesto(e){
 	if($(modal_presupuesto).find(".modal-title").html() == "Editar Presupuesto"){
@@ -241,23 +227,9 @@ $('#btn-componente-guardar').on('click',function(){
 	guardar_datos_accion(false);
 });
 
-/*
-$('#btn-actividad-guardar').on('click',function(){
-	guardar_datos_accion(true,'actividad');
-});
-*/
-
 function guardar_datos_accion(cerrar){
 	var nivel = $('#nivel-accion').val();
-	/*
-	if(selector == 'actividad'){
-		var formulario = form_actividad;
-		var modal = modal_actividad;
-	}else{
-		var formulario = form_componente;
-		var modal = modal_componente;
-	}
-	*/
+	
 	Validation.cleanFormErrors(form_accion);
 	var parametros = $(form_accion).serialize();
 	parametros += '&guardar=accion';
@@ -295,25 +267,10 @@ function guardar_datos_accion(cerrar){
 				if(response.distribucion_total){
 					fibapAcciones.llenar_tabla_distribucion_general(response.distribucion_total);
 				}
-				/*
-	            if(nivel == 'actividad'){
-	            	fibapAcciones.llenar_datagrid_actividades(response.extras.actividades);
-	            }else{
-	            	fibapAcciones.llenar_datagrid(response.acciones);
-		            if(response.distribucion_total){
-						fibapAcciones.llenar_tabla_distribucion_general(response.distribucion_total);
-					}
-	            }
-				*/
-
+				
 	            if(cerrar){
 					$(modal_accion).modal('hide');
 				}else{
-					/*
-					if(selector == 'componente'){
-						$('#tablink-componente-actividades').tab('show');
-					}
-					*/
 					if(response.metas){
 						fibapAcciones.actualizar_metas_ids('accion',response.metas);
 					}
@@ -338,21 +295,9 @@ function guardar_datos_accion(cerrar){
 	        _success: function(response){
 	            MessageManager.show({data:'Datos de la acción almacenados con éxito',type:'OK',timer:3});
 				fibapAcciones.llenar_datagrid(response.acciones);
-				/*
-	            if(nivel == 'actividad'){
-	            	fibapAcciones.llenar_datagrid_actividades(response.extras.actividades);
-	            }else{
-	            	fibapAcciones.llenar_datagrid(response.acciones);
-	            }
-	            */
 	            if(cerrar){
 					$(modal_accion).modal('hide');
 				}else{
-					/*
-					if(nivel == 'actividad'){
-						$(form_accion + ' #id-actividad').val(response.data.id);
-					}else{
-					*/
 					$('#lnk-descarga-archivo-presupuesto').attr('href',SERVER_HOST+'/expediente/descargar-archivo-municipios/'+$('#id').val()+'?tipo-carga=presupuesto&id-accion='+response.data.id);
 					$('#lnk-descarga-archivo-presupuesto').removeClass('disabled');
 					if(response.data.idComponente){
@@ -361,10 +306,7 @@ function guardar_datos_accion(cerrar){
 						$(form_accion + ' #id-actividad').val(response.data.idActividad);
 					}
 					$(form_accion + ' #id-accion').val(response.data.id);
-					//$('#tablink-componente-actividades').attr('data-toggle','tab');
-					//$('#tablink-componente-actividades').parent().removeClass('disabled');
-					//$('#tablink-componente-actividades').tab('show');
-					//}
+					
 					if(response.metas){
 						fibapAcciones.actualizar_metas_ids('accion',response.metas);
 					}
@@ -531,7 +473,9 @@ $('#btn-fibap-guardar').on('click',function(){
 	        _success: function(response){
 	            MessageManager.show({data:'Datos del proyecto actualizados con éxito',type:'OK',timer:3});
 	            fibapAcciones.actualizar_total_presupuesto(parseFloat(response.data.presupuestoRequerido));
-				fibapAcciones.llenar_tabla_distribucion_general(response.data.distribucion_presupuesto_agrupado);
+				if(response.data.distribucion_presupuesto_agrupado){
+					fibapAcciones.llenar_tabla_distribucion_general(response.data.distribucion_presupuesto_agrupado);
+				}
 				fibapAcciones.habilitar_meses(response.data.periodoEjecucionInicio, response.data.periodoEjecucionFinal);
 	        },
 	        _error: function(response){
