@@ -247,7 +247,7 @@ function llenar_datos_fibap(fibap){
     }
     $('#tabla-antecedentes > tbody').html(html_antecedentes);
 
-    var presupuesto_requerido = fibap.presupuestoRequerido || 0;
+    var presupuesto_requerido = parseFloat(fibap.presupuestoRequerido) || 0;
 
     var html_distribucion = '';
     for(var i in fibap.distribucion_presupuesto_agrupado){
@@ -256,7 +256,7 @@ function llenar_datos_fibap(fibap){
         html_distribucion += '<tr>';
         html_distribucion += '<td>' + presupuesto.objeto_gasto.clave + '</td>';
         html_distribucion += '<td>' + presupuesto.objeto_gasto.descripcion + '</td>';
-        html_distribucion += '<td>' + presupuesto.cantidad.format() + '</td>';
+        html_distribucion += '<td>' + parseFloat(presupuesto.cantidad).format() + '</td>';
         html_distribucion += '<td>' + parseFloat(porcentaje.toFixed(2)) + '% </td>';
         html_distribucion += '</tr>';
     }
@@ -265,7 +265,7 @@ function llenar_datos_fibap(fibap){
     $('.valores-origenes').text('0');
 
     for(var i in fibap.propuestas_financiamiento){
-        $('#lbl-origen-'+fibap.propuestas_financiamiento[i].idOrigenFinanciamiento).text(fibap.propuestas_financiamiento[i].cantidad.format());
+        $('#lbl-origen-'+fibap.propuestas_financiamiento[i].idOrigenFinanciamiento).text(parseFloat(fibap.propuestas_financiamiento[i].cantidad).format());
     }
         
     $('#lbl-presupuesto-requerido').text(presupuesto_requerido.format());

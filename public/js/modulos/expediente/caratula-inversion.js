@@ -31,7 +31,7 @@ var form_presupuesto = '#form-presupuesto';
 
 var modal_antecedente = '#modal-antecedente';
 var modal_presupuesto = '#modal-presupuesto';
-var modal_accion  = '#modal-componente';
+var modal_accion  = '#modal-accion';
 var modal_beneficiario = '#modalBeneficiario';
 //var modal_componente = '#modal-componente';
 //var modal_actividad = '#modal-actividad';
