@@ -17,9 +17,8 @@
 namespace V1;
 
 use SSA\Utilerias\Util;
-use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, View;
-use Excel, PDF, Proyecto, FIBAP, ComponenteMetaMes, ActividadMetaMes,Jurisdiccion,Municipio,Region;
+use PDF, Proyecto, Jurisdiccion,Municipio,Region;
 
 class ReporteEvaluacionController extends BaseController {
 
@@ -67,21 +66,28 @@ class ReporteEvaluacionController extends BaseController {
 			$query->where('mes','=',$mes_actual)->orderBy('mes','ASC');
 		},'componentes.desgloseConDatos.metasMesAcumuladas'=>function($query) use ($mes_actual){
 			$query->where('mes','<',$mes_actual)->orderBy('mes','ASC');
+		},'componentes.actividades.desgloseConDatos.metasMes'=>function($query) use ($mes_actual){
+			$query->where('mes','=',$mes_actual)->orderBy('mes','ASC');
+		},'componentes.actividades.desgloseConDatos.metasMesAcumuladas'=>function($query) use ($mes_actual){
+			$query->where('mes','<',$mes_actual)->orderBy('mes','ASC');
 		},'analisisFuncional'=>function($query) use ($mes_actual){
 			$query->where('mes','=',$mes_actual)->orderBy('mes','ASC');
 		}))->find($id);
-
-		if($recurso->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
+		$recurso = $recurso->toArray();
+		
+		if($recurso['idCobertura'] == 1){ //Cobertura Estado => Todos las Jurisdicciones
 			$jurisdicciones = Jurisdiccion::all();
-		}elseif($recurso->idCobertura == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
-			$jurisdicciones = Municipio::obtenerJurisdicciones($recurso->claveMunicipio)->get();
-		}elseif($recurso->idCobertura == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
-			$jurisdicciones = Region::obtenerJurisdicciones($recurso->claveRegion)->get();
+		}elseif($recurso['idCobertura'] == 2){ //Cobertura Municipio => La Jurisdiccion a la que pertenece el Municipio
+			$jurisdicciones = Municipio::obtenerJurisdicciones($recurso['claveMunicipio'])->get();
+		}elseif($recurso['idCobertura'] == 3){ //Cobertura Region => Las Jurisdicciones de los municipios pertencientes a la Region
+			$jurisdicciones = Region::obtenerJurisdicciones($recurso['claveRegion'])->get();
 		}
 		$data['jurisdicciones'] = array('OC'=>'Oficina Central') + $jurisdicciones->lists('nombre','clave');
+		$jurisdicciones = $jurisdicciones->toArray();
+		unset($jurisdicciones);
 
-		$nombreArchivo = ($recurso->idClasificacionProyecto== 2) ? 'Rendición de Cuentas Inversión' : 'Rendición de Cuentas Institucional';
-		$nombreArchivo.=' - '.$recurso->ClavePresupuestaria;
+		$nombreArchivo = ($recurso['idClasificacionProyecto']== 2) ? 'Rendición de Cuentas Inversión' : 'Rendición de Cuentas Institucional';
+		$nombreArchivo.=' - '.$recurso['ClavePresupuestaria'];
 
 		$data['mes_actual'] = $mes_actual;
 		$data['meses'] = array(
@@ -98,27 +104,30 @@ class ReporteEvaluacionController extends BaseController {
 			11 => array('mes'=>'Noviembre',		'abrev'=>'NOV',	'trimestre'=>4, 'trimestre_letras'=>'CUARTO'),
 			12 => array('mes'=>'Dicembre',		'abrev'=>'DIC',	'trimestre'=>4, 'trimestre_letras'=>'CUARTO')
 		);
-		$data['recurso'] = $recurso;
+		
 		$data['componentes'] = array();
 		$data['beneficiarios'] = array();
 		$data['beneficiarios_avances'] = array();
 		$data['avances_mes'] = array('componentes'=>array(),'actividades'=>array());
 		$data['jurisdicciones_mes'] = array('componentes'=>array(),'actividades'=>array());
-		$data['localidades_mes'] = array('componentes'=>array(),'actividades'=>array());
+		$data['localidades_mes'] = array('componentes'=>array(),'actividades'=>array(),'localidades'=>array());
 		$data['conteo_elementos'] = 0;
 		$data['planes_mejora'] = array('componentes'=>array(),'actividades'=>array());
 
-		foreach ($recurso->componentes as $componente) {
+		foreach ($recurso['componentes'] as $componente) {
+			if(isset($recurso['componentes'])){
+				unset($recurso['componentes']);
+			}
 			$data['conteo_elementos']++;
 			$datos_componente = array(
-				'indicador' => $componente->indicador,
-				'id' => $componente->id,
+				'indicador' => $componente['indicador'],
+				'id' => $componente['id'],
 				'actividades' => array()
 			);
 
 			$total_avance_acumulado = 0;
-			if(!isset($data['avances_mes']['componentes'][$componente->id])){
-				$data['avances_mes']['componentes'][$componente->id] = array(
+			if(!isset($data['avances_mes']['componentes'][$componente['id']])){
+				$data['avances_mes']['componentes'][$componente['id']] = array(
 					'meta_programada' => 0.0,
 					'avance_mes' => 0.0,
 					'avance_acumulado' => 0.0,
@@ -127,26 +136,29 @@ class ReporteEvaluacionController extends BaseController {
 					'plan_mejora' => 0
 				);
 			}
-			foreach ($componente->registroAvance as $avance){
-				$total_avance_acumulado += $avance->avanceMes;
-				if($avance->mes == $mes_actual){
-					$data['avances_mes']['componentes'][$componente->id]['avance_mes'] 				= $avance->avanceMes;
-					$data['avances_mes']['componentes'][$componente->id]['analisis_resultados'] 	= $avance->analisisResultados;
-					$data['avances_mes']['componentes'][$componente->id]['justificacion_acumulada'] = $avance->justificacionAcumulada;
-					$data['avances_mes']['componentes'][$componente->id]['plan_mejora'] 			= $avance->planMejora;
+			foreach ($componente['registro_avance'] as $avance){
+				if(isset($componente['registro_avance'])){
+					unset($componente['registro_avance']);
+				}
+				$total_avance_acumulado += $avance['avanceMes'];
+				if($avance['mes'] == $mes_actual){
+					$data['avances_mes']['componentes'][$componente['id']]['avance_mes'] 				= $avance['avanceMes'];
+					$data['avances_mes']['componentes'][$componente['id']]['analisis_resultados'] 		= $avance['analisisResultados'];
+					$data['avances_mes']['componentes'][$componente['id']]['justificacion_acumulada'] 	= $avance['justificacionAcumulada'];
+					$data['avances_mes']['componentes'][$componente['id']]['plan_mejora'] 				= $avance['planMejora'];
 				}
 			}
-			$data['avances_mes']['componentes'][$componente->id]['avance_acumulado'] = $total_avance_acumulado;
+			$data['avances_mes']['componentes'][$componente['id']]['avance_acumulado'] = $total_avance_acumulado;
 
-			foreach ($componente->planMejora as $plan_mejora) {
-				$data['planes_mejora']['componentes'][$componente->id] = array(
-					'id' => $componente->id,
-					'accionMejora' => $plan_mejora->accionMejora,
-					'grupoTrabajo' => $plan_mejora->grupoTrabajo,
-					'fechaInicio' => $plan_mejora->fechaInicio,
-					'fechaTermino' => $plan_mejora->fechaTermino,
-					'fechaNotificacion' => $plan_mejora->fechaNotificacion,
-					'documentacionComprobatoria' => $plan_mejora->documentacionComprobatoria
+			foreach ($componente['plan_mejora'] as $plan_mejora) {
+				$data['planes_mejora']['componentes'][$componente['id']] = array(
+					'id' => $componente['id'],
+					'accionMejora' => $plan_mejora['accionMejora'],
+					'grupoTrabajo' => $plan_mejora['grupoTrabajo'],
+					'fechaInicio' => $plan_mejora['fechaInicio'],
+					'fechaTermino' => $plan_mejora['fechaTermino'],
+					'fechaNotificacion' => $plan_mejora['fechaNotificacion'],
+					'documentacionComprobatoria' => $plan_mejora['documentacionComprobatoria']
 				);
 			}
 			
@@ -154,46 +166,59 @@ class ReporteEvaluacionController extends BaseController {
 			$metas_programada = array();
 			$avance_acumulado = array();
 			
-			foreach ($componente->metasMes as $meta_mes){
-				if(!isset($metas_programada[$meta_mes->claveJurisdiccion])){
-					$metas_programada[$meta_mes->claveJurisdiccion] = 0;
-					$avance_acumulado[$meta_mes->claveJurisdiccion] = 0;
+			foreach ($componente['metas_mes'] as $meta_mes){
+				if(!isset($metas_programada[$meta_mes['claveJurisdiccion']])){
+					$metas_programada[$meta_mes['claveJurisdiccion']] = 0;
+					$avance_acumulado[$meta_mes['claveJurisdiccion']] = 0;
 				}
 
-				$meta_mes_programada += $meta_mes->meta;
+				$meta_mes_programada += $meta_mes['meta'];
 
-				$metas_programada[$meta_mes->claveJurisdiccion] += $meta_mes->meta;
-				$avance_acumulado[$meta_mes->claveJurisdiccion] += $meta_mes->avance;
+				$metas_programada[$meta_mes['claveJurisdiccion']] += $meta_mes['meta'];
+				$avance_acumulado[$meta_mes['claveJurisdiccion']] += $meta_mes['avance'];
 
-				$data['jurisdicciones_mes']['componentes'][$componente->id][$meta_mes->claveJurisdiccion] = array(
-					'meta_programada' => $metas_programada[$meta_mes->claveJurisdiccion],
-					'avance_mes' => ($meta_mes->mes == $mes_actual)?$meta_mes->avance:0.0,
-					'avance_acumulado' => $avance_acumulado[$meta_mes->claveJurisdiccion]
+				$data['jurisdicciones_mes']['componentes'][$componente['id']][$meta_mes['claveJurisdiccion']] = array(
+					'meta_programada' => $metas_programada[$meta_mes['claveJurisdiccion']],
+					'avance_mes' => ($meta_mes['mes'] == $mes_actual)?$meta_mes['avance']:0.0,
+					'avance_acumulado' => $avance_acumulado[$meta_mes['claveJurisdiccion']]
 				);
 			}
-			$data['avances_mes']['componentes'][$componente->id]['meta_programada'] = $meta_mes_programada;
-			//print_r($componente->desgloseConDatos->toArray());die;
-			foreach ($componente->desgloseConDatos as $desglose) {
-				$data['localidades_mes']['componentes'][$componente->id][$desglose->claveJurisdiccion][] = array(
-					'municipio' => $desglose->municipio,
-					'localidad' => $desglose->localidad,
-					'meta_programada' => $desglose->metasMes[0]->meta + ((count($desglose->metasMesAcumuladas))?$desglose->metasMesAcumuladas->meta:0),
-					'avance_mes' => $desglose->metasMes[0]->avance,
-					'avance_acumulado' => $desglose->metasMes[0]->avance + ((count($desglose->metasMesAcumuladas))?$desglose->metasMesAcumuladas->avance:0)
+			$data['avances_mes']['componentes'][$componente['id']]['meta_programada'] = $meta_mes_programada;
+			
+			foreach ($componente['desglose_con_datos'] as $desglose) {
+				if(!isset($data['localidades_mes']['localidades'][$desglose['claveMunicipio'].'_'.$desglose['claveLocalidad']])){
+					$data['localidades_mes']['localidades'][$desglose['claveMunicipio'].'_'.$desglose['claveLocalidad']] = array(
+						'municipio' => $desglose['municipio'],
+						'localidad' => $desglose['localidad']
+					);
+				}
+				if(count($desglose['metas_mes'])){
+					$metas_mes = $desglose['metas_mes'][0];
+				}else{
+					$metas_mes = array('avance'=>0,'meta'=>0);
+				}
+				$data['localidades_mes']['componentes'][$componente['id']][$desglose['claveJurisdiccion']][] = array(
+					'clave_localidad'=> $desglose['claveMunicipio'].'_'.$desglose['claveLocalidad'],
+					'meta_programada' => $metas_mes['meta'] + ((count($desglose['metas_mes_acumuladas']))?$desglose['metas_mes_acumuladas']['meta']:0),
+					'avance_mes' => $metas_mes['avance'],
+					'avance_acumulado' => $metas_mes['avance'] + ((count($desglose['metas_mes_acumuladas']))?$desglose['metas_mes_acumuladas']['avance']:0)
 				);
 			}
 
-			foreach ($componente->actividades as $actividad) {
+			foreach ($componente['actividades'] as $actividad) {
+				if(isset($componente['actividades'])){
+					unset($componente['actividades']);
+				}
+				
 				$data['conteo_elementos']++;
 				$datos_actividad = array(
-					'indicador' => $actividad->indicador,
-					'id' => $actividad->id
+					'indicador' => $actividad['indicador'],
+					'id' => $actividad['id']
 				);
-
-
+				
 				$total_avance_acumulado = 0;
-				if(!isset($data['avances_mes']['actividades'][$actividad->id])){
-					$data['avances_mes']['actividades'][$actividad->id] = array(
+				if(!isset($data['avances_mes']['actividades'][$actividad['id']])){
+					$data['avances_mes']['actividades'][$actividad['id']] = array(
 						'meta_programada' => 0.0,
 						'avance_mes' => 0.0,
 						'avance_acumulado' => 0.0,
@@ -202,26 +227,26 @@ class ReporteEvaluacionController extends BaseController {
 						'plan_mejora' => 0
 					);
 				}
-				foreach ($actividad->registroAvance as $avance){
-					$total_avance_acumulado += $avance->avanceMes;
-					if($avance->mes == $mes_actual){
-						$data['avances_mes']['actividades'][$actividad->id]['avance_mes'] 				= $avance->avanceMes;
-						$data['avances_mes']['actividades'][$actividad->id]['analisis_resultados'] 		= $avance->analisisResultados;
-						$data['avances_mes']['actividades'][$actividad->id]['justificacion_acumulada'] 	= $avance->justificacionAcumulada;
-						$data['avances_mes']['actividades'][$actividad->id]['plan_mejora'] 				= $avance->planMejora;
+				foreach ($actividad['registro_avance'] as $avance){
+					$total_avance_acumulado += $avance['avanceMes'];
+					if($avance['mes'] == $mes_actual){
+						$data['avances_mes']['actividades'][$actividad['id']]['avance_mes'] 				= $avance['avanceMes'];
+						$data['avances_mes']['actividades'][$actividad['id']]['analisis_resultados'] 		= $avance['analisisResultados'];
+						$data['avances_mes']['actividades'][$actividad['id']]['justificacion_acumulada'] 	= $avance['justificacionAcumulada'];
+						$data['avances_mes']['actividades'][$actividad['id']]['plan_mejora'] 				= $avance['planMejora'];
 					}
 				}
-				$data['avances_mes']['actividades'][$actividad->id]['avance_acumulado'] = $total_avance_acumulado;
+				$data['avances_mes']['actividades'][$actividad['id']]['avance_acumulado'] = $total_avance_acumulado;
 
-				foreach ($actividad->planMejora as $plan_mejora) {
-					$data['planes_mejora']['actividades'][$actividad->id] = array(
-						'id' => $actividad->id,
-						'accionMejora' => $plan_mejora->accionMejora,
-						'grupoTrabajo' => $plan_mejora->grupoTrabajo,
-						'fechaInicio' => $plan_mejora->fechaInicio,
-						'fechaTermino' => $plan_mejora->fechaTermino,
-						'fechaNotificacion' => $plan_mejora->fechaNotificacion,
-						'documentacionComprobatoria' => $plan_mejora->documentacionComprobatoria
+				foreach ($actividad['plan_mejora'] as $plan_mejora) {
+					$data['planes_mejora']['actividades'][$actividad['id']] = array(
+						'id' => $actividad['id'],
+						'accionMejora' => $plan_mejora['accionMejora'],
+						'grupoTrabajo' => $plan_mejora['grupoTrabajo'],
+						'fechaInicio' => $plan_mejora['fechaInicio'],
+						'fechaTermino' => $plan_mejora['fechaTermino'],
+						'fechaNotificacion' => $plan_mejora['fechaNotificacion'],
+						'documentacionComprobatoria' => $plan_mejora['documentacionComprobatoria']
 					);
 				}
 
@@ -229,44 +254,67 @@ class ReporteEvaluacionController extends BaseController {
 				$metas_programada = array();
 				$avance_acumulado = array();
 
-				foreach ($actividad->metasMes as $meta_mes){
-					if(!isset($metas_programada[$meta_mes->claveJurisdiccion])){
-						$metas_programada[$meta_mes->claveJurisdiccion] = 0;
-						$avance_acumulado[$meta_mes->claveJurisdiccion] = 0;
+				foreach ($actividad['metas_mes'] as $meta_mes){
+					if(!isset($metas_programada[$meta_mes['claveJurisdiccion']])){
+						$metas_programada[$meta_mes['claveJurisdiccion']] = 0;
+						$avance_acumulado[$meta_mes['claveJurisdiccion']] = 0;
 					}
 
-					$meta_mes_programada += $meta_mes->meta;
+					$meta_mes_programada += $meta_mes['meta'];
 
-					$metas_programada[$meta_mes->claveJurisdiccion] += $meta_mes->meta;
-					$avance_acumulado[$meta_mes->claveJurisdiccion] += $meta_mes->avance;
-					$data['jurisdicciones_mes']['actividades'][$actividad->id][$meta_mes->claveJurisdiccion] = array(
-						'meta_programada' => $metas_programada[$meta_mes->claveJurisdiccion],
-						'avance_mes' => ($meta_mes->mes == $mes_actual)?$meta_mes->avance:0.0,
-						'avance_acumulado' => $avance_acumulado[$meta_mes->claveJurisdiccion]
+					$metas_programada[$meta_mes['claveJurisdiccion']] += $meta_mes['meta'];
+					$avance_acumulado[$meta_mes['claveJurisdiccion']] += $meta_mes['avance'];
+					$data['jurisdicciones_mes']['actividades'][$actividad['id']][$meta_mes['claveJurisdiccion']] = array(
+						'meta_programada' => $metas_programada[$meta_mes['claveJurisdiccion']],
+						'avance_mes' => ($meta_mes['mes'] == $mes_actual)?$meta_mes['avance']:0.0,
+						'avance_acumulado' => $avance_acumulado[$meta_mes['claveJurisdiccion']]
 					);
 				}
-				$data['avances_mes']['actividades'][$actividad->id]['meta_programada'] = $meta_mes_programada;
+				$data['avances_mes']['actividades'][$actividad['id']]['meta_programada'] = $meta_mes_programada;
+				
+				foreach ($actividad['desglose_con_datos'] as $desglose) {
+					if(!isset($data['localidades_mes']['localidades'][$desglose['claveMunicipio'].'_'.$desglose['claveLocalidad']])){
+						$data['localidades_mes']['localidades'][$desglose['claveMunicipio'].'_'.$desglose['claveLocalidad']] = array(
+							'municipio' => $desglose['municipio'],
+							'localidad' => $desglose['localidad']
+						);
+					}
+					$data['localidades_mes']['actividades'][$actividad['id']][$desglose['claveJurisdiccion']][] = array(
+						'clave_localidad' => $desglose['claveMunicipio'].'_'.$desglose['claveLocalidad'],
+						'meta_programada' => $desglose['metas_mes'][0]['meta'] + ((count($desglose['metas_mes_acumuladas']))?$desglose['metas_mes_acumuladas']['meta']:0),
+						'avance_mes' => $desglose['metas_mes'][0]['avance'],
+						'avance_acumulado' => $desglose['metas_mes'][0]['avance'] + ((count($desglose['metas_mes_acumuladas']))?$desglose['metas_mes_acumuladas']['avance']:0)
+					);
+				}
+				
 				$datos_componente['actividades'][] = $datos_actividad;
 			}
 			$data['componentes'][] = $datos_componente;
 		}
+		unset($metas_programada);
+		unset($avance_acumulado);
+		unset($componente);
+		unset($actividad);
+		unset($desglose);
+		unset($datos_actividad);
+		unset($datos_componente);
 
 		if(($mes_actual % 3) == 0){
-			foreach ($recurso->beneficiarios as $beneficiario) {
-				if(!isset($data['beneficiarios'][$beneficiario->idTipoBeneficiario])){
-					$data['beneficiarios'][$beneficiario->idTipoBeneficiario] = array(
-						'id' => $beneficiario->idTipoBeneficiario,
-						'tipoBeneficiario' => $beneficiario->tipoBeneficiario->descripcion
+			foreach ($recurso['beneficiarios'] as $beneficiario) {
+				if(!isset($data['beneficiarios'][$beneficiario['idTipoBeneficiario']])){
+					$data['beneficiarios'][$beneficiario['idTipoBeneficiario']] = array(
+						'id' => $beneficiario['idTipoBeneficiario'],
+						'tipoBeneficiario' => $beneficiario['tipo_beneficiario']['descripcion']
 					);
 				}
 
 				$beneficiarios_acumulados = array();
 
-				foreach ($beneficiario->registroAvance as $avance) {
+				foreach ($beneficiario['registro_avance'] as $avance) {
 					//if(!isset($data['beneficiarios_avances'][$avance->mes][$avance->idTipoBeneficiario])){
-					if(!isset($data['beneficiarios_avances'][$avance->idTipoBeneficiario])){
-						//$data['beneficiarios_avances'][$avance->mes][$avance->idTipoBeneficiario] = array(
-						$data['beneficiarios_avances'][$avance->idTipoBeneficiario] = array(
+					if(!isset($data['beneficiarios_avances'][$avance['idTipoBeneficiario']])){
+						//$data['beneficiarios_avances'][$avance['mes']][$avance['idTipoBeneficiario']] = array(
+						$data['beneficiarios_avances'][$avance['idTipoBeneficiario']] = array(
 							'f' => array(
 								'total' => 0,'urbana' => 0,'rural' => 0,'mestiza' => 0,'indigena' => 0,
 								'inmigrante' => 0,'otros' => 0,'muyAlta' => 0,'alta' => 0,'media' => 0,
@@ -280,46 +328,48 @@ class ReporteEvaluacionController extends BaseController {
 						);
 					}
 
-					if(!isset($beneficiarios_acumulados[$avance->idTipoBeneficiario])){
-						$beneficiarios_acumulados[$avance->idTipoBeneficiario] = array('f'=>0,'m'=>0);
+					if(!isset($beneficiarios_acumulados[$avance['idTipoBeneficiario']])){
+						$beneficiarios_acumulados[$avance['idTipoBeneficiario']] = array('f'=>0,'m'=>0);
 					}
 
-					$beneficiarios_acumulados[$avance->idTipoBeneficiario][$avance->sexo] += $avance->total;
+					$beneficiarios_acumulados[$avance['idTipoBeneficiario']][$avance['sexo']] += $avance['total'];
 
 					//$data['beneficiarios_avances'][$avance->mes][$avance->idTipoBeneficiario][$avance->sexo] = array(
-					$data['beneficiarios_avances'][$avance->idTipoBeneficiario][$avance->sexo] = array(
-						'total' => $avance->total,
-						'urbana' => $avance->urbana,
-						'rural' => $avance->rural,
-						'mestiza' => $avance->mestiza,
-						'indigena' => $avance->indigena,
-						'inmigrante' => $avance->inmigrante,
-						'otros' => $avance->otros,
-						'muyAlta' => $avance->muyAlta,
-						'alta' => $avance->alta,
-						'media' => $avance->media,
-						'baja' => $avance->baja,
-						'muyBaja' => $avance->muyBaja,
-						'acumulado' => $beneficiarios_acumulados[$avance->idTipoBeneficiario][$avance->sexo]
+					$data['beneficiarios_avances'][$avance['idTipoBeneficiario']][$avance['sexo']] = array(
+						'total' => $avance['total'],
+						'urbana' => $avance['urbana'],
+						'rural' => $avance['rural'],
+						'mestiza' => $avance['mestiza'],
+						'indigena' => $avance['indigena'],
+						'inmigrante' => $avance['inmigrante'],
+						'otros' => $avance['otros'],
+						'muyAlta' => $avance['muyAlta'],
+						'alta' => $avance['alta'],
+						'media' => $avance['media'],
+						'baja' => $avance['baja'],
+						'muyBaja' => $avance['muyBaja'],
+						'acumulado' => $beneficiarios_acumulados[$avance['idTipoBeneficiario']][$avance['sexo']]
 					);
 				}
 			}
+			unset($beneficiarios_acumulados);
+		}else{
+			unset($recurso['beneficiarios']);
 		}
-		//print_r($recurso->objetivoPedCompleto->toArray());die();
-
+		
 		$mes_actual = $data['mes_actual'];
 		$i = $mes_actual;
 		
 		$datos['mes'] = $data['meses'][$mes_actual];
 		$datos['proyecto'] = array(
-			'ejercicio' => $data['recurso']->ejercicio,
-			'nombreTecnico' => $data['recurso']->nombreTecnico,
-			'ClavePresupuestaria' => $data['recurso']->ClavePresupuestaria,
-			'liderProyecto' => $data['recurso']->liderProyecto->nombre,
-			'cargoLiderProyecto' => $data['recurso']->liderProyecto->cargo,
-			'responsableInformacion' => $data['recurso']->responsableInformacion->nombre,
-			'cargoResponsableInformacion' => $data['recurso']->responsableInformacion->cargo,
-			'fuenteInformacion' => $data['recurso']->fuenteInformacion
+			'ejercicio' => $recurso['ejercicio'],
+			'nombreTecnico' => $recurso['nombreTecnico'],
+			'ClavePresupuestaria' => $recurso['ClavePresupuestaria'],
+			'liderProyecto' => $recurso['lider_proyecto']['nombre'],
+			'cargoLiderProyecto' => $recurso['lider_proyecto']['cargo'],
+			'responsableInformacion' => $recurso['responsable_informacion']['nombre'],
+			'cargoResponsableInformacion' => $recurso['responsable_informacion']['cargo'],
+			'fuenteInformacion' => $recurso['fuenteInformacion']
 		);
 
 		$datos['componentes'] = $data['componentes'];
@@ -341,8 +391,9 @@ class ReporteEvaluacionController extends BaseController {
 
 		$datos['localidades_mes']['componentes'] = $data['localidades_mes']['componentes'];
 		$datos['localidades_mes']['actividades'] = $data['localidades_mes']['actividades'];
-
-		//var_dump($datos['localidades_mes']['componentes']); die;
+		$datos['localidades_mes']['localidades'] = $data['localidades_mes']['localidades'];
+		
+		//var_dump($datos['localidades_mes']['localidades']); die;
 
 		$datos['jurisdicciones'] = $data['jurisdicciones'];
 
@@ -353,31 +404,41 @@ class ReporteEvaluacionController extends BaseController {
 			$datos['beneficiarios_avances'] = $data['beneficiarios_avances'];
 			$reporte_indicador = 'trimestre';
 
-			$datos['proyecto']['programaPresupuestario'] = $data['recurso']->datosProgramaPresupuestario->clave . ' ' . $data['recurso']->datosProgramaPresupuestario->descripcion;
-			$datos['proyecto']['funcion'] = $data['recurso']->datosFuncion->clave . ' ' . $data['recurso']->datosFuncion->descripcion;
-			$datos['proyecto']['subFuncion'] = $data['recurso']->datosSubFuncion->clave . ' ' . $data['recurso']->datosSubFuncion->descripcion;
-			$datos['proyecto']['politicaPublica'] = $data['recurso']->objetivoPedCompleto->padre->clave . ' ' . $data['recurso']->objetivoPedCompleto->padre->descripcion;
-			$datos['proyecto']['tema'] = $data['recurso']->objetivoPedCompleto->padre->padre->clave . ' ' . $data['recurso']->objetivoPedCompleto->padre->padre->descripcion;
-			$datos['proyecto']['eje'] = $data['recurso']->objetivoPedCompleto->padre->padre->padre->clave . ' ' . $data['recurso']->objetivoPedCompleto->padre->padre->padre->descripcion;
+			$datos['proyecto']['programaPresupuestario'] = $recurso['datos_programa_presupuestario']['clave'] . ' ' . $recurso['datos_programa_presupuestario']['descripcion'];
+			$datos['proyecto']['funcion'] = $recurso['datos_funcion']['clave'] . ' ' . $recurso['datos_funcion']['descripcion'];
+			$datos['proyecto']['subFuncion'] = $recurso['datos_sub_funcion']['clave'] . ' ' . $recurso['datos_sub_funcion']['descripcion'];
+			$datos['proyecto']['politicaPublica'] = $recurso['objetivo_ped_completo']['padre']['clave'] . ' ' . $recurso['objetivo_ped_completo']['padre']['descripcion'];
+			$datos['proyecto']['tema'] = $recurso['objetivo_ped_completo']['padre']['padre']['clave'] . ' ' . $recurso['objetivo_ped_completo']['padre']['padre']['descripcion'];
+			$datos['proyecto']['eje'] = $recurso['objetivo_ped_completo']['padre']['padre']['padre']['clave'] . ' ' . $recurso['objetivo_ped_completo']['padre']['padre']['padre']['descripcion'];
 
-		   	$datos['fuentes_financiamiento'] = $data['recurso']->fuentesFinanciamiento;
+		   	$datos['fuentes_financiamiento'] = $recurso['fuentes_financiamiento'];
 
 		   	$datos['mes'] = $data['meses'][$i];
-		   	$datos['analisis_funcional'] = $data['recurso']->analisisFuncional[0];
+		   	$datos['analisis_funcional'] = $recurso['analisis_funcional'][0];
 
 		    $datos['planes_mejora'] = $data['planes_mejora'];
 		}
 
 		$dato_reporte = array('datos'=>$datos, 'reporte' => $reporte_indicador, 'tipo_reporte' => $tipo_reporte);
-
-		//var_dump($dato_reporte);die;
-
+		
+		unset($data);
+		unset($datos);
+		unset($reporte_indicador);
+		unset($tipo_reporte);
+		unset($recurso);
+		/*
+		$memoria = memory_get_usage();
+		if ($memoria < 1024) 
+            $memoria_dato = $memoria." B"; 
+        elseif ($memoria < 1048576) 
+            $memoria_dato = ($memoria/1024)." KB"; 
+        else 
+            $memoria_dato = ($memoria/1048576)." MB";
+		var_dump($memoria_dato);die;
+		*/
+		
 		$pdf = PDF::setPaper('LETTER')->setOrientation('landscape')->setWarnings(false)->loadView('rendicion-cuentas.pdf.reporte-seguimiento',$dato_reporte);
-		/*if($tipo_reporte == 'seg-beneficiarios'){
-			$pdf = PDF::setPaper('LETTER')->setOrientation('landscape')->setWarnings(false)->loadView('rendicion-cuentas.pdf.reporte-seguimiento',$dato_reporte);
-		}else{
-			
-		}*/
+		
 		$pdf->output();
 		$dom_pdf = $pdf->getDomPDF();
 		$canvas = $dom_pdf ->get_canvas();
@@ -386,142 +447,5 @@ class ReporteEvaluacionController extends BaseController {
 		$canvas->page_text(($w-75), ($h-16), "Página {PAGE_NUM} de {PAGE_COUNT}", null, 10, array(0, 0, 0));
 
 		return $pdf->stream('reporte_seguimiento.pdf');
-
-		Excel::create($nombreArchivo, function($excel) use ($data){
-
-			$mes_actual = $data['mes_actual'];
-			$i = $mes_actual;
-			
-			$datos['mes'] = $data['meses'][$mes_actual];
-			$datos['proyecto'] = array(
-				'ejercicio' => $data['recurso']->ejercicio,
-				'nombreTecnico' => $data['recurso']->nombreTecnico,
-				'ClavePresupuestaria' => $data['recurso']->ClavePresupuestaria,
-				'liderProyecto' => $data['recurso']->liderProyecto->nombre,
-				'cargoLiderProyecto' => $data['recurso']->liderProyecto->cargo,
-				'responsableInformacion' => $data['recurso']->responsableInformacion->nombre,
-				'cargoResponsableInformacion' => $data['recurso']->responsableInformacion->cargo,
-				'fuenteInformacion' => $data['recurso']->fuenteInformacion
-			);
-
-			$datos['componentes'] = $data['componentes'];
-
-			if(isset($data['avances_mes']['componentes'])){
-				$datos['avances_mes']['componentes'] = $data['avances_mes']['componentes'];
-			}else{
-				$datos['avances_mes']['componentes'] = array();
-			}
-			
-			if(isset($data['avances_mes']['actividades'])){
-				$datos['avances_mes']['actividades'] = $data['avances_mes']['actividades'];
-			}else{
-				$datos['avances_mes']['actividades'] = array();
-			}
-			
-			$datos['jurisdicciones_mes']['componentes'] = $data['jurisdicciones_mes']['componentes'];
-			$datos['jurisdicciones_mes']['actividades'] = $data['jurisdicciones_mes']['actividades'];
-
-			$datos['localidades_mes']['componentes'] = $data['localidades_mes']['componentes'];
-			$datos['localidades_mes']['actividades'] = $data['localidades_mes']['actividades'];
-
-			//var_dump($datos['localidades_mes']['componentes']); die;
-
-			$datos['jurisdicciones'] = $data['jurisdicciones'];
-
-			$excel->sheet('SM '.$datos['mes']['abrev'], function($sheet)  use ($datos){
-		        $sheet->loadView('rendicion-cuentas.excel.seguimiento-metas-mes', $datos);
-		        $imagen = $this->obtenerImagen('LogoFederal.png','A1');
-				$imagen->setWorksheet($sheet);
-		        $imagen = $this->obtenerImagen('LogoInstitucional.png','J1');
-				$imagen->setWorksheet($sheet);
-		    });
-
-		    $excel->getActiveSheet()->getStyle('A7:J7')->getAlignment()->setWrapText(true); 
-		    $excel->getActiveSheet()->getStyle('A10:J10')->getAlignment()->setWrapText(true); 
-
-		    $elementos = $data['conteo_elementos'];
-		    $excel->getActiveSheet()->getStyle('A11:J'.(11 + $elementos))->getAlignment()->setWrapText(true); 
-
-		    $numero_fila = 10 + $elementos + 8;
-		    $excel->getActiveSheet()->getStyle('A'.$numero_fila.':J'.$numero_fila)->getAlignment()->setWrapText(true); 
-
-		    if(($i % 3) == 0){
-		    	$datos_beneficiarios['proyecto'] = $datos['proyecto'];
-		    	//$datos_beneficiarios['mes'] = $data['meses'][$i];
-		    	$datos_beneficiarios['mes'] = $data['meses'][$mes_actual];
-		    	$datos_beneficiarios['beneficiarios'] = $data['beneficiarios'];
-				//$datos_beneficiarios['beneficiarios_avances'] = $data['beneficiarios_avances'][$i];
-				$datos_beneficiarios['beneficiarios_avances'] = $data['beneficiarios_avances'];
-
-		    	$excel->sheet('SB'.$datos['mes']['trimestre'].'TRIM', function($sheet)  use ($datos_beneficiarios){
-			        $sheet->loadView('rendicion-cuentas.excel.seguimiento-beneficiarios', $datos_beneficiarios);
-			        $imagen = $this->obtenerImagen('LogoFederal.png','A1');
-					$imagen->setWorksheet($sheet);
-			        $imagen = $this->obtenerImagen('LogoInstitucional.png','N1');
-					$imagen->setWorksheet($sheet);
-			        $sheet->getStyle('A7:O7')->getAlignment()->setWrapText(true);
-			    });
-
-			    $total_beneficiarios = count($datos_beneficiarios['beneficiarios']);
-			    $row = 9;
-
-			   	for($i = 0 ; $i < $total_beneficiarios ; $i++){
-			   		$excel->getActiveSheet()->getStyle('F'.$row.':O'.$row)->getAlignment()->setWrapText(true);
-			    	$excel->getActiveSheet()->getStyle('A'.($row+1).':N'.($row+1))->getAlignment()->setWrapText(true);
-			    	$row += 11;
-			    	//throw new \Exception($row, 1);
-			   	}
-
-			   	$datos['proyecto']['programaPresupuestario'] = $data['recurso']->datosProgramaPresupuestario->clave . ' ' . $data['recurso']->datosProgramaPresupuestario->descripcion;
-				$datos['proyecto']['funcion'] = $data['recurso']->datosFuncion->clave . ' ' . $data['recurso']->datosFuncion->descripcion;
-				$datos['proyecto']['subFuncion'] = $data['recurso']->datosSubFuncion->clave . ' ' . $data['recurso']->datosSubFuncion->descripcion;
-				$datos['proyecto']['politicaPublica'] = $data['recurso']->objetivoPedCompleto->padre->clave . ' ' . $data['recurso']->objetivoPedCompleto->padre->descripcion;
-				$datos['proyecto']['tema'] = $data['recurso']->objetivoPedCompleto->padre->padre->clave . ' ' . $data['recurso']->objetivoPedCompleto->padre->padre->descripcion;
-				$datos['proyecto']['eje'] = $data['recurso']->objetivoPedCompleto->padre->padre->padre->clave . ' ' . $data['recurso']->objetivoPedCompleto->padre->padre->padre->descripcion;
-
-			   	$datos_analisis['proyecto'] = $datos['proyecto'];
-			   	$datos_analisis['fuentes_financiamiento'] = $data['recurso']->fuentesFinanciamiento;
-			   	$datos_analisis['mes'] = $data['meses'][$i];
-			   	$datos_analisis['analisis_funcional'] = $data['recurso']->analisisFuncional[0];
-			   	$excel->sheet('CP'.$datos['mes']['trimestre'].'TRIM', function($sheet)  use ($datos_analisis){
-			        $sheet->loadView('rendicion-cuentas.excel.analisis-funcional', $datos_analisis);
-
-			        $imagen = $this->obtenerImagen('LogoFederal.png','A1');
-			        $imagen->setWorksheet($sheet);
-					
-			        $imagen = $this->obtenerImagen('LogoInstitucional.png','E1',60);
-					$imagen->setWorksheet($sheet);
-			    });
-			    $excel->getActiveSheet()->getStyle('A8:D8')->getAlignment()->setWrapText(true);
-			    $excel->getActiveSheet()->getStyle('A11:E11')->getAlignment()->setWrapText(true);
-			    $excel->getActiveSheet()->getStyle('A10:D10')->getAlignment()->setWrapText(true);
-
-			    $datos_plan['componentes'] = $data['componentes'];
-			    $datos_plan['proyecto'] = $datos['proyecto'];
-			    $datos_plan['planes_mejora'] = $data['planes_mejora'];
-			    $excel->sheet('PAM'.$datos['mes']['trimestre'].'TRIM', function($sheet)  use ($datos_plan,$elementos){
-			        $sheet->loadView('rendicion-cuentas.excel.plan-mejora', $datos_plan);
-			        $sheet->getStyle('F9')->getAlignment()->setWrapText(true);
-			        $sheet->getStyle('A7:M7')->getAlignment()->setWrapText(true);
-			        $sheet->getStyle('A10:M10')->getAlignment()->setWrapText(true);
-			        $sheet->getStyle('A11:M'.(11 + $elementos))->getAlignment()->setWrapText(true); 
-			        $imagen = $this->obtenerImagen('LogoFederal.png','A1');
-					$imagen->setWorksheet($sheet);
-			        $imagen = $this->obtenerImagen('LogoInstitucional.png','L1',60);
-					$imagen->setWorksheet($sheet);
-			    });
-			    //$excel->getActiveSheet()->getStyle('A9:M9')->getAlignment()->setWrapText(true);
-		    }
-		})->download('xls');
-	}
-
-	private function obtenerImagen($imagen,$celda,$offset = 10){
-		$objDrawing = new \PHPExcel_Worksheet_Drawing();
-		$objDrawing->setPath('./img/'.$imagen);// filesystem reference for the image file
-		$objDrawing->setHeight(100);// sets the image height to 36px (overriding the actual image height); 
-		$objDrawing->setWidth(200);// sets the image height to 36px (overriding the actual image height); 
-		$objDrawing->setCoordinates($celda);// pins the top-left corner of the image to cell D24
-		$objDrawing->setOffsetX($offset);// pins the top left corner of the image at an offset of 10 points horizontally to the right of the top-left corner of the cell
-		return $objDrawing;
 	}
 }

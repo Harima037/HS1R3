@@ -24,7 +24,7 @@ class ActividadDesglose extends BaseModel
 	}
 
 	public function scopeListarMunicipios($query){
-		$query->select('actividadDesglose.id','actividadDesglose.idComponente','actividadDesglose.idAccion','actividadDesglose.claveJurisdiccion','municipio.*')
+		$query->select('actividadDesglose.id','actividadDesglose.idActividad','actividadDesglose.idAccion','actividadDesglose.claveJurisdiccion','municipio.*')
                 ->leftjoin('vistaMunicipios AS municipio','municipio.clave','=','actividadDesglose.claveMunicipio')
                 ->groupBy('actividadDesglose.claveJurisdiccion','municipio.clave')
                 ->orderBy('municipio.nombre','ASC');

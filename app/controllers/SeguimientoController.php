@@ -75,6 +75,75 @@ class SeguimientoController extends BaseController {
 		$datos['trimestre_avance'] = Util::obtenerTrimestre(date('n')-1);
 		return parent::loadIndex('RENDCUENTA','RENDINV',$datos);
 	}
+	
+	public function archivoMetas($id){
+		//El id es idAccion
+		$mes_actual = Util::obtenerMesActual();
+		$parametros = Input::all();
+		
+		if($parametros['nivel'] == 'componente'){
+			$idElemento = 'idComponente';
+			$tablaMetasMes = 'desgloseMetasMes';
+			$tablaDesglose = 'componenteDesglose';
+			$recurso = Componente::find($id);
+		}elseif($parametros['nivel'] == 'actividad'){
+			$idElemento = 'idActividad';
+			$tablaMetasMes = 'actividadDesgloseMetasMes';
+			$tablaDesglose = 'actividadDesglose';
+			$recurso = Actividad::find($id);
+		}
+		
+		$recurso->load(array(
+		'desglose'=>function($query)use($mes_actual,$idElemento,$tablaDesglose,$tablaMetasMes){
+			$query->join('vistaMunicipios AS municipios',$tablaDesglose.'.claveMunicipio','=','municipios.clave')
+				->join('vistaLocalidades AS localidades',function($join)use($tablaDesglose){
+					$join->on($tablaDesglose.'.claveLocalidad','=','localidades.clave')
+						->on('municipios.id','=','localidades.idMunicipio');
+				})
+				->join('vistaJurisdicciones AS jurisdicciones','claveJurisdiccion','=','jurisdicciones.clave')
+				->leftjoin($tablaMetasMes,function($join)use($mes_actual,$idElemento,$tablaDesglose){
+					$join->on($idElemento.'Desglose','=',$tablaDesglose.'.id')
+						->where('mes','=',$mes_actual);
+				})
+				->select($tablaDesglose.'.'.$idElemento,'idAccion','jurisdicciones.nombre AS jurisdiccion',
+						'municipios.nombre AS municipio','localidades.nombre AS localidad',
+						DB::raw('concat_ws("_",'.$tablaDesglose.'.claveMunicipio,'.$tablaDesglose.'.claveLocalidad) AS claveElemento'),
+						$tablaMetasMes.'.meta',$tablaMetasMes.'.avance')
+				->orderBy('claveJurisdiccion')->orderBy('municipio')->orderBy('localidad');
+		}));
+		
+		try{
+			$headers = [
+					'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0'
+				,   'Content-type'        => 'text/csv'
+				,   'Content-Disposition' => 'attachment; filename=ArchivoProgramacionMetas.csv'
+				,   'Expires'             => '0'
+				,   'Pragma'              => 'public'
+			];
+			
+			# add headers for each column in the CSV download
+			$callback = function() use ($recurso){
+				$FH = fopen('php://output', 'w');
+				fputcsv($FH, array('clave','jurisdiccion','municipio','localidad','meta','avance'));
+				foreach ($recurso->desglose->toArray() as $key => $row) {
+					if($key == 0){ unset($recurso->desglose); }//Se elimina el array original, dado que genera mucha memoria ocupada
+					
+					$item = array();
+					$item['clave'] = $row['claveElemento'];
+					$item['jurisdiccion'] = $row['jurisdiccion'];
+					$item['municipio'] = $row['municipio'];
+					$item['localidad'] = $row['localidad'];
+					$item['meta'] = ($row['meta'])?$row['meta']:'0';
+					$item['avance'] = $row['avance'];
+					fputcsv($FH, $item);
+				}
+				fclose($FH);
+			};
+		}catch(Exception $ex){
+			return Response::json(array('data'=>$ex->getMessage(),'line'=>$ex->getLine()),500);
+		}
+		return Response::stream($callback, 200, $headers);
+	}
 
 	public function rendicionCuentas($id){
 		$datos['sys_sistemas'] = SysGrupoModulo::all();

@@ -50,7 +50,16 @@ class IndicadorFassaController extends \BaseController {
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 			
 				$rows = IndicadorFASSA::getModel();
-
+				
+				$usuario = Sentry::getUser();
+				if($usuario->idDepartamento == 2){
+					if($usuario->filtrarProgramas){
+						$rows = $rows->where('idUsuarioValidacionSeg','=',$usuario->id);
+					}
+				}else{
+					$rows = $rows->where('idUsuarioRendCuenta','=',$usuario->id);
+				}
+				
 				if(isset($parametros['buscar'])){
 					if($parametros['buscar']){
 						$rows = $rows->where(function($query) use ($parametros){

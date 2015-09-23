@@ -102,6 +102,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('rend-cuenta-fassa',array('uses'=>'RendicionFassaController@index'));
 
 		Route::get('editar-avance/{id}',array('uses'=>'SeguimientoController@rendicionCuentas'));
+		Route::get('descargar-archivo-metas/{id}',array('uses'=>'SeguimientoController@archivoMetas'));
 		Route::get('avance-programa/{id}',array('uses'=>'RendicionProgramaController@editarAvance'));
 	});
 
@@ -112,7 +113,9 @@ Route::group(array('before'=>'auth.sentry'), function(){
 
 	Route::group(array('prefix'=>'reportes'),function(){
 		Route::get('reporte-seguimiento-inst',array('uses'=>'ReporteSeguimientoMetasController@indexInstitucional'));
+		Route::get('reporte-seguimiento-inv',array('uses'=>'ReporteSeguimientoMetasController@indexInversion'));
 		Route::get('reporte-seg-programas',array('uses'=>'ReporteSeguimientoProgramasController@index'));
+		Route::get('reporte-indicadores-fassa',array('uses'=>'ReporteSeguimientoIndicadoresFASSAController@index'));
 		Route::get('cedulas-avances',array('uses'=>'CedulaAvanceController@index'));
 		Route::get('indicadores-resultados',array('uses'=>'IndicadorResultadoController@index'));
 		Route::get('gasto-regionalizado',array('uses'=>'GastoRegionalizadoController@index'));
@@ -151,6 +154,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 
 		Route::resource('reporte-seguimiento-inst',	'V1\ReporteSeguimientoMetasController', array('only' => array('index','show')));
 		Route::resource('reporte-seg-programas',	'V1\ReporteSeguimientoProgramasController', array('only'=>array('index','show')));
+		Route::resource('reporte-indicadores-fassa','V1\ReporteSeguimientoIndicadoresFASSAController', array('only' => array('index','show')));
 
 		Route::resource('cuenta-publica',				'V1\CuentaPublicaController');
 		Route::resource('reporte-cuenta-publica',		'V1\ReporteCuentaPublicaController');

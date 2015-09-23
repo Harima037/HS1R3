@@ -7,7 +7,7 @@ use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime,Mail;
 use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,
 	RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionPlanMejora,EvaluacionComentario,
-	EvaluacionProyectoMes,ComponenteDesglose,Directorio,BitacoraValidacionSeguimiento;
+	EvaluacionProyectoMes,ComponenteDesglose,ActividadDesglose,Directorio,BitacoraValidacionSeguimiento;
 
 class SeguimientoInstitucionalController extends BaseController {
 	private $reglasDatosInformacion = array(
@@ -177,6 +177,9 @@ class SeguimientoInstitucionalController extends BaseController {
 				if($parametros['nivel'] == 'componente'){
 					$recurso = ComponenteDesglose::listarDatos()->where('claveMunicipio','=',$parametros['clave-municipio'])
 													->where('idComponente','=',$id);
+				}else{
+					$recurso = ActividadDesglose::listarDatos()->where('claveMunicipio','=',$parametros['clave-municipio'])
+													->where('idActividad','=',$id);
 				}
 				$recurso = $recurso->with(array('metasMes'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
@@ -199,13 +202,11 @@ class SeguimientoInstitucionalController extends BaseController {
 				},'planMejora'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
 				},'unidadMedida','comentarios'))->find($id);
-
-				if($parametros['nivel'] == 'componente'){
-					$recurso->load('desgloseMunicipios');
-					//$queries = DB::getQueryLog();
-					//throw new Exception(print_r(end($queries),true), 1);
-				}
-			}elseif($parametros['mostrar'] == 'datos-metas-avance'){
+				
+				$recurso->load('desgloseMunicipios');
+			}
+			/*
+			elseif($parametros['mostrar'] == 'datos-metas-avance'){
 				if($parametros['nivel'] == 'componente'){
 					$recurso = Componente::getModel()->with(array('comentarios'));
 				}else{
@@ -228,7 +229,8 @@ class SeguimientoInstitucionalController extends BaseController {
 					//throw new Exception(print_r(end($queries),true), 1);
 				}
 				
-			}elseif($parametros['mostrar'] == 'datos-beneficiarios-avance'){
+			}*/
+			elseif($parametros['mostrar'] == 'datos-beneficiarios-avance'){
 				//$mes_actual = Util::obtenerMesActual();
 				//$mes_actual = date('n') - 1 ;
 				$recurso['acumulado'] = RegistroAvanceBeneficiario::where('idProyecto','=',$parametros['id-proyecto'])

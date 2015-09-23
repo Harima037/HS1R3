@@ -82,6 +82,10 @@
 			font-weight: bold;
 			background-color: #DDDDDD;
 		}
+		.subsubtitulo-tabla{
+			font-weight: bold;
+			background-color: #EFEFEF;
+		}
 		.nota-titulo{
 			font-family: arial, sans-serif;
 			font-size:8;

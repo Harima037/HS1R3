@@ -33,10 +33,17 @@ class ReporteEvaluacionFASSAController extends BaseController {
 		
 		$recurso = IndicadorFASSAMeta::indicadorMetaDetalle()->find($id);
 		if($recurso){
-			$mes_actual = Util::obtenerMesActual();
-			if($mes_actual == 0){
-				$mes_actual = date('n')-1;
+			$parametros = Input::all();
+			
+			if(isset($parametros['mes'])){
+				$mes_actual = $parametros['mes'];
+			}else{
+				$mes_actual = Util::obtenerMesActual();
+				if($mes_actual == 0){
+					$mes_actual = date('n')-1;
+				}
 			}
+			
 			$recurso->load(array('registroAvance'=>function($query)use($mes_actual){
 				return $query->where('mes','=',$mes_actual);
 			}));

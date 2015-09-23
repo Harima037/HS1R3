@@ -1,19 +1,18 @@
 /*=====================================
 
     # Nombre:
-        lista-proyectos-rendicion.js
+        lista-indicadores-fassa.js
 
     # Módulos:
-        seguimiento/seguimiento-inst
-        seguimiento/seguimiento-inv
+        reportes/reporte-indicadores-fassa
 
     # Descripción:
-        Funciones para seguimiento de metas de proyectos institucionales y de inversión
+        Funciones para listar los indicadores de FASSA e imprimir los reportes.
 
 =====================================*/
 // Inicialización General para casi cualquier módulo
-var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/reporte-seg-programas');
-var moduloDatagrid = new Datagrid("#datagridProgramas",moduloResource,{ formatogrid:true, pagina: 1, clasificacionProyecto: 1});
+var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/reporte-indicadores-fassa');
+var moduloDatagrid = new Datagrid("#datagridIndicadores",moduloResource,{ formatogrid:true, pagina: 1, clasificacionProyecto: 1});
 
 moduloDatagrid.init();
 moduloDatagrid.actualizar({
@@ -25,20 +24,20 @@ moduloDatagrid.actualizar({
             var item = {};
 
             item.id = response.data[i].id;
-            item.clave = response.data[i].clave;
-            item.programa = response.data[i].programaPresupuestario;
+            item.indicador = response.data[i].indicador;
             item.trim1 = '<span class="fa fa-times"></span>';
             item.trim2 = '<span class="fa fa-times"></span>';
             item.trim3 = '<span class="fa fa-times"></span>';
             item.trim4 = '<span class="fa fa-times"></span>';
             
-            if(response.data[i].evaluacion_trimestre){
-                for(var j in response.data[i].evaluacion_trimestre){
-                    var eval = response.data[i].evaluacion_trimestre[j];
+            if(response.data[i].registro_avance){
+                for(var j in response.data[i].registro_avance){
+                    var eval = response.data[i].registro_avance[j];
+                    var trimestre = parseInt(eval.mes/3);
                     if(eval.idEstatus == 4){
-                        item['trim'+eval.trimestre] = '<button onClick="cargarReporte('+item.id+','+eval.trimestre+')" class="btn btn-primary" type="button"><span class="fa fa-check"></span></button>';
+                        item['trim'+trimestre] = '<button onClick="cargarReporte('+item.id+','+eval.mes+')" class="btn btn-primary" type="button"><span class="fa fa-check"></span></button>';
                     }else{
-                        item['trim'+eval.trimestre] = '<button onClick="cargarReporte('+item.id+','+eval.trimestre+')" class="btn btn-success" type="button"><span class="fa fa-pencil"></span></button>';
+                        item['trim'+trimestre] = '<button onClick="cargarReporte('+item.id+','+eval.mes+')" class="btn btn-success" type="button"><span class="fa fa-pencil"></span></button>';
                     }
                 }
             }
@@ -54,12 +53,12 @@ moduloDatagrid.actualizar({
     }
 });
 
-function cargarReporte(id,trimestre){
-    var parametros = id + '?trimestre='+trimestre;
-    window.open(SERVER_HOST+'/v1/reporte-programa/'+parametros);
-}
+function cargar_datos_indicador(){}
 
-function cargar_datos_programa(){}
+function cargarReporte(id,mes){
+    var parametros = id + '?mes='+mes;
+    window.open(SERVER_HOST+'/v1/reporte-fassa/'+parametros);
+}
 
 /*             Extras               */
 /**

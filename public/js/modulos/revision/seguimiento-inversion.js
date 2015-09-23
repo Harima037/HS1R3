@@ -165,9 +165,11 @@ function cargar_datos_proyecto(e){
 			
 			$('#btn-firmar').hide();
 			
-			if(response.data.evaluacion_meses[0].idEstatus == "4")
-				$('#btn-firmar').show();
-
+            if(response.data.evaluacion_meses.length){
+                if(response.data.evaluacion_meses[0].idEstatus == "4")
+				    $('#btn-firmar').show();
+            }
+			
             $('#btn-comentar-avance').attr('data-id-proyecto',e);
 
             $('#modalDatosSeguimiento').modal('show');

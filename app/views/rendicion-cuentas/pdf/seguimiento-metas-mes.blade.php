@@ -269,13 +269,13 @@
 		@foreach($jurisdicciones as $clave => $jurisdiccion)
 		<tr height="20" class="tabla-datos">
 			<td></td>
-			<td>{{$clave}} {{$jurisdiccion}}</td>
+			<td class="{{($tiene_desglose = isset($localidades_mes['componentes'][$componente['id']]))?'subsubtitulo-tabla':''}}">{{$clave}} {{$jurisdiccion}}</td>
 			@if(isset($jurisdicciones_mes['componentes'][$componente['id']][$clave]))
-				<td>{{number_format($jurisdicciones_mes['componentes'][$componente['id']][$clave]['meta_programada'],2)}}</td>
-				<td></td>
-				<td>{{number_format($jurisdicciones_mes['componentes'][$componente['id']][$clave]['avance_mes'],2)}}</td>
-				<td>{{number_format($jurisdicciones_mes['componentes'][$componente['id']][$clave]['avance_acumulado'],2)}}</td>
-				<td>
+				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">{{number_format($jurisdicciones_mes['componentes'][$componente['id']][$clave]['meta_programada'],2)}}</td>
+				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}"></td>
+				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">{{number_format($jurisdicciones_mes['componentes'][$componente['id']][$clave]['avance_mes'],2)}}</td>
+				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">{{number_format($jurisdicciones_mes['componentes'][$componente['id']][$clave]['avance_acumulado'],2)}}</td>
+				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">
 				@if($jurisdicciones_mes['componentes'][$componente['id']][$clave]['meta_programada'] > 0)
 					{{
 					number_format(
@@ -303,19 +303,22 @@
 				@endif
 				 %</td>
 			@else
-				<td>0</td>
-				<td></td>
-				<td>0</td>
-				<td>0</td>
-				<td>0%</td>
+				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0</td>
+				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}"></td>
+				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0</td>
+				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0</td>
+				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0%</td>
 			@endif
-			<td></td>
+			<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}"></td>
 		</tr>
 			@if(isset($localidades_mes['componentes'][$componente['id']][$clave]))
 				@foreach ($localidades_mes['componentes'][$componente['id']][$clave] as $desglose)
+					@if($localidades_mes['componentes'][$componente['id']][$clave])
+					<!--{{ $localidades_mes['componentes'][$componente['id']][$clave] = NULL }}-->
+					@endif
 					<tr height="20" class="tabla-datos">
 						<td></td>
-						<td>{{$desglose['municipio']}} - {{$desglose['localidad']}}</td>
+						<td>{{$localidades_mes['localidades'][$desglose['clave_localidad']]['municipio']}} - {{$localidades_mes['localidades'][$desglose['clave_localidad']]['localidad']}}</td>
 						<td>{{number_format($desglose['meta_programada'],2)}}</td>
 						<td></td>
 						<td>{{number_format($desglose['avance_mes'],2)}}</td>
@@ -407,13 +410,13 @@
 			@foreach($jurisdicciones as $clave => $jurisdiccion)
 			<tr height="20" class="tabla-datos">
 				<td></td>
-				<td>{{$clave}} {{$jurisdiccion}}</td>
+				<td class="{{($tiene_desglose = isset($localidades_mes['actividades'][$actividad['id']]))?'subsubtitulo-tabla':''}}">{{$clave}} {{$jurisdiccion}}</td>
 				@if(isset($jurisdicciones_mes['actividades'][$actividad['id']][$clave]))
-					<td>{{number_format($jurisdicciones_mes['actividades'][$actividad['id']][$clave]['meta_programada'],2)}}</td>
-					<td></td>
-					<td>{{number_format($jurisdicciones_mes['actividades'][$actividad['id']][$clave]['avance_mes'],2)}}</td>
-					<td>{{number_format($jurisdicciones_mes['actividades'][$actividad['id']][$clave]['avance_acumulado'],2)}}</td>
-					<td>
+					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">{{number_format($jurisdicciones_mes['actividades'][$actividad['id']][$clave]['meta_programada'],2)}}</td>
+					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}"></td>
+					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">{{number_format($jurisdicciones_mes['actividades'][$actividad['id']][$clave]['avance_mes'],2)}}</td>
+					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">{{number_format($jurisdicciones_mes['actividades'][$actividad['id']][$clave]['avance_acumulado'],2)}}</td>
+					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">
 					@if($jurisdicciones_mes['actividades'][$actividad['id']][$clave]['meta_programada'] > 0)
 						{{
 						number_format(
@@ -443,18 +446,60 @@
 					@endif
 					 %</td>
 				@else
-					<td>0</td>
-					<td></td>
-					<td>0</td>
-					<td>0</td>
-					<td>0%</td>
+					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0</td>
+					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}"></td>
+					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0</td>
+					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0</td>
+					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0%</td>
 				@endif
-				<td></td>
+				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}"></td>
 			</tr>
+				@if(isset($localidades_mes['actividades'][$actividad['id']][$clave]))
+					@foreach ($localidades_mes['actividades'][$actividad['id']][$clave] as $desglose)
+						@if($localidades_mes['actividades'][$actividad['id']][$clave])
+						<!--{{ $localidades_mes['actividades'][$actividad['id']][$clave] = NULL }}-->
+						@endif
+						<tr height="20" class="tabla-datos">
+							<td></td>
+							<td>{{$localidades_mes['localidades'][$desglose['clave_localidad']]['municipio']}} - {{$localidades_mes['localidades'][$desglose['clave_localidad']]['localidad']}}</td>
+							<td>{{number_format($desglose['meta_programada'],2)}}</td>
+							<td></td>
+							<td>{{number_format($desglose['avance_mes'],2)}}</td>
+							<td>{{number_format($desglose['avance_acumulado'],2)}}</td>
+							<td>
+								@if($desglose['meta_programada'] > 0)
+								{{
+								number_format(
+									(
+										$desglose['avance_acumulado']/
+										$desglose['meta_programada']
+									)
+									*100
+								,2)
+								}}
+							@else
+								@if($desglose['avance_acumulado'] > 0 )
+									@if($desglose['avance_acumulado'] > 999)
+										999.00
+									@elseif($desglose['avance_acumulado'] > 100)
+										{{number_format($desglose['avance_acumulado'],2)}}
+									@elseif($desglose['avance_acumulado'] > 10)
+										{{number_format($desglose['avance_acumulado'] * 10,2)}}
+									@else
+										{{number_format($desglose['avance_acumulado'] * 100,2)}}
+									@endif
+								@else
+									0
+								@endif
+							@endif
+							%</td>
+							<td></td>
+						</tr>
+					@endforeach
+				@endif
 			@endforeach
 		</tbody>
 	</table>
 		@endforeach
-
 	@endforeach
 	

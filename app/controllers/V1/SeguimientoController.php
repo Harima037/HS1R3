@@ -18,9 +18,9 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
-use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime,Mail;
+use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime,Mail,File;
 use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionProyectoMes,
-	EvaluacionPlanMejora,ComponenteDesglose,DesgloseMetasMes,Directorio,SysConfiguracionVariable,BitacoraValidacionSeguimiento;
+	EvaluacionPlanMejora,ComponenteDesglose,DesgloseMetasMes,ActividadDesgloseMetasMes,Directorio,SysConfiguracionVariable,BitacoraValidacionSeguimiento,ActividadDesglose,Accion;
 
 class SeguimientoController extends BaseController {
 	private $reglasBeneficiarios = array(
@@ -220,6 +220,9 @@ class SeguimientoController extends BaseController {
 				if($parametros['nivel'] == 'componente'){
 					$recurso = ComponenteDesglose::listarDatos()->where('claveMunicipio','=',$parametros['clave-municipio'])
 													->where('idComponente','=',$id);
+				}elseif($parametros['nivel'] == 'actividad'){
+					$recurso = ActividadDesglose::listarDatos()->where('claveMunicipio','=',$parametros['clave-municipio'])
+													->where('idActividad','=',$id);
 				}
 				$recurso = $recurso->with(array('metasMes'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
@@ -243,12 +246,13 @@ class SeguimientoController extends BaseController {
 				},'planMejora'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
 				},'unidadMedida','comentarios'))->find($id);
-
-				if($parametros['nivel'] == 'componente'){
-					$recurso->load('desgloseMunicipios');
+				
+				$recurso->load('desgloseMunicipios');
+				//if($parametros['nivel'] == 'componente'){
+					//$recurso->load('desgloseMunicipios');
 					//$queries = DB::getQueryLog();
 					//throw new Exception(print_r(end($queries),true), 1);
-				}
+				//}
 			}elseif($parametros['mostrar'] == 'datos-beneficiarios-avance'){
 				$mes_actual = Util::obtenerMesActual();
 				$recurso['acumulado'] = RegistroAvanceBeneficiario::where('idProyecto','=',$parametros['id-proyecto'])
@@ -364,6 +368,8 @@ class SeguimientoController extends BaseController {
 						$respuesta['data'] = $validacion['data'];
 					}
 				}
+			}elseif($parametros['guardar'] == 'cargar-archivo-avances'){
+				$respuesta = $this->importar_archivo_avance($parametros,$parametros['id-accion']);
 			}
 		}catch(\Exception $ex){
 			$respuesta['http_status'] = 500;	
@@ -708,6 +714,210 @@ class SeguimientoController extends BaseController {
 		}
 		return $respuesta;
 	}
+	
+	public function importar_archivo_avance($parametros,$id){
+		$respuesta = array();
+		$respuesta['http_status'] = 200;
+		$respuesta['data'] = array("data"=>'');	
+		$mes_actual = Util::obtenerMesActual();
+		
+		if($parametros['nivel'] == 'componente'){
+			$idElemento = 'idComponente';
+			$elemento = 'componente';
+			$tablaMetasMes = 'componenteMetasMes';
+			$tablaDesgloseMetasMes = 'desgloseMetasMes';
+			$tablaElemento = 'proyectoComponentes';
+		}else{
+			$idElemento = 'idActividad';
+			$elemento = 'actividad';
+			$tablaMetasMes = 'actividadMetasMes';
+			$tablaDesgloseMetasMes = 'actividadDesgloseMetasMes';
+			$tablaElemento = 'componenteActividades';
+		}
+		
+		$usuario = Sentry::getUser();
+
+		if (Input::hasFile('datoscsv')){
+			$finfo = finfo_open(FILEINFO_MIME_TYPE); 
+			$archivoConDatos = Input::file('datoscsv');
+			$type = finfo_file($finfo, $archivoConDatos); 
+			$archivo_avances = storage_path().'/archivoscsv/archivo_avances_'.$usuario->id.'.csv';
+			
+			//Si el Mime coincide con CSV
+			if($type=="text/plain"){
+				$row = 1;
+				$datos_archivo = array();
+				if (($handle = fopen($archivoConDatos, "r")) !== FALSE && ($datos_avance = fopen($archivo_avances, "w")) !== FALSE) {
+					if($parametros['nivel'] == 'componente'){
+						$accion = Accion::with(array('desgloseComponente'=>function($query){
+								$query->select('*',DB::raw('CONCAT_WS("_",claveMunicipio,claveLocalidad) AS claveCompuesta'));
+							}))->where('idComponente','=',$id)->first();
+						$accion->desglose = $accion->desgloseComponente;
+					}else{
+						$accion = Accion::with(array('desgloseActividad'=>function($query){
+								$query->select('*',DB::raw('CONCAT_WS("_",claveMunicipio,claveLocalidad) AS claveCompuesta'));
+							}))->where('idActividad','=',$id)->first();
+						$accion->desglose = $accion->desgloseActividad;
+					}
+					
+					$desgloses_capturados = array();
+					foreach($accion->desglose as $desglose){
+						$desgloses_capturados[$desglose->claveCompuesta] = $desglose;
+					}
+					
+					$accion->desglose->load(array('metasMes'=>function($query)use($mes_actual){
+						$query->where('mes','=',$mes_actual);
+					}));
+					
+					$row = 1;
+					while (($csv_data = fgetcsv($handle, 0, ",")) !== FALSE) {
+						if($row == 1){
+							$row++;
+							continue;
+						}
+						
+						$claves = explode('_',$csv_data[0]);
+
+						$clave_municipio = $claves[0];
+						$clave_localidad = $claves[1];
+						
+						if(isset($desgloses_capturados[$csv_data[0]])){
+							$desglose = $desgloses_capturados[$csv_data[0]];
+							
+							if(count($desglose->metasMes)){
+								$meta_mes = $desglose->metasMes[0];
+								fputcsv($datos_avance,[
+									$meta_mes->id,
+									$desglose->id,
+									($desglose->idComponente)?$desglose->idComponente:$desglose->idActividad,
+									$meta_mes->claveMunicipio,
+									$meta_mes->claveLocalidad,
+									$meta_mes->mes,
+									$meta_mes->meta,
+									floatval($csv_data[5]),
+									$meta_mes->creadoPor,
+									$meta_mes->creadoAl
+								]);
+							}else{
+								if(floatval($csv_data[5])){
+									fputcsv($datos_avance,[
+										NULL,
+										$desglose->id,
+										($desglose->idComponente)?$desglose->idComponente:$desglose->idActividad,
+										$clave_municipio,
+										$clave_localidad,
+										$mes_actual,
+										0,
+										floatval($csv_data[5]),
+										NULL,
+										NULL
+									]);
+								}
+							}
+						}
+					}
+					fclose($datos_avance);
+					unset($desgloses_capturados);
+					
+					try {
+						DB::connection()->getPdo()->beginTransaction();
+
+						$id_usuario = $usuario->id;
+						
+						//Cargar Archivo de Metas x mes
+						$query = sprintf("
+							LOAD DATA local INFILE '%s' REPLACE 
+							INTO TABLE ".$tablaDesgloseMetasMes." 
+							FIELDS TERMINATED BY ',' 
+							OPTIONALLY ENCLOSED BY '\"' 
+							ESCAPED BY '\"' 
+							LINES TERMINATED BY '\\n'
+							(
+							@vid,
+							@v".$idElemento."Desglose,
+							@v".$idElemento.",
+							@vclaveMunicipio,
+							@vclaveLocalidad,
+							@vmes,
+							@vmeta,
+							@vavance,
+							@vcreadoPor,
+							@vcreadoAl
+							)
+							set
+							id = nullif(@vid,''),
+							".$idElemento."Desglose = @v".$idElemento."Desglose,
+							".$idElemento." = @v".$idElemento.",
+							claveMunicipio = @vclaveMunicipio,
+							claveLocalidad = @vclaveLocalidad,
+							mes = @vmes,
+							meta = @vmeta,
+							avance = nullif(@vavance,''),
+							creadoPor = ifnull(nullif(@vcreadoPor,''),%s),
+							creadoAl = ifnull(nullif(@vcreadoAl,''),CURRENT_TIMESTAMP),
+							actualizadoPor = %s,
+							modificadoAl = CURRENT_TIMESTAMP
+							", addslashes($archivo_avances),$id_usuario,$id_usuario);
+						DB::connection()->getpdo()->exec($query);
+						
+						//Se insertan/reemplazan las metas por mes del componente con los valores importados del archivo
+						$query = sprintf("
+							REPLACE INTO ".$tablaMetasMes."
+							SELECT 
+							cMetas.id, comp.idProyecto, desglose.".$idElemento.", desglose.claveJurisdiccion, metasMes.mes, 
+							SUM(metasMes.meta) AS meta, SUM(metasMes.avance) AS avance, ifnull(cMetas.creadoPor,%s) AS creadoPor, 
+							%s AS actualizadoPor, cMetas.creadoAl, cMetas.modificadoAl, NULL AS borradoAl
+							FROM ".$elemento."Desglose AS desglose
+							LEFT JOIN ".$tablaDesgloseMetasMes." AS metasMes 
+							ON metasMes.claveMunicipio = desglose.claveMunicipio 
+							AND desglose.id = metasMes.".$idElemento."Desglose
+							AND metasMes.borradoAl IS NULL
+							LEFT JOIN ".$tablaMetasMes." AS cMetas
+							ON cMetas.".$idElemento." = desglose.".$idElemento."
+							AND cMetas.claveJurisdiccion = desglose.claveJurisdiccion
+							AND cMetas.mes = metasMes.mes
+							AND cMetas.borradoAl IS NULL
+							JOIN ".$tablaElemento." AS comp ON comp.id = desglose.".$idElemento."
+							WHERE desglose.".$idElemento." = %s AND desglose.borradoAl IS NULL AND metasMes.mes = %s
+							GROUP BY desglose.claveJurisdiccion, metasMes.mes;
+						",$id_usuario,$id_usuario,$id,$mes_actual);
+						DB::connection()->getpdo()->exec($query);
+						
+						DB::connection()->getPdo()->commit();
+
+						File::delete($archivo_avances);
+						
+						if($parametros['nivel'] == 'componente'){
+							$recurso = ComponenteMetaMes::where('mes','=',$mes_actual)->where('idComponente','=',$id)->get();
+						}else{
+							$recurso = ActividadMetaMes::where('mes','=',$mes_actual)->where('idActividad','=',$id)->get();
+						}
+						$respuesta['data']['data'] = $recurso;
+						
+					}catch (\PDOException $e){
+						File::delete($archivo_avances);
+						$respuesta['http_status'] = 404;
+						$respuesta['data'] = array("data"=>"Ha ocurrido un error, no se pudieron cargar los datos. Verfique su conexión a Internet.",'code'=>'U06');
+						DB::connection()->getPdo()->rollBack();
+						throw $e;
+					}catch(Exception $e){
+						$respuesta['http_status'] = 500;
+						$respuesta['data'] = array("data"=>"",'ex'=>$e->getMessage(),'line'=>$e->getLine(),'code'=>'S02');
+					}
+				}else{
+					fclose($datos_avance);
+				}
+				fclose($handle);
+			}else{
+				$respuesta['http_status'] = 404;
+				$respuesta['data'] = array("data"=>"Formato de archivo incorrecto.",'code'=>'U06');
+			}
+		}else{
+			$respuesta['http_status'] = 404;
+			$respuesta['data'] = array("data"=>"No se encontró el archivo.",'code'=>'U06');
+		}
+		return $respuesta;
+	}
 
 	public function guardarAvanceLocalidad($parametros){
 		$respuesta['http_status'] = 200;
@@ -724,7 +934,12 @@ class SeguimientoController extends BaseController {
 				$query->where('mes','=',$mes_actual);
 			}))->find($parametros['id-accion']);
 		}else{
-			throw new Exception("Elemento no soportado por el momento", 1);
+			$accion = Actividad::with(array('desglose'=>function($query) use ($clave_municipio){
+				$query->where('claveMunicipio','=',$clave_municipio);
+			},'desglose.metasMes'=>function($query) use ($mes_actual){
+				$query->where('mes','=',$mes_actual);
+			}))->find($parametros['id-accion']);
+			//throw new Exception("Elemento no soportado por el momento", 1);
 		}
 		
 		$guardar_metas_localidades = array(); //Para guardar nuevo/editar
@@ -845,25 +1060,25 @@ class SeguimientoController extends BaseController {
 		$avance_acumulado = $accion_metas->metasMesJurisdiccion->sum('avance');
 		$tiene_desglose = FALSE;
 		//Checar desglose
-		if($parametros['nivel'] == 'componente'){
-			$accion_metas->load('desglose');
-			if(count($accion_metas->desglose)){
-				$tiene_desglose = TRUE;
-				$id_desgloses = $accion_metas->desglose->lists('id');
+		$accion_metas->load('desglose');
+		if(count($accion_metas->desglose)){
+			$tiene_desglose = TRUE;
+			$id_desgloses = $accion_metas->desglose->lists('id');
+			if($parametros['nivel'] == 'componente'){
 				$avances_faltantes = DesgloseMetasMes::whereIn('idComponenteDesglose',$id_desgloses)
-													->where('mes','=',$mes_actual)
-													->whereNull('avance')
-													->get();
-				//
-				if(count($avances_faltantes)){
-					$respuesta['http_status'] = 500;
-					$respuesta['data']['code'] = 'S01';
-					$respuesta['data']['data'] = 'Aún hay avances que no han sido capturados, capturalos para poder guardar los datos.';
-					return $respuesta;
-				}
+													->where('mes','=',$mes_actual)->whereNull('avance')->get();
+			}else{
+				$avances_faltantes = ActividadDesgloseMetasMes::whereIn('idActividadDesglose',$id_desgloses)
+													->where('mes','=',$mes_actual)->whereNull('avance')->get();
+			}
+			if(count($avances_faltantes)){
+				$respuesta['http_status'] = 500;
+				$respuesta['data']['code'] = 'S01';
+				$respuesta['data']['data'] = 'Aún hay avances que no han sido capturados, capturalos para poder guardar los datos.';
+				return $respuesta;
 			}
 		}
-
+		
 		if(!$tiene_desglose){
 			foreach ($accion_metas->metasMes as $metas) {
 				if($parametros['avance'][$metas->claveJurisdiccion] == ''){

@@ -266,6 +266,13 @@
 								</a>
 							</li>
 							@endif
+							@if($id_clasificacion == 2)
+							<li role="presentation" class="pull-right">
+								<a href="#panel-importar-archivo" aria-controls="panel-importar-archivo" role="tab" data-toggle="tab" id="tab-link-importar-archivo">
+									<span class="fa fa-upload"></span> Importar Archivo CSV
+								</a>
+							</li>
+							@endif
 						</ul>
 						<!-- Tab panes -->
 						<div class="tab-content">
@@ -448,6 +455,37 @@
 										</div>
 									</div>
 								</div>
+							</div>
+							@endif
+							@if($id_clasificacion == 2)
+							<div role="tabpanel" class="tab-pane" id="panel-importar-archivo">
+								<br>
+								<fieldset>
+									<span class="help-block">
+										Para importar un archivo csv con los datos del avance del mes, baje el archivo de la programación de localidades dando click en el siguiente enlace:
+									</span>
+									<div class="row">
+										<div class="col-sm-12">
+											<a href="#" class="btn btn-link" id="lnk-descarga-archivo-metas" target="_blank">
+												<span class="fa fa-download"></span> Descargar Archivo con la Programación de Metas
+											</a>
+										</div>
+									</div>
+									<span class="help-block">
+										Llene la información requerida en el archivo descargado, y vuelva a subirlo mediante el siguiente formulario.
+									</span>
+									<!--form id="form-subir-archivo"-->
+										<div class="row">
+											<div class="col-sm-12">
+												<div class="form-group">
+													<label class="control-label" for="archivo">Archivo</label>
+													<input type="file" id="archivo" name="archivo" accept=".csv" class="form-control">
+												</div>
+											</div>
+										</div>
+									<!--/form-->
+									<button type="button" class="btn btn-primary" id="btn-subir-archivo"><span class="fa fa-upload"></span> Cargar Datos del Archivo</button>
+								</fieldset>
 							</div>
 							@endif
 						</div>

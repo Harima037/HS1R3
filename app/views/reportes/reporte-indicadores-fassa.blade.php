@@ -6,7 +6,7 @@
 @parent
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
-<script src="{{ URL::to('js/modulos/reportes/lista-programas-presupuestarios.js') }}"></script>
+<script src="{{ URL::to('js/modulos/reportes/lista-indicadores-fassa.js') }}"></script>
 @stop
 
 @section('aside')
@@ -15,7 +15,7 @@
 @section('content')
 <div class="row">
     <div class="col-md-12">
-        <div class="panel panel-default datagrid" id="datagridProgramas" data-edit-row="cargar_datos_programa" data-trimestre="{{$trim_actual}}">
+        <div class="panel panel-default datagrid" id="datagridIndicadores" data-edit-row="cargar_datos_indicador" data-trimestre="{{$trim_actual}}">
             <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> {{ $sys_mod_activo->nombre }}</h4></div>
             <div class="panel-body">
                 <div class="row">
@@ -27,23 +27,13 @@
                             </span>
                         </div>
                     </div>
-                    <div class="col-lg-6">
-                        <!--div class="btn-toolbar pull-right" >
-                            <div class="btn-group" style="margin:5px">
-                                <button type="button" class="btn btn-success btn-edit-rows" id="btn-detalles-proyecto">
-                                    <span class="fa fa-edit"></span> Ver Detalles del Programa
-                                </button>
-                            </div>
-                        </div-->
-                    </div>
                 </div>
             </div>
             <table class="table table-striped table-hover table-condensed">
                 <thead>
                     <tr height="50">
                         <th><input type="checkbox" class="check-select-all-rows"></th>
-                        <th width="50">Clave</th>
-                        <th>Programa Presupuestario</th>
+                        <th>Indicador</th>
 						<th width="60">Trim 1</th>
 						<th width="60">Trim 2</th>
 						<th width="60">Trim 3</th>
@@ -53,7 +43,7 @@
                 <tbody></tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="7" class="text-right">
+                        <td colspan="6" class="text-right">
                             <b>Estatus del Reporte: </b>
                             <span class="btn btn-primary btn-xs"><span class="fa fa-check"></span></span> Registrado 
                             <span class="btn btn-success btn-xs"><span class="fa fa-pencil"></span></span> Firmado

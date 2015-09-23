@@ -277,6 +277,9 @@ function seguimiento_metas(e){
                     }
                 }
             }
+            
+            $('#lnk-descarga-archivo-metas').attr('href',SERVER_HOST+'/rendicion-cuentas/descargar-archivo-metas/'+$('#id-accion').val()+'?nivel='+$('#nivel').val());
+            
             $('#modalEditarAvance').modal('show');
         }
     });    
@@ -304,6 +307,7 @@ function asignar_municipios(datos){
         
         $(row + ' td.accion-municipio').addClass('btn-link');
         $(row + ' td.accion-municipio span').addClass('caret');
+        $(row + ' td.accion-municipio').off('click');
         $(row + ' td.accion-municipio').on('click',function(){ 
             $('.lista-localidades-jurisdiccion .btn-ocultar-avance-localidades').click();
             $('#desglose-avance-'+$(this).parent().attr('data-clave-jurisdiccion')).removeClass('hidden'); 
@@ -325,7 +329,8 @@ function asignar_municipios(datos){
         }
         $(panel_id + ' .select-lista-municipios').html(opciones.join(''));
     }
-
+    
+    $('.btn-ocultar-avance-localidades').off('click');
     $('.btn-ocultar-avance-localidades').on('click',function(){
         $('#desglose-avance-'+$(this).attr('data-jurisdiccion')+' .select-lista-municipios').val('');
         $('#panel-localidades-'+$(this).attr('data-jurisdiccion')+' table.tabla-avance-localidades tbody').empty();
@@ -337,15 +342,70 @@ function asignar_municipios(datos){
         $(tabla_totales + ' tr td.total-municipio-porcentaje').attr('data-valor',0);
         $('#desglose-avance-'+$(this).attr('data-jurisdiccion')).addClass('hidden');
     });
-
+    
+    $('.btn-guardar-avance-localidades').off('click');
     $('.btn-guardar-avance-localidades').on('click',function(){
         enviar_datos_municipio($(this).attr('data-jurisdiccion'));
     });
-
+    
+    $('.select-lista-municipios').off('change');
     $('.select-lista-municipios').on('change',function(){
         buscar_localidades($(this).attr('data-jurisdiccion'),$(this).val());
     });
 }
+
+$('#btn-subir-archivo').on('click',function(){
+    Validation.cleanFieldErrors('archivo');
+    var cuantosArchivos = document.getElementById("archivo").files.length;
+    if(cuantosArchivos > 0){
+        //var parametros = $(form_subir_archivo).serialize();
+        //parametros += '&guardar=cargar-archivo-desglose&id-accion='+$('#id-accion').val()+'&id-fibap='+id_fibap;
+        var data  = new FormData();
+        var archivo = document.getElementById("archivo").files;
+            
+        $("#loading").fadeIn();
+        data.append('datoscsv', archivo[0]); 
+        data.append('id-proyecto',$('#id').val());
+        data.append('id-accion',$('#id-accion').val());
+        data.append('guardar','cargar-archivo-avances');
+        data.append('nivel',$('#nivel').val());
+        
+        $.ajax({
+            url: SERVER_HOST+'/v1/rend-cuenta-inv', //Url a donde la enviaremos
+            type:'POST', //Metodo que usaremos
+            dataType:'json',
+            contentType:false, //Debe estar en false para que pase el objeto sin procesar
+            data:data, //Le pasamos el objeto que creamos con los archivos
+            processData:false, //Debe estar en false para que JQuery no procese los datos a enviar
+            cache:false, //Para que el formulario no guarde cache,
+            success: function(response){ 
+                for(var i in response.data){
+                    var dato = response.data[i];
+                    $('#avance_'+dato.claveJurisdiccion).val(dato.avance).change();
+                }
+                $("#loading").fadeOut();
+                MessageManager.show({timer:10,data:'Los datos del archivo fueron cargados con éxito.',type:'OK'});
+            },
+            error: function( response ){
+                $("#loading").fadeOut(function(){ 
+                    try{
+                        var json = $.parseJSON(response.responseText);
+                        if(!json.code)
+                            MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                        else{
+                            MessageManager.show(json);
+                        }
+                        Validation.formValidate(json.data);
+                    }catch(e){
+                        console.log(e);
+                    }
+                });
+            }   
+        });
+    }else{
+        Validation.printFieldsErrors('archivo','Debe seleccionar un archivo a subir.');
+    } 
+});
 
 function enviar_datos_municipio(jurisdiccion){
     var municipio = $('#panel-localidades-'+jurisdiccion+' select.select-lista-municipios[data-jurisdiccion="'+jurisdiccion+'"]').val();

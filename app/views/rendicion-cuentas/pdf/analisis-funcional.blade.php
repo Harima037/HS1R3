@@ -44,11 +44,11 @@
 				{{'<tr class="tabla-datos">'}}
 			@endif
 			<td class="texto-medio" style="padding:5px;">
-				{{$fuente->fuenteFinanciamiento->clave}}. {{$fuente->fuenteFinanciamiento->descripcion}}
+				{{$fuente['fuente_financiamiento']['clave']}}. {{$fuente['fuente_financiamiento']['descripcion']}}
 			</td>
 			<td class="texto-medio" style="padding:5px;" colspan="2">
-			@foreach ($fuente->subFuentesFinanciamiento as $llave => $subfuente)
-				{{$subfuente->clave}} {{$subfuente->descripcion}} <br>
+			@foreach ($fuente['sub_fuentes_financiamiento'] as $llave => $subfuente)
+				{{$subfuente['clave']}} {{$subfuente['descripcion']}} <br>
 			@endforeach
 			</td>
 			@if($key < count($fuentes_financiamiento))
@@ -71,28 +71,28 @@
 	</tr>
 
 	<tr class="tabla-datos" height="50">
-		<td class="texto-medio" style="padding:5px;" colspan="6">{{{ $analisis_funcional->finalidadProyecto }}}</td>
+		<td class="texto-medio" style="padding:5px;" colspan="6">{{{ $analisis_funcional['finalidadProyecto'] }}}</td>
 	</tr>
 
 	<tr class="tabla-datos">
 		<th colspan="6" class="encabezado-tabla" style="font-size:8;">ANALISIS DE RESULTADO</th>
 	</tr>
 	<tr class="tabla-datos" height="150">
-		<td class="texto-medio" style="padding:5px;" colspan="6">{{{ $analisis_funcional->analisisResultado }}}</td>
+		<td class="texto-medio" style="padding:5px;" colspan="6">{{{ $analisis_funcional['analisisResultado'] }}}</td>
 	</tr>
 
 	<tr class="tabla-datos">
 		<th colspan="6" class="encabezado-tabla" style="font-size:8;">BENEFICIARIOS</th>
 	</tr>
 	<tr class="tabla-datos" height="50">
-		<td class="texto-medio" style="padding:5px;" colspan="6">{{{ $analisis_funcional->beneficiarios }}}</td>
+		<td class="texto-medio" style="padding:5px;" colspan="6">{{{ $analisis_funcional['beneficiarios'] }}}</td>
 	</tr>
 
 	<tr class="tabla-datos">
 		<th colspan="6" class="encabezado-tabla" style="font-size:8;">JUSTIFICACIÓN GLOBAL DEL PROYECTO</th>
 	</tr>
 	<tr class="tabla-datos" height="150">
-		<td class="texto-medio" style="padding:5px;" colspan="6">{{{ $analisis_funcional->justificacionGlobal }}}</td>
+		<td class="texto-medio" style="padding:5px;" colspan="6">{{{ $analisis_funcional['justificacionGlobal'] }}}</td>
 	</tr>
 	<tr><td colspan="6" height="40"></td></tr>
 </table>
