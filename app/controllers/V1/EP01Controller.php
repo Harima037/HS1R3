@@ -39,10 +39,8 @@ class EP01Controller extends \BaseController {
 					$total = $rows->count();						
 				}
 
-				$rows = $rows->select('bitacoraCargaEP01.id','ejercicio','mes',
-										DB::raw('FORMAT(totalRegistros,0) AS totalRegistros'),
-										'usuario.username',
-										'bitacoraCargaEP01.modificadoAl')
+				$rows = $rows->select('bitacoraCargaEP01.id','ejercicio','mes','totalRegistros',
+										'usuario.username','bitacoraCargaEP01.modificadoAl')
 									->leftjoin('sentryUsers AS usuario','usuario.id','=','bitacoraCargaEP01.actualizadoPor')
 									->orderBy('id', 'desc')
 									->skip(($parametros['pagina']-1)*10)->take(10)
@@ -134,7 +132,7 @@ class EP01Controller extends \BaseController {
 								$lineasConErrorEnCampos = $lineasConErrorEnCampos . $row . ", ";
 								$errorNumeroCampos = 1;
 							}
-							if($data2[16] != $ejercicio){
+							if(intval($data2[16]) > intval($ejercicio)){
 								$lineasConErrorEjercicio = $lineasConErrorEjercicio . $row . ", ";
 								$errorNumeroCampos = 1;
 							}
