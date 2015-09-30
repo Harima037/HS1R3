@@ -170,7 +170,7 @@
 	                        <th>Meta Programada</th>
 	                        <th>Avance Acumulado</th>
 							<th>Avances del Mes</th>
-							<th width="50"></th>
+							<th width="65"></th>
 	                    </tr>
 	                </thead>
 	                <tbody>
@@ -230,9 +230,6 @@
             <button type="button" class="btn btn-default" id="btn-proyecto-cancelar">
                 <span class="fa fa-chevron-left"></span> Regresar a la lista de Proyectos
             </button>
-            <!--<button type="button" class="btn btn-success" id="btn-enviar-proyecto">
-                <span class="fa fa-send-o"></span> Enviar Proyecto a Revisión
-            </button>-->
         </div>
     </div>
 </div>
@@ -296,6 +293,11 @@
 								</a>
 							</li>
 							@endif
+							<li role="presentation" class="pull-right">
+								<a href="#panel-observaciones" aria-controls="panel-observaciones" role="tab" data-toggle="tab" id="tab-link-observaciones">
+									<span class="fa fa-comment"></span> Observaciones <span id="conteo-observaciones" class="badge">0</span>
+								</a>
+							</li>
 						</ul>
 						<!-- Tab panes -->
 						<div class="tab-content">
@@ -488,6 +490,46 @@
 								</div>
 							</div>
 							@endif
+							<div role="tabpanel" class="tab-pane" id="panel-observaciones">
+								<br>
+								<div class="row">
+									<div class="col-sm-12">
+										<button type="button" class="btn btn-primary pull-right" id="btn-agregar-observacion">
+											<span class="fa fa-plus-circle"></span> Agregar Observación
+										</button>
+									</div>
+									<div class="col-sm-12">
+										<table id="tabla-lista-observaciones" class="table table-condensed table-striped table-hover">
+											<thead>
+												<tr>
+													<th>Observación</th>
+													<th width="170px">Fecha</th>
+													<th width="100px">Opciones</th>
+												</tr>
+											</thead>
+											<tbody>
+											</tbody>
+											<tfoot>
+												<tr id="formulario-observacion" class="hidden">
+													<td colspan="2">
+														<textarea id="observacion" class="form-control" rows="4"></textarea>
+														<input type="hidden" id="id-observacion">
+													</td>
+													<td>
+														<br>
+														<button type="button" class="btn btn-success btn-block" id="btn-guardar-observacion">
+															<span class="fa fa-save"></span> Guardar
+														</button>
+														<button type="button" class="btn btn-default btn-block" id="btn-cancelar-observacion">
+															Cancelar
+														</button>
+													</td>
+												</tr>
+											</tfoot>
+										</table>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 					<input type="hidden" name="id-avance" id="id-avance">

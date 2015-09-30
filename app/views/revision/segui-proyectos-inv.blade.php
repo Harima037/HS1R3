@@ -30,13 +30,14 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="btn-toolbar pull-right" >
-                            @section('panel-botones')
-                                <div class="btn-group" style="margin:5px">
-                                    <button type="button" class="btn btn-success btn-edit-rows" id="btn-detalles-proyecto">
-                                        <span class="glyphicon glyphicon-eye-open"></span> Ver Detalles del Proyecto
-                                    </button>
-                                </div>
-                            @show
+                            <div class="btn-group" style="margin:5px">
+                                <button type="button" class="btn btn-info" id="btn-reporte-seguimiento">
+                                    <span class="fa fa-file-excel-o"></span> Reporte Seguimiento
+                                </button>
+                                <button type="button" class="btn btn-success btn-edit-rows" id="btn-detalles-proyecto">
+                                    <span class="glyphicon glyphicon-eye-open"></span> Ver Detalles del Proyecto
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -52,6 +53,8 @@
                             <th width="30" class="{{ ($mes[1]['clave'] == $mes_actual)?'bg-info':'' }}"><p class="texto-vertical">{{$mes[1]['abrev']}} </p></th>
                             <th width="30" class="{{ ($mes[2]['clave'] == $mes_actual)?'bg-info':'' }}"><p class="texto-vertical">{{$mes[2]['abrev']}} </p></th>
                         @endforeach
+                        <th width="108">Estado</th>
+                        <th width="50"></th>
                     </tr>
                 </thead>
                 <tbody></tbody>

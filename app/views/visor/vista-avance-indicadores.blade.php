@@ -55,6 +55,7 @@
 	                        <th width="135" class="text-center">Meta al Mes<br>Acumulada</th>
 	                        <th width="135" class="text-center">Avance<br>Acumulado</th>
 							<th width="135" class="text-center">Avances<br>del Mes</th>
+							<th width="28"></th>
 	                    </tr>
 	                </thead>
 	                <tbody>
@@ -133,6 +134,11 @@
 						<li role="presentation">
 							<a href="#cumplimiento-jurisdiccion" aria-controls="cumplimiento-jurisdiccion" id="tablink-cumplimiento-jurisdiccion" role="tab" data-toggle="tab">
 								<span class="fa fa-bar-chart"></span> Cumplimiento por Jurisdicción
+							</a>
+						</li>
+						<li role="presentation" class="pull-right">
+							<a href="#panel-observaciones" aria-controls="panel-observaciones" role="tab" data-toggle="tab">
+								<span class="fa fa-comment"></span> Observaciones <span id="conteo-observaciones" class="badge">0</span>
 							</a>
 						</li>
 					</ul>
@@ -324,6 +330,18 @@
 						<div role="tabpanel" class="tab-pane" id="cumplimiento-jurisdiccion">
 							<br>
 							<div id="grafica_cumplimiento_jurisdiccion" style="width:100%; height:300px;"></div>
+						</div>
+						<div role="tabpanel" class="tab-pane" id="panel-observaciones">
+							<br>
+							<table id="tabla-lista-observaciones" class="table table-condensed table-striped table-hover">
+								<thead>
+									<tr>
+										<th>Observación</th>
+										<th width="170px">Fecha</th>
+									</tr>
+								</thead>
+								<tbody></tbody>
+							</table>
 						</div>
 					</div>
 				</div>

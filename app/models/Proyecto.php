@@ -818,4 +818,8 @@ class Proyecto extends BaseModel
     public function programa(){
     	return $this->hasOne('Programa','id','idPrograma');
     }
+
+    public function observaciones(){
+    	return $this->hasMany('ObservacionRendicionCuenta','idProyecto');
+    }
 }

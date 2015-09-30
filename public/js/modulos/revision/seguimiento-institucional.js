@@ -87,6 +87,10 @@ moduloDatagrid.actualizar({
                 item.estado = '<span class="text-muted">Inactivo</span>';
             }
 
+            if(response.data[i].observaciones){
+                item.estado += ' <span class="fa fa-comment text-muted"></span>';
+            }
+
             if(estatus_anteriores){
                 for(var j in estatus_anteriores){
                     if(estatus_anteriores[j].idEstatus == 6){

@@ -606,11 +606,17 @@ class VisorController extends BaseController {
 				}
 
 				$componentes = $componentes->select('proyectoComponentes.id','proyectoComponentes.idProyecto',
-											'proyectoComponentes.indicador',DB::raw('sum(metasMes.meta) AS metaAnual'))
+											'proyectoComponentes.indicador',DB::raw('sum(metasMes.meta) AS metaAnual'),
+											DB::raw('count(observaciones.id) AS observaciones'))
 										->join('componenteMetasMes AS metasMes',function($join)use($jurisdiccion){
 											$join->on('metasMes.idComponente','=','proyectoComponentes.id')
 												->whereNull('metasMes.borradoAl');
 											if($jurisdiccion){ $join->where('metasMes.claveJurisdiccion','=',$jurisdiccion); }
+										})
+										->leftjoin('observacionRendicionCuenta AS observaciones',function($join){
+											$join->on('proyectoComponentes.id','=','observaciones.idElemento')
+												->where('observaciones.nivel','=',1)
+												->whereNull('observaciones.borradoAl');
 										})
 										->with(array('metasMes'=>function($query)use($mes_actual,$jurisdiccion){
 											$query->select('id','idComponente',DB::raw('sum(meta) AS meta'),'mes',
@@ -631,11 +637,17 @@ class VisorController extends BaseController {
 										->get();
 				$actividades = $actividades->select('componenteActividades.id','componenteActividades.idProyecto',
 											'componenteActividades.idComponente','componenteActividades.indicador',
-											DB::raw('sum(metasMes.meta) AS metaAnual'))
+											DB::raw('sum(metasMes.meta) AS metaAnual'),
+											DB::raw('count(observaciones.id) AS observaciones'))
 										->join('actividadMetasMes AS metasMes',function($join)use($jurisdiccion){
 											$join->on('metasMes.idActividad','=','componenteActividades.id')
 												->whereNull('metasMes.borradoAl');
 											if($jurisdiccion){ $join->where('metasMes.claveJurisdiccion','=',$jurisdiccion); }
+										})
+										->leftjoin('observacionRendicionCuenta AS observaciones',function($join){
+											$join->on('componenteActividades.id','=','observaciones.idElemento')
+												->where('observaciones.nivel','=',2)
+												->whereNull('observaciones.borradoAl');
 										})
 										->with(array('metasMes'=>function($query)use($mes_actual,$jurisdiccion){
 											$query->select('id','idActividad',DB::raw('sum(meta) AS meta'),'mes',
@@ -664,7 +676,8 @@ class VisorController extends BaseController {
 						'indicador' => $componente->indicador,
 						'metaAnual' => floatval($componente->metaAnual),
 						'metaMes' => $componente->metasMes->sum('meta'),
-						'avanceAcumulado' => 0,'avanceMes' => 0
+						'avanceAcumulado' => 0,'avanceMes' => 0,
+						'observaciones' => $componente->observaciones
 					);
 
 					$avances_validos = $componente->registroAvance->lists('mes','mes');
@@ -689,7 +702,8 @@ class VisorController extends BaseController {
 						'indicador' => $actividad->indicador,
 						'metaAnual' => floatval($actividad->metaAnual),
 						'metaMes' => $actividad->metasMes->sum('meta'),
-						'avanceAcumulado' => 0,'avanceMes' => 0
+						'avanceAcumulado' => 0,'avanceMes' => 0,
+						'observaciones' => $actividad->observaciones
 					);
 
 					if(isset($componentes_nivel[$actividad->idComponente])){
@@ -786,9 +800,10 @@ class VisorController extends BaseController {
 									})->where('registroAvancesMetas.mes','<=',$mes_actual)
 									->orderBy('registroAvancesMetas.mes','desc')
 									->select('registroAvancesMetas.*');
-							}
-							,'planMejora'=>function($query) use ($mes_actual){
+							},'planMejora'=>function($query) use ($mes_actual){
 								$query->where('mes','=',$mes_actual);
+							},'observaciones'=>function($query){
+								$query->orderBy('modificadoAl','desc');
 							},'unidadMedida'))->find($id);
 
 				$elemento = array(
@@ -798,7 +813,7 @@ class VisorController extends BaseController {
 					'unidadMedida' => $recurso->unidadMedida->descripcion,
 					'metaTotal' => $recurso->metasMesAgrupado->sum('meta'),
 					'analisisResultados' => null,'justificacion' => null,
-					'planMejora' => null
+					'planMejora' => null, 'observaciones'=>$recurso->observaciones
 				);
 
 				$meses_capturados = $recurso->registroAvance->lists('mes','mes');

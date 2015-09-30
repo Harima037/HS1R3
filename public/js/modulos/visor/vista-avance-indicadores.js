@@ -71,6 +71,12 @@ accionesDatagrid.actualizar({
             item.avances_acumulados = elemento.avanceAcumulado.format(2);
             item.avances_mes = elemento.avanceMes.format(2);
 
+            if(elemento.observaciones){
+                item.observaciones = '<span class="fa fa-comment"></span>';
+            }else{
+                item.observaciones = '';
+            }
+
             datos_grid.push(item);
         }
         accionesDatagrid.cargarDatos(datos_grid);                         
@@ -122,6 +128,23 @@ function seguimiento_metas(e){
             $('#indicador').text(response.data.indicador);
             $('#unidad-medida').text(response.data.unidadMedida);
             $('#meta-total').text(response.data.metaTotal.format(2));
+
+            if(response.data.observaciones.length){
+                var observaciones = '';
+                for(var i in response.data.observaciones){
+                    var observacion = response.data.observaciones[i];
+
+                    observaciones += '<tr>';
+                    observaciones += '<td>'+observacion.observacion+'</td>';
+                    observaciones += '<td>'+observacion.modificadoAl+'</td>';
+                    observaciones += '</tr>';
+                }
+                $('#tabla-lista-observaciones tbody').html(observaciones);
+                $('#conteo-observaciones').text(response.data.observaciones.length);
+            }else{
+                $('#tabla-lista-observaciones tbody').html('<tr><td colspan="2"><span class="fa fa-info-circle"></span> No hay observaciones capturadas</td></tr>');
+                $('#conteo-observaciones').text('0');
+            }
 
             if(response.data.tomar == 'jurisdicciones'){
                 $('#analisis-resultados').text(response.data.analisisResultados);

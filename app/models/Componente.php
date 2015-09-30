@@ -124,4 +124,8 @@ class Componente extends BaseModel
 	public function comentarios(){
     	return $this->hasMany('EvaluacionComentario','idElemento')->where('tipoElemento','=',2);
     }
+	
+	public function observaciones(){
+		return $this->hasMany('ObservacionRendicionCuenta','idElemento')->where('nivel','=',1);
+	}
 }
