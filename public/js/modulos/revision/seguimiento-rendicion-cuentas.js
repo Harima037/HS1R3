@@ -23,6 +23,7 @@ $('#btn-proyecto-cancelar').on('click',function(){
 });
 
 var comentariosArray = [];
+var observacionesArray = [];
 
 /********************************************************************************************************************************
         Inicio: Seguimiento de Metas
@@ -53,7 +54,7 @@ function seguimiento_metas(e){
 			
 			for(var cont in response.data.comentarios)
 			{
-				comentario = response.data.comentarios[cont];
+				var comentario = response.data.comentarios[cont];
 				if(comentario.mes == $('#mes').val())
 				{
 					if(comentario.idCampo == 'avancesmetas')
@@ -72,6 +73,15 @@ function seguimiento_metas(e){
 			}
 			
 			/*Termina de poner los comentarios*/
+            
+            /* Poner las observaciones */
+            if(response.data.observaciones.length){
+                observacionesArray = response.data.observaciones;
+            }else{
+                observacionesArray = [];
+            }            
+            cargarObservaciones();
+            /* Termina de poner las observaciones */
 
             $('#indicador').text(response.data.indicador);
             $('#unidad-medida').text(response.data.unidad_medida.descripcion);
@@ -279,13 +289,14 @@ function buscar_localidades(jurisdiccion,municipio){
                 }else{
                     var datos_meta = {meta:0,avance:0};
                 }
+                var datos_acumulado = {};
                 if(dato.metas_mes_acumuladas){
-                    var datos_acumulado = {
+                    datos_acumulado = {
                         meta: parseFloat(dato.metas_mes_acumuladas.meta) || 0,
                         avance: parseFloat(dato.metas_mes_acumuladas.avance) || 0
                     }
                 }else{
-                    var datos_acumulado = {meta:0, avance:0}
+                    datos_acumulado = {meta:0, avance:0}
                 }
                 var avance_anterior = datos_acumulado.avance - (datos_meta.avance || 0); 
                 html_rows += '<tr data-clave-localidad="'+dato.claveLocalidad+'"><td>' + dato.localidad + '</td>' +
@@ -340,6 +351,147 @@ function buscar_localidades(jurisdiccion,municipio){
     });
 }
 
+function cargarObservaciones(){
+    var observaciones = '';
+    if(observacionesArray.length){
+        for(var i in observacionesArray){
+            observaciones += '<tr data-id="'+observacionesArray[i].id+'" class="observacion">';
+            observaciones += '<td>'+observacionesArray[i].observacion+'</td>';
+            observaciones += '<td>'+observacionesArray[i].modificadoAl+'</td>';
+            observaciones += '<td>';
+            observaciones += '<button type="button" class="btn btn-success" onClick="editarObservacion('+observacionesArray[i].id+')"><span class="fa fa-edit"></span></button>';
+            observaciones += '<button type="button" class="btn btn-danger" onClick="eliminarObservacion('+observacionesArray[i].id+')"><span class="fa fa-trash"></span></button>';
+            observaciones += '</td>';
+            observaciones += '</tr>';
+        }
+    }else{
+        observaciones = '<tr><td colspan="3"><span class="fa fa-info-circle"></span> No hay observaciones capturadas</td></tr>';
+    }
+    $('#conteo-observaciones').text(observacionesArray.length);
+    $('#tabla-lista-observaciones tbody').html(observaciones);
+}
+
+function editarObservacion(id){
+    if(!$('#formulario-observacion').hasClass('hidden')){
+        ocultarFormulario();
+    }
+    var observacion = obtenerObservacion(id);
+    $('#id-observacion').val(observacion.id);
+    $('#observacion').val(observacion.observacion);
+    $('#formulario-observacion').prependTo('#tabla-lista-observaciones tbody');
+    $('#formulario-observacion').removeClass('hidden');
+    
+    $('#tabla-lista-observaciones tbody tr.observacion[data-id="'+id+'"]').addClass('hidden'); 
+}
+
+function eliminarObservacion(id){
+    var parametros = {
+        'eliminar':'observacion',
+    };
+    Confirm.show({
+        titulo:"Eliminar Observación",
+        mensaje: "¿Estás seguro de eliminar la observación seleccionado?",
+            callback: function(){
+                moduloResource.delete(id,parametros,{
+                    _success: function(response){ 
+                        MessageManager.show({data:'Comentario eliminado con éxito.',type:'INF',timer:4});
+                        borrarObservacion(id);
+                        cargarObservaciones();							
+                    },
+                    _error: function(jqXHR){ 
+                        MessageManager.show(jqXHR.responseJSON);
+                    }
+                });
+            }
+    });
+}
+
+function borrarObservacion(id){
+    for(var i in observacionesArray){
+        if(observacionesArray[i].id == id){
+            delete observacionesArray[i];
+            break;
+        }
+    }
+    
+    var nuevoArray = [];
+    for(var i in observacionesArray){
+        if(observacionesArray[i]){
+            nuevoArray.push(observacionesArray[i]);
+        }
+    }
+    observacionesArray = nuevoArray;
+}
+
+function obtenerObservacion(id){
+    for(var i in observacionesArray){
+        if(observacionesArray[i].id == id){
+            return observacionesArray[i];
+        }
+    }
+    return {};
+}
+
+function ocultarFormulario(){
+    if($('#id-observacion').val() != ''){
+        var id = $('#id-observacion').val();
+        $('#tabla-lista-observaciones tbody tr.observacion[data-id="'+id+'"]').removeClass('hidden');
+    }
+    $('#id-observacion').val('');
+    $('#observacion').val('');
+    $('#formulario-observacion').prependTo('#tabla-lista-observaciones tfoot');
+    $('#formulario-observacion').addClass('hidden');
+}
+
+$('#btn-cancelar-observacion').on('click',function(){ocultarFormulario();});
+
+$('#btn-agregar-observacion').on('click',function(){
+    $('#formulario-observacion').prependTo('#tabla-lista-observaciones tbody');
+    $('#formulario-observacion').removeClass('hidden');
+});
+
+$('#btn-guardar-observacion').on('click',function(){
+    var parametros = {
+        'guardar':'observacion',
+        'id-proyecto':$('#id').val(),
+        'id-elemento':$('#id-accion').val(),
+        'observacion':$('#observacion').val(),
+        'nivel':$('#nivel').val()
+    };
+    
+    if($('#id-observacion').val()){
+        moduloResource.put($('#id-observacion').val(),parametros,{
+            _success: function(response){
+                ocultarFormulario();
+                borrarObservacion(response.data.id);
+                observacionesArray.unshift(
+                    {
+                        id:response.data.id,
+                        observacion:response.data.observacion,
+                        modificadoAl:response.data.modificadoAl
+                    }
+                );
+                cargarObservaciones();
+                accionesDatagrid.actualizar();
+            }
+        });
+    }else{
+        moduloResource.post(parametros,{
+            _success: function(response){
+                ocultarFormulario();
+                observacionesArray.unshift(
+                    {
+                        id:response.data.id,
+                        observacion:response.data.observacion,
+                        modificadoAl:response.data.modificadoAl
+                    }
+                );
+                cargarObservaciones();
+                accionesDatagrid.actualizar();
+            }
+        });
+    }
+});
 
 $('.avance-mes').on('keyup',function(){ $(this).change() });
 $('.avance-mes').on('change',function(){
@@ -494,6 +646,10 @@ $('#modalEditarAvance').on('hide.bs.modal',function(e){
     $('.lista-localidades-jurisdiccion').remove();
     Validation.cleanFormErrors('#form_avance');
 	
+    if(!$('#formulario-observacion').hasClass('hidden')){
+        ocultarFormulario();
+    }
+    
 	var arrayTemporal = [];
 	
 	for(var i = 0; i < comentariosArray.length; i++)
@@ -568,6 +724,11 @@ function llenar_grid_acciones(response){
                 }
             }
         }
+
+        if(componente.observaciones.length){
+            item.justificacion += ' <span class="fa fa-comment"></span>';
+        }
+
         datos_grid.push(item);
 
         for(var j in componente.actividades){
@@ -599,6 +760,11 @@ function llenar_grid_acciones(response){
                     }
                 }
             }
+
+            if(actividad.observaciones.length){
+                item.justificacion += ' <span class="fa fa-comment"></span>';
+            }
+
             datos_grid.push(item);
         }
     }

@@ -27,7 +27,22 @@ moduloDatagrid.actualizar({
             var trimestre = $('#datagridProyectos').attr('data-trim-activo');
             var mes_inicia = ((trimestre - 1) * 3) + 1;
             var meses = [1,2,3,4,5,6,7,8,9,10,11,12];
+            var estado_actual = 0;
+            var meses_capturados = {'1':'','2':'','3':'','4':'','5':'','6':'','7':'','8':'','9':'','10':'','11':'','12':''};
 
+            for(var j in response.data[i].componentes_metas_mes){
+                var meta = response.data[i].componentes_metas_mes[j];
+                if(parseFloat(meta.totalMeta) > 0){
+                    meses_capturados[meta.mes] = 'style="background-color:#DDDDDD"';
+                }
+            }
+
+            for(var j in response.data[i].actividades_metas_mes){
+                var meta = response.data[i].actividades_metas_mes[j];
+                if(parseFloat(meta.totalMeta) > 0){
+                    meses_capturados[meta.mes] = 'style="background-color:#DDDDDD"';
+                }
+            }
 
             item.id = response.data[i].id;
             item.clave = response.data[i].clavePresup;
@@ -35,23 +50,83 @@ moduloDatagrid.actualizar({
 
             for(var j in meses){
                 if(meses[j] == mes_activo){
-                    item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class=""><span class="fa fa-unlock"></span></span>';
+                    item['mes_'+meses[j]] = '<div id="grid-mes-'+meses[j]+'" class="text-center" '+meses_capturados[meses[j]]+'><span class="fa fa-unlock"></span></div>';
                 }else if(meses[j] < mes_activo){
-                    item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class="text-muted"><span class="fa fa-times"></span></span>';
+                    item['mes_'+meses[j]] = '<div id="grid-mes-'+meses[j]+'" class="text-center text-muted" '+meses_capturados[meses[j]]+'><span class="fa fa-times"></span></div>';
                 }else{
-                    item['mes_'+meses[j]] = '<span id="grid-mes-'+meses[j]+'" class=""><span class="fa fa-lock"></span></span>';
+                    item['mes_'+meses[j]] = '<div id="grid-mes-'+meses[j]+'" class="text-center" '+meses_capturados[meses[j]]+'><span class="fa fa-lock"></span></div>';
+                }
+            }
+            var estatus_anteriores = {};
+            item.estado = '<span class="text-muted">Inactivo</span>';
+            if(response.data[i].evaluacion_meses.length){
+                for(var j in response.data[i].evaluacion_meses){
+                    var evaluacion_mes = response.data[i].evaluacion_meses[j];
+                    if(evaluacion_mes.mes == mes_activo){
+                        if(evaluacion_mes.idEstatus == 1){
+                            item.estado = '<span class="label label-info">En Trámite</span>';
+                        }else if(evaluacion_mes.idEstatus == 2){
+                            item.estado = '<span class="label label-warning">En Revisión</span>';
+                            estado_actual = 1;
+                        }else if(evaluacion_mes.idEstatus == 3){
+                            item.estado = '<span class="label label-danger">En Correción</span>';
+                        }else if(evaluacion_mes.idEstatus == 4){
+                            item.estado = '<span class="label label-primary">Registrado</span>';
+                            estado_actual = 1;
+                        }else if(evaluacion_mes.idEstatus == 5){
+                            item.estado = '<span class="label label-success">Firmado</span>';
+                            estado_actual = 1;
+                        }
+                    }else{
+                        estatus_anteriores[evaluacion_mes.mes] = {idEstatus:evaluacion_mes.idEstatus,planMejora:parseInt(evaluacion_mes.planMejora)};
+                    }
+                }
+            }else{
+                item.estado = '<span class="text-muted">Inactivo</span>';
+            }
+
+            if(response.data[i].observaciones){
+                item.estado += ' <span class="fa fa-comment text-muted"></span>';
+            }
+
+            if(estatus_anteriores){
+                for(var j in estatus_anteriores){
+                    if(estatus_anteriores[j].idEstatus == 6){
+                        if(parseInt(estatus_anteriores[j].planMejora) > 0){
+                            item['mes_'+j] = '<div id="grid-mes-'+j+'" class="text-center text-danger" '+meses_capturados[j]+'><span class="fa fa-circle-o"></span></div>';
+                        }else{
+                            item['mes_'+j] = '<div id="grid-mes-'+j+'" class="text-center text-success" '+meses_capturados[j]+'><span class="fa fa-circle-o"></span></div>';
+                        }
+                    }
                 }
             }
 
+            var fuente_informacion = '';
+            if(response.data[i].fuenteInformacion){
+                fuente_informacion = 'text-primary';
+            }else{
+                fuente_informacion = 'text-muted';
+            }
+
+            var responsable_informacion = '';
+            if(response.data[i].idResponsable){
+                responsable_informacion = 'text-primary';
+            }else{
+                responsable_informacion = 'text-muted';
+            }
+
+            item.informacion = '<span class="fa fa-info-circle '+fuente_informacion+'"></span> <span class="fa fa-user '+responsable_informacion+'"></span>';
+
             for(var j in response.data[i].registro_avance){
                 var avance = response.data[i].registro_avance[j];
-                var clase_icono = (avance.mes == mes_activo)?'fa-unlock':'fa-circle';
+                var clase_icono = (avance.mes != mes_activo)?'fa-circle':(estado_actual != 0)?'fa-lock':'fa-unlock';
                 if(parseInt(avance.planMejora) > 0){
-                    item['mes_'+avance.mes] = '<span id="grid-mes-'+avance.mes+'" class="text-danger"><span class="fa '+clase_icono+'"></span></span>';
+                    item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-danger" '+meses_capturados[avance.mes]+'><span class="fa '+clase_icono+'"></span></div>';
                 }else{
-                    item['mes_'+avance.mes] = '<span id="grid-mes-'+avance.mes+'" class="text-success"><span class="fa '+clase_icono+'"></span></span>';
+                    item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-success" '+meses_capturados[avance.mes]+'><span class="fa '+clase_icono+'"></span></div>';
                 }
             }
+            
             datos_grid.push(item);
         }
         moduloDatagrid.cargarDatos(datos_grid);                         
@@ -182,7 +257,9 @@ $('#btn-comentar-avance').on('click',function(){
     window.location.href = SERVER_HOST+'/revision/comentar-avance/' + $('#btn-comentar-avance').attr('data-id-proyecto');
 });
 
-
+$('#btn-reporte-seguimiento').on('click',function(){
+    window.open(SERVER_HOST+'/v1/reporte-seguimiento?clasificacion-proyecto=2');
+});
 
 $('#btn-firmar').on('click',function(){
 	

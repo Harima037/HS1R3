@@ -53,7 +53,7 @@
                             <th width="30" class="{{ ($mes[1]['clave'] == $mes_actual)?'bg-info':'' }}"><p class="texto-vertical">{{$mes[1]['abrev']}} </p></th>
                             <th width="30" class="{{ ($mes[2]['clave'] == $mes_actual)?'bg-info':'' }}"><p class="texto-vertical">{{$mes[2]['abrev']}} </p></th>
                         @endforeach
-                        <th width="100">Estado</th>
+                        <th width="108">Estado</th>
                         <th width="50"></th>
                     </tr>
                 </thead>

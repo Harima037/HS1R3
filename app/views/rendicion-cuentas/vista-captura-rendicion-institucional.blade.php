@@ -179,12 +179,12 @@
 	                <thead>
 	                    <tr>
 	                        <th><input type="checkbox" class="check-select-all-rows"></th>
-	                        <th>Nivel</th>
+	                        <th width="111px">Nivel</th>
 	                        <th>Indicador</th>
-	                        <th>Meta Programada</th>
-	                        <th>Avance Acumulado</th>
-							<th>Avances del Mes</th>
-							<th width="50"></th>
+	                        <th width="143px">Meta Programada</th>
+	                        <th width="155px">Avance Acumulado</th>
+							<th width="143px">Avances del Mes</th>
+							<th width="65"></th>
 	                    </tr>
 	                </thead>
 	                <tbody>
@@ -273,6 +273,11 @@
 								</a>
 							</li>
 							@endif
+							<li role="presentation" class="pull-right">
+								<a href="#panel-observaciones" aria-controls="panel-observaciones" role="tab" data-toggle="tab">
+									<span class="fa fa-comment"></span> Observaciones <span id="conteo-observaciones" class="badge">0</span>
+								</a>
+							</li>
 						</ul>
 						<!-- Tab panes -->
 						<div class="tab-content">
@@ -488,6 +493,18 @@
 								</fieldset>
 							</div>
 							@endif
+							<div role="tabpanel" class="tab-pane" id="panel-observaciones">
+								<br>
+								<table id="tabla-lista-observaciones" class="table table-condensed table-striped table-hover">
+									<thead>
+										<tr>
+											<th>Observación</th>
+											<th width="170px">Fecha</th>
+										</tr>
+									</thead>
+									<tbody></tbody>
+								</table>
+							</div>
 						</div>
 					</div>
 					<input type="hidden" name="id-avance" id="id-avance">

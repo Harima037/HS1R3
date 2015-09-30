@@ -7,7 +7,8 @@ use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime,Mail;
 use Proyecto,Componente,Actividad,Beneficiario,RegistroAvanceMetas,ComponenteMetaMes,ActividadMetaMes,
 	RegistroAvanceBeneficiario,EvaluacionAnalisisFuncional,EvaluacionPlanMejora,EvaluacionComentario,
-	EvaluacionProyectoMes,ComponenteDesglose,ActividadDesglose,Directorio,BitacoraValidacionSeguimiento;
+	EvaluacionProyectoMes,ComponenteDesglose,ActividadDesglose,Directorio,BitacoraValidacionSeguimiento,
+	ObservacionRendicionCuenta;
 
 class SeguimientoInstitucionalController extends BaseController {
 	private $reglasDatosInformacion = array(
@@ -35,8 +36,16 @@ class SeguimientoInstitucionalController extends BaseController {
 
 			if(isset($parametros['grid'])){
 				if($parametros['grid'] == 'rendicion-acciones'){
-					$rows = Proyecto::with('componentes.actividades.registroAvance','componentes.actividades.comentarios','responsableInformacion')->find($parametros['idProyecto']);
-					$rows->componentes->load('registroAvance','comentarios');
+					$rows = Proyecto::with(array('componentes.actividades.registroAvance',
+										'componentes.actividades.comentarios',
+										'componentes.actividades.observaciones'=>function($query){
+											$query->groupBy('idElemento')->select(DB::raw('count(idElemento) AS total'),'idElemento','nivel','id');
+										},'responsableInformacion'))
+									->find($parametros['idProyecto']);
+					$rows->componentes->load(array('registroAvance','comentarios',
+											'observaciones'=>function($query){
+												$query->groupBy('idElemento')->select(DB::raw('count(idElemento) AS total'),'idElemento','nivel','id');
+											}));
 					$total = count($rows);
 				}elseif($parametros['grid'] == 'rendicion-beneficiarios'){
 					$rows = Beneficiario::with(array('comentarios','registroAvance'=>function($query){
@@ -115,11 +124,16 @@ class SeguimientoInstitucionalController extends BaseController {
 				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
 					'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl',
-					'proyectos.fuenteInformacion','proyectos.idResponsable')
+					'proyectos.fuenteInformacion','proyectos.idResponsable',DB::raw('count(observaciones.id) AS observaciones'))
 					->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
 					->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')									
 					->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
+					->leftjoin('observacionRendicionCuenta AS observaciones',function($join){
+						$join->on('observaciones.idProyecto','=','proyectos.id')
+							->whereNull('observaciones.borradoAl');
+					})
 					->orderBy('id', 'desc')
+					->groupBy('proyectos.id')
 					->skip(($parametros['pagina']-1)*10)->take(10)
 					->get();
 			}
@@ -201,6 +215,8 @@ class SeguimientoInstitucionalController extends BaseController {
 					$query->where('mes','=',$mes_actual);
 				},'planMejora'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
+				},'observaciones'=>function($query){
+					$query->orderBy('modificadoAl','desc');
 				},'unidadMedida','comentarios'))->find($id);
 				
 				$recurso->load('desgloseMunicipios');
@@ -270,9 +286,24 @@ class SeguimientoInstitucionalController extends BaseController {
 		$respuesta['data'] = array("data"=>'');
 
 		$parametros = Input::all();
-
 		$mes_actual = Util::obtenerMesActual();
-		if($mes_actual > 0){
+		
+		if(isset($parametros['guardar'])){
+			if($parametros['guardar'] == 'observacion'){
+				$nuevaObservacion = new ObservacionRendicionCuenta;
+				$nuevaObservacion->observacion = $parametros['observacion'];
+				$nuevaObservacion->idProyecto = $parametros['id-proyecto'];
+				if($parametros['nivel'] == 'componente'){
+					$recurso = Componente::find($parametros['id-elemento']);
+					$nuevaObservacion->nivel = 1;
+				}else{
+					$recurso = Actividad::find($parametros['id-elemento']);
+					$nuevaObservacion->nivel = 2;
+				}
+				$recurso->observaciones()->save($nuevaObservacion);
+				$respuesta['data']['data'] = $nuevaObservacion;
+			}
+		}else if($mes_actual > 0){
 			$nuevoComentario = new EvaluacionComentario;
 
 			$nuevoComentario->idProyecto = $parametros['idproyecto'];
@@ -477,6 +508,15 @@ class SeguimientoInstitucionalController extends BaseController {
 				}else{
 					$respuesta = $validado;
 				}
+			}elseif($parametros['guardar'] == 'observacion'){
+				$observacion = ObservacionRendicionCuenta::find($id);
+				$observacion->observacion = $parametros['observacion'];
+				if($observacion->save()){
+					$respuesta['data']['data'] = $observacion;
+				}else{
+					$respuesta['http_status'] = 500;
+					$respuesta['data'] = array('data'=>'Ocurrio un error al intentar guardar los datos.','code'=>'S01');
+				}
 			}
 		}else{
 			if($mes_actual > 0){
@@ -517,9 +557,16 @@ class SeguimientoInstitucionalController extends BaseController {
 		//
 		$http_status = 200;
 		$data = array();
-
+		$recurso = null;
+		$parametros = Input::all();
 		try{
-			$recurso = EvaluacionComentario::where('id','=',$id)->delete();
+			if(isset($parametros['eliminar'])){
+				if($parametros['eliminar'] == 'observacion'){
+					$recurso = ObservacionRendicionCuenta::where('id','=',$id)->delete();
+				}
+			}else{
+				$recurso = EvaluacionComentario::where('id','=',$id)->delete();
+			}
 			
 			if(is_null($recurso)){
 				$respuesta['http_status'] = 404;
@@ -527,7 +574,7 @@ class SeguimientoInstitucionalController extends BaseController {
 			}
 		}catch(Exception $ex){
 			$http_status = 500;	
-			$data = array('data' => "No se puede eliminar el comentario",'ex'=>$ex->getMessage(),'code'=>'S03');	
+			$data = array('data' => "No se puede eliminar el recurso",'ex'=>$ex->getMessage(),'code'=>'S03');	
 		}
 
 		return Response::json($data,$http_status);

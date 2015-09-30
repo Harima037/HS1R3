@@ -279,6 +279,23 @@ function seguimiento_metas(e){
             }
             
             $('#lnk-descarga-archivo-metas').attr('href',SERVER_HOST+'/rendicion-cuentas/descargar-archivo-metas/'+$('#id-accion').val()+'?nivel='+$('#nivel').val());
+
+            if(response.data.observaciones.length){
+                var observaciones = '';
+                for(var i in response.data.observaciones){
+                    var observacion = response.data.observaciones[i];
+
+                    observaciones += '<tr>';
+                    observaciones += '<td>'+observacion.observacion+'</td>';
+                    observaciones += '<td>'+observacion.modificadoAl+'</td>';
+                    observaciones += '</tr>';
+                }
+                $('#tabla-lista-observaciones tbody').html(observaciones);
+                $('#conteo-observaciones').text(response.data.observaciones.length);
+            }else{
+                $('#tabla-lista-observaciones tbody').html('<tr><td colspan="2"><span class="fa fa-info-circle"></span> No hay observaciones capturadas</td></tr>');
+                $('#conteo-observaciones').text('0');
+            }
             
             $('#modalEditarAvance').modal('show');
         }
@@ -732,6 +749,11 @@ function llenar_grid_acciones(response){
                 }
             }
         }
+
+        if(componente.observaciones.length){
+            item.justificacion += ' <span class="fa fa-comment"></span>';
+        }
+        
         item.avances_acumulados = item.avances_acumulados.format(2);
         item.avances_mes = item.avances_mes.format(2);
         datos_grid.push(item);
@@ -765,6 +787,11 @@ function llenar_grid_acciones(response){
                     }
                 }
             }
+
+            if(actividad.observaciones.length){
+                item.justificacion += ' <span class="fa fa-comment"></span>';
+            }
+
             item.avances_acumulados = item.avances_acumulados.format(2);
             item.avances_mes = item.avances_mes.format(2);
             datos_grid.push(item);

@@ -84,7 +84,13 @@ class SeguimientoController extends BaseController {
 
 			if(isset($parametros['grid'])){
 				if($parametros['grid'] == 'rendicion-acciones'){
-					$rows = Proyecto::with('componentes.comentarios','componentes.registroAvance','componentes.actividades.comentarios','componentes.actividades.registroAvance')
+					$rows = Proyecto::with(array('componentes.comentarios','componentes.registroAvance',
+												'componentes.actividades.comentarios','componentes.actividades.registroAvance',
+												'componentes.observaciones'=>function($query){
+													$query->groupBy('idElemento')->select(DB::raw('count(idElemento) AS total'),'idElemento','nivel','id');
+												},'componentes.actividades.observaciones'=>function($query){
+													$query->groupBy('idElemento')->select(DB::raw('count(idElemento) AS total'),'idElemento','nivel','id');
+												}))
 									->find($parametros['idProyecto']);
 					//$rows->componentes->load('registroAvance');
 					$rows['responsables'] = Directorio::responsablesActivos($rows->unidadResponsable)->get();
@@ -159,10 +165,15 @@ class SeguimientoController extends BaseController {
 				
 				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
-					'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
+					'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl',DB::raw('count(observaciones.id) AS observaciones'))
 					->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
 					->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
 					->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
+					->leftjoin('observacionRendicionCuenta AS observaciones',function($join){
+						$join->on('observaciones.idProyecto','=','proyectos.id')
+							->whereNull('observaciones.borradoAl');
+					})
+					->groupBy('proyectos.id')
 					->orderBy('id', 'desc')
 					->skip(($parametros['pagina']-1)*10)->take(10)
 					->get();
@@ -245,6 +256,8 @@ class SeguimientoController extends BaseController {
 					$query->where('mes','=',$mes_actual);
 				},'planMejora'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
+				},'observaciones'=>function($query){
+					$query->orderBy('modificadoAl','desc');
 				},'unidadMedida','comentarios'))->find($id);
 				
 				$recurso->load('desgloseMunicipios');
