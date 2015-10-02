@@ -18,7 +18,7 @@
 	<h3 class="panel-title">Rendición de cuentas del mes de {{$mes}}</h3>
 </div>
 <div class="panel-body" id="panel-rendicion-cuentas">
-
+	@if($evaluacion_capturada)
 	<div class="btn-toolbar pull-right">
 		<div class="btn-group" style="margin:5px">
 	    	<button type="button" id="btnAcciones" class="btn btn-primary"><i class="fa fa-gears"></i> Acciones</button>
@@ -29,6 +29,7 @@
     	    </ul>
 		</div>
 	</div>
+	@endif
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" class="active">
             <a href="#seguimiento-metas" aria-controls="seguimiento-metas" role="tab" data-toggle="tab">
@@ -165,12 +166,12 @@
 	                <thead>
 	                    <tr>
 	                        <th><input type="checkbox" class="check-select-all-rows"></th>
-	                        <th>Nivel</th>
+	                        <th width="70px">Nivel</th>
 	                        <th>Indicador</th>
-	                        <th>Meta Programada</th>
-	                        <th>Avance Acumulado</th>
-							<th>Avances del Mes</th>
-							<th width="65"></th>
+	                        <th width="143px">Meta Programada</th>
+	                        <th width="153px">Avance Acumulado</th>
+							<th width="143px">Avances del Mes</th>
+							<th width="65px"></th>
 	                    </tr>
 	                </thead>
 	                <tbody>
@@ -449,7 +450,8 @@
 									<div class="col-sm-12">
 										<div class="form-group">
 											<label class="input-label" for="lbl-accion-mejora">Acción de Mejora</label>
-                                            <p id="lbl-accion-mejora" name="lbl-accion-mejora" class="form-control" style="height:auto"></p>                                            <button type="button" class="btn btn-default" onclick="escribirComentario('accion-mejora','Acción de mejora','lbl-accion-mejora','nivel','nivel');"><span class="fa fa-edit"></span> Comentar Acción de Mejora</button>
+                                            <p id="lbl-accion-mejora" name="lbl-accion-mejora" class="form-control" style="height:auto"></p>
+                                            <button type="button" class="btn btn-default" onclick="escribirComentario('accion-mejora','Acción de mejora','lbl-accion-mejora','nivel','nivel');"><span class="fa fa-edit"></span> Comentar Acción de Mejora</button>
 										</div>
 									</div>
 									<div class="col-sm-12">
@@ -558,7 +560,7 @@
                     <input type="hidden" name="idcampo" id="idcampo">
                     <input type="hidden" name="tipocomentario" id="tipocomentario">
                     <input type="hidden" name="idelemento" id="idelemento">
-                    
+                    @if($evaluacion_capturada)
                     <div class="row">
                     	<div class="col-sm-12">
                         	<div class="form-group">
@@ -575,11 +577,20 @@
                             </div>
                         </div>
                     </div>
+                    @else
+                    <div class="row">
+                    	<div class="col-sm-12">
+                    		<p class="help-text">La captura de comentarios se encuentra desactivada en este momento.</p>
+                    	</div>
+                    </div>
+                    @endif
                 </form>
              </div>
              <div class="modal-footer">
+             	@if($evaluacion_capturada)
              	<button type="button" class="btn btn-warning" id="btnGuardarComentario">Guardar comentario</button>
                 <button type="button" class="btn btn-danger" id="btnQuitarComentario">Quitar comentario</button>
+                @endif
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
              </div>
         </div><!-- /.modal-content -->
@@ -604,25 +615,31 @@
     		<thead>
     			<tr>
     				<th>Beneficiario</th>
-    				<th></th>
-					<th>Total Femenino</th>
-					<th>Total Masculino</th>
-					<th>Total</th>
+    				<th width="240px"></th>
+					<th width="143px">Total Femenino</th>
+					<th width="143px">Total Masculino</th>
+					<th width="143px">Total</th>
     			</tr>
     		</thead>
     		<tbody>
-    			<tr>
-    				<td rowspan="2" id="tipo-beneficiario" data-valor="0"></td>
-    				<td>P</td>
+    			<tr class="bg-info">
+    				<td rowspan="3" id="tipo-beneficiario" data-valor="0"></td>
+    				<th class="text-right">Programado</th>
     				<td class="cant-benficiarios" id="total-f" data-valor="0">0</td>
     				<td class="cant-benficiarios" id="total-m" data-valor="0">0</td>
     				<td class="cant-benficiarios" id="total-beneficiario" data-valor="0">0</td>
 				</tr>
 				<tr>
-					<td>A</td>
+					<th class="text-right">Acumulado al Trimestre Anterior</th>
     				<td class="cant-benficiarios" id="acumulado-f" data-valor="0">0</td>
     				<td class="cant-benficiarios" id="acumulado-m" data-valor="0">0</td>
     				<td class="cant-benficiarios" id="acumulado-beneficiario" data-valor="0">0</td>
+				</tr>
+				<tr class="bg-info">
+					<th class="text-right">Total Acumulado</th>
+    				<td class="cant-benficiarios" id="total-acumulado-f" data-valor="0">0</td>
+    				<td class="cant-benficiarios" id="total-acumulado-m" data-valor="0">0</td>
+    				<td class="cant-benficiarios" id="total-acumulado-beneficiario" data-valor="0">0</td>
 				</tr>
     		</tbody>
     	</table>

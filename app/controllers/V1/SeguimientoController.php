@@ -1144,10 +1144,10 @@ class SeguimientoController extends BaseController {
 			$porcentaje_avance = 100;
 		}
 		
-		if($porcentaje_avance < 90 || $porcentaje_avance > 110){
+		if(round($porcentaje_avance,2) < 90 || round($porcentaje_avance,2) > 110){
 			$conteo_alto_bajo_avance++;
 		}
-
+		
 		if($conteo_alto_bajo_avance){
 			if(trim($parametros['justificacion-acumulada']) == ''){
 				$faltan_campos[] = json_encode(array('field'=>'justificacion-acumulada','error'=>'Este campo es requerido.'));

@@ -273,7 +273,7 @@
 								</a>
 							</li>
 							@endif
-							<li role="presentation" class="pull-right">
+							<li role="presentation" class="pull-right hidden">
 								<a href="#panel-observaciones" aria-controls="panel-observaciones" role="tab" data-toggle="tab">
 									<span class="fa fa-comment"></span> Observaciones <span id="conteo-observaciones" class="badge">0</span>
 								</a>
@@ -538,22 +538,22 @@
     		<thead>
     			<tr>
     				<th>Beneficiario</th>
-    				<th></th>
-					<th>Total Femenino</th>
-					<th>Total Masculino</th>
-					<th>Total</th>
+    				<th width="240px"></th>
+					<th width="143px">Total Femenino</th>
+					<th width="143px">Total Masculino</th>
+					<th width="143px">Total</th>
     			</tr>
     		</thead>
     		<tbody>
     			<tr>
     				<td rowspan="2" id="tipo-beneficiario" data-valor="0"></td>
-    				<td>P</td>
+    				<th class="text-right">Programado</th>
     				<td class="cant-benficiarios" id="total-f" data-valor="0">0</td>
     				<td class="cant-benficiarios" id="total-m" data-valor="0">0</td>
     				<td class="cant-benficiarios" id="total-beneficiario" data-valor="0">0</td>
 				</tr>
 				<tr>
-					<td>A</td>
+					<th class="text-right">Acumulado al Trimestre Anterior</th>
     				<td class="cant-benficiarios" id="acumulado-f" data-valor="0">0</td>
     				<td class="cant-benficiarios" id="acumulado-m" data-valor="0">0</td>
     				<td class="cant-benficiarios" id="acumulado-beneficiario" data-valor="0">0</td>

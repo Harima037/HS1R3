@@ -107,6 +107,13 @@ class SeguimientoInstitucionalController extends BaseController {
 		}))->find($id);
 
 		if(count($proyecto->evaluacionMeses) == 0){
+			$datos['evaluacion_capturada'] = false;
+		}else{
+			$datos['evaluacion_capturada'] = true;
+		}
+
+		/*
+		if(count($proyecto->evaluacionMeses) == 0){
 			return Response::view('errors.avance_no_capturado', array(
 				'usuario'=>$datos['usuario'],
 				'sys_activo'=>null,
@@ -114,6 +121,7 @@ class SeguimientoInstitucionalController extends BaseController {
 				'sys_mod_activo'=>null), 403
 			);
 		}
+		*/
 
 		if($proyecto->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones
 			$jurisdicciones = Jurisdiccion::all();
@@ -134,7 +142,7 @@ class SeguimientoInstitucionalController extends BaseController {
 			$datos['trimestre_activo'] = FALSE;
 		}
 		
-		$datos['jurisdicciones'] = array('OC'=>'Oficina Central') + $jurisdicciones->lists('nombre','clave');
+		$datos['jurisdicciones'] = array('OC'=>'OFICINA CENTRAL') + $jurisdicciones->lists('nombre','clave');
 		
 		$datos['id'] = $id;
 		$datos['id_clasificacion'] = $proyecto->idClasificacionProyecto;

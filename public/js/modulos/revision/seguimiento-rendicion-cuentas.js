@@ -699,7 +699,7 @@ function llenar_grid_acciones(response){
         if(componente.comentarios.length){
             item.nivel = '<span class="fa fa-warning"></span> Componente ' + contador_componente;
         }else{
-            item.nivel = 'Componente ' + contador_componente;
+            item.nivel = 'C ' + contador_componente;
         }
         item.indicador = componente.indicador;
         item.meta = (parseFloat(componente.valorNumerador) || 0).format(2);
@@ -725,6 +725,9 @@ function llenar_grid_acciones(response){
             }
         }
 
+        item.avances_acumulados = item.avances_acumulados.format(2);
+        item.avances_mes = item.avances_mes.format(2);
+
         if(componente.observaciones.length){
             item.justificacion += ' <span class="fa fa-comment"></span>';
         }
@@ -739,7 +742,7 @@ function llenar_grid_acciones(response){
             if(actividad.comentarios.length){
                 item.nivel = '<span class="fa fa-warning"></span> Actividad ' + contador_componente + '.' + contador_actividad;
             }else{
-                item.nivel = 'Actividad ' + contador_componente + '.' + contador_actividad;
+                item.nivel = 'A ' + contador_componente + '.' + contador_actividad;
             }
             item.indicador = actividad.indicador;
             item.meta = (parseFloat(actividad.valorNumerador) || 0).format(2);
@@ -760,6 +763,9 @@ function llenar_grid_acciones(response){
                     }
                 }
             }
+
+            item.avances_acumulados = item.avances_acumulados.format(2);
+            item.avances_mes = item.avances_mes.format(2);
 
             if(actividad.observaciones.length){
                 item.justificacion += ' <span class="fa fa-comment"></span>';
@@ -797,6 +803,7 @@ function seguimiento_beneficiarios(e){
             $('#tipo-beneficiario').text(beneficiario.descripcion);
             $('#id-beneficiario').val(beneficiario.id);
             var suma = 0;
+            var total_acumulado = {'f':0,'m':0};
             for(var i in response.data.beneficiario){
                 var beneficiario = response.data.beneficiario[i];
                 $('#total-'+beneficiario.sexo).text(beneficiario.total.format());
@@ -832,6 +839,8 @@ function seguimiento_beneficiarios(e){
 
                     $('#rural'+avance.sexo).val(avance.rural);
                     $('#urbana'+avance.sexo).val(avance.urbana);
+
+                    total_acumulado[avance.sexo] = avance.rural + avance.urbana;
                 }
             }
 
@@ -847,10 +856,19 @@ function seguimiento_beneficiarios(e){
                 $('#acumulado-'+response.data.acumulado[i].sexo).text(parseInt(response.data.acumulado[i].total).format());
                 $('#acumulado-'+response.data.acumulado[i].sexo).attr('data-valor',response.data.acumulado[i].total);
                 suma_acumulados += parseInt(response.data.acumulado[i].total);
+
+                total_acumulado[response.data.acumulado[i].sexo] += parseInt(response.data.acumulado[i].total);
+                
+                $('#total-acumulado-'+response.data.acumulado[i].sexo).text(total_acumulado[response.data.acumulado[i].sexo].format());
+                $('#total-acumulado-'+response.data.acumulado[i].sexo).attr('data-valor',total_acumulado[response.data.acumulado[i].sexo]);
             }
+            var suma_total_acumulados = total_acumulado['f'] + total_acumulado['m'];
 
             $('#acumulado-beneficiario').text(suma_acumulados.format());
             $('#acumulado-beneficiario').attr('data-valor',suma_acumulados);
+
+            $('#total-acumulado-beneficiario').text(suma_total_acumulados.format());
+            $('#total-acumulado-beneficiario').attr('data-valor',suma_total_acumulados);
 
             $('#total-beneficiario').text(suma.format());
             $('#total-beneficiario').attr('data-valor',suma);
