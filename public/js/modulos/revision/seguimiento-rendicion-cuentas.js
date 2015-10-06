@@ -858,10 +858,10 @@ function seguimiento_beneficiarios(e){
                 suma_acumulados += parseInt(response.data.acumulado[i].total);
 
                 total_acumulado[response.data.acumulado[i].sexo] += parseInt(response.data.acumulado[i].total);
-                
-                $('#total-acumulado-'+response.data.acumulado[i].sexo).text(total_acumulado[response.data.acumulado[i].sexo].format());
-                $('#total-acumulado-'+response.data.acumulado[i].sexo).attr('data-valor',total_acumulado[response.data.acumulado[i].sexo]);
             }
+            $('#total-acumulado-f').text(total_acumulado['f'].format());
+            $('#total-acumulado-m').text(total_acumulado['m'].format());
+
             var suma_total_acumulados = total_acumulado['f'] + total_acumulado['m'];
 
             $('#acumulado-beneficiario').text(suma_acumulados.format());
