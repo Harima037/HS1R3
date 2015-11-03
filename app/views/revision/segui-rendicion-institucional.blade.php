@@ -431,6 +431,7 @@
 										<div class="form-group">
 											<label class="input-label" for="lbl-analisis-resultados">Análisis de Resultados Acumulados</label>
 											<p class="form-control" name="lbl-analisis-resultados" id="lbl-analisis-resultados" style="height:auto;"></p>
+											<span class="text-muted pull-right"><span id="analisis-resultados-contador">0</span>/500</span>
                                             <button type="button" class="btn btn-default" onclick="escribirComentario('analisis-resultados','Análisis de Resultados Acumulado','lbl-analisis-resultados','nivel','nivel');"><span class="fa fa-edit"></span> Comentar Análisis de Resultados Acumulado</button>
 										</div>
 									</div>
@@ -438,6 +439,7 @@
 										<div class="form-group">
 											<label class="input-label" for="lbl-justificacion-acumulada">Justificación Acumulada</label>
 											<p class="form-control" name="lbl-justificacion-acumulada" id="lbl-justificacion-acumulada" style="height:auto;"></p>
+											<span class="text-muted pull-right"><span id="justificacion-acumulada-contador">0</span>/500</span>
                                             <button type="button" class="btn btn-default" onclick="escribirComentario('justificacion-acumulada','Justificación Acumulada','lbl-justificacion-acumulada','nivel','nivel');"><span class="fa fa-edit"></span> Comentar Justificación Acumulada</button>
 										</div>
 									</div>

@@ -409,12 +409,14 @@
 										<div class="form-group">
 											<label class="control-label" for="analisis-resultados">Análisis de Resultados Acumulados</label>
 											<textarea rows="6" class="form-control" name="analisis-resultados" id="analisis-resultados"></textarea>
+											<span class="text-muted pull-right"><span id="analisis-resultados-contador">0</span>/500</span>
 										</div>
 									</div>
 									<div class="col-sm-12">
 										<div class="form-group">
 											<label class="control-label" for="justificacion-acumulada">Justificación Acumulada</label>
 											<textarea rows="6" class="form-control" name="justificacion-acumulada" id="justificacion-acumulada" disabled></textarea>
+											<span class="text-muted pull-right"><span id="justificacion-acumulada-contador">0</span>/500</span>
 										</div>
 									</div>
 								</div>

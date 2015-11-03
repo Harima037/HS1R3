@@ -1152,7 +1152,11 @@ class SeguimientoController extends BaseController {
 			if(trim($parametros['justificacion-acumulada']) == ''){
 				$faltan_campos[] = json_encode(array('field'=>'justificacion-acumulada','error'=>'Este campo es requerido.'));
 			}else{
-				$registro_avance->justificacionAcumulada = $parametros['justificacion-acumulada'];
+				if(strlen($parametros['justificacion-acumulada']) > 500){
+					$faltan_campos[] = json_encode(array('field'=>'justificacion-acumulada','error'=>'Solo se pueden capturar un máximo de 500 caracteres.'));
+				}else{
+					$registro_avance->justificacionAcumulada = $parametros['justificacion-acumulada'];
+				}
 			}
 			if($mes_actual != 12){
 				$registro_avance->planMejora = 1;
@@ -1169,7 +1173,11 @@ class SeguimientoController extends BaseController {
 		if(trim($parametros['analisis-resultados']) == ''){
 			$faltan_campos[] = json_encode(array('field'=>'analisis-resultados','error'=>'Este campo es requerido.'));
 		}else{
-			$registro_avance->analisisResultados = $parametros['analisis-resultados'];
+			if(strlen($parametros['analisis-resultados']) > 500){
+				$faltan_campos[] = json_encode(array('field'=>'analisis-resultados','error'=>'Solo se pueden capturar un máximo de 500 caracteres.'));
+			}else{
+				$registro_avance->analisisResultados = $parametros['analisis-resultados'];
+			}
 		}
 
 		$plan_mejora = NULL;

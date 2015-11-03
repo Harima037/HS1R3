@@ -148,7 +148,9 @@ function seguimiento_metas(e){
             if(response.data.registro_avance.length){
                 $('#id-avance').val(response.data.registro_avance[0].id);
                 $('#lbl-analisis-resultados').html(response.data.registro_avance[0].analisisResultados);
+                $('#analisis-resultados-contador').text(response.data.registro_avance[0].analisisResultados.length);
                 $('#lbl-justificacion-acumulada').html(response.data.registro_avance[0].justificacionAcumulada);
+                $('#justificacion-acumulada-contador').text(response.data.registro_avance[0].justificacionAcumulada.length);
             }
 			
 			$('#lbl-accion-mejora').html('&nbsp; ');

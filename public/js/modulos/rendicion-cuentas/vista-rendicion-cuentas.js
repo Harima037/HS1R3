@@ -231,7 +231,11 @@ function seguimiento_metas(e){
             if(response.data.registro_avance.length){
                 $('#id-avance').val(response.data.registro_avance[0].id);
                 $('#analisis-resultados').val(response.data.registro_avance[0].analisisResultados);
+                $('#analisis-resultados-contador').text(response.data.registro_avance[0].analisisResultados.length);
+                checar_longitud_maxima('#analisis-resultados-contador',response.data.registro_avance[0].analisisResultados.length,500);
                 $('#justificacion-acumulada').val(response.data.registro_avance[0].justificacionAcumulada);
+                $('#justificacion-acumulada-contador').text(response.data.registro_avance[0].justificacionAcumulada.length);
+                checar_longitud_maxima('#justificacion-acumulada-contador',response.data.registro_avance[0].justificacionAcumulada.length,500);
             }
 
             if(response.data.plan_mejora.length){
@@ -300,6 +304,24 @@ function seguimiento_metas(e){
             $('#modalEditarAvance').modal('show');
         }
     });    
+}
+
+$('#analisis-resultados').on('keyup',function(){
+    $('#analisis-resultados-contador').text($('#analisis-resultados').val().length);
+    checar_longitud_maxima('#analisis-resultados-contador',$('#analisis-resultados').val().length,500);
+});
+
+$('#justificacion-acumulada').on('keyup',function(){
+    $('#justificacion-acumulada-contador').text($('#justificacion-acumulada').val().length);
+    checar_longitud_maxima('#justificacion-acumulada-contador',$('#justificacion-acumulada').val().length,500);
+});
+
+function checar_longitud_maxima(identificador,valor_asignado,valor_maximo){
+    if(valor_asignado > valor_maximo){
+        $(identificador).addClass('text-danger');
+    }else{
+        $(identificador).removeClass('text-danger');
+    }
 }
 
 function asignar_municipios(datos){
@@ -701,6 +723,11 @@ $('#modalEditarAvance').on('hide.bs.modal',function(e){
     $('.accion-municipio').removeClass('btn-link');
     $('.accion-municipio span').removeClass('caret');
     $('input.avance-mes').attr('disabled',false);
+    $('#analisis-resultados-contador').text('0');
+    $('#justificacion-acumulada-contador').text('0');
+    checar_longitud_maxima('#analisis-resultados-contador',$('#analisis-resultados').val().length,500);
+    checar_longitud_maxima('#justificacion-acumulada-contador',$('#analisis-resultados').val().length,500);
+    
     //$('span.nueva-cantidad').text('');
     //$('span.vieja-cantidad').text('0');
     $('#justificacion-acumulada').attr('disabled',true);

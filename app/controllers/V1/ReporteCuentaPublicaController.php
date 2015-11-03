@@ -218,10 +218,20 @@ class ReporteCuentaPublicaController extends BaseController {
 					$section->addText(htmlspecialchars(trim($elemento->cuentaPublica)),$texto,$justificado);
 				}else{
 					$mes_programado = 0;
-					if($elemento->componentesMetasMes[0]->mes < $elemento->actividadesMetasMes[0]->mes){
-						$mes_programado = $elemento->componentesMetasMes[0]->mes;
+					if(isset($elemento->componentesMetasMes[0])){
+						$mes_componente = $elemento->componentesMetasMes[0]->mes;
 					}else{
-						$mes_programado = $elemento->actividadesMetasMes[0]->mes;
+						$mes_componente = 99;
+					}
+					if(isset($elemento->actividadesMetasMes[0])){
+						$mes_actividad = $elemento->actividadesMetasMes[0]->mes;
+					}else{
+						$mes_actividad = 99;
+					}
+					if($mes_componente < $mes_actividad){
+						$mes_programado = $mes_componente;
+					}else{
+						$mes_programado = $mes_actividad;
 					}
 					$trimestre_programado = Util::obtenerTrimestre($mes_programado);
 					$section->addText(htmlspecialchars('Las acciones de este proyecto se encuentran programadas al '.$trimestre_programado.' trimestre.'),$texto,$justificado);
