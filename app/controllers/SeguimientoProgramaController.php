@@ -7,7 +7,7 @@ class SeguimientoProgramaController extends BaseController {
 		$datos = array();
 		$datos['mes_avance'] = Util::obtenerMesActual();
 		$datos['trimestre_avance'] = Util::obtenerTrimestre();
-
+		
 		$mes_del_trimestre = Util::obtenerMesTrimestre();
 		if($mes_del_trimestre == 3){
 			$datos['trimestre_activo'] = TRUE;

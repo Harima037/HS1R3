@@ -5,7 +5,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
-use Programa, ProgramaIndicador, RegistroAvancePrograma, EvaluacionProgramaTrimestre, RegistroAvanceComentario; 
+use Programa, ProgramaIndicador, RegistroAvancePrograma, EvaluacionProgramaTrimestre, RegistroAvanceComentario, Directorio; 
 
 class SeguimientoProgramaController extends BaseController {
 	private $reglasAvance = array(
@@ -18,6 +18,11 @@ class SeguimientoProgramaController extends BaseController {
 			'idcampo' => 'required',
 			'comentario' => 'required'
 		);
+
+	private $reglasDatosInformacion = array(
+		'fuente-informacion'		=> 'required',
+		'responsable-informacion'	=> 'required'
+	);
 
 	/**
 	 * Display a listing of the resource.
@@ -140,6 +145,7 @@ class SeguimientoProgramaController extends BaseController {
 					->join('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','programa.claveUnidadResponsable')
 					->select('programa.*','programaPresupuestario.descripcion AS programaPresupuestario','unidadResponsable.descripcion AS unidadResponsable')
 					->find($id);
+				$recurso['responsables'] = Directorio::responsablesActivos($recurso->claveUnidadResponsable)->get();
 			}elseif($parametros['mostrar'] == 'datos-metas-avance'){
 				$trimestre_actual = Util::obtenerTrimestre();
 				$recurso = ProgramaIndicador::with(array('registroAvance'=>function($query) use ($trimestre_actual){
@@ -273,7 +279,25 @@ class SeguimientoProgramaController extends BaseController {
 					}
 				}
 			}
-			
+			else if($parametros['actualizarprograma'] == 'datos-informacion')
+			{
+				$validado = Validador::validar($parametros,$this->reglasDatosInformacion);
+				if($validado === TRUE){
+					$recurso = Programa::find($id);
+
+					$recurso->fuenteInformacion = $parametros['fuente-informacion'];
+					$recurso->idResponsable = $parametros['responsable-informacion'];
+					if($recurso->save()){
+						$respuesta['http_status'] = 200;
+						$respuesta['data'] = array('data'=>$recurso);
+					}else{
+						$respuesta['http_status'] = 500;
+						$respuesta['data'] = array('data'=>'Ocurrio un error al intentar guardar los datos.','code'=>'S01');
+					}
+				}else{
+					$respuesta = $validado;
+				}
+			}
 		}
 		else
 		{

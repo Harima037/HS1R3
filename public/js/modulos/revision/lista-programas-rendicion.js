@@ -95,6 +95,19 @@ function cargar_datos_programa(e){
             $('#unidad-responsable').text(response.data.claveUnidadResponsable + ' ' + response.data.unidadResponsable);
             var datos_programa = {};
 			
+            $('#fuente-informacion').val(response.data.fuenteInformacion);
+
+            if(response.data.responsables.length){
+                var opciones_responsables = '<option value="">Seleccione un responsable</option>';
+                for(var i in response.data.responsables){
+                    var responsable = response.data.responsables[i];
+                    opciones_responsables += '<option value="'+responsable.id+'" data-cargo="'+responsable.cargo+'">'+responsable.nombre+'</option>';
+                }
+                $('#responsable-informacion').html(opciones_responsables);
+                $('#descripcion-cargo-responsable').text('');
+            }
+            $('#responsable-informacion').val(response.data.idResponsable).change();
+
 			//console.log(trimactual);
 			$('#btn-firmar').hide();			
 			for(var j in response.data.evaluacion_trimestre)
@@ -171,6 +184,50 @@ function cargar_datos_programa(e){
     });
 }
 
+$('#responsable-informacion').on('change',function(){
+    if($('#responsable-informacion').val() != ''){
+        var cargo_seleccionado = $('#responsable-informacion option:selected').attr('data-cargo');
+    }else{
+        var cargo_seleccionado = '';
+    }
+    $('#descripcion-cargo-responsable').text(cargo_seleccionado);
+});
+
+$('#btn-guardar-informacion').on('click',function(){
+    Validation.cleanFormErrors('#form_fuente_informacion');
+    if(($('#fuente-informacion').val().trim() == '') || (!$('#responsable-informacion').val())){
+        if($('#fuente-informacion').val().trim() == ''){
+            Validation.printFieldsErrors('fuente-informacion','Este campo es requerido');
+        }
+        if(!$('#responsable-informacion').val()){
+            Validation.printFieldsErrors('responsable-informacion','Este campo es requerido');
+        }
+        return false;
+    }
+    //
+    var parametros = $('#form_fuente_informacion').serialize();
+    parametros += '&actualizarprograma=datos-informacion';
+    moduloResource.put($('#btn-editar-avance').attr('data-id-programa'),parametros,{
+        _success: function(response){
+            MessageManager.show({data:'La información fue almacenada con éxito.',type:'OK',timer:3});
+            moduloDatagrid.actualizar();
+        },
+        _error: function(response){
+            try{
+                var json = $.parseJSON(response.responseText);
+                if(!json.code)
+                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                else{
+                    //json.container = modal_actividad + ' .modal-body';
+                    MessageManager.show(json);
+                }
+                Validation.formValidate(json.data);
+            }catch(e){
+                console.log(e);
+            }
+        }
+    });
+});
 
 $('#btn-firmar').on('click',function(){
 	var parametros = 'actualizarprograma=firmar';	
@@ -200,13 +257,6 @@ $('#btn-firmar').on('click',function(){
 				}
 	});
 });
-
-
-
-
-
-
-
 
 //rend-cuenta-inst-editar
 $('#btn-editar-avance').on('click',function(){

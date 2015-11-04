@@ -109,6 +109,11 @@
                                 </a>
                             </li>
                             @endfor
+                            <li role="presentation" class="pull-right">
+                                <a href="#panel-informacion" aria-controls="panel-informacion" role="tab" data-toggle="tab">
+                                    <span class="fa fa-info-circle"></span> Información
+                                </a>
+                            </li>
                         </ul>
                         <div class="tab-content">
                             <br>
@@ -135,6 +140,37 @@
                                 </table>
                             </div>
                             @endfor
+                            <div role="tabpanel" class="tab-pane" id="panel-informacion">
+                                <br>
+                                <form id="form_fuente_informacion">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label" for="fuente-informacion">
+                                                    Fuente de la Información
+                                                </label>
+                                                <input type="text" class="form-control" id="fuente-informacion" name="fuente-informacion" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="control-label" for="responsable-informacion">
+                                                    Responsable de la Información
+                                                </label>
+                                                <select class="form-control" id="responsable-informacion" name="responsable-informacion">
+                                                    <option value="">Seleccione un responsable</option>
+                                                </select>
+                                                <small><span class="text-muted" id="descripcion-cargo-responsable"></span></small>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <button type="button" class="btn btn-success" id="btn-guardar-informacion">
+                                                <span class="fa fa-save"></span> Guardar Información
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
