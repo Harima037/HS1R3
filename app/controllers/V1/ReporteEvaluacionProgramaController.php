@@ -44,8 +44,8 @@ class ReporteEvaluacionProgramaController extends BaseController {
 		}))->select('programa.*','programaPresupuestal.descripcion as programaPresupuestario','titular.nombre as liderPrograma',
 					'titular.cargo as cargoLiderPrograma','responsable.nombre as responsableInformacion',
 					'responsable.cargo as cargoResponsableInformacion')
-		->join('catalogoProgramasPresupuestales AS programaPresupuestal','programaPresupuestal.clave','=','programa.claveProgramaPresupuestario')
-		->join('vistaDirectorio as titular','titular.id','=','programa.idLiderPrograma')
+		->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestal','programaPresupuestal.clave','=','programa.claveProgramaPresupuestario')
+		->leftjoin('vistaDirectorio as titular','titular.id','=','programa.idLiderPrograma')
 		->leftjoin('vistaDirectorio as responsable','responsable.id','=','programa.idResponsable')
 		->find($id);
 
