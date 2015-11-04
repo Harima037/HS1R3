@@ -233,7 +233,16 @@ class ReporteCuentaPublicaController extends BaseController {
 					}else{
 						$mes_programado = $mes_actividad;
 					}
+
 					$trimestre_programado = Util::obtenerTrimestre($mes_programado);
+
+					if($trimestre_programado == 1 || $trimestre_programado == 3){
+						$trimestre_programado = $trimestre_programado.'er';
+					}elseif($trimestre_programado == 2){
+						$trimestre_programado = '2do';
+					}elseif($trimestre_programado == 4){
+						$trimestre_programado = '4to';
+					}
 					$section->addText(htmlspecialchars('Las acciones de este proyecto se encuentran programadas al '.$trimestre_programado.' trimestre.'),$texto,$justificado);
 				}
 			}
