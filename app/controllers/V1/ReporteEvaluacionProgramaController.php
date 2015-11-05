@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, View;
-use Excel, Programa, ProgramaIndicador, RegistroAvancePrograma, EvaluacionProgramaTrimestre; 
+use Excel,PDF, Programa, ProgramaIndicador, RegistroAvancePrograma, EvaluacionProgramaTrimestre; 
 
 class ReporteEvaluacionProgramaController extends BaseController {
 
@@ -49,98 +49,79 @@ class ReporteEvaluacionProgramaController extends BaseController {
 		->leftjoin('vistaDirectorio as responsable','responsable.id','=','programa.idResponsable')
 		->find($id);
 
-		Excel::create($nombreArchivo, function($excel) use ($recurso, $trimestre_actual){
 
-			$datos['trimestre'] = $trimestre_actual;
+		$datos['trimestre'] = $trimestre_actual;
+		$datos['programa'] = array(
+			'ejercicio' => $recurso->ejercicio,
+			'nombre' => $recurso->programaPresupuestario,
+			'fuenteInformacion' => $recurso->fuenteInformacion,
+			'liderPrograma' => $recurso->liderPrograma,
+			'cargoLiderPrograma' => $recurso->cargoLiderPrograma,
+			'responsableInformacion' => $recurso->responsableInformacion,
+			'cargoResponsableInformacion' => $recurso->cargoResponsableInformacion
+		);
 
-			$datos['programa'] = array(
-				'ejercicio' => $recurso->ejercicio,
-				'nombre' => $recurso->programaPresupuestario,
-				'fuenteInformacion' => $recurso->fuenteInformacion,
-				'liderPrograma' => $recurso->liderPrograma,
-				'cargoLiderPrograma' => $recurso->cargoLiderPrograma,
-				'responsableInformacion' => $recurso->responsableInformacion,
-				'cargoResponsableInformacion' => $recurso->cargoResponsableInformacion
+		$datos['indicadores'] = array();
+
+		foreach ($recurso->indicadores as $indicador) {
+			$metas = array(
+				1 => $indicador->trim1,
+				2 => $indicador->trim2,
+				3 => $indicador->trim3,
+				4 => $indicador->trim4
 			);
 
-			$datos['indicadores'] = array();
+			$datos_indicador = array(
+				'nivel' => '',
+				'indicador' => $indicador->descripcionIndicador,
+				'meta_original' => 0,
+				'avance_trimestre' => 0,
+				'avance_acumulado' => 0,
+				'analisis_resultados' => '',
+				'justificacion_acumulada' => ''
+			);
 
-			foreach ($recurso->indicadores as $indicador) {
-				$metas = array(
-					1 => $indicador->trim1,
-					2 => $indicador->trim2,
-					3 => $indicador->trim3,
-					4 => $indicador->trim4
-				);
-
-				$datos_indicador = array(
-					'nivel' => '',
-					'indicador' => $indicador->descripcionIndicador,
-					'meta_original' => 0,
-					'avance_trimestre' => 0,
-					'avance_acumulado' => 0,
-					'analisis_resultados' => '',
-					'justificacion_acumulada' => ''
-				);
-
-				if($indicador->claveTipoIndicador == 'F'){
-					$datos_indicador['nivel'] = 'Fin';
-				}else{
-					$datos_indicador['nivel'] = 'Proposito';
-				}
-
-				foreach ($indicador->registroAvance as $registro_avance) {
-					if($registro_avance->trimestre == $trimestre_actual){
-						$datos_indicador['avance_trimestre'] = $registro_avance->avance;
-						$datos_indicador['analisis_resultados'] = $registro_avance->analisisResultados;
-						$datos_indicador['justificacion_acumulada'] = $registro_avance->justificacionAcumulada;
-					}
-					$datos_indicador['avance_acumulado'] += $registro_avance->avance;
-				}
-
-				for ($i=1; $i <= $trimestre_actual ; $i++) { 
-					$datos_indicador['meta_original'] += $metas[$i];
-				}
-
-				$datos['indicadores'][] = $datos_indicador;
+			if($indicador->claveTipoIndicador == 'F'){
+				$datos_indicador['nivel'] = 'Fin';
+			}else{
+				$datos_indicador['nivel'] = 'Proposito';
 			}
 
-			switch ($trimestre_actual) {
-				case 1:
-					$datos['trimestre_lbl'] = 'Primero';
-					break;
-				case 2:
-					$datos['trimestre_lbl'] = 'Segundo';
-					break;
-				case 3:
-					$datos['trimestre_lbl'] = 'Tercero';
-					break;
-				case 4:
-					$datos['trimestre_lbl'] = 'Cuarto';
-					break;
+			foreach ($indicador->registroAvance as $registro_avance) {
+				if($registro_avance->trimestre == $trimestre_actual){
+					$datos_indicador['avance_trimestre'] = $registro_avance->avance;
+					$datos_indicador['analisis_resultados'] = $registro_avance->analisisResultados;
+					$datos_indicador['justificacion_acumulada'] = $registro_avance->justificacionAcumulada;
+				}
+				$datos_indicador['avance_acumulado'] += $registro_avance->avance;
 			}
-			
-			$excel->sheet('PP', function($sheet)  use ($datos){
-		        $sheet->loadView('rendicion-cuentas.excel.programa-metas-trimestre', $datos);
-		        $imagen = $this->obtenerImagen('LogoFederal.png','A1');
-				$imagen->setWorksheet($sheet);
-		        $imagen = $this->obtenerImagen('LogoInstitucional.png','H1');
-				$imagen->setWorksheet($sheet);
-		    });
-		    $excel->getActiveSheet()->getStyle('A7:H7')->getAlignment()->setWrapText(true);
-			$excel->getActiveSheet()->getStyle('A9:H9')->getAlignment()->setWrapText(true);
 
-			$excel->getActiveSheet()->getStyle('A10:H11')->getAlignment()->setWrapText(true);
-		})->download('xls');
-	}
+			for ($i=1; $i <= $trimestre_actual ; $i++) { 
+				$datos_indicador['meta_original'] += $metas[$i];
+			}
 
-	private function obtenerImagen($imagen,$celda,$offset = 10){
-		$objDrawing = new \PHPExcel_Worksheet_Drawing();
-		$objDrawing->setPath('./img/'.$imagen);// filesystem reference for the image file
-		$objDrawing->setHeight(100);// sets the image height to 36px (overriding the actual image height); 
-		$objDrawing->setWidth(200);// sets the image height to 36px (overriding the actual image height); 
-		$objDrawing->setCoordinates($celda);// pins the top-left corner of the image to cell D24
-		$objDrawing->setOffsetX($offset);// pins the top left corner of the image at an offset of 10 points horizontally to the right of the top-left corner of the cell
-		return $objDrawing;
+			$datos['indicadores'][] = $datos_indicador;
+		}
+
+		switch ($trimestre_actual) {
+			case 1:
+				$datos['trimestre_lbl'] = 'Primero';
+				break;
+			case 2:
+				$datos['trimestre_lbl'] = 'Segundo';
+				break;
+			case 3:
+				$datos['trimestre_lbl'] = 'Tercero';
+				break;
+			case 4:
+				$datos['trimestre_lbl'] = 'Cuarto';
+				break;
+		}
+		
+		$pdf = PDF::setPaper('LETTER')
+					->setOrientation('landscape')
+					->setWarnings(false)
+					->loadView('rendicion-cuentas.pdf.programa-metas-trimestre',$datos);
+		return $pdf->stream($nombreArchivo.'.pdf');
 	}
 }
