@@ -49,7 +49,7 @@ class ReporteEP20Controller extends BaseController {
 				//$rows = Proyecto::cedulasAvances($mes,$ejercicio);
 
 				$rows  = CargaDatosEP01::where('cargaDatosEP01.mes','=',$mes)
-										->where('cargaDatosEP01.CP','=',$ejercicio)
+										//->where('cargaDatosEP01.CP','=',$ejercicio)
 										->join('catalogoFuncionesGasto AS funcionesGasto','funcionesGasto.clave','=',DB::raw('concat_ws(".",cargaDatosEP01.FI,cargaDatosEP01.FU,cargaDatosEP01.SF,cargaDatosEP01.SSF)'))
 										->groupBy('cargaDatosEP01.FI')
 										->groupBy('cargaDatosEP01.FU')
@@ -88,7 +88,7 @@ class ReporteEP20Controller extends BaseController {
 			}else{
 
 				$rows  = CargaDatosEP01::where('cargaDatosEP01.mes','=',$mes)
-						->where('cargaDatosEP01.CP','=',$ejercicio)
+						//->where('cargaDatosEP01.CP','=',$ejercicio)
 						->join('catalogoFuncionesGasto AS funcionesGasto','funcionesGasto.clave','=',DB::raw('concat_ws(".",cargaDatosEP01.FI,cargaDatosEP01.FU,cargaDatosEP01.SF,cargaDatosEP01.SSF)'))
 						->groupBy('cargaDatosEP01.FI')
 						->groupBy('cargaDatosEP01.FU')
@@ -112,7 +112,6 @@ class ReporteEP20Controller extends BaseController {
 				$rows = $rows->get();
 				//var_dump($rows);die;
 				//print_r($rows);die;
-
 				//$queries = DB::getQueryLog();
 				//var_dump($queries);die;
 
