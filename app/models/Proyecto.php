@@ -233,8 +233,8 @@ class Proyecto extends BaseModel
 						->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(proyectos.numeroProyectoEstrategico,3,"0"))'))
 						->on('ep01.FF','=','fuente.clave')
 						->on('ep01.DG','LIKE','destinoGasto.destino')
-						->where('ep01.mes','=',$mes)
-						->where('ep01.CP','=',$ejercicio);
+						->where('ep01.mes','=',$mes);
+						//->where('ep01.CP','=',$ejercicio)
 				})->select(
 						'proyectoFinanciamiento.id','proyectoFinanciamiento.idProyecto','proyectoFinanciamiento.idFuenteFinanciamiento',
 						'fuente.clave','fuente.descripcion',DB::raw('sum(ep01.presupuestoAprobado) AS presupuestoAprobado'),
@@ -314,8 +314,8 @@ class Proyecto extends BaseModel
 					->on('ep01.PE','=','proyectos.programaEspecial')
 					->on('ep01.AI','=','proyectos.actividadInstitucional')
 					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'))
-					->where('ep01.mes','=',$mes)
-					->where('ep01.CP','=',$ejercicio);
+					->where('ep01.mes','=',$mes);
+					//->where('ep01.CP','=',$ejercicio)
 			})
 
 			->where('proyectos.idEstatusProyecto','=',5)
@@ -356,8 +356,8 @@ class Proyecto extends BaseModel
 					->on('ep01.PE','=','proyectos.programaEspecial')
 					->on('ep01.AI','=','proyectos.actividadInstitucional')
 					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'))
-					->where('ep01.mes','=',$mes)
-					->where('ep01.CP','=',$ejercicio);
+					->where('ep01.mes','=',$mes);
+					//->where('ep01.CP','=',$ejercicio)
 			})
 			->where('proyectos.idEstatusProyecto','=',5)			
 			->groupBy('proyectos.id');
@@ -398,8 +398,8 @@ class Proyecto extends BaseModel
 					->on('ep01.PE','=','proyectos.programaEspecial')
 					->on('ep01.AI','=','proyectos.actividadInstitucional')
 					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'))
-					->where('ep01.mes','=',$mes)
-					->where('ep01.CP','=',$ejercicio);
+					->where('ep01.mes','=',$mes);
+					//->where('ep01.CP','=',$ejercicio)
 			})
 
 			->where('proyectos.idEstatusProyecto','=',5)
@@ -488,8 +488,8 @@ class Proyecto extends BaseModel
 					->on('ep01.PE','=','proyectos.programaEspecial')
 					->on('ep01.AI','=','proyectos.actividadInstitucional')
 					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'))
-					->where('ep01.mes','=',$mes)
-					->where('ep01.CP','=',$ejercicio);
+					->where('ep01.mes','=',$mes);
+					//->where('ep01.CP','=',$ejercicio)
 			})
 
 			->where('proyectos.idEstatusProyecto','=',5)
