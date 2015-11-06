@@ -149,6 +149,18 @@ function cargar_datos_proyecto(e){
             $('#programa-presupuestario').text(response.data.datos_programa_presupuestario.clave + ' ' + response.data.datos_programa_presupuestario.descripcion);
             $('#funcion').text(response.data.datos_funcion.clave + ' ' + response.data.datos_funcion.descripcion);
             $('#subfuncion').text(response.data.datos_sub_funcion.clave + ' ' + response.data.datos_sub_funcion.descripcion);
+
+            $('#fuente-informacion').val(response.data.fuenteInformacion);
+            if(response.data.responsables){
+                var html_rows = '<option value="">Seleccione un responsable</option>';
+                for(var i in response.data.responsables){
+                    var responsable = response.data.responsables[i];
+                    html_rows += '<option value="'+responsable.id+'" data-cargo="'+responsable.cargo+'">'+responsable.nombre+'</option>';
+                }
+                $('#responsable-informacion').html(html_rows);
+            }
+            $('#responsable-informacion').val(response.data.idResponsable).change();
+
             var html_tbody = '';
             var contador_componente = 0;
             var contador_actividad = 0;
@@ -259,6 +271,51 @@ $('#btn-comentar-avance').on('click',function(){
 
 $('#btn-reporte-seguimiento').on('click',function(){
     window.open(SERVER_HOST+'/v1/reporte-seguimiento?clasificacion-proyecto=2');
+});
+
+$('#responsable-informacion').on('change',function(){
+    if($('#responsable-informacion').val() != ''){
+        var cargo = $('#responsable-informacion option:selected').attr('data-cargo');
+    }else{
+        var cargo = '';
+    }
+    $('#cargo-responsable').text(cargo);
+});
+
+$('#btn-guardar-informacion').on('click',function(){
+    Validation.cleanFormErrors('#form_fuente_informacion');
+    if(($('#fuente-informacion').val().trim() == '') || (!$('#responsable-informacion').val())){
+        if($('#fuente-informacion').val().trim() == ''){
+            Validation.printFieldsErrors('fuente-informacion','Este campo es requerido');
+        }
+        if(!$('#responsable-informacion').val()){
+            Validation.printFieldsErrors('responsable-informacion','Este campo es requerido');
+        }
+        return false;
+    }
+    //
+    var parametros = $('#form_fuente_informacion').serialize();
+    parametros += '&guardar=datos-informacion';
+    moduloResource.put($('#btn-comentar-avance').attr('data-id-proyecto'),parametros,{
+        _success: function(response){
+            MessageManager.show({data:'La información fue almacenada con éxito.',type:'OK',timer:3});
+            moduloDatagrid.actualizar();
+        },
+        _error: function(response){
+            try{
+                var json = $.parseJSON(response.responseText);
+                if(!json.code)
+                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                else{
+                    //json.container = modal_actividad + ' .modal-body';
+                    MessageManager.show(json);
+                }
+                Validation.formValidate(json.data);
+            }catch(e){
+                console.log(e);
+            }
+        }
+    });
 });
 
 $('#btn-firmar').on('click',function(){

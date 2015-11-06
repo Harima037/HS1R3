@@ -162,6 +162,7 @@
                                                 <select class="form-control" id="responsable-informacion" name="responsable-informacion">
                                                     <option value="">Seleccione un responsable</option>
                                                 </select>
+                                                <small><span class="text-muted" id="cargo-responsable"></span></small>
                                             </div>
                                         </div>
                                         <div class="col-sm-12">

@@ -157,11 +157,11 @@ function cargar_datos_proyecto(e){
                 var html_rows = '<option value="">Seleccione un responsable</option>';
                 for(var i in response.data.responsables){
                     var responsable = response.data.responsables[i];
-                    html_rows += '<option value="'+responsable.id+'">'+responsable.nombre+'</option>';
+                    html_rows += '<option value="'+responsable.id+'" data-cargo="'+responsable.cargo+'">'+responsable.nombre+'</option>';
                 }
                 $('#responsable-informacion').html(html_rows);
             }
-            $('#responsable-informacion').val(response.data.idResponsable);
+            $('#responsable-informacion').val(response.data.idResponsable).change();
             
             var html_tbody = '';
             var contador_componente = 0;
@@ -278,6 +278,15 @@ $('#btn-comentar-avance').on('click',function(){
 
 $('#btn-reporte-seguimiento').on('click',function(){
     window.open(SERVER_HOST+'/v1/reporte-seguimiento?clasificacion-proyecto=1');
+});
+
+$('#responsable-informacion').on('change',function(){
+    if($('#responsable-informacion').val() != ''){
+        var cargo = $('#responsable-informacion option:selected').attr('data-cargo');
+    }else{
+        var cargo = '';
+    }
+    $('#cargo-responsable').text(cargo);
 });
 
 $('#btn-guardar-informacion').on('click',function(){
