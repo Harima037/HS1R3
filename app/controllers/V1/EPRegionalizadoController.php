@@ -132,7 +132,7 @@ class EPRegionalizadoController extends \BaseController {
 								$lineasConErrorEnCampos = $lineasConErrorEnCampos . $row . ", ";
 								$errorNumeroCampos = 1;
 							}
-							if($data2[16] != $ejercicio){
+							if(intval($data2[16]) > intval($ejercicio)){
 								$lineasConErrorEjercicio = $lineasConErrorEjercicio . $row . ", ";
 								$errorNumeroCampos = 1;
 							}
