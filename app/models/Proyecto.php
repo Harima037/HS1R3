@@ -632,16 +632,17 @@ class Proyecto extends BaseModel
 			->orderBy('proyectos.subFuncion','asc')
 			->orderBy('proyectos.subSubFuncion','asc')
 
+			->orderBy('proyectos.idClasificacionProyecto','asc')
+
 			->orderBy('politicaPublica.clave','asc')
 			->orderBy('proyectos.programaPresupuestario','asc')
-
+			
 			->orderBy('proyectos.unidadResponsable','asc')
 			->orderBy('proyectos.programaSectorial','asc')
 			->orderBy('proyectos.programaEspecial','asc')
 			->orderBy('proyectos.actividadInstitucional','asc')
 			->orderBy('proyectos.proyectoEstrategico','asc')
-			->orderBy('proyectos.numeroProyectoEstrategico','asc')
-			->orderBy('proyectos.idClasificacionProyecto','asc');
+			->orderBy('proyectos.numeroProyectoEstrategico','asc');
     }
 
 	public function scopeContenidoCompleto($query){

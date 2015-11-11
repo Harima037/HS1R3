@@ -154,6 +154,7 @@
                 </form>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-link pull-left" id="btn-descargar-reporte">Descargar Reporte de Proyectos</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary" id="btn-subir-archivo">
                     <span class="fa fa-save"></span> Guardar

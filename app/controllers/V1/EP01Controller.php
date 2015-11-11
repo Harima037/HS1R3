@@ -4,7 +4,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry,Exception;
-use Hash, File, BitacoraCargaEP01, CargaDatosEP01;
+use Hash, File, BitacoraCargaEP01, CargaDatosEP01, Excel;
 
 class EP01Controller extends \BaseController {
 	private $reglas = array(
@@ -83,17 +83,77 @@ class EP01Controller extends \BaseController {
 		//
 		$http_status = 200;
 		$data = array();
-
-		$recurso = BitacoraCargaEP01::find($id);
-
-		if(is_null($recurso)){
-			$http_status = 404;
-			$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+		$parametros = Input::all();
+		
+		if(isset($parametros['listaproyectos'])){
+			$datos['datos'] = CargaDatosEP01::where('idBitacoraCargaEP01',$id)
+						->groupBy(DB::raw('concat(cargaDatosEP01.UR,cargaDatosEP01.FI,cargaDatosEP01.FU,cargaDatosEP01.SF,cargaDatosEP01.SSF,cargaDatosEP01.PS,cargaDatosEP01.PP,cargaDatosEP01.PE,cargaDatosEP01.AI,cargaDatosEP01.PT)'))
+						->select(DB::raw('concat(cargaDatosEP01.UR,cargaDatosEP01.FI,cargaDatosEP01.FU,cargaDatosEP01.SF,cargaDatosEP01.SSF,cargaDatosEP01.PS,cargaDatosEP01.PP,cargaDatosEP01.PE,cargaDatosEP01.AI,cargaDatosEP01.PT) AS clavePresupuestaria'),
+							'proyectos.nombreTecnico',
+							DB::raw('SUM(presupuestoAprobado) AS presupuestoAprobado'),
+							DB::raw('SUM(modificacionNeta) AS modificacionNeta'),
+							DB::raw('SUM(presupuestoModificado) AS presupuestoModificado'),
+							DB::raw('SUM(presupuestoLiberado) AS presupuestoLiberado'),
+							DB::raw('SUM(presupuestoPorLiberar) AS presupuestoPorLiberar'),
+							DB::raw('SUM(presupuestoMinistrado) AS presupuestoMinistrado'),
+							DB::raw('SUM(presupuestoComprometidoModificado) AS presupuestoComprometidoModificado'),
+							DB::raw('SUM(presupuestoDevengadoModificado) AS presupuestoDevengadoModificado'),
+							DB::raw('SUM(presupuestoEjercidoModificado) AS presupuestoEjercidoModificado'),
+							DB::raw('SUM(presupuestoPagadoModificado) AS presupuestoPagadoModificado'),
+							DB::raw('SUM(disponibilidadFinancieraModificada) AS disponibilidadFinancieraModificada'),
+							DB::raw('SUM(disponiblePresupuestarioModificado) AS disponiblePresupuestarioModificado')
+						)
+						->leftjoin('proyectos',function($join){
+							$join->on(
+								DB::raw("
+									concat(
+										proyectos.unidadResponsable,
+										proyectos.finalidad,
+										proyectos.funcion,
+										proyectos.subFuncion,
+										proyectos.subSubFuncion,
+										proyectos.programaSectorial,
+										proyectos.programaPresupuestario,
+										proyectos.programaEspecial,
+										proyectos.actividadInstitucional,
+							            concat(proyectos.proyectoEstrategico,LPAD(proyectos.numeroProyectoEstrategico,3,'0'))
+						        	)
+								"),
+								"=",
+								DB::raw("
+									concat(
+										cargaDatosEP01.UR,
+										cargaDatosEP01.FI,
+										cargaDatosEP01.FU,
+										cargaDatosEP01.SF,
+										cargaDatosEP01.SSF,
+										cargaDatosEP01.PS,
+										cargaDatosEP01.PP,
+										cargaDatosEP01.PE,
+										cargaDatosEP01.AI,
+										cargaDatosEP01.PT
+									)
+								")
+							)->whereNull('proyectos.borradoAl');
+						})
+						->get();
+			Excel::create('ListaProyectos', function($excel) use ($datos){
+				$excel->sheet('Proyectos', function($sheet)  use ($datos){
+			        $sheet->loadView('cargar.excel.reporte-proyectos', $datos);
+			    });
+			    $excel->getActiveSheet()->getStyle('A2:I'.(count($datos['datos'])+1))->getAlignment()->setWrapText(true);
+			})->download('xls');
 		}else{
-			$data = array("data"=>$recurso->toArray());
-		}
+			$recurso = BitacoraCargaEP01::find($id);
+			if(is_null($recurso)){
+				$http_status = 404;
+				$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+			}else{
+				$data = array("data"=>$recurso->toArray());
+			}
 
-		return Response::json($data,$http_status);
+			return Response::json($data,$http_status);
+		}
 	}
 
 	/**

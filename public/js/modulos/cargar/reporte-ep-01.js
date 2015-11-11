@@ -96,6 +96,10 @@ $('#btn-subir-archivo').on('click',function(){
     }
 });
 
+$('#btn-descargar-reporte').on('click',function(){
+    window.open(SERVER_HOST+'/v1/reporte-ep-01/'+$('#id').val()+'?listaproyectos=1');
+});
+
 function editar(e){
     moduloResource.get(e,null,{
         _success: function(response){
