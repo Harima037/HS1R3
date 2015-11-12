@@ -152,6 +152,54 @@ class Proyecto extends BaseModel
 			->orderBy('proyectos.id','desc');
 	}
 
+	public function scopeFuentesFinanciamientoEP01($query,$mes,$ejercicio){
+    	$query->select('proyectos.id AS idProyecto', DB::raw('UPPER(proyectos.nombreTecnico) As nombreTecnico'),
+    			'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
+				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
+				'proyectos.programaPresupuestario','proyectos.programaEspecial',
+				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
+				'proyectos.numeroProyectoEstrategico','fuente.clave','fuente.descripcion',
+				DB::raw('sum(ep01.presupuestoAprobado) AS presupuestoAprobado'),
+				DB::raw('sum(ep01.presupuestoModificado) AS presupuestoModificado'),
+				DB::raw('sum(ep01.presupuestoDevengadoModificado) AS presupuestoDevengado'))
+    		->leftjoin('cargaDatosEP01 AS ep01',function($join) use ($mes,$ejercicio){
+				$join->on('ep01.UR','=','proyectos.unidadResponsable')
+					->on('ep01.FI','=','proyectos.finalidad')
+					->on('ep01.FU','=','proyectos.funcion')
+					->on('ep01.SF','=','proyectos.subFuncion')
+					->on('ep01.SSF','=','proyectos.subSubFuncion')
+					->on('ep01.PS','=','proyectos.programaSectorial')
+					->on('ep01.PP','=','proyectos.programaPresupuestario')
+					->on('ep01.PE','=','proyectos.programaEspecial')
+					->on('ep01.AI','=','proyectos.actividadInstitucional')
+					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(proyectos.numeroProyectoEstrategico,3,"0"))'))
+					->where('ep01.mes','=',$mes);
+					//->on('ep01.FF','=','fuente.clave')
+					//->on('ep01.DG','LIKE','destinoGasto.destino')
+					//->where('ep01.CP','=',$ejercicio)
+			})
+			->leftjoin('catalogoFuenteFinanciamiento AS fuente',function($join){
+				$join->on('fuente.clave','=','ep01.FF')->whereNull('fuente.borradoAl');
+			})
+			->where('proyectos.idEstatusProyecto','=',5)
+			
+			->groupBy('proyectos.id')
+			->groupBy('ep01.FF')
+
+			->orderBy('proyectos.unidadResponsable','asc')
+			->orderBy('proyectos.finalidad','asc')
+			->orderBy('proyectos.funcion','asc')
+			->orderBy('proyectos.subFuncion','asc')
+			->orderBy('proyectos.subSubFuncion','asc')
+			->orderBy('proyectos.programaSectorial','asc')
+			->orderBy('proyectos.programaPresupuestario','asc')
+			->orderBy('proyectos.programaEspecial','asc')
+			->orderBy('proyectos.actividadInstitucional','asc')
+			->orderBy('proyectos.proyectoEstrategico','asc')
+			->orderBy('proyectos.numeroProyectoEstrategico','asc')
+			->orderBy('proyectos.idClasificacionProyecto','asc');
+    }
+
 	public function scopeReporteIndicadoresResultados($query,$mes,$ejercicio){
 		$query->select(
 				'proyectos.id', DB::raw('UPPER(proyectos.nombreTecnico) As nombreTecnico'), 'proyectos.idClasificacionProyecto',
@@ -211,7 +259,8 @@ class Proyecto extends BaseModel
 							->whereNull('avanceMetas.borradoAl');
 					})
 					->groupBy('componenteActividades.id','metasMes.idActividad');
-			},'fuentesFinanciamiento'=>function($fuenteFinan) use ($mes,$ejercicio){
+			}
+			/*,'fuentesFinanciamiento'=>function($fuenteFinan) use ($mes,$ejercicio){
 				$fuenteFinan->join('catalogoFuenteFinanciamiento AS fuente',function($join){
 					$join->on('fuente.id','=','proyectoFinanciamiento.idFuenteFinanciamiento')
 						->whereNull('fuente.borradoAl');
@@ -242,7 +291,8 @@ class Proyecto extends BaseModel
 						DB::raw('sum(ep01.presupuestoDevengadoModificado) AS presupuestoDevengado')
 					)
 				->groupBy('proyectoFinanciamiento.idProyecto','ep01.FF');
-			},'beneficiariosDescripcion'=>function($beneficiario) use ($mes){
+			}*/
+			,'beneficiariosDescripcion'=>function($beneficiario) use ($mes){
 				$beneficiario->leftjoin('registroAvancesBeneficiarios as avanceBenef',function($join)use($mes){
 					$join->on('avanceBenef.idProyectoBeneficiario','=','proyectoBeneficiarios.id')
 						->on('avanceBenef.idTipoBeneficiario','=','proyectoBeneficiarios.idTipoBeneficiario')

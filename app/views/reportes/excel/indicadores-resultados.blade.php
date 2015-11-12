@@ -207,9 +207,9 @@
 			@endif
 
 			@if(isset($proyecto->fuentesFinanciamiento[$i]) && count($proyecto->fuentesFinanciamiento) > 1)
-				<td valign="top">{{$proyecto->fuentesFinanciamiento[$i]->presupuestoAprobado or 0.00}}</td>
-				<td valign="top">{{$proyecto->fuentesFinanciamiento[$i]->presupuestoModificado or 0.00}}</td>
-				<td valign="top">{{$proyecto->fuentesFinanciamiento[$i]->presupuestoDevengado or 0.00}}</td>
+				<td valign="top">{{$proyecto->fuentesFinanciamiento[$i]['presupuestoAprobado'] or 0.00}}</td>
+				<td valign="top">{{$proyecto->fuentesFinanciamiento[$i]['presupuestoModificado'] or 0.00}}</td>
+				<td valign="top">{{$proyecto->fuentesFinanciamiento[$i]['presupuestoDevengado'] or 0.00}}</td>
 			@else
 				<td></td><td></td><td></td>
 			@endif

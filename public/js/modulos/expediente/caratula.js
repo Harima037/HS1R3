@@ -56,10 +56,26 @@ if($('#id').val()){
         _success: function(response){
         	inicializar_comportamiento_caratula();
 
-        	$('#lbl-lider-proyecto').html(response.data.lider_proyecto.nombre + '<br><small class="text-muted">'+response.data.lider_proyecto.cargo+'</small>');
-			$('#lbl-jefe-inmediato').html(response.data.jefe_inmediato.nombre + '<br><small class="text-muted">'+response.data.jefe_inmediato.cargo+'</small>');
-			$('#lbl-jefe-planeacion').html(response.data.jefe_planeacion.nombre + '<br><small class="text-muted">'+response.data.jefe_planeacion.cargo+'</small>');
-			$('#lbl-coordinador-grupo').html(response.data.coordinador_grupo_estrategico.nombre + '<br><small class="text-muted">'+response.data.coordinador_grupo_estrategico.cargo+'</small>');
+        	if(response.data.lider_proyecto){
+        		$('#lbl-lider-proyecto').html(response.data.lider_proyecto.nombre + '<br><small class="text-muted">'+response.data.lider_proyecto.cargo+'</small>');
+        	}else{
+        		$('#lbl-lider-proyecto').html('<span class="text-muted">No asignado</span>')
+        	}
+			if(response.data.jefe_inmediato){
+				$('#lbl-jefe-inmediato').html(response.data.jefe_inmediato.nombre + '<br><small class="text-muted">'+response.data.jefe_inmediato.cargo+'</small>');
+			}else{
+				$('#lbl-jefe-inmediato').html('<span class="text-muted">No asignado</span>')
+			}
+			if(response.data.jefe_planeacion){
+				$('#lbl-jefe-planeacion').html(response.data.jefe_planeacion.nombre + '<br><small class="text-muted">'+response.data.jefe_planeacion.cargo+'</small>');
+			}else{
+				$('#lbl-jefe-planeacion').html('<span class="text-muted">No asignado</span>')
+			}
+			if(response.data.coordinador_grupo_estrategico){
+				$('#lbl-coordinador-grupo').html(response.data.coordinador_grupo_estrategico.nombre + '<br><small class="text-muted">'+response.data.coordinador_grupo_estrategico.cargo+'</small>');
+			}else{
+				$('#lbl-coordinador-grupo').html('<span class="text-muted">No asignado</span>')
+			}
 
             $('#nombretecnico').val(response.data.nombreTecnico);
             $('#ejercicio').val(response.data.ejercicio);
