@@ -22,10 +22,26 @@ var id_form = '#form_caratula';
 
 context.llenar_datos = function(datos){
 	//
-	$('#lbl-lider-proyecto').text(datos.lider_proyecto.nombre);
-	$('#lbl-jefe-inmediato').text(datos.jefe_inmediato.nombre);
-	$('#lbl-jefe-planeacion').text(datos.jefe_planeacion.nombre);
-	$('#lbl-coordinador-grupo').text(datos.coordinador_grupo_estrategico.nombre);
+	if(datos.lider_proyecto){
+		$('#lbl-lider-proyecto').html(datos.lider_proyecto.nombre + '<br><small class="text-muted">'+datos.lider_proyecto.cargo+'</small>');
+	}else{
+		$('#lbl-lider-proyecto').html('<span class="text-muted">No asignado</span>')
+	}
+	if(datos.jefe_inmediato){
+		$('#lbl-jefe-inmediato').html(datos.jefe_inmediato.nombre + '<br><small class="text-muted">'+datos.jefe_inmediato.cargo+'</small>');
+	}else{
+		$('#lbl-jefe-inmediato').html('<span class="text-muted">No asignado</span>')
+	}
+	if(datos.jefe_planeacion){
+		$('#lbl-jefe-planeacion').html(datos.jefe_planeacion.nombre + '<br><small class="text-muted">'+datos.jefe_planeacion.cargo+'</small>');
+	}else{
+		$('#lbl-jefe-planeacion').html('<span class="text-muted">No asignado</span>')
+	}
+	if(datos.coordinador_grupo_estrategico){
+		$('#lbl-coordinador-grupo').html(datos.coordinador_grupo_estrategico.nombre + '<br><small class="text-muted">'+datos.coordinador_grupo_estrategico.cargo+'</small>');
+	}else{
+		$('#lbl-coordinador-grupo').html('<span class="text-muted">No asignado</span>')
+	}
 
     $('#nombretecnico').val(datos.nombreTecnico);
     $('#ejercicio').val(datos.ejercicio);

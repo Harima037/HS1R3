@@ -296,7 +296,8 @@ class Proyecto extends BaseModel
 				$beneficiario->leftjoin('registroAvancesBeneficiarios as avanceBenef',function($join)use($mes){
 					$join->on('avanceBenef.idProyectoBeneficiario','=','proyectoBeneficiarios.id')
 						->on('avanceBenef.idTipoBeneficiario','=','proyectoBeneficiarios.idTipoBeneficiario')
-						->where('avanceBenef.mes','<=',$mes);
+						->where('avanceBenef.mes','<=',$mes)
+						->whereNull('avanceBenef.borradoAl');
 				})
 				->select('proyectoBeneficiarios.id','proyectoBeneficiarios.idProyecto','proyectoBeneficiarios.idTipoBeneficiario',
 					DB::raw('sum(avanceBenef.total) AS avanceBeneficiario'),
@@ -496,7 +497,8 @@ class Proyecto extends BaseModel
 						$join->on('avanceBenef.idTipoBeneficiario','=','proyectoBeneficiarios.idTipoBeneficiario')
 							->on('avanceBenef.idProyecto','=','proyectoBeneficiarios.idProyecto')
 							->on('avanceBenef.idProyectoBeneficiario','=','proyectoBeneficiarios.id')
-							->where('avanceBenef.mes','<=',$mes);
+							->where('avanceBenef.mes','<=',$mes)
+							->whereNull('avanceBenef.borradoAl');
 					})
 					->groupBy('proyectoBeneficiarios.idProyecto','proyectoBeneficiarios.idTipoBeneficiario','avanceBenef.idTipoBeneficiario','avanceBenef.idProyecto');
 			}))
@@ -607,7 +609,7 @@ class Proyecto extends BaseModel
 
 	public function scopeReporteCuentaPublica($query,$mes,$anio){
 		$query->select(
-				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
+				'proyectos.id', DB::raw('LCASE(proyectos.nombreTecnico) AS nombreTecnico'), 'proyectos.idClasificacionProyecto',
 				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
 				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
 				'proyectos.programaPresupuestario','proyectos.programaEspecial',

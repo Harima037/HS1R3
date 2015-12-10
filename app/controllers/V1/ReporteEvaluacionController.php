@@ -271,7 +271,7 @@ class ReporteEvaluacionController extends BaseController {
 					);
 				}
 				$data['avances_mes']['actividades'][$actividad['id']]['meta_programada'] = $meta_mes_programada;
-				
+				//var_dump($actividad['desglose_con_datos']);die;
 				foreach ($actividad['desglose_con_datos'] as $desglose) {
 					if(!isset($data['localidades_mes']['localidades'][$desglose['claveMunicipio'].'_'.$desglose['claveLocalidad']])){
 						$data['localidades_mes']['localidades'][$desglose['claveMunicipio'].'_'.$desglose['claveLocalidad']] = array(
@@ -279,12 +279,19 @@ class ReporteEvaluacionController extends BaseController {
 							'localidad' => $desglose['localidad']
 						);
 					}
+					if(count($desglose['metas_mes'])){
+						$metas_mes = $desglose['metas_mes'][0];
+					}else{
+						$metas_mes = array('avance'=>0,'meta'=>0);
+					}
+					
 					$data['localidades_mes']['actividades'][$actividad['id']][$desglose['claveJurisdiccion']][] = array(
 						'clave_localidad' => $desglose['claveMunicipio'].'_'.$desglose['claveLocalidad'],
-						'meta_programada' => $desglose['metas_mes'][0]['meta'] + ((count($desglose['metas_mes_acumuladas']))?$desglose['metas_mes_acumuladas']['meta']:0),
-						'avance_mes' => $desglose['metas_mes'][0]['avance'],
-						'avance_acumulado' => $desglose['metas_mes'][0]['avance'] + ((count($desglose['metas_mes_acumuladas']))?$desglose['metas_mes_acumuladas']['avance']:0)
+						'meta_programada' => $metas_mes['meta'] + ((count($desglose['metas_mes_acumuladas']))?$desglose['metas_mes_acumuladas']['meta']:0),
+						'avance_mes' => $metas_mes['avance'],
+						'avance_acumulado' => $metas_mes['avance'] + ((count($desglose['metas_mes_acumuladas']))?$desglose['metas_mes_acumuladas']['avance']:0)
 					);
+					
 				}
 				
 				$datos_componente['actividades'][] = $datos_actividad;
