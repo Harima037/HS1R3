@@ -90,15 +90,15 @@ class ReporteCedulaAvanceController extends BaseController {
 				}
 				
 				$rows = $rows->get()->toArray();
-
+				//var_dump($rows);die;
 				foreach ($rows as $indice => $row) {
 					$suma_porcentajes = 0;
 					$total_porcentajes = count($row['componentes_metas_mes']) + count($row['actividades_metas_mes']);
 					foreach ($row['componentes_metas_mes'] as $componente) {
-						$suma_porcentajes = floatval($componente['porcentajeAcumulado']);
+						$suma_porcentajes += floatval($componente['porcentajeAcumulado']);
 					}
 					foreach ($row['actividades_metas_mes'] as $actividad) {
-						$suma_porcentajes = floatval($actividad['porcentajeAcumulado']);
+						$suma_porcentajes += floatval($actividad['porcentajeAcumulado']);
 					}
 					if($total_porcentajes > 0){
 						$rows[$indice]['nivelCumplimientoFisico'] = number_format($suma_porcentajes / $total_porcentajes,2);
