@@ -28,7 +28,7 @@
 	<div class="col-md-4">
 	@if(count($permisos))
 		<div class="panel panel-primary">
-			<div class="panel-heading"><b>Mes de Captura:</b> {{$mes}} <span class="pull-right">{{date('Y')}}</span></div>
+			<div class="panel-heading"><b>Mes de Captura:</b> {{$mes}} <span class="pull-right">{{$anio}}</span></div>
 			<table class="table table-condensed">
 			@if($mes_activo > 0 && (isset($permisos['RENDINST']) || isset($permisos['RENDINV']) || isset($permisos['VIPROYINST']) ))
 				<tr>
@@ -84,7 +84,7 @@
 		</div>
 		@if(isset($permisos['VIPROYINST']))
 		<div class="panel panel-primary">
-			<div class="panel-heading"><b>Mes de Información:</b> {{$mes_info}} <span class="pull-right">{{date('Y')}}</span></div>
+			<div class="panel-heading"><b>Mes de Información:</b> {{$mes_info}} <span class="pull-right">{{$anio_info}}</span></div>
 		</div>
 		@endif
 	@endif

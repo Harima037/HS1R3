@@ -51,14 +51,32 @@ class DashboardController extends \BaseController {
 		$lista_estatus = EstatusProyecto::all();
 
 		$mes = Util::obtenerMesActual();
+		$anio = Util::obtenerAnioCaptura();
 		$mes_trimestre = Util::obtenerMesTrimestre();
 
 		if($mes){
 			$datos['mes'] = Util::obtenerDescripcionMes($mes);
-			$datos['mes_info'] = Util::obtenerDescripcionMes($mes-1);
+			$datos['anio'] = $anio;
+
+			if($mes == 1){
+				$datos['mes_info'] = Util::obtenerDescripcionMes(12);
+				$datos['anio_info'] = $anio-1;
+			}else{
+				$datos['mes_info'] = Util::obtenerDescripcionMes($mes-1);
+				$datos['anio_info'] = $anio;
+			}
 		}else{
 			$datos['mes'] = 'No disponible';
-			$datos['mes_info'] = Util::obtenerDescripcionMes(date('n')-1);
+			$datos['anio'] = $anio;
+
+			$mes_info = date('n')-1;
+			$anio_info = $anio;
+			if($mes_info == 0){ 
+				$mes_info = 12;
+				//$anio_info = $anio-1;
+			}
+			$datos['mes_info'] = Util::obtenerDescripcionMes($mes_info);
+			$datos['anio_info'] = $anio_info;
 		}
 		$datos['mes_activo'] = $mes;
 		$datos['mes_trimestre'] = $mes_trimestre;

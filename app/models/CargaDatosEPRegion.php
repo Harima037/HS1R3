@@ -12,22 +12,13 @@ class CargaDatosEPRegion extends BaseModel
 	public function scopeReporteEstatal($query, $mes, $anio){
 		$query->select('cargaDatosEPRegion.PP', DB::RAW('SUM(cargaDatosEPRegion.importe) AS ImporteEstatal'))
 				->where('cargaDatosEPRegion.mes','=',$mes)
-				//->where('cargaDatosEPRegion.CP','=',$anio)
+				->where('cargaDatosEPRegion.ejercicio','=',$anio)
 				->where('cargaDatosEPRegion.MPIO','=','000')				
 				->groupBy('cargaDatosEPRegion.PP');
 	}
 	
 	public function scopeReporteRegional($query, $mes, $region, $anio){
-		$query = 'SELECT cargaDatosEPRegion.PP,SUM(cargaDatosEPRegion.importe) AS importe FROM cargaDatosEPRegion WHERE mes = "'.$mes.'" AND (MPIO IN (SELECT clave FROM vistaMunicipios WHERE idRegion="'.$region.'") OR MPIO IN (SELECT claveMunicipio FROM catalogoRegionalizado WHERE idRegion="'.$region.'")) GROUP BY PP'; //AND CP="'.$anio.'" 
+		$query = 'SELECT cargaDatosEPRegion.PP,SUM(cargaDatosEPRegion.importe) AS importe FROM cargaDatosEPRegion WHERE mes = "'.$mes.'" AND ejercicio="'.$anio.'"  AND (MPIO IN (SELECT clave FROM vistaMunicipios WHERE idRegion="'.$region.'") OR MPIO IN (SELECT claveMunicipio FROM catalogoRegionalizado WHERE idRegion="'.$region.'")) GROUP BY PP';
 		return DB::select(DB::raw($query));
 	}
-	
-	
-	
-	
-	
- 
-	
-	
-	
 }

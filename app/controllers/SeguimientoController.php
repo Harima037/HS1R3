@@ -36,9 +36,16 @@ class SeguimientoController extends BaseController {
 		$mes_actual = Util::obtenerMesActual();
 		if($mes_actual == 0){
 			$mes_actual = date('n')-1;
+			if($mes_actual == 0){ $mes_actual = 12; }
 		}
 		$datos['mes_actual'] = $mes_actual;
-		$datos['trimestre_avance'] = Util::obtenerTrimestre(date('n')-1);
+
+		$mes_trimestre = date('n')-1;
+		if($mes_trimestre == 0){ $mes_trimestre = 12; }
+
+		$datos['trimestre_avance'] = Util::obtenerTrimestre($mes_trimestre);
+
+		$datos['anio_captura'] = Util::obtenerAnioCaptura();
 		return parent::loadIndex('RENDCUENTA','RENDINST',$datos);
 	}
 	public function indexInversion(){
@@ -70,9 +77,16 @@ class SeguimientoController extends BaseController {
 		$mes_actual = Util::obtenerMesActual();
 		if($mes_actual == 0){
 			$mes_actual = date('n')-1;
+			if($mes_actual == 0){ $mes_actual = 12; }
 		}
 		$datos['mes_actual'] = $mes_actual;
-		$datos['trimestre_avance'] = Util::obtenerTrimestre(date('n')-1);
+
+		$mes_trimestre = date('n')-1;
+		if($mes_trimestre == 0){ $mes_trimestre = 12; }
+
+		$datos['trimestre_avance'] = Util::obtenerTrimestre($mes_trimestre);
+
+		$datos['anio_captura'] = Util::obtenerAnioCaptura();
 		return parent::loadIndex('RENDCUENTA','RENDINV',$datos);
 	}
 	

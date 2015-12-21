@@ -5,59 +5,96 @@ use SysConfiguracionVariable;
 
 class Util 
 {
+	public static function obtenerAnioCaptura(){
+		$variables = SysConfiguracionVariable::obtenerVariables(array('anio-captura'))->lists('valor','variable');
+		if($variables['anio-captura']){
+			$anio = intval($variables['anio-captura']); 
+		}else{
+			$mes = self::obtenerMesActual();
+			if($mes){
+				if($mes == 12){
+					$anio = date('Y')-1;
+				}else{
+					$anio = date('Y');
+				}
+			}else{
+				if(intval(date('n')) == 1){
+					$anio = date('Y')-1;
+				}else{
+					$anio = date('Y');
+				}
+			}
+		}
+		return $anio;
+	}
+
 	public static function obtenerMesActual(){
 		$usuario = \Sentry::getUser();
 		
 		$variables = SysConfiguracionVariable::obtenerVariables(array('dias-captura','mes-captura'))->lists('valor','variable');
 
 		if($variables['mes-captura']){
-			$mes = $variables['mes-captura'];
+			$mes = $variables['mes-captura']; //Usamos el mes de captura asignado por el administrador, de manera global
 		}elseif($usuario->mesCaptura){
-			$mes = $usuario->mesCaptura;
+			$mes = $usuario->mesCaptura; //Usamos el mes de captura asignado al usuario, de manera individual
 		}else{
 			if($variables['dias-captura']){
 				$dias_validos = intval($variables['dias-captura']);
 			}else{
 				$dias_validos = 10;
 			}
+
 			$mes = date('n');
 			$dia = date('j');
-			if($dia <= $dias_validos){
-				$mes = $mes - 1;
+
+			if($dia <= $dias_validos){ //si el dia del mes es menor al maximo dia valido podemos abrir la captura
+				//Si el mes es enero, sumamos uno para que no de 0 en la resta, al abrir la captura
+				if($mes == 1){ $mes = 13; }
+
+				$mes = $mes - 1; //Obtenemos el mes anterior para abrir la captura
 			}else{
-				$mes = 0;
+				$mes = 0; //cuando el mes es 0 significa que la captura esta cerrada
 			}
 		}
 
 		return $mes;
 	}
+
 	public static function obtenerMesTrimestre($mes = NULL){
 		if($mes){
-			$mes_actual = $mes;
+			$mes_actual = $mes; //Para obtener el trimestre de un mes en especifico
 		}else{
-			$mes_actual = self::obtenerMesActual();
+			$mes_actual = self::obtenerMesActual();  //Para obtener el trimestre del mes anterior activo
 		}
-		if($mes_actual == 0){
+
+		if($mes_actual == 0){ //Si el mes no esta activo, usamos el mes actual
 			$mes_actual = date('n');
 		}
 		
-		$trimestre = ceil($mes_actual/3);
-        $ajuste = ($trimestre - 1) * 3;
+		$trimestre = ceil($mes_actual/3); //Hayr otra forma mas sencilla de hacer esto?
+        $ajuste = ($trimestre - 1) * 3;	//Se obtiene el numero del mes dentro del trimestre (1, 2, 3)
         $mes_del_trimestre = $mes_actual - $ajuste;
+
         return $mes_del_trimestre;
 	}
+
 	public static function obtenerTrimestre($mes = NULL){
 		if($mes){
 			$mes_actual = $mes;
 		}else{
 			$mes_actual = self::obtenerMesActual();
 		}
+
 		if($mes_actual == 0){
 			$mes_actual = date('n');
 		}
+
+		//Obtenemos el trimestre en el que nos encontramos, dependiendo del mes indicado
 		$trimestre = ceil($mes_actual/3);
+
 		return $trimestre;
 	}
+
 	public static function obtenerDescripcionMes($mes = NULL){
 		if(!$mes){
 			$mes = date('n');
@@ -66,6 +103,7 @@ class Util
 					   7 => 'Julio', 8 => 'Agosto', 9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre');
 		return $meses[$mes];
 	}
+
 	public static function transformarFecha($fecha)
 	{
 		$fecha= explode("-",$fecha);

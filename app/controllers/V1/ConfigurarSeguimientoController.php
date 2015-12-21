@@ -27,7 +27,7 @@ class ConfigurarSeguimientoController extends \BaseController {
 		$validacion = Validador::validar(Input::all(), $this->reglas);
 
 		if($validacion === TRUE){
-			$variables = SysConfiguracionVariable::obtenerVariables(array('mes-captura','dias-captura','poblacion-total'));
+			$variables = SysConfiguracionVariable::obtenerVariables(array('mes-captura','dias-captura','anio-captura','poblacion-total'));
 
 			foreach ($variables as $variable) {
 				$valor = $parametros[$variable->variable];

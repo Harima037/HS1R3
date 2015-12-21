@@ -7,6 +7,7 @@ class RendicionProgramaController extends BaseController {
 		$datos = array();
 		$datos['mes_avance'] = Util::obtenerMesActual();
 		$datos['trimestre_avance'] = Util::obtenerTrimestre();
+		$datos['anio_captura'] = Util::obtenerAnioCaptura();
 
 		$mes_del_trimestre = Util::obtenerMesTrimestre();
 		if($mes_del_trimestre == 3){

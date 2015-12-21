@@ -15,7 +15,7 @@ class CargaDatosEP01 extends BaseModel
 				DB::RAW('SUM(cargaDatosEP01.presupuestoModificado) AS PresModificado'))
 				->leftJoin('catalogoProgramasPresupuestales','catalogoProgramasPresupuestales.clave','=','cargaDatosEP01.PP')
 				->where('cargaDatosEP01.mes','=',$mes)
-				//->where('cargaDatosEP01.CP','=',$anio)
+				->where('cargaDatosEP01.ejercicio','=',$anio)
 				->groupBy('cargaDatosEP01.PP');
 	}			
 }

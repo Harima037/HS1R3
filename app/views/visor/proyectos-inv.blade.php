@@ -17,7 +17,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="panel panel-default datagrid" id="datagridProyectos" data-edit-row="cargar_datos_proyecto" data-trim-activo="{{$trimestre_avance}}" data-mes-activo="{{$mes_avance}}" data-mes-actual="{{$mes_actual}}">
-            <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> Proyectos de Inversión</h4></div>
+            <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> Proyectos de Inversión  {{$anio_captura}}</h4></div>
             @if(isset($mostrar_filtrado))
             <div class="panel-body bg-info">
                 <div class="row">

@@ -34,13 +34,19 @@ class ReporteEP20Controller extends BaseController {
 
 			if(!isset($parametros['mes'])){
 				$mes = Util::obtenerMesActual();
-				if($mes == 0){ $mes = date('n')-1; }
+				if($mes == 0){ 
+					if(date('n') == 1){
+						$mes = 12;
+					}else{
+						$mes = date('n')-1; 
+					}
+				}
 			}else{
 				$mes = intval($parametros['mes']);
 			}
 
 			if(!isset($parametros['ejercicio'])){
-				$ejercicio = date('Y');
+				$ejercicio = Util::obtenerAnioCaptura();
 			}else{
 				$ejercicio = intval($parametros['ejercicio']);
 			}
@@ -49,7 +55,7 @@ class ReporteEP20Controller extends BaseController {
 				//$rows = Proyecto::cedulasAvances($mes,$ejercicio);
 
 				$rows  = CargaDatosEP01::where('cargaDatosEP01.mes','=',$mes)
-										//->where('cargaDatosEP01.CP','=',$ejercicio)
+										->where('cargaDatosEP01.ejercicio','=',$ejercicio)
 										->join('catalogoFuncionesGasto AS funcionesGasto','funcionesGasto.clave','=',DB::raw('concat_ws(".",cargaDatosEP01.FI,cargaDatosEP01.FU,cargaDatosEP01.SF,cargaDatosEP01.SSF)'))
 										->groupBy('cargaDatosEP01.FI')
 										->groupBy('cargaDatosEP01.FU')
@@ -88,7 +94,7 @@ class ReporteEP20Controller extends BaseController {
 			}else{
 
 				$rows  = CargaDatosEP01::where('cargaDatosEP01.mes','=',$mes)
-						//->where('cargaDatosEP01.CP','=',$ejercicio)
+						->where('cargaDatosEP01.ejercicio','=',$ejercicio)
 						->join('catalogoFuncionesGasto AS funcionesGasto','funcionesGasto.clave','=',DB::raw('concat_ws(".",cargaDatosEP01.FI,cargaDatosEP01.FU,cargaDatosEP01.SF,cargaDatosEP01.SSF)'))
 						->groupBy('cargaDatosEP01.FI')
 						->groupBy('cargaDatosEP01.FU')

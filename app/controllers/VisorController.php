@@ -38,9 +38,12 @@ class VisorController extends BaseController {
 		$mes_actual = Util::obtenerMesActual();
 		if($mes_actual == 0){
 			$mes_actual = date('n')-1;
+			if($mes_actual == 0){ $mes_actual = 12; }
 		}
 		$datos['mes_actual'] = $mes_actual;
 		$datos['trimestre_avance'] = Util::obtenerTrimestre(date('n')-1);
+		$datos_captura = $this->obtenerDatosCaptura();
+		$datos['anio_captura'] = '[ ' . Util::obtenerDescripcionMes($datos_captura['mes']) . ' del ' . $datos_captura['anio'] . ']';
 
 		$usuario = Sentry::getUser();
 		if(!$usuario->claveJurisdiccion && !$usuario->claveUnidad){
@@ -66,7 +69,9 @@ class VisorController extends BaseController {
 	}
 
 	public function indexDesempenioGeneral(){
-		return parent::loadIndex('VISORGEN','VIDESEMGEN');
+		$datos_captura = $this->obtenerDatosCaptura();
+		$anio_captura = '[ ' . Util::obtenerDescripcionMes($datos_captura['mes']) . ' del ' . $datos_captura['anio'] . ']';
+		return parent::loadIndex('VISORGEN','VIDESEMGEN',array('anio_captura' => $anio_captura));
 	}
 
 	public function indexPresupuesto(){
@@ -80,7 +85,9 @@ class VisorController extends BaseController {
 				'sys_mod_activo'=>null), 403
 			);
 		}
-		return parent::loadIndex('VISORGEN','VIPRESUP');
+		$datos_captura = $this->obtenerDatosCaptura();
+		$anio_captura = '[ ' . Util::obtenerDescripcionMes($datos_captura['mes']) . ' del ' . $datos_captura['anio'] . ']';
+		return parent::loadIndex('VISORGEN','VIPRESUP',array('anio_captura' => $anio_captura));
 	}
 
 	public function indexPresupuestoMeta(){
@@ -94,7 +101,9 @@ class VisorController extends BaseController {
 				'sys_mod_activo'=>null), 403
 			);
 		}
-		return parent::loadIndex('VISORGEN','VIPRESUPME');
+		$datos_captura = $this->obtenerDatosCaptura();
+		$anio_captura = '[ ' . Util::obtenerDescripcionMes($datos_captura['mes']) . ' del ' . $datos_captura['anio'] . ']';
+		return parent::loadIndex('VISORGEN','VIPRESUPME',array('anio_captura' => $anio_captura));
 	}
 
 	public function indexEstatal(){
@@ -108,9 +117,12 @@ class VisorController extends BaseController {
 				'sys_mod_activo'=>null), 403
 			);
 		}
+		$datos_captura = $this->obtenerDatosCaptura();
+		$anio_captura = '[ ' . Util::obtenerDescripcionMes($datos_captura['mes']) . ' del ' . $datos_captura['anio'] . ']';
 		$catalogos = array( 
 			'jurisdicciones' => array('OC'=>'OFICINA CENTRAL') + Jurisdiccion::all()->lists('nombre','clave'),
-			'unidades_responsables' => UnidadResponsable::all()->lists('descripcion','clave')
+			'unidades_responsables' => UnidadResponsable::all()->lists('descripcion','clave'),
+			'anio_captura' => $anio_captura
 		);
 		return parent::loadIndex('VISORGEN','VIESTATAL',$catalogos);
 	}
@@ -126,7 +138,9 @@ class VisorController extends BaseController {
 				'sys_mod_activo'=>null), 403
 			);
 		}
-		return parent::loadIndex('VISORGEN','VIDIRECS');
+		$datos_captura = $this->obtenerDatosCaptura();
+		$anio_captura = '[ ' . Util::obtenerDescripcionMes($datos_captura['mes']) . ' del ' . $datos_captura['anio'] . ']';
+		return parent::loadIndex('VISORGEN','VIDIRECS',array('anio_captura' => $anio_captura));
 	}
 
 	public function indexJurisdicciones(){
@@ -140,7 +154,12 @@ class VisorController extends BaseController {
 				'sys_mod_activo'=>null), 403
 			);
 		}
-		$catalogos = array( 'jurisdicciones' => array('OC'=>'OFICINA CENTRAL') + Jurisdiccion::all()->lists('nombre','clave') );
+		$datos_captura = $this->obtenerDatosCaptura();
+		$anio_captura = '[ ' . Util::obtenerDescripcionMes($datos_captura['mes']) . ' del ' . $datos_captura['anio'] . ']';
+		$catalogos = array( 
+				'jurisdicciones' => array('OC'=>'OFICINA CENTRAL') + Jurisdiccion::all()->lists('nombre','clave'),
+				'anio_captura' => $anio_captura
+			);
 		return parent::loadIndex('VISORGEN','VIJURIS',$catalogos);
 	}
 
@@ -150,8 +169,9 @@ class VisorController extends BaseController {
 
 		$parametros = Input::all();
 
-		$mes_actual = Util::obtenerMesActual();
-		if($mes_actual == 0){ $mes_actual = date('n')-1; }
+		$datos_captura = $this->obtenerDatosCaptura();
+
+		$mes_actual = $datos_captura['mes'];
 
 		$meses = array(1=>'Enero',2=>'Febrero',3=>'Marzo',4=>'Abril',5=>'Mayo',6=>'Junio',
 						7=>'Julio',8=>'Agosto',9=>'Septiembre',10=>'Octubre',11=>'Noviembre',12=>'Diciembre');
@@ -281,13 +301,14 @@ class VisorController extends BaseController {
 			if(isset($parametros['tipo'])){
 				if($parametros['tipo'] == 'tabla'){
 					$mes_actual = Util::obtenerMesActual();
+					$anio_captura = Util::obtenerAnioCaptura();
 					if($mes_actual == 0){ 
 						$mes_actual = date('n')-1; 
 					}else{
 						$mes_actual = $mes_actual-1;
 					}
 
-					$rows = CargaDatosEP01::where('mes','=',$mes_actual);
+					$rows = CargaDatosEP01::where('mes','=',$mes_actual)->where('ejercicio','=',$anio_captura);
 
 					$usuario = Sentry::getUser();
 					if($usuario->claveUnidad){
@@ -351,6 +372,23 @@ class VisorController extends BaseController {
 						->loadView('visor.pdf.reporte-graficas-indicador',$datos);
 		}
 		return $pdf->stream('Grafica.pdf');
+	}
+
+	public function obtenerDatosCaptura(){
+		$mes_actual = Util::obtenerMesActual();
+		$anio_captura = Util::obtenerAnioCaptura();
+		if($mes_actual == 0){ 
+			$mes_actual = date('n')-1; 
+		}else{ 
+			$mes_actual = $mes_actual-1;
+			if($mes_actual == 0){
+				$anio_captura -= 1;
+			}
+		}
+		if($mes_actual == 0){ 
+			$mes_actual = 12; 
+		}
+		return ['mes'=>$mes_actual,'anio'=>$anio_captura];
 	}
 }
 ?>

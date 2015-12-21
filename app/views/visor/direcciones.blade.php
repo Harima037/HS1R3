@@ -17,7 +17,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="panel panel-default" >
-            <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> {{ $sys_mod_activo->nombre }}</h4></div>
+            <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> {{ $sys_mod_activo->nombre }} {{$anio_captura}}</h4></div>
             <div class="panel-body">
                 <div class="btn-group btn-group-justified" role="group" aria-label="estadisticas-direcciones">
                     <div class="btn-group btn-group-lg" role="group">

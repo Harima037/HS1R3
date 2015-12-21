@@ -46,7 +46,13 @@ class ReporteIndicadorResultadoController extends BaseController {
 			
 			if(!isset($parametros['mes'])){
 				$mes = Util::obtenerMesActual();
-				if($mes == 0){ $mes = date('n')-1; }
+				if($mes == 0){ 
+					if(date('n') == 1){
+						$mes = 12;
+					}else{
+						$mes = date('n')-1;
+					}
+				}
 			}else{
 				$mes = intval($parametros['mes']);
 			}
@@ -56,7 +62,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 			$datos['trimestre'] = $texto_trimestres[$trimestre];
 
 			if(!isset($parametros['ejercicio'])){
-				$datos['ejercicio'] = date('Y');
+				$datos['ejercicio'] = Util::obtenerAnioCaptura();
 			}else{
 				$datos['ejercicio'] = intval($parametros['ejercicio']);
 			}
@@ -138,30 +144,6 @@ class ReporteIndicadorResultadoController extends BaseController {
 					$row->totalPresupuestoDevengado += $fuente['presupuestoDevengado'];
 				}
 				//---------------------------------------------------------------------------^^^^^^^^^^^^^^^
-				/*
-				$total_fuentes = count($row->fuentesFinanciamiento) - 1;
-				foreach ($row->fuentesFinanciamiento as $key => $fuente) {
-					if($key == 0){
-						$titulo_fuentes = $fuente->descripcion;
-					}elseif($key < $total_fuentes){
-						$titulo_fuentes .= ', ' . $fuente->descripcion;
-					}else{
-						$ultimo = ' y ';
-						if(strtolower(substr($fuente->descripcion,0,1)) == 'i'){
-							$ultimo = ' e ';
-						}elseif(strtolower(substr($fuente->descripcion,0,1)) == 'h'){
-							if(strtolower(substr($fuente->descripcion,1,1)) == 'i'){
-								$ultimo = ' e ';
-							}
-						}
-						$titulo_fuentes .= $ultimo . $fuente->descripcion;
-					}
-					$clave_fuentes .= $fuente->clave .'_';
-					$row->totalPresupuestoAprobado += $fuente->presupuestoAprobado;
-					$row->totalPresupuestoModificado += $fuente->presupuestoModificado;
-					$row->totalPresupuestoDevengado += $fuente->presupuestoDevengado;
-				}
-				*/
 
 				if(!isset($hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto]['fuentes'][$clave_fuentes])){
 					$hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto]['fuentes'][$clave_fuentes] = array(

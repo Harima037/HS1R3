@@ -37,7 +37,13 @@ class ReporteGastoRegionalizadoController extends BaseController {
 
 			if(!isset($parametros['mes'])){
 				$mes = Util::obtenerMesActual();
-				if($mes == 0){ $mes = date('n')-1; }
+				if($mes == 0){ 
+					if(date('n') == 1){
+						$mes = 12;
+					}else{
+						$mes = date('n')-1;
+					}
+				}
 			}else{
 				$mes = intval($parametros['mes']);
 			}
@@ -47,7 +53,7 @@ class ReporteGastoRegionalizadoController extends BaseController {
 			$datos['trimestre'] = $texto_trimestres[$trimestre];
 
 			if(!isset($parametros['ejercicio'])){
-				$datos['ejercicio'] = date('Y');
+				$datos['ejercicio'] = Util::obtenerAnioCaptura();
 			}else{
 				$datos['ejercicio'] = intval($parametros['ejercicio']);
 			}

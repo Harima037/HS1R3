@@ -126,7 +126,7 @@ class Proyecto extends BaseModel
 
 	}
 
-	public function scopeIndicadoresResultados($query,$mes=NULL,$ejercicio=NULL){
+	public function scopeIndicadoresResultados($query,$mes,$ejercicio){
 		$query->select(
 				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
 				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
@@ -147,6 +147,7 @@ class Proyecto extends BaseModel
 					->where('estatusMes.idEstatus','>=',4);
 			})
 			->where('proyectos.idEstatusProyecto','=',5)
+			->where('proyectos.ejercicio','=',$ejercicio)
 			->groupBy('proyectos.id')
 			->orderBy(DB::raw('count(distinct beneficiarios.idTipoBeneficiario)'),'desc')
 			->orderBy('proyectos.id','desc');
@@ -173,15 +174,16 @@ class Proyecto extends BaseModel
 					->on('ep01.PE','=','proyectos.programaEspecial')
 					->on('ep01.AI','=','proyectos.actividadInstitucional')
 					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(proyectos.numeroProyectoEstrategico,3,"0"))'))
-					->where('ep01.mes','=',$mes);
+					->where('ep01.mes','=',$mes)
 					//->on('ep01.FF','=','fuente.clave')
 					//->on('ep01.DG','LIKE','destinoGasto.destino')
-					//->where('ep01.CP','=',$ejercicio)
+					->where('ep01.ejercicio','=',$ejercicio);
 			})
 			->leftjoin('catalogoFuenteFinanciamiento AS fuente',function($join){
 				$join->on('fuente.clave','=','ep01.FF')->whereNull('fuente.borradoAl');
 			})
 			->where('proyectos.idEstatusProyecto','=',5)
+			->where('proyectos.ejercicio','=',$ejercicio)
 			
 			->groupBy('proyectos.id')
 			->groupBy('ep01.FF')
@@ -260,38 +262,6 @@ class Proyecto extends BaseModel
 					})
 					->groupBy('componenteActividades.id','metasMes.idActividad');
 			}
-			/*,'fuentesFinanciamiento'=>function($fuenteFinan) use ($mes,$ejercicio){
-				$fuenteFinan->join('catalogoFuenteFinanciamiento AS fuente',function($join){
-					$join->on('fuente.id','=','proyectoFinanciamiento.idFuenteFinanciamiento')
-						->whereNull('fuente.borradoAl');
-				})->join('catalogoDestinoGasto AS destinoGasto',function($join){
-					$join->on('destinoGasto.id','=','proyectoFinanciamiento.idDestinoGasto')
-						->whereNull('destinoGasto.borradoAl');
-				})
-				->join('proyectos','proyectos.id','=','proyectoFinanciamiento.idProyecto')
-				->join('cargaDatosEP01 AS ep01',function($join) use ($mes,$ejercicio){
-					$join->on('ep01.UR','=','proyectos.unidadResponsable')
-						->on('ep01.FI','=','proyectos.finalidad')
-						->on('ep01.FU','=','proyectos.funcion')
-						->on('ep01.SF','=','proyectos.subFuncion')
-						->on('ep01.SSF','=','proyectos.subSubFuncion')
-						->on('ep01.PS','=','proyectos.programaSectorial')
-						->on('ep01.PP','=','proyectos.programaPresupuestario')
-						->on('ep01.PE','=','proyectos.programaEspecial')
-						->on('ep01.AI','=','proyectos.actividadInstitucional')
-						->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(proyectos.numeroProyectoEstrategico,3,"0"))'))
-						->on('ep01.FF','=','fuente.clave')
-						->on('ep01.DG','LIKE','destinoGasto.destino')
-						->where('ep01.mes','=',$mes);
-						//->where('ep01.CP','=',$ejercicio)
-				})->select(
-						'proyectoFinanciamiento.id','proyectoFinanciamiento.idProyecto','proyectoFinanciamiento.idFuenteFinanciamiento',
-						'fuente.clave','fuente.descripcion',DB::raw('sum(ep01.presupuestoAprobado) AS presupuestoAprobado'),
-						DB::raw('sum(ep01.presupuestoModificado) AS presupuestoModificado'),
-						DB::raw('sum(ep01.presupuestoDevengadoModificado) AS presupuestoDevengado')
-					)
-				->groupBy('proyectoFinanciamiento.idProyecto','ep01.FF');
-			}*/
 			,'beneficiariosDescripcion'=>function($beneficiario) use ($mes){
 				$beneficiario->leftjoin('registroAvancesBeneficiarios as avanceBenef',function($join)use($mes){
 					$join->on('avanceBenef.idProyectoBeneficiario','=','proyectoBeneficiarios.id')
@@ -314,6 +284,7 @@ class Proyecto extends BaseModel
 			))
 			
 			->where('proyectos.idEstatusProyecto','=',5)
+			->where('proyectos.ejercicio','=',$ejercicio)
 			
 			->groupBy('proyectos.id')
 
@@ -365,8 +336,8 @@ class Proyecto extends BaseModel
 					->on('ep01.PE','=','proyectos.programaEspecial')
 					->on('ep01.AI','=','proyectos.actividadInstitucional')
 					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'))
-					->where('ep01.mes','=',$mes);
-					//->where('ep01.CP','=',$ejercicio)
+					->where('ep01.mes','=',$mes)
+					->where('ep01.ejercicio','=',$ejercicio);
 			})
 
 			->where('proyectos.idEstatusProyecto','=',5)
@@ -407,8 +378,8 @@ class Proyecto extends BaseModel
 					->on('ep01.PE','=','proyectos.programaEspecial')
 					->on('ep01.AI','=','proyectos.actividadInstitucional')
 					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'))
-					->where('ep01.mes','=',$mes);
-					//->where('ep01.CP','=',$ejercicio)
+					->where('ep01.mes','=',$mes)
+					->where('ep01.ejercicio','=',$ejercicio);
 			})
 			->where('proyectos.idEstatusProyecto','=',5)			
 			->groupBy('proyectos.id');
@@ -449,8 +420,8 @@ class Proyecto extends BaseModel
 					->on('ep01.PE','=','proyectos.programaEspecial')
 					->on('ep01.AI','=','proyectos.actividadInstitucional')
 					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'))
-					->where('ep01.mes','=',$mes);
-					//->where('ep01.CP','=',$ejercicio)
+					->where('ep01.mes','=',$mes)
+					->where('ep01.ejercicio','=',$ejercicio);
 			})
 
 			->where('proyectos.idEstatusProyecto','=',5)
@@ -540,8 +511,8 @@ class Proyecto extends BaseModel
 					->on('ep01.PE','=','proyectos.programaEspecial')
 					->on('ep01.AI','=','proyectos.actividadInstitucional')
 					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'))
-					->where('ep01.mes','=',$mes);
-					//->where('ep01.CP','=',$ejercicio)
+					->where('ep01.mes','=',$mes)
+					->where('ep01.ejercicio','=',$ejercicio);
 			})
 
 			->where('proyectos.idEstatusProyecto','=',5)

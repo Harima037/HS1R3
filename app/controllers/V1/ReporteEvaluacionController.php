@@ -43,7 +43,11 @@ class ReporteEvaluacionController extends BaseController {
 		}
 		
 		if($mes_actual == 0 || $mes_actual > 12){
-			$mes_actual = date('n') - 1;
+			if(date('n') == 1){
+				$mes_actual = 12;
+			}else{
+				$mes_actual = date('n') - 1;
+			}
 		}
 
 		$recurso = Proyecto::with(array('liderProyecto','responsableInformacion','beneficiarios.tipoBeneficiario','datosProgramaPresupuestario','datosFuncion',

@@ -37,18 +37,24 @@ class IndicadorResultadoController extends BaseController {
 
 				if(!isset($parametros['mes'])){
 					$mes = Util::obtenerMesActual();
-					if($mes == 0){ $mes = date('n')-1; }
+					if($mes == 0){ 
+						if(date('n') == 1){
+							$mes = 12; 
+						}else{
+							$mes = date('n')-1; 
+						}
+					}
 				}else{
 					$mes = intval($parametros['mes']);
 				}
 
 				if(!isset($parametros['ejercicio'])){
-					$ejercicio = date('Y');
+					$ejercicio = Util::obtenerAnioCaptura();
 				}else{
 					$ejercicio = intval($parametros['ejercicio']);
 				}
 
-				$rows = Proyecto::indicadoresResultados($mes);
+				$rows = Proyecto::indicadoresResultados($mes,$ejercicio);
 
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 
@@ -78,12 +84,12 @@ class IndicadorResultadoController extends BaseController {
 
 				return Response::json($data,$http_status);
 			}
-
+			/*
 			$rows = Proyecto::indicadoresResultados();
 			$rows = $rows->get();
 			$total = count($rows);
-
-			$data = array('resultados'=>$total,'data'=>$rows);
+			*/
+			$data = array('resultados'=>0,'data'=>[]);
 			$http_status = 200;
 
 			if($total<=0){
@@ -116,7 +122,13 @@ class IndicadorResultadoController extends BaseController {
 				$mes = intval($parametros['mes']);
 			}else{
 				$mes = Util::obtenerMesActual();
-				if($mes == 0){ $mes = date('n')-1; }
+				if($mes == 0){ 
+					if(date('n') == 1){
+						$mes = 12;
+					}else{
+						$mes = date('n')-1; 
+					}
+				}
 			}
 
 			$recurso = Proyecto::select(

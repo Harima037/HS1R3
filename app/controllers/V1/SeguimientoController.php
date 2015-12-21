@@ -105,12 +105,12 @@ class SeguimientoController extends BaseController {
 				}
 			}else{
 				$mes_actual = Util::obtenerMesActual();
+				$anio_captura = Util::obtenerAnioCaptura();
 
 				$rows = Proyecto::getModel();
 				$rows = $rows->where('idEstatusProyecto','=',5)
-							->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto']);
-							//->where('idClasificacionProyecto','=',$)
-				//$rows = $rows->with('registroAvance');
+							->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto'])
+							->where('ejercicio','=',$anio_captura);
 				
 				$usuario = Sentry::getUser();
 				
@@ -131,7 +131,8 @@ class SeguimientoController extends BaseController {
 					$query->select('id','idProyecto','mes',DB::raw('sum(avanceMes) as avanceMes'),DB::raw('sum(planMejora) as planMejora'),DB::raw('count(idNivel) as registros'))->groupBy('idProyecto','mes');
 				},'evaluacionMeses'=>function($query) use ($mes_actual){
 					if($mes_actual == 0){
-						$mes_actual = date('n') -1;
+						$mes_actual = date('n')-1;
+						if($mes_actual==0){$mes_actual = 12;} //En caso de estar en enero pasar a diciembre del año anterior
 						$query->where('evaluacionProyectoMes.mes','<=',$mes_actual)->where('idEstatus','=',4);
 					}else{
 						$query->where('evaluacionProyectoMes.mes','<=',$mes_actual);
@@ -219,7 +220,8 @@ class SeguimientoController extends BaseController {
 				$recurso = Proyecto::with(array('datosFuncion','datosSubFuncion','datosProgramaPresupuestario','componentes.metasMesAgrupado','componentes.registroAvance','componentes.actividades.metasMesAgrupado','componentes.actividades.registroAvance','beneficiarios.registroAvance','beneficiarios.tipoBeneficiario',
 					'evaluacionMeses'=>function($query) use ($mes_actual){
 						if($mes_actual == 0){
-							$mes_actual = date('n') - 1;
+							$mes_actual = date('n')-1;
+							if($mes_actual==0){$mes_actual = 12;}
 							$query->where('mes','=',$mes_actual)->where('idEstatus','=',4);
 						}else{
 							$query->where('mes','=',$mes_actual);
@@ -332,10 +334,11 @@ class SeguimientoController extends BaseController {
 				}
 			}else{
 				if(!$seguimiento_mes){
+					$anio_captura = Util::obtenerAnioCaptura();
 					$seguimiento_mes = new EvaluacionProyectoMes;
 					$seguimiento_mes->idEstatus = 1;
 					$seguimiento_mes->mes = $mes_actual;
-					$seguimiento_mes->anio = date('Y');
+					$seguimiento_mes->anio = $anio_captura;
 					$seguimiento_mes->idProyecto = $parametros['id-proyecto'];
 					$seguimiento_mes->save();
 				}

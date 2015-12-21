@@ -23,6 +23,22 @@ use Proyecto,ComponenteMetaMes,ActividadMetaMes,Componente,Actividad,CargaDatosE
 
 class VisorController extends BaseController {
 
+	public function obtenerDatosCaptura(){
+		$mes_actual = Util::obtenerMesActual();
+		$anio_captura = Util::obtenerAnioCaptura();
+		if($mes_actual == 0){ 
+			$mes_actual = date('n')-1; 
+		}else{ 
+			$mes_actual = $mes_actual-1;
+			if($mes_actual == 0){
+				$anio_captura -= 1;
+			}
+		}
+		if($mes_actual == 0){ 
+			$mes_actual = 12; 
+		}
+		return ["mes"=>$mes_actual,"anio"=>$anio_captura];
+	}
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -39,6 +55,9 @@ class VisorController extends BaseController {
 				case 'proyectos_direccion':
 						$rows = Proyecto::getModel();
 						$usuario = Sentry::getUser();
+						$datos_captura = $this->obtenerDatosCaptura();
+						$anio_captura = $datos_captura['anio'];
+
 						if($usuario->claveUnidad){
 							$unidades = explode('|',$usuario->claveUnidad);
 							$rows = $rows->whereIn('unidadResponsable',$unidades);
@@ -47,6 +66,7 @@ class VisorController extends BaseController {
 												DB::raw('count(distinct proyectos.id) AS noProyectos'))
 										->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','proyectos.unidadResponsable')
 										->where('idEstatusProyecto','=',5)
+										->where('ejercicio','=',$anio_captura)
 										->groupBy('unidadResponsable')
 										->get();
 						$total = $rows->sum('noProyectos');
@@ -57,6 +77,8 @@ class VisorController extends BaseController {
 				case 'proyectos_tipo':
 						$rows = Proyecto::getModel();
 						$usuario = Sentry::getUser();
+						$datos_captura = $this->obtenerDatosCaptura();
+						$anio_captura = $datos_captura['anio'];
 						if($usuario->claveUnidad){
 							$unidades = explode('|',$usuario->claveUnidad);
 							$rows = $rows->whereIn('unidadResponsable',$unidades);
@@ -65,20 +87,18 @@ class VisorController extends BaseController {
 												DB::raw('count(distinct proyectos.id) AS noProyectos'))
 										->leftjoin('catalogoClasificacionProyectos AS clasificacion','clasificacion.id','=','proyectos.idClasificacionProyecto')
 										->where('idEstatusProyecto','=',5)
+										->where('ejercicio','=',$anio_captura)
 										->groupBy('idClasificacionProyecto')
 										->get();
 						$total = $rows->sum('noProyectos');
 						$data = array('data'=>$rows,'total'=>$total);
 					break;
 				case 'presupuesto_fuente':
-						$mes_actual = Util::obtenerMesActual();
-						if($mes_actual == 0){ 
-							$mes_actual = date('n')-1; 
-						}else{
-							$mes_actual = $mes_actual-1;
-						}
-
-						$rows = CargaDatosEP01::where('mes','=',$mes_actual);
+						$datos_captura = $this->obtenerDatosCaptura();
+						$anio_captura = $datos_captura['anio'];
+						$mes_actual = $datos_captura['mes'];
+						
+						$rows = CargaDatosEP01::where('mes','=',$mes_actual)->where('ejercicio','=',$anio_captura);
 
 						$usuario = Sentry::getUser();
 						if($usuario->claveUnidad){
@@ -97,17 +117,14 @@ class VisorController extends BaseController {
 									->groupBy('FF')
 									->get();
 						$total = $rows->sum('presupuestoModificado');
-						$data = array('data'=>$rows,'total'=>$total);
+						$data = array('data'=>$rows,'total'=>$total,'datos_captura'=>$datos_captura);
 					break;
 				case 'presupuesto_ejercido_capitulo':
-						$mes_actual = Util::obtenerMesActual();
-						if($mes_actual == 0){ 
-							$mes_actual = date('n')-1; 
-						}else{
-							$mes_actual = $mes_actual-1;
-						}
+						$datos_captura = $this->obtenerDatosCaptura();
+						$anio_captura = $datos_captura['anio'];
+						$mes_actual = $datos_captura['mes'];
 
-						$rows = CargaDatosEP01::where('mes','=',$mes_actual);
+						$rows = CargaDatosEP01::where('mes','=',$mes_actual)->where('ejercicio','=',$anio_captura);
 
 						$usuario = Sentry::getUser();
 						if($usuario->claveUnidad){
@@ -126,15 +143,12 @@ class VisorController extends BaseController {
 						//$queries = DB::getQueryLog();
 						//var_dump(end($queries));die;
 						$total = $rows->sum('presupuestoEjercido');
-						$data = array('data'=>$rows,'total'=>$total);
+						$data = array('data'=>$rows,'total'=>$total,'datos_captura'=>$datos_captura);
 					break;
 				case 'presupuesto_ejercido':
-						$mes_actual = Util::obtenerMesActual();
-						if($mes_actual == 0){ 
-							$mes_actual = date('n')-1; 
-						}else{
-							$mes_actual = $mes_actual-1;
-						}
+						$datos_captura = $this->obtenerDatosCaptura();
+						$anio_captura = $datos_captura['anio'];
+						$mes_actual = $datos_captura['mes'];
 
 						$presupuesto = CargaDatosEP01::getModel();
 						$usuario = Sentry::getUser();
@@ -149,15 +163,18 @@ class VisorController extends BaseController {
 						}
 
 						$presupuesto = $presupuesto->where('mes','=',$mes_actual)
-														->select(DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
-															DB::raw('sum(presupuestoEjercidoModificado) AS presupuestoEjercido'))
-														->first();
+													->where('ejercicio','=',$anio_captura)
+													->select(DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
+														DB::raw('sum(presupuestoEjercidoModificado) AS presupuestoEjercido'))
+													->first();
 						//
-						$data = array('data'=>$presupuesto);
+						$data = array('data'=>$presupuesto,'datos_captura'=>$datos_captura);
 					break;
 				case 'metas_unidad':
 						$rows = Proyecto::getModel();
 						$usuario = Sentry::getUser();
+						$datos_captura = $this->obtenerDatosCaptura();
+						$anio_captura = $datos_captura['anio'];
 						if($usuario->claveUnidad){
 							$unidades = explode('|',$usuario->claveUnidad);
 							$rows = $rows->whereIn('unidadResponsable',$unidades);
@@ -174,25 +191,23 @@ class VisorController extends BaseController {
 												->whereNull('actividades.borradoAl');
 										})
 										->where('idEstatusProyecto','=',5)
+										->where('ejercicio','=',$anio_captura)
 										->groupBy('unidadResponsable')
 										->get();
 						$total = $rows->sum('noMetas');
 						//$queries = DB::getQueryLog();
 						//var_dump(count($queries));die;
-						$data = array('data'=>$rows,'total'=>$total);
+						$data = array('data'=>$rows,'total'=>$total,'datos_captura'=>$datos_captura);
 					break;
 				case 'metas_cumplidas':
-						$mes_actual = Util::obtenerMesActual();
-						if($mes_actual == 0){ 
-							$mes_actual = date('n')-1; 
-						}else{
-							$mes_actual = $mes_actual-1;
-						}
+						$datos_captura = $this->obtenerDatosCaptura();
+						$anio_captura = $datos_captura['anio'];
+						$mes_actual = $datos_captura['mes'];
 
 						$componentes = ComponenteMetaMes::getModel();
 						$actividades = ActividadMetaMes::getModel();
 
-						$proyectos_ids = Proyecto::where('idEstatusProyecto','=',5);
+						$proyectos_ids = Proyecto::where('idEstatusProyecto','=',5)->where('ejercicio','=',$anio_captura);
 						$jurisdiccion = false;
 						$unidades = false;
 
@@ -290,7 +305,7 @@ class VisorController extends BaseController {
 						    }
 						}
 
-						$data = array('data'=>$metas,'total'=>$total);
+						$data = array('data'=>$metas,'total'=>$total,'datos_captura'=>$datos_captura);
 					break;
 				case 'metas_cumplidas_unidad':
 						$datos = $this->metasCumplidasPorUnidad();
@@ -342,14 +357,11 @@ class VisorController extends BaseController {
 			}
 		}elseif(isset($parametros['tabla'])) {
 			if($parametros['tabla'] == 'resumen_presupuesto'){
-				$mes_actual = Util::obtenerMesActual();
-				if($mes_actual == 0){ 
-					$mes_actual = date('n')-1; 
-				}else{
-					$mes_actual = $mes_actual-1;
-				}
+				$datos_captura = $this->obtenerDatosCaptura();
+				$anio_captura = $datos_captura['anio'];
+				$mes_actual = $datos_captura['mes'];
 
-				$rows = CargaDatosEP01::where('mes','=',$mes_actual);
+				$rows = CargaDatosEP01::where('mes','=',$mes_actual)->where('ejercicio','=',$anio_captura);
 
 				$usuario = Sentry::getUser();
 				if($usuario->claveUnidad){
@@ -379,17 +391,23 @@ class VisorController extends BaseController {
 				$total['presupuestoPagadoModificado'] = $rows->sum('presupuestoPagadoModificado');
 				$total['disponiblePresupuestarioModificado'] = $rows->sum('disponiblePresupuestarioModificado');
 
-				$data = array('data'=>$rows,'total'=>$total);
+				$data = array('data'=>$rows,'total'=>$total,'datos_captura'=>$datos_captura);
 			}
 		}elseif(isset($parametros['formatogrid'])){
 			if(isset($parametros['clasificacionProyecto'])){
-				$mes_actual = Util::obtenerMesActual();
-				$mes_activo = $mes_actual;
-				if($mes_actual == 0){ $mes_actual = date('n') - 1; }else{ $mes_actual = $mes_actual - 1; }
+				$datos_captura = $this->obtenerDatosCaptura();
+				$anio_captura = $datos_captura['anio'];
+				$mes_actual = $datos_captura['mes'];
+
+				$mes_activo = Util::obtenerMesActual();
+				if($mes_activo == 1){
+					$mes_activo = 0;
+				}
 
 				$jurisdiccion = false;
 
 				$rows = Proyecto::where('idEstatusProyecto','=',5)
+								->where('ejercicio','=',$anio_captura)
 							->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto']);
 				
 				$usuario = Sentry::getUser();
@@ -582,12 +600,9 @@ class VisorController extends BaseController {
 				}
 				$data = array('data'=>$proyectos,'resultados'=>$total,'mesActual'=>$mes_actual,'mesActivo'=>$mes_activo);
 			}elseif(isset($parametros['avancesIndicadores'])){
-				$mes_actual = Util::obtenerMesActual();
-				if($mes_actual == 0){
-					$mes_actual = date('n') -1;
-				}else{ 
-					$mes_actual = $mes_actual - 1; 
-				}
+				$datos_captura = $this->obtenerDatosCaptura();
+				$anio_captura = $datos_captura['anio'];
+				$mes_actual = $datos_captura['mes'];
 				
 				$jurisdiccion = false;
 
@@ -726,7 +741,7 @@ class VisorController extends BaseController {
 					$elementos[] = $elemento;
 				}
 				$total = count($elementos);
-				$data = array('data'=>$elementos,'resultados'=>$total);
+				$data = array('data'=>$elementos,'resultados'=>$total,'datos_captura'=>$datos_captura);
 			}
 		}else{
 			$data = array("data"=>"No hay datos",'code'=>'W00');
@@ -748,12 +763,9 @@ class VisorController extends BaseController {
 
 		if(isset($parametros['mostrar'])){
 			if($parametros['mostrar'] == 'detalles-avance-indicador'){
-				$mes_actual = Util::obtenerMesActual();
-				if($mes_actual == 0){
-					$mes_actual = date('n')-1;
-				}else{
-					$mes_actual = $mes_actual-1;
-				}
+				$datos_captura = $this->obtenerDatosCaptura();
+				$anio_captura = $datos_captura['anio'];
+				$mes_actual = $datos_captura['mes'];
 
 				if($parametros['nivel'] == 'componente'){
 					$recurso = Componente::getModel();
@@ -949,12 +961,9 @@ class VisorController extends BaseController {
 	}
 
 	public function presupuestoEjercidoPorUnidad(){
-		$mes_actual = Util::obtenerMesActual();
-		if($mes_actual == 0){ 
-			$mes_actual = date('n')-1; 
-		}else{
-			$mes_actual = $mes_actual-1;
-		}
+		$datos_captura = $this->obtenerDatosCaptura();
+		$anio_captura = $datos_captura['anio'];
+		$mes_actual = $datos_captura['mes'];
 
 		$rows = CargaDatosEP01::getModel();
 
@@ -964,8 +973,8 @@ class VisorController extends BaseController {
 			$rows = $rows->whereIn('UR',$unidades);
 		}
 
-		//$rows = CargaDatosEP01::where('mes','=',$mes_actual)
 		$rows = $rows->where('mes','=',$mes_actual)
+					->where('ejercicio','=',$anio_captura)
 					->select(DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
 						DB::raw('sum(presupuestoEjercidoModificado) AS presupuestoEjercido'),
 						'unidad.descripcion AS unidadResponsable','UR AS clave','unidad.abreviatura AS unidadAbreviacion')
@@ -978,13 +987,10 @@ class VisorController extends BaseController {
 	}
 
 	public function metasCumplidasPorUnidad(){
-		$mes_actual = Util::obtenerMesActual();
-		if($mes_actual == 0){ 
-			$mes_actual = date('n')-1; 
-		}else{
-			$mes_actual = $mes_actual-1;
-		}
-
+		$datos_captura = $this->obtenerDatosCaptura();
+		$anio_captura = $datos_captura['anio'];
+		$mes_actual = $datos_captura['mes'];
+		
 		$usuario = Sentry::getUser();
 		if($usuario->claveUnidad){
 			$unidades = explode('|',$usuario->claveUnidad);
@@ -993,9 +999,10 @@ class VisorController extends BaseController {
 		}
 
 		$componentes = ComponenteMetaMes::where('mes','<=',$mes_actual)
-						->join('proyectos',function($join)use($unidades){
+						->join('proyectos',function($join)use($unidades,$anio_captura){
 							$join->on('proyectos.id','=','componenteMetasMes.idProyecto')
 								->where('proyectos.idEstatusProyecto','=',5)
+								->where('proyectos.ejercicio','=',$anio_captura)
 								->whereNull('proyectos.borradoAl');
 							if($unidades){
 								$join = $join->on('proyectos.unidadResponsable','in',DB::raw('('.implode(',',$unidades).')'));
@@ -1009,9 +1016,10 @@ class VisorController extends BaseController {
 							DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'))->get();
 		//
 		$actividades = ActividadMetaMes::where('mes','<=',$mes_actual)
-						->join('proyectos',function($join)use($unidades){
+						->join('proyectos',function($join)use($unidades,$anio_captura){
 							$join->on('proyectos.id','=','actividadMetasMes.idProyecto')
 								->where('proyectos.idEstatusProyecto','=',5)
+								->where('proyectos.ejercicio','=',$anio_captura)
 								->whereNull('proyectos.borradoAl');
 							if($unidades){
 								$join = $join->on('proyectos.unidadResponsable','in',DB::raw('('.implode(',',$unidades).')'));
@@ -1086,17 +1094,15 @@ class VisorController extends BaseController {
 	}
 
 	public function metasCumplidasPorJurisdiccion(){
-		$mes_actual = Util::obtenerMesActual();
-		if($mes_actual == 0){ 
-			$mes_actual = date('n')-1; 
-		}else{
-			$mes_actual = $mes_actual-1;
-		}
+		$datos_captura = $this->obtenerDatosCaptura();
+		$anio_captura = $datos_captura['anio'];
+		$mes_actual = $datos_captura['mes'];
 
 		$componentes = ComponenteMetaMes::where('mes','<=',$mes_actual)
-						->join('proyectos',function($join){
+						->join('proyectos',function($join)use($anio_captura){
 							$join->on('proyectos.id','=','componenteMetasMes.idProyecto')
 								->where('proyectos.idEstatusProyecto','=',5)
+								->where('proyectos.ejercicio','=',$anio_captura)
 								->whereNull('proyectos.borradoAl');
 						})
 						->leftjoin('vistaJurisdicciones AS jurisdiccion','jurisdiccion.clave','=','claveJurisdiccion')
@@ -1106,9 +1112,10 @@ class VisorController extends BaseController {
 							DB::raw('sum(meta) AS meta'),DB::raw('sum(avance) AS avance'))->get();
 		//
 		$actividades = ActividadMetaMes::where('mes','<=',$mes_actual)
-						->join('proyectos',function($join){
+						->join('proyectos',function($join)use($anio_captura){
 							$join->on('proyectos.id','=','actividadMetasMes.idProyecto')
 								->where('proyectos.idEstatusProyecto','=',5)
+								->where('proyectos.ejercicio','=',$anio_captura)
 								->whereNull('proyectos.borradoAl');
 						})
 						->leftjoin('vistaJurisdicciones AS jurisdiccion','jurisdiccion.clave','=','claveJurisdiccion')

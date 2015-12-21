@@ -37,9 +37,10 @@ class RendicionProgramaController extends BaseController {
 				}else{
 					$trimestre_actual = 0;
 				}
+				$anio_captura = Util::obtenerAnioCaptura();
 
 				$rows = Programa::getModel();
-				$rows = $rows->where('idEstatus','=',5);
+				$rows = $rows->where('idEstatus','=',5)->where('ejercicio','=',$anio_captura);
 
 				$usuario = Sentry::getUser();
 
