@@ -247,8 +247,8 @@ class EP01Controller extends \BaseController {
 										`presupuestoPorLiberar`,`presupuestoMinistrado`,`presupuestoComprometidoModificado`,
 										`presupuestoDevengadoModificado`,`presupuestoEjercidoModificado`,`presupuestoPagadoModificado`,
 										`disponibilidadFinancieraModificada`,`disponiblePresupuestarioModificado`) 
-										set idBitacoraCargaEP01='%s', mes='%s'
-										", addslashes($csv), $idInsertado, $parametros['mes']);
+										set idBitacoraCargaEP01='%s', mes='%s', ejercicio='%s'
+										", addslashes($csv), $idInsertado, $parametros['mes'],$parametros['ejercicio']);
 									DB::connection()->getpdo()->exec($query);
 
 									$conteoTotales = CargaDatosEP01::getModel();

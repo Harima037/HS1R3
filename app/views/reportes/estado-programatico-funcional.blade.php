@@ -37,7 +37,7 @@
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
-                            <input type="number" class="form-control" id="ejercicio" placeholder="Ejercicio" value="{{date('Y')}}" />
+                            <input type="number" class="form-control" id="ejercicio" placeholder="Ejercicio" value="{{$ejercicio}}" />
                         </div>
                     </div>
                     <div class="col-sm-1">

@@ -184,8 +184,8 @@ class EPRegionalizadoController extends \BaseController {
 										IGNORE 1 LINES 
 										(`UR`,`FI`,`FU`,`SF`,`SSF`,`PS`,`PP`,`PE`,`AI`,`PT`,`MPIO`,`OG`,`STG`,`FF`,`SFF`,`DG`,`CP`,
 										`DM`,`importe`) 
-										set idBitacoraCargaEPRegion='%s', mes='%s'
-										", addslashes($csv), $idInsertado, $parametros['mes']);
+										set idBitacoraCargaEPRegion='%s', mes='%s', ejercicio='%s'
+										", addslashes($csv), $idInsertado, $parametros['mes'],$parametros['ejercicio']);
 									DB::connection()->getpdo()->exec($query);
 
 									$conteoTotales = CargaDatosEPRegion::getModel();
