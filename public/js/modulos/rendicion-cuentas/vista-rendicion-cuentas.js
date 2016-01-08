@@ -689,12 +689,16 @@ $('.avance-mes').on('change',function(){
         if($('#justificacion-acumulada').val() == 'El avance se encuentra dentro de lo programado'){
             $('#justificacion-acumulada').val('');
         }
-        $('#tab-link-plan-mejora').attr('data-toggle','tab');
-        $('#tab-link-plan-mejora').parent().removeClass('disabled');
+        if($('#tab-link-plan-mejora').length){
+            $('#tab-link-plan-mejora').attr('data-toggle','tab');
+            $('#tab-link-plan-mejora').parent().removeClass('disabled');
+        }
     }else{
         $('#justificacion-acumulada').attr('disabled',true);
-        $('#tab-link-plan-mejora').attr('data-toggle','');
-        $('#tab-link-plan-mejora').parent().addClass('disabled');
+        if($('#tab-link-plan-mejora').length){
+            $('#tab-link-plan-mejora').attr('data-toggle','');
+            $('#tab-link-plan-mejora').parent().addClass('disabled');
+        }
     }
 });
 
@@ -731,8 +735,10 @@ $('#modalEditarAvance').on('hide.bs.modal',function(e){
     //$('span.nueva-cantidad').text('');
     //$('span.vieja-cantidad').text('0');
     $('#justificacion-acumulada').attr('disabled',true);
-    $('#tab-link-plan-mejora').attr('data-toggle','');
-    $('#tab-link-plan-mejora').parent().addClass('disabled');
+    if($('#tab-link-plan-mejora').length){
+        $('#tab-link-plan-mejora').attr('data-toggle','');
+        $('#tab-link-plan-mejora').parent().addClass('disabled');
+    }
     $('#tabs-seguimiento-metas a:first').tab('show');
     $('.lista-localidades-jurisdiccion').remove();
     Validation.cleanFormErrors('#form_avance');

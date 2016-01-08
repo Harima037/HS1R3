@@ -149,13 +149,14 @@ class ReporteVariacionesGastoController extends BaseController {
 					        'size'      =>  9
 					    )
 					));
-
 					$sheet->loadView('reportes.excel.variaciones-gasto',$datos);
+					/*
 					$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','A1');
 					$imagen->setWorksheet($sheet);
 					$imagen = $this->obtenerImagen('LogoInstitucional.png','G1');
 					$imagen->setWorksheet($sheet);	
-					
+					*/
+
 					$sheet->mergeCells('C5:F5');
 					$sheet->mergeCells('C7:F7');
 					$sheet->mergeCells('E8:F8');
@@ -165,6 +166,7 @@ class ReporteVariacionesGastoController extends BaseController {
 					$sheet->mergeCells('A14:C14');
 					
 					$sheet->cells('B5:F10',function($cells){ $cells->setAlignment('center'); });
+					
 					$sheet->cells('A11:F12',function($cells){ $cells->setAlignment('center'); });
 					$sheet->cells('A13:G13',function($cells){ $cells->setAlignment('center'); });
 					$sheet->cells('A14:G14',function($cells){ $cells->setAlignment('center'); });
@@ -172,16 +174,22 @@ class ReporteVariacionesGastoController extends BaseController {
 					$total = 16 + $datos['cuantosAprobados'];
 					$i = 16;
 																
-					$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
+					//$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
 					$sheet->getStyle('G16:G'.$total)->getAlignment()->setWrapText(true);
+					$sheet->cells('G16:G'.$total,function($cells){ $cells->setAlignment('justify'); });
+					
+					$sheet->getStyle('C8:C9')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+					$sheet->getStyle('D8:D9')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
 					
 					for($i=14;$i<=$total;$i++)
 					{
 						$sheet->mergeCells('A'.$i.':C'.$i);
 						//$sheet->mergeCells('D'.$i.':E'.$i);
 					}
-						
-					$sheet->cells('B14:E'.$total,function($cells){ $cells->setAlignment('center'); });
+					$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
+					$sheet->cells('A16:C'.$total,function($cells){ $cells->setAlignment('justify'); });
+
+					$sheet->cells('B14:F'.$total,function($cells){ $cells->setAlignment('center'); });
 
 					$sheet->setColumnFormat(array(
 						'C10:F10' => '### ### ### ##0.00'
@@ -191,6 +199,7 @@ class ReporteVariacionesGastoController extends BaseController {
 					$sheet->setColumnFormat(array(
 						'D16:F'.$total => '### ### ### ##0.00'
 					));
+					$sheet->getStyle('D16:F'.$total)->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_TOP);
 					
 					$sheet->getStyle('B5:F5')->applyFromArray(array(
 					    'font' => array(
@@ -342,11 +351,12 @@ class ReporteVariacionesGastoController extends BaseController {
 					));
 
 					$sheet->loadView('reportes.excel.variaciones-gasto2',$datos);
+					/*
 					$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','A1');
 					$imagen->setWorksheet($sheet);
 					$imagen = $this->obtenerImagen('LogoInstitucional.png','G1');
 					$imagen->setWorksheet($sheet);	
-					
+					*/
 					$sheet->mergeCells('C5:F5');
 					$sheet->mergeCells('C7:F7');
 					$sheet->mergeCells('E8:F8');
@@ -363,16 +373,20 @@ class ReporteVariacionesGastoController extends BaseController {
 					$total = 16 + $datos['cuantosDevengados'];
 					$i = 16;
 																
-					$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
+					//$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
 					$sheet->getStyle('G16:G'.$total)->getAlignment()->setWrapText(true);
+					$sheet->cells('G16:G'.$total,function($cells){ $cells->setAlignment('justify'); });
+
+					$sheet->getStyle('C8:C9')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+					$sheet->getStyle('D8:D9')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
 					
-					for($i=14;$i<=$total;$i++)
-					{
+					for($i=14;$i<=$total;$i++){
 						$sheet->mergeCells('A'.$i.':C'.$i);
-		
 					}
+					$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
+					$sheet->cells('A16:C'.$total,function($cells){ $cells->setAlignment('justify'); });
 						
-					$sheet->cells('B14:E'.$total,function($cells){ $cells->setAlignment('center'); });
+					$sheet->cells('B14:F'.$total,function($cells){ $cells->setAlignment('center'); });
 
 					$sheet->setColumnFormat(array(
 						'C10:F10' => '### ### ### ##0.00'
@@ -382,6 +396,7 @@ class ReporteVariacionesGastoController extends BaseController {
 					$sheet->setColumnFormat(array(
 						'D16:F'.$total => '### ### ### ##0.00'
 					));
+					$sheet->getStyle('D16:F'.$total)->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_TOP);
 					
 					$sheet->getStyle('B5:F5')->applyFromArray(array(
 					    'font' => array(

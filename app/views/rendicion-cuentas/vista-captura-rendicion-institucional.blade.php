@@ -259,7 +259,7 @@
 									<span class="fa fa-align-left"></span> Análisis y Justificación
 								</a>
 							</li>
-							@if($trimestre_activo)
+							@if($trimestre_activo && $mes_clave != '12')
 							<li role="presentation" class="disabled">
 								<a href="#panel-plan-mejora" aria-controls="panel-plan-mejora" role="tab" data-toggle="" id="tab-link-plan-mejora">
 									<span class="fa fa-file"></span> Plan de Acción de Mejora
@@ -421,7 +421,7 @@
 									</div>
 								</div>
 							</div>
-							@if($trimestre_activo)
+							@if($trimestre_activo && $mes_clave != '12')
 							<div role="tabpanel" class="tab-pane" id="panel-plan-mejora">
 								<br>
 								<div class="row">
