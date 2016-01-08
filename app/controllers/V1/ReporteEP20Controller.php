@@ -122,7 +122,9 @@ class ReporteEP20Controller extends BaseController {
 				//var_dump($queries);die;
 
 				$datos = array('datos'=>$rows);
-				$datos['fecha_trimestre'] = '30 de Junio del 2015';
+				$a_date = $ejercicio."-".$mes."-1";
+				$fecha = date("t", strtotime($a_date));
+				$datos['fecha_trimestre'] = $fecha.' de '.Util::obtenerDescripcionMes($mes).' del 2015';
 				$datos['firmas'] = array();
 				$titulares = Directorio::titularesActivos(array('00','01'))->get();
 

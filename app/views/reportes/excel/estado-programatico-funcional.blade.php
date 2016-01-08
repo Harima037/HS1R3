@@ -10,7 +10,7 @@
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		<tr>
-			<td style="font-weight:bold; font-size:10;">Secretaría de Salud</td>
+			<td style="font-weight:bold; font-size:10;">Instituto de Salud</td>
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		<tr>

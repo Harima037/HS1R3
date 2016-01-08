@@ -283,7 +283,18 @@ class ReporteGastoRegionalizadoController extends BaseController {
 					    )
 					));
 			    });
+				$excel->getActiveSheet()->getPageSetup()->setPaperSize(\PHPExcel_Worksheet_PageSetup::PAPERSIZE_LETTER);
+				$excel->getActiveSheet()->getPageSetup()->setOrientation(\PHPExcel_Worksheet_PageSetup::ORIENTATION_LANDSCAPE);
 
+				$excel->getActiveSheet()->getPageSetup()->setFitToPage(true);
+				$excel->getActiveSheet()->getPageSetup()->setFitToWidth(1);
+				$excel->getActiveSheet()->getPageSetup()->setFitToHeight(0);
+
+				$excel->getActiveSheet()->getPageMargins()->setTop(0.3543307);
+				$excel->getActiveSheet()->getPageMargins()->setBottom(0.3543307);
+
+				$excel->getActiveSheet()->getPageMargins()->setRight(0.1968504);
+				$excel->getActiveSheet()->getPageMargins()->setLeft(0.2755906);
 			})->download('xlsx');
 		}catch(Exception $ex){
 			return Response::json(array('data'=>'Ocurrio un error al generar el reporte.','message'=>$ex->getMessage(),'line'=>$ex->getLine()),500);

@@ -176,6 +176,14 @@ class ReporteIndicadorResultadoController extends BaseController {
 			
 			//return Response::json($hojas,200);
 
+			$datos['nombres_subfuncion'] = [
+				'2.3.1.1'=>'Prest. serv. salud comunidad',
+				'2.3.2.1'=>'Prest. serv. salud persona',
+				'2.3.3.1'=>'Generación recursos salud',
+				'2.3.4.1'=>'Rectoría sistema salud',
+				'2.3.5.1'=>'Protección social en salud'
+			];
+
 			$datos['hojas'] = $hojas;
 
 			Excel::create('indicadores-resultados', function($excel) use ( $datos ){
@@ -183,7 +191,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 				$datos_hoja['ejercicio'] = $datos['ejercicio'];
 				$datos_hoja['trimestre'] = $datos['trimestre'];
 				foreach ($datos['hojas'] as $clave => $hoja) {
-					$excel->sheet($clave, function($sheet) use ( $datos_hoja, $hoja ){
+					$excel->sheet($datos['nombres_subfuncion'][$clave], function($sheet) use ( $datos_hoja, $hoja ){
 						$sheet->setStyle(array(
 						    'font' => array(
 						        'name'      =>  'Arial',

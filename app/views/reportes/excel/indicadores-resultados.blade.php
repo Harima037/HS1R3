@@ -99,11 +99,10 @@
 		</tr>
 		
 		@foreach($clasificacion['fuentes'] as $fuente)
-
 		<tr>
 		<!-- {{ $current_row++; }} -->
 			<td></td><td></td>
-			<td align="center" valign="top" style="text-decoration:underline; font-size:11; font-weight:bold;">{{$fuente['titulo']}}</td>
+			<td align="center" valign="top" style="text-decoration:underline; font-size:11; font-weight:bold;"><br>{{$fuente['titulo']}}</td>
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		
@@ -114,7 +113,7 @@
 				{{$proyecto->proyectoEstrategico}}{{str_pad($proyecto->numeroProyectoEstrategico, 3,'0',STR_PAD_LEFT)}}
 				<!-- {{ $sum_rows[] = $current_row; }} -->
 			</td>
-			<td></td>
+			<td valign="top" align="center">0</td>
 			<td align="center" style="font-weight:bold;text-align:justify;">{{{ rtrim($proyecto->nombreTecnico,'.') }}}</td>
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 			<td valign="top" {{$estilo_fuente = (count($proyecto->fuentesFinanciamiento) > 1)?'style="font-weight:bold; text-decoration:underline;"':''}} >
@@ -126,18 +125,18 @@
 			<td valign="top" {{$estilo_fuente}}>
 			{{ (count($proyecto->fuentesFinanciamiento) > 1)?'=SUM(M'.($current_row+1).':M'.($current_row+count($proyecto->fuentesFinanciamiento)).')':$proyecto->totalPresupuestoDevengado}}
 			</td>
-			<td valign="top">
+			<td align="center" valign="top">
 				@if($proyecto->idCobertura == 1)
-				Cobertura Estatal
+				Cobertura estatal
 				@elseif($proyecto->idCobertura == 2)
 				{{$proyecto->municipio}}
 				@else
 				Cobertura Regional
 				@endif
 			</td>
-			<td valign="top">
+			<td align="center" valign="top">
 				@if($proyecto->idCobertura == 1)
-				Cobertura Estatal
+				Cobertura estatal
 				@elseif($proyecto->idCobertura == 2)
 				{{$proyecto->municipio}}
 				@else
@@ -147,19 +146,19 @@
 			@if(count($proyecto->beneficiariosDescripcion) > 1)
 				@if($proyecto->evaluacionMes)
 					@if($proyecto->evaluacionMes->indicadorResultadoBeneficiarios)
-						<td valign="top">{{$proyecto->evaluacionMes->indicadorResultadoBeneficiarios or 0}}</td>
+						<td align="center" valign="top">{{$proyecto->evaluacionMes->indicadorResultadoBeneficiarios or 0}}</td>
 					@else
 						@foreach($proyecto->beneficiariosDescripcion AS $beneficiario)
-						<td valign="top">{{$beneficiario->tipoBeneficiario}}</td><td>{{$beneficiario->avanceBeneficiario}}</td>
+						<td align="center" valign="top">{{$beneficiario->tipoBeneficiario}}</td><td>{{$beneficiario->avanceBeneficiario}}</td>
 						@endforeach
 					@endif
 				@else
 					@foreach($proyecto->beneficiariosDescripcion AS $beneficiario)
-					<td valign="top">{{$beneficiario->tipoBeneficiario}}</td><td>{{$beneficiario->avanceBeneficiario}}</td>
+					<td align="center" valign="top">{{$beneficiario->tipoBeneficiario}}</td><td>{{$beneficiario->avanceBeneficiario}}</td>
 					@endforeach
 				@endif
 			@else
-				<td valign="top">{{$proyecto->beneficiariosDescripcion[0]->avanceBeneficiario or 0}}</td>
+				<td align="center" valign="top">{{$proyecto->beneficiariosDescripcion[0]->avanceBeneficiario or 0}}</td>
 			@endif
 		</tr>
 

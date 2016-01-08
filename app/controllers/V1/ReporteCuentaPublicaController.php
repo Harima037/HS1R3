@@ -107,7 +107,7 @@ class ReporteCuentaPublicaController extends BaseController {
 		$cell = $row->addCell(8128);
 		$cell->addText(htmlspecialchars('GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS'),$titulo,$centrado);
 		$cell->addTextBreak(0);
-		$cell->addText(htmlspecialchars('SECRETARÍA DE SALUD'),$titulo,$centrado);
+		$cell->addText(htmlspecialchars('INSTITUTO DE SALUD'),$titulo,$centrado);
 		$cell->addTextBreak(0);
 		$cell->addText(htmlspecialchars('ANÁLISIS FUNCIONAL AL '.$trimestres[$trimestre].' TRIMESTRE DEL '.$ejercicio),$titulo,$centrado);
 		$row->addCell(3000)->addImage('img/LogoInstitucional.png');
