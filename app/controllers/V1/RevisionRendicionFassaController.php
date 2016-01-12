@@ -46,7 +46,7 @@ class RevisionRendicionFassaController extends \BaseController {
 			if(isset($parametros['formatogrid'])){
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				
-				$ejercicio_actual = date('Y');
+				$ejercicio_actual = Util::obtenerAnioCaptura();
 				//$rows = IndicadorFASSA::getModel();
 				$rows = IndicadorFASSAMeta::getModel();
 				
