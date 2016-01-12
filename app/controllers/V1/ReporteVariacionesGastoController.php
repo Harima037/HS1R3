@@ -176,6 +176,8 @@ class ReporteVariacionesGastoController extends BaseController {
 																
 					//$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
 					$sheet->getStyle('G16:G'.$total)->getAlignment()->setWrapText(true);
+					$sheet->getStyle('G16:G'.$total)->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_TOP);
+					
 					$sheet->cells('G16:G'.$total,function($cells){ $cells->setAlignment('justify'); });
 					
 					$sheet->getStyle('C8:C9')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
@@ -373,8 +375,9 @@ class ReporteVariacionesGastoController extends BaseController {
 					$total = 16 + $datos['cuantosDevengados'];
 					$i = 16;
 																
-					//$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
+					$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
 					$sheet->getStyle('G16:G'.$total)->getAlignment()->setWrapText(true);
+					$sheet->getStyle('G16:G'.$total)->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_TOP);
 					$sheet->cells('G16:G'.$total,function($cells){ $cells->setAlignment('justify'); });
 
 					$sheet->getStyle('C8:C9')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
@@ -384,6 +387,7 @@ class ReporteVariacionesGastoController extends BaseController {
 						$sheet->mergeCells('A'.$i.':C'.$i);
 					}
 					$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
+					//$sheet->getStyle('A16:C'.$total)->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_TOP);					
 					$sheet->cells('A16:C'.$total,function($cells){ $cells->setAlignment('justify'); });
 						
 					$sheet->cells('B14:F'.$total,function($cells){ $cells->setAlignment('center'); });

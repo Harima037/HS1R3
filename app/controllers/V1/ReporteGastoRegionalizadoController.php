@@ -137,6 +137,24 @@ class ReporteGastoRegionalizadoController extends BaseController {
 					$imagen = $this->obtenerImagen('LogoInstitucional.png','T1',(-18));
 					$imagen->setWorksheet($sheet);
 					
+					$sheet->setWidth(array(
+						'C'     =>  17.29,
+						'D'     =>  17.29,
+						'E'     =>  17.29,
+						'F'     =>  17.29,
+						'G'     =>  17.29,
+						'H'     =>  17.29,
+						'I'     =>  17.29,
+						'J'     =>  17.29,
+						'K'     =>  17.29,
+						'L'     =>  17.29,
+						'M'     =>  17.29,
+						'N'     =>  17.29,
+						'O'     =>  17.29,
+						'P'     =>  17.29,
+						'Q'     =>  17.29
+					));
+					
 					$sheet->mergeCells('A12:A13');
 					$sheet->mergeCells('B12:Q12');
 					$sheet->mergeCells('R12:R13');
@@ -149,6 +167,7 @@ class ReporteGastoRegionalizadoController extends BaseController {
 					$sheet->cells('A10:T13',function($cells) {
 						$cells->setAlignment('center');
 					});
+									
 					
 					$sheet->getStyle('A12:T13')->getAlignment()->setWrapText(true);
 					$sheet->getStyle('A12:T13')->applyFromArray(array(
