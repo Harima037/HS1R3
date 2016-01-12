@@ -6,8 +6,8 @@
 <body>
 	<table>
 
-		<tr><td width="38"></td><td width="21"></td>
-		<td width="18"></td><td width="18"></td><td width="18"></td><td width="18"></td><td width="18"></td><td width="18"></td><td width="18"></td><td width="18"></td><td width="18"></td><td width="18"></td><td width="18"></td><td width="18"></td><td width="18"></td><td width="18"></td><td width="18"></td>
+		<tr><td width="38.07"></td><td width="21.06"></td>
+		<td width="17.95"></td><td width="17.95"></td><td width="17.95"></td><td width="17.95"></td><td width="17.95"></td><td width="17.95"></td><td width="17.95"></td><td width="17.95"></td><td width="17.95"></td><td width="17.95"></td><td width="17.95"></td><td width="17.95"></td><td width="17.95"></td><td width="17.95"></td><td width="17.95"></td>
 		<td width="22"></td><td width="22"></td><td width="22"></td></tr>
 
 		<tr>
@@ -39,7 +39,7 @@
 		<tr class="encabezado-tabla"><td valign="middle" height="15">AL {{$trimestre}} TRIMESTRE DEL {{$ejercicio}}</td></tr>
 
 		<tr class="encabezado-tabla">
-			<td valign="middle" height="23" width="37.29">FUNCIÓN / PROGRAMAS PRESUPUESTARIOS</td>
+			<td valign="middle" height="23">FUNCIÓN / PROGRAMAS PRESUPUESTARIOS</td>
 			<td valign="middle">PRESUPUESTO DEVENGADO</td>
             <td></td>
 			<td></td>
@@ -62,22 +62,22 @@
 		</tr>
 		<tr class="encabezado-tabla">
 			<td height="38"></td>			
-			<td width="20.29" valign="middle">COBERTURA ESTATAL</td>			
-			<td width="17.29" valign="middle">REGIÓN I</td>
-			<td width="17.29" valign="middle">REGIÓN II</td>
-			<td width="17.29" valign="middle">REGIÓN III</td>
-			<td width="17.29" valign="middle">REGIÓN IV</td>
-			<td width="17.29" valign="middle">REGIÓN V</td>
-			<td width="17.29" valign="middle">REGIÓN VI</td>
-			<td width="17.29" valign="middle">REGIÓN VII</td>
-			<td width="17.29" valign="middle">REGIÓN VIII</td>
-			<td width="17.29" valign="middle">REGIÓN IX</td>
-			<td width="17.29" valign="middle">REGIÓN X</td>
-			<td width="17.29" valign="middle">REGIÓN XI</td>
-			<td width="17.29" valign="middle">REGIÓN XII</td>
-			<td width="17.29" valign="middle">REGIÓN XIII</td>
-			<td width="17.29" valign="middle">REGIÓN XIV</td>
-			<td width="17.29" valign="middle">REGIÓN XV</td>
+			<td valign="middle">COBERTURA ESTATAL</td>			
+			<td valign="middle">REGIÓN I</td>
+			<td valign="middle">REGIÓN II</td>
+			<td valign="middle">REGIÓN III</td>
+			<td valign="middle">REGIÓN IV</td>
+			<td valign="middle">REGIÓN V</td>
+			<td valign="middle">REGIÓN VI</td>
+			<td valign="middle">REGIÓN VII</td>
+			<td valign="middle">REGIÓN VIII</td>
+			<td valign="middle">REGIÓN IX</td>
+			<td valign="middle">REGIÓN X</td>
+			<td valign="middle">REGIÓN XI</td>
+			<td valign="middle">REGIÓN XII</td>
+			<td valign="middle">REGIÓN XIII</td>
+			<td valign="middle">REGIÓN XIV</td>
+			<td valign="middle">REGIÓN XV</td>
 			<td></td>
 			<td></td>
 			<td></td>
