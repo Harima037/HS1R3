@@ -106,7 +106,7 @@ class ReporteEvaluacionController extends BaseController {
 			9 => array('mes'=>'Septiembre',		'abrev'=>'SEP',	'trimestre'=>3, 'trimestre_letras'=>'TERCER'),
 			10 => array('mes'=>'Octubre',		'abrev'=>'OCT',	'trimestre'=>4, 'trimestre_letras'=>'CUARTO'),
 			11 => array('mes'=>'Noviembre',		'abrev'=>'NOV',	'trimestre'=>4, 'trimestre_letras'=>'CUARTO'),
-			12 => array('mes'=>'Dicembre',		'abrev'=>'DIC',	'trimestre'=>4, 'trimestre_letras'=>'CUARTO')
+			12 => array('mes'=>'Diciembre',		'abrev'=>'DIC',	'trimestre'=>4, 'trimestre_letras'=>'CUARTO')
 		);
 		
 		$data['componentes'] = array();
