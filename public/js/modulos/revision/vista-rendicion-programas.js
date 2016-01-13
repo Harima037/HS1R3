@@ -188,30 +188,18 @@ function seguimiento_metas(e){
             $('#trimestre-total').attr('data-valor',avance_acumulado + avance_trimestre);
             $('#trimestre-total').text((avance_acumulado + avance_trimestre).format());
 
-            if(parseFloat($('#trimestre-total').attr('data-valor')) > 0){
-                $('#avance-trimestre').change();
-            }
+            calcular_porcentaje((avance_acumulado+avance_trimestre),acumulado);
+
 			$('#modalEditarAvance').modal('show');
         }
     });
 }
-$('#avance-trimestre').on('keyup',function(){ $(this).change() });
-$('#avance-trimestre').on('change',function(){
-    var trimestre = $('#trimestre').val();
 
-    var avance = parseFloat($(this).val()) || 0;
-    var acumulado = parseFloat($('#trimestre-avance').attr('data-valor'));
+function calcular_porcentaje(total_acumulado, total_programado){
 
-    var total_acumulado = avance + acumulado;
-
-    $('#trimestre-total').attr('data-valor',total_acumulado);
-    $('#trimestre-total').text(total_acumulado.format());
-
-    var total_programado = parseFloat($('#trimestre-acumulada').attr('data-valor'));
     var necesita_justificar = false;
     if(total_programado == 0 && total_acumulado ==  0){
         total_porcentaje_acumulado = '<small class="text-success">0%</small>';
-        $('#trimestre-porcentaje').attr('data-estado-avance','');
     }else{
         if(total_programado > 0){
             var total_porcentaje_acumulado = parseFloat(((total_acumulado * 100) / total_programado).toFixed(2))||0;
@@ -224,33 +212,17 @@ $('#avance-trimestre').on('change',function(){
         }
         if(total_porcentaje_acumulado > 110){
             total_porcentaje_acumulado = '<small class="text-danger"><span class="fa fa-arrow-up"></span> '+total_porcentaje_acumulado+'%</small>';
-            $('#trimestre-porcentaje').attr('data-estado-avance','1');
-            necesita_justificar = true;
         }else if(total_porcentaje_acumulado < 90){
             total_porcentaje_acumulado = '<small class="text-danger"><span class="fa fa-arrow-down"></span> '+total_porcentaje_acumulado+'%</small>';
-            $('#trimestre-porcentaje').attr('data-estado-avance','1');
-            necesita_justificar = true;
         }else if(total_programado == 0 && total_porcentaje_acumulado > 0){
             total_porcentaje_acumulado = '<small class="text-info"><span class="fa fa-arrow-up"></span> '+total_porcentaje_acumulado+'%</small>';
-            $('#trimestre-porcentaje').attr('data-estado-avance','1');
-            necesita_justificar = true;
         }else{
             total_porcentaje_acumulado = '<small class="text-success">'+total_porcentaje_acumulado+'%</small>';
-            $('#trimestre-porcentaje').attr('data-estado-avance','');
         }
     }
 
     $('#trimestre-porcentaje').html(total_porcentaje_acumulado);
-
-    if(necesita_justificar){
-        $('#justificacion-acumulada').attr('disabled',false);
-        if($('#justificacion-acumulada').val() == 'El avance se encuentra dentro de los parametros establecidos'){
-            $('#justificacion-acumulada').val('');
-        }
-    }else{
-        $('#justificacion-acumulada').attr('disabled',true);
-    }
-});
+}
 
 $('#modalEditarAvance').on('hide.bs.modal',function(e){
     $('#modalEditarAvance .alert').remove();
