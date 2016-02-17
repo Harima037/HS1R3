@@ -161,6 +161,9 @@ class ReporteIndicadorResultadoController extends BaseController {
 				$total_acciones = count($row->componentes) + count($row->actividades);
 				$total_fuentes = count($row->fuentesFinanciamiento);
 
+				//$hojas[$row->subFuncionClave]['justificaciones'] += $row->componentes->lists('justificacionAcumulada','identificador');
+				//$hojas[$row->subFuncionClave]['justificaciones'] += $row->actividades->lists('justificacionAcumulada','identificador');
+
 				if($total_acciones > $total_fuentes){
 					$row->totalItems = $total_acciones;
 				}else{
@@ -185,7 +188,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 			];
 
 			$datos['hojas'] = $hojas;
-
+			//return Response::json(array('data'=>$hojas),200);
 			Excel::create('indicadores-resultados', function($excel) use ( $datos ){
 				$datos_hoja = array();
 				$datos_hoja['ejercicio'] = $datos['ejercicio'];

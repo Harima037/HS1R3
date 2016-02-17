@@ -175,10 +175,8 @@
 				<td valign="top">{{{ $proyecto->componentes[$i]->metaAnual }}}</td>
 				<td valign="top">{{{ $proyecto->componentes[$i]->avanceAcumulado or 0.00 }}}</td>
 				<td valign="top">
-				@if($proyecto->componentes[$i]->planMejora)
 					{{{ $proyecto->componentes[$i]->identificador }}}
 					<!-- {{ $hoja['justificaciones'][$proyecto->componentes[$i]->identificador]=$proyecto->componentes[$i]->justificacionAcumulada }} -->
-				@endif
 				</td>
 				<td valign="top">
 				{{'=SUM(H'.$current_row.')/G'.$current_row.'*100'}}
@@ -193,10 +191,8 @@
 				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->metaAnual }}}</td>
 				<td valign="top">{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->avanceAcumulado or 0.00 }}}</td>
 				<td valign="top">
-				@if($proyecto->actividades[$i-$proyecto->desfaseActividades]->planMejora)
 					{{{ $proyecto->actividades[$i-$proyecto->desfaseActividades]->identificador }}}
 					<!-- {{ $hoja['justificaciones'][$proyecto->actividades[$i-$proyecto->desfaseActividades]->identificador]=$proyecto->actividades[$i-$proyecto->desfaseActividades]->justificacionAcumulada }} -->
-				@endif
 				</td>
 				<td valign="top">
 					{{'=SUM(H'.$current_row.')/G'.$current_row.'*100'}}
