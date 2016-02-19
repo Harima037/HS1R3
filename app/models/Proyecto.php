@@ -123,7 +123,6 @@ class Proyecto extends BaseModel
 						'coordinadorGrupoEstrategico.cargo AS coordinadorGrupoEstrategicoCargo',
 						'responsableInformacion.cargo AS responsableInformacionCargo'
 					);
-
 	}
 
 	public function scopeIndicadoresResultados($query,$mes,$ejercicio){
@@ -384,7 +383,6 @@ class Proyecto extends BaseModel
 			->where('proyectos.idEstatusProyecto','=',5)			
 			->groupBy('proyectos.id');
 	}
-	
 
 	public function scopeCedulasAvances($query,$mes,$ejercicio){
 		$query->select(
@@ -667,6 +665,17 @@ class Proyecto extends BaseModel
 			->orderBy('proyectos.proyectoEstrategico','asc')
 			->orderBy('proyectos.numeroProyectoEstrategico','asc');
     }
+
+    public function scopeReporteEvaluacionProyectos($query,$mes,$anio){
+		return $query->leftjoin('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','proyectos.unidadResponsable')
+					->leftjoin('catalogoTiposProyectos AS tipoProyecto','tipoProyecto.id','=','proyectos.idTipoProyecto')
+					->leftjoin('catalogoCoberturas AS cobertura','cobertura.id','=','proyectos.idCobertura')
+					->select('proyectos.*',
+						'unidadResponsable.descripcion AS unidadResponsableDescripcion',
+						'tipoProyecto.descripcion AS tipoProyectoDescripcion',
+						'cobertura.descripcion AS coberturaDescripcion'
+					);
+	}
 
 	public function scopeContenidoCompleto($query){
 		return $query->with('componentes','beneficiarios','municipio','region','clasificacionProyecto','tipoProyecto','cobertura','tipoAccion',

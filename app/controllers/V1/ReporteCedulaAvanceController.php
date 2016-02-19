@@ -18,7 +18,7 @@ namespace V1;
 
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
-use BaseController, Input, Response, DB, Sentry, View, PDF;
+use BaseController, Input, Response, DB, Sentry, View, PDF, Exception;
 use Excel, EvaluacionAnalisisFuncional, SysConfiguracionVariable, Proyecto;
 
 class ReporteCedulaAvanceController extends BaseController {
@@ -215,7 +215,7 @@ class ReporteCedulaAvanceController extends BaseController {
 				
 			}
 		}catch(Exception $ex){
-			return Response::json(array('data'=>'Ocurrio un error al generar el reporte.','message'=>$ex->getMessage(),'line'=>$ex->getLine()),500);
+			return Response::json(array('data'=>'Ocurrio un error al generar el reporte.','message'=>$ex->getMessage()),500);
 		}
 	}
 
@@ -327,7 +327,12 @@ class ReporteCedulaAvanceController extends BaseController {
 				$indices[$componente['id']]['indiceActividad'] = 1;
 
 				if($componente['avanceAcumulado']){
-					$porcentaje = number_format(($componente['avanceAcumulado']*100)/$componente['metaAnual'],2);
+					if($componente['metaAnual'] > 0){
+						$porcentaje = number_format(($componente['avanceAcumulado']*100)/$componente['metaAnual'],2);
+					}else{
+						throw new Exception("El componente '".$componente['indicador']."', del proyecto '".$proyecto['nombreTecnico']."', tiene una meta programada de 0", 1);
+						return false;
+					}
 				}else{
 					$porcentaje = '0.00';
 				}
