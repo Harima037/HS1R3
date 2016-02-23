@@ -17,5 +17,24 @@ class CargaDatosEP01 extends BaseModel
 				->where('cargaDatosEP01.mes','=',$mes)
 				->where('cargaDatosEP01.ejercicio','=',$anio)
 				->groupBy('cargaDatosEP01.PP');
-	}			
+	}
+
+	public function scopeReporteProyectosEP01($query,$mes,$anio){
+		$query->select(DB::raw('concat(UR,FI,FU,SF,SSF,PS,PP,PE,AI,PT) AS clavePresupuestaria'), 
+				DB::RAW('SUM(cargaDatosEP01.presupuestoAprobado) AS presupuestoAprobado'),
+				DB::RAW('SUM(cargaDatosEP01.presupuestoModificado) AS presupuestoModificado'),
+				DB::RAW('SUM(cargaDatosEP01.presupuestoDevengadoModificado) AS presupuestoDevengadoModificado'),
+				DB::RAW('SUM(cargaDatosEP01.presupuestoEjercidoModificado) AS presupuestoEjercidoModificado'),
+				'fuente.descripcion AS fuenteFinanciamiento','subfuente.descripcion AS subFuenteFinanciamiento',
+				'fuente.clave AS claveFuenteFinanciamiento','subfuente.clave AS claveSubFuenteFinanciamiento')
+				->groupBy(DB::raw('concat(UR,FI,FU,SF,SSF,PS,PP,PE,AI,PT,FF,SFF)'))
+				->leftJoin('catalogoFuenteFinanciamiento AS fuente',function($join){
+					$join->on('fuente.clave','=','FF')->whereNull('fuente.borradoAl');
+				})
+				->leftJoin('catalogoSubFuenteFinanciamiento AS subfuente',function($join){
+					$join->on('subfuente.clave','=','SFF')->whereNull('subfuente.borradoAl');
+				})
+				->where('cargaDatosEP01.mes','=',$mes)
+				->where('cargaDatosEP01.ejercicio','=',$anio);
+	}
 }

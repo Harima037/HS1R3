@@ -666,7 +666,7 @@ class Proyecto extends BaseModel
 			->orderBy('proyectos.numeroProyectoEstrategico','asc');
     }
 
-    public function scopeReporteEvaluacionProyectos($query,$mes,$anio){
+    public function scopeReporteEvaluacionProyectos($query,$ejercicio){
 		return $query->leftjoin('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','proyectos.unidadResponsable')
 					->leftjoin('catalogoTiposProyectos AS tipoProyecto','tipoProyecto.id','=','proyectos.idTipoProyecto')
 					->leftjoin('catalogoCoberturas AS cobertura','cobertura.id','=','proyectos.idCobertura')
@@ -674,7 +674,8 @@ class Proyecto extends BaseModel
 						'unidadResponsable.descripcion AS unidadResponsableDescripcion',
 						'tipoProyecto.descripcion AS tipoProyectoDescripcion',
 						'cobertura.descripcion AS coberturaDescripcion'
-					);
+					)
+					->where('ejercicio',$ejercicio);
 	}
 
 	public function scopeContenidoCompleto($query){
@@ -682,6 +683,10 @@ class Proyecto extends BaseModel
 			'datosUnidadResponsable','datosFinalidad','datosFuncion','datosSubFuncion','datosSubSubFuncion','datosProgramaSectorial',
 			'datosProgramaPresupuestario','datosProgramaEspecial','datosActividadInstitucional','datosProyectoEstrategico',
 			'objetivoPed','estatusProyecto','jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico','responsableInformacion');
+	}
+
+	public function conteoPlanesMejora(){
+		return $this->hasMany('EvaluacionPlanMejora','idProyecto')->conteo();
 	}
 
 	public function beneficiarios(){
