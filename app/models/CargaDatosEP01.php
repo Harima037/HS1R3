@@ -26,13 +26,17 @@ class CargaDatosEP01 extends BaseModel
 				DB::RAW('SUM(cargaDatosEP01.presupuestoDevengadoModificado) AS presupuestoDevengadoModificado'),
 				DB::RAW('SUM(cargaDatosEP01.presupuestoEjercidoModificado) AS presupuestoEjercidoModificado'),
 				'fuente.descripcion AS fuenteFinanciamiento','subfuente.descripcion AS subFuenteFinanciamiento',
-				'fuente.clave AS claveFuenteFinanciamiento','subfuente.clave AS claveSubFuenteFinanciamiento')
+				'fuente.clave AS claveFuenteFinanciamiento','subfuente.clave AS claveSubFuenteFinanciamiento',
+				'tipoRecurso.clave AS claveTipoRecurso','tipoRecurso.descripcion AS tipoRecurso')
 				->groupBy(DB::raw('concat(UR,FI,FU,SF,SSF,PS,PP,PE,AI,PT,FF,SFF)'))
 				->leftJoin('catalogoFuenteFinanciamiento AS fuente',function($join){
 					$join->on('fuente.clave','=','FF')->whereNull('fuente.borradoAl');
 				})
 				->leftJoin('catalogoSubFuenteFinanciamiento AS subfuente',function($join){
 					$join->on('subfuente.clave','=','SFF')->whereNull('subfuente.borradoAl');
+				})
+				->leftJoin('catalogoFuenteFinanciamiento AS tipoRecurso',function($join){
+					$join->on('tipoRecurso.clave','=','fuente.fuente')->whereNull('tipoRecurso.borradoAl');;
 				})
 				->where('cargaDatosEP01.mes','=',$mes)
 				->where('cargaDatosEP01.ejercicio','=',$anio);
