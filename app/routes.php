@@ -70,6 +70,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('revision-programas',array('uses'=>'RevisionProgramaController@index'));
 		Route::get('revision-ver-programa/{id?}',array('uses'=>'RevisionProgramaController@editar'));
 
+		Route::get('variacion-gasto',array('uses'=>'VariacionesGastoController@index'));
+
 		Route::get('cuenta-publica',array('uses'=>'CuentaPublicaController@index'));
 		
 		Route::get('seguimiento-programas',array('uses'=>'SeguimientoProgramaController@index'));
@@ -119,7 +121,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('cedulas-avances',array('uses'=>'CedulaAvanceController@index'));
 		Route::get('indicadores-resultados',array('uses'=>'IndicadorResultadoController@index'));
 		Route::get('gasto-regionalizado',array('uses'=>'GastoRegionalizadoController@index'));
-		Route::get('variaciones-gasto-pub',array('uses'=>'VariacionesGastoController@index'));
+		Route::get('variacion-gasto',array('uses'=>'VariacionesGastoController@reporte'));
 		Route::get('estado-programatico-funcional',array('uses'=>'ReporteEP20Controller@index'));
 		Route::get('evaluacion-proyectos',array('uses'=>'ReporteEvaluacionProyectosController@index'));
 	});
@@ -163,7 +165,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('indicadores-resultados',		'V1\IndicadorResultadoController');
 		Route::resource('rep-indicadores-resultados',	'V1\ReporteIndicadorResultadoController',array('only'=>array('index')));
 		Route::resource('gasto-regionalizado',			'V1\ReporteGastoRegionalizadoController',array('only'=>array('index')));
-		Route::resource('variaciones-gasto-pub',		'V1\ReporteVariacionesGastoController');
+		Route::resource('variacion-gasto',				'V1\VariacionesGastoController');
+		Route::resource('reporte-variacion-gasto',		'V1\ReporteVariacionesGastoController');
 		Route::resource('estado-programatico-funcional','V1\ReporteEP20Controller',array('only'=>array('index')));
 		Route::resource('evaluacion-proyectos',			'V1\ReporteEvaluacionProyectosController',array('only'=>array('index')));
 

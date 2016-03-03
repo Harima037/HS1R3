@@ -141,402 +141,401 @@ class ReporteVariacionesGastoController extends BaseController {
 				$datos['totalDevengado'] = $totalDevengado;
 				
 				Excel::create('variaciones-gasto', function($excel) use ( $datos ){
-				
-				$excel->sheet('MODIFICADO-APROBADO', function($sheet) use ( $datos ){
-					$sheet->setStyle(array(
-					    'font' => array(
-					        'name'      =>  'Arial',
-					        'size'      =>  9
-					    )
-					));
-					$sheet->loadView('reportes.excel.variaciones-gasto',$datos);
-					/*
-					$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','A1');
-					$imagen->setWorksheet($sheet);
-					$imagen = $this->obtenerImagen('LogoInstitucional.png','G1');
-					$imagen->setWorksheet($sheet);	
-					*/
+					$excel->sheet('MODIFICADO-APROBADO', function($sheet) use ( $datos ){
+						$sheet->setStyle(array(
+						    'font' => array(
+						        'name'      =>  'Arial',
+						        'size'      =>  9
+						    )
+						));
+						$sheet->loadView('reportes.excel.variaciones-gasto',$datos);
+						/*
+						$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','A1');
+						$imagen->setWorksheet($sheet);
+						$imagen = $this->obtenerImagen('LogoInstitucional.png','G1');
+						$imagen->setWorksheet($sheet);	
+						*/
 
-					$sheet->mergeCells('C5:F5');
-					$sheet->mergeCells('C7:F7');
-					$sheet->mergeCells('E8:F8');
-					$sheet->mergeCells('A13:G13');
-					$sheet->mergeCells('C8:C9');
-					$sheet->mergeCells('D8:D9');					
-					$sheet->mergeCells('A14:C14');
-					
-					$sheet->cells('B5:F10',function($cells){ $cells->setAlignment('center'); });
-					
-					$sheet->cells('A11:F12',function($cells){ $cells->setAlignment('center'); });
-					$sheet->cells('A13:G13',function($cells){ $cells->setAlignment('center'); });
-					$sheet->cells('A14:G14',function($cells){ $cells->setAlignment('center'); });
-
-					$total = 16 + $datos['cuantosAprobados'];
-					$i = 16;
-																
-					//$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
-					$sheet->getStyle('G16:G'.$total)->getAlignment()->setWrapText(true);
-					$sheet->getStyle('G16:G'.$total)->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_TOP);
-					
-					$sheet->cells('G16:G'.$total,function($cells){ $cells->setAlignment('justify'); });
-					
-					$sheet->getStyle('C8:C9')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
-					$sheet->getStyle('D8:D9')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
-					
-					for($i=14;$i<=$total;$i++)
-					{
-						$sheet->mergeCells('A'.$i.':C'.$i);
-						//$sheet->mergeCells('D'.$i.':E'.$i);
-					}
-					$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
-					$sheet->cells('A16:C'.$total,function($cells){ $cells->setAlignment('justify'); });
-
-					$sheet->cells('B14:F'.$total,function($cells){ $cells->setAlignment('center'); });
-
-					$sheet->setColumnFormat(array(
-						'C10:F10' => '### ### ### ##0.00'
-					));
-					
-										
-					$sheet->setColumnFormat(array(
-						'D16:F'.$total => '### ### ### ##0.00'
-					));
-					$sheet->getStyle('D16:F'.$total)->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_TOP);
-					
-					$sheet->getStyle('B5:F5')->applyFromArray(array(
-					    'font' => array(
-					        'size'      =>  11,
-					        'bold'      =>  true,
-					        'color'		=> array('rgb'=>'000000')
-					    )
-					));
-					$sheet->getStyle('A13:F13')->applyFromArray(array(
-					    'font' => array(
-					        'size'      =>  10,
-					        'bold'      =>  true,
-					        'color'		=> array('rgb'=>'000000')
-					    )
-					));
-					$sheet->getStyle('C7:F7')->applyFromArray(array(
-					    'font' => array(
-					        'size'      =>  11,
-					        'bold'      =>  true,
-					        'color'		=> array('rgb'=>'FFFFFF')
-					    ),
-						'fill' => array(
-					        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-					        'color' => array('rgb' => '28A659')
-					    ),
-						'borders' => array(
-					    	'allborders' => array(
-					    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
-	            				'color' => array('rgb' => '000000')
-					    	)
-					    )
-					));
-					$sheet->getStyle('C8:F10')->applyFromArray(array(
-					    'font' => array(
-					        'size'      =>  11,
-					        'bold'      =>  true,
-					        'color'		=> array('rgb'=>'000000')
-					    ),						
-						'borders' => array(
-					    	'allborders' => array(
-					    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
-	            				'color' => array('rgb' => '000000')
-					    	)
-					    )
-					));
-					$sheet->getStyle('C8:F9')->applyFromArray(array(
-					    'fill' => array(
-					        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-					        'color' => array('rgb' => 'DDDDDD')
-					    )
-					));
-					$sheet->getStyle('A13:G13')->applyFromArray(array(
-					    'font' => array(
-					        'size'      =>  11,
-					        'bold'      =>  true,
-					        'color'		=> array('rgb'=>'000000')
-					    ),						
-						'borders' => array(
-					    	'allborders' => array(
-					    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
-	            				'color' => array('rgb' => '000000')
-					    	)
-					    )
-					));
-					$sheet->getStyle('A14:G14')->applyFromArray(array(
-					    'font' => array(
-					        'size'      =>  10,
-					        'bold'      =>  true,
-					        'color'		=> array('rgb'=>'FFFFFF')
-					    ),
-						'fill' => array(
-					        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-					        'color' => array('rgb' => '28A659')
-					    ),
-						'borders' => array(
-					    	'allborders' => array(
-					    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
-	            				'color' => array('rgb' => '000000')
-					    	)
-					    )
-					));
-					
-					$sheet->getStyle('A15')->applyFromArray(array(
-					    'font' => array(
-					        'size'      =>  11,
-					        'bold'      =>  true
-					    )
-					));
-										
-					$sheet->getStyle('A15:G'.$total)->applyFromArray(array(
-					    'font' => array(
-					        'size'      =>  11
-					    ),
-						'borders' => array(
-						  	/*'top' => array(
-								'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-	            				'color' => array('argb' => '28A659')
-						    ),*/
-						    'bottom' => array(
-								'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-								'color' => array('argb' => '28A659')
-					    	),
-							'left' => array(
-								'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-								'color' => array('argb' => '28A659')
-					    	),
-							'right' => array(
-								'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-								'color' => array('argb' => '28A659')
-					    	)
-						 )
-					));
-					
-					for($i=16;$i<$total;$i++)
-						$sheet->setCellValue('F'.$i,'=SUM(E'.$i.'-D'.$i.')');
+						$sheet->mergeCells('C5:F5');
+						$sheet->mergeCells('C7:F7');
+						$sheet->mergeCells('E8:F8');
+						$sheet->mergeCells('A13:G13');
+						$sheet->mergeCells('C8:C9');
+						$sheet->mergeCells('D8:D9');					
+						$sheet->mergeCells('A14:C14');
 						
-					$totalMenosUno = $total-1;
-										
-					$sheet->setCellValue('D'.$total,'=SUM(D16:D'.$totalMenosUno.')');
-					$sheet->setCellValue('E'.$total,'=SUM(E16:E'.$totalMenosUno.')');
-					$sheet->setCellValue('F'.$total,'=SUM(F16:F'.$totalMenosUno.')');
-
-					$sheet->setCellValue('C10','=D'.$total);
-					$sheet->setCellValue('D10','=E'.$total);
-
-					$sheet->setCellValue('E10','=D10-C10');
-					$sheet->setCellValue('F10','=D10/C10*100-100');
-					
-					$totalMasDos = $total+2;					
-					$sheet->setCellValue('F'.$totalMasDos,'=SUM(F'.$total.'/E10*100)');
-
-										
-					/*$excel->getActiveSheet()->setCellValue('A'.$ultima_linea,null);
-					$excel->getActiveSheet()->setCellValue('J12','=SUM('.rtrim($suma_j,',').')');
-					$excel->getActiveSheet()->setCellValue('K12','=SUM('.rtrim($suma_k,',').')');*/
-					
-					
-					
-					
-					
-			    });
-				$excel->sheet('MODIFICADO-DEVENGADO', function($sheet) use ( $datos ){
-					
-					$sheet->setStyle(array(
-					    'font' => array(
-					        'name'      =>  'Arial',
-					        'size'      =>  9
-					    )
-					));
-
-					$sheet->loadView('reportes.excel.variaciones-gasto2',$datos);
-					/*
-					$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','A1');
-					$imagen->setWorksheet($sheet);
-					$imagen = $this->obtenerImagen('LogoInstitucional.png','G1');
-					$imagen->setWorksheet($sheet);	
-					*/
-					$sheet->mergeCells('C5:F5');
-					$sheet->mergeCells('C7:F7');
-					$sheet->mergeCells('E8:F8');
-					$sheet->mergeCells('A13:G13');
-					$sheet->mergeCells('C8:C9');
-					$sheet->mergeCells('D8:D9');					
-					$sheet->mergeCells('A14:C14');
-					
-					$sheet->cells('B5:F10',function($cells){ $cells->setAlignment('center'); });
-					$sheet->cells('A11:F12',function($cells){ $cells->setAlignment('center'); });
-					$sheet->cells('A13:G13',function($cells){ $cells->setAlignment('center'); });
-					$sheet->cells('A14:G14',function($cells){ $cells->setAlignment('center'); });
-
-					$total = 16 + $datos['cuantosDevengados'];
-					$i = 16;
-																
-					$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
-					$sheet->getStyle('G16:G'.$total)->getAlignment()->setWrapText(true);
-					$sheet->getStyle('G16:G'.$total)->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_TOP);
-					$sheet->cells('G16:G'.$total,function($cells){ $cells->setAlignment('justify'); });
-
-					$sheet->getStyle('C8:C9')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
-					$sheet->getStyle('D8:D9')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
-					
-					for($i=14;$i<=$total;$i++){
-						$sheet->mergeCells('A'.$i.':C'.$i);
-					}
-					$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
-					//$sheet->getStyle('A16:C'.$total)->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_TOP);					
-					$sheet->cells('A16:C'.$total,function($cells){ $cells->setAlignment('justify'); });
+						$sheet->cells('B5:F10',function($cells){ $cells->setAlignment('center'); });
 						
-					$sheet->cells('B14:F'.$total,function($cells){ $cells->setAlignment('center'); });
+						$sheet->cells('A11:F12',function($cells){ $cells->setAlignment('center'); });
+						$sheet->cells('A13:G13',function($cells){ $cells->setAlignment('center'); });
+						$sheet->cells('A14:G14',function($cells){ $cells->setAlignment('center'); });
 
-					$sheet->setColumnFormat(array(
-						'C10:F10' => '### ### ### ##0.00'
-					));
-					
-										
-					$sheet->setColumnFormat(array(
-						'D16:F'.$total => '### ### ### ##0.00'
-					));
-					$sheet->getStyle('D16:F'.$total)->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_TOP);
-					
-					$sheet->getStyle('B5:F5')->applyFromArray(array(
-					    'font' => array(
-					        'size'      =>  11,
-					        'bold'      =>  true,
-					        'color'		=> array('rgb'=>'000000')
-					    )
-					));
-					$sheet->getStyle('A13:F13')->applyFromArray(array(
-					    'font' => array(
-					        'size'      =>  10,
-					        'bold'      =>  true,
-					        'color'		=> array('rgb'=>'000000')
-					    )
-					));
-					$sheet->getStyle('C7:F7')->applyFromArray(array(
-					    'font' => array(
-					        'size'      =>  11,
-					        'bold'      =>  true,
-					        'color'		=> array('rgb'=>'FFFFFF')
-					    ),
-						'fill' => array(
-					        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-					        'color' => array('rgb' => '28A659')
-					    ),
-						'borders' => array(
-					    	'allborders' => array(
-					    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
-	            				'color' => array('rgb' => '000000')
-					    	)
-					    )
-					));
-					$sheet->getStyle('C8:F10')->applyFromArray(array(
-					    'font' => array(
-					        'size'      =>  11,
-					        'bold'      =>  true,
-					        'color'		=> array('rgb'=>'000000')
-					    ),						
-						'borders' => array(
-					    	'allborders' => array(
-					    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
-	            				'color' => array('rgb' => '000000')
-					    	)
-					    )
-					));
-					$sheet->getStyle('C8:F9')->applyFromArray(array(
-					    'fill' => array(
-					        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-					        'color' => array('rgb' => 'DDDDDD')
-					    )
-					));
-					$sheet->getStyle('A13:G13')->applyFromArray(array(
-					    'font' => array(
-					        'size'      =>  11,
-					        'bold'      =>  true,
-					        'color'		=> array('rgb'=>'000000')
-					    ),						
-						'borders' => array(
-					    	'allborders' => array(
-					    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
-	            				'color' => array('rgb' => '000000')
-					    	)
-					    )
-					));
-					$sheet->getStyle('A14:G14')->applyFromArray(array(
-					    'font' => array(
-					        'size'      =>  10,
-					        'bold'      =>  true,
-					        'color'		=> array('rgb'=>'FFFFFF')
-					    ),
-						'fill' => array(
-					        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-					        'color' => array('rgb' => '28A659')
-					    ),
-						'borders' => array(
-					    	'allborders' => array(
-					    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
-	            				'color' => array('rgb' => '000000')
-					    	)
-					    )
-					));
-					
-					$sheet->getStyle('A15')->applyFromArray(array(
-					    'font' => array(
-					        'size'      =>  11,
-					        'bold'      =>  true
-					    )
-					));
-										
-					$sheet->getStyle('A15:G'.$total)->applyFromArray(array(
-					    'font' => array(
-					        'size'      =>  11
-					    ),
-						'borders' => array(
-						  	/*'top' => array(
-								'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-	            				'color' => array('argb' => '28A659')
-						    ),*/
-						    'bottom' => array(
-								'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-								'color' => array('argb' => '28A659')
-					    	),
-							'left' => array(
-								'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-								'color' => array('argb' => '28A659')
-					    	),
-							'right' => array(
-								'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-								'color' => array('argb' => '28A659')
-					    	)
-						 )
-					));
-					
-					for($i=16;$i<$total;$i++)
-						$sheet->setCellValue('F'.$i,'=SUM(E'.$i.'-D'.$i.')');
+						$total = 16 + $datos['cuantosAprobados'];
+						$i = 16;
+																	
+						//$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
+						$sheet->getStyle('G16:G'.$total)->getAlignment()->setWrapText(true);
+						$sheet->getStyle('G16:G'.$total)->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_TOP);
 						
-					$totalMenosUno = $total-1;
-										
-					$sheet->setCellValue('D'.$total,'=SUM(D16:D'.$totalMenosUno.')');
-					$sheet->setCellValue('E'.$total,'=SUM(E16:E'.$totalMenosUno.')');
-					$sheet->setCellValue('F'.$total,'=SUM(F16:F'.$totalMenosUno.')');
+						$sheet->cells('G16:G'.$total,function($cells){ $cells->setAlignment('justify'); });
+						
+						$sheet->getStyle('C8:C9')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$sheet->getStyle('D8:D9')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						
+						for($i=14;$i<=$total;$i++)
+						{
+							$sheet->mergeCells('A'.$i.':C'.$i);
+							//$sheet->mergeCells('D'.$i.':E'.$i);
+						}
+						$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
+						$sheet->cells('A16:C'.$total,function($cells){ $cells->setAlignment('justify'); });
 
-					$sheet->setCellValue('C10','=D'.$total);
-					$sheet->setCellValue('D10','=E'.$total);
+						$sheet->cells('B14:F'.$total,function($cells){ $cells->setAlignment('center'); });
 
-					$sheet->setCellValue('E10','=D10-C10');
-					$sheet->setCellValue('F10','=D10/C10*100-100');
-					
-					$totalMasDos = $total+2;					
-					$sheet->setCellValue('F'.$totalMasDos,'=SUM(F'.$total.'/E10*100)');
-					
-					
+						$sheet->setColumnFormat(array(
+							'C10:F10' => '### ### ### ##0.00'
+						));
+						
+											
+						$sheet->setColumnFormat(array(
+							'D16:F'.$total => '### ### ### ##0.00'
+						));
+						$sheet->getStyle('D16:F'.$total)->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_TOP);
+						
+						$sheet->getStyle('B5:F5')->applyFromArray(array(
+						    'font' => array(
+						        'size'      =>  11,
+						        'bold'      =>  true,
+						        'color'		=> array('rgb'=>'000000')
+						    )
+						));
+						$sheet->getStyle('A13:F13')->applyFromArray(array(
+						    'font' => array(
+						        'size'      =>  10,
+						        'bold'      =>  true,
+						        'color'		=> array('rgb'=>'000000')
+						    )
+						));
+						$sheet->getStyle('C7:F7')->applyFromArray(array(
+						    'font' => array(
+						        'size'      =>  11,
+						        'bold'      =>  true,
+						        'color'		=> array('rgb'=>'FFFFFF')
+						    ),
+							'fill' => array(
+						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
+						        'color' => array('rgb' => '28A659')
+						    ),
+							'borders' => array(
+						    	'allborders' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
+		            				'color' => array('rgb' => '000000')
+						    	)
+						    )
+						));
+						$sheet->getStyle('C8:F10')->applyFromArray(array(
+						    'font' => array(
+						        'size'      =>  11,
+						        'bold'      =>  true,
+						        'color'		=> array('rgb'=>'000000')
+						    ),						
+							'borders' => array(
+						    	'allborders' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
+		            				'color' => array('rgb' => '000000')
+						    	)
+						    )
+						));
+						$sheet->getStyle('C8:F9')->applyFromArray(array(
+						    'fill' => array(
+						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
+						        'color' => array('rgb' => 'DDDDDD')
+						    )
+						));
+						$sheet->getStyle('A13:G13')->applyFromArray(array(
+						    'font' => array(
+						        'size'      =>  11,
+						        'bold'      =>  true,
+						        'color'		=> array('rgb'=>'000000')
+						    ),						
+							'borders' => array(
+						    	'allborders' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
+		            				'color' => array('rgb' => '000000')
+						    	)
+						    )
+						));
+						$sheet->getStyle('A14:G14')->applyFromArray(array(
+						    'font' => array(
+						        'size'      =>  10,
+						        'bold'      =>  true,
+						        'color'		=> array('rgb'=>'FFFFFF')
+						    ),
+							'fill' => array(
+						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
+						        'color' => array('rgb' => '28A659')
+						    ),
+							'borders' => array(
+						    	'allborders' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
+		            				'color' => array('rgb' => '000000')
+						    	)
+						    )
+						));
+						
+						$sheet->getStyle('A15')->applyFromArray(array(
+						    'font' => array(
+						        'size'      =>  11,
+						        'bold'      =>  true
+						    )
+						));
+											
+						$sheet->getStyle('A15:G'.$total)->applyFromArray(array(
+						    'font' => array(
+						        'size'      =>  11
+						    ),
+							'borders' => array(
+							  	/*'top' => array(
+									'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+		            				'color' => array('argb' => '28A659')
+							    ),*/
+							    'bottom' => array(
+									'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+									'color' => array('argb' => '28A659')
+						    	),
+								'left' => array(
+									'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+									'color' => array('argb' => '28A659')
+						    	),
+								'right' => array(
+									'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+									'color' => array('argb' => '28A659')
+						    	)
+							 )
+						));
+						
+						for($i=16;$i<$total;$i++)
+							$sheet->setCellValue('F'.$i,'=SUM(E'.$i.'-D'.$i.')');
+							
+						$totalMenosUno = $total-1;
+											
+						$sheet->setCellValue('D'.$total,'=SUM(D16:D'.$totalMenosUno.')');
+						$sheet->setCellValue('E'.$total,'=SUM(E16:E'.$totalMenosUno.')');
+						$sheet->setCellValue('F'.$total,'=SUM(F16:F'.$totalMenosUno.')');
 
-			    });
+						$sheet->setCellValue('C10','=D'.$total);
+						$sheet->setCellValue('D10','=E'.$total);
 
-			})->download('xlsx');
+						$sheet->setCellValue('E10','=D10-C10');
+						$sheet->setCellValue('F10','=D10/C10*100-100');
+						
+						$totalMasDos = $total+2;					
+						$sheet->setCellValue('F'.$totalMasDos,'=SUM(F'.$total.'/E10*100)');
+
+											
+						/*$excel->getActiveSheet()->setCellValue('A'.$ultima_linea,null);
+						$excel->getActiveSheet()->setCellValue('J12','=SUM('.rtrim($suma_j,',').')');
+						$excel->getActiveSheet()->setCellValue('K12','=SUM('.rtrim($suma_k,',').')');*/
+						
+						
+						
+						
+						
+				    });
+					$excel->sheet('MODIFICADO-DEVENGADO', function($sheet) use ( $datos ){
+						
+						$sheet->setStyle(array(
+						    'font' => array(
+						        'name'      =>  'Arial',
+						        'size'      =>  9
+						    )
+						));
+
+						$sheet->loadView('reportes.excel.variaciones-gasto2',$datos);
+						/*
+						$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','A1');
+						$imagen->setWorksheet($sheet);
+						$imagen = $this->obtenerImagen('LogoInstitucional.png','G1');
+						$imagen->setWorksheet($sheet);	
+						*/
+						$sheet->mergeCells('C5:F5');
+						$sheet->mergeCells('C7:F7');
+						$sheet->mergeCells('E8:F8');
+						$sheet->mergeCells('A13:G13');
+						$sheet->mergeCells('C8:C9');
+						$sheet->mergeCells('D8:D9');					
+						$sheet->mergeCells('A14:C14');
+						
+						$sheet->cells('B5:F10',function($cells){ $cells->setAlignment('center'); });
+						$sheet->cells('A11:F12',function($cells){ $cells->setAlignment('center'); });
+						$sheet->cells('A13:G13',function($cells){ $cells->setAlignment('center'); });
+						$sheet->cells('A14:G14',function($cells){ $cells->setAlignment('center'); });
+
+						$total = 16 + $datos['cuantosDevengados'];
+						$i = 16;
+																	
+						$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
+						$sheet->getStyle('G16:G'.$total)->getAlignment()->setWrapText(true);
+						$sheet->getStyle('G16:G'.$total)->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_TOP);
+						$sheet->cells('G16:G'.$total,function($cells){ $cells->setAlignment('justify'); });
+
+						$sheet->getStyle('C8:C9')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						$sheet->getStyle('D8:D9')->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_CENTER);
+						
+						for($i=14;$i<=$total;$i++){
+							$sheet->mergeCells('A'.$i.':C'.$i);
+						}
+						$sheet->getStyle('A16:C'.$total)->getAlignment()->setWrapText(true);
+						//$sheet->getStyle('A16:C'.$total)->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_TOP);					
+						$sheet->cells('A16:C'.$total,function($cells){ $cells->setAlignment('justify'); });
+							
+						$sheet->cells('B14:F'.$total,function($cells){ $cells->setAlignment('center'); });
+
+						$sheet->setColumnFormat(array(
+							'C10:F10' => '### ### ### ##0.00'
+						));
+						
+											
+						$sheet->setColumnFormat(array(
+							'D16:F'.$total => '### ### ### ##0.00'
+						));
+						$sheet->getStyle('D16:F'.$total)->getAlignment()->setVertical(\PHPExcel_Style_Alignment::VERTICAL_TOP);
+						
+						$sheet->getStyle('B5:F5')->applyFromArray(array(
+						    'font' => array(
+						        'size'      =>  11,
+						        'bold'      =>  true,
+						        'color'		=> array('rgb'=>'000000')
+						    )
+						));
+						$sheet->getStyle('A13:F13')->applyFromArray(array(
+						    'font' => array(
+						        'size'      =>  10,
+						        'bold'      =>  true,
+						        'color'		=> array('rgb'=>'000000')
+						    )
+						));
+						$sheet->getStyle('C7:F7')->applyFromArray(array(
+						    'font' => array(
+						        'size'      =>  11,
+						        'bold'      =>  true,
+						        'color'		=> array('rgb'=>'FFFFFF')
+						    ),
+							'fill' => array(
+						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
+						        'color' => array('rgb' => '28A659')
+						    ),
+							'borders' => array(
+						    	'allborders' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
+		            				'color' => array('rgb' => '000000')
+						    	)
+						    )
+						));
+						$sheet->getStyle('C8:F10')->applyFromArray(array(
+						    'font' => array(
+						        'size'      =>  11,
+						        'bold'      =>  true,
+						        'color'		=> array('rgb'=>'000000')
+						    ),						
+							'borders' => array(
+						    	'allborders' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
+		            				'color' => array('rgb' => '000000')
+						    	)
+						    )
+						));
+						$sheet->getStyle('C8:F9')->applyFromArray(array(
+						    'fill' => array(
+						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
+						        'color' => array('rgb' => 'DDDDDD')
+						    )
+						));
+						$sheet->getStyle('A13:G13')->applyFromArray(array(
+						    'font' => array(
+						        'size'      =>  11,
+						        'bold'      =>  true,
+						        'color'		=> array('rgb'=>'000000')
+						    ),						
+							'borders' => array(
+						    	'allborders' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
+		            				'color' => array('rgb' => '000000')
+						    	)
+						    )
+						));
+						$sheet->getStyle('A14:G14')->applyFromArray(array(
+						    'font' => array(
+						        'size'      =>  10,
+						        'bold'      =>  true,
+						        'color'		=> array('rgb'=>'FFFFFF')
+						    ),
+							'fill' => array(
+						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
+						        'color' => array('rgb' => '28A659')
+						    ),
+							'borders' => array(
+						    	'allborders' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
+		            				'color' => array('rgb' => '000000')
+						    	)
+						    )
+						));
+						
+						$sheet->getStyle('A15')->applyFromArray(array(
+						    'font' => array(
+						        'size'      =>  11,
+						        'bold'      =>  true
+						    )
+						));
+											
+						$sheet->getStyle('A15:G'.$total)->applyFromArray(array(
+						    'font' => array(
+						        'size'      =>  11
+						    ),
+							'borders' => array(
+							  	/*'top' => array(
+									'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+		            				'color' => array('argb' => '28A659')
+							    ),*/
+							    'bottom' => array(
+									'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+									'color' => array('argb' => '28A659')
+						    	),
+								'left' => array(
+									'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+									'color' => array('argb' => '28A659')
+						    	),
+								'right' => array(
+									'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+									'color' => array('argb' => '28A659')
+						    	)
+							 )
+						));
+						
+						for($i=16;$i<$total;$i++)
+							$sheet->setCellValue('F'.$i,'=SUM(E'.$i.'-D'.$i.')');
+							
+						$totalMenosUno = $total-1;
+											
+						$sheet->setCellValue('D'.$total,'=SUM(D16:D'.$totalMenosUno.')');
+						$sheet->setCellValue('E'.$total,'=SUM(E16:E'.$totalMenosUno.')');
+						$sheet->setCellValue('F'.$total,'=SUM(F16:F'.$totalMenosUno.')');
+
+						$sheet->setCellValue('C10','=D'.$total);
+						$sheet->setCellValue('D10','=E'.$total);
+
+						$sheet->setCellValue('E10','=D10-C10');
+						$sheet->setCellValue('F10','=D10/C10*100-100');
+						
+						$totalMasDos = $total+2;					
+						$sheet->setCellValue('F'.$totalMasDos,'=SUM(F'.$total.'/E10*100)');
+						
+						
+
+				    });
+
+				})->download('xlsx');
 
 				/*//var_dump($rows->toArray());die;*/
 			}
@@ -544,68 +543,6 @@ class ReporteVariacionesGastoController extends BaseController {
 			return Response::json(array('data'=>'Ocurrio un error al generar el reporte.','message'=>$ex->getMessage(),'line'=>$ex->getLine()),500);
 		}
 	}
-	//Funcion para editar
-	public function show($id){
-		//
-		$http_status = 200;
-		$data = array();
-		$parametros = Input::all();
-		
-		$recurso = ProyectosVariacionGastoRazones::ultimaRazon($id)->get();
-		
-		if(is_null($recurso)){
-			$http_status = 404;
-			$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
-		}else{
-			$recurso = $recurso->toArray();			
-			$data["data"] = $recurso;
-		}
-		return Response::json($data,$http_status);
-	}
-	
-	
-	
-	
-	public function update($id)
-	{
-		//
-		$respuesta['http_status'] = 200;
-		$respuesta['data'] = array("data"=>'');
-		
-		$parametros = Input::all();
-		
-		//var_dump($parametros);die;
-		
-		if(isset($parametros["mes-razones"]))
-		{
-			$Busqueda = ProyectosVariacionGastoRazones::hallaRazonPorMes($id,$parametros["mes-razones"])->get();
-			$idabuscar = 0;
-			
-			foreach($Busqueda as $row)
-				$idabuscar = $row->id;
-			
-			$recurso = ProyectosVariacionGastoRazones::find($idabuscar);
-			
-			if(is_null($recurso)){//Insertar
-				$recurso = new ProyectosVariacionGastoRazones;
-				$recurso->idProyecto = $id;
-				$recurso->mes = $parametros["mes-razones"];
-			}
-			//Si no es nulo, solamente actualizar las razones
-			$recurso->razonesAprobado = $parametros["razones"];
-			$recurso->razonesDevengado = $parametros["razones2"];
-			$recurso->save();
-			$respuesta['data']['data'] = $recurso;		
-		}
-		else
-		{
-			$respuesta['http_status'] = 500;
-		}
-		
-		return Response::json($respuesta['data'],$respuesta['http_status']);
-	}
-	
-	
 	
 	private function obtenerImagen($imagen,$celda,$offset = 10){
 		$objDrawing = new \PHPExcel_Worksheet_Drawing();
@@ -616,10 +553,5 @@ class ReporteVariacionesGastoController extends BaseController {
 		$objDrawing->setOffsetX($offset);// pins the top left corner of the image at an offset of 10 points horizontally to the right of the top-left corner of the cell
 		return $objDrawing;
 	}
-	
-	
-	
-	
-	
 }
 ?>

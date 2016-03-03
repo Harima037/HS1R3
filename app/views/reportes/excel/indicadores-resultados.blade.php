@@ -102,7 +102,7 @@
 		<tr>
 		<!-- {{ $current_row++; }} -->
 			<td></td><td></td>
-			<td align="center" valign="top" style="text-decoration:underline; font-size:11; font-weight:bold;"><br>{{$fuente['titulo']}}</td>
+			<td align="center" valign="top" style="text-decoration:underline; font-size:11; font-weight:bold;">{{$fuente['titulo']}}</td>
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		
@@ -113,7 +113,7 @@
 				{{$proyecto->proyectoEstrategico}}{{str_pad($proyecto->numeroProyectoEstrategico, 3,'0',STR_PAD_LEFT)}}
 				<!-- {{ $sum_rows[] = $current_row; }} -->
 			</td>
-			<td valign="top" align="center">0</td>
+			<td valign="top" align="center"></td>
 			<td align="center" style="font-weight:bold;text-align:justify;">{{{ rtrim($proyecto->nombreTecnico,'.') }}}</td>
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 			<td valign="top" {{$estilo_fuente = (count($proyecto->fuentesFinanciamiento) > 1)?'style="font-weight:bold; text-decoration:underline;"':''}} >

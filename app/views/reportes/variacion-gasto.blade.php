@@ -53,8 +53,8 @@
                     <div class="col-sm-12">
                         <div class="btn-toolbar pull-right" >
                             <div class="btn-group">
-                                <button type="button" class="btn btn-success btn-edit-rows">
-                                    <span class="fa fa-pencil"></span> Editar Razones
+                                <button type="button" class="btn btn-info btn-edit-rows">
+                                    <span class="fa fa-pencil"></span> Ver Razones
                                 </button>
                             </div>
                         </div>
@@ -138,7 +138,6 @@
                 </form>
                 </div>
                 <div class="modal-footer">
-	                <button type="button" class="btn btn-success" id="btnGuardarRazones">Guardar razones</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                 </div>
             </div><!-- /.modal-content -->

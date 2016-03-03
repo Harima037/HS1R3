@@ -213,7 +213,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 						$sheet->mergeCells('B9:B10');
 						$sheet->mergeCells('D9:E10');
 						$sheet->mergeCells('F9:J9');
-						$sheet->mergeCells('H10:I10');
+						$sheet->mergeCells('I10:J10');
 						$sheet->mergeCells('K9:K10');
 						$sheet->mergeCells('L9:L10');
 						$sheet->mergeCells('M9:M10');

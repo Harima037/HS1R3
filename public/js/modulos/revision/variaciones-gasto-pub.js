@@ -105,14 +105,24 @@ function realizar_busqueda(){
 
 /*===================================*/
 // Configuración General para cualquier módulo
-$('#btn-ver-cedulas').on('click',function(){
-    var parametros = '?mes='+$('#mes').val()+'&ejercicio='+$('#ejercicio').val();
-    if($('.txt-quick-search').val()){
-        parametros += '&buscar='+$('.txt-quick-search').val();
-    }
-    window.open(SERVER_HOST+'/v1/reporte-variacion-gasto'+parametros);
-});
 
+$('#btnGuardarRazones').on('click',function(){
+	var parametros = $('#formRazones').serialize()+'&mes-razones='+$('#mes-razones').val();
+	moduleResource.put($('#id').val(),parametros,{
+		_success: function(response){							
+			MessageManager.show({data:'Las razones han sido actualizadas con éxito',type:'OK',timer:3});
+			$('#modalRazones').modal('hide');
+			moduleDatagrid.actualizar();
+		},
+		_error: function(response){
+			try{
+				MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+			}catch(e){
+				console.log(e);
+			}
+		}
+	});
+});
 /*===================================*/
 // Funciones adicionales por módulo
 
