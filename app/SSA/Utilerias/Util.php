@@ -145,7 +145,7 @@ class Util
 		{
 			case 2 : $miles[0][0] = " MIL"; $miles[0][1] = " MIL"; break;
 			case 3 :
-					$miles[0][0] = " MILLON"; $miles[0][1] = " MILLONES"; 
+					$miles[0][0] = " MILLÓN"; $miles[0][1] = " MILLONES"; 
 					$miles[1][0] = " MIL"; $miles[1][1] = " MIL";
 					break;
 			case 4 : 
@@ -282,7 +282,7 @@ class Util
 									else
 										$cadena_enteros.=" CIENTO";
 								break;
-							case 2: $cadena_enteros.=" DOCIENTOS"; break;
+							case 2: $cadena_enteros.=" DOSCIENTOS"; break;
 							case 3: $cadena_enteros.=" TRESCIENTOS"; break;
 							case 4: $cadena_enteros.=" CUATROCIENTOS"; break;
 							case 5: $cadena_enteros.=" QUINIENTOS"; break;
@@ -329,7 +329,7 @@ class Util
 													$cadena_enteros.=" VEINTIUNO"; 
 													break;
 										case 2: $cadena_enteros.=" VEINTIDOS"; break;
-										case 3: $cadena_enteros.=" VEINTITRES"; break;
+										case 3: $cadena_enteros.=" VEINTITRÉS"; break;
 										case 4: $cadena_enteros.=" VEINTICUATRO"; break;
 										case 5: $cadena_enteros.=" VEINTICINCO"; break;
 										case 6: $cadena_enteros.=" VEITISEIS"; break;

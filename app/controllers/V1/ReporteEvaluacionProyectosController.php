@@ -74,6 +74,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 
 			$presupuesto_fuente_financiamiento = ['total'=>0.0,'fuentes'=>[]]; //<--- Calcular al obtener las fuentes de financiamiento
 			$presupuestos = [];
+			//return Response::json(array('datos'=>$presupuestos_raw),200);
 			foreach ($presupuestos_raw as $proyecto) {
 				if(!isset($presupuestos[$proyecto['clavePresupuestaria']])){
 					$presupuestos[$proyecto['clavePresupuestaria']] = [
@@ -83,7 +84,8 @@ class ReporteEvaluacionProyectosController extends BaseController {
 						'presupuestoModificado' => 0.00,
 						'fuentesFinanciamiento' => [],
 						'subFuentesFinanciamiento' => [],
-						'tiposRecursos' => []
+						'tiposRecursos' => [],
+						'afectacionPresupuestaria'=>[]
 					];
 				}
 
@@ -96,6 +98,12 @@ class ReporteEvaluacionProyectosController extends BaseController {
 				if(!isset($presupuestos[$proyecto['clavePresupuestaria']]['tiposRecursos'][$proyecto['claveTipoRecurso']])){
 					$presupuestos[$proyecto['clavePresupuestaria']]['tiposRecursos'][$proyecto['claveTipoRecurso']] = $proyecto['tipoRecurso'];
 				}
+				if($proyecto['claveTipoRecurso'] == '1' || $proyecto['claveTipoRecurso'] == '4' || $proyecto['claveTipoRecurso'] == '6'){
+					$presupuestos[$proyecto['clavePresupuestaria']]['afectacionPresupuestaria']['EST'] = 'Estatal';
+				}else{
+					$presupuestos[$proyecto['clavePresupuestaria']]['afectacionPresupuestaria']['FED'] = 'Federal';
+				}
+				
 
 				$presupuesto_fuente_financiamiento['total'] += $proyecto['presupuestoAprobado'];
 				if(!isset($presupuesto_fuente_financiamiento['fuentes'][$proyecto['claveFuenteFinanciamiento']])){
@@ -163,8 +171,8 @@ class ReporteEvaluacionProyectosController extends BaseController {
 		$phpWord->addTableStyle('TablaEncabezado',$headerStyle);
 		$phpWord->addTitleStyle(3, ['bold'=>true], ['align'=>'center']);
 
-		$section_resumen = $phpWord->addSection(array('orientation'=>'portrait','size'=>'letter'));
 		$section = $phpWord->addSection(array('orientation'=>'portrait','size'=>'letter'));
+		$section_resumen = $phpWord->addSection(array('orientation'=>'portrait','size'=>'letter'));
 	/***                <<<<<<<<<<<<<<<<<<<<  Definición de Estilos   >>>>>>>>>>>>>>>>>>>                   ***/
 	    $sectionStyle = $section_resumen->getStyle();
 		$sectionStyle->setMarginLeft(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.75));
@@ -262,12 +270,12 @@ class ReporteEvaluacionProyectosController extends BaseController {
 			$textrun->addText($proyecto['coberturaDescripcion']);
 			//$section->addTextBreak();
 
-			$textrun = $section->addTextRun();
-			$textrun->addText('Afectación presupuestaria: ', array('bold' => true));
-			$textrun->addText('');
-			//$section->addTextBreak();
-
 			if(isset($presupuestos[$proyecto['ClavePresupuestaria']])){
+				$textrun = $section->addTextRun();
+				$textrun->addText('Afectación presupuestaria: ', array('bold' => true));
+				$textrun->addText(implode(' y ', $presupuestos[$proyecto['ClavePresupuestaria']]['afectacionPresupuestaria']));
+				//$section->addTextBreak();
+
 				$textrun = $section->addTextRun();
 				$textrun->addText('Fuente de financiamiento: ', array('bold' => true));
 				$textrun->addText(implode(', ', $presupuestos[$proyecto['ClavePresupuestaria']]['fuentesFinanciamiento']));
@@ -278,9 +286,11 @@ class ReporteEvaluacionProyectosController extends BaseController {
 				$textrun->addText(implode(', ', $presupuestos[$proyecto['ClavePresupuestaria']]['subFuentesFinanciamiento']));
 				//$section->addTextBreak();
 
+				$cantidad_letras = ucfirst(mb_strtolower(ltrim(Util::transformarCantidadLetras($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoAprobado'])),'UTF-8'));
+
 				$textrun = $section->addTextRun();
 				$textrun->addText('Presupuesto autorizado: ', array('bold' => true));
-				$textrun->addText('$ ' . number_format($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoAprobado'],2));
+				$textrun->addText('$ ' . number_format($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoAprobado'],2) . ' ('.$cantidad_letras.' M.N.)');
 				$section->addTextBreak(1);
 
 				$tipo_recurso = implode(' / ', $presupuestos[$proyecto['ClavePresupuestaria']]['tiposRecursos']);
@@ -308,6 +318,11 @@ class ReporteEvaluacionProyectosController extends BaseController {
 					$proyectos_subfuente_financiamiento[$sub_fuente] = 1;
 				}
 			}else{
+				$textrun = $section->addTextRun();
+				$textrun->addText('Afectación presupuestaria: ', array('bold' => true));
+				$textrun->addText('Información no encontrada en el EP01',array('color'=>'#FF0000','bold'=>true));
+				//$section->addTextBreak();
+
 				$textrun = $section->addTextRun();
 				$textrun->addText('Fuente de financiamiento: ', array('bold' => true));
 				$textrun->addText('Información no encontrada en el EP01',array('color'=>'#FF0000','bold'=>true));
@@ -574,7 +589,8 @@ class ReporteEvaluacionProyectosController extends BaseController {
 			if(isset($presupuestos[$proyecto['ClavePresupuestaria']])){
 				$textrun = $section->addTextRun();
 				$textrun->addText('Presupuesto ejercido: ', array('bold' => true));
-				$textrun->addText('$ ' . number_format($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoEjercidoModificado'],2));
+				$cantidad_letras = ucfirst(mb_strtolower(ltrim(Util::transformarCantidadLetras($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoEjercidoModificado'])),'UTF-8'));
+				$textrun->addText('$ ' . number_format($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoEjercidoModificado'],2) . ' ('.$cantidad_letras.' M.N.)');
 
 				if($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoModificado']>0){
 					$avance_logrado = round(($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoEjercidoModificado']*100)/$presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoModificado'],2);
