@@ -332,7 +332,7 @@ class Util
 										case 3: $cadena_enteros.=" VEINTITRÉS"; break;
 										case 4: $cadena_enteros.=" VEINTICUATRO"; break;
 										case 5: $cadena_enteros.=" VEINTICINCO"; break;
-										case 6: $cadena_enteros.=" VEITISEIS"; break;
+										case 6: $cadena_enteros.=" VEINTISEIS"; break;
 										case 7: $cadena_enteros.=" VEINTISIETE"; break;
 										case 8: $cadena_enteros.=" VEINTIOCHO"; break;
 										case 9: $cadena_enteros.=" VEINTINUEVE"; break;
@@ -415,7 +415,7 @@ class Util
 						switch((int)$enteros[$i])
 						{
 							case 0: 
-									if($total==1)
+									//if($total==1)
 										$cadena_enteros.=" CERO"; 
 									break;
 							case 1:

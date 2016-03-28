@@ -116,7 +116,11 @@ class ReporteEvaluacionProyectosController extends BaseController {
 				$presupuesto_fuente_financiamiento['fuentes'][$proyecto['claveFuenteFinanciamiento']]['monto'] += $proyecto['presupuestoAprobado'];
 			}
 
-			$catalogos['jurisdicciones'] = Jurisdiccion::get()->lists('nombre','clave');
+			$conversionCapitalizar = function($cadena){
+				return mb_convert_case($cadena, MB_CASE_TITLE, 'UTF-8');
+			};
+
+			$catalogos['jurisdicciones'] = array_map($conversionCapitalizar, Jurisdiccion::get()->lists('nombre','clave'));
 			$catalogos['unidades_responsables'] = UnidadResponsable::get()->lists('abreviatura','clave');
 
 			$datos = $rows->toArray();
@@ -482,26 +486,28 @@ class ReporteEvaluacionProyectosController extends BaseController {
 					$con_grafica = true;
 				}
 				$jurisdicciones[$indice] = $jurisdiccion['jurisdiccion'];
-				$jurisdicciones_porcentajes[$indice] = $porcentaje_avance ;
+				$jurisdicciones_porcentajes[$indice] = number_format($porcentaje_avance,2);
 			}
+			ksort($jurisdicciones);
+			ksort($jurisdicciones_porcentajes);
 
 			if(count($proyecto_jurisdicciones) == 10 && $con_grafica){
 				$section->addText(htmlspecialchars('El proyecto se implementó en las 10 Jurisdicciones Sanitarias del Estado, observándose los siguientes resultados:'),$texto);
 			}else if(count($proyecto_jurisdicciones) == 10 && !$con_grafica && $avance_comparar == 100.00){
 				$section->addText(htmlspecialchars('El proyecto se implementó en todas Jurisdicciones Sanitarias del Estado, observándose el cumplimiento de las metas programadas.'),$texto);
 			}else if(count($proyecto_jurisdicciones) == 10 && !$con_grafica && $avance_comparar != 100.00){
-				$section->addText(htmlspecialchars('El proyecto se implementó en todas Jurisdicciones Sanitarias del Estado, observándose un avance del '.$avance_comparar.'% en relación a las metas programadas.'),$texto);
+				$section->addText(htmlspecialchars('El proyecto se implementó en todas Jurisdicciones Sanitarias del Estado, observándose un avance del '.number_format($avance_comparar,2).'% en relación a las metas programadas.'),$texto);
 			}else if(count($proyecto_jurisdicciones) < 10 && count($proyecto_jurisdicciones) > 1 && $con_grafica){
 				$section->addText(htmlspecialchars('Las Jurisdicciones Sanitarias en las que se implementó el proyecto fueron: '.implode(', ',$jurisdicciones).'; observándose los siguientes resultados:'),$texto);
 			}else if(count($proyecto_jurisdicciones) < 10 && count($proyecto_jurisdicciones) > 1 && !$con_grafica && $avance_comparar == 100.00){
 				$section->addText(htmlspecialchars('El proyecto se implementó en las Jurisdicciones Sanitarias: '.implode(', ',$jurisdicciones).'; observándose el cumplimiento de las metas programadas.'),$texto);
 			}else if(count($proyecto_jurisdicciones) < 10 && count($proyecto_jurisdicciones) > 1 && !$con_grafica && $avance_comparar != 100.00){
-				$section->addText(htmlspecialchars('El proyecto se implementó en las Jurisdicciones Sanitarias: '.implode(', ',$jurisdicciones).'; observándose un avance del '.$avance_comparar.'% en relación a las metas programadas.'),$texto);
+				$section->addText(htmlspecialchars('El proyecto se implementó en las Jurisdicciones Sanitarias: '.implode(', ',$jurisdicciones).'; observándose un avance del '.number_format($avance_comparar,2).'% en relación a las metas programadas.'),$texto);
 			}else if(count($proyecto_jurisdicciones) == 1 && $avance_comparar == 100.00){
 				$section->addText(htmlspecialchars('El proyecto se implementó en la Jurisdicción Sanitaria '.implode(', ',$jurisdicciones).', observándose el cumplimiento de las metas programadas.'),$texto);
 				$con_grafica = false;
 			}else{
-				$section->addText(htmlspecialchars('El proyecto se implementó en la Jurisdicción Sanitaria '.implode(', ',$jurisdicciones).', observándose un avance del '.$avance_comparar.'% en relación a las metas programadas.'),$texto);
+				$section->addText(htmlspecialchars('El proyecto se implementó en la Jurisdicción Sanitaria '.implode(', ',$jurisdicciones).', observándose un avance del '.number_format($avance_comparar,2).'% en relación a las metas programadas.'),$texto);
 				$con_grafica = false;
 			}
 
@@ -550,7 +556,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 
 			$textrun = $section->addTextRun();
 			$textrun->addText('Promedio de avance físico alcanzado: ', array('bold' => true));
-			$textrun->addText($promedio_avance . ' %');
+			$textrun->addText(number_format($promedio_avance,2) . ' %');
 			//$section->addTextBreak();
 			$avance_logrado = 0;
 
@@ -580,6 +586,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 				$cumplimiento_proyecto['No Satisfactorio'] += 1;
 				$cumplimiento_proyecto_no_satisfactorio['Bajo avance'] += 1;
 				if ($promedio_avance == 0) {
+					$promedio_avance = '0.00';
 					$causas_sin_avance[] = $analisis_funcional;
 				}else{
 					$causas_bajo_avance[] = $analisis_funcional;
@@ -599,7 +606,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 				}
 				$textrun = $section->addTextRun();
 				$textrun->addText('Avance financiero logrado: ', array('bold' => true));
-				$textrun->addText($avance_logrado . ' %');
+				$textrun->addText(number_format($avance_logrado,2) . ' %');
 			}else{
 				$textrun = $section->addTextRun();
 				$textrun->addText('Presupuesto ejercido: ', array('bold' => true));
@@ -613,6 +620,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 			$section->addTextBreak();
 
 			$graph = new \PHPGraphLib(650,150);
+			if($avance_logrado == 0){ $avance_logrado = '0.00';}
 			$data = array("Avance fisico" => $promedio_avance, "Avance financiero" => $avance_logrado);
 			$graph->addData($data);
 			$graph->setBarColor('navy');
@@ -645,7 +653,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 			if(isset($proyecto['analisis_funcional'][0])){
 				$section->addText(htmlspecialchars($proyecto['analisis_funcional'][0]['justificacionGlobal']));
 			}else{
-				$textrun->addText('Información no encontrada en la base de datos',array('color'=>'#FF0000','bold'=>true));
+				$section->addText('Información no encontrada en la base de datos',array('bold'=>true),array('color'=>'#FF0000'));
 			}
 
 			$section->addTextBreak(1);
