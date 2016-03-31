@@ -34,7 +34,12 @@ class ReporteSeguimientoIndicadoresFASSAController extends BaseController {
 		$parametros = Input::all();
 		if(isset($parametros['formatogrid'])){
 			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
-			$ejercicio_actual = date('Y');
+
+			if(isset($parametros['ejercicio'])){
+				$ejercicio_actual = $parametros['ejercicio'];
+			}else{
+				$ejercicio_actual = Util::obtenerAnioCaptura();
+			}
 			//$rows = IndicadorFASSA::getModel();
 			$rows = IndicadorFASSAMeta::getModel();
 			$rows = $rows->with(array('registroAvance'=>function($query){

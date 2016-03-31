@@ -34,7 +34,14 @@ class ReporteSeguimientoProgramasController extends BaseController {
 		$parametros = Input::all();
 		if(isset($parametros['formatogrid'])){
 			$rows = Programa::getModel();
-			$rows = $rows->where('programa.idEstatus','=',5);
+
+			if(isset($parametros['ejercicio'])){
+				$ejercicio = $parametros['ejercicio'];
+			}else{
+				$ejercicio = Util::obtenerAnioCaptura();
+			}
+
+			$rows = $rows->where('programa.idEstatus','=',5)->where('ejercicio',$ejercicio);
 			
 			$usuario = Sentry::getUser();
 			if($usuario->idDepartamento == 2){

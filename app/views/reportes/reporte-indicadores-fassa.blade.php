@@ -19,13 +19,18 @@
             <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> {{ $sys_mod_activo->nombre }}</h4></div>
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-lg-6 col-md-6">
-                        <div class="input-group" style="margin:5px">                            
+                    <div class="col-md-5">
+                        <div class="form-group">
                             <input type="text" class="form-control txt-quick-search" placeholder="Buscar">
-                            <span class="input-group-btn">
-                                <button class="btn btn-default btn-quick-search" type="button"><span class="glyphicon glyphicon-search"></span></button>
-                            </span>
                         </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <input type="number" class="form-control" id="ejercicio" placeholder="Ejercicio" value="{{$ejercicio}}" />
+                        </div>
+                    </div>
+                    <div class="col-sm-1">
+                        <button class="btn btn-default btn-block btn-quick-search" type="button"><span class="fa fa-search"></span></button>
                     </div>
                 </div>
             </div>

@@ -259,6 +259,13 @@
 									<span class="fa fa-align-left"></span> Análisis y Justificación
 								</a>
 							</li>
+							@if($trimestre_activo)
+							<li role="presentation">
+								<a href="#panel-justificacion-trimestral" aria-controls="panel-justificacion-trimestral" role="tab" data-toggle="tab" id="tab-link-justificacion-trimestral">
+									<span class="fa fa-align-left"></span> Análisis y Justificación (Trimestral)
+								</a>
+							</li>
+							@endif
 							@if($trimestre_activo && $mes_clave != '12')
 							<li role="presentation" class="disabled">
 								<a href="#panel-plan-mejora" aria-controls="panel-plan-mejora" role="tab" data-toggle="" id="tab-link-plan-mejora">
@@ -273,7 +280,7 @@
 								</a>
 							</li>
 							@endif
-							<li role="presentation" class="pull-right hidden">
+							<li role="presentation" class="pull-right">
 								<a href="#panel-observaciones" aria-controls="panel-observaciones" role="tab" data-toggle="tab">
 									<span class="fa fa-comment"></span> Observaciones <span id="conteo-observaciones" class="badge">0</span>
 								</a>
@@ -421,6 +428,53 @@
 									</div>
 								</div>
 							</div>
+							@if($trimestre_activo)
+							<div role="tabpanel" class="tab-pane" id="panel-justificacion-trimestral">
+								<br>
+								<div class="row">
+									<div class="col-sm-12">
+										<table id="tabla-avances-metas-trimestral" class="table table-condensed table-bordered">
+					                		<thead>
+					                			<tr>
+						                			<th colspan="2" class="bg-success text-center">Meta Programada del Trimestre</th>
+						                			<th colspan="3" class="bg-info text-center">Avance del Trimestre</th>
+						                			<th rowspan="2" width="90" class="text-center">Porcentaje Acumulado</th>
+					                			</tr>
+					                			<tr>
+					                				<th class="bg-success text-center">Acumulada</th>
+					                				<th class="bg-success text-center" nowrap="nowrap">Mes actual</th>
+					                				<th class="bg-info text-center" nowrap="nowrap">Mes actual</th>
+					                				<th class="bg-info text-center">Acumulado</th>
+					                				<th class="bg-info text-center">Total</th>
+					                			</tr>
+					                		</thead>
+											<tfoot>
+					                			<th class="bg-success" id="total-meta-programada-trimestre">0</th>
+					                			<th id="total-meta-mes-trimestre">0</th>
+					                			<th id="total-avance-mes-trimestre">0</th>
+					                			<th id="total-avance-acumulado-trimestre">0</th>
+					                			<th class="bg-info" id="total-avance-total-trimestre">0</th>
+					                			<th id="total-porcentaje-trimestre">0%</th>
+					                		</tfoot>
+					                	</table>
+									</div>
+									<div class="col-sm-12">
+										<div class="form-group">
+											<label class="control-label" for="analisis-resultados-trimestral">Análisis de Resultados Trimestral</label>
+											<textarea rows="6" class="form-control" name="analisis-resultados-trimestral" id="analisis-resultados-trimestral"></textarea>
+											<span class="text-muted pull-right"><span id="analisis-resultados-trimestral-contador">0</span>/500</span>
+										</div>
+									</div>
+									<div class="col-sm-12">
+										<div class="form-group">
+											<label class="control-label" for="justificacion-trimestral">Justificación Trimestral</label>
+											<textarea rows="6" class="form-control" name="justificacion-trimestral" id="justificacion-trimestral" disabled></textarea>
+											<span class="text-muted pull-right"><span id="justificacion-trimestral-contador">0</span>/500</span>
+										</div>
+									</div>
+								</div>
+							</div>
+							@endif
 							@if($trimestre_activo && $mes_clave != '12')
 							<div role="tabpanel" class="tab-pane" id="panel-plan-mejora">
 								<br>

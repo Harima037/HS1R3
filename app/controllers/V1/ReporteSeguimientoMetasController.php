@@ -34,11 +34,18 @@ class ReporteSeguimientoMetasController extends BaseController {
 
 		$parametros = Input::all();
 		if(isset($parametros['formatogrid'])){
-			$mes_actual = Util::obtenerMesActual();
+			//$mes_actual = Util::obtenerMesActual();
+
+			if(isset($parametros['ejercicio'])){
+				$ejercicio = $parametros['ejercicio'];
+			}else{
+				$ejercicio = Util::obtenerAnioCaptura();
+			}
 
 			$rows = Proyecto::getModel();
 			$rows = $rows->where('idEstatusProyecto','=',5)
-						->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto']);
+						->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto'])
+						->where('ejercicio',$ejercicio);
 			
 			$usuario = Sentry::getUser();
 			

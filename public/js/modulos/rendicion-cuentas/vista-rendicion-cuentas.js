@@ -72,7 +72,7 @@ $('#btn-guardar-avance').on('click',function(){
         if($(this).attr('data-meta-programada')){
             if($(this).val() == ''){
                 campos_faltantes++;
-                Validation.printFieldsErrors($(this).attr('id'),'Este campo es requierido');
+                Validation.printFieldsErrors($(this).attr('id'),'Este campo es requerido');
             }else if(parseFloat($(this).val()) < 0){
                 campos_faltantes++;
                 Validation.printFieldsErrors($(this).attr('id'),'El valor no puede ser negativo');
@@ -87,7 +87,7 @@ $('#btn-guardar-avance').on('click',function(){
 
     if($('#analisis-resultados').val().trim() == ''){
         MessageManager.show({data:'Es necesario capturar el analisis en base al avance del mes.',container:'#modalEditarAvance .modal-body',type:'ADV'});
-        Validation.printFieldsErrors('analisis-resultados','Este campo es requierido');
+        Validation.printFieldsErrors('analisis-resultados','Este campo es requerido');
         $('#tab-link-justificacion').tab('show');
         return;
     }
@@ -95,9 +95,60 @@ $('#btn-guardar-avance').on('click',function(){
     if($('#total-porcentaje').attr('data-estado-avance')){
         if($('#justificacion-acumulada').val().trim() == ''){
             MessageManager.show({data:'Es necesario capturar una justificacion en base al porcentaje de avance del mes.',container:'#modalEditarAvance .modal-body',type:'ADV'});
-            Validation.printFieldsErrors('justificacion-acumulada','Este campo es requierido');
+            Validation.printFieldsErrors('justificacion-acumulada','Este campo es requerido');
             $('#tab-link-justificacion').tab('show');
             return;
+        }
+    }
+
+    if((parseInt($('#mes').val()) % 3) == 0){
+        if($('#analisis-resultados-trimestral').val().trim() == ''){
+            MessageManager.show({data:'Es necesario capturar el analisis en base al avance del trimestre.',container:'#modalEditarAvance .modal-body',type:'ADV'});
+            Validation.printFieldsErrors('analisis-resultados-trimestral','Este campo es requerido');
+            $('#tab-link-justificacion-trimestral').tab('show');
+            return;
+        }
+        if($('#total-porcentaje-trimestre').attr('data-estado-avance')){
+            if($('#justificacion-trimestral').val().trim() == ''){
+                MessageManager.show({data:'Es necesario capturar una justificacion en base al porcentaje de avance del trimestre.',container:'#modalEditarAvance .modal-body',type:'ADV'});
+                Validation.printFieldsErrors('justificacion-trimestral','Este campo es requerido');
+                $('#tab-link-justificacion-trimestral').tab('show');
+                return;
+            }
+        }
+
+        if(parseInt($('#mes').val()) != 12 && $('#total-porcentaje').attr('data-estado-avance')){
+            var errores_plan_mejora = 0;
+            if($('#accion-mejora').val().trim() == ''){
+                Validation.printFieldsErrors('accion-mejora','Este campo es requerido')
+                errores_plan_mejora++;
+            }
+            if($('#grupo-trabajo').val().trim() == ''){
+                Validation.printFieldsErrors('grupo-trabajo','Este campo es requerido')
+                errores_plan_mejora++;
+            }
+            if($('#fecha-inicio').val().trim() == ''){
+                Validation.printFieldsErrors('fecha-inicio','Este campo es requerido')
+                errores_plan_mejora++;
+            }
+            if($('#fecha-termino').val().trim() == ''){
+                Validation.printFieldsErrors('fecha-termino','Este campo es requerido')
+                errores_plan_mejora++;
+            }
+            if($('#fecha-notificacion').val().trim() == ''){
+                Validation.printFieldsErrors('fecha-notificacion','Este campo es requerido')
+                errores_plan_mejora++;
+            }
+            if($('#documentacion-comprobatoria').val().trim() == ''){
+                Validation.printFieldsErrors('documentacion-comprobatoria','Este campo es requerido')
+                errores_plan_mejora++;
+            }
+
+            if(errores_plan_mejora){
+                MessageManager.show({data:'Faltan datos a capturar en el Plan de Acción de Mejora.',container:'#modalEditarAvance .modal-body',type:'ADV'});
+                $('#tab-link-plan-mejora').tab('show');
+                return;
+            }
         }
     }
 
@@ -236,6 +287,20 @@ function seguimiento_metas(e){
                 $('#justificacion-acumulada').val(response.data.registro_avance[0].justificacionAcumulada);
                 $('#justificacion-acumulada-contador').text(response.data.registro_avance[0].justificacionAcumulada.length);
                 checar_longitud_maxima('#justificacion-acumulada-contador',response.data.registro_avance[0].justificacionAcumulada.length,500);
+
+                if((parseInt($('#mes').val()) % 3) == 0){
+                    if(response.data.registro_avance[0].analisisResultadosTrimestral){
+                        $('#analisis-resultados-trimestral').val(response.data.registro_avance[0].analisisResultadosTrimestral);
+                        $('#analisis-resultados-trimestral-contador').text(response.data.registro_avance[0].analisisResultadosTrimestral.length);
+                        checar_longitud_maxima('#analisis-resultados-trimestral-contador',response.data.registro_avance[0].analisisResultadosTrimestral.length,500);
+                    }
+                    
+                    if(response.data.registro_avance[0].justificacionTrimestral){
+                        $('#justificacion-trimestral').val(response.data.registro_avance[0].justificacionTrimestral);
+                        $('#justificacion-trimestral-contador').text(response.data.registro_avance[0].justificacionTrimestral.length);
+                        checar_longitud_maxima('#justificacion-trimestral-contador',response.data.registro_avance[0].justificacionTrimestral.length,500);
+                    }
+                }
             }
 
             if(response.data.plan_mejora.length){
@@ -251,13 +316,19 @@ function seguimiento_metas(e){
             //var total_porcentaje_acumulado = parseFloat((((total_acumulado + total_avance) * 100) / total_programado).toFixed(2)) || 0;
             $('#total-meta-programada').text(total_programado.format(2));
             $('#total-meta-programada-analisis').text(total_programado.format(2));
+            $('#total-meta-programada-trimestre').text(response.data.metas_mes_acumulado_trimestre.meta.format(2));
             $('#total-meta-programada').attr('data-total-programado',total_programado);
+            $('#total-meta-programada-trimestre').attr('data-total-programado',response.data.metas_mes_acumulado_trimestre.meta);
             $('#total-meta-mes').text(total_programado_mes.format(2));
             $('#total-meta-mes-analisis').text(total_programado_mes.format(2));
+            $('#total-meta-mes-trimestre').text(total_programado_mes.format(2));
             $('#total-avance-mes').text(total_avance.format(2));
             $('#total-avance-mes-analisis').text(total_avance.format(2));
+            $('#total-avance-mes-trimestre').text(total_avance.format(2));
             $('#total-avance-acumulado').text(total_acumulado.format(2));
             $('#total-avance-acumulado-analisis').text(total_acumulado.format(2));
+            $('#total-avance-acumulado-trimestre').text(response.data.metas_mes_acumulado_trimestre.avance.format(2));
+            $('#total-avance-acumulado-trimestre').attr('data-total-avance-acumulado',response.data.metas_mes_acumulado_trimestre.avance);
             //$('#total-porcentaje').text(total_porcentaje_acumulado+'% ');
             $('.avance-mes').change();
 
@@ -314,6 +385,16 @@ $('#analisis-resultados').on('keyup',function(){
 $('#justificacion-acumulada').on('keyup',function(){
     $('#justificacion-acumulada-contador').text($('#justificacion-acumulada').val().length);
     checar_longitud_maxima('#justificacion-acumulada-contador',$('#justificacion-acumulada').val().length,500);
+});
+
+$('#analisis-resultados-trimestral').on('keyup',function(){
+    $('#analisis-resultados-trimestral-contador').text($('#analisis-resultados-trimestral').val().length);
+    checar_longitud_maxima('#analisis-resultados-trimestral-contador',$('#analisis-resultados-trimestral').val().length,500);
+});
+
+$('#justificacion-trimestral').on('keyup',function(){
+    $('#justificacion-trimestral-contador').text($('#justificacion-trimestral').val().length);
+    checar_longitud_maxima('#justificacion-trimestral-contador',$('#justificacion-trimestral').val().length,500);
 });
 
 function checar_longitud_maxima(identificador,valor_asignado,valor_maximo){
@@ -631,6 +712,55 @@ $('.avance-mes').on('change',function(){
     suma = +suma.toFixed(2);
     $('#total-avance-mes').text(suma.format(2));
     $('#total-avance-mes-analisis').text(suma.format(2));
+    $('#total-avance-mes-trimestre').text(suma.format(2));
+
+    if((parseInt($('#mes').val()) % 3) == 0){
+        var meta_programada_trimestre = parseFloat($('#total-meta-programada-trimestre').attr('data-total-programado'));
+        var avance_total_trimestre = (parseFloat($('#total-avance-acumulado-trimestre').attr('data-total-avance-acumulado')) || 0) + suma ;
+        $('#total-avance-total-trimestre').text(avance_total_trimestre.format(2));
+        var habilitar_justificacion_trimestral = false;
+        if(meta_programada_trimestre == 0 && avance_total_trimestre ==  0){
+            $('#total-porcentaje-trimestre').html('<small class="text-success">0%</small>');
+        }else{
+            if(meta_programada_trimestre > 0){
+                var total_porcentaje_acumulado = parseFloat(((avance_total_trimestre * 100) / meta_programada_trimestre).toFixed(2))||0;
+            }else{
+                if(avance_total_trimestre > 0){
+                    if(avance_total_trimestre > 999){
+                        var total_porcentaje_acumulado = 999;
+                    }else if(avance_total_trimestre > 100){
+                        var total_porcentaje_acumulado = avance_total_trimestre;
+                    }else if(avance_total_trimestre > 10){
+                        var total_porcentaje_acumulado = 10 * avance_total_trimestre;
+                    }else{
+                        var total_porcentaje_acumulado = 100 * avance_total_trimestre;
+                    }
+                }else{
+                    var total_porcentaje_acumulado = 0;
+                }
+            }
+            if(total_porcentaje_acumulado > 110){
+                total_porcentaje_acumulado = '<small class="text-danger"><span class="fa fa-arrow-up"></span> '+total_porcentaje_acumulado+'%</small>';
+                habilitar_justificacion_trimestral = true;
+            }else if(total_porcentaje_acumulado < 90){
+                total_porcentaje_acumulado = '<small class="text-danger"><span class="fa fa-arrow-down"></span> '+total_porcentaje_acumulado+'%</small>';
+                habilitar_justificacion_trimestral = true;
+            }else if(total_programado == 0 && total_porcentaje_acumulado > 0){
+                total_porcentaje_acumulado = '<small class="text-danger"><span class="fa fa-arrow-up"></span> '+total_porcentaje_acumulado+'%</small>';
+                habilitar_justificacion_trimestral = true;
+            }else{
+                total_porcentaje_acumulado = '<small class="text-success">'+total_porcentaje_acumulado+'%</small>';
+            }
+            $('#total-porcentaje-trimestre').html(total_porcentaje_acumulado);
+        }
+        if(habilitar_justificacion_trimestral){
+            $('#justificacion-trimestral').attr('disabled',false);
+            $('#total-porcentaje-trimestre').attr('data-estado-avance','1');
+        }else{
+            $('#justificacion-trimestral').attr('disabled',true);
+            $('#total-porcentaje-trimestre').attr('data-estado-avance','');
+        }
+    }
 
     var suma = 0;
     $('.avance-total').each(function(){
@@ -646,7 +776,7 @@ $('.avance-mes').on('change',function(){
     
 
     if(total_programado == 0 && total_acumulado ==  0){
-        total_porcentaje_acumulado = '<small class="text-success">0%</small>';
+        var total_porcentaje_acumulado = '<small class="text-success">0%</small>';
         $('#total-porcentaje').attr('data-estado-avance','');
     }else{
         if(total_programado > 0){
@@ -731,10 +861,17 @@ $('#modalEditarAvance').on('hide.bs.modal',function(e){
     $('#justificacion-acumulada-contador').text('0');
     checar_longitud_maxima('#analisis-resultados-contador',$('#analisis-resultados').val().length,500);
     checar_longitud_maxima('#justificacion-acumulada-contador',$('#analisis-resultados').val().length,500);
+    if((parseInt($('#mes').val()) % 3) == 0){
+        $('#analisis-resultados-trimestral-contador').text('0');
+        $('#justificacion-trimestral-contador').text('0');
+        checar_longitud_maxima('#analisis-resultados-trimestral-contador',$('#analisis-resultados-trimestral').val().length,500);
+        checar_longitud_maxima('#justificacion-trimestral-contador',$('#analisis-resultados-trimestral').val().length,500);
+    }
     
     //$('span.nueva-cantidad').text('');
     //$('span.vieja-cantidad').text('0');
     $('#justificacion-acumulada').attr('disabled',true);
+    $('#justificacion-trimestral').attr('disabled',true);
     if($('#tab-link-plan-mejora').length){
         $('#tab-link-plan-mejora').attr('data-toggle','');
         $('#tab-link-plan-mejora').parent().addClass('disabled');

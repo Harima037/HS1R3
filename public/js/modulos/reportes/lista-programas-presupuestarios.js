@@ -13,7 +13,7 @@
 =====================================*/
 // Inicialización General para casi cualquier módulo
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/reporte-seg-programas');
-var moduloDatagrid = new Datagrid("#datagridProgramas",moduloResource,{ formatogrid:true, pagina: 1, clasificacionProyecto: 1});
+var moduloDatagrid = new Datagrid("#datagridProgramas",moduloResource,{ formatogrid:true, pagina: 1});
 
 moduloDatagrid.init();
 moduloDatagrid.actualizar({
@@ -60,6 +60,25 @@ function cargarReporte(id,trimestre){
 }
 
 function cargar_datos_programa(){}
+
+$("#datagridProgramas .txt-quick-search").off('keydown');
+$("#datagridProgramas .txt-quick-search").on('keydown', function(event){
+    if (event.which == 13) {
+        realizar_busqueda();
+    }
+});
+
+$('#datagridProgramas .btn-quick-search').off('click');
+$('#datagridProgramas .btn-quick-search').on('click',function(){
+    realizar_busqueda();
+})
+
+function realizar_busqueda(){
+    moduloDatagrid.setPagina(1);
+    moduloDatagrid.parametros.buscar = $('.txt-quick-search').val();
+    moduloDatagrid.parametros.ejercicio = $('#ejercicio').val();
+    moduloDatagrid.actualizar();
+}
 
 /*             Extras               */
 /**

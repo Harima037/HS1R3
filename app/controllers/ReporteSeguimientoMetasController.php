@@ -24,10 +24,14 @@ class ReporteSeguimientoMetasController extends BaseController {
 					array('clave'=>12,	'mes'=>'Dicembre',		'abrev'=>'DIC')
 				)
 		);
+		$datos['anio_captura'] = Util::obtenerAnioCaptura();
 		$datos['mes_avance'] = Util::obtenerMesActual();
 		$mes_actual = Util::obtenerMesActual();
 		if($mes_actual == 0){
 			$mes_actual = date('n')-1;
+			if($mes_actual == 0){
+				$mes_actual = 12;
+			}
 		}
 		$datos['mes_actual'] = $mes_actual;
 		return parent::loadIndex('REPORTES','REPSEGINST',$datos);
@@ -50,10 +54,14 @@ class ReporteSeguimientoMetasController extends BaseController {
 					array('clave'=>12,	'mes'=>'Dicembre',		'abrev'=>'DIC')
 				)
 		);
+		$datos['anio_captura'] = Util::obtenerAnioCaptura();
 		$datos['mes_avance'] = Util::obtenerMesActual();
 		$mes_actual = Util::obtenerMesActual();
 		if($mes_actual == 0){
 			$mes_actual = date('n')-1;
+			if($mes_actual == 0){
+				$mes_actual = 12;
+			}
 		}
 		$datos['mes_actual'] = $mes_actual;
 		return parent::loadIndex('REPORTES','REPSEGINV',$datos);

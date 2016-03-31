@@ -55,6 +55,25 @@ moduloDatagrid.actualizar({
 
 function cargar_datos_indicador(){}
 
+$("#datagridIndicadores .txt-quick-search").off('keydown');
+$("#datagridIndicadores .txt-quick-search").on('keydown', function(event){
+    if (event.which == 13) {
+        realizar_busqueda();
+    }
+});
+
+$('#datagridIndicadores .btn-quick-search').off('click');
+$('#datagridIndicadores .btn-quick-search').on('click',function(){
+    realizar_busqueda();
+})
+
+function realizar_busqueda(){
+    moduloDatagrid.setPagina(1);
+    moduloDatagrid.parametros.buscar = $('.txt-quick-search').val();
+    moduloDatagrid.parametros.ejercicio = $('#ejercicio').val();
+    moduloDatagrid.actualizar();
+}
+
 function cargarReporte(id,mes){
     var parametros = id + '?mes='+mes;
     window.open(SERVER_HOST+'/v1/reporte-fassa/'+parametros);

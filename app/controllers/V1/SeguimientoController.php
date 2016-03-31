@@ -250,19 +250,42 @@ class SeguimientoController extends BaseController {
 					$recurso = Actividad::getModel();
 				}
 				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
-				$recurso = $recurso->with(array('metasMesJurisdiccion'=>function($query) use ($mes_actual){
+				$recurso = $recurso->with(array(
+				 'metasMesJurisdiccion'=>function($query) use ($mes_actual){
 					$query->where('mes','<=',$mes_actual);
 				},'registroAvance'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
 				},'metasMes' => function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
+					$query->where('mes','<=',$mes_actual);
 				},'planMejora'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
 				},'observaciones'=>function($query){
 					$query->orderBy('modificadoAl','desc');
 				},'unidadMedida','comentarios'))->find($id);
-				
+
 				$recurso->load('desgloseMunicipios');
+
+				$trimestre = ceil($mes_actual/3);
+				$metas_mes = [];
+				$metas_mes_trimestre = [
+					'meta' => 0,
+					'avance' => 0
+				];
+				foreach ($recurso->metasMes as $meta_mes) {
+					if($meta_mes->mes == $mes_actual){
+						$metas_mes[] = $meta_mes;
+					}
+					if(ceil($meta_mes->mes/3) == $trimestre){
+						$metas_mes_trimestre['meta'] += $meta_mes->meta;
+						if($meta_mes->mes < $mes_actual){
+							$metas_mes_trimestre['avance'] += $meta_mes->avance;
+						}
+					}
+				}
+
+				$recurso = $recurso->toArray();
+				$recurso['metas_mes'] = $metas_mes;
+				$recurso['metas_mes_acumulado_trimestre'] = $metas_mes_trimestre;
 				//if($parametros['nivel'] == 'componente'){
 					//$recurso->load('desgloseMunicipios');
 					//$queries = DB::getQueryLog();
@@ -1194,6 +1217,30 @@ class SeguimientoController extends BaseController {
 		}
 
 		$mes_del_trimestre = Util::obtenerMesTrimestre();
+
+		if($mes_del_trimestre == 3){
+			if(trim($parametros['analisis-resultados-trimestral']) == ''){
+				$faltan_campos[] = json_encode(array('field'=>'analisis-resultados-trimestral','error'=>'Este campo es requerido.'));
+			}else{
+				if(strlen($parametros['analisis-resultados-trimestral']) > 500){
+					$faltan_campos[] = json_encode(array('field'=>'analisis-resultados-trimestral','error'=>'Solo se pueden capturar un máximo de 500 caracteres.'));
+				}else{
+					$registro_avance->analisisResultadosTrimestral = $parametros['analisis-resultados-trimestral'];
+				}
+			}
+
+			if(isset($parametros['justificacion-trimestral'])){
+				if(trim($parametros['justificacion-trimestral']) != ''){
+					if(strlen($parametros['justificacion-trimestral']) > 500){
+						$faltan_campos[] = json_encode(array('field'=>'justificacion-trimestral','error'=>'Solo se pueden capturar un máximo de 500 caracteres.'));
+					}else{
+						$registro_avance->justificacionTrimestral = $parametros['justificacion-trimestral'];
+					}
+				}
+			}else{
+				$registro_avance->justificacionTrimestral = 'El avance se encuentra dentro de lo programado';
+			}
+		}
 
 		if($registro_avance->planMejora && $mes_del_trimestre == 3){
 			$validacion = Validador::validar(Input::all(), $this->reglasPlanMejora);
