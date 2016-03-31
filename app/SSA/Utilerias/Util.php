@@ -415,7 +415,7 @@ class Util
 						switch((int)$enteros[$i])
 						{
 							case 0: 
-									//if($total==1)
+									if($total==1)
 										$cadena_enteros.=" CERO"; 
 									break;
 							case 1:

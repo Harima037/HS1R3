@@ -290,7 +290,12 @@ class ReporteEvaluacionProyectosController extends BaseController {
 				$textrun->addText(implode(', ', $presupuestos[$proyecto['ClavePresupuestaria']]['subFuentesFinanciamiento']));
 				//$section->addTextBreak();
 
-				$cantidad_letras = ucfirst(mb_strtolower(ltrim(Util::transformarCantidadLetras($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoAprobado'])),'UTF-8'));
+				if($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoAprobado'] == 0){
+					$cantidad_letras = 'Cero pesos 00/100';
+				}else{
+					$cantidad_letras = ucfirst(mb_strtolower(ltrim(Util::transformarCantidadLetras($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoAprobado'])),'UTF-8'));
+				}
+				
 
 				$textrun = $section->addTextRun();
 				$textrun->addText('Presupuesto autorizado: ', array('bold' => true));
@@ -596,7 +601,12 @@ class ReporteEvaluacionProyectosController extends BaseController {
 			if(isset($presupuestos[$proyecto['ClavePresupuestaria']])){
 				$textrun = $section->addTextRun();
 				$textrun->addText('Presupuesto ejercido: ', array('bold' => true));
-				$cantidad_letras = ucfirst(mb_strtolower(ltrim(Util::transformarCantidadLetras($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoEjercidoModificado'])),'UTF-8'));
+
+				if($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoEjercidoModificado'] == 0){
+					$cantidad_letras = 'Cero pesos 00/100';
+				}else{
+					$cantidad_letras = ucfirst(mb_strtolower(ltrim(Util::transformarCantidadLetras($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoEjercidoModificado'])),'UTF-8'));
+				}
 				$textrun->addText('$ ' . number_format($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoEjercidoModificado'],2) . ' ('.$cantidad_letras.' M.N.)');
 
 				if($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoModificado']>0){
