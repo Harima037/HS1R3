@@ -173,7 +173,7 @@ class Util
 		{
 			
 			if($i==$total-1){
-				$centesimos=0;
+				$centesimos=1;
 				$anexo = "";
 			}				
 			else{

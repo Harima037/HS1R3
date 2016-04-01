@@ -491,7 +491,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 					$con_grafica = true;
 				}
 				$jurisdicciones[$indice] = $jurisdiccion['jurisdiccion'];
-				$jurisdicciones_porcentajes[$indice] = number_format($porcentaje_avance,2);
+				$jurisdicciones_porcentajes[$indice] = number_format($porcentaje_avance,2,'.','');
 			}
 			ksort($jurisdicciones);
 			ksort($jurisdicciones_porcentajes);
@@ -591,7 +591,6 @@ class ReporteEvaluacionProyectosController extends BaseController {
 				$cumplimiento_proyecto['No Satisfactorio'] += 1;
 				$cumplimiento_proyecto_no_satisfactorio['Bajo avance'] += 1;
 				if ($promedio_avance == 0) {
-					$promedio_avance = '0.00';
 					$causas_sin_avance[] = $analisis_funcional;
 				}else{
 					$causas_bajo_avance[] = $analisis_funcional;
@@ -630,7 +629,8 @@ class ReporteEvaluacionProyectosController extends BaseController {
 			$section->addTextBreak();
 
 			$graph = new \PHPGraphLib(650,150);
-			if($avance_logrado == 0){ $avance_logrado = '0.00';}
+			$avance_logrado = number_format($avance_logrado,2,'.','');
+			$promedio_avance = number_format($promedio_avance,2,'.','');
 			$data = array("Avance fisico" => $promedio_avance, "Avance financiero" => $avance_logrado);
 			$graph->addData($data);
 			$graph->setBarColor('navy');
