@@ -105,7 +105,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 				}
 				
 
-				$presupuesto_fuente_financiamiento['total'] += $proyecto['presupuestoAprobado'];
+				$presupuesto_fuente_financiamiento['total'] += $proyecto['presupuestoModificado'];
 				if(!isset($presupuesto_fuente_financiamiento['fuentes'][$proyecto['claveFuenteFinanciamiento']])){
 					$presupuesto_fuente_financiamiento['fuentes'][$proyecto['claveFuenteFinanciamiento']] = [
 						'fuenteFinanciamiento' => str_replace(['á','é','í','ó','ú','Á','É','Í','Ó','Ú'],['a','e','i','o','u','A','E','I','O','U'], $proyecto['fuenteFinanciamiento']),
@@ -113,7 +113,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 						'porcentaje' => 0.00
 					];
 				}
-				$presupuesto_fuente_financiamiento['fuentes'][$proyecto['claveFuenteFinanciamiento']]['monto'] += $proyecto['presupuestoAprobado'];
+				$presupuesto_fuente_financiamiento['fuentes'][$proyecto['claveFuenteFinanciamiento']]['monto'] += $proyecto['presupuestoModificado'];
 			}
 
 			$conversionCapitalizar = function($cadena){
@@ -290,16 +290,16 @@ class ReporteEvaluacionProyectosController extends BaseController {
 				$textrun->addText(implode(', ', $presupuestos[$proyecto['ClavePresupuestaria']]['subFuentesFinanciamiento']));
 				//$section->addTextBreak();
 
-				if($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoAprobado'] == 0){
+				if($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoModificado'] == 0){
 					$cantidad_letras = 'Cero pesos 00/100';
 				}else{
-					$cantidad_letras = ucfirst(mb_strtolower(ltrim(Util::transformarCantidadLetras($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoAprobado'])),'UTF-8'));
+					$cantidad_letras = ucfirst(mb_strtolower(ltrim(Util::transformarCantidadLetras($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoModificado'])),'UTF-8'));
 				}
 				
 
 				$textrun = $section->addTextRun();
 				$textrun->addText('Presupuesto autorizado: ', array('bold' => true));
-				$textrun->addText('$ ' . number_format($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoAprobado'],2) . ' ('.$cantidad_letras.' M.N.)');
+				$textrun->addText('$ ' . number_format($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoModificado'],2) . ' ('.$cantidad_letras.' M.N.)');
 				$section->addTextBreak(1);
 
 				$tipo_recurso = implode(' / ', $presupuestos[$proyecto['ClavePresupuestaria']]['tiposRecursos']);
