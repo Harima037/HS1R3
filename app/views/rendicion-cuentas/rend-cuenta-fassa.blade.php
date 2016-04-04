@@ -46,7 +46,7 @@
                         <th class="text-center" style="width:60px;">Trim 3</th>
                         <th class="text-center" style="width:60px;">Trim 4</th>
                         <th style="width:100px;">Metas</th>
-                        <th style="width:100px;">Avance</th>
+                        <th style="width:110px;">Avance</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
