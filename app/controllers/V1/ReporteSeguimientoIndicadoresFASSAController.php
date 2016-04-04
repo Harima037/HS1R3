@@ -68,12 +68,15 @@ class ReporteSeguimientoIndicadoresFASSAController extends BaseController {
 				$total = $rows->count();
 			}
 
-			$rows = $rows->select('indicadorFASSA.id','indicadorFASSAMeta.idEstatus','indicadorFASSA.indicador','indicadorFASSA.claveNivel')
+			$rows = $rows->select('indicadorFASSAMeta.id','indicadorFASSAMeta.idEstatus','indicadorFASSA.indicador','indicadorFASSA.claveNivel')
 						->orderBy('id', 'desc')
 						->skip(($parametros['pagina']-1)*10)->take(10)
 						->get();
-			
-			$data = array('resultados'=>$total,'data'=>$rows);
+
+			$queries = DB::getQueryLog();
+			$last_query = end($queries);
+
+			$data = array('resultados'=>$total,'data'=>$rows,'query'=>$last_query);
 
 			if($total<=0){
 				$http_status = 404;

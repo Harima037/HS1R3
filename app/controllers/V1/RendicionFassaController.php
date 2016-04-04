@@ -169,13 +169,15 @@ class RendicionFassaController extends \BaseController {
 							$validar['metas'] = true;
 						}
 					}
-				}
-
-				if(isset($parametros['avance-numerador'])){
+				}elseif(isset($parametros['avance-numerador'])){
 					$mes_actual = Util::obtenerMesActual();
 
 					if($recurso->claveFrecuencia == 'A'){
 						if($mes_actual != 12){
+							throw new Exception("El registro avances no esta actualmente disponible para este indicador.", 1);
+						}
+					}elseif($recurso->claveFrecuencia == 'S'){
+						if($mes_actual != 6 && $mes_actual != 12){
 							throw new Exception("El registro avances no esta actualmente disponible para este indicador.", 1);
 						}
 					}else{

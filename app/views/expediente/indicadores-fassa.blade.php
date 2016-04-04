@@ -161,7 +161,7 @@
                                 <div id="lbl-estatus" class="row">
                                 </div>
                                 <div class="row">
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-5">
                                         <div class="form-group">
                                             <label class="control-label" for="unidad-responsable">Unidad Responsable</label>
                                             <select class="form-control informacion-meta" id="unidad-responsable" name="unidad-responsable">
@@ -172,11 +172,21 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-5">
                                         <div class="form-group">
                                             <label class="control-label" for="responsable-informacion">Responsable de la Información</label>
                                             <select class="form-control informacion-meta" id="responsable-informacion" name="responsable-informacion">
                                                 <option value="">Selecciona una unidad</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div class="form-group">
+                                            <label class="control-label" for="frecuencia">Frecuencia</label>
+                                            <select class="form-control informacion-meta" id="frecuencia" name="frecuencia">
+                                                <option value="A">Anual</option>
+                                                <option value="S">Semestral</option>
+                                                <option value="T">Trimestral</option>
                                             </select>
                                         </div>
                                     </div>

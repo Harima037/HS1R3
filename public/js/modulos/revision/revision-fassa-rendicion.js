@@ -29,25 +29,39 @@ moduloDatagrid.actualizar({
             item.indicador = response.data[i].indicador;
             //item.otro = response.data[i].unidadResponsable;
 
-            if(response.data[i].claveFrecuencia == 'A'){
-                item.trim1 = '<div class="text-center text-muted"><span class="fa fa-minus"></span></div>';
-                item.trim2 = '<div class="text-center text-muted"><span class="fa fa-minus"></span></div>';
-                item.trim3 = '<div class="text-center text-muted"><span class="fa fa-minus"></span></div>';
-                if(response.mes_actual == 12 && (response.data[i].idEstatus == 4 || response.data[i].idEstatus == 5)){
-                    item.trim4 = '<div class="text-center"><span class="fa fa-unlock"></span></div>';
-                }else{
-                    item.trim4 = '<div class="text-center"><span class="fa fa-lock"></span></div>';
-                }
-            }else{
+            var trim_cerrado = '<div class="text-center"><span class="fa fa-lock"></span></div>';
+
+            if(response.data[i].idEstatus >= 4){
                 var trim_actual = response.mes_actual/3;
-                var trim_cerrado = '<div class="text-center"><span class="fa fa-lock"></span></div>';
                 var trim_abierto = '<div class="text-center"><span class="fa fa-unlock"></span></div>';
                 var trim_perdido = '<div class="text-center text-muted"><span class="fa fa-times"></span></div>';
 
-                item.trim1 = (trim_actual == 1)?trim_abierto:(trim_actual > 1)?trim_perdido:trim_cerrado;
-                item.trim2 = (trim_actual == 2)?trim_abierto:(trim_actual > 2)?trim_perdido:trim_cerrado;
-                item.trim3 = (trim_actual == 3)?trim_abierto:(trim_actual > 3)?trim_perdido:trim_cerrado;
-                item.trim4 = (trim_actual == 4)?trim_abierto:(trim_actual > 4)?trim_perdido:trim_cerrado;
+                if(response.data[i].claveFrecuencia == 'A'){
+                    item.trim1 = '<div class="text-center text-muted"><span class="fa fa-minus"></span></div>';
+                    item.trim2 = '<div class="text-center text-muted"><span class="fa fa-minus"></span></div>';
+                    item.trim3 = '<div class="text-center text-muted"><span class="fa fa-minus"></span></div>';
+                    item.trim4 = (trim_actual == 4)?trim_abierto:(trim_actual > 4)?trim_perdido:trim_cerrado;
+                    /*if(response.mes_actual == 12 && (response.data[i].idEstatus == 4 || response.data[i].idEstatus == 5)){
+                        item.trim4 = '<div class="text-center"><span class="fa fa-unlock"></span></div>';
+                    }else{
+                        item.trim4 = '<div class="text-center"><span class="fa fa-lock"></span></div>';
+                    }*/
+                }else if(response.data[i].claveFrecuencia == 'S'){
+                    item.trim1 = '<div class="text-center text-muted"><span class="fa fa-minus"></span></div>';
+                    item.trim2 = (trim_actual == 2)?trim_abierto:(trim_actual > 2)?trim_perdido:trim_cerrado;
+                    item.trim3 = '<div class="text-center text-muted"><span class="fa fa-minus"></span></div>';
+                    item.trim4 = (trim_actual == 4)?trim_abierto:(trim_actual > 4)?trim_perdido:trim_cerrado;
+                }else{
+                    item.trim1 = (trim_actual == 1)?trim_abierto:(trim_actual > 1)?trim_perdido:trim_cerrado;
+                    item.trim2 = (trim_actual == 2)?trim_abierto:(trim_actual > 2)?trim_perdido:trim_cerrado;
+                    item.trim3 = (trim_actual == 3)?trim_abierto:(trim_actual > 3)?trim_perdido:trim_cerrado;
+                    item.trim4 = (trim_actual == 4)?trim_abierto:(trim_actual > 4)?trim_perdido:trim_cerrado;
+                }
+            }else{
+                item.trim1 = trim_cerrado;
+                item.trim2 = trim_cerrado;
+                item.trim3 = trim_cerrado;
+                item.trim4 = trim_cerrado;
             }
 
             var clase_estatus = '';
@@ -305,13 +319,16 @@ function editar(e){
 					if(come.mes == response.data.mes_actual)
 						comentariosArray.push([come.id, come.idCampo, come.observacion, come.idAvance]); 
 			}
-
-
+            
             var puede_editar_avance = false;
-            if(response.data.claveFrecuencia == 'A' && response.data.mes_actual == 12 && (response.data.idEstatus == 4 || response.data.idEstatus == 5)){
-                puede_editar_avance = true;
-            }else if(response.data.claveFrecuencia == 'T' && (response.data.mes_actual%3) == 0){
-                puede_editar_avance = true;
+            if(response.data.idEstatus == 4 || response.data.idEstatus == 5){
+                if(response.data.claveFrecuencia == 'A' && response.data.mes_actual == 12){
+                    puede_editar_avance = true;
+                }else if(response.data.claveFrecuencia == 'T' && (response.data.mes_actual%3) == 0){
+                    puede_editar_avance = true;
+                }else if(response.data.claveFrecuencia == 'S' && (response.data.mes_actual == 6 || response.data.mes_actual == 12)){
+                    puede_editar_avance = true;
+                }
             }
 
             label_html = '<div class="text-center text-muted"><big>Inactivo</big></div>';

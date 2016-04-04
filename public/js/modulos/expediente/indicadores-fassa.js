@@ -90,6 +90,7 @@ function editar(e){
                         $('#denominador').text((parseFloat(meta.denominador) || 0).format(2));
                         $('#porcentaje').text((parseFloat(meta.porcentaje) || 0).format(2) + ' %');
 
+                        $('#frecuencia').val(meta.claveFrecuencia);
                         $('#unidad-responsable').val(meta.claveUnidadResponsable);
                         $('#responsable-informacion').empty();
                         var html_opciones = '<option value="">Selecciona un responsable</option>';

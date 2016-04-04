@@ -204,7 +204,7 @@ class IndicadorFassaController extends \BaseController {
 
 				$recurso_meta = new IndicadorFASSAMeta;
 				$recurso_meta->ejercicio				= date('Y');
-				$recurso_meta->claveFrecuencia			= 'A';
+				$recurso_meta->claveFrecuencia			= $parametros['frecuencia'];
 				$recurso_meta->claveUnidadResponsable 	= $parametros['unidad-responsable'];
 				$recurso_meta->idResponsableInformacion	= $parametros['responsable-informacion'];
 				$recurso_meta->idEstatus				= 1;
@@ -272,7 +272,7 @@ class IndicadorFassaController extends \BaseController {
 					$recurso_meta = new IndicadorFASSAMeta;
 					$recurso_meta->idEstatus = 1;
 					$recurso_meta->ejercicio = date('Y');
-					$recurso_meta->claveFrecuencia = 'A';
+					//$recurso_meta->claveFrecuencia = 'A';
 					//$checar_ejercicio = TRUE;
 				}
 
@@ -309,6 +309,7 @@ class IndicadorFassaController extends \BaseController {
 					//$recurso_meta->denominador 				= $parametros['denominador'];
 				$recurso_meta->claveUnidadResponsable 	= $parametros['unidad-responsable'];
 				$recurso_meta->idResponsableInformacion	= $parametros['responsable-informacion'];
+				$recurso_meta->claveFrecuencia = $parametros['frecuencia'];
 					/*
 					$numerador = $parametros['numerador'];
 					$denominador = $parametros['denominador'];
