@@ -72,6 +72,15 @@ class IndicadorFassaController extends \BaseController {
 					$total = $rows->count();
 				}
 
+				if(isset($parametros['ejercicio'])){
+					$ejercicio = $parametros['ejercicio'];
+					$rows = $rows->join('indicadorFASSAMeta',function($join)use($ejercicio){
+							$join->on('indicadorFASSAMeta.idIndicadorFASSA','=','indicadorFASSA.id')
+								->whereNull('indicadorFASSAMeta.borradoAl');
+						})->groupBy('indicadorFASSAMeta.idIndicadorFASSA')
+						->having(DB::raw('MAX(indicadorFASSAMeta.ejercicio)'),'=',$ejercicio);
+				}
+
 				$rows = $rows->select('indicadorFASSA.id','indicadorFASSA.indicador','indicadorFASSA.claveNivel','sentryUsers.username','indicadorFASSA.modificadoAl')
 							->orderBy('id', 'desc')
 							->leftjoin('sentryUsers','indicadorFASSA.actualizadoPor','=','sentryUsers.id')

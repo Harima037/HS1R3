@@ -99,33 +99,52 @@
                     </div>
                 </div>
                 <form id="form_indicador_fassa">
-                    <div class="row">
+                    <div class="row" id="panel-programacion-fassa">
                         <div class="col-sm-2">
                             <div class="form-group">
                                 <label class="control-label">Programación</label>
                                 <div id="estatus-programacion"></div>
                             </div>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-12">
+                            <table id="table-programacion-trimestres" class="table table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Numerador</th>
+                                        <th>Denominador</th>
+                                        <th>Porcentaje</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row" id="panel-avance-fassa" style="background-color:#E4E4E4; padding-top:15px;">
+                        <div class="col-sm-2">
                             <div class="form-group">
-                                <label class="control-label" for="numerador">Numerador</label>
-                                <input type="number" min="0" class="form-control informacion-meta" id="numerador" name="numerador">
+                                <label class="control-label">Meta del Trimestre</label>
+                                <div id="estatus-programacion-trimestre"></div>
                             </div>
                         </div>
                         <div class="col-sm-4">
                             <div class="form-group">
-                                <label class="control-label" for="denominador">Denominador</label>
-                                <input type="number" min="0" class="form-control informacion-meta" id="denominador" name="denominador">
+                                <label class="control-label">Numerador</label>
+                                <span class="form-control" id="numerador-trimestre"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">Denominador</label>
+                                <span class="form-control" id="denominador-trimestre"></span>
                             </div>
                         </div>
                         <div class="col-sm-2">
                             <div class="form-group">
-                                <label class="control-label" for="porcentaje">Porcentaje</label>
-                                <span class="form-control" id="porcentaje">%</span>
+                                <label class="control-label">Porcentaje</label>
+                                <span class="form-control" id="porcentaje-trimestre">%</span>
                             </div>
                         </div>
-                    </div>
-                    <div class="row" style="background-color:#E4E4E4; padding-top:15px;">
                         <div class="col-sm-2">
                             <div class="form-group">
                                 <label class="control-label">Avance</label>

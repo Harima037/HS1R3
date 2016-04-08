@@ -671,9 +671,6 @@ class UsuariosController extends \BaseController {
 			$ids = Input::get('rows');
 
 			$respuesta = DB::transaction(function()use($ids){
-				Proyecto::whereIn('idUsuarioValidacionSeg',$ids)->update(array('idUsuarioValidacionSeg'=>NULL));
-				Proyecto::whereIn('idUsuarioRendCuenta',$ids)->update(array('idUsuarioRendCuenta'=>NULL));
-				Proyecto::whereIn('idUsuarioCaptura',$ids)->update(array('idUsuarioCaptura'=>NULL));
 				$idUsuario = Sentry::getUser()->id;
 
 				$ids_borrar = array();
@@ -682,7 +679,18 @@ class UsuariosController extends \BaseController {
 						$ids_borrar[] = $id;
 					}
 				}
-				SentryUser::whereIn('id',$ids_borrar)->update(array('email'=>'borrado@borrado.com'));
+
+				Proyecto::whereIn('idUsuarioValidacionSeg',$ids_borrar)->update(array('idUsuarioValidacionSeg'=>NULL));
+				Proyecto::whereIn('idUsuarioRendCuenta',$ids_borrar)->update(array('idUsuarioRendCuenta'=>NULL));
+				Proyecto::whereIn('idUsuarioCaptura',$ids_borrar)->update(array('idUsuarioCaptura'=>NULL));
+				
+				IndicadorFASSA::whereIn('idUsuarioValidacionSeg',$ids_borrar)->update(array('idUsuarioValidacionSeg'=>NULL));
+				IndicadorFASSA::whereIn('idUsuarioRendCuenta',$ids_borrar)->update(array('idUsuarioRendCuenta'=>NULL));
+				
+				Programa::whereIn('idUsuarioValidacionSeg',$ids_borrar)->update(array('idUsuarioValidacionSeg'=>NULL));
+				Programa::whereIn('idUsuarioRendCuenta',$ids_borrar)->update(array('idUsuarioRendCuenta'=>NULL));
+
+				//SentryUser::whereIn('id',$ids_borrar)->update(array('email'=>'concat_ws("-",email,"borrado@borrado.com")'));
 				if(SentryUser::whereIn('id',$ids_borrar)->delete()){
 					return array('data'=>array("data"=>"Se han eliminado los recursos."),'http_status'=>200);
 				}else{

@@ -137,26 +137,6 @@ moduloDatagrid.actualizar({
     }
 });
 
-$('#denominador,#numerador').on('keyup',function(){
-    $(this).change();
-});
-$('#denominador,#numerador').on('change',function(){
-    var porcentaje = 0;
-    if($('#tipo-formula').val()){
-        var numerador = parseFloat($('#numerador').val()) || 0;
-        var denominador = parseFloat($('#denominador').val()) || 1;
-        if($('#tipo-formula').val() == 'T'){
-            porcentaje = parseFloat((numerador * 100000)/denominador);
-        }else{
-            porcentaje = parseFloat((numerador * 100)/denominador);
-        }
-        $('#porcentaje').text(porcentaje.format(2) + ' %');
-    }else{
-        $('#porcentaje').text('%');
-    }
-    $('#porcentaje').attr('data-valor',porcentaje);
-});
-
 $('#avance-denominador,#avance-numerador').on('keyup',function(){
     $(this).change();
 });
@@ -178,7 +158,7 @@ $('#avance-denominador,#avance-numerador').on('change',function(){
 
     var porcentaje_total = 0;
     if(porcentaje_avance){
-        var porcentaje_meta = parseFloat($('#porcentaje').attr('data-valor'));
+        var porcentaje_meta = parseFloat($('#porcentaje-trimestre').attr('data-valor'));
         porcentaje_total = (porcentaje_avance / porcentaje_meta)*100;
         $('#porcentaje-total').text(porcentaje_total.format(2) + ' %')
     }else{
@@ -205,6 +185,8 @@ $('#modalIndicador').on('hidden.bs.modal',function(){
     $('#form_indicador_fassa .texto-comentario').remove();
     $('#form_indicador_fassa .has-warning').removeClass('has-warning');
     $('#btn-imprimir-reporte').addClass('hidden');
+    $('#panel-avance-fassa').removeClass('hidden');
+$('#panel-programacion-fassa').removeClass('hidden');
     Validation.cleanFormErrors('#form_indicador_fassa');
 });
 
@@ -223,20 +205,13 @@ function editar(e){
             $('#indicador').text(response.data.indicador);
             $('#tipo-formula').val(response.data.claveTipoFormula);
             $('#formula').text(response.data.formula);
-            //$('#fuente-informacion').text(response.data.fuenteInformacion);
 
-            $('#numerador').val(parseFloat(response.data.numerador));
-            $('#denominador').val(parseFloat(response.data.denominador));
+            $('#numerador').text((parseFloat(response.data.numerador) || 0).format(2));
+            $('#denominador').text((parseFloat(response.data.denominador) || 0).format(2));
             if(response.data.porcentaje){
                 $('#porcentaje').text(parseFloat(response.data.porcentaje).format(2) + ' %');
                 $('#porcentaje').attr('data-valor',response.data.porcentaje);
             }
-            /*
-            var responsable_informacion = '<big>' + response.data.nombreResponsableInformacion + '</big><br><small>'+response.data.cargoResponsableInformacion+'</small>';
-            $('#responsable-informacion').html(responsable_informacion);
-            var lider_programa = '<big>' + response.data.nombreLiderPrograma + '</big><br><small>'+response.data.cargoLiderPrograma+'</small>';
-            $('#lider-programa').html(lider_programa);
-            */
 
             var label_class = '';
             switch(response.data.idEstatus){
@@ -247,10 +222,50 @@ function editar(e){
                 case 5: label_class = 'label-success'; break;
             }
 
+            var inicio = 1;
+            var final = 4;
+            var incremento = 1;
+            if(response.data.claveFrecuencia == 'A'){
+                inicio = 4;
+                final = 4;
+                incremento = 1;
+            }else if(response.data.claveFrecuencia == 'S'){
+                inicio = 2;
+                final = 4;
+                incremento = 2;
+            }
+
+            var rows = '';
+            for (var i = inicio; i <= final; i = i + incremento) {
+                rows += '<tr>' +
+                            '<th>Trimestre '+i+'</th>' +
+                            '<td>' +
+                                '<input type="number" min="0" class="form-control informacion-meta informacion-meta-numerador" id="numerador-'+i+'" name="trimestre['+i+'][numerador]" data-trimestre="'+i+'">' +
+                            '</td>' +
+                            '<td>' +
+                                '<input type="number" min="0" class="form-control informacion-meta informacion-meta-denominador" id="denominador-'+i+'" name="trimestre['+i+'][denominador]" data-trimestre="'+i+'">' +
+                            '</td>' +
+                            '<td>' +
+                                '<span class="form-control" id="porcentaje-'+i+'">%</span>' +
+                            '</td>' +
+                        '</tr>';
+            }
+
+            $('#table-programacion-trimestres tbody').html(rows);
+            actualizar_acciones_metas();
+
             var label_html = '<div class="text-center '+label_class+'"><span class="label"><big>'+response.data.estatus+'</big></span></div>';
             $('#estatus-programacion').html(label_html);
+            $('#estatus-programacion-trimestre').html(label_html);
             if(response.data.idEstatus == 2 || response.data.idEstatus == 4 || response.data.idEstatus == 5){
                 bloquear_controles('.informacion-meta');
+            }
+
+            for(var i in response.data.metas_trimestre){
+                var meta = response.data.metas_trimestre[i];
+                $('#numerador-'+meta.trimestre).val(meta.numerador);
+                $('#denominador-'+meta.trimestre).val(meta.denominador);
+                $('#porcentaje-'+meta.trimestre).text(parseFloat(meta.porcentaje).format(2)+' %');
             }
             
             var puede_editar_avance = false;
@@ -267,7 +282,32 @@ function editar(e){
             label_html = '<div class="text-center text-muted"><big>Inactivo</big></div>';
             if(!puede_editar_avance){
                 bloquear_controles('.informacion-avance');
+                $('#panel-avance-fassa').addClass('hidden');
             }else{
+                $('#panel-programacion-fassa').addClass('hidden');
+
+                var trimestre_actual = Math.floor(response.data.mes_actual/3);
+                var numerador = 0;
+                var denominador = 0;
+                var porcentaje = 0;
+
+                for(var i in response.data.metas_trimestre){
+                    var meta = response.data.metas_trimestre[i];
+                    if(meta.trimestre == trimestre_actual){
+                        denominador = meta.denominador;
+                        numerador = meta.numerador;
+                        porcentaje = meta.porcentaje;
+                    }
+                }
+
+                $('#numerador-trimestre').text((parseFloat(numerador) || 0).format(2));
+                $('#denominador-trimestre').text((parseFloat(denominador) || 0).format(2));
+                if(porcentaje){
+                    $('#porcentaje-trimestre').text(parseFloat(porcentaje).format(2) + ' %');
+                    $('#porcentaje-trimestre').attr('data-valor',porcentaje);
+                }
+                
+                $('#avance-denominador').val(parseFloat(denominador));
                 if(response.data.registro_avance.length){
                     for(var i in response.data.registro_avance){
                         var avance = response.data.registro_avance[i];
@@ -276,7 +316,7 @@ function editar(e){
                             $('#avance-numerador').val(parseFloat(avance.numerador));
                             $('#avance-porcentaje').text(parseFloat(avance.porcentaje).format(2) + ' %');
                             $('#justificacion').val(avance.justificacionAcumulada);
-                            var porcentaje_total = (avance.porcentaje/response.data.porcentaje)*100;
+                            var porcentaje_total = (avance.porcentaje/porcentaje)*100;
                             actualizar_porcentaje(porcentaje_total);
 
                             label_class = '';
@@ -333,6 +373,29 @@ $('#btn-guardar-indicador').on('click',function(e){
     guardar_indicador(false);
 });
 
+function actualizar_acciones_metas(){
+    $('.informacion-meta').on('keyup',function(){
+        $(this).change();
+    });
+    $('.informacion-meta').on('change',function(){
+        var trimestre = $(this).attr('data-trimestre');
+        var porcentaje = 0;
+        if($('#tipo-formula').val()){
+            var numerador = parseFloat($('#numerador-'+trimestre).val()) || 0;
+            var denominador = parseFloat($('#denominador-'+trimestre).val()) || 1;
+            if($('#tipo-formula').val() == 'T'){
+                porcentaje = parseFloat((numerador * 100000)/denominador);
+            }else{
+                porcentaje = parseFloat((numerador * 100)/denominador);
+            }
+            $('#porcentaje-'+trimestre).text(porcentaje.format(2) + ' %');
+        }else{
+            $('#porcentaje-'+trimestre).text('%');
+        }
+        $('#porcentaje-'+trimestre).attr('data-valor',porcentaje);
+    });
+}
+
 function guardar_indicador(validar){
     Validation.cleanFormErrors('#form_indicador_fassa');
 
@@ -370,10 +433,10 @@ function guardar_indicador(validar){
 
 function actualizar_porcentaje(porcentaje_total){
     $('#porcentaje-total').attr('data-valor',porcentaje_total);
-    if(porcentaje_total < 90){
+    if(porcentaje_total < 100){
         $('#porcentaje-total').html('<span class="text-danger"><span class="fa fa-arrow-down"></span> ' + porcentaje_total.format(2) + ' %</span>');
         $('#justificacion').prop('disabled',false);
-    }else if(porcentaje_total > 110){
+    }else if(porcentaje_total > 100){
         $('#porcentaje-total').html('<span class="text-danger"><span class="fa fa-arrow-up"></span> ' + porcentaje_total.format(2) + ' %</span>');
         $('#justificacion').prop('disabled',false);
     }else{

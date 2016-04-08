@@ -17,7 +17,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador,SSA\Utilerias\Util;
 use Illuminate\Database\QueryException, \Exception;
-use BaseController, Input, Response, DB, Sentry, IndicadorFASSA, RegistroAvanceIndicadorFASSA, IndicadorFASSAMeta,Directorio;
+use BaseController, Input, Response, DB, Sentry, IndicadorFASSA, RegistroAvanceIndicadorFASSA, IndicadorFASSAMeta,Directorio, IndicadorFASSAMetaTrimestre;
 
 class RendicionFassaController extends \BaseController {
 
@@ -110,7 +110,7 @@ class RendicionFassaController extends \BaseController {
 		$data = array();
 
 		try{
-			$recurso = IndicadorFASSAMeta::indicadorMetaDetalle()->find($id);
+			$recurso = IndicadorFASSAMeta::indicadorMetaDetalle()->with('metasTrimestre')->find($id);
 			if($recurso){
 				$mes_actual = intval(Util::obtenerMesActual());
 
@@ -146,24 +146,55 @@ class RendicionFassaController extends \BaseController {
 			if($valid_result === true){
 				$parametros = Input::all();
 				$validar = array('metas'=>false,'avance'=>false);
-				$recurso = IndicadorFASSAMeta::with('indicador')->find($id);
+				$recurso = IndicadorFASSAMeta::with('indicador','metasTrimestre')->find($id);
 				$recurso_avance = NULL;
-				
+				$metas_trimestre = [];
+
 				$tipo_formula = $recurso->indicador->claveTipoFormula;
 				
-				if(isset($parametros['numerador'])){
+				if(isset($parametros['trimestre'])){
 					if($recurso->idEstatus == 1 || $recurso->idEstatus == 3){
-						$recurso->numerador 				= $parametros['numerador'];
-						$recurso->denominador 				= $parametros['denominador'];
+						$metas = $recurso->metasTrimestre->lists('id','trimestre');
+						//$metas = $recurso->metasTrimestre;
+						$total_numerador = 0;
+						$total_denominador = 0;
+						foreach ($parametros['trimestre'] as $trim => $meta) {
+							if(isset($metas[$trim])){
+								$meta_trimestre = $recurso->metasTrimestre()->find($metas[$trim]);
+							}else{
+								$meta_trimestre = new IndicadorFASSAMetaTrimestre;
+							}
 
-						$numerador = $parametros['numerador'];
-						$denominador = $parametros['denominador'];
-						if($tipo_formula == 'T'){
-							$porcentaje = floatval(($numerador * 100000)/$denominador);
-						}else{
-							$porcentaje = floatval(($numerador * 100)/$denominador);
+							$meta_trimestre->trimestre 		= $trim;
+							$meta_trimestre->numerador 		= floatval($meta['numerador']);
+							$meta_trimestre->denominador 	= floatval($meta['denominador']);
+							$meta_trimestre->porcentaje 	= 0;
+
+							$total_numerador += $meta_trimestre->numerador;
+							$total_denominador += $meta_trimestre->denominador;
+
+							if($meta_trimestre->numerador > 0){
+								if(!$meta_trimestre->denominador){
+									$meta_trimestre->denominador = 1;
+								}
+
+								if($tipo_formula == 'T'){
+									$meta_trimestre->porcentaje = floatval(($meta_trimestre->numerador * 100000)/$meta_trimestre->denominador);
+								}else{
+									$meta_trimestre->porcentaje = floatval(($meta_trimestre->numerador * 100)/$meta_trimestre->denominador);
+								}
+							}elseif (!$meta_trimestre->id) {
+								$meta_trimestre = NULL;
+							}
+							
+							if($meta_trimestre){
+								$metas_trimestre[] = $meta_trimestre;
+							}
 						}
-						$recurso->porcentaje = $porcentaje;
+
+						$recurso->numerador 	= $meta_trimestre->numerador;
+						$recurso->denominador 	= $meta_trimestre->denominador;
+						$recurso->porcentaje 	= $meta_trimestre->porcentaje;
 
 						if(isset($parametros['validar'])){
 							$validar['metas'] = true;
@@ -171,6 +202,8 @@ class RendicionFassaController extends \BaseController {
 					}
 				}elseif(isset($parametros['avance-numerador'])){
 					$mes_actual = Util::obtenerMesActual();
+					$metas = $recurso->metasTrimestre->lists('porcentaje','trimestre');
+					$trimestre = ceil($mes_actual/3);
 
 					if($recurso->claveFrecuencia == 'A'){
 						if($mes_actual != 12){
@@ -184,6 +217,10 @@ class RendicionFassaController extends \BaseController {
 						if(($mes_actual%3) != 0){
 							throw new Exception("El registro avances no esta actualmente disponible para este indicador.", 1);
 						}
+					}
+
+					if(!isset($metas[$trimestre])){
+						throw new Exception("No hay metas registradas para este trimestre.", 1);
 					}
 
 					if($parametros['id-avance']){
@@ -217,9 +254,9 @@ class RendicionFassaController extends \BaseController {
 						}
 						$recurso_avance->porcentaje = $porcentaje;
 
-						$porcentaje_total = ($recurso_avance->porcentaje / $recurso->porcentaje)*100;
+						$porcentaje_total = ($recurso_avance->porcentaje / floatval($metas[$trimestre]))*100;
 
-						if($porcentaje_total > 110 || $porcentaje_total < 90){
+						if($porcentaje_total > 100 || $porcentaje_total < 100){
 							$recurso_avance->justificacion = 1;
 						}else{
 							$recurso_avance->justificacion = 0;
@@ -258,7 +295,7 @@ class RendicionFassaController extends \BaseController {
 					throw new Exception("Ninguno de los elementos está disponble para edición.", 1);
 				}
 
-				$respuesta = DB::transaction(function() use ($recurso, $recurso_avance, $validar){
+				$respuesta = DB::transaction(function() use ($recurso, $recurso_avance, $metas_trimestre, $validar){
 					$respuesta_transaction = array();
 
 					if($recurso->idEstatus == 1 || $recurso->idEstatus == 3){
@@ -266,7 +303,9 @@ class RendicionFassaController extends \BaseController {
 							$recurso->idEstatus = 2;
 						}
 
-						if(!$recurso->save()){
+						if($recurso->save()){
+							$recurso->metasTrimestre()->saveMany($metas_trimestre);
+						}else{
 							$respuesta_transaction['http_status'] = 500;
 							$respuesta_transaction['data'] = array("data"=>'Ocurrio un error al intentar guardar la información de la meta','code'=>'S01');
 						}
@@ -294,6 +333,7 @@ class RendicionFassaController extends \BaseController {
 
 					return $respuesta_transaction;
 				});
+				$respuesta['data']['debug'] = $metas_trimestre;
 			}else{
 				$respuesta['http_status'] = $valid_result['http_status'];
 				$respuesta['data'] = $valid_result['data'];

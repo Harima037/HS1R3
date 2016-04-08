@@ -12,7 +12,7 @@
 =====================================*/
 
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/indicadores-fassa');
-var moduloDatagrid = new Datagrid("#datagridIndicadores",moduloResource,{ formatogrid:true, pagina: 1});
+var moduloDatagrid = new Datagrid("#datagridIndicadores",moduloResource,{ formatogrid:true, pagina: 1, ejercicio:$('#ejercicio').val()});
 
 moduloDatagrid.init();
 //moduloDatagrid.actualizar();
@@ -308,6 +308,37 @@ function bloquear_controles(identificador){
             $(this).trigger('chosen:updated');
         }
     });
+}
+
+$('#filtrar-ejercicio').on('change',function(){
+    if($('#filtrar-ejercicio').prop('checked')){
+        $('#ejercicio').prop('disabled',false);
+    }else{
+        $('#ejercicio').prop('disabled',true);
+    }
+});
+
+$("#datagridIndicadores .txt-quick-search").off('keydown');
+$("#datagridIndicadores .txt-quick-search").on('keydown', function(event){
+    if (event.which == 13) {
+        realizar_busqueda();
+    }
+});
+
+$('#datagridIndicadores .btn-quick-search').off('click');
+$('#datagridIndicadores .btn-quick-search').on('click',function(){
+    realizar_busqueda();
+})
+
+function realizar_busqueda(){
+    moduloDatagrid.setPagina(1);
+    moduloDatagrid.parametros.buscar = $('.txt-quick-search').val();
+    if($('#filtrar-ejercicio').prop('checked')){
+        moduloDatagrid.parametros.ejercicio = $('#ejercicio').val();
+    }else{
+        delete moduloDatagrid.parametros.ejercicio;
+    }
+    moduloDatagrid.actualizar();
 }
 
 /*             Extras               */
