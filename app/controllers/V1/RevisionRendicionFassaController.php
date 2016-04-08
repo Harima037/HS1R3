@@ -114,7 +114,7 @@ class RevisionRendicionFassaController extends \BaseController {
 		$data = array();
 
 		try{
-			$recurso = IndicadorFASSAMeta::indicadorMetaDetalle()->with('comentario')->find($id);
+			$recurso = IndicadorFASSAMeta::indicadorMetaDetalle()->with('comentario','metasTrimestre')->find($id);
 			if($recurso){
 				$mes_actual = intval(Util::obtenerMesActual());
 

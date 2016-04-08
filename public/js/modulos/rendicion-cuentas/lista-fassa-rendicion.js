@@ -146,15 +146,15 @@ $('#avance-denominador,#avance-numerador').on('change',function(){
         var numerador = parseFloat($('#avance-numerador').val()) || 0;
         var denominador = parseFloat($('#avance-denominador').val()) || 1;
         if($('#tipo-formula').val() == 'T'){
-            porcentaje_avance = parseFloat((numerador * 100000)/denominador);
+            porcentaje_avance = Math.round((parseFloat((numerador * 100000)/denominador))*100)/100;
         }else{
-            porcentaje_avance = parseFloat((numerador * 100)/denominador);
+            porcentaje_avance = Math.round((parseFloat((numerador * 100)/denominador))*100)/100;
         }
         $('#avance-porcentaje').text(porcentaje_avance.format(2) + ' %');
     }else{
         $('#avance-porcentaje').text('%');
     }
-    $('#avance-porcentaje').attr('data-valor',porcentaje_avance);
+    $('#avance-porcentaje').attr('data-valor',Math.round(porcentaje_avance * 100) / 100);
 
     var porcentaje_total = 0;
     if(porcentaje_avance){

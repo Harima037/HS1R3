@@ -248,9 +248,9 @@ class RendicionFassaController extends \BaseController {
 						}
 
 						if($tipo_formula == 'T'){
-							$porcentaje = floatval(($numerador * 100000)/$denominador);
+							$porcentaje = round(floatval(($numerador * 100000)/$denominador),2);
 						}else{
-							$porcentaje = floatval(($numerador * 100)/$denominador);
+							$porcentaje = round(floatval(($numerador * 100)/$denominador),2);
 						}
 						$recurso_avance->porcentaje = $porcentaje;
 

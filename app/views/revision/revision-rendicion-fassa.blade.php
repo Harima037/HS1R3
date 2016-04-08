@@ -46,7 +46,7 @@
                         <th class="text-center" style="width:60px;">Trim 2</th>
                         <th class="text-center" style="width:60px;">Trim 3</th>
                         <th class="text-center" style="width:60px;">Trim 4</th>
-                        <th style="width:100px;">Metas</th>
+                        <th style="width:110px;">Metas</th>
                         <th style="width:110px;">Avance</th>
                     </tr>
                 </thead>
@@ -100,46 +100,52 @@
                     </div>
                 </div>
                 <form id="form_indicador_fassa">
-                    <div class="row">
+                    <div class="row" id="panel-programacion-fassa">
                         <div class="col-sm-2">
                             <div class="form-group">
                                 <label class="control-label">Programación</label>
                                 <div id="estatus-programacion"></div>
                             </div>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-12">
+                            <table id="table-programacion-trimestres" class="table table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Numerador</th>
+                                        <th>Denominador</th>
+                                        <th>Porcentaje</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row" id="panel-avance-fassa" style="background-color:#E4E4E4; padding-top:15px;">
+                        <div class="col-sm-2">
                             <div class="form-group">
-                                <label class="control-label" for="numerador">Numerador</label>                                
-                                <!--<input type="number" min="0" class="form-control informacion-meta" id="numerador" name="numerador">-->
-                                <div class="input-group">
-                                	<span class="input-group-btn" onclick="escribirComentario('numerador','Numerador','numerador','meta');">
-                                    	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
-                                    </span>
-                                    <p id="numerador" name="numerador" class="form-control informacion-meta" style="height:auto">&nbsp;</p>
-                  			    </div>
-
+                                <label class="control-label">Meta del Trimestre</label>
+                                <div id="estatus-programacion-trimestre"></div>
                             </div>
                         </div>
                         <div class="col-sm-4">
                             <div class="form-group">
-                                <label class="control-label" for="denominador">Denominador</label>
-                                <!--<input type="number" min="0" class="form-control informacion-meta" id="denominador" name="denominador">-->
-                                <div class="input-group">
-                                	<span class="input-group-btn" onclick="escribirComentario('denominador','Denominador','denominador','meta');">
-                                    	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
-                                    </span>
-                                    <p id="denominador" name="denominador" class="form-control informacion-meta" style="height:auto">&nbsp;</p>
-                  			    </div>
+                                <label class="control-label">Numerador</label>
+                                <span class="form-control" id="numerador-trimestre"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label class="control-label">Denominador</label>
+                                <span class="form-control" id="denominador-trimestre"></span>
                             </div>
                         </div>
                         <div class="col-sm-2">
                             <div class="form-group">
-                                <label class="control-label" for="porcentaje">Porcentaje</label>
-                                <span class="form-control" id="porcentaje">%</span>
+                                <label class="control-label">Porcentaje</label>
+                                <span class="form-control" id="porcentaje-trimestre">%</span>
                             </div>
                         </div>
-                    </div>
-                    <div class="row" style="background-color:#E4E4E4; padding-top:15px;">
                         <div class="col-sm-2">
                             <div class="form-group">
                                 <label class="control-label">Avance</label>
@@ -149,7 +155,6 @@
                         <div class="col-sm-3">
                             <div class="form-group">
                                 <label class="control-label" for="avance-numerador">Numerador</label>
-                                <!--<input type="number" min="0" class="form-control informacion-avance" id="avance-numerador" name="avance-numerador">-->
                                 <div class="input-group">
                                 	<span class="input-group-btn" onclick="escribirComentario('avance-numerador','Numerador','avance-numerador','avance');">
                                     	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
@@ -161,7 +166,6 @@
                         <div class="col-sm-3">
                             <div class="form-group">
                                 <label class="control-label" for="avance-denominador">Denominador</label>
-                                <!--<input type="number" min="0" class="form-control informacion-avance" id="avance-denominador" name="avance-denominador">-->
                                 <div class="input-group">
                                 	<span class="input-group-btn" onclick="escribirComentario('avance-denominador','Denominador','avance-denominador','avance');">
                                     	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
@@ -185,7 +189,6 @@
                         <div class="col-sm-12">
                             <div class="form-group">
                                 <label class="control-label" for="justificacion">Justificación Acumulada</label>
-                                <!--<textarea class="form-control informacion-avance" id="justificacion" name="justificacion" rows="3" disabled></textarea>-->
                                 <div class="input-group">
                                 	<span class="input-group-btn" onclick="escribirComentario('justificacion','Justificación Acumulada','justificacion','avance');">
                                     	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
@@ -204,11 +207,6 @@
                 </form>
             </div>
             <div class="modal-footer">
-                
-                <!--<button type="button" class="btn btn-primary" id="btn-guardar-indicador"><span class="fa fa-save"></span> Guardar</button>-->
-                <!--<button type="button" class="btn btn-success" id="btn-guardar-validar-indicador">
-                    <span class="fa fa-send-o"></span> Guardar y Enviar a Validar
-                </button>-->
                 <div class="btn-toolbar pull-right">
 					<div class="btn-group" style="margin:5px">
                     	<button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>

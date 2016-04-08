@@ -215,16 +215,21 @@ $('#modalIndicador').on('hidden.bs.modal',function(){
     $('#porcentaje').attr('data-valor','');
     $('#avance-porcentaje').text('%');
     $('#avance-porcentaje').attr('data-valor','');
+    $('#avance-denominador').html('&nbsp;');
+    $('#avance-numerador').html('&nbsp;');
+    $('#justificacion').html('&nbsp;');
     $('#porcentaje-total').text('%');
     $('#porcentaje-total').attr('data-valor','');
     $('#justificacion').prop('disabled',true);
+    $('#panel-avance-fassa').removeClass('hidden');
+    $('#panel-programacion-fassa').removeClass('hidden');
     Validation.cleanFormErrors('#form_indicador_fassa');
 
 });
 
 
 function escribirComentario(idcampo,nombrecampo,objetoconinformacion, tipo)
-{	
+{
 	if(tipoRevision==tipo)
 	{
 		$('#modalComentario').find(".modal-title").html("<i class=\"fa fa-pencil-square-o\"></i> Escribir comentario");    
@@ -277,7 +282,6 @@ function editar(e){
             $('#indicador').text(response.data.indicador);
             $('#tipo-formula').val(response.data.claveTipoFormula);
             $('#formula').text(response.data.formula);
-            //$('#fuente-informacion').text(response.data.fuenteInformacion);
 
             $('#numerador').text(parseFloat(response.data.numerador));
             $('#denominador').text(parseFloat(response.data.denominador));
@@ -285,7 +289,6 @@ function editar(e){
                 $('#porcentaje').text(parseFloat(response.data.porcentaje).format(2) + ' %');
                 $('#porcentaje').attr('data-valor',response.data.porcentaje);
             }
-           
 
             var label_class = '';
             switch(response.data.idEstatus){
@@ -295,20 +298,73 @@ function editar(e){
                 case 4: label_class = 'label-primary'; break;
                 case 5: label_class = 'label-success'; break;
             }
+
+            var inicio = 1;
+            var final = 4;
+            var incremento = 1;
+            if(response.data.claveFrecuencia == 'A'){
+                inicio = 4;
+                final = 4;
+                incremento = 1;
+            }else if(response.data.claveFrecuencia == 'S'){
+                inicio = 2;
+                final = 4;
+                incremento = 2;
+            }
+
+            if(response.data.idEstatus == 2 || response.data.idEstatus == 4){
+                tipoRevision = 'meta';
+                //console.log(response.data.comentario);                
+            }
+
+            var rows = '';
+            for (var i = inicio; i <= final; i = i + incremento) {
+                rows += '<tr>' +
+                            '<th width="20%">Trimestre '+i+'</th>' +
+                            '<td>' +
+                                    
+                                '<div class="input-group">' +
+                                    '<span class="input-group-btn" onclick="escribirComentario(\'numerador-'+i+'\',\'Numerador\',\'numerador-'+i+'\',\'meta\');">' +
+                                        '<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>' +
+                                    '</span>' +
+                                    '<p id="numerador-'+i+'" class="form-control informacion-meta" style="height:auto">&nbsp;</p>' +
+                                '</div>' +
+
+                            '</td>' +
+                            '<td>' +
+
+                                '<div class="input-group">' +
+                                    '<span class="input-group-btn" onclick="escribirComentario(\'denominador-'+i+'\',\'Denominador\',\'denominador-'+i+'\',\'meta\');">' +
+                                        '<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>' +
+                                    '</span>' +
+                                    '<p id="denominador-'+i+'" class="form-control informacion-meta" style="height:auto">&nbsp;</p>' +
+                                '</div>' +
+
+                            '</td>' +
+                            '<td width="20%">' +
+                                '<span class="form-control" id="porcentaje-'+i+'">%</span>' +
+                            '</td>' +
+                        '</tr>';
+            }
+            
+            $('#table-programacion-trimestres tbody').html(rows);
 			
 			$('#id-estatus-meta').val(response.data.idEstatus);
 
             var label_html = '<div class="text-center '+label_class+'"><span class="label"><big>'+response.data.estatus+'</big></span></div>';
             $('#estatus-programacion').html(label_html);
+            $('#estatus-programacion-trimestre').html(label_html);
             //if(response.data.idEstatus == 2 || response.data.idEstatus == 4 || response.data.idEstatus == 5){
-                bloquear_controles('.informacion-meta');
+            bloquear_controles('.informacion-meta');
             //}
-	
-			if(response.data.idEstatus == 2 || response.data.idEstatus == 4){
-				tipoRevision = 'meta';
-				//console.log(response.data.comentario);				
-			}
-			
+
+            for(var i in response.data.metas_trimestre){
+                var meta = response.data.metas_trimestre[i];
+                $('#numerador-'+meta.trimestre).text(parseFloat(meta.numerador).format(2));
+                $('#denominador-'+meta.trimestre).text(parseFloat(meta.denominador).format(2));
+                $('#porcentaje-'+meta.trimestre).text(parseFloat(meta.porcentaje).format(2)+' %');
+            }
+
 			for(var j in response.data.comentario)
 			{
 				var come = response.data.comentario[j];
@@ -334,7 +390,31 @@ function editar(e){
             label_html = '<div class="text-center text-muted"><big>Inactivo</big></div>';
             if(!puede_editar_avance){
                 bloquear_controles('.informacion-avance');
+                $('#panel-avance-fassa').addClass('hidden');
             }else{
+                $('#panel-programacion-fassa').addClass('hidden');
+
+                var trimestre_actual = Math.floor(response.data.mes_actual/3);
+                var numerador = 0;
+                var denominador = 0;
+                var porcentaje = 0;
+
+                for(var i in response.data.metas_trimestre){
+                    var meta = response.data.metas_trimestre[i];
+                    if(meta.trimestre == trimestre_actual){
+                        denominador = meta.denominador;
+                        numerador = meta.numerador;
+                        porcentaje = meta.porcentaje;
+                    }
+                }
+
+                $('#numerador-trimestre').text((parseFloat(numerador) || 0).format(2));
+                $('#denominador-trimestre').text((parseFloat(denominador) || 0).format(2));
+                if(porcentaje){
+                    $('#porcentaje-trimestre').text(parseFloat(porcentaje).format(2) + ' %');
+                    $('#porcentaje-trimestre').attr('data-valor',porcentaje);
+                }
+
                 if(response.data.registro_avance.length){
                     for(var i in response.data.registro_avance){
                         var avance = response.data.registro_avance[i];
@@ -343,7 +423,7 @@ function editar(e){
                             $('#avance-numerador').text(parseFloat(avance.numerador));
                             $('#avance-porcentaje').text(parseFloat(avance.porcentaje).format(2) + ' %');
                             $('#justificacion').text(avance.justificacionAcumulada);
-                            var porcentaje_total = (avance.porcentaje/response.data.porcentaje)*100;
+                            var porcentaje_total = (avance.porcentaje/porcentaje)*100;
                             actualizar_porcentaje(porcentaje_total);
 
                             label_class = '';
@@ -432,10 +512,10 @@ function guardar_indicador(validar){
 
 function actualizar_porcentaje(porcentaje_total){
     $('#porcentaje-total').attr('data-valor',porcentaje_total);
-    if(porcentaje_total < 90){
+    if(porcentaje_total < 100){
         $('#porcentaje-total').html('<span class="text-danger"><span class="fa fa-arrow-down"></span> ' + porcentaje_total.format(2) + ' %</span>');
         $('#justificacion').prop('disabled',false);
-    }else if(porcentaje_total > 110){
+    }else if(porcentaje_total > 100){
         $('#porcentaje-total').html('<span class="text-danger"><span class="fa fa-arrow-up"></span> ' + porcentaje_total.format(2) + ' %</span>');
         $('#justificacion').prop('disabled',false);
     }else{
