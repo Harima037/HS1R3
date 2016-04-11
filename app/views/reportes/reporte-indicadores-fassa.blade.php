@@ -37,8 +37,9 @@
             <table class="table table-striped table-hover table-condensed">
                 <thead>
                     <tr height="50">
-                        <th><input type="checkbox" class="check-select-all-rows"></th>
+                        <th><input type="checkbox" class="check-select-all-rows"></th>                        
                         <th>Indicador</th>
+                        <th width="60">Metas</th>
 						<th width="60">Trim 1</th>
 						<th width="60">Trim 2</th>
 						<th width="60">Trim 3</th>

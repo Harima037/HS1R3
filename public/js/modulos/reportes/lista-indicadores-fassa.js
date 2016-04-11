@@ -25,11 +25,20 @@ moduloDatagrid.actualizar({
 
             item.id = response.data[i].id;
             item.indicador = response.data[i].indicador;
-            item.trim1 = '<span class="fa fa-times"></span>';
-            item.trim2 = '<span class="fa fa-times"></span>';
-            item.trim3 = '<span class="fa fa-times"></span>';
-            item.trim4 = '<span class="fa fa-times"></span>';
+            item.metas = '<div style="text-align:center"><span class="fa fa-times"></span></div>';
+            item.trim1 = '<div style="text-align:center"><span class="fa fa-times"></span></div>';
+            item.trim2 = '<div style="text-align:center"><span class="fa fa-times"></span></div>';
+            item.trim3 = '<div style="text-align:center"><span class="fa fa-times"></span></div>';
+            item.trim4 = '<div style="text-align:center"><span class="fa fa-times"></span></div>';
             
+            if(response.data[i].idEstatus > 3){
+                if(response.data[i].idEstatus == 4){
+                    item.metas = '<button onClick="cargarReporteMetas('+item.id+')" class="btn btn-primary" type="button"><span class="fa fa-check"></span></button>';
+                }else if(response.data[i].idEstatus == 5){
+                    item.metas = '<button onClick="cargarReporteMetas('+item.id+')" class="btn btn-success" type="button"><span class="fa fa-pencil"></span></button>';
+                }
+            }
+
             if(response.data[i].registro_avance){
                 for(var j in response.data[i].registro_avance){
                     var eval = response.data[i].registro_avance[j];
@@ -76,6 +85,11 @@ function realizar_busqueda(){
 
 function cargarReporte(id,mes){
     var parametros = id + '?mes='+mes;
+    window.open(SERVER_HOST+'/v1/reporte-fassa/'+parametros);
+}
+
+function cargarReporteMetas(id){
+    var parametros = id + '?metas='+1;
     window.open(SERVER_HOST+'/v1/reporte-fassa/'+parametros);
 }
 

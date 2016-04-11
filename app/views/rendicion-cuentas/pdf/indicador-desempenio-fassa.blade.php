@@ -166,36 +166,60 @@
 	<tr><td colspan="2">&nbsp;</td></tr>
 </table>
 <br>
-<table>
-	<thead>
-		<tr class="tabla-datos">
-			<th class="encabezado-tabla"  colspan="3">META</th>
-			<th class="encabezado-tabla"  colspan="3">AVANCES DEL TRIMESTRE</th>
-			<th class="encabezado-tabla"  rowspan="2">% DESEMPEÑO</th>
-			<th class="encabezado-tabla"  rowspan="2">JUSTIFICACIÓN ACUMULADA</th>
-		</tr>
-		<tr class="tabla-datos">
-			<th class="encabezado-tabla" >NUMERADOR</th>
-			<th class="encabezado-tabla" >DENOMINADOR</th>
-			<th class="encabezado-tabla" >%</th>
-			<th class="encabezado-tabla" >NUMERADOR</th>
-			<th class="encabezado-tabla" >DENOMINADOR</th>
-			<th class="encabezado-tabla" >%</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr class="tabla-datos">
-			<td align="center" vertical-align="middle"  height="30">{{$indicador['metaNumerador']}}</td>
-			<td align="center" vertical-align="middle" >{{$indicador['metaDenominador']}}</td>
-			<td align="center" vertical-align="middle" >{{$indicador['metaPorcentaje']}}</td>
-			<td align="center" vertical-align="middle" >{{$indicador['avanceNumerador']}}</td>
-			<td align="center" vertical-align="middle" >{{$indicador['avanceDenominador']}}</td>
-			<td align="center" vertical-align="middle" >{{$indicador['avancePorcentaje']}}</td>
-			<td align="center" vertical-align="middle" >{{$indicador['desempenio']}}</td>
-			<td align="center" vertical-align="middle" >{{$indicador['justificacion']}}</td>
-		</tr>
-	</tbody>
-</table>
+@if(isset($indicador['metas']))
+	<table>
+		<thead>
+			<tr class="tabla-datos">
+				<th class="encabezado-tabla"  colspan="3">META</th>
+			</tr>
+			<tr class="tabla-datos">
+				<th class="encabezado-tabla" >NUMERADOR</th>
+				<th class="encabezado-tabla" >DENOMINADOR</th>
+				<th class="encabezado-tabla" >%</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach($indicador['metas'] as $meta)
+			<tr class="tabla-datos">
+				<td align="center" vertical-align="middle"  height="30">{{$meta['numerador']}}</td>
+				<td align="center" vertical-align="middle" >{{$meta['denominador']}}</td>
+				<td align="center" vertical-align="middle" >{{$meta['porcentaje']}}</td>
+			</tr>
+			@endforeach
+		</tbody>
+	</table>
+@else
+	<table>
+		<thead>
+			<tr class="tabla-datos">
+				<th class="encabezado-tabla"  colspan="3">META</th>
+				<th class="encabezado-tabla"  colspan="3">AVANCES DEL TRIMESTRE</th>
+				<th class="encabezado-tabla"  rowspan="2">% DESEMPEÑO</th>
+				<th class="encabezado-tabla"  rowspan="2">JUSTIFICACIÓN ACUMULADA</th>
+			</tr>
+			<tr class="tabla-datos">
+				<th class="encabezado-tabla" >NUMERADOR</th>
+				<th class="encabezado-tabla" >DENOMINADOR</th>
+				<th class="encabezado-tabla" >%</th>
+				<th class="encabezado-tabla" >NUMERADOR</th>
+				<th class="encabezado-tabla" >DENOMINADOR</th>
+				<th class="encabezado-tabla" >%</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr class="tabla-datos">
+				<td align="center" vertical-align="middle"  height="30">{{$indicador['metaNumerador']}}</td>
+				<td align="center" vertical-align="middle" >{{$indicador['metaDenominador']}}</td>
+				<td align="center" vertical-align="middle" >{{$indicador['metaPorcentaje']}}</td>
+				<td align="center" vertical-align="middle" >{{$indicador['avanceNumerador']}}</td>
+				<td align="center" vertical-align="middle" >{{$indicador['avanceDenominador']}}</td>
+				<td align="center" vertical-align="middle" >{{$indicador['avancePorcentaje']}}</td>
+				<td align="center" vertical-align="middle" >{{$indicador['desempenio']}}</td>
+				<td align="center" vertical-align="middle" >{{$indicador['justificacion']}}</td>
+			</tr>
+		</tbody>
+	</table>
+@endif
 <br>
 <table style="page-break-inside:avoid;">
 	<tr class="negrita" height="20">
