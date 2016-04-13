@@ -95,7 +95,9 @@ function editar(e){
                         //$('#ejercicio').val(meta.ejercicio);
 
                         $('#numerador').text((parseFloat(meta.numerador) || 0).format(2));
+                        $('#numerador').attr('data-valor',meta.numerador);
                         $('#denominador').text((parseFloat(meta.denominador) || 0).format(2));
+                        $('#denominador').attr('data-valor',meta.denominador);
                         $('#porcentaje').text((parseFloat(meta.porcentaje) || 0).format(2) + ' %');
 
                         $('#frecuencia').val(meta.claveFrecuencia);
@@ -200,13 +202,13 @@ $('#tasa').on('change',function(){
 
 function calcularPorcentaje(){
     if($('#tipo-formula').val()){
-        var numerador = parseFloat($('#numerador').text()) || 0;
-        var denominador = parseFloat($('#denominador').text()) || 1;
+        var numerador = parseFloat($('#numerador').attr('data-valor')) || 0;
+        var denominador = parseFloat($('#denominador').attr('data-valor')) || 1;
         var porcentaje = '';
         if($('#tipo-formula').val() == 'T'){
             var tasa = parseFloat($('#tasa').val());
             porcentaje = parseFloat((numerador * tasa)/denominador);
-            //porcentaje = parseFloat((numerador/denominador) * 100000);
+            //porcentaje = parseFloat((numerador/denominador) * tasa);
         }else{
             porcentaje = parseFloat((numerador * 100)/denominador);
             //porcentaje = parseFloat((numerador/denominador) * 100);
