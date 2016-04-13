@@ -53,12 +53,27 @@ moduloDatagrid.actualizar({
             datos_grid.push(item);
         }
         moduloDatagrid.cargarDatos(datos_grid);                         
-        moduloDatagrid.cargarTotalResultados(response.resultados,'<b>Programas(s)</b>');
+        moduloDatagrid.cargarTotalResultados(response.resultados,'<b>Indicador(es)</b>');
         var total = parseInt(response.resultados/moduloDatagrid.rxpag); 
         var plus = parseInt(response.resultados)%moduloDatagrid.rxpag;
         if(plus>0) 
             total++;
         moduloDatagrid.paginacion(total);
+    },
+    _error: function(jqXHR){
+        //console.log('{ error => "'+jqXHR.status +' - '+ jqXHR.statusText +'", response => "'+ jqXHR.responseText +'" }'); 
+        var json = $.parseJSON(jqXHR.responseText);
+        if(json.code == "W00"){
+            moduloDatagrid.limpiar();
+            moduloDatagrid.cargarTotalResultados(0,'<b>Indicador(es)</b>');
+            var colspan = $(moduloDatagrid.selector + " thead > tr th").length;
+            $(moduloDatagrid.selector + " tbody").append("<tr><td colspan='"+colspan+"' style='text-align:left'><i class='fa fa-info-circle'></i> "+json.data+"</td></tr>");
+        }else{
+            json.type = 'ERR';
+            MessageManager.show(json);
+            moduloDatagrid.limpiar();
+        }
+        
     }
 });
 

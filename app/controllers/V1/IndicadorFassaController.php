@@ -59,6 +59,16 @@ class IndicadorFassaController extends \BaseController {
 				}else{
 					$rows = $rows->where('idUsuarioRendCuenta','=',$usuario->id);
 				}
+
+				if(isset($parametros['ejercicio'])){
+					$ejercicio = $parametros['ejercicio'];
+					$rows = $rows->join('indicadorFASSAMeta',function($join)use($ejercicio){
+							$join->on('indicadorFASSAMeta.idIndicadorFASSA','=','indicadorFASSA.id')
+								->where('indicadorFASSAMeta.ejercicio','=',$ejercicio)
+								->whereNull('indicadorFASSAMeta.borradoAl');
+						});//->groupBy('indicadorFASSAMeta.idIndicadorFASSA');
+						//->having(DB::raw('MAX(indicadorFASSAMeta.ejercicio)'),'=',$ejercicio);
+				}
 				
 				if(isset($parametros['buscar'])){
 					if($parametros['buscar']){
@@ -70,15 +80,6 @@ class IndicadorFassaController extends \BaseController {
 					$total = $rows->count();
 				}else{
 					$total = $rows->count();
-				}
-
-				if(isset($parametros['ejercicio'])){
-					$ejercicio = $parametros['ejercicio'];
-					$rows = $rows->join('indicadorFASSAMeta',function($join)use($ejercicio){
-							$join->on('indicadorFASSAMeta.idIndicadorFASSA','=','indicadorFASSA.id')
-								->whereNull('indicadorFASSAMeta.borradoAl');
-						})->groupBy('indicadorFASSAMeta.idIndicadorFASSA')
-						->having(DB::raw('MAX(indicadorFASSAMeta.ejercicio)'),'=',$ejercicio);
 				}
 
 				$rows = $rows->select('indicadorFASSA.id','indicadorFASSA.indicador','indicadorFASSA.claveNivel','sentryUsers.username','indicadorFASSA.modificadoAl')
@@ -211,6 +212,10 @@ class IndicadorFassaController extends \BaseController {
 				$recurso->fuenteInformacion 		= $parametros['fuente-informacion'];
 				$recurso->idEstatus					= 1;
 
+				if($recurso->claveTipoFormula == 'T'){
+					$recurso->tasa = $parametros['tasa'];
+				}
+
 				$recurso_meta = new IndicadorFASSAMeta;
 				$recurso_meta->ejercicio				= date('Y');
 				$recurso_meta->claveFrecuencia			= $parametros['frecuencia'];
@@ -281,29 +286,19 @@ class IndicadorFassaController extends \BaseController {
 					$recurso_meta = new IndicadorFASSAMeta;
 					$recurso_meta->idEstatus = 1;
 					$recurso_meta->ejercicio = date('Y');
-					//$recurso_meta->claveFrecuencia = 'A';
-					//$checar_ejercicio = TRUE;
 				}
-
-				/*if(($recurso->idEstatus == 2 || $recurso->idEstatus == 4) && ($recurso_meta->idEstatus == 2 || $recurso_meta->idEstatus == 4)){
-					throw new Exception("Ninguno de los elementos esta disponible para edición", 1);
-				}*/
-
-				/*if($checar_ejercicio){
-					$ejercicios_capturados = IndicadorFASSAMeta::where('idIndicadorFASSA','=',$recurso->id)
-																->where('ejercicio','=',$recurso_meta->ejercicio)->count();
-					if($ejercicios_capturados){
-						throw new Exception('Ya se capturo la meta para el ejercicio especificado.', 1);
-					}
-				}*/
 
 				$recurso->claveNivel 				= $parametros['nivel-indicador'];
 				$recurso->indicador 				= $parametros['indicador'];
 				$recurso->claveTipoFormula 			= $parametros['tipo-formula'];
 				$recurso->formula 					= $parametros['formula'];
 				$recurso->fuenteInformacion 		= $parametros['fuente-informacion'];
-				//if($recurso->idEstatus == 1 || $recurso->idEstatus == 3){
-				//}
+
+				if($recurso->claveTipoFormula == 'T'){
+					$recurso->tasa = $parametros['tasa'];
+				}else{
+					$recurso->tasa = null;
+				}
 				
 				$tipo_formula = $recurso->claveTipoFormula;
 				
@@ -313,23 +308,9 @@ class IndicadorFassaController extends \BaseController {
 					$recurso_meta->idLiderPrograma = $titular->id;
 				}
 
-					//$recurso_meta->ejercicio				= $parametros['ejercicio'];
-					//$recurso_meta->numerador 				= $parametros['numerador'];
-					//$recurso_meta->denominador 				= $parametros['denominador'];
 				$recurso_meta->claveUnidadResponsable 	= $parametros['unidad-responsable'];
 				$recurso_meta->idResponsableInformacion	= $parametros['responsable-informacion'];
 				$recurso_meta->claveFrecuencia = $parametros['frecuencia'];
-					/*
-					$numerador = $parametros['numerador'];
-					$denominador = $parametros['denominador'];
-					if($tipo_formula == 'T'){
-						$porcentaje = floatval(($numerador * 100000)/$denominador);
-					}else{
-						$porcentaje = floatval(($numerador * 100)/$denominador);
-					}
-					$recurso_meta->porcentaje = $porcentaje;
-					*/
-				//}
 				
 				$respuesta = DB::transaction(function() use ($recurso,$recurso_meta){
 					$respuesta_transaction = array();

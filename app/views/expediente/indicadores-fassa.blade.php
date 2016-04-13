@@ -128,26 +128,32 @@
                         <div class="col-sm-8">
                             <div class="form-group">
                                 <label class="control-label" for="indicador">Indicador</label>
-                                <input type="text" class="form-control informacion-indicador" id="indicador" name="indicador">
+                                <textarea class="form-control informacion-indicador" id="indicador" name="indicador" rows="2"></textarea>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-4">
+                        <div class="col-sm-2">
                             <div class="form-group">
                                 <label class="control-label" for="tipo-formula">Tipo de Fórmula</label>
                                 <select class="form-control informacion-indicador" id="tipo-formula" name="tipo-formula">
-                                    <option value="">Selecciona un tipo de formula</option>
+                                    <option value="">Selecciona un tipo</option>
                                     @foreach($tipos_formulas as $clave => $tipo)
                                     <option value="{{$clave}}">{{$tipo}}</option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
+                        <div class="col-sm-2">
+                            <div class="form-group hidden" id="panel-tasa-formula">
+                                <label class="control-label" for="tasa">Tasa</label>
+                                <input type="number" class="form-control informacion-indicador" id="tasa" name="tasa" value="100000">
+                            </div>
+                        </div>
                         <div class="col-sm-8">
                             <div class="form-group">
                                 <label class="control-label" for="formula">Fórmula</label>
-                                <input type="text" class="form-control informacion-indicador" id="formula" name="formula">
+                                <textarea class="form-control informacion-indicador" id="formula" name="formula" rows="3"></textarea>
                             </div>
                         </div>
                     </div>

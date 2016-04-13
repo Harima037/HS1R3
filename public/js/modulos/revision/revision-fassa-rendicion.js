@@ -116,6 +116,7 @@ moduloDatagrid.actualizar({
             datos_grid.push(item);
         }
         moduloDatagrid.cargarDatos(datos_grid);
+        moduloDatagrid.cargarTotalResultados(response.resultados,'<b>Indicador(es)</b>');
         var total = parseInt(response.resultados/moduloDatagrid.rxpag); 
         var plus = parseInt(response.resultados)%moduloDatagrid.rxpag;
         if(plus>0) 
@@ -127,6 +128,7 @@ moduloDatagrid.actualizar({
         var json = $.parseJSON(jqXHR.responseText);
         if(json.code == "W00"){
             moduloDatagrid.limpiar();
+            moduloDatagrid.cargarTotalResultados(0,'<b>Indicador(es)</b>');
             var colspan = $(moduloDatagrid.selector + " thead > tr th").length;
             $(moduloDatagrid.selector + " tbody").append("<tr><td colspan='"+colspan+"' style='text-align:left'><i class='fa fa-info-circle'></i> "+json.data+"</td></tr>");
 

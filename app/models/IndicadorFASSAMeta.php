@@ -31,7 +31,7 @@ class IndicadorFASSAMeta extends BaseModel
 					'liderPrograma.cargo AS cargoLiderPrograma','responsableInformacion.nombre AS nombreResponsableInformacion',
 					'responsableInformacion.cargo AS cargoResponsableInformacion','estatus.descripcion AS estatus',
 					'indicadorFASSA.claveNivel','indicadorFASSA.indicador','indicadorFASSA.formula','indicadorFASSA.fuenteInformacion',
-					'indicadorFASSA.claveTipoFormula')
+					'indicadorFASSA.claveTipoFormula','indicadorFASSA.tasa')
 					->join('indicadorFASSA','indicadorFASSA.id','=','indicadorFASSAMeta.idIndicadorFASSA')
 					->leftjoin('vistaDirectorio AS liderPrograma','liderPrograma.id','=','indicadorFASSAMeta.idLiderPrograma')
 					->leftjoin('vistaDirectorio AS responsableInformacion','responsableInformacion.id','=','indicadorFASSAMeta.idResponsableInformacion')

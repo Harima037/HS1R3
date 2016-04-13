@@ -87,6 +87,7 @@
                 <h4 class="modal-title" id="modalLabel">Nuevo</h4>
             </div>
             <input type="hidden" id="tipo-formula">
+            <input type="hidden" id="tasa">
             <div class="modal-body" style="padding-bottom:0;">
                 <div class="row">
                     <div class="col-sm-6">

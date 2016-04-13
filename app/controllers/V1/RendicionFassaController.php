@@ -179,7 +179,7 @@ class RendicionFassaController extends \BaseController {
 								}
 
 								if($tipo_formula == 'T'){
-									$meta_trimestre->porcentaje = floatval(($meta_trimestre->numerador * 100000)/$meta_trimestre->denominador);
+									$meta_trimestre->porcentaje = floatval(($meta_trimestre->numerador * $recurso->indicador->tasa)/$meta_trimestre->denominador);
 								}else{
 									$meta_trimestre->porcentaje = floatval(($meta_trimestre->numerador * 100)/$meta_trimestre->denominador);
 								}
@@ -248,7 +248,7 @@ class RendicionFassaController extends \BaseController {
 						}
 
 						if($tipo_formula == 'T'){
-							$porcentaje = round(floatval(($numerador * 100000)/$denominador),2);
+							$porcentaje = round(floatval(($numerador * $recurso->indicador->tasa)/$denominador),2);
 						}else{
 							$porcentaje = round(floatval(($numerador * 100)/$denominador),2);
 						}

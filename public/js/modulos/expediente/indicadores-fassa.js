@@ -40,6 +40,7 @@ moduloDatagrid.actualizar({
             response.data[i].modificadoAl = response.data[i].modificadoAl.substring(0,11);
         }
         moduloDatagrid.cargarDatos(response.data);                         
+        moduloDatagrid.cargarTotalResultados(response.resultados,'<b>Indicador(es)</b>');
         var total = parseInt(response.resultados/moduloDatagrid.rxpag); 
         var plus = parseInt(response.resultados)%moduloDatagrid.rxpag;
         if(plus>0) 
@@ -51,6 +52,7 @@ moduloDatagrid.actualizar({
         var json = $.parseJSON(jqXHR.responseText);
         if(json.code == "W00"){
             moduloDatagrid.limpiar();
+            moduloDatagrid.cargarTotalResultados(0,'<b>Indicador(es)</b>');
             var colspan = $(moduloDatagrid.selector + " thead > tr th").length;
             $(moduloDatagrid.selector + " tbody").append("<tr><td colspan='"+colspan+"' style='text-align:left'><i class='fa fa-info-circle'></i> "+json.data+"</td></tr>");
 
@@ -73,7 +75,13 @@ function editar(e){
             $('#tipo-formula').val(response.data.claveTipoFormula);
             $('#formula').val(response.data.formula);
             $('#fuente-informacion').val(response.data.fuenteInformacion);
-
+            if(response.data.claveTipoFormula == 'T'){
+                $('#tasa').val(response.data.tasa);
+            }else{
+                $('#tasa').val(100000);
+            }
+            
+            $('#tipo-formula').change();
             /*if(response.data.idEstatus == 2 || response.data.idEstatus == 4){
                 bloquear_controles('.informacion-indicador');
             }*/
@@ -174,20 +182,30 @@ function editar(e){
 }
 
 $('#tipo-formula').on('change',function(){
-    $('#numerador').change();
+    if($('#tipo-formula').val() == 'T'){
+        $('#panel-tasa-formula').removeClass('hidden');
+    }else{
+        $('#panel-tasa-formula').addClass('hidden');
+    }
+    calcularPorcentaje();
 });
 
-$('#denominador,#numerador').on('keyup',function(){
-    $(this).change();
+$('#tasa').on('keyup',function(){
+    calcularPorcentaje();
 });
 
-$('#denominador,#numerador').on('change',function(){
+$('#tasa').on('change',function(){
+    calcularPorcentaje();
+});
+
+function calcularPorcentaje(){
     if($('#tipo-formula').val()){
-        var numerador = parseFloat($('#numerador').val()) || 0;
-        var denominador = parseFloat($('#denominador').val()) || 1;
+        var numerador = parseFloat($('#numerador').text()) || 0;
+        var denominador = parseFloat($('#denominador').text()) || 1;
         var porcentaje = '';
         if($('#tipo-formula').val() == 'T'){
-            porcentaje = parseFloat((numerador * 100000)/denominador);
+            var tasa = parseFloat($('#tasa').val());
+            porcentaje = parseFloat((numerador * tasa)/denominador);
             //porcentaje = parseFloat((numerador/denominador) * 100000);
         }else{
             porcentaje = parseFloat((numerador * 100)/denominador);
@@ -197,7 +215,7 @@ $('#denominador,#numerador').on('change',function(){
     }else{
         $('#porcentaje').text('%');
     }
-});
+}
 
 $('#modalIndicador').on('shown.bs.modal', function () {
     $('#modalIndicador').find('input').eq(0).focus();
@@ -216,6 +234,7 @@ $('#modalIndicador').on('hidden.bs.modal',function(){
     $('#numerador').text('');
     $('#denominador').text('');
     $('#lbl-estatus').empty();
+    $('#panel-tasa-formula').addClass('hidden');
     Validation.cleanFormErrors('#form_indicador_fassa');
 });
 

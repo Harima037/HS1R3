@@ -114,6 +114,7 @@ moduloDatagrid.actualizar({
             datos_grid.push(item);
         }
         moduloDatagrid.cargarDatos(datos_grid);
+        moduloDatagrid.cargarTotalResultados(response.resultados,'<b>Indicador(es)</b>');
         var total = parseInt(response.resultados/moduloDatagrid.rxpag); 
         var plus = parseInt(response.resultados)%moduloDatagrid.rxpag;
         if(plus>0) 
@@ -125,6 +126,7 @@ moduloDatagrid.actualizar({
         var json = $.parseJSON(jqXHR.responseText);
         if(json.code == "W00"){
             moduloDatagrid.limpiar();
+            moduloDatagrid.cargarTotalResultados(0,'<b>Indicador(es)</b>');
             var colspan = $(moduloDatagrid.selector + " thead > tr th").length;
             $(moduloDatagrid.selector + " tbody").append("<tr><td colspan='"+colspan+"' style='text-align:left'><i class='fa fa-info-circle'></i> "+json.data+"</td></tr>");
 
@@ -146,7 +148,8 @@ $('#avance-denominador,#avance-numerador').on('change',function(){
         var numerador = parseFloat($('#avance-numerador').val()) || 0;
         var denominador = parseFloat($('#avance-denominador').val()) || 1;
         if($('#tipo-formula').val() == 'T'){
-            porcentaje_avance = Math.round((parseFloat((numerador * 100000)/denominador))*100)/100;
+            var tasa = $('#tasa').val();
+            porcentaje_avance = Math.round((parseFloat((numerador * tasa)/denominador))*100)/100;
         }else{
             porcentaje_avance = Math.round((parseFloat((numerador * 100)/denominador))*100)/100;
         }
@@ -204,6 +207,7 @@ function editar(e){
 
             $('#indicador').text(response.data.indicador);
             $('#tipo-formula').val(response.data.claveTipoFormula);
+            $('#tasa').val(parseFloat(response.data.tasa));
             $('#formula').text(response.data.formula);
 
             $('#numerador').text((parseFloat(response.data.numerador) || 0).format(2));
@@ -384,7 +388,8 @@ function actualizar_acciones_metas(){
             var numerador = parseFloat($('#numerador-'+trimestre).val()) || 0;
             var denominador = parseFloat($('#denominador-'+trimestre).val()) || 1;
             if($('#tipo-formula').val() == 'T'){
-                porcentaje = parseFloat((numerador * 100000)/denominador);
+                var tasa = $('#tasa').val();
+                porcentaje = parseFloat((numerador * tasa)/denominador);
             }else{
                 porcentaje = parseFloat((numerador * 100)/denominador);
             }
