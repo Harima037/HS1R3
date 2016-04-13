@@ -121,6 +121,8 @@ class ReporteEvaluacionProyectosController extends BaseController {
 			};
 
 			$catalogos['jurisdicciones'] = array_map($conversionCapitalizar, Jurisdiccion::get()->lists('nombre','clave'));
+			$catalogos['jurisdicciones']['OC'] = 'Oficina Central';
+			$catalogos['jurisdicciones']['02'] = 'San Cristóbal de las Casas';
 			$catalogos['unidades_responsables'] = UnidadResponsable::get()->lists('abreviatura','clave');
 
 			$datos = $rows->toArray();
@@ -150,6 +152,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 	/***                <<<<<<<<<<<<<<<<<<<<  Definición de Estilos   >>>>>>>>>>>>>>>>>>>                   ***/
 		$titulo_pag = array('bold' => true,'size'=>20);
 		$titulo = array('bold' => true);
+		$titulo_grande = array('bold' => true,'size'=>12);
 		$titulo_tabla = array('bold' => true, 'size'=>7, 'color'=>'FFFFFF');
 		$titulo_tabla_style = array('valign'=>'center', 'bgColor'=>'28A659');
 		$titulo_row_span =  array('vMerge'=>'restart', 'valign'=>'center', 'bgColor'=>'28A659');
@@ -173,7 +176,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 		$phpWord->addTableStyle('TablaInfo', $infoStyle);
 		$phpWord->addTableStyle('TablaInfoHeader', $infoHeader);
 		$phpWord->addTableStyle('TablaEncabezado',$headerStyle);
-		$phpWord->addTitleStyle(3, ['bold'=>true], ['align'=>'center']);
+		$phpWord->addTitleStyle(3, ['bold'=>true,'size'=>12], ['align'=>'center']);
 
 		$section = $phpWord->addSection(array('orientation'=>'portrait','size'=>'letter'));
 		$section_resumen = $phpWord->addSection(array('orientation'=>'portrait','size'=>'letter'));
@@ -250,42 +253,42 @@ class ReporteEvaluacionProyectosController extends BaseController {
 		/***   Datos pertenecientes al análisis general  ***/
 
 			$section->addTitle(htmlspecialchars('4.' . ($index+1) . ' ' . $proyecto['nombreTecnico']),3);
-			$section->addText(htmlspecialchars('('.$proyecto['ClavePresupuestaria'].')'),$titulo,$centrado);
+			$section->addText(htmlspecialchars('('.$proyecto['ClavePresupuestaria'].')'),$titulo_grande,$centrado);
 
 			$section->addTextBreak(1);
 		/***                <<<<<<<<<<<<<<<<<<<<  Información General  >>>>>>>>>>>>>>>>>>>                   ***/
-			$textrun = $section->addTextRun();
+			$textrun = $section->addTextRun(['lineHeight'=>1.5]);
 			$textrun->addText('Área líder del proyecto: ', array('bold' => true));
 			$textrun->addText($proyecto['unidadResponsableDescripcion']);
 			//$section->addTextBreak();
 
-			$textrun = $section->addTextRun();
-			$textrun->addText('Tipo de proyecto estratégico: ', array('bold' => true));
+			$textrun = $section->addTextRun(['lineHeight'=>1.5]);
+			$textrun->addText('Proyecto estratégico: ', array('bold' => true));
 			$textrun->addText(($proyecto['idClasificacionProyecto'])?'Institucional':'Inversión');
 			//$section->addTextBreak();
 
-			$textrun = $section->addTextRun();
+			$textrun = $section->addTextRun(['lineHeight'=>1.5]);
 			$textrun->addText('Tipo de proyecto: ', array('bold' => true));
 			$textrun->addText($proyecto['tipoProyectoDescripcion']);
 			//$section->addTextBreak();
 
-			$textrun = $section->addTextRun();
+			$textrun = $section->addTextRun(['lineHeight'=>1.5]);
 			$textrun->addText('Cobertura: ', array('bold' => true));
 			$textrun->addText($proyecto['coberturaDescripcion']);
 			//$section->addTextBreak();
 
 			if(isset($presupuestos[$proyecto['ClavePresupuestaria']])){
-				$textrun = $section->addTextRun();
+				$textrun = $section->addTextRun(['lineHeight'=>1.5]);
 				$textrun->addText('Afectación presupuestaria: ', array('bold' => true));
 				$textrun->addText(implode(' y ', $presupuestos[$proyecto['ClavePresupuestaria']]['afectacionPresupuestaria']));
 				//$section->addTextBreak();
 
-				$textrun = $section->addTextRun();
+				$textrun = $section->addTextRun(['lineHeight'=>1.5]);
 				$textrun->addText('Fuente de financiamiento: ', array('bold' => true));
 				$textrun->addText(implode(', ', $presupuestos[$proyecto['ClavePresupuestaria']]['fuentesFinanciamiento']));
 				//$section->addTextBreak();
 
-				$textrun = $section->addTextRun();
+				$textrun = $section->addTextRun(['lineHeight'=>1.5]);
 				$textrun->addText('Subfuente de financiamiento: ', array('bold' => true));
 				$textrun->addText(implode(', ', $presupuestos[$proyecto['ClavePresupuestaria']]['subFuentesFinanciamiento']));
 				//$section->addTextBreak();
@@ -297,7 +300,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 				}
 				
 
-				$textrun = $section->addTextRun();
+				$textrun = $section->addTextRun(['lineHeight'=>1.5]);
 				$textrun->addText('Presupuesto autorizado: ', array('bold' => true));
 				$textrun->addText('$ ' . number_format($presupuestos[$proyecto['ClavePresupuestaria']]['presupuestoModificado'],2) . ' ('.$cantidad_letras.' M.N.)');
 				$section->addTextBreak(1);
@@ -327,22 +330,22 @@ class ReporteEvaluacionProyectosController extends BaseController {
 					$proyectos_subfuente_financiamiento[$sub_fuente] = 1;
 				}
 			}else{
-				$textrun = $section->addTextRun();
+				$textrun = $section->addTextRun(['lineHeight'=>1.5]);
 				$textrun->addText('Afectación presupuestaria: ', array('bold' => true));
 				$textrun->addText('Información no encontrada en el EP01',array('color'=>'#FF0000','bold'=>true));
 				//$section->addTextBreak();
 
-				$textrun = $section->addTextRun();
+				$textrun = $section->addTextRun(['lineHeight'=>1.5]);
 				$textrun->addText('Fuente de financiamiento: ', array('bold' => true));
 				$textrun->addText('Información no encontrada en el EP01',array('color'=>'#FF0000','bold'=>true));
 				//$section->addTextBreak();
 
-				$textrun = $section->addTextRun();
+				$textrun = $section->addTextRun(['lineHeight'=>1.5]);
 				$textrun->addText('Subfuente de financiamiento: ', array('bold' => true));
 				$textrun->addText('Información no encontrada en el EP01',array('color'=>'#FF0000','bold'=>true));
 				//$section->addTextBreak();
 
-				$textrun = $section->addTextRun();
+				$textrun = $section->addTextRun(['lineHeight'=>1.5]);
 				$textrun->addText('Presupuesto autorizado: ', array('bold' => true));
 				$textrun->addText('Información no encontrada en el EP01',array('color'=>'#FF0000','bold'=>true));
 				$section->addTextBreak(1);
@@ -378,6 +381,8 @@ class ReporteEvaluacionProyectosController extends BaseController {
 			
 			$row_class = null;
 			$row_counter = 0;
+			$suma_porcentajes_avance = 0;
+			$conteo_porcentajes_avance = 0;
 			foreach ($proyecto['componentes'] as $componente) {
 				$row_counter++;
 				if(($row_counter%2) == 0){
@@ -391,7 +396,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 					$trimestre = ceil($meta['mes'] / 3);
 					$trimestres[$trimestre] += $meta['avance'];
 					$total_avance += $meta['avance'];
-					if($meta['claveJurisdiccion'] == 'OC'){ $meta['claveJurisdiccion'] = '01'; }
+					//if($meta['claveJurisdiccion'] == 'OC'){ $meta['claveJurisdiccion'] = '01'; }
 					if($meta['avance'] > 0 || $meta['meta'] > 0){
 						if(!isset($proyecto_jurisdicciones[$meta['claveJurisdiccion']])){
 							$proyecto_jurisdicciones[$meta['claveJurisdiccion']] = [
@@ -406,10 +411,12 @@ class ReporteEvaluacionProyectosController extends BaseController {
 				}
 
 				$porcentaje_avance = round(($total_avance*100)/$componente['valorNumerador'],2);
+				$suma_porcentajes_avance += $porcentaje_avance;
+				$conteo_porcentajes_avance += 1;
 
 				$row = $table->addRow();
 				$row->addCell(1251,$titulo_cell)->addText('COMPONENTE',$titulo_tabla,$centrado);
-				$row->addCell(1552,$row_class)->addText($componente['indicador'],$texto_tabla,$izquierda);
+				$row->addCell(1552,$row_class)->addText($componente['indicador'],$texto_tabla,$justificado);
 				$row->addCell(1251,$row_class)->addText(number_format($componente['valorNumerador'],2),$texto_tabla,$centrado);
 				$row->addCell(1251,$row_class)->addText(number_format($trimestres[1],2),$texto_tabla,$centrado);
 				$row->addCell(1251,$row_class)->addText(number_format($trimestres[2],2),$texto_tabla,$centrado);
@@ -442,7 +449,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 						$trimestre = ceil($meta['mes'] / 3);
 						$trimestres[$trimestre] += $meta['avance'];
 						$total_avance += $meta['avance'];
-						if($meta['claveJurisdiccion'] == 'OC'){ $meta['claveJurisdiccion'] = '01'; }
+						//if($meta['claveJurisdiccion'] == 'OC'){ $meta['claveJurisdiccion'] = '01'; }
 						if($meta['avance'] > 0 || $meta['meta'] > 0){
 							if(!isset($proyecto_jurisdicciones[$meta['claveJurisdiccion']])){
 								$proyecto_jurisdicciones[$meta['claveJurisdiccion']] = [
@@ -456,18 +463,33 @@ class ReporteEvaluacionProyectosController extends BaseController {
 						}
 					}
 
+					$porcentaje_avance = round(($total_avance*100)/$actividad['valorNumerador'],2);
+					$suma_porcentajes_avance += $porcentaje_avance;
+					$conteo_porcentajes_avance += 1;
+
 					$row = $table->addRow();
 					$row->addCell(1251,$titulo_cell)->addText('ACTIVIDAD',$titulo_tabla,$centrado);
-					$row->addCell(1552,$row_class)->addText($actividad['indicador'],$texto_tabla,$izquierda);
+					$row->addCell(1552,$row_class)->addText($actividad['indicador'],$texto_tabla,$justificado);
 					$row->addCell(1251,$row_class)->addText(number_format($actividad['valorNumerador'],2),$texto_tabla,$centrado);
 					$row->addCell(1251,$row_class)->addText(number_format($trimestres[1],2),$texto_tabla,$centrado);
 					$row->addCell(1251,$row_class)->addText(number_format($trimestres[2],2),$texto_tabla,$centrado);
 					$row->addCell(1251,$row_class)->addText(number_format($trimestres[3],2),$texto_tabla,$centrado);
 					$row->addCell(1251,$row_class)->addText(number_format($trimestres[4],2),$texto_tabla,$centrado);
 					$row->addCell(1251,$row_class)->addText(number_format($total_avance,2),$texto_tabla,$centrado);
-					$row->addCell(950,$row_class)->addText(number_format(round(($total_avance*100)/$actividad['valorNumerador'],2),2).'%',$texto_tabla,$centrado);
+					$row->addCell(950,$row_class)->addText(number_format($porcentaje_avance,2).'%',$texto_tabla,$centrado);
+
+					if($porcentaje_avance <= 110 && $porcentaje_avance >= 90){
+						$cumplimiento_indicadores['Satisfactorio'] += 1;
+					}elseif ($porcentaje_avance > 110) {
+						$cumplimiento_indicadores['No Satisfactorio'] += 1;
+						$cumplimiento_indicadores_no_satisfactorio['Alto avance'] += 1;
+					}elseif ($porcentaje_avance < 90) {
+						$cumplimiento_indicadores['No Satisfactorio'] += 1;
+						$cumplimiento_indicadores_no_satisfactorio['Bajo avance'] += 1;
+					}
 				}
 			}
+			$promedio_avance = round($suma_porcentajes_avance / $conteo_porcentajes_avance,2);
 
 			$section->addTextBreak(2);
 			$section->addText(htmlspecialchars('AVANCE JURISDICCIONAL'),$titulo);
@@ -557,7 +579,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 			$section->addText(htmlspecialchars('AVANCE FÍSICO-FINANCIERO'),$titulo);
 			$section->addTextBreak(1);
 
-			$promedio_avance = round($suma_porcentajes/count($jurisdicciones_porcentajes),2);
+			//$promedio_avance = round($suma_porcentajes/count($jurisdicciones_porcentajes),2);
 
 			$textrun = $section->addTextRun();
 			$textrun->addText('Promedio de avance físico alcanzado: ', array('bold' => true));
