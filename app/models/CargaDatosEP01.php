@@ -36,7 +36,9 @@ class CargaDatosEP01 extends BaseModel
 					$join->on('subfuente.clave','=','SFF')->whereNull('subfuente.borradoAl');
 				})
 				->leftJoin('catalogoFuenteFinanciamiento AS tipoRecurso',function($join){
-					$join->on('tipoRecurso.clave','=','fuente.fuente')->whereNull('tipoRecurso.borradoAl');;
+					$join->on('tipoRecurso.clave','=','fuente.fuente')
+						->where('tipoRecurso.nivel','=',1)
+						->whereNull('tipoRecurso.borradoAl');
 				})
 				->where('cargaDatosEP01.mes','=',$mes)
 				->where('cargaDatosEP01.ejercicio','=',$anio);

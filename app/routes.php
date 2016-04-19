@@ -168,7 +168,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('variacion-gasto',				'V1\VariacionesGastoController');
 		Route::resource('reporte-variacion-gasto',		'V1\ReporteVariacionesGastoController');
 		Route::resource('estado-programatico-funcional','V1\ReporteEP20Controller',array('only'=>array('index')));
-		Route::resource('evaluacion-proyectos',			'V1\ReporteEvaluacionProyectosController',array('only'=>array('index')));
+		Route::resource('evaluacion-proyectos',			'V1\EvaluacionProyectosController',array('only'=>array('index','show','update','store')));
+		Route::resource('evaluacion-proyectos-reporte',	'V1\ReporteEvaluacionProyectosController',array('only'=>array('index')));
 
 		Route::resource('reporte-seguimiento',	'V1\ReporteSeguimientoController', array('only' => array('index')));
 		Route::resource('revision-proyectos',	'V1\RevisionController');

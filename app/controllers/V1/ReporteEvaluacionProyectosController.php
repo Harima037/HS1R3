@@ -52,7 +52,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 				$ejercicio = intval($parametros['ejercicio']);
 			}
 
-			$rows = Proyecto::reporteEvaluacionProyectos($ejercicio)
+			$rows = Proyecto::reporteEvaluacionProyectos($ejercicio,$mes)
 							->where('idEstatusProyecto',5)
 							->with([
 								'componentes.metasMes' => function($componentesMetasMes) use ($mes){
@@ -115,6 +115,10 @@ class ReporteEvaluacionProyectosController extends BaseController {
 				}
 				$presupuesto_fuente_financiamiento['fuentes'][$proyecto['claveFuenteFinanciamiento']]['monto'] += $proyecto['presupuestoModificado'];
 			}
+
+			/*$queries = DB::getQueryLog();
+			$last_query = end($queries);
+			return Response::json(array('datos'=>$last_query),200);*/
 
 			$conversionCapitalizar = function($cadena){
 				return mb_convert_case($cadena, MB_CASE_TITLE, 'UTF-8');
@@ -709,7 +713,9 @@ class ReporteEvaluacionProyectosController extends BaseController {
 			$section->addTextBreak(1);
 			
 			$section->addText(htmlspecialchars('OBSERVACIONES:'),$titulo);
-			if(isset($proyecto['analisis_funcional'][0])){
+			if($proyecto['observaciones']){
+				$section->addText(htmlspecialchars($proyecto['observaciones']));
+			}elseif(isset($proyecto['analisis_funcional'][0])){
 				$section->addText(htmlspecialchars($proyecto['analisis_funcional'][0]['justificacionGlobal']));
 			}else{
 				$section->addText('Información no encontrada en la base de datos',array('bold'=>true),array('color'=>'#FF0000'));

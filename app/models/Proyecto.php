@@ -666,14 +666,19 @@ class Proyecto extends BaseModel
 			->orderBy('proyectos.numeroProyectoEstrategico','asc');
     }
 
-    public function scopeReporteEvaluacionProyectos($query,$ejercicio){
+    public function scopeReporteEvaluacionProyectos($query,$ejercicio,$mes){
 		return $query->leftjoin('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','proyectos.unidadResponsable')
 					->leftjoin('catalogoTiposProyectos AS tipoProyecto','tipoProyecto.id','=','proyectos.idTipoProyecto')
 					->leftjoin('catalogoCoberturas AS cobertura','cobertura.id','=','proyectos.idCobertura')
+					->leftjoin('evaluacionProyectoObservaciones AS observaciones',function($join)use($mes){
+						$join->on('observaciones.idProyecto','=','proyectos.id')
+							->where('observaciones.mes','=',$mes)
+							->whereNull('observaciones.borradoAl');
+					})
 					->select('proyectos.*',
 						'unidadResponsable.descripcion AS unidadResponsableDescripcion',
 						'tipoProyecto.descripcion AS tipoProyectoDescripcion',
-						'cobertura.descripcion AS coberturaDescripcion'
+						'cobertura.descripcion AS coberturaDescripcion', 'observaciones.observaciones'
 					)
 					->where('ejercicio',$ejercicio);
 	}
@@ -847,6 +852,10 @@ class Proyecto extends BaseModel
 
 	public function evaluacionMes(){
 		return $this->hasOne('EvaluacionProyectoMes','idProyecto');
+	}
+
+	public function evaluacionProyectoObservacion(){
+		return $this->hasOne('EvaluacionProyectoObservacion','idProyecto');
 	}
 
 	public function fuentesFinanciamiento(){

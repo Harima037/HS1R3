@@ -49,6 +49,52 @@
                         </button>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="btn-toolbar pull-right" >
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-info btn-edit-rows">
+                                    <span class="fa fa-pencil"></span> Ver Observaciones
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" class="check-select-all-rows"></th>
+                        <th width="200">Clave Presupuestaria</th>
+                        <th>Nombre Técnico</th>
+                        <th width="120">Seguimiento<br> de Metas</th>
+                        <th width="120">Cuenta<br>Pública</th>
+                        <th width="130">Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <div class="panel-footer">
+                <div class="btn-toolbar ">
+                    <div class="btn-group pull-right" style="margin-left:5px; margin-bottom:5px;">
+                        <button class="btn btn-default btn-back-rows"><i class="glyphicon glyphicon-arrow-left"></i></button>
+                        <button class="btn btn-default btn-next-rows"><i class="glyphicon glyphicon-arrow-right"></i></button>
+                    </div>
+                    <div class="btn-group pull-right " style="width:200px; ">   
+                        <div class="input-group" > 
+                            <span class="input-group-addon">Pág.</span> 
+                            <input type="text" class="txt-go-page form-control" style="text-align:center" value="1" >     
+                            <span class="input-group-addon btn-total-paginas" data-pages="0">de 0</span> 
+                            <div class="input-group-btn dropup">
+                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                                <ul class="dropdown-menu pull-right">
+                                    <li><a class="btn-go-first-rows" href="#">Primera Página</a></li>
+                                    <li><a class="btn-go-last-rows" href="#">Última Página</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -57,5 +103,45 @@
 
 @section('modals')
 <!-- Dejar parent al ultimo -->
+<div class="modal fade" id="modalObservaciones" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-85-screen">
+        <div class="modal-content modal-content-85-screen">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="modalLabel"><span id="accion-observaciones"></span> Observaciones</h4>
+            </div>
+            <table id="tabla-lista-indicadores" class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>Nivel</th>
+                        <th>Indicador</th>
+                        <th width="1">Cantidad<br>Programada</th>
+                        <th width="1">Cantidad<br>Alcanzada</th>
+                        <th width="1">Porcentaje<br>Alcanzado</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot></tfoot>
+            </table>
+            <div class="modal-body">
+            <form action="" id="formObservaciones">
+                <input type="hidden" id="id" name="id">
+                <input type="hidden" id="id-proyecto" name="id-proyecto">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <textarea class="form-control" name="observaciones" id="observaciones" rows="8"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btnGuardarObservaciones">Guardar</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 @parent
 @stop
