@@ -124,6 +124,13 @@
                 <tfoot></tfoot>
             </table>
             <div class="modal-body">
+            <table border="0" width="100%">
+                <tr>
+                    <td><strong>Presupuesto autorizado:</strong> <span id="presupuesto-autorizado"></span></td>
+                    <td><strong>Presupuesto ejercido:</strong> <span id="presupuesto-ejercido"></span></td>
+                    <td><strong>Avance financiero:</strong> <span id="presupuesto-porcentaje"></span></td>
+                </tr>
+            </table>
             <form action="" id="formObservaciones">
                 <input type="hidden" id="id" name="id">
                 <input type="hidden" id="id-proyecto" name="id-proyecto">

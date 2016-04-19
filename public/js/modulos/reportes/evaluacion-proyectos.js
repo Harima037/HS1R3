@@ -63,7 +63,7 @@ moduleDatagrid.actualizar({
 // Implementación personalizada del módulo
 
 function editar (e){
-    var parametros = {'mes':$('#mes').val()};
+    var parametros = {'mes':$('#mes').val(),'ejercicio':$('#ejercicio').val()};
     moduleResource.get(e,parametros,{
         _success: function(response){
             $('#tabla-lista-indicadores tbody').html('');
@@ -138,6 +138,18 @@ function editar (e){
                 $('#accion-observaciones').text('Capturar');
                 $('#observaciones').val(response.data.analisis_funcional[0].justificacionGlobal);
             }
+            var modificado = parseFloat(response.data.presupuestoModificado) || 0;
+            var ejercido = parseFloat(response.data.presupuestoEjercidoModificado) || 0;
+            var porcentaje = 0;
+
+            if(modificado){
+                porcentaje = (ejercido * 100)/modificado;
+            }
+
+            $('#presupuesto-autorizado').text('$ ' + modificado.format(2));
+            $('#presupuesto-ejercido').text('$ ' + ejercido.format(2));
+            $('#presupuesto-porcentaje').text(porcentaje.format(2) + ' %');
+
             $('#modalObservaciones').modal('show');
         }
     });

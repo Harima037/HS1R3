@@ -116,6 +116,12 @@ class EvaluacionProyectosController extends BaseController {
 		}else{
 			$mes = intval($parametros['mes']);
 		}
+
+		if(!isset($parametros['ejercicio'])){
+			$ejercicio = date('Y');
+		}else{
+			$ejercicio = intval($parametros['ejercicio']);
+		}
 		
 		$recurso = Proyecto::with([
 			'analisisFuncional' => function($analisisFuncional) use ($mes){
@@ -130,7 +136,23 @@ class EvaluacionProyectosController extends BaseController {
 			'evaluacionProyectoObservacion' => function($evaluacionProyecto) use ($mes){
 				$evaluacionProyecto->where('mes','=',$mes);
 			}
-		])->find($id);
+		])
+		->leftjoin('cargaDatosEP01 AS ep01',function($join) use ($mes,$ejercicio){
+			$join->on('ep01.UR','=','proyectos.unidadResponsable')
+				->on('ep01.FI','=','proyectos.finalidad')
+				->on('ep01.FU','=','proyectos.funcion')
+				->on('ep01.SF','=','proyectos.subFuncion')
+				->on('ep01.SSF','=','proyectos.subSubFuncion')
+				->on('ep01.PS','=','proyectos.programaSectorial')
+				->on('ep01.PP','=','proyectos.programaPresupuestario')
+				->on('ep01.PE','=','proyectos.programaEspecial')
+				->on('ep01.AI','=','proyectos.actividadInstitucional')
+				->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(proyectos.numeroProyectoEstrategico,3,"0"))'))
+				->where('ep01.mes','=',$mes)
+				->where('ep01.ejercicio','=',$ejercicio);
+		})
+		->select('proyectos.*',DB::raw('SUM(ep01.presupuestoModificado) AS presupuestoModificado'),DB::raw('SUM(ep01.presupuestoEjercidoModificado) AS presupuestoEjercidoModificado'))
+		->find($id);
 		
 		if(is_null($recurso)){
 			$http_status = 404;
