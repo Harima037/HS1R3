@@ -130,9 +130,9 @@
 	<div class="header">
 		<table>
 			<tr>
-				<td rowspan="5" class="imagen izquierda"><img src="{{ URL::to('img/LogoFederal.png') }}" width="125"></td>
+				<td rowspan="5" class="imagen izquierda"><img src="{{ public_path().'/img/LogoFederal.png' }}" width="125"></td>
 				<td class="titulo1" align="center">INSTITUTO DE SALUD</td>
-				<td rowspan="5" class="imagen derecha"><img src="{{ URL::to('img/LogoInstitucional.png') }}" width="125"></td>
+				<td rowspan="5" class="imagen derecha"><img src="{{ public_path().'/img/LogoInstitucional.png' }}" width="125"></td>
 			</tr>
 			<tr><td class="titulo2" align="center">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td></tr>
 			<tr><td class="titulo3" align="center">SUBDIRECCIÓN DE PLANEACIÓN EN SALUD</td></tr>

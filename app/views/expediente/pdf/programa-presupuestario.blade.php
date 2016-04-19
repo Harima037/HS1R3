@@ -2,11 +2,11 @@
 	<tr><td colspan="8"></td></tr>
 	<tr>
 		<td rowspan="8" class="imagen izquierda">
-			<img src="{{ URL::to('img/EscudoGobiernoChiapas.png') }}" width="150">
+			<img src="{{ public_path().'/img/EscudoGobiernoChiapas.png' }}" width="150">
 		</td>
 		<td class="titulo">GOBIERNO DEL ESTADO DE CHIAPAS</td>
 		<td rowspan="8" class="imagen derecha">
-			<img src="{{ URL::to('img/Marca.png') }}" width="150">
+			<img src="{{ public_path().'/img/Marca.png' }}" width="150">
 		</td>
 	</tr>
 	<tr>

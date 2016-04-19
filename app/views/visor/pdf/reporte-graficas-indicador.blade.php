@@ -60,11 +60,11 @@
 		<table>
 			<tr>
 				<td class="imagen izquierda">
-					<img src="{{ URL::to('img/EscudoGobiernoChiapas.png') }}" width="180">
+					<img src="{{ public_path().'/img/EscudoGobiernoChiapas.png' }}" width="180">
 				</td>
 				<td height="40" class="titulo" align="center">Instituto de Salud</td>
 				<td class="imagen derecha">
-					<img src="{{ URL::to('img/Marca.png') }}" width="180">
+					<img src="{{ public_path().'/img/Marca.png' }}" width="180">
 				</td>
 			</tr>
 			<tr><td colspan="3" height="5">&nbsp;</td></tr>

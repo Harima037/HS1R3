@@ -1,11 +1,11 @@
 <table class="tabla" width="100%">
 	<tr>
 		<td rowspan="5" class="imagen izquierda" width="150">
-			<img src="{{ URL::to('img/LogoFederal.png') }}" width="150">
+			<img src="{{ public_path().'/img/LogoFederal.png' }}" width="150">
 		</td>
 		<td height="20" class="titulo" align="center">INSTITUTO DE SALUD</td>
 		<td rowspan="5" class="imagen derecha" width="150">
-			<img src="{{ URL::to('img/LogoInstitucional.png') }}" width="150">
+			<img src="{{ public_path().'/img/LogoInstitucional.png' }}" width="150">
 		</td>
 	</tr>
 	<tr>
