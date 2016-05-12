@@ -24,6 +24,17 @@ class AutenticacionController extends Controller {
 			return Redirect::intended('/');
 		}
 
+		$variables = SysConfiguracionVariable::obtenerVariables(array('anio-captura'))->lists('valor','variable');
+		if($variables['anio-captura']){
+			$anio = intval($variables['anio-captura']); 
+		}else{
+			if(intval(date('n')) == 1){
+				$anio = date('Y')-1;
+			}else{
+				$anio = date('Y');
+			}
+		}
+		
 		if(Input::all()){
 			$usuario = Input::get('usuario');
 			$parametros = Input::all();
@@ -81,7 +92,7 @@ class AutenticacionController extends Controller {
 			}
 		}
 
-		return View::make('login')->with(array('error'=>$error,'info'=>$info,'usuario'=>$usuario));
+		return View::make('login')->with(array('error'=>$error,'info'=>$info,'usuario'=>$usuario,'ejercicio'=>$anio));
 	}
 
 	public function logout(){
