@@ -143,51 +143,75 @@ class Util
 		$miles = array();
 		switch($total)
 		{
-			case 2 : $miles[0][0] = " MIL"; $miles[0][1] = " MIL"; break;
+			case 2 :
+						$miles[0][0] = " MIL"; 
+						$miles[0][1] = " MIL"; 
+					break;
 			case 3 :
-					$miles[0][0] = " MILLÓN"; $miles[0][1] = " MILLONES"; 
-					$miles[1][0] = " MIL"; $miles[1][1] = " MIL";
+						$miles[0][0] = " MILLÓN";
+						$miles[0][1] = " MILLONES"; 
+						$miles[1][0] = " MIL";
+						$miles[1][1] = " MIL";
 					break;
 			case 4 : 
-					$miles[0][0] = " MIL"; $miles[0][1] = " MIL";
-					$miles[1][0] = " MILLON"; $miles[1][1] = " MILLONES";
-					$miles[2][0] = " MIL"; $miles[2][1] = " MIL";
+						$miles[0][0] = " MIL"; 
+						$miles[0][1] = " MIL";
+						$miles[1][0] = " MILLON"; 
+						$miles[1][1] = " MILLONES";
+						$miles[2][0] = " MIL"; 
+						$miles[2][1] = " MIL";
 					break;
 			case 5 : 
-					$miles[0][0] = " BILLON"; $miles[0][1] = " BILLONES";
-					$miles[1][0] = " MIL"; $miles[1][1] = " MIL";
-					$miles[2][0] = " MILLON"; $miles[2][1] = " MILLONES";
-					$miles[3][0] = " MIL"; $miles[3][1] = " MIL";
+						$miles[0][0] = " BILLON"; 
+						$miles[0][1] = " BILLONES";
+						$miles[1][0] = " MIL"; 
+						$miles[1][1] = " MIL";
+						$miles[2][0] = " MILLON"; 
+						$miles[2][1] = " MILLONES";
+						$miles[3][0] = " MIL"; 
+						$miles[3][1] = " MIL";
 					break;
 			case 6 : 
-					$miles[0][0] = " MIL"; $miles[0][1] = " MIL";
-					$miles[1][0] = " BILLON"; $miles[1][1] = " BILLONES";
-					$miles[2][0] = " MIL"; $miles[2][1] = " MIL";
-					$miles[3][0] = " MILLON"; $miles[3][1] = " MILLONES";
-					$miles[4][0] = " MIL"; $miles[4][1] = " MIL";
+						$miles[0][0] = " MIL"; 
+						$miles[0][1] = " MIL";
+						$miles[1][0] = " BILLON"; 
+						$miles[1][1] = " BILLONES";
+						$miles[2][0] = " MIL"; 
+						$miles[2][1] = " MIL";
+						$miles[3][0] = " MILLON"; 
+						$miles[3][1] = " MILLONES";
+						$miles[4][0] = " MIL"; 
+						$miles[4][1] = " MIL";
 					break;
 			
 		}
-		
+
+		$moneda = ' PESOS ';
+		if($total > 2 && $enteros_array[1] == 0  && $enteros_array[2] == 0){
+			$moneda = ' DE PESOS';
+		}
+
 		for($i=0;$i<$total;$i++)
 		{
-			
+			$anexo = "";
 			if($i==$total-1){
 				$centesimos=1;
-				$anexo = "";
 			}				
 			else{
 				$centesimos=1;				
 				
-				if($enteros_array[$i]>1)
-					$anexo = $miles[$i][1];
-				else
-					$anexo = $miles[$i][0];
+				if($enteros_array[$i] > 0){
+					if($enteros_array[$i]>1){
+						$anexo = $miles[$i][1];
+					}else{
+						$anexo = $miles[$i][0];
+					}
+				}
 			}
 				
 			$numero_letras.= self::regresa_letras($enteros_array[$i],$centesimos).$anexo;
 		}
-		return $numero_letras." PESOS ".$numeros[1]."/100";
+		return $numero_letras.$moneda.$numeros[1]."/100";
 		
 		
 	}

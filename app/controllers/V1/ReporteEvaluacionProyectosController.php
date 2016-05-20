@@ -268,7 +268,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 
 			$textrun = $section->addTextRun(['lineHeight'=>1.5]);
 			$textrun->addText('Proyecto estratégico: ', array('bold' => true));
-			$textrun->addText(($proyecto['idClasificacionProyecto'])?'Institucional':'Inversión');
+			$textrun->addText(($proyecto['idClasificacionProyecto'] == 1)?'Institucional':'Inversión');
 			//$section->addTextBreak();
 
 			$textrun = $section->addTextRun(['lineHeight'=>1.5]);
@@ -402,7 +402,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 					$trimestres[$trimestre] += $meta['avance'];
 					$total_avance += $meta['avance'];
 
-					if($meta['avance'] > 0 || $meta['meta'] > 0){
+					if(floatval($meta['avance']) > 0 || floatval($meta['meta']) > 0){
 						if(!isset($componente_jurisdicciones[$meta['claveJurisdiccion']])){
 							$componente_jurisdicciones[$meta['claveJurisdiccion']] = [
 								'programado' 	=> 0.00,
@@ -471,7 +471,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 						$trimestres[$trimestre] += $meta['avance'];
 						$total_avance += $meta['avance'];
 						
-						if($meta['avance'] > 0 || $meta['meta'] > 0){
+						if(floatval($meta['avance']) > 0 || floatval($meta['meta']) > 0){
 							if(!isset($actividad_jurisdicciones[$meta['claveJurisdiccion']])){
 								$actividad_jurisdicciones[$meta['claveJurisdiccion']] = [
 									'programado' 	=> 0.00,
@@ -534,7 +534,9 @@ class ReporteEvaluacionProyectosController extends BaseController {
 
 			$avance_comparar = false;
 			$jurisdicciones = [];
+			$oficina_central = false;
 			$jurisdicciones_porcentajes = [];
+			$oficina_central_porcentaje = '';
 
 			foreach ($proyecto_jurisdicciones as $indice => $jurisdiccion) {
 				$porcentaje_avance = round($jurisdiccion['suma_porcentajes']/$jurisdiccion['conteo_porcentajes'],2);
@@ -543,31 +545,63 @@ class ReporteEvaluacionProyectosController extends BaseController {
 				}else if($avance_comparar != $porcentaje_avance){
 					$con_grafica = true;
 				}
-				$jurisdicciones[$indice] = $indice . ' ' . $catalogos['jurisdicciones'][$indice];
-				$jurisdicciones_porcentajes[$indice] = number_format($porcentaje_avance,2,'.','');
+				if($indice != 'OC'){
+					$jurisdicciones[$indice] = $indice . ' ' . $catalogos['jurisdicciones'][$indice];
+				}else{
+					$oficina_central = true;
+				}
+				
+				if($indice != 'OC'){
+					$jurisdicciones_porcentajes[$indice] = number_format($porcentaje_avance,2,'.','');
+				}else{
+					$oficina_central_porcentaje = number_format($porcentaje_avance,2,'.','');
+				}
+				
 			}
 			ksort($jurisdicciones);
 			ksort($jurisdicciones_porcentajes);
 
+			if($oficina_central){
+				$jurisdicciones_porcentajes['OC'] = $oficina_central_porcentaje;
+			}
+
 			$total_proyecto_jurisdicciones = count($proyecto_jurisdicciones);
 
-			if($total_proyecto_jurisdicciones == 10 && $con_grafica){
-				$section->addText(htmlspecialchars('El proyecto se implementó en las 10 Jurisdicciones Sanitarias del Estado, observándose los siguientes resultados:'),$texto);
-			}else if($total_proyecto_jurisdicciones == 10 && !$con_grafica && $avance_comparar == 100.00){
-				$section->addText(htmlspecialchars('El proyecto se implementó en todas Jurisdicciones Sanitarias del Estado, observándose el cumplimiento de las metas programadas.'),$texto);
-			}else if($total_proyecto_jurisdicciones == 10 && !$con_grafica && $avance_comparar != 100.00){
-				$section->addText(htmlspecialchars('El proyecto se implementó en todas Jurisdicciones Sanitarias del Estado, observándose un avance del '.number_format($avance_comparar,2).'% en relación a las metas programadas.'),$texto);
-			}else if($total_proyecto_jurisdicciones < 10 && $total_proyecto_jurisdicciones > 1 && $con_grafica){
-				$section->addText(htmlspecialchars('Las Jurisdicciones Sanitarias en las que se implementó el proyecto fueron: '.implode(', ',$jurisdicciones).'; observándose los siguientes resultados:'),$texto);
-			}else if($total_proyecto_jurisdicciones < 10 && $total_proyecto_jurisdicciones > 1 && !$con_grafica && $avance_comparar == 100.00){
-				$section->addText(htmlspecialchars('El proyecto se implementó en las Jurisdicciones Sanitarias: '.implode(', ',$jurisdicciones).'; observándose el cumplimiento de las metas programadas.'),$texto);
-			}else if($total_proyecto_jurisdicciones < 10 && $total_proyecto_jurisdicciones > 1 && !$con_grafica && $avance_comparar != 100.00){
-				$section->addText(htmlspecialchars('El proyecto se implementó en las Jurisdicciones Sanitarias: '.implode(', ',$jurisdicciones).'; observándose un avance del '.number_format($avance_comparar,2).'% en relación a las metas programadas.'),$texto);
+			if($oficina_central){
+				$texto_comodin = ' y Oficina Central';
+			}else{
+				$texto_comodin = '';
+			}
+
+			$total_jurisdicciones = count($jurisdicciones);
+
+			if( $total_jurisdicciones == 10 && $con_grafica){
+				$section->addText(htmlspecialchars('El proyecto se implementó en las 10 Jurisdicciones Sanitarias del Estado'.$texto_comodin.', observándose los siguientes resultados:'),$texto);
+			}else if( $total_jurisdicciones == 10 && !$con_grafica && $avance_comparar == 100.00){
+				$section->addText(htmlspecialchars('El proyecto se implementó en todas las Jurisdicciones Sanitarias del Estado'.$texto_comodin.', observándose el cumplimiento de las metas programadas.'),$texto);
+			}else if( $total_jurisdicciones == 10 && !$con_grafica && $avance_comparar != 100.00){
+				$section->addText(htmlspecialchars('El proyecto se implementó en todas las Jurisdicciones Sanitarias del Estado'.$texto_comodin.', observándose un avance del '.number_format($avance_comparar,2).'% en relación a las metas programadas.'),$texto);
+			}else if( $total_jurisdicciones < 10 && $total_proyecto_jurisdicciones > 1 && $con_grafica){
+				$section->addText(htmlspecialchars('Las Jurisdicciones Sanitarias en las que se implementó el proyecto fueron: '.implode(', ',$jurisdicciones).$texto_comodin.'; observándose los siguientes resultados:'),$texto);
+			}else if( $total_jurisdicciones < 10 && $total_proyecto_jurisdicciones > 1 && !$con_grafica && $avance_comparar == 100.00){
+				$section->addText(htmlspecialchars('El proyecto se implementó en las Jurisdicciones Sanitarias: '.implode(', ',$jurisdicciones).$texto_comodin.'; observándose el cumplimiento de las metas programadas.'),$texto);
+			}else if( $total_jurisdicciones < 10 && $total_proyecto_jurisdicciones > 1 && !$con_grafica && $avance_comparar != 100.00){
+				$section->addText(htmlspecialchars('El proyecto se implementó en las Jurisdicciones Sanitarias: '.implode(', ',$jurisdicciones).$texto_comodin.'; observándose un avance del '.number_format($avance_comparar,2).'% en relación a las metas programadas.'),$texto);
 			}else if($total_proyecto_jurisdicciones == 1 && $avance_comparar == 100.00){
-				$section->addText(htmlspecialchars('El proyecto se implementó en la Jurisdicción Sanitaria '.implode(', ',$jurisdicciones).', observándose el cumplimiento de las metas programadas.'),$texto);
+				if($oficina_central){
+					$extra = 'Oficina Central';
+				}else{
+					$extra = 'Jurisdicción Sanitaria '.implode(', ',$jurisdicciones);
+				}
+				$section->addText(htmlspecialchars('El proyecto se implementó en la '.$extra.', observándose el cumplimiento de las metas programadas.'),$texto);
 				$con_grafica = false;
 			}else{
-				$section->addText(htmlspecialchars('El proyecto se implementó en la Jurisdicción Sanitaria '.implode(', ',$jurisdicciones).', observándose un avance del '.number_format($avance_comparar,2).'% en relación a las metas programadas.'),$texto);
+				if($oficina_central){
+					$extra = 'Oficina Central';
+				}else{
+					$extra = 'Jurisdicción Sanitaria '.implode(', ',$jurisdicciones);
+				}
+				$section->addText(htmlspecialchars('El proyecto se implementó en la '.$extra.', observándose un avance del '.number_format($avance_comparar,2).'% en relación a las metas programadas.'),$texto);
 				$con_grafica = false;
 			}
 
