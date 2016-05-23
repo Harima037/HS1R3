@@ -591,17 +591,17 @@ class ReporteEvaluacionProyectosController extends BaseController {
 				if($oficina_central){
 					$extra = 'Oficina Central';
 				}else{
-					$extra = 'Jurisdicción Sanitaria '.implode(', ',$jurisdicciones);
+					$extra = 'la Jurisdicción Sanitaria '.implode(', ',$jurisdicciones);
 				}
-				$section->addText(htmlspecialchars('El proyecto se implementó en la '.$extra.', observándose el cumplimiento de las metas programadas.'),$texto);
+				$section->addText(htmlspecialchars('El proyecto se implementó en '.$extra.', observándose el cumplimiento de las metas programadas.'),$texto);
 				$con_grafica = false;
 			}else{
 				if($oficina_central){
 					$extra = 'Oficina Central';
 				}else{
-					$extra = 'Jurisdicción Sanitaria '.implode(', ',$jurisdicciones);
+					$extra = 'la Jurisdicción Sanitaria '.implode(', ',$jurisdicciones);
 				}
-				$section->addText(htmlspecialchars('El proyecto se implementó en la '.$extra.', observándose un avance del '.number_format($avance_comparar,2).'% en relación a las metas programadas.'),$texto);
+				$section->addText(htmlspecialchars('El proyecto se implementó en '.$extra.', observándose un avance del '.number_format($avance_comparar,2).'% en relación a las metas programadas.'),$texto);
 				$con_grafica = false;
 			}
 

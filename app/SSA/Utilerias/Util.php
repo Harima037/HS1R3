@@ -188,7 +188,7 @@ class Util
 
 		$moneda = ' PESOS ';
 		if($total > 2 && $enteros_array[1] == 0  && $enteros_array[2] == 0){
-			$moneda = ' DE PESOS';
+			$moneda = ' DE PESOS ';
 		}
 
 		for($i=0;$i<$total;$i++)
