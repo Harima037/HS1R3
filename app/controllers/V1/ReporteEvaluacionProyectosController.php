@@ -736,22 +736,20 @@ class ReporteEvaluacionProyectosController extends BaseController {
 			
 			$section->addTextBreak();
 			
-			/*
-			$graph = new \PHPGraphLib(650,150);
+			
+			$graph = new \PHPGraphLib(650,210);
 			$avance_logrado = number_format($avance_logrado,2,'.','');
 			$promedio_avance = number_format($promedio_avance,2,'.','');
-			//$data = array("Avance fisico" => $promedio_avance, "Avance financiero" => $avance_logrado);
-			$data = array("Avance fisico" => $promedio_avance,"Avance financiero" => 0);
-			$data2 = array("Avance fisico" => 0,"Avance financiero" => $avance_logrado);
-			$graph->addData($data, $data2);
-			$graph->setBarColor('green','silver');
+			$data = array("Avance fisico" => $promedio_avance, "Avance financiero" => $avance_logrado);
+			$graph->addData($data);
+			$graph->setBarColor('green');
 			$graph->setGrid(false);
 			$graph->setDataValues(true);
 			$graph->setDataValueColor('black');
 			$graph->setDataFormat('percent');
 			$graph->setXValuesHorizontal(true);
-			*/
-
+			
+			/*
 			$graph = new \PHPGraphLibStacked(650,210);
 			$data = array('Avance fisico'=>$promedio_avance,'Avance financiero'=>0);
 			$data2 = array('Avance fisico'=>0,'Avance financiero'=>$avance_logrado);
@@ -763,6 +761,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 			$graph->setLegend(TRUE);
 			$graph->setLegendOutlineColor('white');
 			$graph->setLegendTitle(number_format($promedio_avance,2,'.','').'%',number_format($avance_logrado,2,'.','').'%');
+			*/
 
 			ob_start();
 				$graph->createGraph();
