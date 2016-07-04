@@ -44,6 +44,7 @@
 						<th width="60">Trim 2</th>
 						<th width="60">Trim 3</th>
 						<th width="60">Trim 4</th>
+                        <th width="60">Cierre</th>
                     </tr>
                 </thead>
                 <tbody></tbody>

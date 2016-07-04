@@ -35,13 +35,20 @@ class ReporteEvaluacionFASSAController extends BaseController {
 		if($recurso){
 			$parametros = Input::all();
 			
+			/*$variables = SysConfiguracionVariable::obtenerVariables(array('captura-cierre-fassa'))->lists('valor','variable');
+			if($variables['captura-cierre-fassa']){
+				$cierre_fassa = intval($variables['captura-cierre-fassa']); //1 Abierto | 2 Cerrado
+			}else{
+				$cierre_fassa = null;
+			}*/
+
 			if($recurso->idEstatus < 4){
 				return Response::json(array('data'=>'El recurso no se encuentra disponible para impresión'),500);
 			}
 
 			if(isset($parametros['metas'])){
 				$recurso->load('metasTrimestre');
-			}else{
+			}elseif(!isset($parametros['cierre'])){
 				if(isset($parametros['mes'])){
 					$mes_actual = $parametros['mes'];
 				}else{
@@ -88,6 +95,16 @@ class ReporteEvaluacionFASSAController extends BaseController {
 
 			if(isset($parametros['metas'])){
 				$indicador['metas'] = $recurso->metasTrimestre;
+			}elseif(isset($parametros['cierre'])){
+				$indicador['metaNumerador'] = number_format($recurso->numerador,2);
+				$indicador['metaDenominador'] = number_format($recurso->denominador,2);
+				$indicador['metaPorcentaje'] = number_format($recurso->porcentaje,2);
+
+				$indicador['avanceNumerador'] = number_format($recurso->numeradorCierre,2);
+				$indicador['avanceDenominador'] = number_format($recurso->denominadorCierre,2);
+				$indicador['avancePorcentaje'] = number_format($recurso->porcentajeCierre,2);
+				$indicador['desempenio'] = number_format(($recurso->porcentajeCierre / $recurso->porcentaje)*100,2);
+				$indicador['justificacion'] = $recurso->justificacionAcumuladaCierre;
 			}else{
 				$indicador['metaNumerador'] = number_format($recurso->metasTrimestre[0]->numerador,2);
 				$indicador['metaDenominador'] = number_format($recurso->metasTrimestre[0]->denominador,2);

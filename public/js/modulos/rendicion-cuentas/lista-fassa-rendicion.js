@@ -22,7 +22,7 @@ moduloDatagrid.actualizar({
         var datos_grid = [];
         for(var i in response.data){
             var item = {};
-
+            
             item.id = response.data[i].id;
             item.indicador = response.data[i].indicador;
             //item.otro = response.data[i].unidadResponsable;
@@ -38,22 +38,17 @@ moduloDatagrid.actualizar({
                     item.trim1 = '<div class="text-center text-muted"><span class="fa fa-minus"></span></div>';
                     item.trim2 = '<div class="text-center text-muted"><span class="fa fa-minus"></span></div>';
                     item.trim3 = '<div class="text-center text-muted"><span class="fa fa-minus"></span></div>';
-                    item.trim4 = (trim_actual == 4)?trim_abierto:(trim_actual > 4)?trim_perdido:trim_cerrado;
-                    /*if(response.mes_actual == 12 && (response.data[i].idEstatus == 4 || response.data[i].idEstatus == 5)){
-                        item.trim4 = '<div class="text-center"><span class="fa fa-unlock"></span></div>';
-                    }else{
-                        item.trim4 = '<div class="text-center"><span class="fa fa-lock"></span></div>';
-                    }*/
+                    item.trim4 = (trim_actual == 4 && !response.cierre_fassa)?trim_abierto:(trim_actual > 4)?trim_perdido:trim_cerrado;
                 }else if(response.data[i].claveFrecuencia == 'S'){
                     item.trim1 = '<div class="text-center text-muted"><span class="fa fa-minus"></span></div>';
-                    item.trim2 = (trim_actual == 2)?trim_abierto:(trim_actual > 2)?trim_perdido:trim_cerrado;
+                    item.trim2 = (trim_actual == 2 && !response.cierre_fassa)?trim_abierto:(trim_actual > 2)?trim_perdido:trim_cerrado;
                     item.trim3 = '<div class="text-center text-muted"><span class="fa fa-minus"></span></div>';
-                    item.trim4 = (trim_actual == 4)?trim_abierto:(trim_actual > 4)?trim_perdido:trim_cerrado;
+                    item.trim4 = (trim_actual == 4 && !response.cierre_fassa)?trim_abierto:(trim_actual > 4)?trim_perdido:trim_cerrado;
                 }else{
-                    item.trim1 = (trim_actual == 1)?trim_abierto:(trim_actual > 1)?trim_perdido:trim_cerrado;
-                    item.trim2 = (trim_actual == 2)?trim_abierto:(trim_actual > 2)?trim_perdido:trim_cerrado;
-                    item.trim3 = (trim_actual == 3)?trim_abierto:(trim_actual > 3)?trim_perdido:trim_cerrado;
-                    item.trim4 = (trim_actual == 4)?trim_abierto:(trim_actual > 4)?trim_perdido:trim_cerrado;
+                    item.trim1 = (trim_actual == 1 && !response.cierre_fassa)?trim_abierto:(trim_actual > 1)?trim_perdido:trim_cerrado;
+                    item.trim2 = (trim_actual == 2 && !response.cierre_fassa)?trim_abierto:(trim_actual > 2)?trim_perdido:trim_cerrado;
+                    item.trim3 = (trim_actual == 3 && !response.cierre_fassa)?trim_abierto:(trim_actual > 3)?trim_perdido:trim_cerrado;
+                    item.trim4 = (trim_actual == 4 && !response.cierre_fassa)?trim_abierto:(trim_actual > 4)?trim_perdido:trim_cerrado;
                 }
             }else{
                 item.trim1 = trim_cerrado;
@@ -62,6 +57,12 @@ moduloDatagrid.actualizar({
                 item.trim4 = trim_cerrado;
             }
             
+            if(response.cierre_fassa == 1){
+                item.cierre = trim_abierto;
+            }else{
+                item.cierre = trim_cerrado;
+            }
+
             var clase_estatus = '';
             switch(response.data[i].idEstatus){
                 case 1: clase_estatus = 'label-info'; break;
@@ -87,7 +88,7 @@ moduloDatagrid.actualizar({
                         clase_desempenio = 'text-success';
                     }
 
-                    if(response.mes_actual == avance.mes){
+                    if(response.mes_actual == avance.mes && !(response.cierre_fassa)){
                         if(avance.idEstatus == 2 || avance.idEstatus == 4 || avance.idEstatus == 5){
                             clase_candado = 'fa-lock';
                         }else{
@@ -109,6 +110,54 @@ moduloDatagrid.actualizar({
                     var trim = parseInt(avance.mes/3);
                     item['trim'+trim] = '<div class="text-center '+clase_desempenio+'"><span class="fa '+clase_candado+'"></span></div>';
                 }
+            }
+
+            if(response.cierre_fassa){
+                var avance = response.data[i];
+                var clase_desempenio = '';
+                var clase_candado = '';
+                var clase_estatus = '';
+
+                if(avance.justificacionCierre){
+                    clase_desempenio = 'text-danger';
+                }else if(avance.idEstatusCierre){
+                    clase_desempenio = 'text-success';
+                }else{
+                    clase_desempenio = '';
+                }
+
+                if(response.cierre_fassa == 1){
+                    if(avance.idEstatusCierre == 2 || avance.idEstatusCierre == 4 || avance.idEstatusCierre == 5){
+                        clase_candado = 'fa-lock';
+                    }else{
+                        clase_candado = 'fa-unlock';
+                    }
+
+                    switch(avance.idEstatusCierre){
+                        case 1: clase_estatus = 'label-info'; break;
+                        case 2: clase_estatus = 'label-warning'; break;
+                        case 3: clase_estatus = 'label-danger'; break;
+                        case 4: clase_estatus = 'label-primary'; break;
+                        case 5: clase_estatus = 'label-success'; break;
+                    }
+                    if(avance.estatusCierre){
+                        item.avance = '<span class="label '+clase_estatus+'">'+avance.estatusCierre+'</span>';
+                    }else{
+                        item.avance = '<span class="text-muted">Inactivo</span>';
+                    }
+                    
+                }else{
+                    
+                    if(avance.idEstatusCierre == 4 || avance.idEstatusCierre == 5){
+                        clase_candado = 'fa-circle';
+                    }else{
+                        clase_desempenio = 'text-muted';
+                        clase_candado = 'fa-times';
+                    }
+                    item.avance = '<span class="text-muted">Inactivo</span>';
+                }
+
+                item.cierre = '<div class="text-center '+clase_desempenio+'"><span class="fa '+clase_candado+'"></span></div>';
             }
 
             datos_grid.push(item);
@@ -196,6 +245,7 @@ $('#panel-programacion-fassa').removeClass('hidden');
 function editar(e){
     moduloResource.get(e,null,{
         _success: function(response){
+            var meses = {1:'Enero',2:'Febrero',3:'Marzo',4:'Abril',5:'Mayo',6:'Junio',7:'Julio',8:'Agosto',9:'Septiembre',10:'Octubre',11:'Noviembre',12:'Diciembre'};
             var nivel = '';
             switch(response.data.claveNivel){
                 case 'F': nivel = 'Fin'; break;
@@ -205,17 +255,17 @@ function editar(e){
             }
             $('#modalIndicador').find(".modal-title").html('Nivel: ' + nivel);
 
+            if(!response.data.cierre_fassa){
+                $('#label-mes-avance').text(' ['+meses[response.data.mes_actual]+']');
+            }else{
+                $('#label-mes-avance').text(' [Cierre]');
+            }
+            
+
             $('#indicador').text(response.data.indicador);
             $('#tipo-formula').val(response.data.claveTipoFormula);
             $('#tasa').val(parseFloat(response.data.tasa));
             $('#formula').text(response.data.formula);
-
-            $('#numerador').text((parseFloat(response.data.numerador) || 0).format(2));
-            $('#denominador').text((parseFloat(response.data.denominador) || 0).format(2));
-            if(response.data.porcentaje){
-                $('#porcentaje').text(parseFloat(response.data.porcentaje).format(2) + ' %');
-                $('#porcentaje').attr('data-valor',response.data.porcentaje);
-            }
 
             var label_class = '';
             switch(response.data.idEstatus){
@@ -255,8 +305,27 @@ function editar(e){
                         '</tr>';
             }
 
+            rows += '<tr>' +
+                        '<th>Cierre</th>' +
+                        '<td>' +
+                            '<span class="form-control" id="numerador-cierre" disabled></span>' +
+                        '</td>' +
+                        '<td>' +
+                            '<span class="form-control" id="denominador-cierre" disabled></span>' +
+                        '</td>' +
+                        '<td>' +
+                            '<span class="form-control" id="porcentaje-cierre" disabled>%</span>' +
+                        '</td>' +
+                    '</tr>';
+
             $('#table-programacion-trimestres tbody').html(rows);
             actualizar_acciones_metas();
+
+            $('#numerador-cierre').text((parseFloat(response.data.numerador) || 0).format(2));
+            $('#denominador-cierre').text((parseFloat(response.data.denominador) || 0).format(2));
+            if(response.data.porcentaje){
+                $('#porcentaje-cierre').text(parseFloat(response.data.porcentaje).format(2) + ' %');
+            }
 
             var label_html = '<div class="text-center '+label_class+'"><span class="label"><big>'+response.data.estatus+'</big></span></div>';
             $('#estatus-programacion').html(label_html);
@@ -295,59 +364,107 @@ function editar(e){
                 var denominador = 0;
                 var porcentaje = 0;
 
-                for(var i in response.data.metas_trimestre){
-                    var meta = response.data.metas_trimestre[i];
-                    if(meta.trimestre == trimestre_actual){
-                        denominador = meta.denominador;
-                        numerador = meta.numerador;
-                        porcentaje = meta.porcentaje;
+                if(!response.data.cierre_fassa){
+                    for(var i in response.data.metas_trimestre){
+                        var meta = response.data.metas_trimestre[i];
+                        if(meta.trimestre == trimestre_actual){
+                            denominador = meta.denominador;
+                            numerador = meta.numerador;
+                            porcentaje = meta.porcentaje;
+                        }
                     }
-                }
 
-                $('#numerador-trimestre').text((parseFloat(numerador) || 0).format(2));
-                $('#denominador-trimestre').text((parseFloat(denominador) || 0).format(2));
-                if(porcentaje){
-                    $('#porcentaje-trimestre').text(parseFloat(porcentaje).format(2) + ' %');
-                    $('#porcentaje-trimestre').attr('data-valor',porcentaje);
-                }
-                
-                $('#avance-denominador').val(parseFloat(denominador));
-                if(response.data.registro_avance.length){
-                    for(var i in response.data.registro_avance){
-                        var avance = response.data.registro_avance[i];
-                        if(avance.mes == response.data.mes_actual){
-                            $('#avance-denominador').val(parseFloat(avance.denominador));
-                            $('#avance-numerador').val(parseFloat(avance.numerador));
-                            $('#avance-porcentaje').text(parseFloat(avance.porcentaje).format(2) + ' %');
-                            $('#justificacion').val(avance.justificacionAcumulada);
-                            var porcentaje_total = (avance.porcentaje/porcentaje)*100;
-                            actualizar_porcentaje(porcentaje_total);
+                    $('#numerador-trimestre').text((parseFloat(numerador) || 0).format(2));
+                    $('#denominador-trimestre').text((parseFloat(denominador) || 0).format(2));
+                    if(porcentaje){
+                        $('#porcentaje-trimestre').text(parseFloat(porcentaje).format(2) + ' %');
+                        $('#porcentaje-trimestre').attr('data-valor',porcentaje);
+                    }
+                    
+                    $('#avance-denominador').val(parseFloat(denominador));
+                    if(response.data.registro_avance.length){
+                        for(var i in response.data.registro_avance){
+                            var avance = response.data.registro_avance[i];
+                            if(avance.mes == response.data.mes_actual){
+                                $('#avance-denominador').val(parseFloat(avance.denominador));
+                                $('#avance-numerador').val(parseFloat(avance.numerador));
+                                $('#avance-porcentaje').text(parseFloat(avance.porcentaje).format(2) + ' %');
+                                $('#justificacion').val(avance.justificacionAcumulada);
+                                var porcentaje_total = (avance.porcentaje/porcentaje)*100;
+                                actualizar_porcentaje(porcentaje_total);
 
-                            label_class = '';
-                            switch(avance.idEstatus){
-                                case 1: label_class = 'label-info'; break;
-                                case 2: label_class = 'label-warning'; break;
-                                case 3: label_class = 'label-danger'; break;
-                                case 4: label_class = 'label-primary'; break;
-                                case 5: label_class = 'label-success'; break;
-                            }
-                            label_html = '<div class="text-center '+label_class+'"><span class="label"><big>'+avance.estatus+'</big></span></div>';
-                            $('#id-avance').val(avance.id);
+                                label_class = '';
+                                switch(avance.idEstatus){
+                                    case 1: label_class = 'label-info'; break;
+                                    case 2: label_class = 'label-warning'; break;
+                                    case 3: label_class = 'label-danger'; break;
+                                    case 4: label_class = 'label-primary'; break;
+                                    case 5: label_class = 'label-success'; break;
+                                }
+                                label_html = '<div class="text-center '+label_class+'"><span class="label"><big>'+avance.estatus+'</big></span></div>';
+                                $('#id-avance').val(avance.id);
 
-                            if(avance.idEstatus == 2 || avance.idEstatus == 4 || avance.idEstatus == 5){
-                                bloquear_controles('.informacion-avance');
-                            }
-                            
-                            if(avance.idEstatus == 4 || avance.idEstatus == 5){
-                                $('#btn-imprimir-reporte').removeClass('hidden');
-                                $('#btn-imprimir-reporte').off('click');
-                                $('#btn-imprimir-reporte').on('click',function(){
-                                    window.open(SERVER_HOST+'/v1/reporte-fassa/' + response.data.id);
-                                });
+                                if(avance.idEstatus == 2 || avance.idEstatus == 4 || avance.idEstatus == 5){
+                                    bloquear_controles('.informacion-avance');
+                                }
+                                
+                                if(avance.idEstatus == 4 || avance.idEstatus == 5){
+                                    $('#btn-imprimir-reporte').removeClass('hidden');
+                                    $('#btn-imprimir-reporte').off('click');
+                                    $('#btn-imprimir-reporte').on('click',function(){
+                                        window.open(SERVER_HOST+'/v1/reporte-fassa/' + response.data.id);
+                                    });
+                                }
                             }
                         }
                     }
+                }else{
+                    $('#numerador-trimestre').text((parseFloat(response.data.numerador) || 0).format(2));
+                    $('#denominador-trimestre').text((parseFloat(response.data.denominador) || 0).format(2));
+                    if(response.data.porcentaje){
+                        $('#porcentaje-trimestre').text(parseFloat(response.data.porcentaje).format(2) + ' %');
+                        $('#porcentaje-trimestre').attr('data-valor',response.data.porcentaje);
+                    }
+
+                    $('#avance-denominador').val(parseFloat(response.data.denominador));
+                    if(response.data.idEstatusCierre){
+                        var avance = response.data;
+                        $('#avance-denominador').val(parseFloat(avance.denominadorCierre));
+                        $('#avance-numerador').val(parseFloat(avance.numeradorCierre));
+                        $('#avance-porcentaje').text(parseFloat(avance.porcentajeCierre).format(2) + ' %');
+                        $('#justificacion').val(avance.justificacionAcumuladaCierre);
+                        var porcentaje_total = (avance.porcentajeCierre/avance.porcentaje)*100;
+                        actualizar_porcentaje(porcentaje_total);
+
+                        label_class = '';
+                        switch(avance.idEstatusCierre){
+                            case 1: label_class = 'label-info'; break;
+                            case 2: label_class = 'label-warning'; break;
+                            case 3: label_class = 'label-danger'; break;
+                            case 4: label_class = 'label-primary'; break;
+                            case 5: label_class = 'label-success'; break;
+                        }
+                        label_html = '<div class="text-center '+label_class+'"><span class="label"><big>'+avance.estatusCierre+'</big></span></div>';
+                        $('#id-avance').val(avance.id);
+
+                        if(avance.idEstatusCierre == 2 || avance.idEstatusCierre == 4 || avance.idEstatusCierre == 5){
+                            bloquear_controles('.informacion-avance');
+                        }else if(response.data.cierre_fassa == 2){
+                            bloquear_controles('.informacion-avance');
+                        }
+                        
+                        if(avance.idEstatusCierre == 4 || avance.idEstatusCierre == 5){
+                            $('#btn-imprimir-reporte').removeClass('hidden');
+                            $('#btn-imprimir-reporte').off('click');
+                            $('#btn-imprimir-reporte').on('click',function(){
+                                window.open(SERVER_HOST+'/v1/reporte-fassa/' + response.data.id + '?cierre=1');
+                            });
+                        }
+                    }else if(response.data.cierre_fassa == 2){
+                        bloquear_controles('.informacion-avance');
+                    }
                 }
+                
             }
             $('#estatus-avance').html(label_html);
             
@@ -398,6 +515,12 @@ function actualizar_acciones_metas(){
             $('#porcentaje-'+trimestre).text('%');
         }
         $('#porcentaje-'+trimestre).attr('data-valor',porcentaje);
+
+        if(trimestre == 4){
+            $('#numerador-cierre').text((parseFloat(numerador) || 0).format(2))
+            $('#denominador-cierre').text((parseFloat(denominador) || 0).format(2));
+            $('#porcentaje-cierre').text((parseFloat(porcentaje) || 0).format(2));
+        }
     });
 }
 

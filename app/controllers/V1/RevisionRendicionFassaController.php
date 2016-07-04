@@ -17,7 +17,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador,SSA\Utilerias\Util;
 use Illuminate\Database\QueryException, \Exception;
-use BaseController, Input, Response, DB, Sentry, IndicadorFASSA, RegistroAvanceIndicadorFASSA, IndicadorFASSAMeta,Directorio, IndicadorFASSAMetaComentarios;
+use BaseController, Input, Response, DB, Sentry, IndicadorFASSA, RegistroAvanceIndicadorFASSA, IndicadorFASSAMeta,Directorio, IndicadorFASSAMetaComentarios, SysConfiguracionVariable;
 
 class RevisionRendicionFassaController extends \BaseController {
 	
@@ -78,7 +78,14 @@ class RevisionRendicionFassaController extends \BaseController {
 							->skip(($parametros['pagina']-1)*10)->take(10)
 							->get();
 				//
-				$data = array('resultados'=>$total,'data'=>$rows, 'mes_actual'=>Util::obtenerMesActual());
+				$variables = SysConfiguracionVariable::obtenerVariables(array('captura-cierre-fassa'))->lists('valor','variable');
+				if($variables['captura-cierre-fassa']){
+					$cierre_fassa = intval($variables['captura-cierre-fassa']); //1 Abierto | 2 Cerrado
+				}else{
+					$cierre_fassa = null;
+				}
+
+				$data = array('resultados'=>$total,'data'=>$rows, 'mes_actual'=>Util::obtenerMesActual(), 'cierre_fassa' => $cierre_fassa);
 				$respuesta['data'] = $data;
 
 				if($total<=0){
@@ -115,14 +122,27 @@ class RevisionRendicionFassaController extends \BaseController {
 
 		try{
 			$recurso = IndicadorFASSAMeta::indicadorMetaDetalle()->with('comentario','metasTrimestre')->find($id);
+
 			if($recurso){
-				$mes_actual = intval(Util::obtenerMesActual());
+				$variables = SysConfiguracionVariable::obtenerVariables(array('captura-cierre-fassa'))->lists('valor','variable');
+				if($variables['captura-cierre-fassa']){
+					$cierre_fassa = intval($variables['captura-cierre-fassa']); //1 Abierto | 2 Cerrado
+				}else{
+					$cierre_fassa = null;
+				}
+
+				if($cierre_fassa){
+					$mes_actual = 12;
+				}else{
+					$mes_actual = intval(Util::obtenerMesActual());
+				}
 
 				$recurso->load(array('registroAvance'=>function($query)use($mes_actual){
 					return $query->where('mes','<=',$mes_actual);
 				}));
 
 				$recurso['mes_actual'] = $mes_actual;
+				$recurso['cierre_fassa'] = $cierre_fassa;
 				$data['data'] = $recurso;
 			}else{
 				$http_status = 404;
@@ -193,6 +213,13 @@ class RevisionRendicionFassaController extends \BaseController {
 		if(isset($parametros['actualizarproyecto']))
 		{
 			//throw new Exception($parametros['actualizarproyecto'],1);
+
+			$variables = SysConfiguracionVariable::obtenerVariables(array('captura-cierre-fassa'))->lists('valor','variable');
+			if($variables['captura-cierre-fassa']){
+				$cierre_fassa = intval($variables['captura-cierre-fassa']); //1 Abierto | 2 Cerrado
+			}else{
+				$cierre_fassa = null;
+			}
 			
 			if($parametros['actualizarproyecto']=="aprobar") //Poner estatus 4 (Aprobado)
 			{
@@ -209,14 +236,26 @@ class RevisionRendicionFassaController extends \BaseController {
 				}
 				else if($parametros['tiporevision']=='avance')
 				{
-					$recurso = RegistroAvanceIndicadorFASSA::find($parametros['idavance']);
-					if(is_null($recurso)){
-						$respuesta['http_status'] = 404;
-						$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
-					}else{
-						$recurso->idEstatus = 4;
-						$recurso->save();
+					if(!$cierre_fassa){
+						$recurso = RegistroAvanceIndicadorFASSA::find($parametros['idavance']);
+						if(is_null($recurso)){
+							$respuesta['http_status'] = 404;
+							$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+						}else{
+							$recurso->idEstatus = 4;
+							$recurso->save();
+						}
+					}elseif($cierre_fassa == 1){
+						$recurso = IndicadorFASSAMeta::find($id);
+						if(is_null($recurso)){
+							$respuesta['http_status'] = 404;
+							$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+						}else{
+							$recurso->idEstatusCierre = 4;
+							$recurso->save();
+						}
 					}
+					
 				}
 			}
 			else if($parametros['actualizarproyecto']=="regresar") //Poner estatus 3 (Regreso a corrección)
@@ -234,13 +273,24 @@ class RevisionRendicionFassaController extends \BaseController {
 				}
 				else if($parametros['tiporevision']=='avance')
 				{
-					$recurso = RegistroAvanceIndicadorFASSA::find($parametros['idavance']);
-					if(is_null($recurso)){
-						$respuesta['http_status'] = 404;
-						$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
-					}else{
-						$recurso->idEstatus = 3;
-						$recurso->save();
+					if(!$cierre_fassa){
+						$recurso = RegistroAvanceIndicadorFASSA::find($parametros['idavance']);
+						if(is_null($recurso)){
+							$respuesta['http_status'] = 404;
+							$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+						}else{
+							$recurso->idEstatus = 3;
+							$recurso->save();
+						}
+					}elseif($cierre_fassa == 1){
+						$recurso = IndicadorFASSAMeta::find($id);
+						if(is_null($recurso)){
+							$respuesta['http_status'] = 404;
+							$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+						}else{
+							$recurso->idEstatusCierre = 3;
+							$recurso->save();
+						}
 					}
 				}
 			}
@@ -259,13 +309,24 @@ class RevisionRendicionFassaController extends \BaseController {
 				}
 				else if($parametros['tiporevision']=='avance')
 				{
-					$recurso = RegistroAvanceIndicadorFASSA::find($parametros['idavance']);
-					if(is_null($recurso)){
-						$respuesta['http_status'] = 404;
-						$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
-					}else{
-						$recurso->idEstatus = 5;
-						$recurso->save();
+					if(!$cierre_fassa){
+						$recurso = RegistroAvanceIndicadorFASSA::find($parametros['idavance']);
+						if(is_null($recurso)){
+							$respuesta['http_status'] = 404;
+							$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+						}else{
+							$recurso->idEstatus = 5;
+							$recurso->save();
+						}
+					}elseif($cierre_fassa == 1){
+						$recurso = IndicadorFASSAMeta::find($id);
+						if(is_null($recurso)){
+							$respuesta['http_status'] = 404;
+							$respuesta['data'] = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+						}else{
+							$recurso->idEstatusCierre = 5;
+							$recurso->save();
+						}
 					}
 				}
 			}

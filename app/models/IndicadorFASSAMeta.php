@@ -10,18 +10,20 @@ class IndicadorFASSAMeta extends BaseModel
 	public function scopeConDetalle($query){
 		return $query->select('indicadorFASSAMeta.*','liderPrograma.nombre AS nombreLiderPrograma',
 					'liderPrograma.cargo AS cargoLiderPrograma','responsableInformacion.nombre AS nombreResponsableInformacion',
-					'responsableInformacion.cargo AS cargoResponsableInformacion','estatus.descripcion AS estatus')
+					'responsableInformacion.cargo AS cargoResponsableInformacion','estatus.descripcion AS estatus','estatusCierre.descripcion AS estatusCierre')
 					->leftjoin('vistaDirectorio AS liderPrograma','liderPrograma.id','=','indicadorFASSAMeta.idLiderPrograma')
 					->leftjoin('vistaDirectorio AS responsableInformacion','responsableInformacion.id','=','indicadorFASSAMeta.idResponsableInformacion')
 					->leftjoin('catalogoEstatusProyectos AS estatus','estatus.id','=','indicadorFASSAMeta.idEstatus')
+					->leftjoin('catalogoEstatusProyectos AS estatusCierre','estatusCierre.id','=','indicadorFASSAMeta.idEstatusCierre')
 					->orderBy('ejercicio','asc');
 	}
 
 	public function scopeIndicadoresEjercicio($query){
 		return $query->select('indicadorFASSAMeta.*','indicadorFASSA.claveNivel','indicadorFASSA.indicador',
-					'estatus.descripcion AS estatus','unidad.descripcion AS unidadResponsable')
+					'estatus.descripcion AS estatus','estatusCierre.descripcion AS estatusCierre','unidad.descripcion AS unidadResponsable')
 					->join('indicadorFASSA','indicadorFASSA.id','=','indicadorFASSAMeta.idIndicadorFASSA')
 					->leftjoin('catalogoEstatusProyectos AS estatus','estatus.id','=','indicadorFASSAMeta.idEstatus')
+					->leftjoin('catalogoEstatusProyectos AS estatusCierre','estatusCierre.id','=','indicadorFASSAMeta.idEstatusCierre')
 					->leftjoin('catalogoUnidadesResponsables AS unidad','unidad.clave','=','indicadorFASSAMeta.claveUnidadResponsable');
 
 	}
@@ -30,12 +32,13 @@ class IndicadorFASSAMeta extends BaseModel
 		return $query->select('indicadorFASSAMeta.*','liderPrograma.nombre AS nombreLiderPrograma',
 					'liderPrograma.cargo AS cargoLiderPrograma','responsableInformacion.nombre AS nombreResponsableInformacion',
 					'responsableInformacion.cargo AS cargoResponsableInformacion','estatus.descripcion AS estatus',
-					'indicadorFASSA.claveNivel','indicadorFASSA.indicador','indicadorFASSA.formula','indicadorFASSA.fuenteInformacion',
-					'indicadorFASSA.claveTipoFormula','indicadorFASSA.tasa')
+					'estatusCierre.descripcion AS estatusCierre','indicadorFASSA.claveNivel','indicadorFASSA.indicador',
+					'indicadorFASSA.formula','indicadorFASSA.fuenteInformacion','indicadorFASSA.claveTipoFormula','indicadorFASSA.tasa')
 					->join('indicadorFASSA','indicadorFASSA.id','=','indicadorFASSAMeta.idIndicadorFASSA')
 					->leftjoin('vistaDirectorio AS liderPrograma','liderPrograma.id','=','indicadorFASSAMeta.idLiderPrograma')
 					->leftjoin('vistaDirectorio AS responsableInformacion','responsableInformacion.id','=','indicadorFASSAMeta.idResponsableInformacion')
-					->leftjoin('catalogoEstatusProyectos AS estatus','estatus.id','=','indicadorFASSAMeta.idEstatus');
+					->leftjoin('catalogoEstatusProyectos AS estatus','estatus.id','=','indicadorFASSAMeta.idEstatus')
+					->leftjoin('catalogoEstatusProyectos AS estatusCierre','estatusCierre.id','=','indicadorFASSAMeta.idEstatusCierre');
 	}
 
 	public function indicador(){
