@@ -205,9 +205,9 @@ class ReporteEvaluacionProyectosController extends BaseController {
 		$phpWord->addTableStyle('TablaInfoHeader', $infoHeader);
 		$phpWord->addTableStyle('TablaEncabezado',$headerStyle);
 		$phpWord->addTitleStyle(3, ['bold'=>true,'size'=>12], ['align'=>'center']);
-
-		$section_resumen = $phpWord->addSection(array('orientation'=>'portrait','size'=>'letter'));
+		
 		$section = $phpWord->addSection(array('orientation'=>'portrait','size'=>'letter'));
+		$section_resumen = $phpWord->addSection(array('orientation'=>'portrait','size'=>'letter'));
 		
 	/***                <<<<<<<<<<<<<<<<<<<<  Definición de Estilos   >>>>>>>>>>>>>>>>>>>                   ***/
 	    $sectionStyle = $section_resumen->getStyle();
