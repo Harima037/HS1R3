@@ -16,7 +16,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="panel panel-default datagrid" id="datagridProyectos" data-edit-row="cargar_datos_proyecto" data-trim-activo="{{$trimestre_avance}}" data-mes-activo="{{$mes_avance}}" data-mes-actual="{{$mes_actual}}">
-            <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> Proyectos Institucionales {{$anio_captura}}</h4></div>
+            <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> Indicadores de Resultados {{$anio_captura}}</h4></div>
             @if(isset($mostrar_filtrado))
             <div class="panel-body bg-info">
                 <div class="row">
@@ -26,14 +26,12 @@
                         </label>
                     </div>
                     <div class="col-sm-5">
-                        
                         <select class="form-control" id="filtro-jurisdiccion">
                             <option value="">Estatal</option>
                             @foreach($jurisdicciones as $clave => $jurisdiccion)
                             <option value="{{$clave}}" {{($jurisdiccion_select==$clave)?'selected':''}}>{{$clave}} {{$jurisdiccion}}</option>
                             @endforeach
                         </select>
-
                     </div>
                 </div>
             </div>
@@ -41,18 +39,18 @@
             <div class="panel-body">
                 <div class="row">
                     <div class="col-sm-5">
-                        <div class="input-group">
+                        <!--div class="input-group">
                             <input type="text" class="form-control txt-quick-search" placeholder="Buscar">
                             <span class="input-group-btn">
                                 <button class="btn btn-default btn-quick-search" type="button"><span class="glyphicon glyphicon-search"></span></button>
                             </span>
-                        </div>
+                        </div-->
                     </div>
                     <div class="col-sm-5">
                     </div>
                     <div class="col-sm-2">
                         <button type="button" class="btn btn-block btn-success btn-edit-rows" id="btn-justificacion-jurisdiccion">
-                            <span class="fa fa-edit"></span> Ver Justificación
+                            <span class="fa fa-file-excel-o"></span> Descargar Excel
                         </button>
                     </div>
                 </div>
@@ -65,7 +63,6 @@
                         <th width="80" class="text-center">Meta</th>
                         <th width="80" class="text-center">Avance</th>
                         <th width="80" class="text-center">%</th>
-                        <th width="100">Justificación</th>
                     </tr>
                 </thead>
                 <tbody></tbody>

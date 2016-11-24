@@ -17,6 +17,11 @@ class VisorController extends BaseController {
 		return parent::loadIndex('VISORGEN','VIPROYINV',$datos);
 	}
 
+	public function indexIndicadoresResultados(){
+		$datos = $this->obtenerDatosAvances();
+		return parent::loadIndex('VISORGEN','VINDRES',$datos);
+	}
+
 	public function obtenerDatosAvances(){
 		$datos = array(
 			'meses' => array(
