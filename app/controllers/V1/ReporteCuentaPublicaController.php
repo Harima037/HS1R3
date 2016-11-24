@@ -204,7 +204,7 @@ class ReporteCuentaPublicaController extends BaseController {
 				$politica_programa_anterior = $politica_programa_actual;
 			}
 
-			$section->addTitle(htmlspecialchars('Proyecto: '.rtrim($elemento->nombreTecnico,'.').'. ('.$elemento->unidadResponsableDescipcion.').'),4);
+			$section->addTitle(htmlspecialchars('Proyecto: '.$elemento->nombreTecnico.'. ('.$elemento->unidadResponsableDescipcion.').'),4);
 			$section->addTextBreak();
 
 			if($elemento->totalMetas > 0){

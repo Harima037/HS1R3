@@ -716,10 +716,10 @@
 				<table class="table table-striped table-condensed">
 					<thead>
 						<tr>
-							<th >Mestiza</th>
-							<th >Indígena</th>
-							<th >Inmigrante</th>
-							<th >Otros</th>
+							<th colspan="2">Mestiza</th>
+							<th colspan="2">Indígena</th>
+							<!--th >Inmigrante</th>
+							<th >Otros</th-->
 						</tr>
 					</thead>
 					<tbody>
@@ -733,6 +733,8 @@
 										<input type="number" class="form-control sub-total-poblacion fem" name="mestizaf" id="mestizaf">
 									</div>
 			                    </div>
+			                </td>
+			                <td>
 			                    <div class="form-group">
 			                    	<div class="input-group">
 										<span class="input-group-addon">
@@ -751,6 +753,8 @@
 										<input type="number" class="form-control sub-total-poblacion fem" name="indigenaf" id="indigenaf">
 									</div>
 			                    </div>
+			                </td>
+			                <td>
 			                    <div class="form-group">
 			                    	<div class="input-group">
 										<span class="input-group-addon">
@@ -760,7 +764,7 @@
 									</div>
 			                    </div>
 			                </td>
-			                <td>
+			                <!--td>
 			                    <div class="form-group">
 			                    	<div class="input-group">
 										<span class="input-group-addon">
@@ -795,7 +799,7 @@
 										<input type="number" class="form-control sub-total-poblacion masc" name="otrosm" id="otrosm">
 									</div>
 			                    </div>
-			                </td>
+			                </td-->
 			            </tr>
 					</tbody>
 		            <tfoot>

@@ -47,8 +47,9 @@ class ProyectosController extends \BaseController {
 
 		//$datos['grid_beneficiarios'] = View::make('expediente.formulario-caratula-beneficiarios');
 		$datos_financiamiento = array(
-			'fuentes_financiamiento'	=> FuenteFinanciamiento::where('nivel','=',4)->get(),
-			'destino_gasto'				=> DestinoGasto::all(),
+			'fuentes_financiamiento'	=> FuenteFinanciamiento::where('nivel','=',4)->with('fondos')->get(),
+			//'programas_fondos'			=> FuenteFinanciamiento::where('nivel','=',5)->get(),
+			//'destino_gasto'				=> DestinoGasto::all(),
 			'subfuentes_financiamiento' => SubFuenteFinanciamiento::all()
 		);
 		$datos['grid_fuentes_financiamiento'] = View::make('expediente.formulario-caratula-financiamiento',$datos_financiamiento);

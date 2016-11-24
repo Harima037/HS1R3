@@ -114,14 +114,14 @@ class SeguimientoInstitucionalController extends BaseController {
 					//$rows = $rows->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%');
 					$rows = $rows->where(function($query)use($parametros){
 						$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
-							->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
+							->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
 					});
 					$total = $rows->count();
 				}else{				
 					$total = $rows->count();						
 				}
 				
-				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
+				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
 					'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl',
 					'proyectos.fuenteInformacion','proyectos.idResponsable',DB::raw('count(observaciones.id) AS observaciones'))
@@ -201,18 +201,20 @@ class SeguimientoInstitucionalController extends BaseController {
 					$query->where('mes','<=',$mes_actual);
 				}))->get();
 			}elseif($parametros['mostrar'] == 'datos-metas-avance'){
+				//$mes_actual = Util::obtenerMesActual();
 				if($parametros['nivel'] == 'componente'){
 					$recurso = Componente::getModel();
 				}else{
 					$recurso = Actividad::getModel();
 				}
 				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
-				$recurso = $recurso->with(array('metasMesJurisdiccion'=>function($query) use ($mes_actual){
+				$recurso = $recurso->with(array(
+				'metasMesJurisdiccion'=>function($query) use ($mes_actual){
 					$query->where('mes','<=',$mes_actual);
 				},'registroAvance'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
 				},'metasMes' => function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
+					$query->where('mes','<=',$mes_actual);
 				},'planMejora'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
 				},'observaciones'=>function($query){
@@ -220,33 +222,30 @@ class SeguimientoInstitucionalController extends BaseController {
 				},'unidadMedida','comentarios'))->find($id);
 				
 				$recurso->load('desgloseMunicipios');
-			}
-			/*
-			elseif($parametros['mostrar'] == 'datos-metas-avance'){
-				if($parametros['nivel'] == 'componente'){
-					$recurso = Componente::getModel()->with(array('comentarios'));
-				}else{
-					$recurso = Actividad::getModel()->with(array('comentarios'));
+
+				$trimestre = ceil($mes_actual/3);
+				$metas_mes = [];
+				$metas_mes_trimestre = [
+					'meta' => 0,
+					'avance' => 0
+				];
+				foreach ($recurso->metasMes as $meta_mes) {
+					if($meta_mes->mes == $mes_actual){
+						$metas_mes[] = $meta_mes;
+					}
+					if(ceil($meta_mes->mes/3) == $trimestre){
+						$metas_mes_trimestre['meta'] += $meta_mes->meta;
+						if($meta_mes->mes < $mes_actual){
+							$metas_mes_trimestre['avance'] += $meta_mes->avance;
+						}
+					}
 				}
-				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
-				$recurso = $recurso->with(array('metasMesJurisdiccion'=>function($query) use ($mes_actual){
-					$query->where('mes','<=',$mes_actual);
-				},'registroAvance'=>function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'metasMes' => function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'planMejora'=>function($query) use ($mes_actual){
-					$query->where('mes','=',$mes_actual);
-				},'unidadMedida'))->find($id);
-				
-				if($parametros['nivel'] == 'componente'){
-					$recurso->load('desgloseMunicipios');
-					//$queries = DB::getQueryLog();
-					//throw new Exception(print_r(end($queries),true), 1);
-				}
-				
-			}*/
-			elseif($parametros['mostrar'] == 'datos-beneficiarios-avance'){
+
+				$recurso = $recurso->toArray();
+				$recurso['metas_mes'] = $metas_mes;
+				$recurso['metas_mes_acumulado_trimestre'] = $metas_mes_trimestre;
+
+			}elseif($parametros['mostrar'] == 'datos-beneficiarios-avance'){
 				//$mes_actual = Util::obtenerMesActual();
 				//$mes_actual = date('n') - 1 ;
 				$recurso['acumulado'] = RegistroAvanceBeneficiario::where('idProyecto','=',$parametros['id-proyecto'])

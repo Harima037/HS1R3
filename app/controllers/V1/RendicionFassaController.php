@@ -17,7 +17,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador,SSA\Utilerias\Util;
 use Illuminate\Database\QueryException, \Exception;
-use BaseController, Input, Response, DB, Sentry, IndicadorFASSA, RegistroAvanceIndicadorFASSA, IndicadorFASSAMeta,Directorio, IndicadorFASSAMetaTrimestre,SysConfiguracionVariable;
+use BaseController, Input, Response, DB, Sentry, IndicadorFASSA, RegistroAvanceIndicadorFASSA, IndicadorFASSAMeta,Directorio, IndicadorFASSAMetaTrimestre;
 
 class RendicionFassaController extends \BaseController {
 
@@ -74,14 +74,7 @@ class RendicionFassaController extends \BaseController {
 							->skip(($parametros['pagina']-1)*10)->take(10)
 							->get();
 				//
-				$variables = SysConfiguracionVariable::obtenerVariables(array('captura-cierre-fassa'))->lists('valor','variable');
-				if($variables['captura-cierre-fassa']){
-					$cierre_fassa = intval($variables['captura-cierre-fassa']); //1 Abierto | 2 Cerrado
-				}else{
-					$cierre_fassa = null;
-				}
-				
-				$data = array('resultados' => $total, 'data' => $rows, 'mes_actual' => Util::obtenerMesActual(), 'cierre_fassa' => $cierre_fassa);
+				$data = array('resultados'=>$total,'data'=>$rows, 'mes_actual'=>Util::obtenerMesActual());
 				$respuesta['data'] = $data;
 
 				if($total<=0){
@@ -118,27 +111,14 @@ class RendicionFassaController extends \BaseController {
 
 		try{
 			$recurso = IndicadorFASSAMeta::indicadorMetaDetalle()->with('metasTrimestre')->find($id);
-
 			if($recurso){
-				$variables = SysConfiguracionVariable::obtenerVariables(array('captura-cierre-fassa'))->lists('valor','variable');
-				if($variables['captura-cierre-fassa']){
-					$cierre_fassa = intval($variables['captura-cierre-fassa']); //1 Abierto | 2 Cerrado
-				}else{
-					$cierre_fassa = null;
-				}
+				$mes_actual = intval(Util::obtenerMesActual());
 
-				if($cierre_fassa){
-					$mes_actual = 12;
-				}else{
-					$mes_actual = intval(Util::obtenerMesActual());
-				}
-				
 				$recurso->load(array('registroAvance'=>function($query)use($mes_actual){
 					return $query->where('mes','<=',$mes_actual);
 				},'comentario'));
 
 				$recurso['mes_actual'] = $mes_actual;
-				$recurso['cierre_fassa'] = $cierre_fassa;
 				$data['data'] = $recurso;
 			}else{
 				$http_status = 404;
@@ -169,14 +149,6 @@ class RendicionFassaController extends \BaseController {
 				$recurso = IndicadorFASSAMeta::with('indicador','metasTrimestre')->find($id);
 				$recurso_avance = NULL;
 				$metas_trimestre = [];
-				$no_editables = 0;
-
-				$variables = SysConfiguracionVariable::obtenerVariables(array('captura-cierre-fassa'))->lists('valor','variable');
-				if($variables['captura-cierre-fassa']){
-					$cierre_fassa = intval($variables['captura-cierre-fassa']); //1 Abierto | 2 Cerrado
-				}else{
-					$cierre_fassa = null;
-				}
 
 				$tipo_formula = $recurso->indicador->claveTipoFormula;
 				
@@ -228,7 +200,7 @@ class RendicionFassaController extends \BaseController {
 							$validar['metas'] = true;
 						}
 					}
-				}elseif(isset($parametros['avance-numerador']) && !$cierre_fassa){
+				}elseif(isset($parametros['avance-numerador'])){
 					$mes_actual = Util::obtenerMesActual();
 					$metas = $recurso->metasTrimestre->lists('porcentaje','trimestre');
 					$trimestre = ceil($mes_actual/3);
@@ -308,65 +280,9 @@ class RendicionFassaController extends \BaseController {
 							$validar['avance'] = true;
 						}
 					}
-				}else{
-					if($cierre_fassa == 1){
-						if(!$recurso->idEstatusCierre){
-							$recurso->idEstatusCierre = 1;
-						}
-						if($recurso->idEstatusCierre == 1 || $recurso->idEstatusCierre == 3){
-							$recurso->numeradorCierre 			= $parametros['avance-numerador'];
-							$recurso->denominadorCierre 		= $parametros['avance-denominador'];
-
-							$numerador 		= $parametros['avance-numerador'];
-							$denominador 	= $parametros['avance-denominador'];
-
-							if($numerador < 0){
-								throw new Exception('{"field":"avance-numerador","error":"El valor no puede ser negativo."}', 1);
-							}
-
-							if($denominador < 0){
-								throw new Exception('{"field":"avance-denominador","error":"El valor no puede ser negativo."}', 1);
-							}
-
-							if($tipo_formula == 'T'){
-								$porcentaje = round(floatval(($numerador * $recurso->indicador->tasa)/$denominador),2);
-							}else{
-								$porcentaje = round(floatval(($numerador * 100)/$denominador),2);
-							}
-							$recurso->porcentajeCierre = $porcentaje;
-
-							$porcentaje_total = ($recurso->porcentajeCierre / floatval($recurso->porcentaje))*100;
-
-							if($porcentaje_total > 100 || $porcentaje_total < 100){
-								$recurso->justificacionCierre = 1;
-							}else{
-								$recurso->justificacionCierre = 0;
-							}
-
-							if($recurso->justificacionCierre){
-								if(isset($parametros['justificacion'])){
-									if($parametros['justificacion']){
-										$recurso->justificacionAcumuladaCierre = $parametros['justificacion'];
-									}else{
-										throw new Exception('{"field":"justificacion","error":"Este campo es requerido."}', 1);
-									}
-								}else{
-									throw new Exception('{"field":"justificacion","error":"Este campo es requerido."}', 1);
-								}
-							}else{
-								$recurso->justificacionAcumuladaCierre = 'El avance se encuentra dentro de lo programado';
-							}
-
-							if(isset($parametros['validar'])){
-								$validar['avance'] = true;
-							}
-						}
-					}else{
-						throw new Exception("Ninguno de los elementos está disponble para edición.", 1);
-					}
 				}
 				
-				$no_editables += ($recurso->idEstatus == 2 || $recurso->idEstatus == 4 || $recurso->idEstatus == 5)?1:0;
+				$no_editables = ($recurso->idEstatus == 2 || $recurso->idEstatus == 4 || $recurso->idEstatus == 5)?1:0;
 
 				if($recurso_avance){
 					$no_editables += ($recurso_avance->idEstatus == 2 || $recurso_avance->idEstatus == 4 || $recurso_avance->idEstatus == 5)?1:0;
@@ -374,12 +290,12 @@ class RendicionFassaController extends \BaseController {
 					$no_editables += 1;
 				}
 
-				if($no_editables == 2 && !$cierre_fassa){
+				if($no_editables == 2){
 					$respuesta['data']['data'] = 'Ninguno de los elementos está disponble para edición.';
 					throw new Exception("Ninguno de los elementos está disponble para edición.", 1);
 				}
 
-				$respuesta = DB::transaction(function() use ($recurso, $recurso_avance, $metas_trimestre, $validar, $cierre_fassa){
+				$respuesta = DB::transaction(function() use ($recurso, $recurso_avance, $metas_trimestre, $validar){
 					$respuesta_transaction = array();
 
 					if($recurso->idEstatus == 1 || $recurso->idEstatus == 3){
@@ -407,21 +323,6 @@ class RendicionFassaController extends \BaseController {
 									$respuesta_transaction['data'] = array("data"=>'Ocurrio un error al intentar guardar la información del avance','code'=>'S01');
 								}
 							}
-						}
-					}
-
-					if($cierre_fassa == 1){
-						if($recurso->idEstatusCierre == 1 || $recurso->idEstatusCierre == 3){
-							if($validar['avance']){
-								$recurso->idEstatusCierre = 2;
-							}
-							if(!$recurso->save()){
-								$respuesta_transaction['http_status'] = 500;
-								$respuesta_transaction['data'] = array("data"=>'Ocurrio un error al intentar guardar la información del avance','code'=>'S01');
-							}
-						}else{
-							$respuesta_transaction['http_status'] = 500;
-							$respuesta_transaction['data'] = array("data"=>'No se puede editar el avance','code'=>'S01');
 						}
 					}
 

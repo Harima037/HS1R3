@@ -47,10 +47,26 @@ if($('#id').val()){
 	proyectoResource.get($('#id').val(),null,{
         _success: function(response){
         	//inicializar_comportamiento_caratula();
-        	$('#lbl-lider-proyecto').text(response.data.lider_proyecto.nombre);
-			$('#lbl-jefe-inmediato').text(response.data.jefe_inmediato.nombre);
-			$('#lbl-jefe-planeacion').text(response.data.jefe_planeacion.nombre);
-			$('#lbl-coordinador-grupo').text(response.data.coordinador_grupo_estrategico.nombre);
+        	if(response.data.lider_proyecto){
+        		$('#lbl-lider-proyecto').html(response.data.lider_proyecto.nombre + '<br><small class="text-muted">'+response.data.lider_proyecto.cargo+'</small>');
+        	}else{
+        		$('#lbl-lider-proyecto').html('<span class="text-muted">No asignado</span>')
+        	}
+			if(response.data.jefe_inmediato){
+				$('#lbl-jefe-inmediato').html(response.data.jefe_inmediato.nombre + '<br><small class="text-muted">'+response.data.jefe_inmediato.cargo+'</small>');
+			}else{
+				$('#lbl-jefe-inmediato').html('<span class="text-muted">No asignado</span>')
+			}
+			if(response.data.jefe_planeacion){
+				$('#lbl-jefe-planeacion').html(response.data.jefe_planeacion.nombre + '<br><small class="text-muted">'+response.data.jefe_planeacion.cargo+'</small>');
+			}else{
+				$('#lbl-jefe-planeacion').html('<span class="text-muted">No asignado</span>')
+			}
+			if(response.data.coordinador_grupo_estrategico){
+				$('#lbl-coordinador-grupo').html(response.data.coordinador_grupo_estrategico.nombre + '<br><small class="text-muted">'+response.data.coordinador_grupo_estrategico.cargo+'</small>');
+			}else{
+				$('#lbl-coordinador-grupo').html('<span class="text-muted">No asignado</span>')
+			}
 
 			$('#lbl-nombretecnico').text(response.data.nombreTecnico);
             $('#lbl-ejercicio').text(response.data.ejercicio);
@@ -66,7 +82,7 @@ if($('#id').val()){
             $('#subsubfuncion').text(response.data.datos_sub_sub_funcion.clave.slice(-1));
             $('#programa_sectorial').text(response.data.datos_programa_sectorial.clave );
             $('#programa_presupuestario').text(response.data.datos_programa_presupuestario.clave );
-            $('#programa_especial').text(response.data.datos_programa_especial.clave );
+            $('#origen_asignacion').text(response.data.datos_origen_asignacion.clave );
             $('#actividad_institucional').text(response.data.datos_actividad_institucional.clave );
             $('#proyecto_estrategico').text(response.data.datos_proyecto_estrategico.clave);
             $('#no_proyecto_estrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
@@ -76,7 +92,7 @@ if($('#id').val()){
 			$('#lbl-funciongasto').text(response.data.datos_sub_sub_funcion.clave+' - '+response.data.datos_sub_sub_funcion.descripcion);
 			$('#lbl-programasectorial').text(response.data.datos_programa_sectorial.clave+' - '+response.data.datos_programa_sectorial.descripcion);			
 			$('#lbl-programapresupuestario').text(response.data.datos_programa_presupuestario.clave+' - '+response.data.datos_programa_presupuestario.descripcion);
-			$('#lbl-programaespecial').text(response.data.datos_programa_especial.clave+' - '+response.data.datos_programa_especial.descripcion);			
+			$('#lbl-origenasignacion').text(response.data.datos_origen_asignacion.clave+' - '+response.data.datos_origen_asignacion.descripcion);			
 			$('#lbl-actividadinstitucional').text(response.data.datos_actividad_institucional.clave+' - '+response.data.datos_actividad_institucional.descripcion);			
 			$('#lbl-proyectoestrategico').text(response.data.datos_proyecto_estrategico.clave+' - '+response.data.datos_proyecto_estrategico.descripcion);           
             $('#lbl-numeroproyectoestrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
@@ -113,7 +129,7 @@ if($('#id').val()){
 			{
 				if(encabezado==0)
 				{
-					cadenaHTML = cadenaHTML + '<td colspan="3"><strong> &nbsp;Tipo de beneficiario: </strong></td><td colspan="11">&nbsp;'+response.data.beneficiarios[cuentabeneficia].tipo_beneficiario.descripcion+'</td><td>&nbsp;</td></tr><tr><td colspan="2" rowspan="2" align="center"><strong>Total</strong></td><td rowspan="2" align="center"><strong>Género</strong></td><td colspan="2" align="center"><strong>Zona</strong></td><td colspan="4" align="center"><strong>Población</strong></td><td colspan="5" align="center"><strong>Marginación</strong></td><td rowspan="3" align="center"> <button type="button" class="btn btn-default" id="beneficiario'+response.data.beneficiarios[cuentabeneficia].idTipoBeneficiario+'" onclick="escribirComentario(\'beneficiario'+response.data.beneficiarios[cuentabeneficia].idTipoBeneficiario+'\',\'Tipo de beneficiario\',\''+response.data.beneficiarios[cuentabeneficia].tipo_beneficiario.descripcion+'\')" ><i class="fa fa-pencil-square-o"></i>Comentar</button></td></tr><tr><td align="center"><strong>Urbana</strong></td><td align="center"><strong>Rural</strong></td><td align="center"><strong>Mestiza</strong></td><td align="center"><strong>Indígena</strong></td><td align="center"><strong>Inmigrante</strong></td><td align="center"><strong>Otros</strong></td><td align="center"><strong>Muy Alta</strong></td><td align="center"><strong>Alta</strong></td><td align="center"><strong>Media</strong></td><td align="center"><strong>Baja</strong></td><td align="center"><strong>Muy Baja</strong></td></tr><tr>';					
+					cadenaHTML = cadenaHTML + '<td colspan="3"><strong> &nbsp;Tipo de beneficiario: </strong></td><td colspan="9">&nbsp;'+response.data.beneficiarios[cuentabeneficia].tipo_beneficiario.descripcion+'</td><td>&nbsp;</td></tr><tr><td colspan="2" rowspan="2" align="center"><strong>Total</strong></td><td rowspan="2" align="center"><strong>Género</strong></td><td colspan="2" align="center"><strong>Zona</strong></td><td colspan="2" align="center"><strong>Población</strong></td><td colspan="5" align="center"><strong>Marginación</strong></td><td rowspan="3" align="center"> <button type="button" class="btn btn-default" id="beneficiario'+response.data.beneficiarios[cuentabeneficia].idTipoBeneficiario+'" onclick="escribirComentario(\'beneficiario'+response.data.beneficiarios[cuentabeneficia].idTipoBeneficiario+'\',\'Tipo de beneficiario\',\''+response.data.beneficiarios[cuentabeneficia].tipo_beneficiario.descripcion+'\')" ><i class="fa fa-pencil-square-o"></i>Comentar</button></td></tr><tr><td align="center"><strong>Urbana</strong></td><td align="center"><strong>Rural</strong></td><td align="center"><strong>Mestiza</strong></td><td align="center"><strong>Indígena</strong></td><td align="center"><strong>Muy Alta</strong></td><td align="center"><strong>Alta</strong></td><td align="center"><strong>Media</strong></td><td align="center"><strong>Baja</strong></td><td align="center"><strong>Muy Baja</strong></td></tr><tr>';					
 					encabezado = 1;
 				}
 																		
@@ -164,8 +180,6 @@ if($('#id').val()){
 				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].rural+'</td>';
 				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].mestiza+'</td>';
 				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].indigena+'</td>';
-				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].inmigrante+'</td>';
-				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].otros+'</td>';
 				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].muyAlta+'</td>';
 				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].alta+'</td>';
 				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].media+'</td>';
@@ -193,8 +207,8 @@ if($('#id').val()){
 				financiaHTML += '<div class="panel panel-default"><div class="panel-heading"><h3 class="panel-title">';				
 				financiaHTML += '<strong>Fuente de financiamiento: ';
 				financiaHTML += '</strong>'+response.data.fuentes_financiamiento[fuente].fuente_financiamiento.descripcion;	
-				financiaHTML += '<div style="text-align:right; float: right;"><strong> Destino del gasto: </strong>';
-				financiaHTML += response.data.fuentes_financiamiento[fuente].destino_gasto.descripcion;				
+				financiaHTML += '<div style="text-align:right; float: right;"><strong> Programa y/o Fondo: </strong>';
+				financiaHTML += response.data.fuentes_financiamiento[fuente].fondo_financiamiento.descripcion;				
 				financiaHTML += '</div></h3></div><div class="panel-body">';
 				
 				financiaHTML += '<div class="col-sm-12"><strong>SubFuente de Financiamiento</strong></div>';
@@ -447,21 +461,21 @@ if($('#id').val()){
 					presupuestoHTML = presupuestoHTML + '</tr></thead>';
 					presupuestoHTML = presupuestoHTML + '<tbody>';
 
-					for(var localidad in response.data.componentes[cuentaComponentes].accion.desglose_presupuesto)
+					for(var localidad in response.data.componentes[cuentaComponentes].accion.desglose_presupuesto_componente)
 					{
-						var local = response.data.componentes[cuentaComponentes].accion.desglose_presupuesto[localidad].localidad;
-						var munic = response.data.componentes[cuentaComponentes].accion.desglose_presupuesto[localidad].municipio;
-						var juris = response.data.componentes[cuentaComponentes].accion.desglose_presupuesto[localidad].jurisdiccion;
+						var local = response.data.componentes[cuentaComponentes].accion.desglose_presupuesto_componente[localidad].localidad;
+						var munic = response.data.componentes[cuentaComponentes].accion.desglose_presupuesto_componente[localidad].municipio;
+						var juris = response.data.componentes[cuentaComponentes].accion.desglose_presupuesto_componente[localidad].jurisdiccion;
 						var descripcion = response.data.componentes[cuentaComponentes].indicador;
 						var unidadmedida = response.data.componentes[cuentaComponentes].unidad_medida.descripcion;
-						var idDelDesglose = response.data.componentes[cuentaComponentes].accion.desglose_presupuesto[localidad].id;
+						var idDelDesglose = response.data.componentes[cuentaComponentes].accion.desglose_presupuesto_componente[localidad].id;
 						
 						presupuestoHTML = presupuestoHTML +'<tr>';
 						presupuestoHTML = presupuestoHTML +'<td>'+local+'</td>';
 						presupuestoHTML = presupuestoHTML +'<td>'+munic+'</td>';
 						presupuestoHTML = presupuestoHTML +'<td>'+juris+'</td>';
-						presupuestoHTML = presupuestoHTML +'<td> $ '+response.data.componentes[cuentaComponentes].accion.desglose_presupuesto[localidad].presupuesto+'</td>';
-						presupuestoHTML = presupuestoHTML +'<td><button class="btn btn-info" onclick="verdetallepresupuesto(\''+idDelDesglose+'\',\''+local+'\',\''+munic+'\',\''+juris+'\',\''+descripcion+'\',\''+unidadmedida+'\')"><i class="fa fa-eye"></i> Ver</button></td>';
+						presupuestoHTML = presupuestoHTML +'<td> $ '+response.data.componentes[cuentaComponentes].accion.desglose_presupuesto_componente[localidad].presupuesto+'</td>';
+						presupuestoHTML = presupuestoHTML +'<td><button class="btn btn-info" onclick="verdetallepresupuesto(\'componente\',\''+idDelDesglose+'\',\''+local+'\',\''+munic+'\',\''+juris+'\',\''+descripcion+'\',\''+unidadmedida+'\')"><i class="fa fa-eye"></i> Ver</button></td>';
 						presupuestoHTML = presupuestoHTML +'<td><button id="desglose'+idComponente+'-'+idDelDesglose+'" class="btn btn-default" onclick="escribirComentarioComponente(\'desglose|'+idComponente+'-'+idDelDesglose+'\',\'Distribución del presupuesto en la Localidad:\',\''+local+'\');"><i class="fa fa-pencil-square-o"></i> Comentar</button></td>';
 						presupuestoHTML = presupuestoHTML +'</tr>';
 						//console.log(response.data.componentes[cuentaComponentes].accion.desglose_presupuesto[localidad].id);
@@ -570,7 +584,90 @@ if($('#id').val()){
 						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-metaindicadoractividad'+idActividad+'">Meta</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'metaindicador|'+idActividad+'\',\'Meta\',\'lbl-metaindicadoractividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-metaindicadoractividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].metaIndicador+'</p></div></div></div>';
 						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '</div>';
 						/*TERMINA SECCIÓN DE METAS*/
-						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '</div>';
+
+						PanelDeActividades[contadorDeActividades] += '<div class="col-sm-12"><p>&nbsp;</p></div>';
+						/*COMIENZA SECCIÓN DE PRESUPUESTO*/
+						if(response.data.idClasificacionProyecto==2)
+						{
+							PanelDeActividades[contadorDeActividades] += '<br><div class="col-sm-12 bg-info"><span class="fa fa-usd"></span> <strong>Presupuesto</strong></div>';
+							var presupuestoHTML = '';					
+							presupuestoHTML = presupuestoHTML +'<div class="col-sm-12"><div class="panel panel-default"><div class="panel-heading"><div class="row"><div class="col-sm-12"><strong>Partidas capturadas</strong></div></div></div><div class="panel-body">';
+							
+							presupuestoHTML = presupuestoHTML +'<div class="col-sm-12"><button type="button" class="btn btn-default" id="partidas'+idActividad+'" onclick="escribirComentarioComponente(\'partidas|'+idActividad+'\',\'Partidas del componente\',\''+response.data.componentes[cuentaComponentes].actividades[indiceActividad].objetivo+'\')" ><i class="fa fa-pencil-square-o"></i>Comentar</button></div>';
+							presupuestoHTML = presupuestoHTML +'<div class="col-sm-2"><strong>Clave</strong></div>';
+							presupuestoHTML = presupuestoHTML +'<div class="col-sm-10"><strong>Descripción</strong></div>';
+							for(var partida in response.data.componentes[cuentaComponentes].actividades[indiceActividad].accion.partidas)
+							{
+								presupuestoHTML = presupuestoHTML +'<div class="col-sm-2">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].accion.partidas[partida].clave+'</div>';
+								presupuestoHTML = presupuestoHTML +'<div class="col-sm-10">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].accion.partidas[partida].descripcion+'</div>';
+							}
+							presupuestoHTML = presupuestoHTML +'</div></div></div>';
+							presupuestoHTML = presupuestoHTML +'<br><div class="col-sm-12"><strong>Origen del presupuesto</strong></div>';
+							
+							for(var propuesta in response.data.componentes[cuentaComponentes].actividades[indiceActividad].accion.propuestas_financiamiento)
+							{
+								var descripcionpropuesta = response.data.componentes[cuentaComponentes].actividades[indiceActividad].accion.propuestas_financiamiento[propuesta].origen.descripcion;
+								presupuestoHTML = presupuestoHTML + '<div class="col-sm-4">';
+								presupuestoHTML = presupuestoHTML + '<div class="form-group">';
+								presupuestoHTML = presupuestoHTML + '<label class="control-label" for="lbl-propuesta'+descripcionpropuesta+idActividad+'">'+descripcionpropuesta+'</label>';
+								presupuestoHTML = presupuestoHTML + '<div class="input-group">';
+								presupuestoHTML = presupuestoHTML + '<span class="input-group-btn" onclick="escribirComentarioActividad(\'propuesta'+descripcionpropuesta+'|'+idActividad+'\',\''+descripcionpropuesta+'\',\'lbl-propuesta'+descripcionpropuesta+idActividad+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-propuesta'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].accion.propuestas_financiamiento[propuesta].origen.descripcion+idActividad+'" class="form-control" style="height:auto"> $'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].accion.propuestas_financiamiento[propuesta].cantidad+'</p>';
+								presupuestoHTML = presupuestoHTML + '</div>';
+								presupuestoHTML = presupuestoHTML + '</div>';
+								presupuestoHTML = presupuestoHTML + '</div>';
+							}
+							
+							presupuestoHTML = presupuestoHTML +'<br><div class="col-sm-12">&nbsp;</div>';
+							
+							presupuestoHTML = presupuestoHTML + '<div class="col-sm-4"><div class="form-group">';
+							presupuestoHTML = presupuestoHTML + '<label class="control-label" for="lbl-presupuestorequerido'+idActividad+'">Presupuesto Requerido</label>';
+							presupuestoHTML = presupuestoHTML + '<div class="input-group">';
+							
+							presupuestoHTML = presupuestoHTML + '<span class="input-group-btn" onclick="escribirComentarioActividad(\'presupuestorequerido|'+idActividad+'\',\'Presupuesto Requerido\',\'lbl-presupuestorequerido'+idActividad+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-presupuestorequerido'+idActividad+'" class="form-control" style="height:auto"> $'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].accion.presupuestoRequerido+'</p>';
+							presupuestoHTML = presupuestoHTML + '</div>';
+							presupuestoHTML = presupuestoHTML + '</div></div>';
+							
+							presupuestoHTML = presupuestoHTML + '<br><div class="col-sm-12 bg-info"><span class="fa fa-usd"></span><span class="fa fa-usd"></span> <strong>Distribución del Presupuesto</strong></div><br>';
+							
+							presupuestoHTML = presupuestoHTML + '<table class="table table-striped table-hover">';
+							presupuestoHTML = presupuestoHTML + '<thead>';
+							presupuestoHTML = presupuestoHTML + '<tr>';
+							presupuestoHTML = presupuestoHTML + '<th>Localidad</th>';
+							presupuestoHTML = presupuestoHTML + '<th>Municipio</th>';
+							presupuestoHTML = presupuestoHTML + '<th>Jurisdicción</th>';
+							presupuestoHTML = presupuestoHTML + '<th>Monto</th>';
+							presupuestoHTML = presupuestoHTML + '<th>Ver</th>';
+							presupuestoHTML = presupuestoHTML + '<th>Comentario</th>';
+							presupuestoHTML = presupuestoHTML + '</tr></thead>';
+							presupuestoHTML = presupuestoHTML + '<tbody>';
+
+							for(var localidad in response.data.componentes[cuentaComponentes].actividades[indiceActividad].accion.desglose_presupuesto_actividad)
+							{
+								var local = response.data.componentes[cuentaComponentes].actividades[indiceActividad].accion.desglose_presupuesto_actividad[localidad].localidad;
+								var munic = response.data.componentes[cuentaComponentes].actividades[indiceActividad].accion.desglose_presupuesto_actividad[localidad].municipio;
+								var juris = response.data.componentes[cuentaComponentes].actividades[indiceActividad].accion.desglose_presupuesto_actividad[localidad].jurisdiccion;
+								var descripcion = response.data.componentes[cuentaComponentes].actividades[indiceActividad].indicador;
+								var unidadmedida = response.data.componentes[cuentaComponentes].actividades[indiceActividad].unidad_medida.descripcion;
+								var idDelDesglose = response.data.componentes[cuentaComponentes].actividades[indiceActividad].accion.desglose_presupuesto_actividad[localidad].id;
+								
+								presupuestoHTML += '<tr>';
+								presupuestoHTML += '<td>'+local+'</td>';
+								presupuestoHTML += '<td>'+munic+'</td>';
+								presupuestoHTML += '<td>'+juris+'</td>';
+								presupuestoHTML += '<td> $ '+response.data.componentes[cuentaComponentes].actividades[indiceActividad].accion.desglose_presupuesto_actividad[localidad].presupuesto+'</td>';
+								presupuestoHTML += '<td><button class="btn btn-info" onclick="verdetallepresupuesto(\'actividad\',\''+idDelDesglose+'\',\''+local+'\',\''+munic+'\',\''+juris+'\',\''+descripcion+'\',\''+unidadmedida+'\')"><i class="fa fa-eye"></i> Ver</button></td>';
+								presupuestoHTML += '<td><button id="desgloseactividad'+idActividad+'-'+idDelDesglose+'" class="btn btn-default" onclick="escribirComentarioActividad(\'desglose|'+idActividad+'-'+idDelDesglose+'\',\'Distribución del presupuesto en la Localidad:\',\''+local+'\');"><i class="fa fa-pencil-square-o"></i> Comentar</button></td>';
+								presupuestoHTML += '</tr>';
+								//console.log(response.data.componentes[cuentaComponentes].actividades[indiceActividad].accion.desglose_presupuesto[localidad].id);
+							}
+							presupuestoHTML = presupuestoHTML + '</tbody></table>';
+							
+							PanelDeActividades[contadorDeActividades] += presupuestoHTML;
+						}				
+						/*TERMINA SECCIÓN DE PRESUPUESTO*/
+
+
+						PanelDeActividades[contadorDeActividades] += '</div>';
 						contadorDeActividades++;
 					}
 					actividades = '<br><div role="tabpanel">';
@@ -721,8 +818,23 @@ if($('#id').val()){
 				}
 				else if(response.data.comentarios[contador]['tipoComentario']=='3')//Tipo 3 = Actividad de Componente
 				{
-					objetoAColorear = '#lbl-'+idCampo;
-					$(objetoAColorear).parent().parent().addClass('has-error has-feedback');
+					if(idCampo.substr(0,8)=='partidas')
+					{
+						objetoAColorear = '#'+idCampo;
+						$(objetoAColorear).removeClass('btn-default');
+						$(objetoAColorear).addClass('btn-warning');					
+					}
+					else if(idCampo.substr(0,8)=='desglose')
+					{
+						objetoAColorear = '#'+idCampo;
+						$(objetoAColorear).removeClass('btn-default');
+						$(objetoAColorear).addClass('btn-warning');					
+					}					
+					else
+					{
+						objetoAColorear = '#lbl-'+idCampo;
+						$(objetoAColorear).parent().parent().addClass('has-error has-feedback');
+					}
 					comentariosArray.push([response.data.comentarios[contador]['id'],response.data.comentarios[contador]['idCampo'], response.data.comentarios[contador]['observacion'],'3']);
 				}
 				
@@ -834,10 +946,11 @@ function construyebeneficiarios(datos){
 }
 
 
-function verdetallepresupuesto(iddesglose, localidad, municipio, jurisdiccion, descri, udadmedida)
+function verdetallepresupuesto(tipoaccion, iddesglose, localidad, municipio, jurisdiccion, descri, udadmedida)
 {
 	var parametros = {};	
 	parametros['ver'] = 'detalles-presupuesto';
+	parametros['tipo-accion'] = tipoaccion;
 
 	proyectoResource.get(iddesglose,parametros,{
         _success: function(response){
@@ -1045,6 +1158,10 @@ function escribirComentarioActividad(idcampo,nombrecampo,objetoconinformacion)
 	
 	if(idcampo.substr(0,12) == 'beneficiario')
 		$('#lbl-informacioncampo').text(objetoconinformacion);
+	else if(idcampo.substr(0,8) == 'partidas')
+		$('#lbl-informacioncampo').text(objetoconinformacion);
+	else if(idcampo.substr(0,8) == 'desglose')
+		$('#lbl-informacioncampo').text(objetoconinformacion);
 	else
 		$('#lbl-informacioncampo').text($('#'+objetoconinformacion).text());
 	var borrarAreaText = 1;
@@ -1082,7 +1199,7 @@ $('#btnGuardarComentario').on('click',function(){
 		else
 			if($('#tipocomentario').val() == '3')
 				objetoQueSeColorea += 'actividad';
-	
+
 	if($('#comentario').val()=="")
 	{
 		MessageManager.show({data:'Debe escribir un comentario antes de guardar',type:'ADV',timer:3});		
@@ -1844,8 +1961,8 @@ $('#programasectorial').on('change',function(){
 $('#programapresupuestario').on('change',function(){
 	actualiza_clave('programa_presupuestario',$(this).val(),'---');
 });
-$('#programaespecial').on('change',function(){
-	actualiza_clave('programa_especial',$(this).val(),'---');
+$('#origenasignacion').on('change',function(){
+	actualiza_clave('origen_asignacion',$(this).val(),'--');
 });
 $('#actividadinstitucional').on('change',function(){
 	actualiza_clave('actividad_institucional',$(this).val(),'---');

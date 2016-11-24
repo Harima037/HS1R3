@@ -53,7 +53,8 @@ context.llenar_datos = function(datos){
     $('#funciongasto').val(funcion_gasto);
     $('#programasectorial').val(datos.programaSectorial);
     $('#programapresupuestario').val(datos.programaPresupuestario);
-    $('#programaespecial').val(datos.programaEspecial);
+    //$('#programaespecial').val(datos.programaEspecial);
+    $('#origenasignacion').val(datos.origenAsignacion);
     $('#actividadinstitucional').val(datos.actividadInstitucional);
     $('#proyectoestrategico').val(datos.proyectoEstrategico);
     $('#no_proyecto_estrategico').text(("000" + datos.numeroProyectoEstrategico).slice(-3));
@@ -73,7 +74,7 @@ context.llenar_datos = function(datos){
     if(datos.claveRegion){
     	$('#region').val(datos.claveRegion);
     }
-    
+    $('#origenasignacion').change();
 	$('.chosen-one').trigger('chosen:updated');
     $('.chosen-one').chosen().change();
 }
@@ -126,9 +127,12 @@ context.init = function(){
 	$('#programapresupuestario').on('change',function(){
 		actualiza_clave('programa_presupuestario',$(this).val(),'---');
 	});
-	$('#programaespecial').on('change',function(){
-		actualiza_clave('programa_especial',$(this).val(),'---');
+	$('#origenasignacion').on('change',function(){
+		actualiza_clave('origen_asignacion',$(this).val(),'--');
 	});
+	/*$('#programaespecial').on('change',function(){
+		actualiza_clave('programa_especial',$(this).val(),'---');
+	});*/
 	$('#actividadinstitucional').on('change',function(){
 		actualiza_clave('actividad_institucional',$(this).val(),'---');
 	});

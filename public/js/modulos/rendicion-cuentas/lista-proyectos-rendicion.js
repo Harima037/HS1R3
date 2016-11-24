@@ -258,38 +258,39 @@ function cargar_datos_proyecto(e){
                     }
                 }
                 var rows = '';
+                
                 for(var j in lista_beneficiarios){
                     rows += '<tr>';
                     rows += '<td rowspan="2">' + lista_beneficiarios[j].tipo + '</td>';
-                    rows += '<td rowspan="2">' + lista_beneficiarios[j].total.format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['f'].total || 0 ).format() + '</td>';
+                    rows += '<td rowspan="2">' + parseInt(lista_beneficiarios[j].total).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].total) || 0 ).format() + '</td>';
                     rows += '<th>Femenino</th>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['f'].urbana || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['f'].rural || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['f'].mestiza || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['f'].indigena || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['f'].inmigrante || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['f'].otros || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['f'].muyAlta || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['f'].alta || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['f'].media || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['f'].baja || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['f'].muyBaja || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].urbana) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].rural) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].mestiza) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].indigena) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].inmigrante) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].otros) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].muyAlta) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].alta) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].media) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].baja) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].muyBaja) || 0 ).format() + '</td>';
                     rows += '</tr>';
                     rows += '<tr>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['m'].total || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].total) || 0 ).format() + '</td>';
                     rows += '<th>Masculino</th>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['m'].urbana || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['m'].rural || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['m'].mestiza || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['m'].indigena || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['m'].inmigrante || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['m'].otros || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['m'].muyAlta || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['m'].alta || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['m'].media || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['m'].baja || 0 ).format() + '</td>';
-                    rows += '<td>' + ( lista_beneficiarios[j].desglose['m'].muyBaja || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].urbana) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].rural) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].mestiza) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].indigena) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].inmigrante) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].otros) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].muyAlta) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].alta) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].media) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].baja) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].muyBaja) || 0 ).format() + '</td>';
                     rows += '</tr>';
                 }
                 $('.tabla-avance-beneficiarios tbody').empty();
@@ -321,6 +322,11 @@ $('#btn-editar-avance').on('click',function(){
 $('#btn-reporte-general').off('click');
 $('#btn-reporte-general').on('click',function(){
     var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '?tipo=seg-metas';
+    window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
+});
+$('#btn-reporte-trimestral').off('click');
+$('#btn-reporte-trimestral').on('click',function(){
+    var parametros = $('#btn-editar-avance').attr('data-id-proyecto') + '?tipo=seg-metas-trimestre';
     window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
 });
 $('#btn-reporte-beneficiarios').off('click');

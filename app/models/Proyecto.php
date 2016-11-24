@@ -21,7 +21,7 @@ class Proyecto extends BaseModel
         					 ->where('subSubFuncion',$item->subSubFuncion)
         					 ->where('programaSectorial',$item->programaSectorial)
         					 ->where('programaPresupuestario',$item->programaPresupuestario)
-        					 ->where('programaEspecial',$item->programaEspecial)
+        					 ->where('origenAsignacion',$item->origenAsignacion)
         					 ->where('actividadInstitucional',$item->actividadInstitucional)
         					 ->where('proyectoEstrategico',$item->proyectoEstrategico)
         					 ->max('numeroProyectoEstrategico');
@@ -36,7 +36,7 @@ class Proyecto extends BaseModel
     }
 
 	public function getClavePresupuestariaAttribute(){
-		return $this->unidadResponsable . $this->finalidad . $this->funcion . $this->subFuncion . $this->subSubFuncion . $this->programaSectorial . $this->programaPresupuestario . $this->programaEspecial . $this->actividadInstitucional . $this->proyectoEstrategico . str_pad($this->numeroProyectoEstrategico, 3,'0',STR_PAD_LEFT);
+		return $this->unidadResponsable . $this->finalidad . $this->funcion . $this->subFuncion . $this->subSubFuncion . $this->programaSectorial . $this->programaPresupuestario . $this->origenAsignacion . $this->actividadInstitucional . $this->proyectoEstrategico . str_pad($this->numeroProyectoEstrategico, 3,'0',STR_PAD_LEFT);
 	}
 
 	public function getClaveFuncionAttribute(){
@@ -55,7 +55,7 @@ class Proyecto extends BaseModel
 		$query->select('proyectos.id','nombreTecnico','catalogoEstatusProyectos.descripcion AS estatusProyectoDescripcion',
 				'proyectos.idEstatusProyecto','catalogoUnidadesResponsables.descripcion AS unidadResponsableDescripcion',
 				'unidadResponsable','finalidad','funcion','subFuncion','subSubFuncion','programaSectorial','programaPresupuestario',
-				'programaEspecial','actividadInstitucional','proyectoEstrategico','numeroProyectoEstrategico','idClasificacionProyecto')
+				'origenAsignacion','actividadInstitucional','proyectoEstrategico','numeroProyectoEstrategico','idClasificacionProyecto')
 				->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
 				->join('catalogoUnidadesResponsables','catalogoUnidadesResponsables.clave','=','proyectos.unidadResponsable')
 				->orderBy('proyectos.nombreTecnico','asc');
@@ -69,7 +69,7 @@ class Proyecto extends BaseModel
 					->leftjoin('catalogoFuncionesGasto AS subSubFuncion','subSubFuncion.clave','=',DB::raw('concat_ws(".",proyectos.finalidad,proyectos.funcion,proyectos.subFuncion,proyectos.subSubFuncion)'))
 					->leftjoin('catalogoProgramasSectoriales AS programaSectorial','programaSectorial.clave','=','proyectos.programaSectorial')
 					->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','proyectos.programaPresupuestario')
-					->leftjoin('catalogoProgramasEspeciales AS programaEspecial','programaEspecial.clave','=','proyectos.programaEspecial')
+					->leftjoin('catalogoOrigenesAsignacion AS origenAsignacion','origenAsignacion.clave','=','proyectos.origenAsignacion')
 					->leftjoin('catalogoActividades AS actividadInstitucional','actividadInstitucional.clave','=','proyectos.actividadInstitucional')
 					->leftjoin('catalogoProyectosEstrategicos AS proyectoEstrategico','proyectoEstrategico.clave','=','proyectos.proyectoEstrategico')
 					->leftjoin('catalogoObjetivosPED AS objetivoPED','objetivoPED.id','=','proyectos.idObjetivoPED')
@@ -101,7 +101,7 @@ class Proyecto extends BaseModel
 						DB::raw('concat_ws(" ",objetivoPED.clave,objetivoPED.descripcion) AS objetivoPEDDescripcion'),
 						DB::raw('concat_ws(" ",ejeRector.clave,ejeRector.descripcion) AS ejeRectorDescripcion'),
 						DB::raw('concat_ws(" ",politicaPublica.clave,politicaPublica.descripcion) AS politicaPublicaDescripcion'),
-						DB::raw('concat_ws(" ",programaEspecial.clave,programaEspecial.descripcion) AS programaEspecialDescripcion'),
+						DB::raw('concat_ws(" ",origenAsignacion.clave,origenAsignacion.descripcion) AS origenAsignacionDescripcion'),
 						DB::raw('concat_ws(" ",proyectoEstrategico.clave,proyectoEstrategico.descripcion) AS proyectoEstrategicoDescripcion'),
 						DB::raw('concat_ws(" ",actividadInstitucional.clave,actividadInstitucional.descripcion) AS actividadInstitucionalDescripcion'),
 						DB::raw('concat_ws(" ",tipoAccion.clave,tipoAccion.descripcion) AS tipoAccionDescripcion'),
@@ -130,7 +130,7 @@ class Proyecto extends BaseModel
 				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
 				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
 				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
-				'proyectos.programaPresupuestario','proyectos.programaEspecial','estatusMes.indicadorResultadoBeneficiarios',
+				'proyectos.programaPresupuestario','proyectos.origenAsignacion','estatusMes.indicadorResultadoBeneficiarios',
 				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico','estatusMes.idEstatus AS idEstatusAvance',
 				'proyectos.numeroProyectoEstrategico','proyectos.idCobertura','cobertura.clave AS claveCobertura',
 				DB::raw('count(distinct beneficiarios.idTipoBeneficiario) AS beneficiarios')
@@ -156,7 +156,7 @@ class Proyecto extends BaseModel
     	$query->select('proyectos.id AS idProyecto', DB::raw('UPPER(proyectos.nombreTecnico) As nombreTecnico'),
     			'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
 				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
-				'proyectos.programaPresupuestario','proyectos.programaEspecial',
+				'proyectos.programaPresupuestario','proyectos.origenAsignacion',
 				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
 				'proyectos.numeroProyectoEstrategico','fuente.clave','fuente.descripcion',
 				DB::raw('sum(ep01.presupuestoAprobado) AS presupuestoAprobado'),
@@ -170,7 +170,7 @@ class Proyecto extends BaseModel
 					->on('ep01.SSF','=','proyectos.subSubFuncion')
 					->on('ep01.PS','=','proyectos.programaSectorial')
 					->on('ep01.PP','=','proyectos.programaPresupuestario')
-					->on('ep01.PE','=','proyectos.programaEspecial')
+					->on('ep01.OA','=','proyectos.origenAsignacion')
 					->on('ep01.AI','=','proyectos.actividadInstitucional')
 					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(proyectos.numeroProyectoEstrategico,3,"0"))'))
 					->where('ep01.mes','=',$mes)
@@ -194,7 +194,7 @@ class Proyecto extends BaseModel
 			->orderBy('proyectos.subSubFuncion','asc')
 			->orderBy('proyectos.programaSectorial','asc')
 			->orderBy('proyectos.programaPresupuestario','asc')
-			->orderBy('proyectos.programaEspecial','asc')
+			->orderBy('proyectos.origenAsignacion','asc')
 			->orderBy('proyectos.actividadInstitucional','asc')
 			->orderBy('proyectos.proyectoEstrategico','asc')
 			->orderBy('proyectos.numeroProyectoEstrategico','asc')
@@ -206,7 +206,7 @@ class Proyecto extends BaseModel
 				'proyectos.id', DB::raw('UPPER(proyectos.nombreTecnico) As nombreTecnico'), 'proyectos.idClasificacionProyecto',
 				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
 				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
-				'proyectos.programaPresupuestario','proyectos.programaEspecial',
+				'proyectos.programaPresupuestario','proyectos.origenAsignacion',
 				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
 				'proyectos.numeroProyectoEstrategico','subFuncionGasto.clave AS subFuncionClave',
 				DB::raw('UPPER(subFuncionGasto.descripcion) AS subFuncionDescripcion'),'municipios.nombre AS municipio',
@@ -294,7 +294,7 @@ class Proyecto extends BaseModel
 			->orderBy('proyectos.subSubFuncion','asc')
 			->orderBy('proyectos.programaSectorial','asc')
 			->orderBy('proyectos.programaPresupuestario','asc')
-			->orderBy('proyectos.programaEspecial','asc')
+			->orderBy('proyectos.origenAsignacion','asc')
 			->orderBy('proyectos.actividadInstitucional','asc')
 			->orderBy('proyectos.proyectoEstrategico','asc')
 			->orderBy('proyectos.numeroProyectoEstrategico','asc')
@@ -306,7 +306,7 @@ class Proyecto extends BaseModel
 				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
 				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
 				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
-				'proyectos.programaPresupuestario','proyectos.programaEspecial',
+				'proyectos.programaPresupuestario','proyectos.origenAsignacion',
 				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
 				'proyectos.numeroProyectoEstrategico','variacionGasto.razonesAprobado','variacionGasto.razonesDevengado',
 
@@ -332,7 +332,7 @@ class Proyecto extends BaseModel
 					->on('ep01.SSF','=','proyectos.subSubFuncion')
 					->on('ep01.PS','=','proyectos.programaSectorial')
 					->on('ep01.PP','=','proyectos.programaPresupuestario')
-					->on('ep01.PE','=','proyectos.programaEspecial')
+					->on('ep01.OA','=','proyectos.origenAsignacion')
 					->on('ep01.AI','=','proyectos.actividadInstitucional')
 					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'))
 					->where('ep01.mes','=',$mes)
@@ -349,7 +349,7 @@ class Proyecto extends BaseModel
 				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
 				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
 				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
-				'proyectos.programaPresupuestario','proyectos.programaEspecial',
+				'proyectos.programaPresupuestario','proyectos.origenAsignacion',
 				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
 				'proyectos.numeroProyectoEstrategico','variacionGasto.razonesAprobado','variacionGasto.razonesDevengado',
 
@@ -374,7 +374,7 @@ class Proyecto extends BaseModel
 					->on('ep01.SSF','=','proyectos.subSubFuncion')
 					->on('ep01.PS','=','proyectos.programaSectorial')
 					->on('ep01.PP','=','proyectos.programaPresupuestario')
-					->on('ep01.PE','=','proyectos.programaEspecial')
+					->on('ep01.OA','=','proyectos.origenAsignacion')
 					->on('ep01.AI','=','proyectos.actividadInstitucional')
 					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'))
 					->where('ep01.mes','=',$mes)
@@ -389,7 +389,7 @@ class Proyecto extends BaseModel
 				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
 				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
 				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
-				'proyectos.programaPresupuestario','proyectos.programaEspecial',
+				'proyectos.programaPresupuestario','proyectos.origenAsignacion',
 				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
 				'proyectos.numeroProyectoEstrategico','analisisFunc.finalidadProyecto',
 
@@ -415,7 +415,7 @@ class Proyecto extends BaseModel
 					->on('ep01.SSF','=','proyectos.subSubFuncion')
 					->on('ep01.PS','=','proyectos.programaSectorial')
 					->on('ep01.PP','=','proyectos.programaPresupuestario')
-					->on('ep01.PE','=','proyectos.programaEspecial')
+					->on('ep01.OA','=','proyectos.origenAsignacion')
 					->on('ep01.AI','=','proyectos.actividadInstitucional')
 					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'))
 					->where('ep01.mes','=',$mes)
@@ -479,7 +479,7 @@ class Proyecto extends BaseModel
 			->orderBy('proyectos.subSubFuncion','asc')
 			->orderBy('proyectos.programaSectorial','asc')
 			->orderBy('proyectos.programaPresupuestario','asc')
-			->orderBy('proyectos.programaEspecial','asc')
+			->orderBy('proyectos.origenAsignacion','asc')
 			->orderBy('proyectos.actividadInstitucional','asc')
 			->orderBy('proyectos.proyectoEstrategico','asc')
 			->orderBy('proyectos.numeroProyectoEstrategico','asc')
@@ -491,7 +491,7 @@ class Proyecto extends BaseModel
 				'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
 				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
 				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
-				'proyectos.programaPresupuestario','proyectos.programaEspecial',
+				'proyectos.programaPresupuestario','proyectos.origenAsignacion',
 				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
 				'proyectos.numeroProyectoEstrategico',
 
@@ -506,7 +506,7 @@ class Proyecto extends BaseModel
 					->on('ep01.SSF','=','proyectos.subSubFuncion')
 					->on('ep01.PS','=','proyectos.programaSectorial')
 					->on('ep01.PP','=','proyectos.programaPresupuestario')
-					->on('ep01.PE','=','proyectos.programaEspecial')
+					->on('ep01.OA','=','proyectos.origenAsignacion')
 					->on('ep01.AI','=','proyectos.actividadInstitucional')
 					->on('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'))
 					->where('ep01.mes','=',$mes)
@@ -569,7 +569,7 @@ class Proyecto extends BaseModel
 			->orderBy('proyectos.subSubFuncion','asc')
 			->orderBy('proyectos.programaSectorial','asc')
 			->orderBy('proyectos.programaPresupuestario','asc')
-			->orderBy('proyectos.programaEspecial','asc')
+			->orderBy('proyectos.origenAsignacion','asc')
 			->orderBy('proyectos.actividadInstitucional','asc')
 			->orderBy('proyectos.proyectoEstrategico','asc')
 			->orderBy('proyectos.numeroProyectoEstrategico','asc')
@@ -578,10 +578,10 @@ class Proyecto extends BaseModel
 
 	public function scopeReporteCuentaPublica($query,$mes,$anio){
 		$query->select(
-				'proyectos.id', DB::raw('LCASE(proyectos.nombreTecnico) AS nombreTecnico'), 'proyectos.idClasificacionProyecto',
+				'proyectos.id','proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
 				'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
 				'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
-				'proyectos.programaPresupuestario','proyectos.programaEspecial',
+				'proyectos.programaPresupuestario','proyectos.origenAsignacion',
 				'proyectos.actividadInstitucional','proyectos.proyectoEstrategico',
 				'proyectos.numeroProyectoEstrategico',
 
@@ -660,10 +660,20 @@ class Proyecto extends BaseModel
 			
 			->orderBy('proyectos.unidadResponsable','asc')
 			->orderBy('proyectos.programaSectorial','asc')
-			->orderBy('proyectos.programaEspecial','asc')
+			->orderBy('proyectos.origenAsignacion','asc')
 			->orderBy('proyectos.actividadInstitucional','asc')
 			->orderBy('proyectos.proyectoEstrategico','asc')
 			->orderBy('proyectos.numeroProyectoEstrategico','asc');
+    }
+
+    public function scopeReporteProyectosEvaluacion($query,$ejercicio,$mes){
+    	return $query->leftjoin('proyectosEvaluacion AS evaluacion',function($join)use($mes){
+						$join->on('evaluacion.idProyecto','=','proyectos.id')
+							->where('evaluacion.mes','=',$mes)
+							->whereNull('evaluacion.borradoAl');
+					})
+					->select('proyectos.*','evaluacion.observaciones','evaluacion.justificaciones')
+					->where('ejercicio',$ejercicio);
     }
 
     public function scopeReporteEvaluacionProyectos($query,$ejercicio,$mes){
@@ -686,7 +696,7 @@ class Proyecto extends BaseModel
 	public function scopeContenidoCompleto($query){
 		return $query->with('componentes','beneficiarios','municipio','region','clasificacionProyecto','tipoProyecto','cobertura','tipoAccion',
 			'datosUnidadResponsable','datosFinalidad','datosFuncion','datosSubFuncion','datosSubSubFuncion','datosProgramaSectorial',
-			'datosProgramaPresupuestario','datosProgramaEspecial','datosActividadInstitucional','datosProyectoEstrategico',
+			'datosProgramaPresupuestario','datosOrigenAsignacion','datosActividadInstitucional','datosProyectoEstrategico',
 			'objetivoPed','estatusProyecto','jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico','responsableInformacion');
 	}
 
@@ -814,8 +824,8 @@ class Proyecto extends BaseModel
 		return $this->belongsTo('ProgramaPresupuestario','programaPresupuestario','clave');
 	}
 
-	public function datosProgramaEspecial(){
-		return $this->belongsTo('ProgramaEspecial','programaEspecial','clave');
+	public function datosOrigenAsignacion(){
+		return $this->belongsTo('OrigenAsignacion','origenAsignacion','clave');
 	}
 
 	public function datosActividadInstitucional(){
@@ -856,6 +866,10 @@ class Proyecto extends BaseModel
 
 	public function evaluacionProyectoObservacion(){
 		return $this->hasOne('EvaluacionProyectoObservacion','idProyecto');
+	}
+
+	public function proyectoEvaluacion(){
+		return $this->hasOne('ProyectoEvaluacion','idProyecto');
 	}
 
 	public function fuentesFinanciamiento(){

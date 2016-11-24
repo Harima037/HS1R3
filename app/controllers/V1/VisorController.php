@@ -18,10 +18,21 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
-use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime,Mail;
-use Proyecto,ComponenteMetaMes,ActividadMetaMes,Componente,Actividad,CargaDatosEP01;
+use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime,Mail, PDF;
+use Proyecto,ComponenteMetaMes,ActividadMetaMes,Componente,Actividad,CargaDatosEP01,PlanMejoraJurisdiccion;
 
 class VisorController extends BaseController {
+	private $reglasPlanMejora = array(
+		'justificacion-acumulada-jurisdiccion'		=> 'required',
+		'accion-mejora-jurisdiccion'				=> 'required',
+		'grupo-trabajo-jurisdiccion'				=> 'required',
+		'documentacion-comprobatoria-jurisdiccion'	=> 'required',
+		'fecha-inicio-jurisdiccion'					=> 'required|date',
+		'fecha-termino-jurisdiccion'				=> 'required|date',
+		'fecha-notificacion-jurisdiccion'			=> 'required|date',
+		'responsable-informacion'					=> 'required',
+		'cargo-responsable-informacion'				=> 'required'
+	);
 
 	public function obtenerDatosCaptura(){
 		$mes_actual = Util::obtenerMesActual();
@@ -58,6 +69,29 @@ class VisorController extends BaseController {
 						$datos_captura = $this->obtenerDatosCaptura();
 						$anio_captura = $datos_captura['anio'];
 
+						if($usuario->claveJurisdiccion){
+							//$proyectos_ids = [];
+							$componentes = ComponenteMetaMes::groupBy('idProyecto')
+													->where('claveJurisdiccion','=',$usuario->claveJurisdiccion)
+													->where(function($condition){
+														$condition->where('meta','>',0)
+																->orWhere('avance','>',0);
+													})
+													->select('idProyecto')->get()->lists('idProyecto');
+							$actividades = ActividadMetaMes::groupBy('idProyecto')
+													->where('claveJurisdiccion','=',$usuario->claveJurisdiccion)
+													->where(function($condition){
+														$condition->where('meta','>',0)
+																->orWhere('avance','>',0);
+													})
+													->select('idProyecto')->get()->lists('idProyecto');
+							//$proyectos_ids = $componentes + $actividades;
+							//$rows = $rows->whereIn('proyectos.id',$proyectos_ids);
+							$rows = $rows->where(function($condicion)use($componentes,$actividades){
+								$condicion->whereIn('proyectos.id',$componentes)
+										->orWhereIn('proyectos.id',$actividades);
+							});
+						}
 						if($usuario->claveUnidad){
 							$unidades = explode('|',$usuario->claveUnidad);
 							$rows = $rows->whereIn('unidadResponsable',$unidades);
@@ -71,7 +105,7 @@ class VisorController extends BaseController {
 										->get();
 						$total = $rows->sum('noProyectos');
 						//$queries = DB::getQueryLog();
-						//var_dump(count($queries));die;
+						//var_dump($queries);die;
 						$data = array('data'=>$rows,'total'=>$total);
 					break;
 				case 'proyectos_tipo':
@@ -79,6 +113,27 @@ class VisorController extends BaseController {
 						$usuario = Sentry::getUser();
 						$datos_captura = $this->obtenerDatosCaptura();
 						$anio_captura = $datos_captura['anio'];
+
+						if($usuario->claveJurisdiccion){
+							$componentes = ComponenteMetaMes::groupBy('idProyecto')
+													->where('claveJurisdiccion','=',$usuario->claveJurisdiccion)
+													->where(function($condition){
+														$condition->where('meta','>',0)
+																->orWhere('avance','>',0);
+													})
+													->select('idProyecto')->get()->lists('idProyecto');
+							$actividades = ActividadMetaMes::groupBy('idProyecto')
+													->where('claveJurisdiccion','=',$usuario->claveJurisdiccion)
+													->where(function($condition){
+														$condition->where('meta','>',0)
+																->orWhere('avance','>',0);
+													})
+													->select('idProyecto')->get()->lists('idProyecto');
+							$rows = $rows->where(function($condicion)use($componentes,$actividades){
+								$condicion->whereIn('proyectos.id',$componentes)
+										->orWhereIn('proyectos.id',$actividades);
+							});
+						}
 						if($usuario->claveUnidad){
 							$unidades = explode('|',$usuario->claveUnidad);
 							$rows = $rows->whereIn('unidadResponsable',$unidades);
@@ -175,26 +230,106 @@ class VisorController extends BaseController {
 						$usuario = Sentry::getUser();
 						$datos_captura = $this->obtenerDatosCaptura();
 						$anio_captura = $datos_captura['anio'];
+						$componentes_ids = false;
+						$actividades_ids = false;
+
 						if($usuario->claveUnidad){
 							$unidades = explode('|',$usuario->claveUnidad);
 							$rows = $rows->whereIn('unidadResponsable',$unidades);
 						}
-						$rows = $rows->select('unidadResponsable AS clave', 'unidades.descripcion AS unidad', 
-										DB::raw('count(distinct componentes.id)+count(distinct actividades.id) AS noMetas'))
-										->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','proyectos.unidadResponsable')
-										->leftjoin('proyectoComponentes AS componentes',function($join){
-											$join->on('componentes.idProyecto','=','proyectos.id')
-												->whereNull('componentes.borradoAl');
-										})
-										->leftjoin('componenteActividades AS actividades',function($join){
-											$join->on('actividades.idProyecto','=','proyectos.id')
-												->whereNull('actividades.borradoAl');
-										})
-										->where('idEstatusProyecto','=',5)
-										->where('ejercicio','=',$anio_captura)
-										->groupBy('unidadResponsable')
-										->get();
-						$total = $rows->sum('noMetas');
+
+						if($usuario->claveJurisdiccion){
+							$clave_jurisdiccion = $usuario->claveJurisdiccion;
+							
+							$componentes = ComponenteMetaMes::groupBy('idProyecto','idComponente')
+													->where('claveJurisdiccion','=',$usuario->claveJurisdiccion)
+													->where(function($condition){
+														$condition->where('meta','>',0)
+																->orWhere('avance','>',0);
+													})
+													->select('idProyecto','idComponente')->get();
+							$componentes_ids = $componentes->lists('idProyecto','idComponente');
+							$componentes = $componentes->lists('idProyecto');
+							
+							$actividades = ActividadMetaMes::groupBy('idProyecto','idActividad')
+													->where('claveJurisdiccion','=',$usuario->claveJurisdiccion)
+													->where(function($condition){
+														$condition->where('meta','>',0)
+																->orWhere('avance','>',0);
+													})
+													->select('idProyecto','idActividad')->get();
+							$actividades_ids = $actividades->lists('idProyecto','idActividad');
+							$actividades = $actividades->lists('idProyecto');
+
+							$totales = count($componentes) + count($actividades);
+
+							$rows = $rows->where(function($condicion)use($componentes,$actividades){
+								$condicion->whereIn('proyectos.id',$componentes)
+										->orWhereIn('proyectos.id',$actividades);
+							});
+
+							$rows = $rows->select( DB::raw('concat_ws("|",unidadResponsable,unidades.descripcion) AS unidad'),'proyectos.id')
+								->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','proyectos.unidadResponsable')
+								->where('idEstatusProyecto','=',5)
+								->where('ejercicio','=',$anio_captura)
+								->get();
+
+							$unidades_proyectos = $rows->lists('unidad','id');
+
+							$rows = [];
+							$total = 0;
+
+							foreach ($componentes_ids as $key => $value) {
+								if(isset($unidades_proyectos[$value])){
+									$unidad = explode('|', $unidades_proyectos[$value]);
+									if(!isset($rows[intval($unidad[0])])){
+										$rows[intval($unidad[0])] = [
+											'clave'=>$unidad[0],
+											'noMetas'=>0,
+											'unidad'=>$unidad[1]
+										];
+									}
+									$rows[intval($unidad[0])]['noMetas'] += 1;
+									$total += 1;
+								}
+							}
+
+							foreach ($actividades_ids as $key => $value) {
+								if(isset($unidades_proyectos[$value])){
+									$unidad = explode('|', $unidades_proyectos[$value]);
+									if(!isset($rows[intval($unidad[0])])){
+										$rows[intval($unidad[0])] = [
+											'clave'=>$unidad[0],
+											'noMetas'=>0,
+											'unidad'=>$unidad[1]
+										];
+									}
+									$rows[intval($unidad[0])]['noMetas'] += 1;
+									$total += 1;
+								}
+							}
+
+							//$total = count($componentes) + count($actividades);
+						}else{
+							$rows = $rows->select('unidadResponsable AS clave', 'unidades.descripcion AS unidad', 
+								DB::raw('count(distinct componentes.id)+count(distinct actividades.id) AS noMetas'))
+								->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','proyectos.unidadResponsable')
+								->leftjoin('proyectoComponentes AS componentes',function($join){
+									$join->on('componentes.idProyecto','=','proyectos.id')
+										->whereNull('componentes.borradoAl');
+								})
+								->leftjoin('componenteActividades AS actividades',function($join){
+									$join->on('actividades.idProyecto','=','proyectos.id')
+										->whereNull('actividades.borradoAl');
+								})
+								->where('idEstatusProyecto','=',5)
+								->where('ejercicio','=',$anio_captura)
+								->groupBy('unidadResponsable')
+								->get();
+
+							$total = $rows->sum('noMetas');
+						}
+						
 						//$queries = DB::getQueryLog();
 						//var_dump(count($queries));die;
 						$data = array('data'=>$rows,'total'=>$total,'datos_captura'=>$datos_captura);
@@ -214,6 +349,9 @@ class VisorController extends BaseController {
 						$usuario = Sentry::getUser();
 						if($usuario->claveJurisdiccion){
 							$jurisdiccion = $usuario->claveJurisdiccion;
+							if(isset($parametros['unidad'])){
+								$unidades = array($parametros['unidad']);
+							}
 						}elseif($usuario->claveUnidad){
 							$unidades = explode('|',$usuario->claveUnidad);
 						}else{
@@ -233,9 +371,9 @@ class VisorController extends BaseController {
 
 						if($jurisdiccion){
 							$componentes = $componentes->where('claveJurisdiccion','=',$jurisdiccion)
-														 ->groupBy('idComponente','claveJurisdiccion');
+														 ->groupBy('idComponente');
 							$actividades = $actividades->where('claveJurisdiccion','=',$jurisdiccion)
-														 ->groupBy('idActividad','claveJurisdiccion');
+														 ->groupBy('idActividad');
 						}else{
 							$componentes = $componentes->groupBy('idComponente');
 							$actividades = $actividades->groupBy('idActividad');
@@ -243,6 +381,10 @@ class VisorController extends BaseController {
 						
 						$componentes = $componentes//->where('mes','<=',$mes_actual)
 														->whereIn('idProyecto',$proyectos_ids)
+														->where(function($condition){
+																$condition->where('meta','>',0)
+																		->orWhere('avance','>',0);
+															})
 														->select('id','idComponente AS idElemento','idProyecto',
 															DB::raw('sum(if(mes <= '.$mes_actual.' ,meta,0)) AS meta'),
 															DB::raw('sum(if(mes <= '.$mes_actual.' ,avance,0)) AS avance'),
@@ -250,13 +392,17 @@ class VisorController extends BaseController {
 						//
 						$actividades = $actividades//->where('mes','<=',$mes_actual)
 														->whereIn('idProyecto',$proyectos_ids)
+														->where(function($condition){
+																$condition->where('meta','>',0)
+																		->orWhere('avance','>',0);
+															})
 														->select('id','idActividad AS idElemento','idProyecto',
 															DB::raw('sum(if(mes <= '.$mes_actual.' ,meta,0)) AS meta'),
 															DB::raw('sum(if(mes <= '.$mes_actual.' ,avance,0)) AS avance'),
 															DB::raw('min(mes) as mes'))->get();
 						//
 						$total = count($componentes) + count($actividades);
-
+						
 						$metas = array('cumplidas'=>0,'altoAvance'=>0,'bajoAvance'=>0,'posteriores'=>0);
 						foreach ($componentes as $componente) {
 							$meta = floatval($componente->meta);
@@ -450,7 +596,7 @@ class VisorController extends BaseController {
 				if(isset($parametros['buscar'])){				
 					$rows = $rows->where(function($query)use($parametros){
 						$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
-							->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
+							->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
 					});
 					$total = $rows->count();
 				}else{				
@@ -478,7 +624,7 @@ class VisorController extends BaseController {
 					if($jurisdiccion){ $query->where('claveJurisdiccion','=',$jurisdiccion); }
 				}));
 
-				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
+				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 					'nombreTecnico')
 					->orderBy('id', 'desc')
 					->skip(($parametros['pagina']-1)*10)->take(10)
@@ -943,6 +1089,16 @@ class VisorController extends BaseController {
 
 				if($jurisdiccion){
 					$elemento['tomar'] = 'meses';
+
+					$planMejoraJurisdiccion = PlanMejoraJurisdiccion::where('mes','=',$mes_actual)
+																	->where('idNivel','=',$id)
+																	->where('nivel','=',($parametros['nivel']=='componente')?1:2)
+																	->where('claveJurisdiccion','=',$jurisdiccion)
+																	->first();
+					if($planMejoraJurisdiccion){
+						$elemento['planMejoraJurisdiccion'] = $planMejoraJurisdiccion;
+					}
+
 				}else{
 					$elemento['tomar'] = 'jurisdicciones';
 				}
@@ -950,6 +1106,172 @@ class VisorController extends BaseController {
 				$data['data'] = $elemento;
 				//$data["data"] = $recurso;
 			}
+		}elseif(isset($parametros['reporte-plan-mejora'])){
+			$datos_captura = $this->obtenerDatosCaptura();
+			$anio_captura = $datos_captura['anio'];
+			$mes_actual = $datos_captura['mes'];
+
+			$meses = array(
+				1 => array('mes'=>'Enero',			'abrev'=>'ENE',	'trimestre'=>1, 'trimestre_letras'=>'PRIMER'),
+				2 => array('mes'=>'Febrero',		'abrev'=>'FEB',	'trimestre'=>1, 'trimestre_letras'=>'PRIMER'),
+				3 => array('mes'=>'Marzo',			'abrev'=>'MAR',	'trimestre'=>1, 'trimestre_letras'=>'PRIMER'),
+				4 => array('mes'=>'Abril',			'abrev'=>'ABR',	'trimestre'=>2, 'trimestre_letras'=>'SEGUNDO'),
+				5 => array('mes'=>'Mayo',			'abrev'=>'MAY',	'trimestre'=>2, 'trimestre_letras'=>'SEGUNDO'),
+				6 => array('mes'=>'Junio',			'abrev'=>'JUN',	'trimestre'=>2, 'trimestre_letras'=>'SEGUNDO'),
+				7 => array('mes'=>'Julio',			'abrev'=>'JUL',	'trimestre'=>3, 'trimestre_letras'=>'TERCER'),
+				8 => array('mes'=>'Agosto',			'abrev'=>'AGO',	'trimestre'=>3, 'trimestre_letras'=>'TERCER'),
+				9 => array('mes'=>'Septiembre',		'abrev'=>'SEP',	'trimestre'=>3, 'trimestre_letras'=>'TERCER'),
+				10 => array('mes'=>'Octubre',		'abrev'=>'OCT',	'trimestre'=>4, 'trimestre_letras'=>'CUARTO'),
+				11 => array('mes'=>'Noviembre',		'abrev'=>'NOV',	'trimestre'=>4, 'trimestre_letras'=>'CUARTO'),
+				12 => array('mes'=>'Diciembre',		'abrev'=>'DIC',	'trimestre'=>4, 'trimestre_letras'=>'CUARTO')
+			);
+
+			$jurisdiccion = false;
+
+			$usuario = Sentry::getUser();
+			if($usuario->claveJurisdiccion){
+				$jurisdiccion = $usuario->claveJurisdiccion;
+			}else{
+				if(isset($parametros['jurisdiccion'])){
+					if($parametros['jurisdiccion']){
+						$jurisdiccion = $parametros['jurisdiccion'];
+					}
+				}
+			}
+
+			if(!$jurisdiccion){
+				return Response::json(array("data"=>"Se debe elegir una jursidicción.",'code'=>'U06'),500);
+			}
+
+			$recurso = Proyecto::where('idEstatusProyecto','=',5)->with(array('liderProyecto',
+			'evaluacionMeses'=>function($query)use($mes_actual){
+				$estatus = [4,5];
+				$query->where('mes','<=',$mes_actual)
+						->whereIn('idEstatus',$estatus)
+						->whereNull('borradoAl')
+						->orderBy('mes','ASC');
+			},'componentes.metasMes'=>function($query) use ($mes_actual,$jurisdiccion){
+				$query->where('mes','<=',$mes_actual)
+						->where('claveJurisdiccion','=',$jurisdiccion)
+						->orderBy('mes','ASC');
+			},'componentes.planesMejoraJurisdiccion'=>function($query)use($mes_actual,$jurisdiccion){
+				$query->where('mes','=',$mes_actual)
+						->where('claveJurisdiccion','=',$jurisdiccion)
+						->orderBy('mes','ASC');
+			},'componentes.actividades.metasMes'=>function($query) use ($mes_actual,$jurisdiccion){
+				$query->where('mes','<=',$mes_actual)
+						->where('claveJurisdiccion','=',$jurisdiccion)
+						->orderBy('mes','ASC');
+			},'componentes.actividades.planesMejoraJurisdiccion'=>function($query)use($mes_actual,$jurisdiccion){
+				$query->where('mes','=',$mes_actual)
+						->where('claveJurisdiccion','=',$jurisdiccion)
+						->orderBy('mes','ASC');
+			}))->find($id);
+			//$recurso = $recurso->toArray();
+
+			$meses_capturados = $recurso->evaluacionMeses->lists('idEstatus','mes');
+			//return Response::json($meses_capturados,200);
+
+			$acciones = array();
+			$datos['proyecto'] = array(
+				'ejercicio' => $recurso->ejercicio,
+				'nombreTecnico' => $recurso->nombreTecnico,
+				'ClavePresupuestaria' => $recurso->ClavePresupuestaria,
+				'liderProyecto' => '',
+				'cargoLiderProyecto' => '',
+				'responsableInformacion' => '',
+				'cargoResponsableInformacion' => ''
+			);
+
+			if($recurso->liderProyecto){
+				$datos['proyecto']['liderProyecto'] = $recurso->liderProyecto->nombre;
+				$datos['proyecto']['cargoLiderProyecto'] = $recurso->liderProyecto->cargo;
+			}
+
+			foreach ($recurso->componentes as $componente) {
+				$meta_acumulada = 0;
+				$avance_acumulado = 0;
+				foreach ($componente->metasMes as $metaMes) {
+					$meta_acumulada += floatval($metaMes->meta);
+					if(isset($meses_capturados[$metaMes->mes])){
+			        	$avance_acumulado += floatval($metaMes->avance);
+					}
+				}
+				if($meta_acumulada > 0){ $porcentaje = ($avance_acumulado*100) / $meta_acumulada; }
+		        else{ $porcentaje = ($avance_acumulado*100); }
+
+		        $estatus = 1;
+		        if(!($meta_acumulada == 0 && $avance_acumulado == 0)){
+					if($porcentaje > 110){ $estatus = 3; }
+					elseif($porcentaje < 90){ $estatus = 2; }
+					elseif($porcentaje > 0 && $meta_acumulada == 0){ $estatus = 3; }
+		        }
+
+		        $datos_componente = array(
+		        	'indicador' => $componente->indicador,
+		        	'nivel' => 'componente',
+		        	'estatus'=>$estatus,
+		        	'avance_acumulado' => $porcentaje,
+		        	'actividades' => array()
+		        );
+
+		        
+	        	if(count($componente->planesMejoraJurisdiccion)){
+	        		$datos_componente['plan_mejora'] = $componente->planesMejoraJurisdiccion[0];
+	        		$datos['proyecto']['responsableInformacion'] = $componente->planesMejoraJurisdiccion[0]->responsableInformacion;
+		        	$datos['proyecto']['cargoResponsableInformacion'] = $componente->planesMejoraJurisdiccion[0]->cargoResponsableInformacion;
+	        	}
+		        
+		        foreach ($componente->actividades as $actividad) {
+					$meta_acumulada = 0;
+					$avance_acumulado = 0;
+					foreach ($actividad->metasMes as $metaMes) {
+						$meta_acumulada += floatval($metaMes->meta);
+						if(isset($meses_capturados[$metaMes->mes])){
+				        	$avance_acumulado += floatval($metaMes->avance);
+						}
+					}
+					if($meta_acumulada > 0){ $porcentaje = ($avance_acumulado*100) / $meta_acumulada; }
+			        else{ $porcentaje = ($avance_acumulado*100); }
+
+			        $estatus = 1;
+			        if(!($meta_acumulada == 0 && $avance_acumulado == 0)){
+						if($porcentaje > 110){ $estatus = 3; }
+						elseif($porcentaje < 90){ $estatus = 2; }
+						elseif($porcentaje > 0 && $meta_acumulada == 0){ $estatus = 3; }
+			        }
+
+			        $datos_actividad = array(
+			        	'indicador' => $actividad->indicador,
+			        	'nivel' => 'actividad',
+			        	'estatus'=>$estatus,
+			        	'avance_acumulado' => $porcentaje
+			        );
+			        
+		        	if(count($actividad->planesMejoraJurisdiccion)){
+		        		$datos_actividad['plan_mejora'] = $actividad->planesMejoraJurisdiccion[0];
+		        		$datos['proyecto']['responsableInformacion'] = $actividad->planesMejoraJurisdiccion[0]->responsableInformacion;
+		        		$datos['proyecto']['cargoResponsableInformacion'] = $actividad->planesMejoraJurisdiccion[0]->cargoResponsableInformacion;
+		        	}
+			        
+			        $datos_componente['actividades'][] = $datos_actividad;
+				}
+				$acciones[] = $datos_componente;
+			}
+			//return Response::json($acciones,200);
+			$datos['proyecto']['componentes'] = $acciones;
+			$datos['mes'] = $meses[intval($mes_actual)];
+
+			$pdf = PDF::setPaper('LETTER')->setOrientation('landscape')->setWarnings(false)->loadView('reportes.plan-mejora-jurisdiccion',$datos);
+		
+			$pdf->output();
+			$dom_pdf = $pdf->getDomPDF();
+			$canvas = $dom_pdf ->get_canvas();
+			$w = $canvas->get_width();
+	  		$h = $canvas->get_height();
+			$canvas->page_text(($w-75), ($h-16), "Página {PAGE_NUM} de {PAGE_COUNT}", null, 10, array(0, 0, 0));
+
+			return $pdf->stream('plan_mejora_jurisdiccional.pdf');
 		}
 
 		if(is_null($recurso)){
@@ -1193,5 +1515,156 @@ class VisorController extends BaseController {
 		}
 
 		return array('metas_jurisdiccion'=>$metas_jurisdiccion,'total_metas'=>$total);
+	}
+
+	public function store(){
+		$respuesta['http_status'] = 200;
+		$respuesta['data'] = array("data"=>'');
+
+		try{
+			$usuario = Sentry::getUser();
+
+			$parametros = Input::all();
+			$validacion = Validador::validar($parametros, $this->reglasPlanMejora);
+
+			if($validacion === TRUE){
+				$fechas = $this->validar_fechas($parametros['fecha-inicio-jurisdiccion'], $parametros['fecha-termino-jurisdiccion'], $parametros['fecha-notificacion-jurisdiccion']);
+
+				if(isset($fechas['error'])){
+					$respuesta['data']['data'] = [$fechas['data']];
+					$respuesta['data']['code'] = 'U00';
+					$respuesta['http_status'] = 409;
+				}else{
+					$plan_mejora = new PlanMejoraJurisdiccion;
+
+					if($parametros['tipo'] == 'componente'){
+						$plan_mejora->nivel = 1;
+					}else{
+						$plan_mejora->nivel = 2;
+					}
+					
+					$plan_mejora->idProyecto = $parametros['id-proyecto-plan-mejora'];
+					$plan_mejora->idNivel = $parametros['id-accion-plan-mejora'];
+					$plan_mejora->mes = $parametros['mes-plan-mejora'];
+
+					if($usuario->claveJurisdiccion){
+						$plan_mejora->claveJurisdiccion = $usuario->claveJurisdiccion;
+					}elseif($parametros['jurisdiccion-plan-mejora']){
+						$plan_mejora->claveJurisdiccion = $parametros['jurisdiccion-plan-mejora'];
+					}else{
+						throw new Exception("No se encontró Jurisdicción", 1);
+					}
+
+					$plan_mejora->justificacionAcumulada 		= $parametros['justificacion-acumulada-jurisdiccion'];
+					$plan_mejora->accionMejora 					= $parametros['accion-mejora-jurisdiccion'];
+					$plan_mejora->grupoTrabajo 					= $parametros['grupo-trabajo-jurisdiccion'];
+					$plan_mejora->documentacionComprobatoria 	= $parametros['documentacion-comprobatoria-jurisdiccion'];
+					$plan_mejora->fechaInicio 					= $fechas['inicio'];
+					$plan_mejora->fechaTermino 					= $fechas['termino'];
+					$plan_mejora->fechaNotificacion 			= $fechas['notificacion'];
+					$plan_mejora->responsableInformacion		= $parametros['responsable-informacion'];
+					$plan_mejora->cargoResponsableInformacion 	= $parametros['cargo-responsable-informacion'];
+
+					if($plan_mejora->save()){
+						$respuesta['data']['data'] = $plan_mejora;
+					}else{
+						throw new Exception("Error Processing Request", 1);
+						
+					}
+				}
+			}else{
+				$respuesta['http_status'] = $validacion['http_status'];
+				$respuesta['data'] = $validacion['data'];
+			}
+		}catch(Exception $e){
+			$respuesta['http_status'] = 500;
+			$respuesta['data'] = array("data"=>"Ocurrió un error en el servidor, intente de nuevo mas tarde o pongase en contacto con el administrador del sistema.",'ex'=>$e->getMessage(),'line'=>$e->getLine(),'code'=>'S02');
+		}
+		return Response::json($respuesta['data'],$respuesta['http_status']);
+	}
+
+	public function update($id){
+		$respuesta['http_status'] = 200;
+		$respuesta['data'] = array("data"=>'');
+
+		try{
+			$usuario = Sentry::getUser();
+
+			$parametros = Input::all();
+			$validacion = Validador::validar($parametros, $this->reglasPlanMejora);
+
+			if($validacion === TRUE){
+				$fechas = $this->validar_fechas($parametros['fecha-inicio-jurisdiccion'], $parametros['fecha-termino-jurisdiccion'], $parametros['fecha-notificacion-jurisdiccion']);
+
+				if(isset($fechas['error'])){
+					$respuesta['data']['data'] = [$fechas['data']];
+					$respuesta['data']['code'] = 'U00';
+					$respuesta['http_status'] = 409;
+				}else{
+					$plan_mejora = PlanMejoraJurisdiccion::find($id);
+
+					if(!$plan_mejora){
+						throw new Exception("Registro no encontrado", 1);
+					}
+
+					$plan_mejora->justificacionAcumulada 		= $parametros['justificacion-acumulada-jurisdiccion'];
+					$plan_mejora->accionMejora 					= $parametros['accion-mejora-jurisdiccion'];
+					$plan_mejora->grupoTrabajo 					= $parametros['grupo-trabajo-jurisdiccion'];
+					$plan_mejora->documentacionComprobatoria 	= $parametros['documentacion-comprobatoria-jurisdiccion'];
+					$plan_mejora->fechaInicio 					= $fechas['inicio'];
+					$plan_mejora->fechaTermino 					= $fechas['termino'];
+					$plan_mejora->fechaNotificacion 			= $fechas['notificacion'];
+					$plan_mejora->responsableInformacion		= $parametros['responsable-informacion'];
+					$plan_mejora->cargoResponsableInformacion 	= $parametros['cargo-responsable-informacion'];
+					
+					if($plan_mejora->save()){
+						$respuesta['data']['data'] = $plan_mejora;
+					}else{
+						throw new Exception("Error Processing Request", 1);
+					}
+				}
+			}else{
+				$respuesta['http_status'] = $validacion['http_status'];
+				$respuesta['data'] = $validacion['data'];
+			}
+		}catch(Exception $e){
+			$respuesta['http_status'] = 500;
+			$respuesta['data'] = array("data"=>"Ocurrió un error en el servidor, intente de nuevo mas tarde o pongase en contacto con el administrador del sistema.",'ex'=>$e->getMessage(),'line'=>$e->getLine(),'code'=>'S02');
+		}
+		return Response::json($respuesta['data'],$respuesta['http_status']);
+	}
+
+	private function validar_fechas($fecha_inicial, $fecha_final, $fecha_noti){
+		$fecha_inicio = DateTime::createFromFormat('d/m/Y',$fecha_inicial);
+		$fecha_termino = DateTime::createFromFormat('d/m/Y',$fecha_final);
+		$fecha_notificacion = DateTime::createFromFormat('d/m/Y',$fecha_noti);
+
+		if(!$fecha_inicio){ $fecha_inicio = DateTime::createFromFormat('Y-m-d',$fecha_inicial); }
+
+		if(!$fecha_termino){ $fecha_termino = DateTime::createFromFormat('Y-m-d',$fecha_final); }
+
+		if(!$fecha_notificacion){ $fecha_notificacion = DateTime::createFromFormat('Y-m-d',$fecha_noti); }
+
+		if(!$fecha_inicio){
+			return array('error'=>true,'data'=>'{"field":"fecha-inicio-jurisdiccion","error":"La fecha de inicio del periodo de ejecución no tiene el formato correcto."}');
+		}
+
+		if(!$fecha_termino){
+			return array('error'=>true,'data'=>'{"field":"fecha-termino-jurisdiccion","error":"La fecha final del periodo de ejecución no tiene el formato correcto."}');
+		}
+
+		if(!$fecha_notificacion){
+			return array('error'=>true,'data'=>'{"field":"fecha-notificacion-jurisdiccion","error":"La fecha final del periodo de ejecución no tiene el formato correcto."}');
+		}		
+
+		if($fecha_termino < $fecha_inicio){
+			return array('error'=>true,'data'=>'{"field":"fecha-termino-jurisdiccion","error":"La fecha de termino no puede ser menor que la de inicio."}');
+		}
+
+		if($fecha_notificacion < $fecha_termino){
+			return array('error'=>true,'data'=>'{"field":"fecha-notificacion-jurisdiccion","error":"La fecha de notificación no puede ser menor que la de termino."}');
+		}
+
+		return array('inicio' =>$fecha_inicio, 'termino' => $fecha_termino, 'notificacion' => $fecha_notificacion);
 	}
 }

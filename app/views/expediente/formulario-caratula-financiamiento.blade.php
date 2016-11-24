@@ -35,7 +35,7 @@
                         <th><input type="checkbox" class="check-select-all-rows"></th>
                         <th width="70">Clave</th>
                         <th>Fuente de Financiamiento</th>
-                        <th>Destino</th>
+                        <th>Programa y/o Fondo</th>
                         <th width="150">SubFuentes</th>
                     </tr>
                 </thead>
@@ -57,26 +57,17 @@
                 <form id="form-fuente">
                     <input type="hidden" name="id-financiamiento" id="id-financiamiento" value="">
                     <div class="row">
-                        <div class="col-sm-6">
+                        <div class="col-sm-12">
                             <div class="form-group">
-                                <label class="control-label" for="fuente-financiamiento">Fuente de Financiamiento</label>
-                                <select class="form-control chosen-one" id="fuente-financiamiento" name="fuente-financiamiento">
+                                <label class="control-label" for="fondo-financiamiento">Programa y/o Fondo</label>
+                                <select class="form-control chosen-one" id="fondo-financiamiento" name="fondo-financiamiento">
                                     <option value="">Selecciona una fuente de financiamiento</option>
                                     @foreach($fuentes_financiamiento as $fuente)
-                                    <option value="{{$fuente->id}}">{{$fuente->clave}}. {{$fuente->descripcion}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                                <label class="control-label" for="destino-gasto">Destino del Gasto</label>
-                                <select class="form-control chosen-one" id="destino-gasto" name="destino-gasto">
-                                    <option value="">Selecciona un destino del gasto</option>
-                                    @foreach($destino_gasto as $destino)
-                                    <option data-id-fuente="{{$destino->idFuenteFinanciamiento}}" value="{{$destino->id}}" class="hidden" disabled>
-                                        {{$destino->descripcion}}
-                                    </option>
+                                        <optgroup label="{{$fuente->clave}} {{$fuente->descripcion}}">
+                                            @foreach($fuente->fondos as $fondo)
+                                                <option value="{{$fondo->id}}">{{$fondo->clave}} - {{$fondo->descripcion}}</option>
+                                            @endforeach
+                                        </optgroup>
                                     @endforeach
                                 </select>
                             </div>

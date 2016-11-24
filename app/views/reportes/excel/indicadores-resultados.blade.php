@@ -29,7 +29,7 @@
 
 		<tr>
 			<td valign="middle" height="23">NUM. CONSEC. / CLAVE PROYECTO</td>
-			<td valign="middle">OBJETIVO DEL MILENIO</td>
+			<td valign="middle">OBJETIVO DE DESARROLLO SOSTENIBLE</td>
 			<td valign="middle">SUBFUNCIÓN / TIPO DE PROYECTO / FUENTE DE FINANCIAMIENTO</td>
 			<td valign="middle">UNIDAD DE MEDIDA</td>
 			<td></td>
@@ -98,22 +98,14 @@
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		
-		@foreach($clasificacion['fuentes'] as $fuente)
-		<tr>
-		<!-- {{ $current_row++; }} -->
-			<td></td><td></td>
-			<td align="center" valign="top" style="text-decoration:underline; font-size:11; font-weight:bold;">{{$fuente['titulo']}}</td>
-			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-		</tr>
-		
-		@foreach($fuente['proyectos'] as $proyecto)
+		@foreach($clasificacion['proyectos'] as $proyecto)
 		<tr>
 		<!-- {{ $current_row++; }} -->
 			<td align="center" valign="top" style="font-weight:bold;">
 				{{$proyecto->proyectoEstrategico}}{{str_pad($proyecto->numeroProyectoEstrategico, 3,'0',STR_PAD_LEFT)}}
 				<!-- {{ $sum_rows[] = $current_row; }} -->
 			</td>
-			<td valign="top" align="center"></td>
+			<td valign="middle" align="center">3</td>
 			<td align="center" style="font-weight:bold;text-align:justify;">{{{ rtrim($proyecto->nombreTecnico,'.') }}}</td>
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 			<td valign="top" {{$estilo_fuente = (count($proyecto->fuentesFinanciamiento) > 1)?'style="font-weight:bold; text-decoration:underline;"':''}} >
@@ -212,8 +204,6 @@
 				<td></td><td></td><td></td>
 			</tr>
 		@endfor
-
-		@endforeach
 
 		@endforeach
 

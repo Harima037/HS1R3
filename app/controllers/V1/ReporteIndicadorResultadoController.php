@@ -78,16 +78,32 @@ class ReporteIndicadorResultadoController extends BaseController {
 						'totalPresupuestoAprobado'=>0,
 						'totalPresupuestoModificado'=>0,
 						'totalPresupuestoDevengado'=>0,
-						'fuentesFinanciamiento' => array()
+						//'fuentesFinanciamiento' => array()
+						'fuentesFinanciamiento' => array(
+							0 => array(
+								'descripcion' 			=> 0,
+								'clave' 				=> 0,
+								'presupuestoAprobado' 	=> 0,
+								'presupuestoModificado' => 0,
+								'presupuestoDevengado' 	=> 0
+							)
+						)
 					);
 				}
-				$fuentesFinan[$fuente->idProyecto]['fuentesFinanciamiento'][] = array(
+				/*$fuentesFinan[$fuente->idProyecto]['fuentesFinanciamiento'][] = array(
 					'descripcion' 			=> $fuente->descripcion,
 					'clave' 				=> $fuente->clave,
 					'presupuestoAprobado' 	=> $fuente->presupuestoAprobado,
 					'presupuestoModificado' => $fuente->presupuestoModificado,
 					'presupuestoDevengado' 	=> $fuente->presupuestoDevengado
-				);
+				);*/
+
+				$fuentesFinan[$fuente->idProyecto]['fuentesFinanciamiento'][0]['descripcion'] 			+= $fuente->descripcion;
+				$fuentesFinan[$fuente->idProyecto]['fuentesFinanciamiento'][0]['clave'] 				+= $fuente->clave;
+				$fuentesFinan[$fuente->idProyecto]['fuentesFinanciamiento'][0]['presupuestoAprobado'] 	+= $fuente->presupuestoAprobado;
+				$fuentesFinan[$fuente->idProyecto]['fuentesFinanciamiento'][0]['presupuestoModificado'] += $fuente->presupuestoModificado;
+				$fuentesFinan[$fuente->idProyecto]['fuentesFinanciamiento'][0]['presupuestoDevengado'] 	+= $fuente->presupuestoDevengado;
+
 				$fuentesFinan[$fuente->idProyecto]['totalPresupuestoAprobado']		+= $fuente->presupuestoAprobado;
 				$fuentesFinan[$fuente->idProyecto]['totalPresupuestoModificado']	+= $fuente->presupuestoModificado;
 				$fuentesFinan[$fuente->idProyecto]['totalPresupuestoDevengado']		+= $fuente->presupuestoDevengado;
@@ -110,11 +126,30 @@ class ReporteIndicadorResultadoController extends BaseController {
 						'clase' => array()
 					);
 				}
+				/*
+				if(count($hojas) == 0){
+					$hojas[] = array(
+							'titulo'=>'Proyectos',
+							'total_presup_aprobado' => 0,
+							'total_presup_modificado' => 0,
+							'total_presup_devengado' => 0,
+							'conteo_items' => 0,
+							'justificaciones'=>array(),
+							'clase' => array()
+						);
+				}
+				*/
 
 				if(!isset($hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto])){
-					$hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto] = array('fuentes'=>array());
+					$hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto] = array('proyectos'=>array());
 					$hojas[$row->subFuncionClave]['conteo_items']++;
 				}
+				/*
+				if(!isset($hojas[0]['clase'][$row->idClasificacionProyecto])){
+					$hojas[0]['clase'][$row->idClasificacionProyecto] = array('proyectos'=>array());
+					$hojas[0]['conteo_items']++;
+				}
+				*/
 
 				$clave_fuentes = '';
 				$titulo_fuentes = '';
@@ -123,7 +158,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 				$total_fuentes = count($fuentes_del_proyecto['fuentesFinanciamiento']) - 1;
 				$row->fuentesFinanciamiento = $fuentes_del_proyecto['fuentesFinanciamiento'];
 				foreach ($fuentes_del_proyecto['fuentesFinanciamiento'] as $key => $fuente) {
-					if($key == 0){
+					/*if($key == 0){
 						$titulo_fuentes = $fuente['descripcion'];
 					}elseif($key < $total_fuentes){
 						$titulo_fuentes .= ', ' . $fuente['descripcion'];
@@ -137,24 +172,28 @@ class ReporteIndicadorResultadoController extends BaseController {
 							}
 						}
 						$titulo_fuentes .= $ultimo . $fuente['descripcion'];
-					}
-					$clave_fuentes .= $fuente['clave'] .'_';
+					}*/
+					//$clave_fuentes .= $fuente['clave'] .'_';
 					$row->totalPresupuestoAprobado += $fuente['presupuestoAprobado'];
 					$row->totalPresupuestoModificado += $fuente['presupuestoModificado'];
 					$row->totalPresupuestoDevengado += $fuente['presupuestoDevengado'];
 				}
 				//---------------------------------------------------------------------------^^^^^^^^^^^^^^^
 
-				if(!isset($hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto]['fuentes'][$clave_fuentes])){
+				/*if(!isset($hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto]['fuentes'][$clave_fuentes])){
 					$hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto]['fuentes'][$clave_fuentes] = array(
 						'titulo' => $titulo_fuentes,
 						'proyectos'=>array()
 					);
-					$hojas[$row->subFuncionClave]['conteo_items']++;
-				}
+					//$hojas[$row->subFuncionClave]['conteo_items']++;
+				}*/
 
-				$hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto]['fuentes'][$clave_fuentes]['proyectos'][] = $row;
+				$hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto]['proyectos'][] = $row;
 				$hojas[$row->subFuncionClave]['conteo_items']++;
+				/*
+				$hojas[0]['clase'][$row->idClasificacionProyecto]['proyectos'][] = $row;
+				$hojas[0]['conteo_items']++;
+				*/
 
 				$row->desfaseActividades = count($row->componentes);
 
@@ -171,10 +210,16 @@ class ReporteIndicadorResultadoController extends BaseController {
 				}
 
 				$hojas[$row->subFuncionClave]['conteo_items'] += $row->totalItems;
-				
 				$hojas[$row->subFuncionClave]['total_presup_aprobado'] += $row->totalPresupuestoAprobado;
 				$hojas[$row->subFuncionClave]['total_presup_modificado'] += $row->totalPresupuestoModificado;
 				$hojas[$row->subFuncionClave]['total_presup_devengado'] += $row->totalPresupuestoDevengado;
+
+				/*
+				$hojas[0]['conteo_items'] += $row->totalItems;
+				$hojas[0]['total_presup_aprobado'] += $row->totalPresupuestoAprobado;
+				$hojas[0]['total_presup_modificado'] += $row->totalPresupuestoModificado;
+				$hojas[0]['total_presup_devengado'] += $row->totalPresupuestoDevengado;
+				*/
 			}
 			
 			//return Response::json($hojas,200);
@@ -194,6 +239,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 				$datos_hoja['ejercicio'] = $datos['ejercicio'];
 				$datos_hoja['trimestre'] = $datos['trimestre'];
 				foreach ($datos['hojas'] as $clave => $hoja) {
+					//$excel->sheet('Proyectos', function($sheet) use ( $datos_hoja, $hoja ){
 					$excel->sheet($datos['nombres_subfuncion'][$clave], function($sheet) use ( $datos_hoja, $hoja ){
 						$sheet->setStyle(array(
 						    'font' => array(
@@ -285,6 +331,12 @@ class ReporteIndicadorResultadoController extends BaseController {
 								));
 							}
 						}
+						$sheet->mergeCells('B14:B'.$total);
+						$sheet->cell('B14',function($cell){
+							$cell->setAlignment('center');
+							$cell->setValignment('center');
+						});
+
 						$sheet->getStyle('A14:P'.$total)->getAlignment()->setWrapText(true);
 						$sheet->setColumnFormat(array(
 							'F14:H'.$total => '### ### ### ##0.00',
@@ -312,6 +364,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 						$suma_m .= 'M'.$valor.',';
 					}
 					
+					$excel->getActiveSheet()->setCellValue('B14','3');
 					$excel->getActiveSheet()->setCellValue('A'.$ultima_linea,null);
 					$excel->getActiveSheet()->setCellValue('K12','=SUM('.rtrim($suma_k,',').')');
 					$excel->getActiveSheet()->setCellValue('L12','=SUM('.rtrim($suma_l,',').')');

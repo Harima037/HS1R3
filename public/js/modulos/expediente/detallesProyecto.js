@@ -41,7 +41,7 @@ context.mostrar_datos = function(datos){
     $('#lbl_sub_sub_funcion').text(datos.datos_sub_sub_funcion.clave + ' - ' + datos.datos_sub_sub_funcion.descripcion);
     $('#lbl_programa_sectorial').text(datos.datos_programa_sectorial.clave + ' - ' + datos.datos_programa_sectorial.descripcion);
     $('#lbl_programa_presupuestario').text(datos.datos_programa_presupuestario.clave + ' - ' + datos.datos_programa_presupuestario.descripcion);
-    $('#lbl_programa_especial').text(datos.datos_programa_especial.clave + ' - ' + datos.datos_programa_especial.descripcion);
+    $('#lbl_origen_asignacion').text(datos.datos_origen_asignacion.clave + ' - ' + datos.datos_origen_asignacion.descripcion);
     $('#lbl_actividad_institucional').text(datos.datos_actividad_institucional.clave + ' - ' + datos.datos_actividad_institucional.descripcion);
     $('#lbl_proyecto_estrategico').text(datos.datos_proyecto_estrategico.clave + ' - ' + datos.datos_proyecto_estrategico.descripcion);
 
@@ -137,34 +137,30 @@ function llenar_tabla_beneficiarios(datos){
                 desglose: {'f':{},'m':{}}
             };
         }
-        beneficiarios[datos[i].idTipoBeneficiario].total += datos[i].total;
+        beneficiarios[datos[i].idTipoBeneficiario].total += (parseInt(datos[i].total) || 0);
         beneficiarios[datos[i].idTipoBeneficiario].desglose[datos[i].sexo] = {
             sexo: datos[i].sexo,
-            total: datos[i].total,
-            urbana: datos[i].urbana,
-            rural: datos[i].rural,
-            mestiza: datos[i].mestiza,
-            indigena: datos[i].indigena,
-            inmigrante: datos[i].inmigrante,
-            otros: datos[i].otros,
-            muyAlta: datos[i].muyAlta,
-            alta: datos[i].alta,
-            media: datos[i].media,
-            baja: datos[i].baja,
-            muyBaja: datos[i].muyBaja
+            total: (parseInt(datos[i].total) || 0),
+            urbana: (parseInt(datos[i].urbana) || 0),
+            rural: (parseInt(datos[i].rural) || 0),
+            mestiza: (parseInt(datos[i].mestiza) || 0),
+            indigena: (parseInt(datos[i].indigena) || 0),
+            muyAlta: (parseInt(datos[i].muyAlta) || 0),
+            alta: (parseInt(datos[i].alta) || 0),
+            media: (parseInt(datos[i].media) || 0),
+            baja: (parseInt(datos[i].baja) || 0),
+            muyBaja: (parseInt(datos[i].muyBaja) || 0)
         }
     }
     var rows = '';
     for(var i in beneficiarios){
-        rows += '<tr class="bg-primary"><th colspan="12">' + beneficiarios[i].tipo + '</th><th>' + beneficiarios[i].total.format() + '</th></tr>'
+        rows += '<tr class="bg-primary"><th colspan="10">' + beneficiarios[i].tipo + '</th><th>' + beneficiarios[i].total.format() + '</th></tr>'
         rows += '<tr>';
         rows += '<th><span class="fa fa-female"></span></th>';
         rows += '<td>' + ( beneficiarios[i].desglose['f'].urbana.format() || 0 ) + '</td>';
         rows += '<td>' + ( beneficiarios[i].desglose['f'].rural.format() || 0 ) + '</td>';
         rows += '<td class="bg-info">' + ( beneficiarios[i].desglose['f'].mestiza.format() || 0 ) + '</td>';
         rows += '<td class="bg-info">' + ( beneficiarios[i].desglose['f'].indigena.format() || 0 ) + '</td>';
-        rows += '<td class="bg-info">' + ( beneficiarios[i].desglose['f'].inmigrante.format() || 0 ) + '</td>';
-        rows += '<td class="bg-info">' + ( beneficiarios[i].desglose['f'].otros.format() || 0 ) + '</td>';
         rows += '<td class="bg-success">' + ( beneficiarios[i].desglose['f'].muyAlta.format() || 0 ) + '</td>';
         rows += '<td class="bg-success">' + ( beneficiarios[i].desglose['f'].alta.format() || 0 ) + '</td>';
         rows += '<td class="bg-success">' + ( beneficiarios[i].desglose['f'].media.format() || 0 ) + '</td>';
@@ -178,8 +174,6 @@ function llenar_tabla_beneficiarios(datos){
         rows += '<td>' + ( beneficiarios[i].desglose['m'].rural.format() || 0 ) + '</td>';
         rows += '<td class="bg-info">' + ( beneficiarios[i].desglose['m'].mestiza.format() || 0 ) + '</td>';
         rows += '<td class="bg-info">' + ( beneficiarios[i].desglose['m'].indigena.format() || 0 ) + '</td>';
-        rows += '<td class="bg-info">' + ( beneficiarios[i].desglose['m'].inmigrante.format() || 0 ) + '</td>';
-        rows += '<td class="bg-info">' + ( beneficiarios[i].desglose['m'].otros.format() || 0 ) + '</td>';
         rows += '<td class="bg-success">' + ( beneficiarios[i].desglose['m'].muyAlta.format() || 0 ) + '</td>';
         rows += '<td class="bg-success">' + ( beneficiarios[i].desglose['m'].alta.format() || 0 ) + '</td>';
         rows += '<td class="bg-success">' + ( beneficiarios[i].desglose['m'].media.format() || 0 ) + '</td>';

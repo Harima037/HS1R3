@@ -27,6 +27,10 @@ class Actividad extends BaseModel
 						'unidadMedida.descripcion AS unidadMedida','componenteActividades.idComponente')
     			->leftjoin('catalogoUnidadesMedida AS unidadMedida','unidadMedida.id','=','idUnidadMedida');
     }
+
+    public function accion(){
+    	return $this->hasOne('Accion','idActividad');
+    }
 	
 	public function registroAvance(){
     	return $this->hasMany('RegistroAvanceMetas','idNivel')->where('nivel','=',2);
@@ -34,6 +38,10 @@ class Actividad extends BaseModel
 
     public function planMejora(){
     	return $this->hasMany('EvaluacionPlanMejora','idNivel')->where('nivel','=',2);
+    }
+
+    public function planesMejoraJurisdiccion(){
+    	return $this->hasMany('PlanMejoraJurisdiccion','idNivel')->where('nivel','=',2);
     }
 	
 	public function desglose(){

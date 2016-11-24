@@ -43,7 +43,7 @@ var form_actividad = '#form_actividad';
 var form_beneficiario = '#form_beneficiario';
 var form_fuente_informacion = '#form_fuente_informacion';
 
-$('.chosen-one').chosen({width:'100%'});
+$('.chosen-one').chosen({width:'100%',search_contains:true,enable_split_word_search:true,no_results_text: "No se econtraron resultados para "});
 
 window.onload = function () { 
 	$('#mensaje-espera').addClass('hidden');
@@ -87,7 +87,8 @@ if($('#id').val()){
             $('#subsubfuncion').text(response.data.subSubFuncion);
             $('#programa_sectorial').text(response.data.programaSectorial);
             $('#programa_presupuestario').text(response.data.programaPresupuestario);
-            $('#programa_especial').text(response.data.programaEspecial);
+            //$('#programa_especial').text(response.data.programaEspecial);
+            $('#origen_asignacion').text(response.data.origenAsignacion);
             $('#actividad_institucional').text(response.data.actividadInstitucional);
             $('#proyecto_estrategico').text(response.data.proyectoEstrategico);
             $('#no_proyecto_estrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
@@ -96,7 +97,8 @@ if($('#id').val()){
             $('#funciongasto').val(response.data.finalidad+ '.' + response.data.funcion+ '.' + response.data.subFuncion+ '.' + response.data.subSubFuncion);
             $('#programasectorial').val(response.data.programaSectorial);
             $('#programapresupuestario').val(response.data.programaPresupuestario);
-            $('#programaespecial').val(response.data.programaEspecial);
+            //$('#programaespecial').val(response.data.programaEspecial);
+            $('#origenasignacion').val(response.data.origenAsignacion);
             $('#actividadinstitucional').val(response.data.actividadInstitucional);
             $('#proyectoestrategico').val(response.data.proyectoEstrategico);
 
@@ -452,8 +454,8 @@ function editar_beneficiario(e){
 		        $('#rural'+sexo).val(beneficiarios[sexo].rural || 0);
 		        $('#mestiza'+sexo).val(beneficiarios[sexo].mestiza || 0);
 		        $('#indigena'+sexo).val(beneficiarios[sexo].indigena || 0);
-		        $('#inmigrante'+sexo).val(beneficiarios[sexo].inmigrante || 0);
-		        $('#otros'+sexo).val(beneficiarios[sexo].otros || 0);
+		        //$('#inmigrante'+sexo).val(beneficiarios[sexo].inmigrante || 0);
+		        //$('#otros'+sexo).val(beneficiarios[sexo].otros || 0);
 		        $('#muyalta'+sexo).val(beneficiarios[sexo].muyAlta || 0);
 		        $('#alta'+sexo).val(beneficiarios[sexo].alta || 0);
 		        $('#media'+sexo).val(beneficiarios[sexo].media || 0);
@@ -884,9 +886,12 @@ $('#programasectorial').on('change',function(){
 $('#programapresupuestario').on('change',function(){
 	actualiza_clave('programa_presupuestario',$(this).val(),'---');
 });
-$('#programaespecial').on('change',function(){
-	actualiza_clave('programa_especial',$(this).val(),'---');
+$('#origenasignacion').on('change',function(){
+	actualiza_clave('origen_asignacion',$(this).val(),'--');
 });
+/*$('#programaespecial').on('change',function(){
+	actualiza_clave('programa_especial',$(this).val(),'---');
+});*/
 $('#actividadinstitucional').on('change',function(){
 	actualiza_clave('actividad_institucional',$(this).val(),'---');
 });
@@ -1204,7 +1209,7 @@ function actualizar_grid_actividades(datos){
 		actividad.indicador = datos[indx].indicador;
 		actividad.interpretacion = datos[indx].interpretacion;
 		actividad.unidad_medida = datos[indx].unidad_medida.descripcion;
-		actividad.creadoPor = datos[indx].usuario.username;
+		actividad.creadoPor = (datos[indx].usuario)?datos[indx].usuario.username:'';
 		actividad.creadoAl = datos[indx].creadoAl.substring(0,11);
 
 		if(comentarios.actividades[datos[indx].id]){
@@ -1233,7 +1238,7 @@ function actualizar_grid_componentes(datos){
 		componente.indicador = datos[indx].indicador;
 		componente.interpretacion = datos[indx].interpretacion || '---';
 		componente.unidad_medida = datos[indx].unidad_medida.descripcion;
-		componente.creadoPor = datos[indx].usuario.username;
+		componente.creadoPor = (datos[indx].usuario)?datos[indx].usuario.username:'';
 		componente.creadoAl = datos[indx].creadoAl.substring(0,11);
 
 		if(comentarios.componentes[datos[indx].id]){
@@ -1287,7 +1292,7 @@ function actualizar_grid_beneficiarios(datos){
 	$('#tablink-beneficiarios > span').text(beneficiarios_grid.length);
 
 	if(beneficiarios_grid.length == 0){
-		$(grid_beneficiarios + ' > table > tbody').append('<tr><td></td><td colspan="4" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
+		$(grid_beneficiarios + ' > table > tbody').append('<tr><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
 	}else{
 		beneficiarioDatagrid.cargarDatos(beneficiarios_grid);
 	}

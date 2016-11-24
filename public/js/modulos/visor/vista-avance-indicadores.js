@@ -170,6 +170,20 @@ function seguimiento_metas(e){
                 $('#mensaje-alerta').addClass('hidden');
             }
 
+            if(response.data.planMejoraJurisdiccion){
+                var plan_mejora = response.data.planMejoraJurisdiccion;
+                $('#justificacion-acumulada-jurisdiccion').val(plan_mejora.justificacionAcumulada);
+                $('#accion-mejora-jurisdiccion').val(plan_mejora.accionMejora);
+                $('#grupo-trabajo-jurisdiccion').val(plan_mejora.grupoTrabajo);
+                $('#documentacion-comprobatoria-jurisdiccion').val(plan_mejora.documentacionComprobatoria);
+                $('#fecha-inicio-jurisdiccion').val(plan_mejora.fechaInicio);
+                $('#fecha-termino-jurisdiccion').val(plan_mejora.fechaTermino);
+                $('#fecha-notificacion-jurisdiccion').val(plan_mejora.fechaNotificacion);
+                $('#responsable-informacion').val(plan_mejora.responsableInformacion);
+                $('#cargo-responsable-informacion').val(plan_mejora.cargoResponsableInformacion);
+                $('#id-plan-mejora-jurisdiccion').val(plan_mejora.id);
+            }
+
             var total_meta_mes = 0;
             var total_meta_acumulada = 0;
             var total_avance_acumulado = 0;
@@ -369,6 +383,20 @@ function seguimiento_metas(e){
                         /*if(i == mes_actual && estatus != 1){ $('#mensaje-alerta').removeClass('hidden'); }
                         else{ $('#mensaje-alerta').addClass('hidden'); }*/
                     }
+
+                    if(i == mes_actual && (estatus == 2 || estatus == 3 || estatus == 1)){
+                        $('#mensaje-alerta-cumplimiento').removeClass('hidden');
+                        if(estatus == 1){
+                            $('#mensaje-alerta-cumplimiento-texto').text('* Este indicador se encuentra dentro de los avances esperados, por lo que NO requiere implementar un Plan de Acción de Mejora.');
+                        }else{
+                            var avance_texto = 'alto';
+                            if(estatus == 2){
+                                avance_texto = 'bajo';
+                            }
+                            $('#mensaje-alerta-cumplimiento-texto').text('* Este indicador presenta un '+avance_texto+' avance, por lo que requiere implementar un Plan de Acción de Mejora.');
+                            $('#tab-link-plan-mejora-jurisdicciones').removeClass('hidden');
+                        }
+                    }
                 }
             }
             charts_data['mensual'] = avance_acumulado_mes;
@@ -390,6 +418,70 @@ function seguimiento_metas(e){
         }
     });    
 }
+
+$('#btn-imprimir-plan-mejora').on('click',function(){
+    var parametros = '?reporte-plan-mejora=1';
+    var jurisdiccion = $('#btn-proyecto-cancelar').attr('data-jurisdiccion');
+    if(jurisdiccion){
+        parametros += '&jurisdiccion='+jurisdiccion;
+    }
+    window.open(SERVER_HOST+'/v1/visor/'+$('#id').val()+parametros);
+});
+
+$('#btn-guardar-plan-mejora').on('click',function(){
+    $('#id-proyecto-plan-mejora').val($('#id').val());
+    $('#jurisdiccion-plan-mejora').val($('#jurisdiccion').val());
+    $('#id-accion-plan-mejora').val($('#id-indicador').val());
+    $('#mes-plan-mejora').val($('#mes').val());
+
+    Validation.cleanFormErrors('#form_plan_mejora');
+
+    var parametros = $('#form_plan_mejora').serialize();
+    parametros += '&guardar=plan-mejora-jurisdiccion&tipo='+$('#nivel').val();
+
+    if($('#id-plan-mejora-jurisdiccion').val()){
+        moduloResource.put($('#id-plan-mejora-jurisdiccion').val(),parametros,{
+            _success: function(response){
+                MessageManager.show({data:'Datos del Plan de Acción de Mejora almacenados con éxito',type:'OK',timer:4});
+                //$('#modalEditarAvance').modal('hide');
+            },
+            _error: function(response){
+                try{
+                    var json = $.parseJSON(response.responseText);
+                    if(!json.code)
+                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                    else{
+                        MessageManager.show(json);
+                    }
+                    Validation.formValidate(json.data);
+                }catch(e){
+                    console.log(e);
+                }                       
+            }
+        });
+    }else{
+        moduloResource.post(parametros,{
+            _success: function(response){
+                MessageManager.show({data:'Datos del Plan de Acción de Mejora almacenados con éxito',type:'OK',timer:4});
+                $('#id-plan-mejora-jurisdiccion').val(response.data.id);
+                //$('#modalEditarAvance').modal('hide');
+            },
+            _error: function(response){
+                try{
+                    var json = $.parseJSON(response.responseText);
+                    if(!json.code)
+                        MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                    else{
+                        MessageManager.show(json);
+                    }
+                    Validation.formValidate(json.data);
+                }catch(e){
+                    console.log(e);
+                }                       
+            }
+        });
+    }
+});
 
 function asignar_municipios(datos){
     //datos
@@ -556,6 +648,14 @@ function buscar_localidades(jurisdiccion,municipio){
 
 $('#modalEditarAvance').on('hide.bs.modal',function(e){
     $('#modalEditarAvance .alert').remove();
+    $('#form_plan_mejora')[0].reset();
+    $('#id-proyecto-plan-mejora').val('');
+    $('#jurisdiccion-plan-mejora').val('');
+    $('#id-accion-plan-mejora').val('');
+    $('#mes-plan-mejora').val('');
+    $('#id-plan-mejora-jurisdiccion').val('');
+    Validation.cleanFormErrors('#form_plan_mejora');
+    $('#tab-link-plan-mejora-jurisdicciones').addClass('hidden');
     $('.valores').html('<span class="text-muted">0</span>');
 });
 

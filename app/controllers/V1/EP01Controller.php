@@ -87,8 +87,8 @@ class EP01Controller extends \BaseController {
 		
 		if(isset($parametros['listaproyectos'])){
 			$datos['datos'] = CargaDatosEP01::where('idBitacoraCargaEP01',$id)
-						->groupBy(DB::raw('concat(cargaDatosEP01.UR,cargaDatosEP01.FI,cargaDatosEP01.FU,cargaDatosEP01.SF,cargaDatosEP01.SSF,cargaDatosEP01.PS,cargaDatosEP01.PP,cargaDatosEP01.PE,cargaDatosEP01.AI,cargaDatosEP01.PT)'))
-						->select(DB::raw('concat(cargaDatosEP01.UR,cargaDatosEP01.FI,cargaDatosEP01.FU,cargaDatosEP01.SF,cargaDatosEP01.SSF,cargaDatosEP01.PS,cargaDatosEP01.PP,cargaDatosEP01.PE,cargaDatosEP01.AI,cargaDatosEP01.PT) AS clavePresupuestaria'),
+						->groupBy(DB::raw('concat(cargaDatosEP01.UR,cargaDatosEP01.FI,cargaDatosEP01.FU,cargaDatosEP01.SF,cargaDatosEP01.SSF,cargaDatosEP01.PS,cargaDatosEP01.PP,cargaDatosEP01.OA,cargaDatosEP01.AI,cargaDatosEP01.PT)'))
+						->select(DB::raw('concat(cargaDatosEP01.UR,cargaDatosEP01.FI,cargaDatosEP01.FU,cargaDatosEP01.SF,cargaDatosEP01.SSF,cargaDatosEP01.PS,cargaDatosEP01.PP,cargaDatosEP01.OA,cargaDatosEP01.AI,cargaDatosEP01.PT) AS clavePresupuestaria'),
 							'proyectos.nombreTecnico',
 							DB::raw('SUM(presupuestoAprobado) AS presupuestoAprobado'),
 							DB::raw('SUM(modificacionNeta) AS modificacionNeta'),
@@ -114,7 +114,7 @@ class EP01Controller extends \BaseController {
 										proyectos.subSubFuncion,
 										proyectos.programaSectorial,
 										proyectos.programaPresupuestario,
-										proyectos.programaEspecial,
+										proyectos.origenAsignacion,
 										proyectos.actividadInstitucional,
 							            concat(proyectos.proyectoEstrategico,LPAD(proyectos.numeroProyectoEstrategico,3,'0'))
 						        	)
@@ -129,7 +129,7 @@ class EP01Controller extends \BaseController {
 										cargaDatosEP01.SSF,
 										cargaDatosEP01.PS,
 										cargaDatosEP01.PP,
-										cargaDatosEP01.PE,
+										cargaDatosEP01.OA,
 										cargaDatosEP01.AI,
 										cargaDatosEP01.PT
 									)
@@ -242,7 +242,7 @@ class EP01Controller extends \BaseController {
 										ESCAPED BY '\"' 
 										LINES TERMINATED BY '\\n' 
 										IGNORE 1 LINES 
-										(`UR`,`FI`,`FU`,`SF`,`SSF`,`PS`,`PP`,`PE`,`AI`,`PT`,`MPIO`,`OG`,`STG`,`FF`,`SFF`,`DG`,`CP`,
+										(`UR`,`FI`,`FU`,`SF`,`SSF`,`PS`,`PP`,`OA`,`AI`,`PT`,`MPIO`,`OG`,`STG`,`FF`,`SFF`,`PF`,`CP`,
 										`DM`,`presupuestoAprobado`,`modificacionNeta`,`presupuestoModificado`,`presupuestoLiberado`,
 										`presupuestoPorLiberar`,`presupuestoMinistrado`,`presupuestoComprometidoModificado`,
 										`presupuestoDevengadoModificado`,`presupuestoEjercidoModificado`,`presupuestoPagadoModificado`,

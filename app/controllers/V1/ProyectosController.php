@@ -20,7 +20,7 @@ use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception;
 use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
 	FibapDatosProyecto, Directorio, ComponenteDesglose, Accion, PropuestaFinanciamiento, DistribucionPresupuesto, DesgloseMetasMes, 
-	DesgloseBeneficiario, ProyectoFinanciamiento, ProyectoFinanciamientoSubFuente,SentryUser;
+	DesgloseBeneficiario, ProyectoFinanciamiento, ProyectoFinanciamientoSubFuente,FuenteFinanciamiento,SentryUser;
 
 class ProyectosController extends BaseController {
 	private $reglasProyecto = array(
@@ -36,7 +36,7 @@ class ProyectosController extends BaseController {
 		'unidadresponsable'			=> 'required|digits:2',
 		'programasectorial'			=> 'required|alpha_num|size:1',
 		'programapresupuestario'	=> 'sometimes|required|alpha_num|size:3',
-		'programaespecial'			=> 'required|alpha_num|size:3',
+		'origenasignacion'			=> 'required|alpha_num|size:2',
 		'actividadinstitucional'	=> 'required|alpha_num|size:3',
 		'proyectoestrategico'		=> 'required|alpha_num|size:1',
 		'vinculacionped'			=> 'sometimes|required'
@@ -52,8 +52,6 @@ class ProyectosController extends BaseController {
 		'bajam' 					=> 'required|integer|min:0',
 		'indigenaf'					=> 'required|integer|min:0',
 		'indigenam'					=> 'required|integer|min:0',
-		'inmigrantef' 				=> 'required|integer|min:0',
-		'inmigrantem' 				=> 'required|integer|min:0',
 		'mediaf' 					=> 'required|integer|min:0',
 		'mediam' 					=> 'required|integer|min:0',
 		'mestizaf' 					=> 'required|integer|min:0',
@@ -62,8 +60,6 @@ class ProyectosController extends BaseController {
 		'muyaltam' 					=> 'required|integer|min:0',
 		'muybajaf' 					=> 'required|integer|min:0',
 		'muybajam' 					=> 'required|integer|min:0',
-		'otrosf' 					=> 'required|integer|min:0',
-		'otrosm' 					=> 'required|integer|min:0',
 		'ruralf' 					=> 'required|integer|min:0',
 		'ruralm' 					=> 'required|integer|min:0',
 		'urbanaf' 					=> 'required|integer|min:0',
@@ -124,8 +120,8 @@ class ProyectosController extends BaseController {
 	);
 
 	private $reglasFinanciamiento = array(
-		'fuente-financiamiento'			=> 'required',
-		'destino-gasto'					=> 'required',
+		'fondo-financiamiento'			=> 'required',
+		//'destino-gasto'					=> 'required',
 		'subfuente'						=> 'required|array|min:1'
 	);
 	/**
@@ -165,14 +161,14 @@ class ProyectosController extends BaseController {
 			if(isset($parametros['buscar'])){				
 				$rows = $rows->where(function($query)use($parametros){
 					$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
-						->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
+						->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
 				});
 				$total = $rows->count();
 			}else{				
 				$total = $rows->count();						
 			}
 			
-			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
+			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','catalogoCoberturas.descripcion AS coberturaDescripcion','proyectos.idEstatusProyecto',
 				'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
 								->join('sentryUsers','sentryUsers.id','=','proyectos.actualizadoPor')
@@ -195,7 +191,7 @@ class ProyectosController extends BaseController {
 			if(isset($parametros['buscar'])){				
 				$rows = $rows->where(function($query)use($parametros){
 						$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
-							->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
+							->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
 					});
 			}
 
@@ -336,7 +332,7 @@ class ProyectosController extends BaseController {
 		}else{
 			$recurso = Proyecto::with('componentes','beneficiarios','clasificacionProyecto','tipoProyecto','estatusProyecto',
 									'jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico',
-									'fuentesFinanciamiento.destinoGasto','fuentesFinanciamiento.fuenteFinanciamiento',
+									'fuentesFinanciamiento.fondoFinanciamiento','fuentesFinanciamiento.fuenteFinanciamiento',
 									'fuentesFinanciamiento.subFuentesFinanciamiento')
 								->find($id);
 
@@ -740,7 +736,7 @@ class ProyectosController extends BaseController {
 					}elseif($parametros['eliminar'] == 'beneficiario'){
 						$data['beneficiarios'] = Beneficiario::with('tipoBeneficiario')->where('idProyecto',$id_padre)->get();
 					}elseif($parametros['eliminar'] == 'financiamiento'){
-						$data['financiamiento'] = ProyectoFinanciamiento::with('destinoGasto','fuenteFinanciamiento','subFuentesFinanciamiento')
+						$data['financiamiento'] = ProyectoFinanciamiento::with('fondoFinanciamiento','fuenteFinanciamiento','subFuentesFinanciamiento')
 																		->where('idProyecto','=',$id_padre)->get();
 					}
 				}
@@ -805,8 +801,10 @@ class ProyectosController extends BaseController {
 				$recurso->idProyecto = $parametros['id-proyecto'];
 			}
 
-			$recurso->idFuenteFinanciamiento 	= $parametros['fuente-financiamiento'];
-			$recurso->idDestinoGasto			= $parametros['destino-gasto'];
+			$fondo = FuenteFinanciamiento::find($parametros['fondo-financiamiento']);
+
+			$recurso->idFuenteFinanciamiento 	= $fondo->idPadre;
+			$recurso->idFondoFinanciamiento		= $parametros['fondo-financiamiento'];
 
 			if($es_editar){
 				$subfuentes_anteriores = $recurso->subFuentesFinanciamiento->lists('id');
@@ -827,7 +825,7 @@ class ProyectosController extends BaseController {
 						$recurso->subFuentesFinanciamiento()->attach($subfuentes['nuevos']);
 					}
 					$respuesta_transaction['data'] = ProyectoFinanciamiento::where('idProyecto','=',$recurso->idProyecto)
-																			->with('fuenteFinanciamiento','destinoGasto','subFuentesFinanciamiento')
+																			->with('fuenteFinanciamiento','fondoFinanciamiento','subFuentesFinanciamiento')
 																			->get();
 				}else{
 					throw new Exception("Ocurrio un error al intentar guardar los datos", 1);
@@ -878,7 +876,7 @@ class ProyectosController extends BaseController {
 			}
 
 			if($es_editar && $recurso->numeroProyectoEstrategico > 0){
-				if($recurso->unidadResponsable != $parametros['unidadresponsable'] || $recurso->finalidad != $funcion_gasto[0] || $recurso->funcion != $funcion_gasto[1] || $recurso->subFuncion != $funcion_gasto[2] || $recurso->subSubFuncion != $funcion_gasto[3] || $recurso->programaSectorial != $parametros['programasectorial'] || $recurso->programaEspecial != $parametros['programaespecial'] || $recurso->actividadInstitucional != $parametros['actividadinstitucional'] || $recurso->proyectoEstrategico != $parametros['proyectoestrategico'] || $recurso->programaPresupuestario != $parametros['programapresupuestario']){
+				if($recurso->unidadResponsable != $parametros['unidadresponsable'] || $recurso->finalidad != $funcion_gasto[0] || $recurso->funcion != $funcion_gasto[1] || $recurso->subFuncion != $funcion_gasto[2] || $recurso->subSubFuncion != $funcion_gasto[3] || $recurso->programaSectorial != $parametros['programasectorial'] || $recurso->origenAsignacion != $parametros['origenasignacion'] || $recurso->actividadInstitucional != $parametros['actividadinstitucional'] || $recurso->proyectoEstrategico != $parametros['proyectoestrategico'] || $recurso->programaPresupuestario != $parametros['programapresupuestario']){
 					$recurso->numeroProyectoEstrategico = 0;
 				}
 			}
@@ -896,7 +894,7 @@ class ProyectosController extends BaseController {
 			$recurso->subFuncion 					= $funcion_gasto[2];
 			$recurso->subSubFuncion 				= $funcion_gasto[3];
 			$recurso->programaSectorial 			= $parametros['programasectorial'];
-			$recurso->programaEspecial 				= $parametros['programaespecial'];
+			$recurso->origenAsignacion 				= $parametros['origenasignacion'];
 			$recurso->actividadInstitucional 		= $parametros['actividadinstitucional'];
 			$recurso->proyectoEstrategico 			= $parametros['proyectoestrategico'];
 			$recurso->idTipoProyecto 				= $parametros['tipoproyecto'];
@@ -1053,8 +1051,8 @@ class ProyectosController extends BaseController {
 
 			$suma_zona_f = $parametros['urbanaf'] + $parametros['ruralf'];
 			$suma_zona_m = $parametros['urbanam'] + $parametros['ruralm'];
-			$suma_poblacion_f = $parametros['mestizaf'] + $parametros['indigenaf'] + $parametros['inmigrantef'] + $parametros['otrosf'];
-			$suma_poblacion_m = $parametros['mestizam'] + $parametros['indigenam'] + $parametros['inmigrantem'] + $parametros['otrosm'];
+			$suma_poblacion_f = $parametros['mestizaf'] + $parametros['indigenaf'];
+			$suma_poblacion_m = $parametros['mestizam'] + $parametros['indigenam'];
 			$suma_marginacion_f = $parametros['muyaltaf'] + $parametros['altaf'] + $parametros['mediaf'] + $parametros['bajaf'] + $parametros['muybajaf'];
 			$suma_marginacion_m = $parametros['muyaltam'] + $parametros['altam'] + $parametros['mediam'] + $parametros['bajam'] + $parametros['muybajam'];
 
@@ -1095,8 +1093,6 @@ class ProyectosController extends BaseController {
 					$beneficiarios[$key]->rural 				= 	$parametros['rural'.$item->sexo];
 					$beneficiarios[$key]->mestiza 				= 	$parametros['mestiza'.$item->sexo];
 					$beneficiarios[$key]->indigena 				= 	$parametros['indigena'.$item->sexo];
-					$beneficiarios[$key]->inmigrante 			=	$parametros['inmigrante'.$item->sexo];
-					$beneficiarios[$key]->otros 				= 	$parametros['otros'.$item->sexo];
 					$beneficiarios[$key]->muyAlta 				= 	$parametros['muyalta'.$item->sexo];
 					$beneficiarios[$key]->alta 					= 	$parametros['alta'.$item->sexo];
 					$beneficiarios[$key]->media 				= 	$parametros['media'.$item->sexo];
@@ -1114,8 +1110,6 @@ class ProyectosController extends BaseController {
 					$beneficiarioF->rural 				= $parametros['ruralf'];
 					$beneficiarioF->mestiza 			= $parametros['mestizaf'];
 					$beneficiarioF->indigena 			= $parametros['indigenaf'];
-					$beneficiarioF->inmigrante 			= $parametros['inmigrantef'];
-					$beneficiarioF->otros 				= $parametros['otrosf'];
 					$beneficiarioF->muyAlta 			= $parametros['muyaltaf'];
 					$beneficiarioF->alta 				= $parametros['altaf'];
 					$beneficiarioF->media 				= $parametros['mediaf'];
@@ -1133,8 +1127,6 @@ class ProyectosController extends BaseController {
 					$beneficiarioM->rural 				= $parametros['ruralm'];
 					$beneficiarioM->mestiza 			= $parametros['mestizam'];
 					$beneficiarioM->indigena 			= $parametros['indigenam'];
-					$beneficiarioM->inmigrante 			= $parametros['inmigrantem'];
-					$beneficiarioM->otros 				= $parametros['otrosm'];
 					$beneficiarioM->muyAlta 			= $parametros['muyaltam'];
 					$beneficiarioM->alta 				= $parametros['altam'];
 					$beneficiarioM->media 				= $parametros['mediam'];
@@ -1388,6 +1380,7 @@ class ProyectosController extends BaseController {
 
 						$recurso->metasMes()->saveMany($metasMes);
 					}
+					$recurso->load('metasMes');
 					return array('data'=>$recurso);	
 					//return array('data'=>$componente,'componentes'=>$proyecto->componentes,'metas'=>$metasMes);
 				}else{

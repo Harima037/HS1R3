@@ -11,8 +11,8 @@ class ProyectoFinanciamiento extends BaseModel
 		return $this->belongsTo('FuenteFinanciamiento','idFuenteFinanciamiento');
 	}
 
-	public function destinoGasto(){
-		return $this->belongsTo('DestinoGasto','idDestinoGasto');
+	public function fondoFinanciamiento(){
+		return $this->belongsTo('FuenteFinanciamiento','idFondoFinanciamiento');
 	}
 
 	public function subFuentesFinanciamiento(){

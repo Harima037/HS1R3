@@ -62,7 +62,7 @@ class CuentaPublicaController extends \BaseController {
 				
 				if(isset($parametros['buscar'])){				
 					$rows = $rows->where(function($query)use($parametros){
-							$query->where(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%')
+							$query->where(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%')
 								->orWhere('nombreTecnico','like','%'.$parametros['buscar'].'%');
 					});
 					$total = $rows->count();

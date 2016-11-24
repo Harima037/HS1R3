@@ -37,6 +37,7 @@ context.init = function(resource,id_proyecto){
 		$(modal_fuente).modal('show');
 	});
 
+	/*
 	$('#fuente-financiamiento').on('change',function(){
         var habilitar_id = $(this).val();
 
@@ -50,6 +51,7 @@ context.init = function(resource,id_proyecto){
             $('#destino-gasto').trigger("chosen:updated");
         }
 	});
+	*/
 
 	$(modal_fuente).on('hide.bs.modal',function(e){
 		reset_modal_form(form_fuente);
@@ -157,9 +159,9 @@ context.editar_fuente = function(e){
 				MessageManager.show({data:comentario,container: modal_fuente + ' .modal-body',type:'ADV'});
 			}
 
-        	$('#fuente-financiamiento').val(response.data.idFuenteFinanciamiento);
-        	$('#fuente-financiamiento').chosen().change();
-        	$('#destino-gasto').val(response.data.idDestinoGasto);
+        	$('#fondo-financiamiento').val(response.data.idFondoFinanciamiento);
+        	$('#fondo-financiamiento').chosen().change();
+        	//$('#destino-gasto').val(response.data.idDestinoGasto);
         	$('#id-financiamiento').val(response.data.id);
 
         	for(var i in response.data.sub_fuentes_financiamiento){
@@ -192,7 +194,7 @@ function llenar_datagrid_fuentes(datos){
 			'id': datos[i].id,
 			'clave':datos[i].fuente_financiamiento.clave,
 			'fuenteFinanciamiento': datos[i].fuente_financiamiento.descripcion,
-			'destino': datos[i].destino_gasto.descripcion,
+			'fondo': datos[i].fondo_financiamiento.descripcion,
 			'subfuentes': lista_subfuentes
 		};
 		fuentes.push(fuente);

@@ -72,6 +72,9 @@
 			color: #FFFFFF;
 			background-color: #0070C0;
 		}
+		.tabla-datos{
+			width: 100%;
+		}
 		.tabla-datos td,
 		.tabla-datos th{
 			border: 1 solid #000000;
@@ -131,6 +134,8 @@
 		{{View::make('rendicion-cuentas.pdf.analisis-funcional',$datos)}}
 	@elseif($tipo_reporte == 'seg-metas')
 		{{View::make('rendicion-cuentas.pdf.seguimiento-metas-mes',$datos)}}
+	@elseif($tipo_reporte == 'seg-metas-trimestre')
+		{{View::make('rendicion-cuentas.pdf.seguimiento-metas-trimestre',$datos)}}
 	@elseif($tipo_reporte == 'seg-beneficiarios')
 		{{View::make('rendicion-cuentas.pdf.seguimiento-beneficiarios',$datos)}}
 	@elseif($tipo_reporte == 'plan-mejora')

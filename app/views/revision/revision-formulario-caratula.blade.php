@@ -92,7 +92,7 @@
                                     <kbd id="subsubfuncion" title="SubSubfunción">-</kbd>
                                     <kbd id="programa_sectorial" title="Programa Sectorial">-</kbd>
                                     <kbd id="programa_presupuestario" title="Programa Presupuestario">---</kbd>
-                                    <kbd id="programa_especial" title="Programa Especial">---</kbd>
+                                    <kbd id="origen_asignacion" title="Origen Asignación">--</kbd>
                                     <kbd id="actividad_institucional" title="Actividad Institucional">---</kbd>
                                     <kbd id="proyecto_estrategico" title="Proyecto Estratégico">-</kbd>
                                     <kbd id="no_proyecto_estrategico" title="Número de Proyecto Estratégico">000</kbd>
@@ -150,12 +150,12 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="form-group">
-                            <label class="control-label" for="lbl-programaespecial">Programa Especial</label>
+                            <label class="control-label" for="lbl-origenasignacion">Origen Asignación</label>
                             <div class="input-group">
-        			           	<span class="input-group-btn" onclick="escribirComentario('programaespecial','Programa Especial','lbl-programaespecial');">
+        			           	<span class="input-group-btn" onclick="escribirComentario('origenasignacion','Origen Asignación','lbl-origenasignacion');">
 			                       	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
             			       	</span>
-			                    <p id="lbl-programaespecial" class="form-control" style="height:auto"></p>
+			                    <p id="lbl-origenasignacion" class="form-control" style="height:auto"></p>
 							</div>
                         </div>
                     </div>

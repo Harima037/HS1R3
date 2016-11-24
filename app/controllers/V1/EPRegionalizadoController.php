@@ -182,7 +182,7 @@ class EPRegionalizadoController extends \BaseController {
 										ESCAPED BY '\"' 
 										LINES TERMINATED BY '\\n' 
 										IGNORE 1 LINES 
-										(`UR`,`FI`,`FU`,`SF`,`SSF`,`PS`,`PP`,`PE`,`AI`,`PT`,`MPIO`,`OG`,`STG`,`FF`,`SFF`,`DG`,`CP`,
+										(`UR`,`FI`,`FU`,`SF`,`SSF`,`PS`,`PP`,`OA`,`AI`,`PT`,`MPIO`,`OG`,`STG`,`FF`,`SFF`,`PF`,`CP`,
 										`DM`,`importe`) 
 										set idBitacoraCargaEPRegion='%s', mes='%s', ejercicio='%s'
 										", addslashes($csv), $idInsertado, $parametros['mes'],$parametros['ejercicio']);

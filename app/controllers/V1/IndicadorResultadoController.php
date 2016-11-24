@@ -62,7 +62,7 @@ class IndicadorResultadoController extends BaseController {
 					if($parametros['buscar']){
 						$rows = $rows->where(function($query)use($parametros){
 							$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
-								->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
+								->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
 						});
 					}
 				}
@@ -135,7 +135,7 @@ class IndicadorResultadoController extends BaseController {
 							'proyectos.id', 'proyectos.nombreTecnico', 'proyectos.idClasificacionProyecto',
 							'proyectos.unidadResponsable','proyectos.finalidad','proyectos.funcion',
 							'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
-							'proyectos.programaPresupuestario','proyectos.programaEspecial','estatusMes.idEstatus',
+							'proyectos.programaPresupuestario','proyectos.origenAsignacion','estatusMes.idEstatus',
 							'proyectos.actividadInstitucional','proyectos.proyectoEstrategico','estatusMes.id AS idAvanceMes',
 							'proyectos.numeroProyectoEstrategico',DB::raw('concat_ws(".- ",subFuncionGasto.clave,subFuncionGasto.descripcion) AS subFuncionDescripcion'),'estatusMes.indicadorResultadoBeneficiarios'
 						)
@@ -161,7 +161,7 @@ class IndicadorResultadoController extends BaseController {
 			$data = array("data"=>$recurso);
 		}catch(\Exception $ex){
 			$http_status = 500;
-			$data = array('data'=>'Error al tratar de obtener los datos del recurso','code'=>'U01');
+			$data = array('data'=>'Error al tratar de obtener los datos del recurso','code'=>'U01','line'=>$ex->getLine(),'message'=>$ex->getMessage());
 		}
 		return Response::json($data,$http_status);
 	}

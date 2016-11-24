@@ -45,7 +45,6 @@
                         <th class="text-center" style="width:60px;">Trim 2</th>
                         <th class="text-center" style="width:60px;">Trim 3</th>
                         <th class="text-center" style="width:60px;">Trim 4</th>
-                        <th class="text-center" style="width:60px;">Cierre</th>
                         <th style="width:110px;">Metas</th>
                         <th style="width:110px;">Avance</th>
                     </tr>
@@ -149,7 +148,7 @@
                         </div>
                         <div class="col-sm-2">
                             <div class="form-group">
-                                <label class="control-label">Avance <span id="label-mes-avance"></span></label>
+                                <label class="control-label">Avance</label>
                                 <div id="estatus-avance"></div>
                             </div>
                         </div>

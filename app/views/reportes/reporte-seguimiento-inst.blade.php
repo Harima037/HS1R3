@@ -142,6 +142,14 @@
                                 @endforeach
                             </tr>
                             <tr>
+                                <td>Seguimiento de Metas Trimestral</td>
+                                @foreach($meses as $mes)
+                                <td class="text-center reporte-boton {{(($mes['clave']%3 != 0))?'text-muted':''}}" id="rep_metas_trim_{{$mes['clave']}}">
+                                    <span class="fa fa-times"></span>
+                                </td>
+                                @endforeach
+                            </tr>
+                            <tr>
                                 <td>Seguimiento de Beneficiarios</td>
                                 @foreach($meses as $mes)
                                 <td class="text-center reporte-boton {{(($mes['clave']%3 != 0))?'text-muted':''}}" id="rep_benef_{{$mes['clave']}}">

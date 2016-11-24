@@ -135,8 +135,6 @@ context.mostrar_datos = function(datos){
         $('#rural'+sexo).val(beneficiarios[sexo].rural || 0);
         $('#mestiza'+sexo).val(beneficiarios[sexo].mestiza || 0);
         $('#indigena'+sexo).val(beneficiarios[sexo].indigena || 0);
-        $('#inmigrante'+sexo).val(beneficiarios[sexo].inmigrante || 0);
-        $('#otros'+sexo).val(beneficiarios[sexo].otros || 0);
         $('#muyalta'+sexo).val(beneficiarios[sexo].muyAlta || 0);
         $('#alta'+sexo).val(beneficiarios[sexo].alta || 0);
         $('#media'+sexo).val(beneficiarios[sexo].media || 0);
@@ -236,7 +234,7 @@ function llenar_datagrid_beneficiarios(datos){
 
 
 	if(beneficiarios_grid.length == 0){
-		$('#datagridBeneficiarios > table > tbody').html('<tr><td></td><td colspan="4" style="text-align:left"><i class="fa fa-info-circle"></i> No se encontraron datos guardados</td></tr>');
+		$('#datagridBeneficiarios > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No se encontraron datos guardados</td></tr>');
 	}else{
 		beneficiariosDatagrid.cargarDatos(beneficiarios_grid);
 	}

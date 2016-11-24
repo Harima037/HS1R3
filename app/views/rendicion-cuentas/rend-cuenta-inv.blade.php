@@ -217,6 +217,11 @@
                                 </li>
                                 @if(($mes_actual % 3) == 0)
                                 <li>
+                                    <a href="#" id="btn-reporte-trimestral">
+                                        <span class="fa fa-file-pdf-o"></span> Seguimiento de Metas Trimestral
+                                    </a>
+                                </li>
+                                <li>
                                     <a href="#" id="btn-reporte-beneficiarios">
                                         <span class="fa fa-file-pdf-o"></span> Seguimiento de Beneficiarios
                                     </a>

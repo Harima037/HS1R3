@@ -93,6 +93,7 @@ class ReporteEvaluacionController extends BaseController {
 		$nombreArchivo = ($recurso['idClasificacionProyecto']== 2) ? 'Rendición de Cuentas Inversión' : 'Rendición de Cuentas Institucional';
 		$nombreArchivo.=' - '.$recurso['ClavePresupuestaria'];
 
+		$mes_actual = intval($mes_actual);
 		$data['mes_actual'] = $mes_actual;
 		$data['meses'] = array(
 			1 => array('mes'=>'Enero',			'abrev'=>'ENE',	'trimestre'=>1, 'trimestre_letras'=>'PRIMER'),
@@ -113,6 +114,7 @@ class ReporteEvaluacionController extends BaseController {
 		$data['beneficiarios'] = array();
 		$data['beneficiarios_avances'] = array();
 		$data['avances_mes'] = array('componentes'=>array(),'actividades'=>array());
+		$data['avances_trimestre'] = array('componentes'=>array(),'actividades'=>array());
 		$data['jurisdicciones_mes'] = array('componentes'=>array(),'actividades'=>array());
 		$data['localidades_mes'] = array('componentes'=>array(),'actividades'=>array(),'localidades'=>array());
 		$data['conteo_elementos'] = 0;
@@ -139,6 +141,13 @@ class ReporteEvaluacionController extends BaseController {
 					'justificacion_acumulada' => '',
 					'plan_mejora' => 0
 				);
+				$data['avances_trimestre']['componentes'][$componente['id']] = array(
+					'meta_programada' => 0.0,
+					'avance_mes' => 0.0,
+					'avance_acumulado' => 0.0,
+					'analisis_resultados' => '',
+					'justificacion_acumulada' => ''
+				);
 			}
 			foreach ($componente['registro_avance'] as $avance){
 				if(isset($componente['registro_avance'])){
@@ -150,6 +159,13 @@ class ReporteEvaluacionController extends BaseController {
 					$data['avances_mes']['componentes'][$componente['id']]['analisis_resultados'] 		= $avance['analisisResultados'];
 					$data['avances_mes']['componentes'][$componente['id']]['justificacion_acumulada'] 	= $avance['justificacionAcumulada'];
 					$data['avances_mes']['componentes'][$componente['id']]['plan_mejora'] 				= $avance['planMejora'];
+
+					$data['avances_trimestre']['componentes'][$componente['id']]['avance_mes'] 				= $avance['avanceMes'];
+					$data['avances_trimestre']['componentes'][$componente['id']]['analisis_resultados'] 		= $avance['analisisResultadosTrimestral'];
+					$data['avances_trimestre']['componentes'][$componente['id']]['justificacion_acumulada'] 	= $avance['justificacionTrimestral'];
+				}
+				if($data['meses'][$mes_actual]['trimestre'] == ceil($avance['mes'] / 3)){
+					$data['avances_trimestre']['componentes'][$componente['id']]['avance_acumulado'] += $avance['avanceMes'];
 				}
 			}
 			$data['avances_mes']['componentes'][$componente['id']]['avance_acumulado'] = $total_avance_acumulado;
@@ -177,6 +193,10 @@ class ReporteEvaluacionController extends BaseController {
 				}
 
 				$meta_mes_programada += $meta_mes['meta'];
+
+				if($data['meses'][$mes_actual]['trimestre'] == ceil($meta_mes['mes'] / 3)){
+					$data['avances_trimestre']['componentes'][$componente['id']]['meta_programada'] += $meta_mes['meta'];
+				}
 
 				$metas_programada[$meta_mes['claveJurisdiccion']] += $meta_mes['meta'];
 				$avance_acumulado[$meta_mes['claveJurisdiccion']] += $meta_mes['avance'];
@@ -230,6 +250,13 @@ class ReporteEvaluacionController extends BaseController {
 						'justificacion_acumulada' => '',
 						'plan_mejora' => 0
 					);
+					$data['avances_trimestre']['actividades'][$actividad['id']] = array(
+						'meta_programada' => 0.0,
+						'avance_mes' => 0.0,
+						'avance_acumulado' => 0.0,
+						'analisis_resultados' => '',
+						'justificacion_acumulada' => ''
+					);
 				}
 				foreach ($actividad['registro_avance'] as $avance){
 					$total_avance_acumulado += $avance['avanceMes'];
@@ -238,6 +265,13 @@ class ReporteEvaluacionController extends BaseController {
 						$data['avances_mes']['actividades'][$actividad['id']]['analisis_resultados'] 		= $avance['analisisResultados'];
 						$data['avances_mes']['actividades'][$actividad['id']]['justificacion_acumulada'] 	= $avance['justificacionAcumulada'];
 						$data['avances_mes']['actividades'][$actividad['id']]['plan_mejora'] 				= $avance['planMejora'];
+
+						$data['avances_trimestre']['actividades'][$actividad['id']]['avance_mes'] 				= $avance['avanceMes'];
+						$data['avances_trimestre']['actividades'][$actividad['id']]['analisis_resultados'] 		= $avance['analisisResultadosTrimestral'];
+						$data['avances_trimestre']['actividades'][$actividad['id']]['justificacion_acumulada'] 	= $avance['justificacionTrimestral'];
+					}
+					if($data['meses'][$mes_actual]['trimestre'] == ceil($avance['mes'] / 3)){
+						$data['avances_trimestre']['actividades'][$actividad['id']]['avance_acumulado'] += $avance['avanceMes'];
 					}
 				}
 				$data['avances_mes']['actividades'][$actividad['id']]['avance_acumulado'] = $total_avance_acumulado;
@@ -265,6 +299,10 @@ class ReporteEvaluacionController extends BaseController {
 					}
 
 					$meta_mes_programada += $meta_mes['meta'];
+
+					if($data['meses'][$mes_actual]['trimestre'] == ceil($meta_mes['mes'] / 3)){
+						$data['avances_trimestre']['actividades'][$actividad['id']]['meta_programada'] += $meta_mes['meta'];
+					}
 
 					$metas_programada[$meta_mes['claveJurisdiccion']] += $meta_mes['meta'];
 					$avance_acumulado[$meta_mes['claveJurisdiccion']] += $meta_mes['avance'];
@@ -328,12 +366,12 @@ class ReporteEvaluacionController extends BaseController {
 						$data['beneficiarios_avances'][$avance['idTipoBeneficiario']] = array(
 							'f' => array(
 								'total' => 0,'urbana' => 0,'rural' => 0,'mestiza' => 0,'indigena' => 0,
-								'inmigrante' => 0,'otros' => 0,'muyAlta' => 0,'alta' => 0,'media' => 0,
+								'muyAlta' => 0,'alta' => 0,'media' => 0,
 								'baja' => 0,'muyBaja' => 0,'acumulado' => 0
 							), 
 							'm' => array(
 								'total' => 0,'urbana' => 0,'rural' => 0,'mestiza' => 0,'indigena' => 0,
-								'inmigrante' => 0,'otros' => 0,'muyAlta' => 0,'alta' => 0,'media' => 0,
+								'muyAlta' => 0,'alta' => 0,'media' => 0,
 								'baja' => 0,'muyBaja' => 0,'acumulado' => 0
 							)
 						);
@@ -352,8 +390,6 @@ class ReporteEvaluacionController extends BaseController {
 						'rural' => $avance['rural'],
 						'mestiza' => $avance['mestiza'],
 						'indigena' => $avance['indigena'],
-						'inmigrante' => $avance['inmigrante'],
-						'otros' => $avance['otros'],
 						'muyAlta' => $avance['muyAlta'],
 						'alta' => $avance['alta'],
 						'media' => $avance['media'],
@@ -371,7 +407,7 @@ class ReporteEvaluacionController extends BaseController {
 		$mes_actual = $data['mes_actual'];
 		$i = $mes_actual;
 		
-		$datos['mes'] = $data['meses'][$mes_actual];
+		$datos['mes'] = $data['meses'][intval($mes_actual)];
 		$datos['proyecto'] = array(
 			'ejercicio' => $recurso['ejercicio'],
 			'nombreTecnico' => $recurso['nombreTecnico'],
@@ -390,11 +426,23 @@ class ReporteEvaluacionController extends BaseController {
 		}else{
 			$datos['avances_mes']['componentes'] = array();
 		}
+
+		if(isset($data['avances_trimestre']['componentes'])){
+			$datos['avances_trimestre']['componentes'] = $data['avances_trimestre']['componentes'];
+		}else{
+			$datos['avances_trimestre']['componentes'] = array();
+		}
 		
 		if(isset($data['avances_mes']['actividades'])){
 			$datos['avances_mes']['actividades'] = $data['avances_mes']['actividades'];
 		}else{
 			$datos['avances_mes']['actividades'] = array();
+		}
+
+		if(isset($data['avances_trimestre']['actividades'])){
+			$datos['avances_trimestre']['actividades'] = $data['avances_trimestre']['actividades'];
+		}else{
+			$datos['avances_trimestre']['actividades'] = array();
 		}
 		
 		$datos['jurisdicciones_mes']['componentes'] = $data['jurisdicciones_mes']['componentes'];
@@ -424,7 +472,7 @@ class ReporteEvaluacionController extends BaseController {
 
 		   	$datos['fuentes_financiamiento'] = $recurso['fuentes_financiamiento'];
 
-		   	$datos['mes'] = $data['meses'][$i];
+		   	$datos['mes'] = $data['meses'][intval($i)];
 		   	$datos['analisis_funcional'] = $recurso['analisis_funcional'][0];
 
 		    $datos['planes_mejora'] = $data['planes_mejora'];

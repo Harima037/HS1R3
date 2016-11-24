@@ -69,9 +69,24 @@ class VisorController extends BaseController {
 	}
 
 	public function indexDesempenioGeneral(){
+		$datos['usuario'] = Sentry::getUser();
+		if(!$datos['usuario']->claveJurisdiccion){
+			$datos['sys_sistemas'] = SysGrupoModulo::all();
+			return Response::view('errors.403', array(
+				'usuario'=>$datos['usuario'],
+				'sys_activo'=>null,
+				'sys_sistemas'=>$datos['sys_sistemas'],
+				'sys_mod_activo'=>null), 403
+			);
+		}
 		$datos_captura = $this->obtenerDatosCaptura();
 		$anio_captura = '[ ' . Util::obtenerDescripcionMes($datos_captura['mes']) . ' del ' . $datos_captura['anio'] . ']';
-		return parent::loadIndex('VISORGEN','VIDESEMGEN',array('anio_captura' => $anio_captura));
+		$catalogos = array( 
+			'jurisdiccion' => Jurisdiccion::where('clave','=',$datos['usuario']->claveJurisdiccion)->first(),
+			'unidades_responsables' => UnidadResponsable::all()->lists('descripcion','clave'),
+			'anio_captura' => $anio_captura
+		);
+		return parent::loadIndex('VISORGEN','VIDESEMGEN',$catalogos);
 	}
 
 	public function indexPresupuesto(){

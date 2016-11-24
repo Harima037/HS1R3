@@ -467,8 +467,14 @@ context.mostrar_datos_presupuesto = function(datos){
     $('.presupuesto-mes').first().change();
     $('.meta-mes').first().change();
 
-    if(comentarios.desgloses[desglose.id]){
-        mostrar_comentario(comentarios.desgloses[desglose.id]);
+    if(datos.idComponente){
+        if(comentarios.desgloses.componentes[desglose.id]){
+            mostrar_comentario(comentarios.desgloses.componentes[desglose.id]);
+        }
+    }else if(datos.idActividad){
+        if(comentarios.desgloses.actividades[desglose.id]){
+            mostrar_comentario(comentarios.desgloses.actividades[desglose.id]);
+        }
     }
 
     $(modal_presupuesto).modal('show');
@@ -839,6 +845,7 @@ function llenar_datagrid_distribucion(id_accion,total_presupuesto,nivel){
                 var total_porcentaje = 0;
                 var total_desglose = parseFloat(response.total_presupuesto) || 0;
                 var datos = response.data;
+                
                 for(var indx in datos){
                     var presupuesto = {};
 
@@ -856,10 +863,16 @@ function llenar_datagrid_distribucion(id_accion,total_presupuesto,nivel){
                     
                     presupuesto.monto = '$ <span class="pull-right">' + parseFloat(datos[indx].presupuesto || 0).format(2) + '</span>';
 
-                    if(comentarios.desgloses[presupuesto.id]){
-                        presupuesto.localidad = '<span class="text-warning fa fa-warning"></span> ' + presupuesto.localidad;
+                    if(datos[indx].idComponente){
+                        if(comentarios.desgloses.componentes[presupuesto.id]){
+                            presupuesto.localidad = '<span class="text-warning fa fa-warning"></span> ' + presupuesto.localidad;
+                        }
+                    }else if(datos[indx].idActividad){
+                        if(comentarios.desgloses.actividades[presupuesto.id]){
+                            presupuesto.localidad = '<span class="text-warning fa fa-warning"></span> ' + presupuesto.localidad;
+                        }
                     }
-
+                    
                     distribucion.push(presupuesto);
                 }
 

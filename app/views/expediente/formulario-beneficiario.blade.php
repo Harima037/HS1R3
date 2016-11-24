@@ -123,8 +123,7 @@
 									<th></th>
 									<th>Mestiza</th>
 									<th>Indigena</th>
-									<th>Inmigrante</th>
-									<th>Otros</th>
+									<th><span class="fa fa-link"></span> Total</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -142,12 +141,7 @@
 									</td>
 									<td>
 										<div class="form-group">
-											<input type="number" class="form-control sub-total-poblacion fem" name="inmigrantef" id="inmigrantef">
-										</div>
-									</td>
-									<td>
-										<div class="form-group">
-											<input type="number" class="form-control sub-total-poblacion fem" name="otrosf" id="otrosf">
+											<span id="total-poblacion-f" class=""></span>
 										</div>
 									</td>
 								</tr>
@@ -164,34 +158,12 @@
 					                    </div>
 					                </td>
 					                <td>
-					                    <div class="form-group">
-											<input type="number" class="form-control sub-total-poblacion masc" name="inmigrantem" id="inmigrantem">
-					                    </div>
-					                </td>	           
-					                <td>
-					                    <div class="form-group">
-											<input type="number" class="form-control sub-total-poblacion masc" name="otrosm" id="otrosm">
-					                    </div>
+					                	<div class="form-group">
+											<span id="total-poblacion-m" class=""></span>
+										</div>
 					                </td>
 					            </tr>
 							</tbody>
-				            <tfoot>
-				            	<tr>
-					                <th colspan="3">
-					                	<span class="fa fa-link"></span> Total
-					                </th>
-					                <td>
-					                	<div class="form-group">
-											<span class="fa fa-female"></span> <span id="total-poblacion-f" class=""></span>
-										</div>
-					                </td>
-					                <td>
-					                	<div class="form-group">
-											<span class="fa fa-male"></span> <span id="total-poblacion-m" class=""></span>
-										</div>
-					                </td>
-					            </tr>
-				            </tfoot>
 				        </table>
 					</div>
 

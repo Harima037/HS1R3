@@ -19,9 +19,9 @@ namespace V1;
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, View, PDF, Exception;
-use Excel, EvaluacionAnalisisFuncional, SysConfiguracionVariable, Proyecto, Jurisdiccion, UnidadResponsable,CargaDatosEP01, EvaluacionProyectoObservacion;
+use Excel, EvaluacionAnalisisFuncional, SysConfiguracionVariable, Proyecto, Jurisdiccion, UnidadResponsable,CargaDatosEP01, EvaluacionProyectoObservacion, ProyectoEvaluacion;
 
-class EvaluacionProyectosController extends BaseController {
+class ReporteProyectosEvaluacionController extends BaseController {
 
 	/**
 	 * Display a listing of the resource.
@@ -46,15 +46,15 @@ class EvaluacionProyectosController extends BaseController {
 			}
 
 			if(isset($parametros['formatogrid'])){
-				$rows = Proyecto::reporteEvaluacionProyectos($ejercicio,$mes)
+				$rows = Proyecto::reporteProyectosEvaluacion($ejercicio,$mes)
 						->where('idEstatusProyecto',5)
 						->with([
-							'analisisFuncional' => function($analisisFuncional) use ($mes){
-								$analisisFuncional->where('mes',$mes);
-							},
 							'evaluacionMes' => function($evaluacionMes) use ($ejercicio,$mes){
 								$evaluacionMes->where('mes','=',$mes)->where('anio','=',$ejercicio)->where('idEstatus','>',3);
-							}
+							},
+							'proyectoEvaluacion' => function($evaluacionProyecto) use ($mes){
+								$evaluacionProyecto->where('mes','=',$mes);
+							},
 						]);
 
 				$usuario = Sentry::getUser();
@@ -124,17 +124,23 @@ class EvaluacionProyectosController extends BaseController {
 		}
 		
 		$recurso = Proyecto::with([
-			'analisisFuncional' => function($analisisFuncional) use ($mes){
-				$analisisFuncional->where('mes',$mes);
-			},
 			'componentes.metasMes' => function($componentesMetasMes) use ($mes){
 				$componentesMetasMes->where('mes','<=',$mes);
+			},
+			'componentes.registroAvance' => function($comopnenteRegistroAvance) use ($mes){
+				$comopnenteRegistroAvance->where('mes','=',$mes);
 			},
 			'componentes.actividades.metasMes' => function($actividadesMetasMes) use ($mes){
 				$actividadesMetasMes->where('mes','<=',$mes);
 			},
-			'evaluacionProyectoObservacion' => function($evaluacionProyecto) use ($mes){
+			'componentes.actividades.registroAvance' => function($actividadRegistroAvance) use ($mes){
+				$actividadRegistroAvance->where('mes','=',$mes);
+			},
+			'proyectoEvaluacion' => function($evaluacionProyecto) use ($mes){
 				$evaluacionProyecto->where('mes','=',$mes);
+			},
+			'evaluacionMes' => function($evaluacionMes) use ($mes){
+				$evaluacionMes->where('mes','=',$mes)->where('idEstatus','>',3);
 			}
 		])
 		->leftjoin('cargaDatosEP01 AS ep01',function($join) use ($mes,$ejercicio){
@@ -176,12 +182,13 @@ class EvaluacionProyectosController extends BaseController {
 			if(isset($parametros['id-proyecto'])){
 				$proyecto = Proyecto::find($parametros['id-proyecto']);
 				if($proyecto){
-					if(isset($parametros['observaciones'])){
-						$recurso = new EvaluacionProyectoObservacion;
+					if(isset($parametros['justificaciones'])){
+						$recurso = new ProyectoEvaluacion;
+						$recurso->justificaciones = $parametros['justificaciones'];
 						$recurso->observaciones = $parametros['observaciones'];
 						$recurso->mes = $parametros['mes'];
 
-						if($proyecto->evaluacionProyectoObservacion()->save($recurso)){
+						if($proyecto->proyectoEvaluacion()->save($recurso)){
 							$respuesta['data'] = array('data'=>$recurso);
 						}else{
 							$respuesta['http_status'] = 500;
@@ -211,9 +218,10 @@ class EvaluacionProyectosController extends BaseController {
 			$parametros = Input::all();
 			
 			//var_dump($parametros);die;
-			$recurso = EvaluacionProyectoObservacion::find($id);
+			$recurso = ProyectoEvaluacion::find($id);
 
 			if($recurso){
+				$recurso->justificaciones = $parametros['justificaciones'];
 				$recurso->observaciones = $parametros['observaciones'];
 
 				if($recurso->save()){

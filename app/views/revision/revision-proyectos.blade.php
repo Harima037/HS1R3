@@ -221,8 +221,8 @@
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <!--label class="control-label"></label-->
-                                                            <span class="label label-default"><b>Programa Especial</b></span>
-                                                            <p id="lbl_programa_especial"></p>
+                                                            <span class="label label-default"><b>Origen Asignación</b></span>
+                                                            <p id="lbl_origen_asignacion"></p>
                                                         </div>
                                                         <div class="col-sm-5">
                                                             <!--label class="control-label"></label-->

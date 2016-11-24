@@ -156,7 +156,7 @@ class InversionController extends ProyectosController {
 					$total = $rows->count();						
 				}
 				
-				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),'fibap.presupuestoRequerido',
+				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),'fibap.presupuestoRequerido',
 					'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
 					'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
 									->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
@@ -264,7 +264,9 @@ class InversionController extends ProyectosController {
 				}elseif($parametros['mostrar'] == 'editar-proyecto'){
 					$recurso = Proyecto::with('jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico',
 										'fibap.documentos','beneficiarios.tipoBeneficiario',
-										'fuentesFinanciamiento.destinoGasto','fuentesFinanciamiento.fuenteFinanciamiento','fuentesFinanciamiento.subFuentesFinanciamiento')
+										'fuentesFinanciamiento.fondoFinanciamiento',
+										'fuentesFinanciamiento.fuenteFinanciamiento',
+										'fuentesFinanciamiento.subFuentesFinanciamiento')
 										->find($id);
 					if($recurso->idEstatusProyecto == 3){
 						$recurso->load('comentarios');

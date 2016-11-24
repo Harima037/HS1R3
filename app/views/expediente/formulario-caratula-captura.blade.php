@@ -113,7 +113,8 @@
                                     <kbd id="subsubfuncion" title="SubSubfunción">-</kbd>
                                     <kbd id="programa_sectorial" title="Programa Sectorial">-</kbd>
                                     <kbd id="programa_presupuestario" title="Programa Presupuestario">---</kbd>
-                                    <kbd id="programa_especial" title="Programa Especial">---</kbd>
+                                    <kbd id="origen_asignacion" title="Origen Asignación">--</kbd>
+                                    <!--kbd id="programa_especial" title="Programa Especial"></kbd-->
                                     <kbd id="actividad_institucional" title="Actividad Institucional">---</kbd>
                                     <kbd id="proyecto_estrategico" title="Proyecto Estratégico">-</kbd>
                                     <kbd id="no_proyecto_estrategico" title="Número de Proyecto Estratégico">000</kbd>
@@ -184,10 +185,20 @@
                     </div>
                     <div class="col-sm-6">
                         <div class="form-group">
+                            <label class="control-label" for="origenasignacion">Origen de Asignación</label>
+                            <select class="form-control" id="origenasignacion" name="origenasignacion">
+                                <option value="">Selecciona un origen</option>
+                                <option value="01">01 Asignación Normal</option>
+                                <option value="02">02 Asignación por Concurrencia</option>
+                            </select>
+                        </div>
+                    </div>
+                    <!--div class="col-sm-6">
+                        <div class="form-group">
                             <label class="control-label" for="programaespecial">Programa Especial</label>
                             {{Form::select('programaespecial',array('' =>'Selecciona un programa especial') + $programas_especiales->lists('descripcion','clave'),'',array('class'=>'form-control chosen-one','id'=>'programaespecial'))}}
                         </div>
-                    </div>
+                    </div-->
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label class="control-label" for="actividadinstitucional">Actividades Institucionales</label>

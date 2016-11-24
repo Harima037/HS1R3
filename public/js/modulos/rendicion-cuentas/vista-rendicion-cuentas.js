@@ -72,15 +72,17 @@ $('#btn-guardar-avance').on('click',function(){
         if($(this).attr('data-meta-programada')){
             if($(this).val() == ''){
                 campos_faltantes++;
+                //MessageManager.show({data:'.',container:'#modalEditarAvance .modal-body',type:'ADV'});
                 Validation.printFieldsErrors($(this).attr('id'),'Este campo es requerido');
             }else if(parseFloat($(this).val()) < 0){
                 campos_faltantes++;
+                //MessageManager.show({data:'.',container:'#modalEditarAvance .modal-body',type:'ADV'});
                 Validation.printFieldsErrors($(this).attr('id'),'El valor no puede ser negativo');
             }
         }
     });
     if(campos_faltantes){
-        //MessageManager.show({data:'Faltan metas por capturar.',container:'#modalEditarAvance .modal-body',type:'ADV'});
+        MessageManager.show({data:'Faltan metas por capturar.',container:'#modalEditarAvance .modal-body',type:'ADV'});
         $('#tabs-seguimiento-metas a:first').tab('show');
         return;
     }
@@ -1084,6 +1086,7 @@ if((parseInt($('#mes').val()) % 3) == 0){
                 var suma = 0;
                 for(var i in response.data.beneficiario){
                     var beneficiario = response.data.beneficiario[i];
+                    beneficiario.total = (parseInt(beneficiario.total) || 0);
                     $('#total-'+beneficiario.sexo).text(beneficiario.total.format());
                     $('#total-'+beneficiario.sexo).attr('data-valor',beneficiario.total)
                     suma += beneficiario.total;
@@ -1108,9 +1111,9 @@ if((parseInt($('#mes').val()) % 3) == 0){
                         $('#muybaja'+avance.sexo).val(avance.muyBaja);
 
                         $('#indigena'+avance.sexo).val(avance.indigena);
-                        $('#inmigrante'+avance.sexo).val(avance.inmigrante);
+                        //$('#inmigrante'+avance.sexo).val(avance.inmigrante);
                         $('#mestiza'+avance.sexo).val(avance.mestiza);
-                        $('#otros'+avance.sexo).val(avance.otros);
+                        //$('#otros'+avance.sexo).val(avance.otros);
 
                         $('#rural'+avance.sexo).val(avance.rural);
                         $('#urbana'+avance.sexo).val(avance.urbana);
@@ -1124,10 +1127,10 @@ if((parseInt($('#mes').val()) % 3) == 0){
                 }
 
                 $('#muybajaf').change();
-                $('#otrosf').change();
+                $('#mestizaf').change();
                 $('#urbanaf').change();
                 $('#muybajam').change();
-                $('#otrosm').change();
+                $('#mestizam').change();
                 $('#urbanam').change();
 
                 var suma_acumulados = 0;
@@ -1299,6 +1302,13 @@ if((parseInt($('#mes').val()) % 3) == 0){
                     'total': 0,
                     'total-avance':0
                 };
+            }else{
+                datos_grid[beneficiario.idTipoBeneficiario]['f'] = (parseInt(datos_grid[beneficiario.idTipoBeneficiario]['f']) || 0);
+                datos_grid[beneficiario.idTipoBeneficiario]['f-avance'] = (parseInt(datos_grid[beneficiario.idTipoBeneficiario]['f-avance']) || 0);
+                datos_grid[beneficiario.idTipoBeneficiario]['m'] = (parseInt(datos_grid[beneficiario.idTipoBeneficiario]['m']) || 0);
+                datos_grid[beneficiario.idTipoBeneficiario]['m-avance'] = (parseInt(datos_grid[beneficiario.idTipoBeneficiario]['m-avance']) || 0);
+                datos_grid[beneficiario.idTipoBeneficiario]['total'] = (parseInt(datos_grid[beneficiario.idTipoBeneficiario]['total']) || 0);
+                datos_grid[beneficiario.idTipoBeneficiario]['total-avance'] = (parseInt(datos_grid[beneficiario.idTipoBeneficiario]['total-avance']) || 0);
             }
 
             if(beneficiario.registro_avance.length){
@@ -1311,8 +1321,8 @@ if((parseInt($('#mes').val()) % 3) == 0){
                 datos_grid[beneficiario.idTipoBeneficiario]['tipoBeneficiario'] = '<span class="fa fa-warning"></span> '+beneficiario.tipo_beneficiario.descripcion;
             }
 
-            datos_grid[beneficiario.idTipoBeneficiario][beneficiario.sexo] += beneficiario.total;
-            datos_grid[beneficiario.idTipoBeneficiario]['total'] += beneficiario.total;
+            datos_grid[beneficiario.idTipoBeneficiario][beneficiario.sexo] += parseInt(beneficiario.total) || 0;
+            datos_grid[beneficiario.idTipoBeneficiario]['total'] += parseInt(beneficiario.total) || 0;
         }
         var datos = [];
 

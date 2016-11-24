@@ -124,7 +124,7 @@ class ReporteEP20Controller extends BaseController {
 				$datos = array('datos'=>$rows);
 				$a_date = $ejercicio."-".$mes."-1";
 				$fecha = date("t", strtotime($a_date));
-				$datos['fecha_trimestre'] = $fecha.' de '.Util::obtenerDescripcionMes($mes).' del 2015';
+				$datos['fecha_trimestre'] = $fecha.' de '.Util::obtenerDescripcionMes($mes).' del '.Util::obtenerAnioCaptura();
 				$datos['firmas'] = array();
 				$titulares = Directorio::titularesActivos(array('00','01'))->get();
 
@@ -140,35 +140,42 @@ class ReporteEP20Controller extends BaseController {
 					$excel->sheet('EP 20', function($sheet) use ( $datos ){
 						$sheet->loadView('reportes.excel.estado-programatico-funcional',$datos);
 
-						$sheet->mergeCells('A1:J1');
-						$sheet->mergeCells('A2:J2');
-						$sheet->mergeCells('A3:J3');
-						$sheet->mergeCells('A4:J4');
-						$sheet->mergeCells('A5:J5');
+						$sheet->mergeCells('A1:I1');
+						$sheet->mergeCells('A2:I2');
+						$sheet->mergeCells('A3:I3');
+						$sheet->mergeCells('A4:I4');
+						$sheet->mergeCells('A5:I5');
+
+						$sheet->getStyle('A6:I6')->applyFromArray(array(
+						    'borders' => array(
+						    	'bottom' => array(
+						    		'style' => \PHPExcel_Style_Border::BORDER_THICK,'color' => array('argb' => 'FF6600')
+						    	)
+						    )
+						));
 
 						$sheet->mergeCells('A8:A10');
 						$sheet->mergeCells('B8:D8');
 						$sheet->mergeCells('B9:B10');
 						$sheet->mergeCells('C9:C10');
 						$sheet->mergeCells('D9:D10');
-						$sheet->mergeCells('F8:J8');
+						$sheet->mergeCells('F8:I8');
 						$sheet->mergeCells('F9:F10');
 						$sheet->mergeCells('G9:G10');
 						$sheet->mergeCells('H9:H10');
 						$sheet->mergeCells('I9:I10');
-						$sheet->mergeCells('J9:J10');
 
-						$sheet->cells('A1:J10',function($cells) { $cells->setAlignment('center'); });
-						$sheet->getStyle('A1:J10')->getAlignment()->setWrapText(true);
-						$sheet->getStyle('A8:J10')->applyFromArray(array(
+						$sheet->cells('A1:I10',function($cells) { $cells->setAlignment('center'); });
+						$sheet->getStyle('A1:I10')->getAlignment()->setWrapText(true);
+						$sheet->getStyle('A8:I10')->applyFromArray(array(
 						    'fill' => array(
 						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-						        'color' => array('rgb' => '92D050')
+						        'color' => array('rgb' => '00B550')
 						    ),
 						    'font' => array(
-						        'size'      =>  8,
+						        'size'      =>  9,
 						        'bold'      =>  true,
-						        'color'		=> array('rgb'=>'000000')
+						        'color'		=> array('rgb'=>'FFFFFF')
 						    ),
 						    'borders' => array(
 						    	'allborders' => array(
@@ -178,8 +185,8 @@ class ReporteEP20Controller extends BaseController {
 						    )
 						));
 						$total = count($datos['datos']);
-						$sheet->getStyle('A12:J'.($total+11))->getAlignment()->setWrapText(true);
-						$sheet->setColumnFormat(array( 'B12:J'.($total+15) => '### ### ### ##0.00' ));
+						$sheet->getStyle('A12:I'.($total+11))->getAlignment()->setWrapText(true);
+						$sheet->setColumnFormat(array( 'B12:I'.($total+15) => '### ### ### ##0.00' ));
 
 						$sheet->getStyle('D'.($total+15))->applyFromArray(array(
 						    'borders' => array(
@@ -190,7 +197,7 @@ class ReporteEP20Controller extends BaseController {
 						    )
 						));
 
-						$sheet->getStyle('J'.($total+15))->applyFromArray(array(
+						$sheet->getStyle('I'.($total+15))->applyFromArray(array(
 						    'borders' => array(
 						    	'bottom' => array(
 						    		'style' => \PHPExcel_Style_Border::BORDER_DOUBLE,
@@ -199,7 +206,7 @@ class ReporteEP20Controller extends BaseController {
 						    )
 						));
 
-						$sheet->getStyle('A'.($total+16).':J'.($total+16).'')->applyFromArray(array(
+						$sheet->getStyle('A'.($total+16).':I'.($total+16).'')->applyFromArray(array(
 						    'borders' => array(
 						    	'bottom' => array(
 						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
@@ -218,7 +225,7 @@ class ReporteEP20Controller extends BaseController {
 						    )
 						));
 
-						$sheet->getStyle('G'.($linea_firmas-1).':I'.($linea_firmas-1).'')->applyFromArray(array(
+						$sheet->getStyle('F'.($linea_firmas-1).':H'.($linea_firmas-1).'')->applyFromArray(array(
 						    'borders' => array(
 						    	'bottom' => array(
 						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,'color' => array('argb' => '000000')
@@ -228,20 +235,20 @@ class ReporteEP20Controller extends BaseController {
 
 						$sheet->mergeCells('B'.$linea_firmas.':D'.$linea_firmas.'');
 						$sheet->mergeCells('B'.($linea_firmas+1).':D'.($linea_firmas+1).'');
-						$sheet->mergeCells('G'.$linea_firmas.':I'.$linea_firmas.'');
-						$sheet->mergeCells('G'.($linea_firmas+1).':I'.($linea_firmas+1).'');
-						$sheet->cells('A'.$linea_firmas.':J'.($linea_firmas+1),function($cells) { 
+						$sheet->mergeCells('F'.$linea_firmas.':H'.$linea_firmas.'');
+						$sheet->mergeCells('F'.($linea_firmas+1).':H'.($linea_firmas+1).'');
+						$sheet->cells('A'.$linea_firmas.':I'.($linea_firmas+1),function($cells) { 
 							$cells->setAlignment('center'); 
 						});
 
 						$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','A1');
 						$imagen->setWorksheet($sheet);
-						$imagen = $this->obtenerImagen('LogoInstitucional.png','J1',(-15));
+						$imagen = $this->obtenerImagen('LogoInstitucional.png','I1',(-15));
 						$imagen->setWorksheet($sheet);
 
 					});
 					$ultima_linea = $excel->getActiveSheet()->getHighestDataRow();
-					$excel->getActiveSheet()->getStyle('A1:J'.$ultima_linea)->applyFromArray(
+					$excel->getActiveSheet()->getStyle('A1:I'.$ultima_linea)->applyFromArray(
 						array( 'font' => array( 'name'=> 'Arial' ) )
 					);
 

@@ -295,7 +295,7 @@
 							</li>
 							<li role="presentation" class="disabled">
 								<a href="#panel-plan-mejora" aria-controls="panel-plan-mejora" role="tab" data-toggle="" id="tab-link-plan-mejora">
-									<span class="fa fa-file"></span> Plan de Mejora
+									<span class="fa fa-file"></span> Plan de Acción de Mejora
 								</a>
 							</li>
 							@endif
@@ -798,10 +798,8 @@
 				<table class="table table-striped table-condensed">
 					<thead>
 						<tr>
-							<th >Mestiza</th>
-							<th >Indígena</th>
-							<th >Inmigrante</th>
-							<th >Otros</th>
+							<th colspan="2">Mestiza</th>
+							<th colspan="2" >Indígena</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -815,6 +813,8 @@
 										<input type="number" class="form-control sub-total-poblacion fem" name="mestizaf" id="mestizaf">
 									</div>
 			                    </div>
+			                </td>
+			                <td>
 			                    <div class="form-group">
 			                    	<div class="input-group">
 										<span class="input-group-addon">
@@ -833,6 +833,8 @@
 										<input type="number" class="form-control sub-total-poblacion fem" name="indigenaf" id="indigenaf">
 									</div>
 			                    </div>
+			                </td>
+			                <td>
 			                    <div class="form-group">
 			                    	<div class="input-group">
 										<span class="input-group-addon">
@@ -843,40 +845,6 @@
 			                    </div>
 			                </td>
 			                <td>
-			                    <div class="form-group">
-			                    	<div class="input-group">
-										<span class="input-group-addon">
-											<span class="fa fa-female"></span>
-										</span>
-										<input type="number" class="form-control sub-total-poblacion fem" name="inmigrantef" id="inmigrantef">
-									</div>
-			                    </div>
-			                    <div class="form-group">
-			                    	<div class="input-group">
-										<span class="input-group-addon">
-											<span class="fa fa-male"></span>
-										</span>
-										<input type="number" class="form-control sub-total-poblacion masc" name="inmigrantem" id="inmigrantem">
-									</div>
-			                    </div>
-			                </td>	           
-			                <td>
-			                    <div class="form-group">
-			                    	<div class="input-group">
-										<span class="input-group-addon">
-											<span class="fa fa-female"></span>
-										</span>
-										<input type="number" class="form-control sub-total-poblacion fem" name="otrosf" id="otrosf">
-									</div>
-			                    </div>
-			                    <div class="form-group">
-			                    	<div class="input-group">
-										<span class="input-group-addon">
-											<span class="fa fa-male"></span>
-										</span>
-										<input type="number" class="form-control sub-total-poblacion masc" name="otrosm" id="otrosm">
-									</div>
-			                    </div>
 			                </td>
 			            </tr>
 					</tbody>

@@ -29,18 +29,18 @@
 <table class="tabla-datos">
 <thead>
 	<tr>
-		<th height="20" width="60" rowspan="2" class="encabezado-tabla" style="font-size:6;">NIVEL</th>
-		<th height="20" width="79" rowspan="2" class="encabezado-tabla" style="font-size:6;">INDICADOR</th>
-		<th height="20" width="50" rowspan="2" class="encabezado-tabla" style="font-size:6;">% DE AVANCE ACUMULADO</th>
-		<th height="20" width="79" rowspan="2" class="encabezado-tabla" style="font-size:6;">ANÁLISIS DE RESULTADOS </th>
-		<th height="20" width="79" rowspan="2" class="encabezado-tabla" style="font-size:6;">JUSTIFICACIÓN</th>
-		<th height="20" width="40" colspan="2" class="encabezado-tabla" style="font-size:6;">¿REQUIERE ACCIÓN DE MEJORA?</th>
-		<th height="20" rowspan="2" class="encabezado-tabla" style="font-size:6;">ACCIÓN <br>DE MEJORA</th>
-		<th height="20" rowspan="2" class="encabezado-tabla" style="font-size:6;">GRUPO DE <br>TRABAJO</th>
-		<th height="20" rowspan="2" class="encabezado-tabla" style="font-size:6;">FECHA DE <br>INICIO</th>
-		<th height="20" rowspan="2" class="encabezado-tabla" style="font-size:6;">FECHA DE <br>TERMINO</th>
-		<th height="20" rowspan="2" class="encabezado-tabla" style="font-size:6;">FECHA DE <br>NOTIFICACIÓN</th>
-		<th height="20" rowspan="2" class="encabezado-tabla" style="font-size:6;">DOCUMENTACIÓN <br>COMPROBATORIA</th>
+		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">NIVEL</th>
+		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">INDICADOR</th>
+		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">% DE AVANCE<br> ACUMULADO</th>
+		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">ANÁLISIS DE RESULTADOS </th>
+		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">JUSTIFICACIÓN</th>
+		<th height="20"  colspan="2" class="encabezado-tabla" style="font-size:6;">¿REQUIERE ACCIÓN DE MEJORA?</th>
+		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">ACCIÓN <br>DE MEJORA</th>
+		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">GRUPO DE <br>TRABAJO</th>
+		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">FECHA DE <br>INICIO</th>
+		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">FECHA DE <br>TERMINO</th>
+		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">FECHA DE <br>NOTIFICACIÓN</th>
+		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">DOCUMENTACIÓN <br>COMPROBATORIA</th>
 	</tr>
 	<tr>
 		<th height="13" class="encabezado-tabla" style="font-size:6;">SI</th>

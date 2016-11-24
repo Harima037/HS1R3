@@ -241,8 +241,8 @@
                                                         </div>
                                                         <div class="col-sm-4">
                                                             <!--label class="control-label"></label-->
-                                                            <span class="label label-default"><b>Programa Especial</b></span>
-                                                            <p id="lbl_programa_especial"></p>
+                                                            <span class="label label-default"><b>Origen Asignación</b></span>
+                                                            <p id="lbl_origen_asignacion"></p>
                                                         </div>
                                                         <div class="col-sm-5">
                                                             <!--label class="control-label"></label-->
@@ -295,7 +295,7 @@
                                                     <!--th nowrap="nowrap" rowspan="2">Descripción de Beneficiario</th-->
                                                     <th rowspan="2"></th>
                                                     <th colspan="2">Zona</th>
-                                                    <th colspan="4" class="bg-info">Población</th>
+                                                    <th colspan="2" class="bg-info">Población</th>
                                                     <th colspan="5" class="bg-success">Marginación</th>
                                                     <th rowspan="2">Total</th>
                                                 </tr>
@@ -304,8 +304,6 @@
                                                     <th>Rural</th>
                                                     <th class="bg-info">Mestiza</th>
                                                     <th class="bg-info">Indigena</th>
-                                                    <th class="bg-info">Inmigrante</th>
-                                                    <th class="bg-info">Otros</th>
                                                     <th nowrap="nowrap" class="bg-success">Muy alta</th>
                                                     <th class="bg-success">Alta</th>
                                                     <th class="bg-success">Media</th>

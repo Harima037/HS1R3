@@ -16,7 +16,7 @@ var proyectoResource = new RESTfulRequests(SERVER_HOST+'/v1/inversion');
 var comentarios = {
 	componentes: {},
 	actividades: {},
-	desgloses: {}
+	desgloses: { actividades:{}, componentes:{} }
 };
 
 var form_caratula = '#form_caratula';
@@ -808,12 +808,25 @@ function mostrar_comentarios(datos){
 			var comentario = {};
 
 			if(id_campo[0] == 'desglose'){
-				var id_desglose = id_campo[1].split('-'); //ids en desglose son idComponente - idDesglose
-				comentarios.desgloses[id_desglose[1]] = {
+				var id_desglose = id_campo[1].split('-'); //ids en desglose son idComponente|idActividad - idDesglose
+				if(tipo_comentario == 2){
+					comentarios.desgloses.componentes[id_desglose[1]] = {
+						tipoComentario: 1,
+						idCampo: id_campo[0],
+						observacion: observacion
+					};
+				}else if(tipo_comentario == 3){
+					comentarios.desgloses.actividades[id_desglose[1]] = {
+						tipoComentario: 1,
+						idCampo: id_campo[0],
+						observacion: observacion
+					};
+				}
+				/*comentarios.desgloses[id_desglose[1]] = {
 					tipoComentario: 1,
 					idCampo: id_campo[0],
 					observacion: observacion
-				};
+				};*/
 			}else{
 				if(tipo_comentario == 2){
 					if(!comentarios.componentes[id_campo[1]]){

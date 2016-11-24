@@ -49,6 +49,12 @@
 			color: #FFFFFF;
 			background-color: #0070C0;
 		}
+		.tabla-datos td.encabezado{
+			border:none !important;
+			font-size:10; 
+			font-weight:bold;
+			text-align: center;
+		}
 		.tabla-datos td,th{
 			border: 1 solid #000000;
 			border-collapse: collapse;
@@ -74,44 +80,52 @@
 	</style>
 </head>
 <body>
+
 	<table class="tabla-datos">
-		<thead>
-			<tr>
-				<th class="encabezado-tabla">Num</th>
-				<th class="encabezado-tabla">Clave Presupuestaria</th>
-				<th class="encabezado-tabla">Nombre Técnico</th>
-				<th class="encabezado-tabla">Dirección</th>
-				<th class="encabezado-tabla">Enlace</th>
-				<th class="encabezado-tabla">Revisor</th>
-				<th class="encabezado-tabla">Estatus Seguimiento</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach ($datos as $row => $item)
-				<tr height="15">
-					<td>{{$row+1}}</td>
-					<td>{{$item->ClavePresupuestaria}}</td>
-					<td>{{$item->nombreTecnico}}</td>
-					<td>{{$item->descripcionUnidadResponsable}}</td>
-					<td>{{$item->nombreEnlace or 'Sin Enlace'}}</td>
-					<td>{{$item->nombreRevisor or 'Sin Revisor'}}</td>
-					<td>
-					@if($item->estatusAvance)
-						{{$item->estatusAvance}}
+		<tr>
+			<td colspan="7" class="encabezado">GOBIERNO DEL ESTADO DE CHIAPAS</td>
+		</tr>
+		<tr>
+			<td colspan="7" class="encabezado">Instituto de Salud</td>
+		</tr>
+		<tr>
+			<td colspan="7" class="encabezado">Reporte de Seguimiento de Proyectos {{$tipo_proyectos}} {{$ejercicio}}</td>
+		</tr>
+		
+		<tr>
+			<th class="encabezado-tabla">Num</th>
+			<th class="encabezado-tabla">Clave Presupuestaria</th>
+			<th class="encabezado-tabla">Nombre Técnico</th>
+			<th class="encabezado-tabla">Dirección</th>
+			<th class="encabezado-tabla">Enlace</th>
+			<th class="encabezado-tabla">Revisor</th>
+			<th class="encabezado-tabla">Estatus Seguimiento</th>
+		</tr>
+	
+		@foreach ($datos as $row => $item)
+			<tr height="15">
+				<td>{{$row+1}}</td>
+				<td>{{$item->ClavePresupuestaria}}</td>
+				<td>{{$item->nombreTecnico}}</td>
+				<td>{{$item->descripcionUnidadResponsable}}</td>
+				<td>{{$item->nombreEnlace or 'Sin Enlace'}}</td>
+				<td>{{$item->nombreRevisor or 'Sin Revisor'}}</td>
+				<td>
+				@if($item->estatusAvance)
+					{{$item->estatusAvance}}
+				@else
+					@if((
+						((isset($item->componentesMetasMes[0]))?$item->componentesMetasMes[0]->totalMeta:0) + 
+						((isset($item->actividadesMetasMes[0]))?$item->actividadesMetasMes[0]->totalMeta:0) 
+						) > 0)
+						Inactivo
 					@else
-						@if((
-							((isset($item->componentesMetasMes[0]))?$item->componentesMetasMes[0]->totalMeta:0) + 
-							((isset($item->actividadesMetasMes[0]))?$item->actividadesMetasMes[0]->totalMeta:0) 
-							) > 0)
-							Inactivo
-						@else
-							No Programado
-						@endif
+						No Programado
 					@endif
-					</td>
-				</tr>
-			@endforeach
-		</tbody>
+				@endif
+				</td>
+			</tr>
+		@endforeach
 	</table>
 </body>
 </html>

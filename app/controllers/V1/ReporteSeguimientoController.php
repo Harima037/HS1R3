@@ -34,6 +34,15 @@ class ReporteSeguimientoController extends BaseController {
 		$datos = array();
 
 		$mes_actual = Util::obtenerMesActual();
+		$ejercicio = Util::obtenerAnioCaptura();
+
+		$datos['ejercicio'] = $ejercicio;
+
+		if($parametros['clasificacion-proyecto'] == 1){
+			$datos['tipo_proyectos'] = 'Institucionales';
+		}else{
+			$datos['tipo_proyectos'] = 'Inversión';
+		}
 
 		$rows = Proyecto::getModel();
 		$rows = $rows->where('idEstatusProyecto','=',5)
@@ -84,7 +93,7 @@ class ReporteSeguimientoController extends BaseController {
 				'catalogoUnidadesResponsables.descripcion AS descripcionUnidadResponsable',
 				'catalogoEstatusProyectos.descripcion AS estatusAvance',
 				'unidadResponsable','finalidad','funcion','subFuncion','subSubFuncion','programaSectorial',
-				'programaPresupuestario','programaEspecial','actividadInstitucional','proyectoEstrategico',
+				'programaPresupuestario','origenAsignacion','actividadInstitucional','proyectoEstrategico',
 				'numeroProyectoEstrategico')
 				->leftjoin('sentryUsers AS datosRevisor','datosRevisor.id','=','proyectos.idUsuarioValidacionSeg')
 				->leftjoin('sentryUsers AS datosEnlace','datosEnlace.id','=','proyectos.idUsuarioRendCuenta')

@@ -5,7 +5,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception;
 use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
-	FibapDatosProyecto, Titular, ComponenteDesglose, ProyectoComentario, Accion, DistribucionPresupuesto, ProyectoFinanciamiento;
+	FibapDatosProyecto, Titular, ComponenteDesglose, ActividadDesglose, ProyectoComentario, Accion, DistribucionPresupuesto, ProyectoFinanciamiento;
 
 class RevisionController extends BaseController {
 	private $reglasComentario = array(
@@ -54,7 +54,7 @@ class RevisionController extends BaseController {
 				$total = $rows->count();						
 			}
 			
-			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
+			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','catalogoUnidadesResponsables.descripcion AS unidadResponsable',
 				'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
 								->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
@@ -91,7 +91,7 @@ class RevisionController extends BaseController {
 				$unidades = explode('|',Sentry::getUser()->claveUnidad);
 			}
 			$rows = Proyecto::getModel();
-			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
+			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto',
 				'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username')
 								->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
@@ -191,10 +191,14 @@ class RevisionController extends BaseController {
 			}elseif($parametros['ver'] == 'datos-fibap'){
 				$recurso = FibapDatosProyecto::where('idFibap','=',$id)->get();
 				$recurso = $recurso[0];
-			}elseif($parametros['ver'] == 'detalles-presupuesto')
-			{
-				$desglose = ComponenteDesglose::with('metasMes','beneficiarios.tipoBeneficiario')->find($id);
+			}elseif($parametros['ver'] == 'detalles-presupuesto'){
 
+				if($parametros['tipo-accion'] == 'componente'){
+					$desglose = ComponenteDesglose::with('metasMes','beneficiarios.tipoBeneficiario')->find($id);
+				}else{
+					$desglose = ActividadDesglose::with('metasMes','beneficiarios.tipoBeneficiario')->find($id);
+				}
+				
 				$recurso = Accion::with('partidas')->find($desglose->idAccion);
 				
 				$calendarizado = DistribucionPresupuesto::where('idAccion','=',$desglose->idAccion)
@@ -212,8 +216,8 @@ class RevisionController extends BaseController {
 			
 		}else{
 			$recurso = Proyecto::contenidoCompleto()->find($id);
-			$recurso->componentes->load('unidadMedida','dimension','tipoIndicador','metasMes','formula','frecuencia','actividades','entregable','entregableTipo','entregableAccion','accion.partidas','accion.propuestasFinanciamiento.origen','accion.distribucionPresupuesto','accion.desglosePresupuesto');
-			$recurso->load('fuentesFinanciamiento.destinoGasto','fuentesFinanciamiento.fuenteFinanciamiento','fuentesFinanciamiento.subFuentesFinanciamiento');
+			$recurso->componentes->load('unidadMedida','dimension','tipoIndicador','metasMes','formula','frecuencia','actividades','entregable','entregableTipo','entregableAccion','accion.partidas','accion.propuestasFinanciamiento.origen','accion.distribucionPresupuesto','accion.desglosePresupuestoComponente');
+			$recurso->load('fuentesFinanciamiento.fondoFinanciamiento','fuentesFinanciamiento.fuenteFinanciamiento','fuentesFinanciamiento.subFuentesFinanciamiento');
 			$recurso->load('comentarios');
 			
 			if($recurso->idClasificacionProyecto == 2){
@@ -232,7 +236,7 @@ class RevisionController extends BaseController {
 			
 			/*$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion','desgloseCompleto'));*/
 			foreach ($recurso->componentes as $key => $componente) {
-				$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida','metasMes'));
+				$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida','metasMes','accion.partidas','accion.propuestasFinanciamiento.origen','accion.distribucionPresupuesto','accion.desglosePresupuestoActividad'));
 			}
 			
 			if($recurso->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones

@@ -157,14 +157,14 @@ class SeguimientoController extends BaseController {
 					//$rows = $rows->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%');
 					$rows = $rows->where(function($query)use($parametros){
 						$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
-							->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
+							->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
 					});
 					$total = $rows->count();
 				}else{				
 					$total = $rows->count();						
 				}
 				
-				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
+				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
 					'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl',DB::raw('count(observaciones.id) AS observaciones'))
 					->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
@@ -251,7 +251,7 @@ class SeguimientoController extends BaseController {
 				}
 				//Se obtienen las metas por mes del mes actual y las metas por mes totales agrupadas por jurisdicción
 				$recurso = $recurso->with(array(
-				 'metasMesJurisdiccion'=>function($query) use ($mes_actual){
+				'metasMesJurisdiccion'=>function($query) use ($mes_actual){
 					$query->where('mes','<=',$mes_actual);
 				},'registroAvance'=>function($query) use ($mes_actual){
 					$query->where('mes','=',$mes_actual);
@@ -286,11 +286,7 @@ class SeguimientoController extends BaseController {
 				$recurso = $recurso->toArray();
 				$recurso['metas_mes'] = $metas_mes;
 				$recurso['metas_mes_acumulado_trimestre'] = $metas_mes_trimestre;
-				//if($parametros['nivel'] == 'componente'){
-					//$recurso->load('desgloseMunicipios');
-					//$queries = DB::getQueryLog();
-					//throw new Exception(print_r(end($queries),true), 1);
-				//}
+				
 			}elseif($parametros['mostrar'] == 'datos-beneficiarios-avance'){
 				$mes_actual = Util::obtenerMesActual();
 				$recurso['acumulado'] = RegistroAvanceBeneficiario::where('idProyecto','=',$parametros['id-proyecto'])
@@ -684,7 +680,8 @@ class SeguimientoController extends BaseController {
 			$suma_total = 0;
 			foreach ($sexos_registrados as $sexo) {
 				$suma_zona		= $parametros['urbana'.$sexo] + $parametros['rural'.$sexo];
-				$suma_poblacion	= $parametros['mestiza'.$sexo] + $parametros['indigena'.$sexo] + $parametros['inmigrante'.$sexo] + $parametros['otros'.$sexo];
+				$suma_poblacion	= $parametros['mestiza'.$sexo] + $parametros['indigena'.$sexo];
+				// + $parametros['inmigrante'.$sexo] + $parametros['otros'.$sexo];
 				$suma_marginacion	= $parametros['muyalta'.$sexo] + $parametros['alta'.$sexo] + $parametros['media'.$sexo] + $parametros['baja'.$sexo] + $parametros['muybaja'.$sexo];
 
 				if(($suma_zona != $suma_poblacion) || ($suma_poblacion != $suma_marginacion) || ($suma_marginacion != $suma_zona)){
@@ -724,8 +721,8 @@ class SeguimientoController extends BaseController {
 
 					$avance->mestiza 			= $parametros['mestiza'.$sexo];
 					$avance->indigena 			= $parametros['indigena'.$sexo];
-					$avance->inmigrante 		= $parametros['inmigrante'.$sexo];
-					$avance->otros 				= $parametros['otros'.$sexo];
+					//$avance->inmigrante 		= $parametros['inmigrante'.$sexo];
+					//$avance->otros 			= $parametros['otros'.$sexo];
 
 					$avance->muyAlta 			= $parametros['muyalta'.$sexo];
 					$avance->alta 				= $parametros['alta'.$sexo];
@@ -1000,8 +997,14 @@ class SeguimientoController extends BaseController {
 					$desglose->metasMes[0]->avance = $parametros['localidad-avance-mes'][$desglose->claveLocalidad];
 					$guardar_metas_localidades[] = $desglose->metasMes[0];
 				}else{
-					$nueva_meta = new DesgloseMetasMes;
-					$nueva_meta->idComponenteDesglose = $desglose->id;
+					if($parametros['nivel'] == 'componente'){
+						$nueva_meta = new DesgloseMetasMes;
+						$nueva_meta->idComponenteDesglose = $desglose->id;
+					}else{
+						$nueva_meta = new ActividadDesgloseMetasMes;
+						$nueva_meta->idActividadDesglose = $desglose->id;
+					}
+					
 					$nueva_meta->mes = $mes_actual;
 					$nueva_meta->meta = 0;
 					$nueva_meta->avance = $parametros['localidad-avance-mes'][$desglose->claveLocalidad];
@@ -1026,8 +1029,12 @@ class SeguimientoController extends BaseController {
 		if(count($accion->metasMes)){
 			$meta_jurisdiccion = $accion->metasMes[0];
 		}else{
-			$meta_jurisdiccion = new ComponenteMetaMes;
-			$meta_jurisdiccion->claveJurisdiccion = $jurisdiccion;
+			if($parametros['nivel'] == 'componente'){
+				$meta_jurisdiccion = new ComponenteMetaMes;
+			}else{
+				$meta_jurisdiccion = new ActividadMetaMes;
+			}
+			$meta_jurisdiccion->claveJurisdiccion = $clave_jurisdiccion;
 			$meta_jurisdiccion->mes = $mes_actual;
 			$meta_jurisdiccion->meta = 0;
 			$meta_jurisdiccion->idProyecto = $accion->idProyecto;

@@ -46,6 +46,10 @@ class Componente extends BaseModel
     	return $this->hasMany('EvaluacionPlanMejora','idNivel')->where('nivel','=',1);
     }
 
+    public function planesMejoraJurisdiccion(){
+    	return $this->hasMany('PlanMejoraJurisdiccion','idNivel')->where('nivel','=',1);
+    }
+
     public function accion(){
     	return $this->hasOne('Accion','idComponente');
     }

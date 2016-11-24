@@ -64,6 +64,7 @@ function cargar_datos_proyecto(e){
                 }
                 $('#rep_metas_'+evaluacion.mes).html('<button onClick="cargarReporte(\'seg-metas\','+evaluacion.mes+')" class="btn '+clase+'" type="button"><span class="fa '+icono+'"></span></button>');
                 if(evaluacion.mes%3 == 0){
+                    $('#rep_metas_trim_'+evaluacion.mes).html('<button onClick="cargarReporte(\'seg-metas-trimestre\','+evaluacion.mes+')" class="btn '+clase+'" type="button"><span class="fa '+icono+'"></span></button>');
                     $('#rep_benef_'+evaluacion.mes).html('<button onClick="cargarReporte(\'seg-beneficiarios\','+evaluacion.mes+')" class="btn '+clase+'" type="button"><span class="fa '+icono+'"></span></button>');
                     $('#rep_plan_'+evaluacion.mes).html('<button onClick="cargarReporte(\'plan-mejora\','+evaluacion.mes+')" class="btn '+clase+'" type="button"><span class="fa '+icono+'"></span></button>');
                     $('#rep_cuenta_'+evaluacion.mes).html('<button onClick="cargarReporte(\'analisis\','+evaluacion.mes+')" class="btn '+clase+'" type="button"><span class="fa '+icono+'"></span></button>');

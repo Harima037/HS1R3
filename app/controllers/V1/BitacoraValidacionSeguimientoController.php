@@ -72,14 +72,14 @@ class BitacoraValidacionSeguimientoController extends \BaseController {
 			if(isset($parametros['buscar'])){				
 				$rows = $rows->where(function($query)use($parametros){
 					$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
-						->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
+						->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
 				});
 				$total = $rows->count();
 			}else{				
 				$total = $rows->count();						
 			}
 			
-			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
+			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','bitacoraValidacionSeguimiento.idEstatus',
 				'catalogoEstatusProyectos.descripcion AS estatus',
 				'sentryUsers.username as usuario','bitacoraValidacionSeguimiento.fechaHora')

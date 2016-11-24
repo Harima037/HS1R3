@@ -139,20 +139,20 @@
                 </div>
                 <div class="col-sm-12">
                     <div class="row">
-                        <div class="col-sm-4">
-                            <div clasS="form-group">
-                                <label class="control-label" for="dimension-{{$identificador}}">
-                                    Dimensión
-                                </label>
-                                {{Form::select('dimension-'.$identificador,array(''=>'Seleccione una dimensión') + $dimensiones->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'dimension-'.$identificador))}}
-                            </div>
-                        </div>
                         <div class="col-sm-3">
                             <div clasS="form-group">
                                 <label class="control-label" for="tipo-ind-{{$identificador}}">
                                     Tipo
                                 </label>
                                 {{Form::select('tipo-ind-'.$identificador,array(''=>'Seleccione un tipo') + $tipos_indicador->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'tipo-ind-'.$identificador))}}
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div clasS="form-group">
+                                <label class="control-label" for="dimension-{{$identificador}}">
+                                    Dimensión
+                                </label>
+                                {{Form::select('dimension-'.$identificador,array(''=>'Seleccione una dimensión') + $dimensiones->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'dimension-'.$identificador))}}
                             </div>
                         </div>
                         <div class="col-sm-5">

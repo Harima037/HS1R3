@@ -112,7 +112,9 @@
 			<td></td>
 			<td></td>
 		</tr>
+		<!-- {{$current_row = 15;}} -->
         @foreach($fila as $filaEP01)
+        <!-- {{$current_row++;}} -->
         <tr>
 			<td>{{{ $filaEP01['programapre'] }}}</td>
             <td>{{{ $filaEP01['importeEstatal'] }}}</td>
@@ -131,7 +133,7 @@
             <td>{{{ $filaEP01['regiones'][13] }}}</td>
             <td>{{{ $filaEP01['regiones'][14] }}}</td>
             <td>{{{ $filaEP01['regiones'][15] }}}</td>
-            <td>{{{ $filaEP01['presupuestoDevengado'] }}}</td>
+            <td>{{{ '=SUM(B'.$current_row.':Q'.$current_row.')' }}}</td>
             <td>{{{ $filaEP01['presupuestoAprobado'] }}}</td>
             <td>{{{ $filaEP01['presupuestoModificado'] }}}</td>
 		</tr>

@@ -18,7 +18,7 @@ namespace V1;
 use SSA\Utilerias\Validador, SSA\Utilerias\Util;
 use Illuminate\Database\QueryException, \Exception;
 use BaseController, Input, Response, DB, Sentry,Proyecto, EvaluacionProyectoMes,ComponenteMetaMes,ActividadMetaMes;
-use EvaluacionAnalisisFuncional,EvaluacionComentario,EvaluacionPlanMejora,RegistroAvanceBeneficiario,RegistroAvanceMetas;
+use EvaluacionAnalisisFuncional,EvaluacionComentario,EvaluacionPlanMejora,RegistroAvanceBeneficiario,RegistroAvanceMetas,Componente,ComponenteDesglose,DesgloseMetasMes,Actividad,ActividadDesglose,ActividadDesgloseMetasMes;
 
 class PurgarSeguimientoController extends \BaseController {
 	/**
@@ -71,14 +71,14 @@ class PurgarSeguimientoController extends \BaseController {
 				if(isset($parametros['buscar'])){
 					$rows = $rows->where(function($query)use($parametros){
 						$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
-							->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
+							->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
 					});
 					$total = $rows->count();
 				}else{				
 					$total = $rows->count();						
 				}
 				
-				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
+				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 					'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto',
 					'evaluacionProyectoMes.idEstatus','catalogoEstatusProyectos.descripcion AS estatusAvance',
 					'proyectos.fuenteInformacion','proyectos.idResponsable',
@@ -228,7 +228,7 @@ class PurgarSeguimientoController extends \BaseController {
 			//
 			$respuesta = DB::transaction(function() use ($ids_proyectos,$mes_actual){
 				$respuesta_transaction = array();
-
+				
 				EvaluacionAnalisisFuncional::whereIn('idProyecto',$ids_proyectos)->where('mes','=',$mes_actual)->delete();
 				EvaluacionComentario::whereIn('idProyecto',$ids_proyectos)->where('mes','=',$mes_actual)->delete();
 				EvaluacionPlanMejora::whereIn('idProyecto',$ids_proyectos)->where('mes','=',$mes_actual)->delete();
@@ -238,7 +238,16 @@ class PurgarSeguimientoController extends \BaseController {
 
 				ComponenteMetaMes::whereIn('idProyecto',$ids_proyectos)->where('mes','=',$mes_actual)->update(array('avance'=>null));
 				ActividadMetaMes::whereIn('idProyecto',$ids_proyectos)->where('mes','=',$mes_actual)->update(array('avance'=>null));
+				
 
+				$ids_componentes = Componente::whereIn('idProyecto',$ids_proyectos)->lists('id');
+				$ids_componentes_desgloses = ComponenteDesglose::whereIn('idComponente',$ids_componentes)->lists('id');
+				DesgloseMetasMes::whereIn('idComponenteDesglose',$ids_componentes_desgloses)->where('mes','=',$mes_actual)->update(array('avance'=>0));
+
+				$ids_actividades = Actividad::whereIn('idProyecto',$ids_proyectos)->lists('id');
+				$ids_actividades_desgloses = ActividadDesglose::whereIn('idActividad',$ids_actividades)->lists('id');
+				ActividadDesgloseMetasMes::whereIn('idActividadDesglose',$ids_actividades_desgloses)->where('mes','=',$mes_actual)->update(array('avance'=>0));
+				
 				EvaluacionProyectoMes::whereIn('idProyecto',$ids_proyectos)->where('mes','=',$mes_actual)->update(array('idEstatus'=>6));
 
 				$respuesta_transaction['http_status'] = 200;

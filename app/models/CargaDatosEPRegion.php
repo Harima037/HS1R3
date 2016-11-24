@@ -5,7 +5,7 @@ class CargaDatosEPRegion extends BaseModel
 	public $timestamps = false;
 
 	public function scopeListarDatosReporte($query){
-		return $query->select('cargaDatosEPREgion.*',DB::raw('concat(UR,FI,FU,SF,SSF,PS,PP,PE,AI,PT,MPIO,OG,STG,FF,SFF,DG,CP,DM) AS clavePresupuestaria'));
+		return $query->select('cargaDatosEPREgion.*',DB::raw('concat(UR,FI,FU,SF,SSF,PS,PP,OA,AI,PT,MPIO,OG,STG,FF,SFF,DG,CP,DM) AS clavePresupuestaria'));
 	}
 	
 	

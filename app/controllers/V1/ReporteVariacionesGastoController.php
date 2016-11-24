@@ -54,7 +54,7 @@ class ReporteVariacionesGastoController extends BaseController {
 					if($parametros['buscar']){
 						$rows = $rows->where(function($query)use($parametros){
 							$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
-								->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
+								->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
 						});
 					}
 				}
@@ -84,7 +84,7 @@ class ReporteVariacionesGastoController extends BaseController {
 					if($parametros['buscar']){
 						$rows = $rows->where(function($query)use($parametros){
 							$query->where('proyectos.nombreTecnico','like','%'.$parametros['buscar'].'%')
-								->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,programaEspecial,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
+								->orWhere(DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0"))'),'like','%'.$parametros['buscar'].'%');
 						});
 					}
 				}

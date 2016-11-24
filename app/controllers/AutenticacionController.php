@@ -34,7 +34,7 @@ class AutenticacionController extends Controller {
 				$anio = date('Y');
 			}
 		}
-		
+
 		if(Input::all()){
 			$usuario = Input::get('usuario');
 			$parametros = Input::all();

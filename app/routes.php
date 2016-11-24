@@ -124,6 +124,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('variacion-gasto',array('uses'=>'VariacionesGastoController@reporte'));
 		Route::get('estado-programatico-funcional',array('uses'=>'ReporteEP20Controller@index'));
 		Route::get('evaluacion-proyectos',array('uses'=>'ReporteEvaluacionProyectosController@index'));
+		Route::get('reporte-proyectos-evaluacion',array('uses'=>'ReporteProyectosEvaluacionController@index'));
 	});
 
 	Route::group(array('prefix'=>"v1"),function(){
@@ -148,7 +149,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('reporteProyecto',	'V1\ReporteProyectoController', array('only' => array('show')));
 		Route::resource('fibap',			'V1\FibapController');
 
-		Route::resource('visor', 			'V1\VisorController', array('only' => array('index','show')));
+		Route::resource('visor', 			'V1\VisorController', array('only' => array('index','show','store','update')));
 
 		Route::resource('rend-cuenta-inst', 	'V1\SeguimientoController');
 		Route::resource('rend-cuenta-inv', 		'V1\SeguimientoController');
@@ -170,6 +171,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('estado-programatico-funcional','V1\ReporteEP20Controller',array('only'=>array('index')));
 		Route::resource('evaluacion-proyectos',			'V1\EvaluacionProyectosController',array('only'=>array('index','show','update','store')));
 		Route::resource('evaluacion-proyectos-reporte',	'V1\ReporteEvaluacionProyectosController',array('only'=>array('index')));
+		Route::resource('reporte-proyectos-evaluacion', 'V1\ReporteProyectosEvaluacionController',array('only'=>array('index','show','update','store')));
 
 		Route::resource('reporte-seguimiento',	'V1\ReporteSeguimientoController', array('only' => array('index')));
 		Route::resource('revision-proyectos',	'V1\RevisionController');
