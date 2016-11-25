@@ -538,6 +538,85 @@ class VisorController extends BaseController {
 				$total['disponiblePresupuestarioModificado'] = $rows->sum('disponiblePresupuestarioModificado');
 
 				$data = array('data'=>$rows,'total'=>$total,'datos_captura'=>$datos_captura);
+			}elseif($parametros['tabla'] == 'indicadores_resultados_jurisdiccion'){
+				$datos_captura = $this->obtenerDatosCaptura();
+				$anio_captura = $datos_captura['anio'];
+				$mes_actual = $datos_captura['mes'];
+				
+				$usuario = Sentry::getUser();
+				if($usuario->claveJurisdiccion){
+					$jurisdiccion = $usuario->claveJurisdiccion;
+				}elseif(isset($parametros['jurisdiccion'])){
+					$jurisdiccion = $parametros['jurisdiccion'];
+				}else{
+					$jurisdiccion = false;
+				}
+
+				$query_params = [];
+
+				$query = "SELECT PC.idProyecto, P.idTipoProyecto as tipoProyecto, 1 AS nivel, concat(unidadResponsable, finalidad, funcion, subfuncion, subsubfuncion, programaSectorial, programaPresupuestario, origenAsignacion, actividadInstitucional, proyectoEstrategico, LPAD(numeroProyectoEstrategico,3,'0')) as clave, P.nombreTecnico, PC.indicador, sum(CMM.meta) as meta, sum(if(EPM.idEstatus>3,CMM.avance,0)) as avance ";
+				$query .= "FROM proyectoComponentes PC ";
+				$query .= "JOIN componenteMetasMes CMM ON CMM.idComponente = PC.id and CMM.borradoAl is null ";
+
+				if($jurisdiccion){
+					$query .= "and CMM.claveJurisdiccion = ? ";
+					$query_params[] = $jurisdiccion;
+				}
+
+				$query .= "LEFT JOIN evaluacionProyectoMes EPM ON EPM.idProyecto = CMM.idProyecto AND EPM.mes = CMM.mes AND EPM.mes < ? ";
+				$query_params[] = $mes_actual;
+				$query .= "JOIN proyectos P ON P.id = PC.idProyecto ";
+				$query .= "WHERE PC.borradoAl IS NULL ";
+				$query .= "GROUP BY CMM.idComponente, CMM.claveJurisdiccion ";
+				//$query .= "ORDER BY P.idTipoProyecto";
+
+				$query .= 'UNION ';
+
+				$query .= "SELECT CA.idProyecto, P2.idTipoProyecto as tipoProyecto, 2 AS nivel, concat(unidadResponsable, finalidad, funcion, subfuncion, subsubfuncion, programaSectorial, programaPresupuestario, origenAsignacion, actividadInstitucional, proyectoEstrategico, LPAD(numeroProyectoEstrategico,3,'0')) as clave, P2.nombreTecnico, CA.indicador, sum(AMM.meta) as meta, sum(if(EPM2.idEstatus>3,AMM.avance,0)) as avance ";
+				$query .= "FROM componenteActividades CA ";
+				$query .= "JOIN actividadMetasMes AMM ON AMM.idActividad = CA.id and AMM.borradoAl is null ";
+
+				if($jurisdiccion){
+					$query .= "and AMM.claveJurisdiccion = ? ";
+					$query_params[] = $jurisdiccion;
+				}
+
+				$query .= "LEFT JOIN evaluacionProyectoMes EPM2 ON EPM2.idProyecto = AMM.idProyecto AND EPM2.mes = AMM.mes AND EPM2.mes < ? ";
+				$query_params[] = $mes_actual;
+				$query .= "JOIN proyectos P2 ON P2.id = CA.idProyecto ";
+				$query .= "WHERE CA.borradoAl IS NULL ";
+				$query .= "GROUP BY AMM.idActividad, AMM.claveJurisdiccion ";
+				$query .= "ORDER BY tipoProyecto, clave, nivel";
+
+				$rows = DB::select($query, $query_params);
+				$indicadores = [1=>[],2=>[]]; //indicadores de proyectos institucionales y de inversión
+				foreach ($rows as $row) {
+					if(!isset($indicadores[$row->tipoProyecto][$row->idProyecto])){
+						$indicadores[$row->tipoProyecto][$row->idProyecto] = [
+							'clave' => $row->clave,
+							'nombre' => $row->nombreTecnico,
+							'componentes' => [],
+							'actividades' => []
+						];
+					}
+					if($row->nivel == 1){
+						$indicadores[$row->tipoProyecto][$row->idProyecto]['componentes'][] = [
+							'indicador' => $row->indicador,
+							'meta' => $row->meta,
+							'avance' => $row->avance,
+							'porcentaje' => 0.00
+						];
+					}else{
+						$indicadores[$row->tipoProyecto][$row->idProyecto]['actividades'][] = [
+							'indicador' => $row->indicador,
+							'meta' => $row->meta,
+							'avance' => $row->avance,
+							'porcentaje' => 0.00
+						];
+					}
+				}
+
+				$data = array('data'=>$indicadores,'datos_captura'=>$datos_captura);
 			}
 		}elseif(isset($parametros['formatogrid'])){
 			if(isset($parametros['clasificacionProyecto'])){

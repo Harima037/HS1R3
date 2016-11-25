@@ -26,7 +26,7 @@
                         </label>
                     </div>
                     <div class="col-sm-5">
-                        <select class="form-control" id="filtro-jurisdiccion">
+                        <select class="form-control" id="filtro-jurisdiccion" onChange="cambiarJurisdiccion()">
                             <option value="">Estatal</option>
                             @foreach($jurisdicciones as $clave => $jurisdiccion)
                             <option value="{{$clave}}" {{($jurisdiccion_select==$clave)?'selected':''}}>{{$clave}} {{$jurisdiccion}}</option>
@@ -55,14 +55,14 @@
                     </div>
                 </div>
             </div>
-            <table class="table table-striped table-hover table-condensed">
+            <table class="table table-striped table-hover table-condensed" id="tbl-lista-proyectos">
                 <thead>
                     <tr height="50">
                         <th></th>
-                        <th colspan="2" >Clave Presupuestaria - Nombre Técnico / Indicador</th>
-                        <th width="80" class="text-center">Meta</th>
-                        <th width="80" class="text-center">Avance</th>
-                        <th width="80" class="text-center">%</th>
+                        <th >Clave Presupuestaria - Nombre Técnico / Indicador</th>
+                        <th width="90" class="text-center">Meta</th>
+                        <th width="90" class="text-center">Avance</th>
+                        <th width="90" class="text-center">%</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
