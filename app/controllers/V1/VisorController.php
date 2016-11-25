@@ -556,10 +556,10 @@ class VisorController extends BaseController {
 
 				$query = "SELECT PC.idProyecto, P.idTipoProyecto as tipoProyecto, 1 AS nivel, concat(unidadResponsable, finalidad, funcion, subfuncion, subsubfuncion, programaSectorial, programaPresupuestario, origenAsignacion, actividadInstitucional, proyectoEstrategico, LPAD(numeroProyectoEstrategico,3,'0')) as clave, P.nombreTecnico, PC.indicador, sum(CMM.meta) as meta, sum(if(EPM.idEstatus>3,CMM.avance,0)) as avance ";
 				$query .= "FROM proyectoComponentes PC ";
-				$query .= "JOIN componenteMetasMes CMM ON CMM.idComponente = PC.id and CMM.borradoAl is null ";
+				$query .= "JOIN componenteMetasMes CMM ON CMM.idComponente = PC.id AND CMM.borradoAl IS NULL AND (CMM.meta > 0 OR CMM.avance > 0) ";
 
 				if($jurisdiccion){
-					$query .= "and CMM.claveJurisdiccion = ? ";
+					$query .= "AND CMM.claveJurisdiccion = ? ";
 					$query_params[] = $jurisdiccion;
 				}
 
@@ -567,17 +567,20 @@ class VisorController extends BaseController {
 				$query_params[] = $mes_actual;
 				$query .= "JOIN proyectos P ON P.id = PC.idProyecto ";
 				$query .= "WHERE PC.borradoAl IS NULL ";
-				$query .= "GROUP BY CMM.idComponente, CMM.claveJurisdiccion ";
-				//$query .= "ORDER BY P.idTipoProyecto";
+				$query .= "GROUP BY CMM.idComponente ";
+
+				if($jurisdiccion){
+					$query .= ", CMM.claveJurisdiccion ";
+				}
 
 				$query .= 'UNION ';
 
 				$query .= "SELECT CA.idProyecto, P2.idTipoProyecto as tipoProyecto, 2 AS nivel, concat(unidadResponsable, finalidad, funcion, subfuncion, subsubfuncion, programaSectorial, programaPresupuestario, origenAsignacion, actividadInstitucional, proyectoEstrategico, LPAD(numeroProyectoEstrategico,3,'0')) as clave, P2.nombreTecnico, CA.indicador, sum(AMM.meta) as meta, sum(if(EPM2.idEstatus>3,AMM.avance,0)) as avance ";
 				$query .= "FROM componenteActividades CA ";
-				$query .= "JOIN actividadMetasMes AMM ON AMM.idActividad = CA.id and AMM.borradoAl is null ";
+				$query .= "JOIN actividadMetasMes AMM ON AMM.idActividad = CA.id AND AMM.borradoAl IS NULL AND (AMM.meta > 0 OR AMM.avance > 0) ";
 
 				if($jurisdiccion){
-					$query .= "and AMM.claveJurisdiccion = ? ";
+					$query .= "AND AMM.claveJurisdiccion = ? ";
 					$query_params[] = $jurisdiccion;
 				}
 
@@ -585,7 +588,12 @@ class VisorController extends BaseController {
 				$query_params[] = $mes_actual;
 				$query .= "JOIN proyectos P2 ON P2.id = CA.idProyecto ";
 				$query .= "WHERE CA.borradoAl IS NULL ";
-				$query .= "GROUP BY AMM.idActividad, AMM.claveJurisdiccion ";
+				$query .= "GROUP BY AMM.idActividad ";
+
+				if($jurisdiccion){
+					$query .= ", AMM.claveJurisdiccion ";
+				}
+
 				$query .= "ORDER BY tipoProyecto, clave, nivel";
 
 				$rows = DB::select($query, $query_params);
@@ -599,19 +607,28 @@ class VisorController extends BaseController {
 							'actividades' => []
 						];
 					}
+
+					$porcentaje = 0.00;
+
+					if($row->avance > 0){
+						if($row->meta > 0){
+							$porcentaje = ($row->avance*100)/$row->meta;
+						}
+					}
+					
 					if($row->nivel == 1){
 						$indicadores[$row->tipoProyecto][$row->idProyecto]['componentes'][] = [
 							'indicador' => $row->indicador,
 							'meta' => $row->meta,
 							'avance' => $row->avance,
-							'porcentaje' => 0.00
+							'porcentaje' => $porcentaje
 						];
 					}else{
 						$indicadores[$row->tipoProyecto][$row->idProyecto]['actividades'][] = [
 							'indicador' => $row->indicador,
 							'meta' => $row->meta,
 							'avance' => $row->avance,
-							'porcentaje' => 0.00
+							'porcentaje' => $porcentaje
 						];
 					}
 				}

@@ -21,6 +21,7 @@ class BaseController extends Controller {
 		$datos['sys_activo'] = SysGrupoModulo::findByKey($sys_sis_llave);
 		$uri = $datos['sys_activo']->uri;
 		$permission = $sys_sis_llave;
+		
 		if($sys_mod_llave === NULL){
 			$datos['sys_mod_activo'] = null;
 		}else{

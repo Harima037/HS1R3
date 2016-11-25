@@ -88,7 +88,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 
 		Route::get('proyectos-inst',array('uses'=>'VisorController@indexInstitucional'));
 		Route::get('proyectos-inv',array('uses'=>'VisorController@indexInversion'));
-		Route::get('indicadores-resultados',array('uses'=>'VisorController@indexIndicadoresResultados'));
+		Route::get('indicadores-resultados-jurisdiccional',array('uses'=>'VisorController@indexIndicadoresResultados'));
 		Route::get('avance-indicadores/{id}',array('uses'=>'VisorController@avanceIndicadores'));
 
 		Route::get('general',array('uses'=>'VisorController@indexDesempenioGeneral'));

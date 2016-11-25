@@ -13,6 +13,8 @@
 // Inicialización General para casi cualquier módulo
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/visor');
 
+cambiarJurisdiccion();
+
 function cambiarJurisdiccion(){
 	var parametros = {tabla:'indicadores_resultados_jurisdiccion'};
 
@@ -32,17 +34,17 @@ function cambiarJurisdiccion(){
 					tipo_de_proyecto = 'PROYECTOS DE INVERSIÓN';
 				}
 
-				tabla_body += '<tr><th colspan="5">'+tipo_de_proyecto+'</th></tr>';
+				tabla_body += '<tr style="background-color:#AAAAAA;"><th colspan="5">'+tipo_de_proyecto+'</th></tr>';
 				for(var id_proyecto in response.data[tipo_proyecto]){
 					var proyecto = response.data[tipo_proyecto][id_proyecto];
-					tabla_body += '<tr><th></th><th width="100">'+proyecto.clave+' - '+proyecto.nombre+'</th><th width="90"></th><th width="90"></th><th width="90"></th></tr>';
+					tabla_body += '<tr style="background-color:#DDDDDD;"><th></th><th colspan="4" width="100">'+proyecto.clave+' - '+proyecto.nombre+'</th></tr>';
 
 					for(var i in proyecto.componentes){
-						tabla_body += '<tr><td></td><td width="100">'+proyecto.componentes[i].indicador+'</td><td width="90">'+proyecto.componentes[i].meta+'</td><td width="90">'+proyecto.componentes[i].avance+'</td><td width="90">'+proyecto.componentes[i].porcentaje+' %</td></tr>';
+						tabla_body += '<tr><td></td><td width="100">'+proyecto.componentes[i].indicador+'</td><td width="100"  class="text-center">'+parseFloat(proyecto.componentes[i].meta).format(2)+'</td><td width="100"  class="text-center">'+parseFloat(proyecto.componentes[i].avance).format(2)+'</td><td width="100"  class="text-center">'+parseFloat(proyecto.componentes[i].porcentaje).format(2)+' %</td></tr>';
 					}
 
 					for(var i in proyecto.actividades){
-						tabla_body += '<tr><td></td><td width="100">'+proyecto.actividades[i].indicador+'</td><td width="90">'+proyecto.actividades[i].meta+'</td><td width="90">'+proyecto.actividades[i].avance+'</td><td width="90">'+proyecto.actividades[i].porcentaje+' %</td></tr>';
+						tabla_body += '<tr><td></td><td width="100">'+proyecto.actividades[i].indicador+'</td><td width="100"  class="text-center">'+parseFloat(proyecto.actividades[i].meta).format(2)+'</td><td width="100"  class="text-center">'+parseFloat(proyecto.actividades[i].avance).format(2)+'</td><td width="100"  class="text-center">'+parseFloat(proyecto.actividades[i].porcentaje).format(2)+' %</td></tr>';
 					}
 				}
 			}
@@ -50,3 +52,15 @@ function cambiarJurisdiccion(){
 		}
 	});
 }
+
+/*             Extras               */
+/**
+ * Number.prototype.format(n, x)
+ * 
+ * @param integer n: length of decimal
+ * @param integer x: length of sections
+ */
+Number.prototype.format = function(n, x) {
+    var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\.' : '$') + ')';
+    return this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+};

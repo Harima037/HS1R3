@@ -55,14 +55,14 @@
                     </div>
                 </div>
             </div>
-            <table class="table table-striped table-hover table-condensed" id="tbl-lista-proyectos">
+            <table class="table table-hover table-condensed" id="tbl-lista-proyectos">
                 <thead>
                     <tr height="50">
                         <th></th>
                         <th >Clave Presupuestaria - Nombre Técnico / Indicador</th>
-                        <th width="90" class="text-center">Meta</th>
-                        <th width="90" class="text-center">Avance</th>
-                        <th width="90" class="text-center">%</th>
+                        <th width="100" class="text-center">Meta</th>
+                        <th width="100" class="text-center">Avance</th>
+                        <th width="100" class="text-center">%</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
