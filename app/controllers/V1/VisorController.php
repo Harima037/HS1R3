@@ -18,7 +18,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
-use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime,Mail, PDF;
+use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime,Mail, PDF, Excel;
 use Proyecto,ComponenteMetaMes,ActividadMetaMes,Componente,Actividad,CargaDatosEP01,PlanMejoraJurisdiccion;
 
 class VisorController extends BaseController {
@@ -554,7 +554,7 @@ class VisorController extends BaseController {
 
 				$query_params = [];
 
-				$query = "SELECT PC.idProyecto, P.idTipoProyecto as tipoProyecto, 1 AS nivel, concat(unidadResponsable, finalidad, funcion, subfuncion, subsubfuncion, programaSectorial, programaPresupuestario, origenAsignacion, actividadInstitucional, proyectoEstrategico, LPAD(numeroProyectoEstrategico,3,'0')) as clave, P.nombreTecnico, PC.indicador, sum(CMM.meta) as meta, sum(if(EPM.idEstatus>3,CMM.avance,0)) as avance ";
+				$query = "select PC.idProyecto, P.idTipoProyecto as tipoProyecto, 1 AS nivel, concat(unidadResponsable, finalidad, funcion, subfuncion, subsubfuncion, programaSectorial, programaPresupuestario, origenAsignacion, actividadInstitucional, proyectoEstrategico, LPAD(numeroProyectoEstrategico,3,'0')) as clave, P.nombreTecnico, PC.indicador, sum(CMM.meta) as meta, sum(if(EPM.idEstatus>3,CMM.avance,0)) as avance ";
 				$query .= "FROM proyectoComponentes PC ";
 				$query .= "JOIN componenteMetasMes CMM ON CMM.idComponente = PC.id AND CMM.borradoAl IS NULL AND (CMM.meta > 0 OR CMM.avance > 0) ";
 
@@ -575,7 +575,7 @@ class VisorController extends BaseController {
 
 				$query .= 'UNION ';
 
-				$query .= "SELECT CA.idProyecto, P2.idTipoProyecto as tipoProyecto, 2 AS nivel, concat(unidadResponsable, finalidad, funcion, subfuncion, subsubfuncion, programaSectorial, programaPresupuestario, origenAsignacion, actividadInstitucional, proyectoEstrategico, LPAD(numeroProyectoEstrategico,3,'0')) as clave, P2.nombreTecnico, CA.indicador, sum(AMM.meta) as meta, sum(if(EPM2.idEstatus>3,AMM.avance,0)) as avance ";
+				$query .= "select CA.idProyecto, P2.idTipoProyecto as tipoProyecto, 2 AS nivel, concat(unidadResponsable, finalidad, funcion, subfuncion, subsubfuncion, programaSectorial, programaPresupuestario, origenAsignacion, actividadInstitucional, proyectoEstrategico, LPAD(numeroProyectoEstrategico,3,'0')) as clave, P2.nombreTecnico, CA.indicador, sum(AMM.meta) as meta, sum(if(EPM2.idEstatus>3,AMM.avance,0)) as avance ";
 				$query .= "FROM componenteActividades CA ";
 				$query .= "JOIN actividadMetasMes AMM ON AMM.idActividad = CA.id AND AMM.borradoAl IS NULL AND (AMM.meta > 0 OR AMM.avance > 0) ";
 
@@ -633,7 +633,21 @@ class VisorController extends BaseController {
 					}
 				}
 
-				$data = array('data'=>$indicadores,'datos_captura'=>$datos_captura);
+				if(isset($parametros['excel'])){
+					Excel::create('IndicadoresResultados', function($excel) use ($indicadores){
+						$excel->sheet('Proyectos', function($sheet)  use ($indicadores){
+					        $sheet->loadView('visor.excel.reporte-indicadores-resultados', ['data'=>$indicadores]);
+
+					        $sheet->setColumnFormat(array( 
+					        	'C5:D999' => '### ### ### ##0.00', 
+					        	'E5:E999' => '##0.00 %' 
+					        ));
+					    });
+					    $excel->getActiveSheet()->getStyle('A1:I999')->getAlignment()->setWrapText(true);
+					})->download('xls');
+				}else{
+					$data = array('data'=>$indicadores,'datos_captura'=>$datos_captura);
+				}
 			}
 		}elseif(isset($parametros['formatogrid'])){
 			if(isset($parametros['clasificacionProyecto'])){

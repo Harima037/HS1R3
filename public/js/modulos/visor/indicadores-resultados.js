@@ -15,6 +15,19 @@ var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/visor');
 
 cambiarJurisdiccion();
 
+$('#btn-justificacion-jurisdiccion').on('click',function obtenerExcel(){
+	var parametros = '?tabla=indicadores_resultados_jurisdiccion';
+
+	if($('#filtro-jurisdiccion').val() != ''){
+		parametros += '&jurisdiccion='+$('#filtro-jurisdiccion').val();
+	}
+
+	parametros += '&excel=1';
+
+	window.open(SERVER_HOST+'/v1/visor'+parametros);
+});
+
+
 function cambiarJurisdiccion(){
 	var parametros = {tabla:'indicadores_resultados_jurisdiccion'};
 
