@@ -640,10 +640,17 @@ class VisorController extends BaseController {
 
 					        $sheet->setColumnFormat(array( 
 					        	'C5:D999' => '### ### ### ##0.00', 
-					        	'E5:E999' => '##0.00 %' 
+					        	'E5:E999' => '# ##0.00%' 
 					        ));
 					    });
 					    $excel->getActiveSheet()->getStyle('A1:I999')->getAlignment()->setWrapText(true);
+
+					    $excel->getActiveSheet()->getColumnDimension('A')->setAutoSize(false);
+						$excel->getActiveSheet()->getColumnDimension('A')->setWidth("40");
+						$excel->getActiveSheet()->getColumnDimension('B')->setAutoSize(false);
+						$excel->getActiveSheet()->getColumnDimension('B')->setWidth("40");
+
+						$excel->getActiveSheet()->freezePane('A3');
 					})->download('xls');
 				}else{
 					$data = array('data'=>$indicadores,'datos_captura'=>$datos_captura);

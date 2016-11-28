@@ -104,15 +104,15 @@
 				<th class="encabezado-tabla" width="14">Porcentaje</th>
 			</tr>
 		</thead>
-		<tbody>
+		<tbody data-row="{{$row = 3}}">
 			@foreach($data as $tipo_proyecto => $proyectos)
 				@if($tipo_proyecto == 1)
-					<tr height="27"><th class="sub-encabezado-tabla" colspan="5">Proyectos Institucionales</th></tr>
+					<tr height="27" data-row="{{$row++}}"><th class="sub-encabezado-tabla" colspan="5"">Proyectos Institucionales</th></tr>
 				@else
-					<tr height="27"><th class="sub-encabezado-tabla" colspan="5">Proyectos de Inversión</th></tr>
+					<tr height="27" data-row="{{$row++}}"><th class="sub-encabezado-tabla" colspan="5"">Proyectos de Inversión</th></tr>
 				@endif
 				@foreach($proyectos as $proyecto)
-					<tr height="25" class="texto-tabla negrita">
+					<tr height="25" class="texto-tabla negrita" data-row="{{$row++}}">
 						<td class="subtitulo-tabla">{{$proyecto['clave']}}</td>
 						<td class="subtitulo-tabla" colspan="4">{{$proyecto['nombre']}}</td>
 					</tr>
@@ -121,7 +121,7 @@
 							<td colspan="2">{{$componente['indicador']}}</td>
 							<td>{{$componente['meta']}}</td>
 							<td>{{$componente['avance']}}</td>
-							<td>{{$componente['porcentaje']}}</td>
+							<td>=D{{$row}}/C{{$row++}}</td>
 						</tr>
 					@endforeach
 
@@ -130,7 +130,7 @@
 							<td colspan="2">{{$actividad['indicador']}}</td>
 							<td>{{$actividad['meta']}}</td>
 							<td>{{$actividad['avance']}}</td>
-							<td>{{$actividad['porcentaje']}}</td>
+							<td>=D{{$row}}/C{{$row++}}</td>
 						</tr>
 					@endforeach
 				@endforeach
