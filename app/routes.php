@@ -126,6 +126,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('estado-programatico-funcional',array('uses'=>'ReporteEP20Controller@index'));
 		Route::get('evaluacion-proyectos',array('uses'=>'ReporteEvaluacionProyectosController@index'));
 		Route::get('reporte-proyectos-evaluacion',array('uses'=>'ReporteProyectosEvaluacionController@index'));
+		Route::get('seguimiento-plan-mejora',array('uses'=>'ReporteSeguimientoPlanMejoraController@index'));
 	});
 
 	Route::group(array('prefix'=>"v1"),function(){
@@ -173,6 +174,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('evaluacion-proyectos',			'V1\EvaluacionProyectosController',array('only'=>array('index','show','update','store')));
 		Route::resource('evaluacion-proyectos-reporte',	'V1\ReporteEvaluacionProyectosController',array('only'=>array('index')));
 		Route::resource('reporte-proyectos-evaluacion', 'V1\ReporteProyectosEvaluacionController',array('only'=>array('index','show','update','store')));
+
+		Route::resource('seguimiento-plan-mejora',		'V1\ReporteSeguimientoPlanMejoraController',array('only'=>array('index')));
 
 		Route::resource('reporte-seguimiento',	'V1\ReporteSeguimientoController', array('only' => array('index')));
 		Route::resource('revision-proyectos',	'V1\RevisionController');
