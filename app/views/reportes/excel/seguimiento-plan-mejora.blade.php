@@ -96,15 +96,15 @@
 			<tr height="27">
 				<th colspan="11">SEGUIMIENTO A ASPECTO SUSCEPTIBLES DE MEJORA CLASIFICADOS COMO ESPECIFICOS, DERIVADOS DE INFORMES DE RENDICIÓN DE CUENTAS</th>
 			</tr>
-			<tr height="27">
+			<tr height="40">
 				<th class="encabezado-tabla">NO.</th>
-				<th class="encabezado-tabla">ASPECTOS<br>SUSCEPTIBLES<br>DE MEJORA </th>
-				<th class="encabezado-tabla">ACTIVIDADES</th>
-				<th class="encabezado-tabla">AREA<br>RESPONSABLE</th>
-				<th class="encabezado-tabla">GRUPO DE<br>TRABAJO</th>
-				<th class="encabezado-tabla">FECHA DE<br>NOTIFICACIÓN</th>
-				<th class="encabezado-tabla">RESULTADO<br>ESPERADO</th>
-				<th class="encabezado-tabla">PRODUCTOS<br>Y/O<br>EVIDENCIAS</th>
+				<th class="encabezado-tabla" width="20">ASPECTOS<br>SUSCEPTIBLES<br>DE MEJORA </th>
+				<th class="encabezado-tabla" width="30">ACTIVIDADES</th>
+				<th class="encabezado-tabla" width="20">AREA<br>RESPONSABLE</th>
+				<th class="encabezado-tabla" width="20">GRUPO DE<br>TRABAJO</th>
+				<th class="encabezado-tabla" width="15">FECHA DE<br>NOTIFICACIÓN</th>
+				<th class="encabezado-tabla" width="20">RESULTADO<br>ESPERADO</th>
+				<th class="encabezado-tabla" width="20">PRODUCTOS<br>Y/O<br>EVIDENCIAS</th>
 				<th class="encabezado-tabla">% AVANCE</th>
 				<th class="encabezado-tabla" colspan="2">IDENTIFICACIÓN<br>DEL DOCUMENTO<br>PROBATORIO</th>
 			</tr>
@@ -120,7 +120,7 @@
 					<td>{{$plan->fechaNotificacion}}</td>
 					<td>{{$plan->accionMejora}}</td>
 					<td>{{$plan->analisisResultados}}</td>
-					<td>{{$plan->porcentaje}}</td>
+					<td>{{$plan->avance/$plan->meta}}</td>
 					<td></td>
 					<td></td>
 				</tr>

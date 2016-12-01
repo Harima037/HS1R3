@@ -143,10 +143,9 @@ class ReporteSeguimientoPlanMejoraController extends BaseController {
 						$excel->sheet('Proyectos', function($sheet)  use ($rows){
 					        $sheet->loadView('reportes.excel.seguimiento-plan-mejora', ['data'=>$rows]);
 
-					        /*$sheet->setColumnFormat(array( 
-					        	'C5:D999' => '### ### ### ##0.00', 
-					        	'E5:E999' => '# ##0.00%' 
-					        ));*/
+					        $sheet->setColumnFormat(array(
+					        	'I3:I'.(count($rows)+3) => '# ##0.00%' 
+					        ));
 					    });
 					    $excel->getActiveSheet()->getStyle('A1:I999')->getAlignment()->setWrapText(true);
 
