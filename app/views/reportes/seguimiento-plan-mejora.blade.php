@@ -67,26 +67,41 @@
                         </button>
                     </div>
                 </div>
-                <!--div class="row">
-                    <div class="col-sm-12">
+                <div class="row">
+                    <div class="col-sm-7">
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <select class="form-control" id="identificacion">
+                                <option value="1">
+                                    SI
+                                </option>
+                                <option value="0">
+                                    NO
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
                         <div class="btn-toolbar pull-right" >
                             <div class="btn-group">
-                                <button type="button" class="btn btn-success btn-edit-rows">
-                                    <span class="fa fa-pencil"></span> Indicar Número de Beneficiarios
+                                <button type="button" id="btnDocumentoProbatorio" class="btn btn-success">
+                                    <span class="fa fa-check"></span> Identificacion Documento Probatorio
                                 </button>
                             </div>
                         </div>
                     </div>
-                </div-->
+                </div>
             </div>
             <table class="table table-striped table-hover">
                 <thead>
                     <tr>
                         <th><input type="checkbox" class="check-select-all-rows"></th>
-                        <th width="230">Area Responsable</th>
+                        <th>Proyecto</th>
                         <th>Aspectos Susceptibles de Mejora</th>
                         <th width="180">Fecha de Notificación</th>
                         <th width="100">% Avance</th>
+                        <th width="30"></th>
                     </tr>
                 </thead>
                 <tbody></tbody>

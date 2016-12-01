@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime,Mail,Excel;
-use UnidadResponsable;
+use UnidadResponsable,EvaluacionPlanMejora;
 
 class ReporteSeguimientoPlanMejoraController extends BaseController {
 	/**
@@ -52,7 +52,7 @@ class ReporteSeguimientoPlanMejoraController extends BaseController {
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				$skip = (($parametros['pagina']-1)*10);
 
-				$query = "select RAM.nivel, RAM.idNivel, RAM.mes, IF(RAM.nivel=1,PC.indicador,CA.indicador) as indicador, RAM.analisisResultados as actividades, P.unidadResponsable as areaResponsable, EPM.grupoTrabajo, EPM.fechaNotificacion, EPM.accionMejora ";
+				$query = "select EPM.id, RAM.nivel, RAM.idNivel, RAM.mes, IF(RAM.nivel=1,PC.indicador,CA.indicador) as indicador, RAM.analisisResultados as actividades, P.nombreTecnico, P.unidadResponsable as areaResponsable, EPM.grupoTrabajo, EPM.fechaNotificacion, EPM.accionMejora, EPM.identificacionDocumentoProbatorio ";
 				$query .= "FROM registroAvancesMetas RAM ";
 				$query .= "JOIN evaluacionPlanMejora EPM on EPM.idNivel = RAM.idNivel and EPM.nivel = RAM.nivel and EPM.mes = RAM.mes and EPM.borradoAl is null ";
 				$query .= "LEFT JOIN proyectoComponentes PC on PC.id = RAM.idNivel and RAM.nivel = 1 ";
@@ -60,7 +60,12 @@ class ReporteSeguimientoPlanMejoraController extends BaseController {
 
 				$query .= "JOIN proyectos P on P.id = EPM.idProyecto and ejercicio = ? ";
 				$query .= "WHERE RAM.planMejora = 1 and RAM.borradoAl is null and RAM.mes = ? ";
-				$query .= "ORDER BY P.unidadResponsable ";
+
+				if(isset($parametros['buscar'])){
+					$query .= 'and (P.nombreTecnico LIKE "%'.$parametros['buscar'].'%" or PC.indicador LIKE "%'.$parametros['buscar'].'%" or CA.indicador LIKE "%'.$parametros['buscar'].'%" ) ';
+				}
+
+				$query .= "ORDER BY P.unidadResponsable, P.id ";
 
 				$query_params = [$ejercicio, $mes];
 
@@ -144,20 +149,30 @@ class ReporteSeguimientoPlanMejoraController extends BaseController {
 					        $sheet->loadView('reportes.excel.seguimiento-plan-mejora', ['data'=>$rows]);
 
 					        $sheet->setColumnFormat(array(
-					        	'I3:I'.(count($rows)+3) => '# ##0.00%' 
+					        	'J3:J'.(count($rows)+3) => '# ##0.00%' 
 					        ));
 					    });
 					    $excel->getActiveSheet()->getStyle('A1:I999')->getAlignment()->setWrapText(true);
-
-					    /*$excel->getActiveSheet()->getColumnDimension('A')->setAutoSize(false);
-						$excel->getActiveSheet()->getColumnDimension('A')->setWidth("40");
-						$excel->getActiveSheet()->getColumnDimension('B')->setAutoSize(false);
-						$excel->getActiveSheet()->getColumnDimension('B')->setWidth("40");*/
-
 						$excel->getActiveSheet()->freezePane('A3');
 					})->download('xls');
 				}else{
-					$total = DB::select('select count(*) as conteo from registroAvancesMetas where planMejora = 1 and borradoAl is null and mes = ?',[$mes]);
+
+					$query = "select count(*) as conteo ";
+					$query .= "FROM registroAvancesMetas RAM ";
+					$query .= "LEFT JOIN proyectoComponentes PC on PC.id = RAM.idNivel and RAM.nivel = 1 ";
+					$query .= "LEFT JOIN componenteActividades CA on CA.id = RAM.idNivel and RAM.nivel = 2 ";
+
+					$query .= "JOIN proyectos P on P.id = RAM.idProyecto and ejercicio = ? ";
+					$query .= "WHERE RAM.planMejora = 1 and RAM.borradoAl is null and RAM.mes = ? ";
+
+					if(isset($parametros['buscar'])){
+						$query .= 'and (P.nombreTecnico LIKE "%'.$parametros['buscar'].'%" or PC.indicador LIKE "%'.$parametros['buscar'].'%" or CA.indicador LIKE "%'.$parametros['buscar'].'%" ) ';
+					}
+
+					$query_params = [$ejercicio, $mes];
+
+
+					$total = DB::select($query,$query_params);
 					$total = $total[0]->conteo;
 					
 					$data = array('resultados'=>$total,'data'=>$rows);
@@ -173,5 +188,32 @@ class ReporteSeguimientoPlanMejoraController extends BaseController {
 		}catch(Exception $ex){
 			return Response::json(['data'=>$ex->getMessage(),'line'=>$ex->getLine()],500);
 		}
+	}
+
+	public function update($id){
+		$respuesta['http_status'] = 200;
+		$respuesta['data'] = array("data"=>'');
+
+		try{
+			$usuario = Sentry::getUser();
+			$parametros = Input::all();
+
+			$ids = $parametros['ids'];
+
+			if($parametros['identificacion']){
+				$valor = 1;
+			}else{
+				$valor = 0;
+			}
+
+			EvaluacionPlanMejora::whereIn('id',$ids)->update(['identificacionDocumentoProbatorio'=>$valor]);
+
+			$respuesta['data']['data'] = $ids;
+
+		}catch(Exception $e){
+			$respuesta['http_status'] = 500;
+			$respuesta['data'] = array("data"=>"Ocurrió un error en el servidor, intente de nuevo mas tarde o pongase en contacto con el administrador del sistema.",'ex'=>$e->getMessage(),'line'=>$e->getLine(),'code'=>'S02');
+		}
+		return Response::json($respuesta['data'],$respuesta['http_status']);
 	}
 }

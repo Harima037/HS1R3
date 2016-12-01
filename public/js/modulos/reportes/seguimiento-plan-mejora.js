@@ -23,10 +23,15 @@ moduleDatagrid.actualizar({
             var item = {};
 
             item.id = response.data[i].id;
-            item.areaResponsable = response.data[i].areaResponsable;
+            item.nombreTecnico = response.data[i].nombreTecnico;
             item.indicador = response.data[i].indicador;
             item.fechaNotificacion = response.data[i].fechaNotificacion;
             item.porcentaje = (parseFloat(response.data[i].porcentaje) || 0).format(2) + ' %';
+            if(parseInt(response.data[i].identificacionDocumentoProbatorio)){
+                item.identificacionDocumentoProbatorio = '<i class="fa fa-check-square-o"></i>';
+            }else{
+                item.identificacionDocumentoProbatorio = '<i class="fa fa-square-o"></i>';
+            }
             
             datos_grid.push(item);
         }
@@ -59,12 +64,41 @@ $('#datagridPlanesMejora .btn-quick-search').on('click',function(){
 
 function realizar_busqueda(){
     moduleDatagrid.setPagina(1);
-    moduleDatagrid.parametros.buscar = $('.txt-quick-search').val();
+    if($('.txt-quick-search').val() != ''){
+        moduleDatagrid.parametros.buscar = $('.txt-quick-search').val();
+    }else{
+        delete moduleDatagrid.parametros.buscar;
+    }
     moduleDatagrid.parametros.ejercicio = $('#ejercicio').val();
     moduleDatagrid.parametros.trimestre = $('#trimestre').val();
     moduleDatagrid.parametros.mes = $('#mes').val();
     moduleDatagrid.actualizar();
 }
+
+$('#btnDocumentoProbatorio').on('click',function (e) {
+    e.preventDefault();
+    row_ids = [];
+    $(moduleDatagrid.selector).find("tbody").find("input[type=checkbox]:checked").each(function () {
+        row_ids.push($(this).parent().parent().data("id"));
+    });
+
+    if (row_ids.length > 0) {
+        var parametros = {'ids':row_ids};
+        if($('#identificacion').val() == 1){
+            parametros.identificacion = 1;
+        }else{
+            parametros.identificacion = 0;
+        }
+        moduleResource.put(0, parametros,{
+            _success: function(response){
+                moduleDatagrid.actualizar();
+                MessageManager.show({data:'Planes actualizados con éxito.',type:'OK',timer:4});
+            }
+        });
+    }else {
+        MessageManager.show({code:'W00',data:"Seleccione al menos un plan de mejora.",timer:5});
+    }
+});
 
 /*===================================*/
 // Configuración General para cualquier módulo

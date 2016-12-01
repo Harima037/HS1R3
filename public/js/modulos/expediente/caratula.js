@@ -448,7 +448,7 @@ function editar_beneficiario(e){
 		    }
 		    
 		    for(var sexo in beneficiarios ){
-		        total += beneficiarios[sexo].total || 0;
+		        total += parseInt(beneficiarios[sexo].total) || 0;
 		        $('#totalbeneficiarios'+sexo).val(beneficiarios[sexo].total || 0);
 		        $('#urbana'+sexo).val(beneficiarios[sexo].urbana || 0);
 		        $('#rural'+sexo).val(beneficiarios[sexo].rural || 0);
@@ -462,7 +462,7 @@ function editar_beneficiario(e){
 		        $('#baja'+sexo).val(beneficiarios[sexo].baja || 0);
 		        $('#muybaja'+sexo).val(beneficiarios[sexo].muyBaja || 0);
 		    }
-            $('#totalbeneficiarios').text(total);
+            $('#totalbeneficiarios').text(total.format());
             cargar_totales();
 			$(modal_beneficiario).modal('show');
 		}
@@ -1273,6 +1273,8 @@ function actualizar_grid_beneficiarios(datos){
 			beneficiario.totalM = 0;
 			beneficiario.total = 0;
 		}
+
+		datos[indx].total = parseInt(datos[indx].total) || 0;
 
 		if(datos[indx].sexo == 'f'){
 			beneficiario.totalF = datos[indx].total;

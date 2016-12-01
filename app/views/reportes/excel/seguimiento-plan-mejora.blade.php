@@ -98,6 +98,7 @@
 			</tr>
 			<tr height="40">
 				<th class="encabezado-tabla">NO.</th>
+				<th class="encabezado-tabla" width="20">NOMBRE DEL<br>PROYECTO</th>
 				<th class="encabezado-tabla" width="20">ASPECTOS<br>SUSCEPTIBLES<br>DE MEJORA </th>
 				<th class="encabezado-tabla" width="30">ACTIVIDADES</th>
 				<th class="encabezado-tabla" width="20">AREA<br>RESPONSABLE</th>
@@ -112,17 +113,23 @@
 		<tbody data-row="{{$row = 3}}">
 			@foreach($data as $index => $plan)
 				<tr height="25" class="texto-tabla">
-					<td>{{$index+1}}</td>
+					<td align="center">{{$index+1}}</td>
+					<td>{{$plan->nombreTecnico}}</td>
 					<td>{{$plan->indicador}}</td>
 					<td>{{$plan->actividades}}</td>
 					<td>{{$plan->areaResponsable}}</td>
 					<td>{{$plan->grupoTrabajo}}</td>
-					<td>{{$plan->fechaNotificacion}}</td>
+					<td align="center">{{$plan->fechaNotificacion}}</td>
 					<td>{{$plan->accionMejora}}</td>
 					<td>{{$plan->analisisResultados}}</td>
-					<td>{{$plan->avance/$plan->meta}}</td>
-					<td></td>
-					<td></td>
+					<td align="center">{{$plan->avance/$plan->meta}}</td>
+					@if($plan->identificacionDocumentoProbatorio)
+						<td align="center">X</td>
+						<td align="center"></td>
+					@else
+						<td align="center"></td>
+						<td align="center">X</td>
+					@endif
 				</tr>
 			@endforeach
 		</tbody>
