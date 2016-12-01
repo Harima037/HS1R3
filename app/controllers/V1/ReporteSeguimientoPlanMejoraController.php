@@ -64,14 +64,13 @@ class ReporteSeguimientoPlanMejoraController extends BaseController {
 
 				$query_params = [$ejercicio, $mes];
 
-				if($skip == 0){
-					$query .= " LIMIT 10 ";
-				}else{
-					$query .= " LIMIT ".$skip.", 10 ";
-					//$query_params[] = $skip;
+				if(!isset($parametros['excel'])){
+					if($skip == 0){
+						$query .= " LIMIT 10 ";
+					}else{
+						$query .= " LIMIT ".$skip.", 10 ";
+					}
 				}
-
-				//$query_params[] = 10;
 				
 				$rows = DB::select($query, $query_params);
 
@@ -84,10 +83,10 @@ class ReporteSeguimientoPlanMejoraController extends BaseController {
 				$unidades = UnidadResponsable::get()->lists('descripcion','clave');
 				$avances_prox_mes = ['componentes'=>[],'actividades'=>[]];
 
-				$query = 'select CMM.idComponente, sum(CMM.avance) as avance, sum(CMM.meta) as meta, RAM.mes, RAM.analisisResultados ';
+				$query = 'select CMM.idComponente, sum(if(CMM.mes <= ? ,CMM.avance,0)) as avance, sum(CMM.meta) as meta, RAM.mes, RAM.analisisResultados ';
 				$query .= 'from componenteMetasMes CMM ';
-				$query .= 'join registroAvancesMetas RAM on RAM.idNivel = CMM.idComponente and RAM.nivel = 1 and RAM.mes = ? and RAM.borradoAl is null ';
-				$query .= 'where CMM.mes <= ? and CMM.borradoAl is null ';
+				$query .= 'left join registroAvancesMetas RAM on RAM.idNivel = CMM.idComponente and RAM.nivel = 1 and RAM.mes = ? and RAM.borradoAl is null ';
+				$query .= 'where CMM.borradoAl is null '; //CMM.mes <= ? and
 				$query .= 'group by CMM.idComponente ';
 
 				$raw_avances_componentes = DB::select($query,[$proximo_mes,$proximo_mes]);
@@ -96,10 +95,10 @@ class ReporteSeguimientoPlanMejoraController extends BaseController {
 					$avances_prox_mes['componentes'][$avance->idComponente] = $avance;
 				}
 
-				$query = 'select AMM.idActividad, sum(AMM.avance) as avance, sum(AMM.meta) as meta, RAM.mes, RAM.analisisResultados ';
+				$query = 'select AMM.idActividad, sum(if(AMM.mes <= ? ,AMM.avance,0)) as avance, sum(AMM.meta) as meta, RAM.mes, RAM.analisisResultados ';
 				$query .= 'from actividadMetasMes AMM ';
-				$query .= 'join registroAvancesMetas RAM on RAM.idNivel = AMM.idActividad and RAM.nivel = 2 and RAM.mes = ? and RAM.borradoAl is null ';
-				$query .= 'where AMM.mes <= ? and AMM.borradoAl is null ';
+				$query .= 'left join registroAvancesMetas RAM on RAM.idNivel = AMM.idActividad and RAM.nivel = 2 and RAM.mes = ? and RAM.borradoAl is null ';
+				$query .= 'where AMM.borradoAl is null '; //AMM.mes <= ? and
 				$query .= 'group by AMM.idActividad ';
 
 				$raw_avances_actividades = DB::select($query,[$proximo_mes,$proximo_mes]);
@@ -126,19 +125,51 @@ class ReporteSeguimientoPlanMejoraController extends BaseController {
 						$row->meta = 0;
 						$row->analisisResultados = '';
 					}
+
+					$porcentaje = 0.00;
+
+					if($row->avance > 0){
+						if($row->meta > 0){
+							$porcentaje = ($row->avance*100)/$row->meta;
+						}
+					}
+
+					$row->porcentaje = $porcentaje;
+
 				}
 
-				$total = DB::select('select count(*) as conteo from registroAvancesMetas where planMejora = 1 and borradoAl is null and mes = ?',[$mes]);
-				$total = $total[0]->conteo;
-				
-				$data = array('resultados'=>$total,'data'=>$rows);
+				if(isset($parametros['excel'])){
+					Excel::create('SeguimientoPlanMejora', function($excel) use ($rows){
+						$excel->sheet('Proyectos', function($sheet)  use ($rows){
+					        $sheet->loadView('reportes.excel.seguimiento-plan-mejora', ['data'=>$rows]);
 
-				if($total<=0){
-					$http_status = 404;
-					$data = array('resultados'=>$total,"data"=>"No hay datos",'code'=>'W00');
+					        /*$sheet->setColumnFormat(array( 
+					        	'C5:D999' => '### ### ### ##0.00', 
+					        	'E5:E999' => '# ##0.00%' 
+					        ));*/
+					    });
+					    $excel->getActiveSheet()->getStyle('A1:I999')->getAlignment()->setWrapText(true);
+
+					    /*$excel->getActiveSheet()->getColumnDimension('A')->setAutoSize(false);
+						$excel->getActiveSheet()->getColumnDimension('A')->setWidth("40");
+						$excel->getActiveSheet()->getColumnDimension('B')->setAutoSize(false);
+						$excel->getActiveSheet()->getColumnDimension('B')->setWidth("40");*/
+
+						$excel->getActiveSheet()->freezePane('A3');
+					})->download('xls');
+				}else{
+					$total = DB::select('select count(*) as conteo from registroAvancesMetas where planMejora = 1 and borradoAl is null and mes = ?',[$mes]);
+					$total = $total[0]->conteo;
+					
+					$data = array('resultados'=>$total,'data'=>$rows);
+
+					if($total<=0){
+						$http_status = 404;
+						$data = array('resultados'=>$total,"data"=>"No hay datos",'code'=>'W00');
+					}
+
+					return Response::json($data,$http_status);
 				}
-
-				return Response::json($data,$http_status);
 			}
 		}catch(Exception $ex){
 			return Response::json(['data'=>$ex->getMessage(),'line'=>$ex->getLine()],500);

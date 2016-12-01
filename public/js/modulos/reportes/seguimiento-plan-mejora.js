@@ -26,7 +26,7 @@ moduleDatagrid.actualizar({
             item.areaResponsable = response.data[i].areaResponsable;
             item.indicador = response.data[i].indicador;
             item.fechaNotificacion = response.data[i].fechaNotificacion;
-            item.avance = response.data[i].avance;
+            item.porcentaje = (parseFloat(response.data[i].porcentaje) || 0).format(2) + ' %';
             
             datos_grid.push(item);
         }
@@ -68,14 +68,12 @@ function realizar_busqueda(){
 
 /*===================================*/
 // Configuración General para cualquier módulo
-$('#btn-ver-reporte').on('click',function(){
-    /*
-    var parametros = '?mes='+$('#mes').val()+'&ejercicio='+$('#ejercicio').val();
+$('#btn-descargar-reporte').on('click',function(){
+    var parametros = '?formatogrid=1&pagina=0&excel=1&mes='+$('#mes').val()+'&ejercicio='+$('#ejercicio').val()+'&trimestre='+$('#trimestre').val();
     if($('.txt-quick-search').val()){
         parametros += '&buscar='+$('.txt-quick-search').val();
     }
-    window.open(SERVER_HOST+'/v1/evaluacion-proyectos-reporte'+parametros);
-    */
+    window.open(SERVER_HOST+'/v1/seguimiento-plan-mejora'+parametros);
 });
 /*===================================*/
 // Funciones adicionales por módulo
