@@ -23,9 +23,10 @@ moduleDatagrid.actualizar({
             var item = {};
 
             item.id = response.data[i].id;
+            item.clave = response.data[i].clave;
             item.nombreTecnico = response.data[i].nombreTecnico;
             item.indicador = response.data[i].indicador;
-            item.fechaNotificacion = response.data[i].fechaNotificacion;
+            //item.fechaNotificacion = response.data[i].fechaNotificacion;
             item.porcentaje = (parseFloat(response.data[i].porcentaje) || 0).format(2) + ' %';
             if(parseInt(response.data[i].identificacionDocumentoProbatorio)){
                 item.identificacionDocumentoProbatorio = '<i class="fa fa-check-square-o"></i>';

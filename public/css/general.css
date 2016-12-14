@@ -146,6 +146,10 @@ input[readonly] {
           margin: 0;
 }
 
+.rows-texto-completo td {
+  white-space: normal !important;
+}
+
 tbody.scrollContent {
   display: block;
   max-height: 300px;

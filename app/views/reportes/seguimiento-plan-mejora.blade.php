@@ -97,14 +97,14 @@
                 <thead>
                     <tr>
                         <th><input type="checkbox" class="check-select-all-rows"></th>
-                        <th>Proyecto</th>
+                        <th width="180">Clave</th>
+                        <th>Nombre Técnico</th>
                         <th>Aspectos Susceptibles de Mejora</th>
-                        <th width="180">Fecha de Notificación</th>
                         <th width="100">% Avance</th>
                         <th width="30"></th>
                     </tr>
                 </thead>
-                <tbody></tbody>
+                <tbody class="rows-texto-completo"></tbody>
             </table>
             <div class="panel-footer">
                 <div class="btn-toolbar ">

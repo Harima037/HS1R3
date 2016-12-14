@@ -52,7 +52,7 @@ class ReporteSeguimientoPlanMejoraController extends BaseController {
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				$skip = (($parametros['pagina']-1)*10);
 
-				$query = "select EPM.id, RAM.nivel, RAM.idNivel, RAM.mes, IF(RAM.nivel=1,PC.indicador,CA.indicador) as indicador, RAM.analisisResultados as actividades, P.nombreTecnico, P.unidadResponsable as areaResponsable, EPM.grupoTrabajo, EPM.fechaNotificacion, EPM.accionMejora, EPM.identificacionDocumentoProbatorio ";
+				$query = "select concat(unidadResponsable, finalidad, funcion, subfuncion, subsubfuncion, programaSectorial, programaPresupuestario, origenAsignacion, actividadInstitucional, proyectoEstrategico, LPAD(numeroProyectoEstrategico,3,'0')) as clave, EPM.id, RAM.nivel, RAM.idNivel, RAM.mes, IF(RAM.nivel=1,PC.indicador,CA.indicador) as indicador, RAM.analisisResultados as actividades, P.nombreTecnico, P.unidadResponsable as areaResponsable, EPM.grupoTrabajo, EPM.fechaNotificacion, EPM.accionMejora, EPM.identificacionDocumentoProbatorio ";
 				$query .= "FROM registroAvancesMetas RAM ";
 				$query .= "JOIN evaluacionPlanMejora EPM on EPM.idNivel = RAM.idNivel and EPM.nivel = RAM.nivel and EPM.mes = RAM.mes and EPM.borradoAl is null ";
 				$query .= "LEFT JOIN proyectoComponentes PC on PC.id = RAM.idNivel and RAM.nivel = 1 ";
@@ -62,7 +62,7 @@ class ReporteSeguimientoPlanMejoraController extends BaseController {
 				$query .= "WHERE RAM.planMejora = 1 and RAM.borradoAl is null and RAM.mes = ? ";
 
 				if(isset($parametros['buscar'])){
-					$query .= 'and (P.nombreTecnico LIKE "%'.$parametros['buscar'].'%" or PC.indicador LIKE "%'.$parametros['buscar'].'%" or CA.indicador LIKE "%'.$parametros['buscar'].'%" ) ';
+					$query .= 'and (P.nombreTecnico LIKE "%'.$parametros['buscar'].'%" or PC.indicador LIKE "%'.$parametros['buscar'].'%" or CA.indicador LIKE "%'.$parametros['buscar'].'%" or concat(unidadResponsable, finalidad, funcion, subfuncion, subsubfuncion, programaSectorial, programaPresupuestario, origenAsignacion, actividadInstitucional, proyectoEstrategico, LPAD(numeroProyectoEstrategico,3,"0")) LIKE "%'.$parametros['buscar'].'%" ) ';
 				}
 
 				$query .= "ORDER BY P.unidadResponsable, P.id ";
@@ -78,6 +78,9 @@ class ReporteSeguimientoPlanMejoraController extends BaseController {
 				}
 				
 				$rows = DB::select($query, $query_params);
+
+				//$queries = DB::getQueryLog();
+				//var_dump(end($queries));die;
 
 				$proximo_mes = $parametros['mes'];
 
@@ -166,12 +169,11 @@ class ReporteSeguimientoPlanMejoraController extends BaseController {
 					$query .= "WHERE RAM.planMejora = 1 and RAM.borradoAl is null and RAM.mes = ? ";
 
 					if(isset($parametros['buscar'])){
-						$query .= 'and (P.nombreTecnico LIKE "%'.$parametros['buscar'].'%" or PC.indicador LIKE "%'.$parametros['buscar'].'%" or CA.indicador LIKE "%'.$parametros['buscar'].'%" ) ';
+						$query .= 'and (P.nombreTecnico LIKE "%'.$parametros['buscar'].'%" or PC.indicador LIKE "%'.$parametros['buscar'].'%" or CA.indicador LIKE "%'.$parametros['buscar'].'%"  or concat(unidadResponsable, finalidad, funcion, subfuncion, subsubfuncion, programaSectorial, programaPresupuestario, origenAsignacion, actividadInstitucional, proyectoEstrategico, LPAD(numeroProyectoEstrategico,3,"0")) LIKE "%'.$parametros['buscar'].'%" ) ';
 					}
 
 					$query_params = [$ejercicio, $mes];
-
-
+					
 					$total = DB::select($query,$query_params);
 					$total = $total[0]->conteo;
 					
