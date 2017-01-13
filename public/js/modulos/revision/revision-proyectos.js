@@ -122,7 +122,7 @@ function editar (e){
 					var siguienteIndice = parseInt(cuentabeneficia,10)+1;										
 					if(response.data.beneficiarios[cuentabeneficia].idTipoBeneficiario == response.data.beneficiarios[siguienteIndice].idTipoBeneficiario)
 					{
-						var sumaTotales = response.data.beneficiarios[cuentabeneficia].total + response.data.beneficiarios[siguienteIndice].total;
+						var sumaTotales = parseInt(response.data.beneficiarios[cuentabeneficia].total) + parseInt(response.data.beneficiarios[siguienteIndice].total);
 						cadenaHTML = cadenaHTML +'<td rowspan="2" align="right">'+sumaTotales+'</td>';
 						sePusoTotales = 1;
 					}
