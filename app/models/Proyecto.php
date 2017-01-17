@@ -270,6 +270,7 @@ class Proyecto extends BaseModel
 				})
 				->select('proyectoBeneficiarios.id','proyectoBeneficiarios.idProyecto','proyectoBeneficiarios.idTipoBeneficiario',
 					DB::raw('sum(avanceBenef.total) AS avanceBeneficiario'),
+					DB::raw('sum(if(avanceBenef.sexo = "f",avanceBenef.total,0)) AS avanceBeneficiarioF'),DB::raw('sum(if(avanceBenef.sexo = "m",avanceBenef.total,0)) AS avanceBeneficiarioM'),
 					'tipoBeneficiario.descripcion AS tipoBeneficiario')
 				->groupBy('proyectoBeneficiarios.idProyecto','proyectoBeneficiarios.idTipoBeneficiario');
 			},'evaluacionMes'=>function($evaluacionMes)use($mes){
@@ -278,6 +279,8 @@ class Proyecto extends BaseModel
 							->where('evaluacionProyectoMes.idEstatus','<',6)
 							->groupBy('evaluacionProyectoMes.idProyecto')
 							->select('evaluacionProyectoMes.id','evaluacionProyectoMes.idProyecto','evaluacionProyectoMes.mes',
+								DB::raw('sum(evaluacionProyectoMes.indicadorResultadoBeneficiariosF) AS indicadorResultadoBeneficiariosF'),
+								DB::raw('sum(evaluacionProyectoMes.indicadorResultadoBeneficiariosM) AS indicadorResultadoBeneficiariosM'),
 								DB::raw('sum(evaluacionProyectoMes.indicadorResultadoBeneficiarios) AS indicadorResultadoBeneficiarios'));
 			}
 			))
@@ -677,7 +680,7 @@ class Proyecto extends BaseModel
     }
 
     public function scopeReporteEvaluacionProyectos($query,$ejercicio,$mes){
-		return $query->leftjoin('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','proyectos.unidadResponsable')
+		$query = $query->leftjoin('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','proyectos.unidadResponsable')
 					->leftjoin('catalogoTiposProyectos AS tipoProyecto','tipoProyecto.id','=','proyectos.idTipoProyecto')
 					->leftjoin('catalogoCoberturas AS cobertura','cobertura.id','=','proyectos.idCobertura')
 					->leftjoin('evaluacionProyectoObservaciones AS observaciones',function($join)use($mes){
@@ -691,6 +694,21 @@ class Proyecto extends BaseModel
 						'cobertura.descripcion AS coberturaDescripcion', 'observaciones.observaciones'
 					)
 					->where('ejercicio',$ejercicio);
+		/*if($fuente_financiamiento){
+			$query = $query->join('cargadatosep01 as ep01',function($join)use($fuente_financiamiento){
+						$join->on('ep01.UR','=','proyectos.unidadResponsable')
+								->where('ep01.FI','=','proyectos.finalidad')
+								->where('ep01.FU','=','proyectos.funcion')
+								->where('ep01.SF','=','proyectos.subfuncion')
+								->where('ep01.SSF','=','proyectos.subsubfuncion')
+								->where('ep01.PS','=','proyectos.programaSectorial')
+								->where('ep01.PP','=','proyectos.programaPresupuestario')
+								->where('ep01.OA','=','proyectos.origenAsignacion')
+								->where('ep01.AI','=','proyectos.actividadInstitucional')
+								->where('ep01.PT','=',DB::raw('concat(proyectos.proyectoEstrategico,LPAD(proyectos.numeroProyectoEstrategico,3,"0"))'));
+					});
+		}*/
+		return $query;
 	}
 
 	public function scopeContenidoCompleto($query){

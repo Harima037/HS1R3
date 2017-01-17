@@ -252,9 +252,9 @@ class ReporteIndicadorResultadoController extends BaseController {
 
 				    	$sheet->loadView('reportes.excel.indicadores-resultados',$datos_hoja);
 				    	
-				    	$sheet->mergeCells('A2:O2');
-						$sheet->mergeCells('A4:O4');
-						$sheet->cells('A2:O4',function($cells){ $cells->setAlignment('center'); });
+				    	$sheet->mergeCells('A2:Q2');
+						$sheet->mergeCells('A4:Q4');
+						$sheet->cells('A2:Q4',function($cells){ $cells->setAlignment('center'); });
 						$sheet->mergeCells('A9:A10');
 						$sheet->mergeCells('B9:B10');
 						$sheet->mergeCells('D9:E10');
@@ -263,11 +263,11 @@ class ReporteIndicadorResultadoController extends BaseController {
 						$sheet->mergeCells('K9:K10');
 						$sheet->mergeCells('L9:L10');
 						$sheet->mergeCells('M9:M10');
-						$sheet->mergeCells('N9:P9');
-						$sheet->mergeCells('C11:P11');
-						$sheet->cells('A9:P12',function($cells) { $cells->setAlignment('center'); });
-						$sheet->getStyle('A9:P12')->getAlignment()->setWrapText(true);
-						$sheet->getStyle('A9:P11')->applyFromArray(array(
+						$sheet->mergeCells('N9:R9');
+						$sheet->mergeCells('C11:R11');
+						$sheet->cells('A9:R12',function($cells) { $cells->setAlignment('center'); });
+						$sheet->getStyle('A9:R12')->getAlignment()->setWrapText(true);
+						$sheet->getStyle('A9:R11')->applyFromArray(array(
 						    'fill' => array(
 						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
 						        'color' => array('rgb' => '28A659')
@@ -284,7 +284,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 						    	)
 						    )
 						));
-						$sheet->getStyle('A11:P11')->applyFromArray(array(
+						$sheet->getStyle('A11:R11')->applyFromArray(array(
 						    'font' => array(
 						        'size'      =>  13,
 						        'bold'      =>  true
@@ -296,7 +296,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 						    	)
 						    )
 						));
-						$sheet->getStyle('A12:P12')->applyFromArray(array(
+						$sheet->getStyle('A12:R12')->applyFromArray(array(
 						    'fill' => array(
 						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
 						        'color' => array('rgb' => 'DDDDDD')
@@ -318,7 +318,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 						    )
 						));
 						$total = $hoja['conteo_items'] + 13;
-						for ($i='A'; $i < 'P' ; $i++) { 
+						for ($i='A'; $i < 'R' ; $i++) { 
 							if($i != 'D' && $i != 'I'){
 								$sheet->getStyle($i.'14:'.$i.$total)->applyFromArray(array(
 								    'font' => array( 'size' => 10),
@@ -337,17 +337,17 @@ class ReporteIndicadorResultadoController extends BaseController {
 							$cell->setValignment('center');
 						});
 
-						$sheet->getStyle('A14:P'.$total)->getAlignment()->setWrapText(true);
+						$sheet->getStyle('A14:R'.$total)->getAlignment()->setWrapText(true);
 						$sheet->setColumnFormat(array(
 							'F14:H'.$total => '### ### ### ##0.00',
 							'K12:M12' => '### ### ### ##0.00',
 						    'J12:M'.$total => '### ### ### ##0.00',
-						    'P14:P'.$total => '### ### ### ##0'
+						    'P14:R'.$total => '### ### ### ##0'
 						));
 
 						$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','A1');
 						$imagen->setWorksheet($sheet);
-						$imagen = $this->obtenerImagen('LogoInstitucional.png','O1');
+						$imagen = $this->obtenerImagen('LogoInstitucional.png','Q1');
 						$imagen->setWorksheet($sheet);
 				    });
 					

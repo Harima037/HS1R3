@@ -137,7 +137,8 @@ class IndicadorResultadoController extends BaseController {
 							'proyectos.subFuncion','proyectos.subSubFuncion','proyectos.programaSectorial',
 							'proyectos.programaPresupuestario','proyectos.origenAsignacion','estatusMes.idEstatus',
 							'proyectos.actividadInstitucional','proyectos.proyectoEstrategico','estatusMes.id AS idAvanceMes',
-							'proyectos.numeroProyectoEstrategico',DB::raw('concat_ws(".- ",subFuncionGasto.clave,subFuncionGasto.descripcion) AS subFuncionDescripcion'),'estatusMes.indicadorResultadoBeneficiarios'
+							'proyectos.numeroProyectoEstrategico',DB::raw('concat_ws(".- ",subFuncionGasto.clave,subFuncionGasto.descripcion) AS subFuncionDescripcion'),'estatusMes.indicadorResultadoBeneficiarios',
+							'estatusMes.indicadorResultadoBeneficiariosF','estatusMes.indicadorResultadoBeneficiariosM'
 						)
 						->leftjoin('catalogoFuncionesGasto AS subFuncionGasto','subFuncionGasto.clave','=',DB::raw('concat_ws(".",proyectos.finalidad,	proyectos.funcion,proyectos.subFuncion,proyectos.subSubFuncion)'))
 						->with(array('beneficiariosDescripcion'=>function($beneficiario)use($mes){
@@ -182,11 +183,24 @@ class IndicadorResultadoController extends BaseController {
 			$recurso = EvaluacionProyectoMes::find($id);
 
 			if($recurso){
+				if($parametros['beneficiariosF'] !== ''){
+					$recurso->indicadorResultadoBeneficiariosF = $parametros['beneficiariosF'];
+				}else{
+					$recurso->indicadorResultadoBeneficiariosF = NULL;
+				}
+
+				if($parametros['beneficiariosM'] !== ''){
+					$recurso->indicadorResultadoBeneficiariosM = $parametros['beneficiariosM'];
+				}else{
+					$recurso->indicadorResultadoBeneficiariosM = NULL;
+				}
+
 				if($parametros['beneficiarios'] !== ''){
 					$recurso->indicadorResultadoBeneficiarios = $parametros['beneficiarios'];
 				}else{
 					$recurso->indicadorResultadoBeneficiarios = NULL;
 				}
+
 				if($recurso->save()){
 					$respuesta['http_status'] = 200;
 					$respuesta['data'] = array("data"=>$recurso);

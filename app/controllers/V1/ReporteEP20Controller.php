@@ -106,6 +106,7 @@ class ReporteEP20Controller extends BaseController {
 								DB::raw('sum(cargaDatosEP01.presupuestoDevengadoModificado) AS presupuestoDevengadoModificado'),
 								DB::raw('sum(cargaDatosEP01.presupuestoComprometidoModificado) AS presupuestoComprometidoModificado'),
 								DB::raw('sum(cargaDatosEP01.presupuestoPorLiberar) AS presupuestoPorLiberar'),
+								DB::raw('sum(cargaDatosEP01.presupuestoModificado) AS presupuestoModificado'),
 								DB::raw('sum(cargaDatosEP01.disponiblePresupuestarioModificado) AS disponiblePresupuestarioModificado')
 						);
 

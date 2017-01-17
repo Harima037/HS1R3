@@ -94,9 +94,23 @@ function editar (e){
             $('#tabla_beneficiarios tbody').html(html);
 
             if(response.data.idAvanceMes){
-                $('#beneficiarios').prop('disabled',false);
+                $('#beneficiarios-f').prop('disabled',false);
+                $('#beneficiarios-f').val(response.data.indicadorResultadoBeneficiariosF);
+                $('#beneficiarios-m').prop('disabled',false);
+                $('#beneficiarios-m').val(response.data.indicadorResultadoBeneficiariosM);
+
+                if(response.data.indicadorResultadoBeneficiariosF || response.data.indicadorResultadoBeneficiariosM){
+                    $('#beneficiarios').prop('disabled',true);
+                }else{
+                    $('#beneficiarios').prop('disabled',false);
+                }
+
                 $('#beneficiarios').val(response.data.indicadorResultadoBeneficiarios);
             }else{
+                $('#beneficiarios-f').prop('disabled',true);
+                $('#beneficiarios-f').val('');
+                $('#beneficiarios-m').prop('disabled',true);
+                $('#beneficiarios-m').val('');
                 $('#beneficiarios').prop('disabled',true);
                 $('#beneficiarios').val('');
             }
@@ -112,15 +126,51 @@ function editar (e){
     });
 }
 
+    $('#beneficiarios-f,#beneficiarios-m').on('keyup',function(){ $(this).change(); });
+    $('#beneficiarios-f,#beneficiarios-m').on('change',function(){
+        var total_beneficiarios = 0;
+
+        if(parseInt($('#beneficiarios-f').val())){
+            total_beneficiarios += parseInt($('#beneficiarios-f').val());
+        }
+
+        if(parseInt($('#beneficiarios-m').val())){
+            total_beneficiarios += parseInt($('#beneficiarios-m').val());
+        }
+
+        if(total_beneficiarios > 0){
+            $('#beneficiarios').prop('disabled',true);
+        }else{
+            $('#beneficiarios').prop('disabled',false);
+        }
+
+        $('#beneficiarios').val(total_beneficiarios);
+    });
+
 $('#btn-guardar-beneficiarios').on('click',function (e){
     e.preventDefault();
 
     if($('#id').val()){
+        var parametros = {};
+
         if(parseInt($('#beneficiarios').val())){
-            var parametros = {beneficiarios:$('#beneficiarios').val()};
+            parametros.beneficiarios = $('#beneficiarios').val();
         }else{
-            var parametros = {beneficiarios:''};
+            parametros.beneficiarios = '';
         }
+
+        if(parseInt($('#beneficiarios-f').val())){
+            parametros.beneficiariosF = $('#beneficiarios-f').val();
+        }else{
+            parametros.beneficiariosF = '';
+        }
+
+        if(parseInt($('#beneficiarios-m').val())){
+            parametros.beneficiariosM = $('#beneficiarios-m').val();
+        }else{
+            parametros.beneficiariosM = '';
+        }
+
         moduleResource.put($('#id').val(),parametros,{
             _success:function(response){
                 moduleDatagrid.actualizar();

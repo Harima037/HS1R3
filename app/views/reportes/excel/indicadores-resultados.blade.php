@@ -6,31 +6,31 @@
 <body>
 	<table>
 
-		<tr><td width="8.4"></td><td width="8.4"></td><td width="52.5"></td><td width="1.8"></td><td width="12.7"></td><td width="12.7"></td><td width="12.7"></td><td width="12.7"></td><td width="1.8"></td><td width="9.7"></td><td width="20.5"></td><td width="20.5"></td><td width="20.5"></td><td width="16.8"></td><td width="16.8"></td><td width="12.5"></td></tr>
+		<tr><td width="8.4"></td><td width="8.4"></td><td width="52.5"></td><td width="1.8"></td><td width="12.7"></td><td width="12.7"></td><td width="12.7"></td><td width="12.7"></td><td width="1.8"></td><td width="9.7"></td><td width="20.5"></td><td width="20.5"></td><td width="20.5"></td><td width="16.8"></td><td width="16.8"></td><td width="12.5"></td><td width="12.5"></td><td width="12.5"></td></tr>
 
 		<tr>
-			<td style="font-size:10; font-weight:bold;">GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td style="font-size:10; font-weight:bold;">GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><td></td><td></td></td>
 		</tr>
-		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 		<tr>
-			<td style="font-size:10; font-weight:bold;">INDICADORES DE RESULTADOS AL {{$trimestre}} TRIMESTRE DEL {{$ejercicio}}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td style="font-size:10; font-weight:bold;">INDICADORES DE RESULTADOS AL {{$trimestre}} TRIMESTRE DEL {{$ejercicio}}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td><td></td><td></td></td>
 		</tr>
 
-		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 
 		<tr>
 			<td></td><td></td>
 			<td><span style="font-weight:bold;">Organismo Público:</span> Instituto de Salud</td>
-			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 
-		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+		<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 
 		<tr>
 			<td valign="middle" height="23">NUM. CONSEC. / CLAVE PROYECTO</td>
 			<td valign="middle">OBJETIVO DE DESARROLLO SOSTENIBLE</td>
-			<td valign="middle">SUBFUNCIÓN / TIPO DE PROYECTO / FUENTE DE FINANCIAMIENTO</td>
+			<td valign="middle">SUBFUNCIÓN / TIPO DE PROYECTO</td>
 			<td valign="middle">UNIDAD DE MEDIDA</td>
 			<td></td>
 			<td valign="middle">METAS</td>
@@ -42,6 +42,8 @@
 			<td valign="middle">PRESUPUESTO<br>MODIFICADO<br> ( PESOS )</td>
 			<td valign="middle">PRESUPUESTO<br>DEVENGADO<br>( PESOS )</td>
 			<td valign="middle">BENEFICIARIOS</td>
+			<td></td>
+			<td></td>
 			<td></td>
 			<td></td>
 		</tr>
@@ -62,11 +64,13 @@
 			<td></td>
 			<td valign="middle">MUNICIPIO</td>
 			<td valign="middle">LOCALIDAD</td>
+			<td valign="middle">MUJER</td>
+			<td valign="middle">HOMBRE</td>
 			<td valign="middle">PERSONA</td>
 		</tr>
 		
 		<tr class="encabezado-tabla">
-			<td></td><td></td><td valign="middle" height="23">SALUD</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td></td><td></td><td valign="middle" height="23">SALUD</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 
 		<tr>
@@ -76,11 +80,11 @@
 			<td valign="top">Formulas</td>
 			<td valign="top">Formulas</td>
 			<td valign="top">Formulas</td>
-			<td></td><td></td><td></td>
+			<td></td><td></td><td></td><td></td><td></td>
 		</tr>
 
 		<tr>
-		<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		<!-- {{ $current_row = 13; }} -->
 		
@@ -95,12 +99,12 @@
 				PROYECTOS DE INVERSIÓN:
 			@endif
 			</td>
-			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		
 		@foreach($clasificacion['proyectos'] as $proyecto)
 		<tr>
-		<!-- {{ $current_row++; }} -->
+			<!-- {{ $current_row++; }} -->
 			<td align="center" valign="top" style="font-weight:bold;">
 				{{$proyecto->proyectoEstrategico}}{{str_pad($proyecto->numeroProyectoEstrategico, 3,'0',STR_PAD_LEFT)}}
 				<!-- {{ $sum_rows[] = $current_row; }} -->
@@ -119,7 +123,7 @@
 			</td>
 			<td align="center" valign="top">
 				@if($proyecto->idCobertura == 1)
-				Cobertura estatal
+				Cobertura Estatal
 				@elseif($proyecto->idCobertura == 2)
 				{{$proyecto->municipio}}
 				@else
@@ -128,7 +132,7 @@
 			</td>
 			<td align="center" valign="top">
 				@if($proyecto->idCobertura == 1)
-				Cobertura estatal
+				Cobertura Estatal
 				@elseif($proyecto->idCobertura == 2)
 				{{$proyecto->municipio}}
 				@else
@@ -138,18 +142,28 @@
 			@if(count($proyecto->beneficiariosDescripcion) > 1)
 				@if($proyecto->evaluacionMes)
 					@if($proyecto->evaluacionMes->indicadorResultadoBeneficiarios)
+						<td align="center" valign="top">{{$proyecto->evaluacionMes->indicadorResultadoBeneficiariosF or 0}}</td>
+						<td align="center" valign="top">{{$proyecto->evaluacionMes->indicadorResultadoBeneficiariosM or 0}}</td>
 						<td align="center" valign="top">{{$proyecto->evaluacionMes->indicadorResultadoBeneficiarios or 0}}</td>
 					@else
 						@foreach($proyecto->beneficiariosDescripcion AS $beneficiario)
-						<td align="center" valign="top">{{$beneficiario->tipoBeneficiario}}</td><td>{{$beneficiario->avanceBeneficiario}}</td>
+						<td align="center" valign="top">{{$beneficiario->tipoBeneficiario}}</td>
+						<td>{{$beneficiario->avanceBeneficiarioF}}</td>
+						<td>{{$beneficiario->avanceBeneficiarioM}}</td>
+						<td>{{$beneficiario->avanceBeneficiario or 0}}</td>
 						@endforeach
 					@endif
 				@else
 					@foreach($proyecto->beneficiariosDescripcion AS $beneficiario)
-					<td align="center" valign="top">{{$beneficiario->tipoBeneficiario}}</td><td>{{$beneficiario->avanceBeneficiario}}</td>
+					<td align="center" valign="top">{{$beneficiario->tipoBeneficiario}}</td>
+					<td>{{$beneficiario->avanceBeneficiarioF}}</td>
+					<td>{{$beneficiario->avanceBeneficiarioM}}</td>
+					<td>{{$beneficiario->avanceBeneficiario or 0}}</td>
 					@endforeach
 				@endif
 			@else
+				<td align="center" valign="top">{{$proyecto->beneficiariosDescripcion[0]->avanceBeneficiarioF or 0}}</td>
+				<td align="center" valign="top">{{$proyecto->beneficiariosDescripcion[0]->avanceBeneficiarioM or 0}}</td>
 				<td align="center" valign="top">{{$proyecto->beneficiariosDescripcion[0]->avanceBeneficiario or 0}}</td>
 			@endif
 		</tr>
@@ -201,7 +215,7 @@
 				<td></td><td></td><td></td>
 			@endif
 
-				<td></td><td></td><td></td>
+				<td></td><td></td><td></td><td></td><td></td>
 			</tr>
 		@endfor
 
@@ -213,14 +227,14 @@
 		<tr>
 			<td></td><td></td>
 			<td>{{$identificador}} {{{$justificacion}}}</td>
-			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		@endforeach
 
 		<tr>
 			<td>{{implode(',',$sum_rows)}}</td><td></td>
 			<td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-			<td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+			<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		
 	</table>

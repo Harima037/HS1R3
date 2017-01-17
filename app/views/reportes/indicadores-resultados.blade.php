@@ -140,9 +140,21 @@
                     <tbody></tbody>
                 </table>
                 <div class="row">
-                    <div class="col-sm-4 col-sm-offset-4">
+                    <div class="col-sm-2 col-sm-offset-3">
                         <div class="form-group">
-                            <label class="control-label">Beneficiarios</label>
+                            <label class="control-label">Femenino</label>
+                            <input type="number" class="form-control" id="beneficiarios-f">
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label class="control-label">Masculino</label>
+                            <input type="number" class="form-control" id="beneficiarios-m">
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label class="control-label">Total</label>
                             <input type="number" class="form-control" id="beneficiarios">
                         </div>
                     </div>
