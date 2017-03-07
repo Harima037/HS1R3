@@ -10,7 +10,7 @@
 			</td>
 		</tr>
 		<tr><td class="titulo2" align="center">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td></tr>
-		<tr><td class="titulo3" align="center">SUBDIRECCIÓN DE PROGRAMACIÓN, ORGANIZACIÓN Y PRESUPUESTO</td></tr>
+		<tr><td class="titulo3" align="center">SUBDIRECCIÓN DE PLANEACIÓN EN SALUD</td></tr>
 		<tr><td class="titulo3" align="center">DEPARTAMENTO DE EVALUACIÓN</td></tr>
 		<tr><td class="titulo3" align="center">PLAN DE ACCIÓN DE MEJORA {{$mes['trimestre_letras']}} TRIMESTRE {{$proyecto['ejercicio']}}</td></tr>
 		<tr><td colspan="3" align="right" class="negrita">Formato RC-7</td></tr>

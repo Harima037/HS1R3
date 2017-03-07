@@ -1197,7 +1197,11 @@ class SeguimientoController extends BaseController {
 				$registro_avance->planMejora = 0;
 			}
 		}else{
-			$registro_avance->justificacionAcumulada = 'El avance se encuentra dentro de lo programado';
+			if($mes_actual != 12){
+				$registro_avance->justificacionAcumulada = 'El avance se encuentra dentro de lo programado';
+			}else{
+				$registro_avance->justificacionAcumulada = 'Se concluyó satisfactoriamente';
+			}
 			$registro_avance->planMejora = 0;
 		}
 
@@ -1245,7 +1249,11 @@ class SeguimientoController extends BaseController {
 					}
 				}
 			}else{
-				$registro_avance->justificacionTrimestral = 'El avance se encuentra dentro de lo programado';
+				if($mes_actual != 12){
+					$registro_avance->justificacionTrimestral = 'El avance se encuentra dentro de lo programado';
+				}else{
+					$registro_avance->justificacionTrimestral = 'Se concluyó satisfactoriamente';
+				}
 			}
 		}
 

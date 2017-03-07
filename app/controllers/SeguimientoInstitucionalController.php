@@ -36,6 +36,7 @@ class SeguimientoInstitucionalController extends BaseController {
 		$mes_actual = Util::obtenerMesActual();
 		if($mes_actual == 0){
 			$mes_actual = date('n')-1;
+			if($mes_actual == 0){ $mes_actual = 12; }
 		}
 		$datos['mes_actual'] = $mes_actual;
 		$datos['trimestre_avance'] = Util::obtenerTrimestre(date('n')-1);
@@ -74,6 +75,7 @@ class SeguimientoInstitucionalController extends BaseController {
 		$mes_actual = Util::obtenerMesActual();
 		if($mes_actual == 0){
 			$mes_actual = date('n')-1;
+			if($mes_actual == 0){ $mes_actual = 12; }
 		}
 		$datos['mes_actual'] = $mes_actual;
 		$datos['trimestre_avance'] = Util::obtenerTrimestre(date('n')-1);
@@ -89,6 +91,7 @@ class SeguimientoInstitucionalController extends BaseController {
 		$mes_actual = Util::obtenerMesActual();
 		if($mes_actual == 0){
 			$mes_actual = date('n') - 1 ;
+			if($mes_actual == 0){ $mes_actual = 12; }
 		}
 		
 		/*if($mes_actual == 0){

@@ -6,7 +6,7 @@
 			<td rowspan="5" class="imagen derecha"><img src="{{ public_path().'/img/LogoInstitucional.png' }}" width="125"></td>
 		</tr>
 		<tr><td class="titulo2" align="center">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td></tr>
-		<tr><td class="titulo3" align="center">SUBDIRECCIÓN DE PROGRAMACIÓN, ORGANIZACIÓN Y PRESUPUESTO</td></tr>
+		<tr><td class="titulo3" align="center">SUBDIRECCIÓN DE PLANEACIÓN EN SALUD</td></tr>
 		<tr><td class="titulo3" align="center">DEPARTAMENTO DE EVALUACIÓN</td></tr>
 		<tr><td class="titulo3" align="center">SEGUIMIENTO DE METAS {{$proyecto['ejercicio']}}</td></tr>
 		<tr><td colspan="3" align="right" class="negrita">Formato RC-3</td></tr>
@@ -38,12 +38,12 @@
 	<tr class="tabla-datos" height="50">
 		<td class="encabezado-tabla">NIVEL</td>
 		<td class="encabezado-tabla">INDICADOR</td>
+		<td class="encabezado-tabla">META<br>ACUMULADA</td>
 		<td class="encabezado-tabla">META<br>PROGRAMADA</td>
-		<td class="encabezado-tabla">META<br>MODIFICADA</td>
 		<td class="encabezado-tabla">AVANCES DEL MES</td>
 		<td class="encabezado-tabla">AVANCE ACUMULADO</td>
 		<td class="encabezado-tabla">% DE AVANCE ACUMULADO</td>
-		<td class="encabezado-tabla">% DE AVANCE MODIFICADO</td>
+		<td class="encabezado-tabla">% DE AVANCE PROGRAMADO</td>
 		<td class="encabezado-tabla">ANALISIS DE RESULTADOS 	ACUMULADO</td>
 		<td class="encabezado-tabla">JUSTIFICACIÓN ACUMULADA</td>
 	</tr>
@@ -55,7 +55,7 @@
 		<td class="texto-medio">{{{ $componente['indicador'] }}}</td>
 		@if(isset($avances_mes['componentes'][$componente['id']]))
 		<td class="texto-medio texto-centro">{{number_format($avances_mes['componentes'][$componente['id']]['meta_programada'],2)}}</td>
-		<td class="texto-medio texto-centro"></td>
+		<td class="texto-medio texto-centro">{{number_format($avances_mes['componentes'][$componente['id']]['meta_global'],2)}}</td>
 		<td class="texto-medio texto-centro">{{number_format($avances_mes['componentes'][$componente['id']]['avance_mes'],2)}}</td>
 		<td class="texto-medio texto-centro">{{number_format($avances_mes['componentes'][$componente['id']]['avance_acumulado'],2)}}</td>
 		<td class="texto-medio texto-centro">
@@ -85,16 +85,26 @@
 			@endif
 		@endif
 		 %</td>
-		<td class="texto-medio texto-centro"></td>
+		<td class="texto-medio texto-centro">
+		{{
+			number_format(
+				(
+					$avances_mes['componentes'][$componente['id']]['avance_acumulado']/
+					$avances_mes['componentes'][$componente['id']]['meta_global']
+				)
+				*100
+			,2)
+		}} %
+		</td>
 		<td class="texto-medio">{{{ $avances_mes['componentes'][$componente['id']]['analisis_resultados'] }}}</td>
 		<td class="texto-medio">{{{ $avances_mes['componentes'][$componente['id']]['justificacion_acumulada'] }}}</td>
 		@else
 		<td class="texto-medio texto-centro">0</td>
-		<td class="texto-medio texto-centro"></td>
+		<td class="texto-medio texto-centro">{{number_format($componente['meta_global'],2)}}</td>
 		<td class="texto-medio texto-centro">0</td>
 		<td class="texto-medio texto-centro">0</td>
 		<td class="texto-medio texto-centro">0%</td>
-		<td class="texto-medio texto-centro"></td>
+		<td class="texto-medio texto-centro">0%</td>
 		<td class="texto-medio"></td>
 		<td class="texto-medio"></td>
 		@endif
@@ -106,7 +116,7 @@
 		<td class="texto-medio">{{{ $actividad['indicador'] }}}</td>
 		@if(isset($avances_mes['actividades'][$actividad['id']]))
 		<td class="texto-medio texto-centro">{{number_format($avances_mes['actividades'][$actividad['id']]['meta_programada'],2)}}</td>
-		<td class="texto-medio texto-centro"></td>
+		<td class="texto-medio texto-centro">{{number_format($avances_mes['actividades'][$actividad['id']]['meta_global'],2)}}</td>
 		<td class="texto-medio texto-centro">{{number_format($avances_mes['actividades'][$actividad['id']]['avance_mes'],2)}}</td>
 		<td class="texto-medio texto-centro">{{number_format($avances_mes['actividades'][$actividad['id']]['avance_acumulado'],2)}}</td>
 		<td class="texto-medio texto-centro">
@@ -136,12 +146,22 @@
 			@endif
 		@endif
 		 %</td>
-		<td class="texto-medio texto-centro"></td>
+		<td class="texto-medio texto-centro">
+		{{
+			number_format(
+				(
+					$avances_mes['actividades'][$actividad['id']]['avance_acumulado']/
+					$avances_mes['actividades'][$actividad['id']]['meta_global']
+				)
+				*100
+			,2)
+		}} %
+		</td>
 		<td class="texto-medio">{{{ $avances_mes['actividades'][$actividad['id']]['analisis_resultados'] }}}</td>
 		<td class="texto-medio">{{{ $avances_mes['actividades'][$actividad['id']]['justificacion_acumulada'] }}}</td>
 		@else
 		<td class="texto-medio texto-centro">0</td>
-		<td class="texto-medio texto-centro"></td>
+		<td class="texto-medio texto-centro">{{number_format($actividad['meta_global'],2)}}</td>
 		<td class="texto-medio texto-centro">0</td>
 		<td class="texto-medio texto-centro">0</td>
 		<td class="texto-medio texto-centro">0%</td>
@@ -207,12 +227,12 @@
 	<tr class="tabla-datos" height="40">
 		<td width="60" class="encabezado-tabla">NIVEL</td>
 		<td width="150" class="encabezado-tabla">INDICADOR</td>
+		<td width="90" class="encabezado-tabla">META ACUMULADA</td>
 		<td width="90" class="encabezado-tabla">META PROGRAMADA</td>
-		<td width="90" class="encabezado-tabla">META MODIFICADA</td>
 		<td width="90" class="encabezado-tabla">AVANCES DEL MES</td>
 		<td width="90" class="encabezado-tabla">AVANCE ACUMULADO</td>
 		<td width="80" class="encabezado-tabla">% DE AVANCE ACUMULADO</td>
-		<td width="80" class="encabezado-tabla">% DE AVANCE MODIFICADO</td>
+		<td width="80" class="encabezado-tabla">% DE AVANCE PROGAMADO</td>
 	</tr>
 	</thead>
 </table>
@@ -225,7 +245,7 @@
 		<td width="150" class="subtitulo-tabla">{{$componente['indicador']}}</td>
 		@if(isset($avances_mes['componentes'][$componente['id']]))
 		<td width="90" class="subtitulo-tabla">{{number_format($avances_mes['componentes'][$componente['id']]['meta_programada'],2)}}</td>
-		<td width="90" class="subtitulo-tabla">&nbsp;</td>
+		<td width="90" class="subtitulo-tabla">{{number_format($avances_mes['componentes'][$componente['id']]['meta_global'],2)}}</td>
 		<td width="90" class="subtitulo-tabla">{{number_format($avances_mes['componentes'][$componente['id']]['avance_mes'],2)}}</td>
 		<td width="90" class="subtitulo-tabla">{{number_format($avances_mes['componentes'][$componente['id']]['avance_acumulado'],2)}}</td>
 		<td width="80" class="subtitulo-tabla">
@@ -255,14 +275,25 @@
 			@endif
 		@endif
 		%</td>
+		<td width="80" class="subtitulo-tabla">
+		{{
+			number_format(
+				(
+					$avances_mes['componentes'][$componente['id']]['avance_acumulado']/
+					$avances_mes['componentes'][$componente['id']]['meta_global']
+				)
+				*100
+			,2)
+		}} %
+		</td>
 		@else
 		<td width="90" class="subtitulo-tabla">0</td>
-		<td width="90" class="subtitulo-tabla"></td>
+		<td width="90" class="subtitulo-tabla">{{number_format($componente['meta_global'],2)}}</td>
 		<td width="90" class="subtitulo-tabla">0</td>
 		<td width="90" class="subtitulo-tabla">0</td>
 		<td width="80" class="subtitulo-tabla">0%</td>
+		<td width="80" class="subtitulo-tabla">0%</td>
 		@endif
-		<td width="80" class="subtitulo-tabla">&nbsp;</td>
 	</tr>
 	</thead>
 	<tbody>
@@ -272,7 +303,7 @@
 			<td class="{{($tiene_desglose = isset($localidades_mes['componentes'][$componente['id']]))?'subsubtitulo-tabla':''}}">{{$clave}} {{$jurisdiccion}}</td>
 			@if(isset($jurisdicciones_mes['componentes'][$componente['id']][$clave]))
 				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">{{number_format($jurisdicciones_mes['componentes'][$componente['id']][$clave]['meta_programada'],2)}}</td>
-				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}"></td>
+				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">{{number_format($jurisdicciones_mes['componentes'][$componente['id']][$clave]['meta_global'],2)}}</td>
 				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">{{number_format($jurisdicciones_mes['componentes'][$componente['id']][$clave]['avance_mes'],2)}}</td>
 				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">{{number_format($jurisdicciones_mes['componentes'][$componente['id']][$clave]['avance_acumulado'],2)}}</td>
 				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">
@@ -302,14 +333,25 @@
 					@endif
 				@endif
 				 %</td>
+				 <td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">
+				 {{
+					number_format(
+						(
+							$jurisdicciones_mes['componentes'][$componente['id']][$clave]['avance_acumulado']/
+							$jurisdicciones_mes['componentes'][$componente['id']][$clave]['meta_global']
+						)
+						*100
+					,2)
+				}} %
+				 </td>
 			@else
 				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0</td>
-				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}"></td>
+				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0</td>
 				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0</td>
 				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0</td>
 				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0%</td>
+				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0%</td>
 			@endif
-			<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}"></td>
 		</tr>
 			@if(isset($localidades_mes['componentes'][$componente['id']][$clave]))
 				@foreach ($localidades_mes['componentes'][$componente['id']][$clave] as $desglose)
@@ -366,7 +408,7 @@
 			<td width="150" class="subtitulo-tabla">{{$actividad['indicador']}}</td>
 			@if(isset($avances_mes['actividades'][$actividad['id']]))
 			<td width="90" class="subtitulo-tabla">{{number_format($avances_mes['actividades'][$actividad['id']]['meta_programada'],2)}}</td>
-			<td width="90" class="subtitulo-tabla">&nbsp;</td>
+			<td width="90" class="subtitulo-tabla">{{number_format($avances_mes['actividades'][$actividad['id']]['meta_global'],2)}}</td>
 			<td width="90" class="subtitulo-tabla">{{number_format($avances_mes['actividades'][$actividad['id']]['avance_mes'],2)}}</td>
 			<td width="90" class="subtitulo-tabla">{{number_format($avances_mes['actividades'][$actividad['id']]['avance_acumulado'],2)}}</td>
 			<td width="80" class="subtitulo-tabla">
@@ -396,14 +438,25 @@
 				@endif
 			@endif
 			 %</td>
+			 <td width="80" class="subtitulo-tabla">
+			 {{
+				number_format(
+					(
+						$avances_mes['actividades'][$actividad['id']]['avance_acumulado']/
+						$avances_mes['actividades'][$actividad['id']]['meta_global']
+					)
+					*100
+				,2)
+			}} %
+			 </td>
 			@else
 			<td width="90" class="subtitulo-tabla">0</td>
-			<td width="90" class="subtitulo-tabla"></td>
+			<td width="90" class="subtitulo-tabla">{{number_format($actividad['meta_global'],2)}}</td>
 			<td width="90" class="subtitulo-tabla">0</td>
 			<td width="90" class="subtitulo-tabla">0</td>
 			<td width="80" class="subtitulo-tabla">0%</td>
+			<td width="80" class="subtitulo-tabla">0%</td>
 			@endif
-			<td width="80" class="subtitulo-tabla">&nbsp;</td>
 		</tr>
 		</thead>
 		<tbody>
@@ -413,7 +466,7 @@
 				<td class="{{($tiene_desglose = isset($localidades_mes['actividades'][$actividad['id']]))?'subsubtitulo-tabla':''}}">{{$clave}} {{$jurisdiccion}}</td>
 				@if(isset($jurisdicciones_mes['actividades'][$actividad['id']][$clave]))
 					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">{{number_format($jurisdicciones_mes['actividades'][$actividad['id']][$clave]['meta_programada'],2)}}</td>
-					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}"></td>
+					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">{{number_format($jurisdicciones_mes['actividades'][$actividad['id']][$clave]['meta_global'],2)}}</td>
 					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">{{number_format($jurisdicciones_mes['actividades'][$actividad['id']][$clave]['avance_mes'],2)}}</td>
 					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">{{number_format($jurisdicciones_mes['actividades'][$actividad['id']][$clave]['avance_acumulado'],2)}}</td>
 					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">
@@ -445,14 +498,27 @@
 						@endif
 					@endif
 					 %</td>
+					 <td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">
+					 	{{
+						number_format(
+							(
+								(
+									$jurisdicciones_mes['actividades'][$actividad['id']][$clave]['avance_acumulado']/
+									$jurisdicciones_mes['actividades'][$actividad['id']][$clave]['meta_global']
+								)
+								*100
+							)
+						,2)
+						}} %
+					 </td>
 				@else
 					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0</td>
-					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}"></td>
+					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0</td>
 					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0</td>
 					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0</td>
 					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0%</td>
+					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0%</td>
 				@endif
-				<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}"></td>
 			</tr>
 				@if(isset($localidades_mes['actividades'][$actividad['id']][$clave]))
 					@foreach ($localidades_mes['actividades'][$actividad['id']][$clave] as $desglose)

@@ -6,7 +6,7 @@
 			<td rowspan="5" class="imagen derecha"><img src="{{ public_path().'/img/LogoInstitucional.png' }}" width="125"></td>
 		</tr>
 		<tr><td class="titulo2" align="center">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td></tr>
-		<tr><td class="titulo3" align="center">SUBDIRECCIÓN DE PROGRAMACIÓN, ORGANIZACIÓN Y PRESUPUESTO</td></tr>
+		<tr><td class="titulo3" align="center">SUBDIRECCIÓN DE PLANEACIÓN EN SALUD</td></tr>
 		<tr><td class="titulo3" align="center">DEPARTAMENTO DE EVALUACIÓN</td></tr>
 		<tr><td class="titulo3" align="center">SEGUIMIENTO DE METAS DEL {{$mes['trimestre_letras']}} TRIMESTRE DEL {{$proyecto['ejercicio']}}</td></tr>
 		<tr><td colspan="3" align="right" class="negrita">Formato RC-8</td></tr>
@@ -39,11 +39,9 @@
 		<td class="encabezado-tabla">NIVEL</td>
 		<td class="encabezado-tabla">INDICADOR</td>
 		<td class="encabezado-tabla">META<br>PROGRAMADA</td>
-		<td class="encabezado-tabla">META<br>MODIFICADA</td>
 		<td class="encabezado-tabla">AVANCES DEL MES</td>
 		<td class="encabezado-tabla">AVANCE ACUMULADO</td>
 		<td class="encabezado-tabla">% DE AVANCE ACUMULADO</td>
-		<td class="encabezado-tabla">% DE AVANCE MODIFICADO</td>
 		<td class="encabezado-tabla">ANALISIS DE RESULTADOS 	ACUMULADO</td>
 		<td class="encabezado-tabla">JUSTIFICACIÓN ACUMULADA</td>
 	</tr>
@@ -55,7 +53,6 @@
 		<td class="texto-medio">{{{ $componente['indicador'] }}}</td>
 		@if(isset($avances_trimestre['componentes'][$componente['id']]))
 		<td class="texto-medio texto-centro">{{number_format($avances_trimestre['componentes'][$componente['id']]['meta_programada'],2)}}</td>
-		<td class="texto-medio texto-centro"></td>
 		<td class="texto-medio texto-centro">{{number_format($avances_trimestre['componentes'][$componente['id']]['avance_mes'],2)}}</td>
 		<td class="texto-medio texto-centro">{{number_format($avances_trimestre['componentes'][$componente['id']]['avance_acumulado'],2)}}</td>
 		<td class="texto-medio texto-centro">
@@ -85,16 +82,13 @@
 			@endif
 		@endif
 		 %</td>
-		<td class="texto-medio texto-centro"></td>
 		<td class="texto-medio">{{{ $avances_trimestre['componentes'][$componente['id']]['analisis_resultados'] }}}</td>
 		<td class="texto-medio">{{{ $avances_trimestre['componentes'][$componente['id']]['justificacion_acumulada'] }}}</td>
 		@else
 		<td class="texto-medio texto-centro">0</td>
-		<td class="texto-medio texto-centro"></td>
 		<td class="texto-medio texto-centro">0</td>
 		<td class="texto-medio texto-centro">0</td>
 		<td class="texto-medio texto-centro">0%</td>
-		<td class="texto-medio texto-centro"></td>
 		<td class="texto-medio"></td>
 		<td class="texto-medio"></td>
 		@endif
@@ -106,7 +100,6 @@
 		<td class="texto-medio">{{{ $actividad['indicador'] }}}</td>
 		@if(isset($avances_trimestre['actividades'][$actividad['id']]))
 		<td class="texto-medio texto-centro">{{number_format($avances_trimestre['actividades'][$actividad['id']]['meta_programada'],2)}}</td>
-		<td class="texto-medio texto-centro"></td>
 		<td class="texto-medio texto-centro">{{number_format($avances_trimestre['actividades'][$actividad['id']]['avance_mes'],2)}}</td>
 		<td class="texto-medio texto-centro">{{number_format($avances_trimestre['actividades'][$actividad['id']]['avance_acumulado'],2)}}</td>
 		<td class="texto-medio texto-centro">
@@ -136,16 +129,13 @@
 			@endif
 		@endif
 		 %</td>
-		<td class="texto-medio texto-centro"></td>
 		<td class="texto-medio">{{{ $avances_trimestre['actividades'][$actividad['id']]['analisis_resultados'] }}}</td>
 		<td class="texto-medio">{{{ $avances_trimestre['actividades'][$actividad['id']]['justificacion_acumulada'] }}}</td>
 		@else
 		<td class="texto-medio texto-centro">0</td>
-		<td class="texto-medio texto-centro"></td>
 		<td class="texto-medio texto-centro">0</td>
 		<td class="texto-medio texto-centro">0</td>
 		<td class="texto-medio texto-centro">0%</td>
-		<td class="texto-medio texto-centro"></td>
 		<td class="texto-medio"></td>
 		<td class="texto-medio"></td>
 		@endif

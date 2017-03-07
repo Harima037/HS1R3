@@ -175,6 +175,7 @@ class SeguimientoInstitucionalController extends BaseController {
 		$mes_actual = Util::obtenerMesActual();
 		if($mes_actual == 0){
 			$mes_actual = date('n') - 1 ;
+			if($mes_actual == 0){ $mes_actual = 12; }
 		}
 
 		if(isset($parametros['mostrar'])){
@@ -353,6 +354,7 @@ class SeguimientoInstitucionalController extends BaseController {
 			$mes_avance = Util::obtenerMesActual();
 			if($mes_avance == 0){
 				$mes_avance = date('n')-1;
+				if($mes_avance == 0){ $mes_avance = 12; }
 			}
 			if($parametros['actualizarproyecto']=="aprobar") //Poner estatus 4 (Aprobado)
 			{
@@ -433,6 +435,7 @@ class SeguimientoInstitucionalController extends BaseController {
 			if($estatus > 0 && $respuesta['http_status'] == 200){
 				if($mes_actual == 0){
 					$mes_actual = date('n') - 1;
+					if($mes_actual == 0){ $mes_actual = 12; }
 				}
 				
 				$recurso = EvaluacionProyectoMes::where('idProyecto','=',$id)

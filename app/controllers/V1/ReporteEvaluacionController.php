@@ -54,13 +54,21 @@ class ReporteEvaluacionController extends BaseController {
 			'datosSubFuncion','objetivoPedCompleto','fuentesFinanciamiento.fuenteFinanciamiento','fuentesFinanciamiento.subFuentesFinanciamiento',
 		'componentes.registroAvance'=>function($query) use ($mes_actual){
 			$query->where('mes','<=',$mes_actual)->orderBy('mes','ASC');
-		},'componentes.metasMes'=>function($query) use ($mes_actual){
+		},'componentes.metasMes'=>function($query){
+			$query->orderBy('mes','ASC');
+		}
+		/*,'componentes.metasMes'=>function($query) use ($mes_actual){
 			$query->where('mes','<=',$mes_actual)->orderBy('mes','ASC');
-		},'componentes.actividades.registroAvance'=>function($query) use ($mes_actual){
+		}*/
+		,'componentes.actividades.registroAvance'=>function($query) use ($mes_actual){
 			$query->where('mes','<=',$mes_actual)->orderBy('mes','ASC');
-		},'componentes.actividades.metasMes'=>function($query) use ($mes_actual){
+		},'componentes.actividades.metasMes'=>function($query){
+			$query->orderBy('mes','ASC');
+		}
+		/*,'componentes.actividades.metasMes'=>function($query) use ($mes_actual){
 			$query->where('mes','<=',$mes_actual)->orderBy('mes','ASC');
-		},'beneficiarios.registroAvance'=>function($query) use ($mes_actual){
+		}*/
+		,'beneficiarios.registroAvance'=>function($query) use ($mes_actual){
 			$query->where('mes','<=',$mes_actual)->orderBy('mes','ASC');
 		},'componentes.planMejora'=>function($query) use ($mes_actual){
 			$query->where('mes','=',$mes_actual)->orderBy('mes','ASC');
@@ -119,7 +127,7 @@ class ReporteEvaluacionController extends BaseController {
 		$data['localidades_mes'] = array('componentes'=>array(),'actividades'=>array(),'localidades'=>array());
 		$data['conteo_elementos'] = 0;
 		$data['planes_mejora'] = array('componentes'=>array(),'actividades'=>array());
-
+		
 		foreach ($recurso['componentes'] as $componente) {
 			if(isset($recurso['componentes'])){
 				unset($recurso['componentes']);
@@ -128,6 +136,7 @@ class ReporteEvaluacionController extends BaseController {
 			$datos_componente = array(
 				'indicador' => $componente['indicador'],
 				'id' => $componente['id'],
+				'meta_global' => $componente['valorNumerador'],
 				'actividades' => array()
 			);
 
@@ -135,6 +144,7 @@ class ReporteEvaluacionController extends BaseController {
 			if(!isset($data['avances_mes']['componentes'][$componente['id']])){
 				$data['avances_mes']['componentes'][$componente['id']] = array(
 					'meta_programada' => 0.0,
+					'meta_global' => $componente['valorNumerador'],
 					'avance_mes' => 0.0,
 					'avance_acumulado' => 0.0,
 					'analisis_resultados' => '',
@@ -184,26 +194,38 @@ class ReporteEvaluacionController extends BaseController {
 			
 			$meta_mes_programada = 0;
 			$metas_programada = array();
+			$metas_globales = array();
 			$avance_acumulado = array();
+			$avances_mes = array();
 			
 			foreach ($componente['metas_mes'] as $meta_mes){
 				if(!isset($metas_programada[$meta_mes['claveJurisdiccion']])){
 					$metas_programada[$meta_mes['claveJurisdiccion']] = 0;
+					$metas_globales[$meta_mes['claveJurisdiccion']] = 0;
 					$avance_acumulado[$meta_mes['claveJurisdiccion']] = 0;
+					$avances_mes[$meta_mes['claveJurisdiccion']] = 0.00;
 				}
 
-				$meta_mes_programada += $meta_mes['meta'];
+				if($meta_mes['mes'] <= $mes_actual){
+					$meta_mes_programada += $meta_mes['meta'];
+					$metas_programada[$meta_mes['claveJurisdiccion']] += $meta_mes['meta'];
+					$avance_acumulado[$meta_mes['claveJurisdiccion']] += $meta_mes['avance'];
+					
+					if($meta_mes['mes'] == $mes_actual){
+						$avances_mes[$meta_mes['claveJurisdiccion']] = $meta_mes['avance'];
+					}
+				}
+
+				$metas_globales[$meta_mes['claveJurisdiccion']] += $meta_mes['meta'];
 
 				if($data['meses'][$mes_actual]['trimestre'] == ceil($meta_mes['mes'] / 3)){
 					$data['avances_trimestre']['componentes'][$componente['id']]['meta_programada'] += $meta_mes['meta'];
 				}
 
-				$metas_programada[$meta_mes['claveJurisdiccion']] += $meta_mes['meta'];
-				$avance_acumulado[$meta_mes['claveJurisdiccion']] += $meta_mes['avance'];
-
 				$data['jurisdicciones_mes']['componentes'][$componente['id']][$meta_mes['claveJurisdiccion']] = array(
 					'meta_programada' => $metas_programada[$meta_mes['claveJurisdiccion']],
-					'avance_mes' => ($meta_mes['mes'] == $mes_actual)?$meta_mes['avance']:0.0,
+					'meta_global' => $metas_globales[$meta_mes['claveJurisdiccion']],
+					'avance_mes' => $avances_mes[$meta_mes['claveJurisdiccion']],
 					'avance_acumulado' => $avance_acumulado[$meta_mes['claveJurisdiccion']]
 				);
 			}
@@ -237,6 +259,7 @@ class ReporteEvaluacionController extends BaseController {
 				$data['conteo_elementos']++;
 				$datos_actividad = array(
 					'indicador' => $actividad['indicador'],
+					'meta_global' => $actividad['valorNumerador'],
 					'id' => $actividad['id']
 				);
 				
@@ -244,6 +267,7 @@ class ReporteEvaluacionController extends BaseController {
 				if(!isset($data['avances_mes']['actividades'][$actividad['id']])){
 					$data['avances_mes']['actividades'][$actividad['id']] = array(
 						'meta_programada' => 0.0,
+						'meta_global' => $actividad['valorNumerador'],
 						'avance_mes' => 0.0,
 						'avance_acumulado' => 0.0,
 						'analisis_resultados' => '',
@@ -290,30 +314,43 @@ class ReporteEvaluacionController extends BaseController {
 
 				$meta_mes_programada = 0;
 				$metas_programada = array();
+				$metas_globales = array();
 				$avance_acumulado = array();
+				$avances_mes = array();
 
 				foreach ($actividad['metas_mes'] as $meta_mes){
 					if(!isset($metas_programada[$meta_mes['claveJurisdiccion']])){
 						$metas_programada[$meta_mes['claveJurisdiccion']] = 0;
+						$metas_globales[$meta_mes['claveJurisdiccion']] = 0;
 						$avance_acumulado[$meta_mes['claveJurisdiccion']] = 0;
+						$avances_mes[$meta_mes['claveJurisdiccion']] = 0.00;
 					}
 
-					$meta_mes_programada += $meta_mes['meta'];
+					if($meta_mes['mes'] <= $mes_actual){
+						$meta_mes_programada += $meta_mes['meta'];
+						$metas_programada[$meta_mes['claveJurisdiccion']] += $meta_mes['meta'];
+						$avance_acumulado[$meta_mes['claveJurisdiccion']] += $meta_mes['avance'];
+						
+						if($meta_mes['mes'] == $mes_actual){
+							$avances_mes[$meta_mes['claveJurisdiccion']] = $meta_mes['avance'];
+						}
+					}
+
+					$metas_globales[$meta_mes['claveJurisdiccion']] += $meta_mes['meta'];
 
 					if($data['meses'][$mes_actual]['trimestre'] == ceil($meta_mes['mes'] / 3)){
 						$data['avances_trimestre']['actividades'][$actividad['id']]['meta_programada'] += $meta_mes['meta'];
 					}
-
-					$metas_programada[$meta_mes['claveJurisdiccion']] += $meta_mes['meta'];
-					$avance_acumulado[$meta_mes['claveJurisdiccion']] += $meta_mes['avance'];
+					
 					$data['jurisdicciones_mes']['actividades'][$actividad['id']][$meta_mes['claveJurisdiccion']] = array(
 						'meta_programada' => $metas_programada[$meta_mes['claveJurisdiccion']],
-						'avance_mes' => ($meta_mes['mes'] == $mes_actual)?$meta_mes['avance']:0.0,
+						'meta_global' => $metas_globales[$meta_mes['claveJurisdiccion']],
+						'avance_mes' => $avances_mes[$meta_mes['claveJurisdiccion']],
 						'avance_acumulado' => $avance_acumulado[$meta_mes['claveJurisdiccion']]
 					);
 				}
 				$data['avances_mes']['actividades'][$actividad['id']]['meta_programada'] = $meta_mes_programada;
-				//var_dump($actividad['desglose_con_datos']);die;
+				
 				foreach ($actividad['desglose_con_datos'] as $desglose) {
 					if(!isset($data['localidades_mes']['localidades'][$desglose['claveMunicipio'].'_'.$desglose['claveLocalidad']])){
 						$data['localidades_mes']['localidades'][$desglose['claveMunicipio'].'_'.$desglose['claveLocalidad']] = array(

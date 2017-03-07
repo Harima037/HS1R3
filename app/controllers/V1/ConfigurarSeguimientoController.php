@@ -9,6 +9,7 @@ use Hash,SysConfiguracionVariable;
 class ConfigurarSeguimientoController extends \BaseController {
 	private $reglas = array(
 		'mes-captura' => 'integer|max:12',
+		'mes-usuario' => 'integer|max:12',
 		'dias-captura' => 'integer|max:30'
 	);
 

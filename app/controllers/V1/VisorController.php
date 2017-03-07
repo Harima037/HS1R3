@@ -563,7 +563,7 @@ class VisorController extends BaseController {
 					$query_params[] = $jurisdiccion;
 				}
 
-				$query .= "LEFT JOIN evaluacionProyectoMes EPM ON EPM.idProyecto = CMM.idProyecto AND EPM.mes = CMM.mes AND EPM.mes < ? ";
+				$query .= "LEFT JOIN evaluacionProyectoMes EPM ON EPM.idProyecto = CMM.idProyecto AND EPM.mes = CMM.mes AND EPM.mes <= ? ";
 				$query_params[] = $mes_actual;
 				$query .= "JOIN proyectos P ON P.id = PC.idProyecto ";
 				$query .= "WHERE PC.borradoAl IS NULL ";
@@ -584,7 +584,7 @@ class VisorController extends BaseController {
 					$query_params[] = $jurisdiccion;
 				}
 
-				$query .= "LEFT JOIN evaluacionProyectoMes EPM2 ON EPM2.idProyecto = AMM.idProyecto AND EPM2.mes = AMM.mes AND EPM2.mes < ? ";
+				$query .= "LEFT JOIN evaluacionProyectoMes EPM2 ON EPM2.idProyecto = AMM.idProyecto AND EPM2.mes = AMM.mes AND EPM2.mes <= ? ";
 				$query_params[] = $mes_actual;
 				$query .= "JOIN proyectos P2 ON P2.id = CA.idProyecto ";
 				$query .= "WHERE CA.borradoAl IS NULL ";
