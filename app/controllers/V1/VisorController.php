@@ -59,6 +59,9 @@ class VisorController extends BaseController {
 		$http_status = 200;
 		$data = array();
 
+		//obtenemos proyectos cancelados
+		$proyectos_cancelados_ids = Proyecto::where('cancelado','=',1)->lists('id');
+
 		$parametros = Input::all();
 
 		if(isset($parametros['grafica'])){
@@ -101,6 +104,7 @@ class VisorController extends BaseController {
 										->leftjoin('catalogoUnidadesResponsables AS unidades','unidades.clave','=','proyectos.unidadResponsable')
 										->where('idEstatusProyecto','=',5)
 										->where('ejercicio','=',$anio_captura)
+										->whereNotIn('proyectos.id',$proyectos_cancelados_ids)
 										->groupBy('unidadResponsable')
 										->get();
 						$total = $rows->sum('noProyectos');
@@ -143,6 +147,7 @@ class VisorController extends BaseController {
 										->leftjoin('catalogoClasificacionProyectos AS clasificacion','clasificacion.id','=','proyectos.idClasificacionProyecto')
 										->where('idEstatusProyecto','=',5)
 										->where('ejercicio','=',$anio_captura)
+										->whereNotIn('proyectos.id',$proyectos_cancelados_ids)
 										->groupBy('idClasificacionProyecto')
 										->get();
 						$total = $rows->sum('noProyectos');
@@ -247,6 +252,7 @@ class VisorController extends BaseController {
 														$condition->where('meta','>',0)
 																->orWhere('avance','>',0);
 													})
+													->whereNotIn('idProyecto',$proyectos_cancelados_ids)
 													->select('idProyecto','idComponente')->get();
 							$componentes_ids = $componentes->lists('idProyecto','idComponente');
 							$componentes = $componentes->lists('idProyecto');
@@ -257,6 +263,7 @@ class VisorController extends BaseController {
 														$condition->where('meta','>',0)
 																->orWhere('avance','>',0);
 													})
+													->whereNotIn('idProyecto',$proyectos_cancelados_ids)
 													->select('idProyecto','idActividad')->get();
 							$actividades_ids = $actividades->lists('idProyecto','idActividad');
 							$actividades = $actividades->lists('idProyecto');
@@ -323,6 +330,7 @@ class VisorController extends BaseController {
 										->whereNull('actividades.borradoAl');
 								})
 								->where('idEstatusProyecto','=',5)
+								->whereNotIn('proyectos.id',$proyectos_cancelados_ids)
 								->where('ejercicio','=',$anio_captura)
 								->groupBy('unidadResponsable')
 								->get();
@@ -342,7 +350,7 @@ class VisorController extends BaseController {
 						$componentes = ComponenteMetaMes::getModel();
 						$actividades = ActividadMetaMes::getModel();
 
-						$proyectos_ids = Proyecto::where('idEstatusProyecto','=',5)->where('ejercicio','=',$anio_captura);
+						$proyectos_ids = Proyecto::where('idEstatusProyecto','=',5)->where('ejercicio','=',$anio_captura)->whereNotIn('id',$proyectos_cancelados_ids);
 						$jurisdiccion = false;
 						$unidades = false;
 
@@ -565,7 +573,7 @@ class VisorController extends BaseController {
 
 				$query .= "LEFT JOIN evaluacionProyectoMes EPM ON EPM.idProyecto = CMM.idProyecto AND EPM.mes = CMM.mes AND EPM.mes <= ? ";
 				$query_params[] = $mes_actual;
-				$query .= "JOIN proyectos P ON P.id = PC.idProyecto ";
+				$query .= "JOIN proyectos P ON P.id = PC.idProyecto and P.cancelado IS NULL ";
 				$query .= "WHERE PC.borradoAl IS NULL ";
 				$query .= "GROUP BY CMM.idComponente ";
 
@@ -586,7 +594,7 @@ class VisorController extends BaseController {
 
 				$query .= "LEFT JOIN evaluacionProyectoMes EPM2 ON EPM2.idProyecto = AMM.idProyecto AND EPM2.mes = AMM.mes AND EPM2.mes <= ? ";
 				$query_params[] = $mes_actual;
-				$query .= "JOIN proyectos P2 ON P2.id = CA.idProyecto ";
+				$query .= "JOIN proyectos P2 ON P2.id = CA.idProyecto and P2.cancelado IS NULL ";
 				$query .= "WHERE CA.borradoAl IS NULL ";
 				$query .= "GROUP BY AMM.idActividad ";
 
@@ -671,7 +679,8 @@ class VisorController extends BaseController {
 
 				$rows = Proyecto::where('idEstatusProyecto','=',5)
 								->where('ejercicio','=',$anio_captura)
-							->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto']);
+								->whereNull('proyectos.cancelado')
+								->where('idClasificacionProyecto','=',$parametros['clasificacionProyecto']);
 				
 				$usuario = Sentry::getUser();
 				if($usuario->claveJurisdiccion){
@@ -1442,6 +1451,7 @@ class VisorController extends BaseController {
 							$join->on('proyectos.id','=','componenteMetasMes.idProyecto')
 								->where('proyectos.idEstatusProyecto','=',5)
 								->where('proyectos.ejercicio','=',$anio_captura)
+								->whereNull('proyectos.cancelado')
 								->whereNull('proyectos.borradoAl');
 							if($unidades){
 								$join = $join->on('proyectos.unidadResponsable','in',DB::raw('('.implode(',',$unidades).')'));
@@ -1459,6 +1469,7 @@ class VisorController extends BaseController {
 							$join->on('proyectos.id','=','actividadMetasMes.idProyecto')
 								->where('proyectos.idEstatusProyecto','=',5)
 								->where('proyectos.ejercicio','=',$anio_captura)
+								->whereNull('proyectos.cancelado')
 								->whereNull('proyectos.borradoAl');
 							if($unidades){
 								$join = $join->on('proyectos.unidadResponsable','in',DB::raw('('.implode(',',$unidades).')'));
@@ -1542,6 +1553,7 @@ class VisorController extends BaseController {
 							$join->on('proyectos.id','=','componenteMetasMes.idProyecto')
 								->where('proyectos.idEstatusProyecto','=',5)
 								->where('proyectos.ejercicio','=',$anio_captura)
+								->whereNull('proyectos.cancelado')
 								->whereNull('proyectos.borradoAl');
 						})
 						->leftjoin('vistaJurisdicciones AS jurisdiccion','jurisdiccion.clave','=','claveJurisdiccion')
@@ -1555,6 +1567,7 @@ class VisorController extends BaseController {
 							$join->on('proyectos.id','=','actividadMetasMes.idProyecto')
 								->where('proyectos.idEstatusProyecto','=',5)
 								->where('proyectos.ejercicio','=',$anio_captura)
+								->whereNull('proyectos.cancelado')
 								->whereNull('proyectos.borradoAl');
 						})
 						->leftjoin('vistaJurisdicciones AS jurisdiccion','jurisdiccion.clave','=','claveJurisdiccion')

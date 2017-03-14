@@ -23,6 +23,12 @@ context.mostrar_datos = function(datos){
 	var titulo_modal = datos.clasificacion_proyecto.descripcion + ' <small>' + datos.tipo_proyecto.descripcion + '</small>';
     $(modal_detalles).find(".modal-title").html(titulo_modal);
 
+    if(datos.cancelado){
+        $(modal_detalles).find('.modal-header').addClass('alert-danger');
+    }else{
+        $(modal_detalles).find('.modal-header').removeClass('alert-danger');
+    }
+
     $('#clasificacion_proyecto').val(datos.clasificacion_proyecto.id);
     $('#tipo_proyecto').val(datos.tipo_proyecto.id);
 

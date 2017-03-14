@@ -31,6 +31,7 @@ var comentarios = { componentes:{}, actividades:{} };
 var modal_componente = '#modalComponente';
 var modal_actividad = '#modalActividad';
 var modal_beneficiario = '#modalBeneficiario';
+var modal_cancelar_proyecto = '#modalCancelarProyecto';
 
 var grid_componentes = '#datagridComponentes';
 var grid_actividades = '#datagridActividades';
@@ -42,6 +43,7 @@ var form_componente = '#form_componente';
 var form_actividad = '#form_actividad';
 var form_beneficiario = '#form_beneficiario';
 var form_fuente_informacion = '#form_fuente_informacion';
+var form_cancelacion_proyecto = '#form_cancelacion_proyecto';
 
 $('.chosen-one').chosen({width:'100%',search_contains:true,enable_split_word_search:true,no_results_text: "No se econtraron resultados para "});
 
@@ -75,6 +77,13 @@ if($('#id').val()){
 				$('#lbl-coordinador-grupo').html(response.data.coordinador_grupo_estrategico.nombre + '<br><small class="text-muted">'+response.data.coordinador_grupo_estrategico.cargo+'</small>');
 			}else{
 				$('#lbl-coordinador-grupo').html('<span class="text-muted">No asignado</span>')
+			}
+
+			if(response.data.cancelado){
+				$('#btn-cancelar-proyecto').hide();
+				$('#span-proyecto-cancelado').show();
+				$('#datagridCaratulas').removeClass('panel-default');
+				$('#datagridCaratulas').addClass('panel-danger');
 			}
 
             $('#nombretecnico').val(response.data.nombreTecnico);
@@ -635,6 +644,52 @@ $('#btn-actividad-guardar').on('click',function(){
 	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
 	                else{
 	                	json.container = modal_actividad + ' .modal-body';
+	                    MessageManager.show(json);
+	                }
+	                Validation.formValidate(json.data);
+	            }catch(e){
+	                console.log(e);
+	            }                       
+	        }
+	    });
+	}
+});
+
+$('#btn-cancelar-proyecto').on('click',function(){
+	if($('#id').val()){
+		$('#motivos-cancelacion').prop('disabled',false);
+		$('#motivos-cancelacion').val('');
+		$('#fecha-cancelacion').prop('disabled',false);
+		$('#fecha-cancelacion').val('');
+		Validation.cleanFormErrors(form_cancelacion_proyecto);
+		$(modal_cancelar_proyecto).modal('show');
+	}else{
+		MessageManager.show({code:'S03',data:"No se puede cancelar un proyecto que no se ha guardado.",timer:2});
+	}
+});
+
+$('#btn-guardar-cancelar-proyecto').on('click',function(){
+	Validation.cleanFormErrors(form_cancelacion_proyecto);
+
+	var parametros = $(form_cancelacion_proyecto).serialize();
+	parametros = parametros + '&guardar=cancelacionproyecto&id-proyecto=' + $('#id').val();
+
+	if($('#id').val()){
+		proyectoResource.put($('#id').val(),parametros,{
+	        _success: function(response){
+				$(modal_cancelar_proyecto).modal('hide');
+				$('#btn-cancelar-proyecto').hide();
+				$('#span-proyecto-cancelado').show();
+				$('#datagridCaratulas').removeClass('panel-default');
+				$('#datagridCaratulas').addClass('panel-danger');
+	            MessageManager.show({data:'Datos almacenados con éxito',type:'OK',timer:3});
+	        },
+	        _error: function(response){
+	            try{
+	                var json = $.parseJSON(response.responseText);
+	                if(!json.code)
+	                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+	                else{
 	                    MessageManager.show(json);
 	                }
 	                Validation.formValidate(json.data);

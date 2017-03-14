@@ -30,7 +30,17 @@
     <div class="col-md-12">
     	<div class="panel panel-default" id="datagridCaratulas">
             <div class="panel-heading">
-                <h4><i class="fa fa-file"></i> <b>{{$clasificacion_proyecto}}</b> <small>({{$tipo_proyecto}})</small></h4>
+                <h4>
+                    <i class="fa fa-file"></i> <b>{{$clasificacion_proyecto}}</b> <small>({{$tipo_proyecto}})</small>
+                    <span class="pull-right">
+                        <button type="button" class="btn btn-danger" id="btn-cancelar-proyecto">
+                            <span class="fa fa-times-circle"></span> Cancelar Proyecto
+                        </button>
+                        <span id="span-proyecto-cancelado" style="display:none;">
+                            <strong>Cancelado</strong>
+                        </span>
+                    </span>
+                </h4>
             </div>
             <div class="panel-body" id="mensaje-espera">
                 <div class="alert alert-info">
@@ -148,6 +158,37 @@
 @stop
 
 @section('modals')
-
+<div class="modal fade" id="modalCancelarProyecto" tabindex="-1" role="dialog" aria-labelledby="modalCanProyLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-85-screen">
+        <div class="modal-content modal-content-85-screen">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="modalCanProyLabel">Cancelar Proyecto</h4>
+            </div>
+            <div class="modal-body">
+                <form id="form_cancelacion_proyecto">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="control-label">Fecha de la Cancelación</label>
+                                <input type="date" class="form-control" name="fecha-cancelacion" id="fecha-cancelacion">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">Motivos de la Cancelación</label>
+                                <textarea class="form-control" name="motivos-cancelacion" id="motivos-cancelacion" rows="10"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-danger" id="btn-guardar-cancelar-proyecto">Cancelar Proyecto</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 @parent
 @stop

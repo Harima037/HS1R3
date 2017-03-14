@@ -170,7 +170,7 @@ class ProyectosController extends BaseController {
 			
 			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','catalogoCoberturas.descripcion AS coberturaDescripcion','proyectos.idEstatusProyecto',
-				'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
+				'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl','proyectos.cancelado')
 								->join('sentryUsers','sentryUsers.id','=','proyectos.actualizadoPor')
 								->join('catalogoCoberturas','catalogoCoberturas.id','=','proyectos.idCobertura')
 								->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
@@ -485,7 +485,11 @@ class ProyectosController extends BaseController {
 		try{
 			if($parametros['guardar'] == 'validar-proyecto'){
 				$proyecto = Proyecto::find($id);
-				if($proyecto->idEstatusProyecto == 1 || $proyecto->idEstatusProyecto == 3){
+
+				if($proyecto->cancelado){
+					$respuesta['data'] = array('data'=>'El Proyecto se encuentra cancelado');
+					throw new Exception("Proyecto cancelado", 1);
+				}elseif($proyecto->idEstatusProyecto == 1 || $proyecto->idEstatusProyecto == 3){
 					$proyecto->load('beneficiarios','componentes','actividades');
 					if(count($proyecto->beneficiarios) == 0){
 						$respuesta['data'] = array('data'=>'El proyecto debe tener al menos un beneficiario capturado.');
@@ -503,14 +507,29 @@ class ProyectosController extends BaseController {
 				}else{
 					$respuesta['data'] = array('data'=>'El Proyecto ya se encuentra en proceso de Revisión');
 				}
+			}elseif($parametros['guardar'] == 'cancelacionproyecto'){
+				$proyecto = Proyecto::find($id);
+				if($proyecto){
+					if($proyecto->cancelado){
+						$respuesta['data'] = array('data'=>'El Proyecto ya se encuentra cancelado');
+						throw new Exception("Proyecto cancelado", 1);
+					}else{
+						$respuesta = $this->cancelar_proyecto($parametros,$proyecto);
+					}
+				}else{
+					throw new Exception("El proyecto no se encuentra disponible", 1);
+				}
 			}else{
 				if($parametros['guardar'] != 'proyecto'){
 					$proyecto = Proyecto::find($parametros['id-proyecto']);
 				}else{
 					$proyecto = Proyecto::find($id);
 				}
-	
-				if($proyecto->idEstatusProyecto != 1 && $proyecto->idEstatusProyecto != 3){
+				
+				if($proyecto->cancelado){
+					$respuesta['data'] = array('data'=>'El Proyecto se encuentra cancelado');
+					throw new Exception("Proyecto cancelado", 1);
+				}elseif($proyecto->idEstatusProyecto != 1 && $proyecto->idEstatusProyecto != 3){
 					switch ($proyecto->idEstatusProyecto) {
 						case 2:
 							$respuesta['data']['data'] = 'El proyecto se encuentra en proceso de revisión, por tanto no es posible editarlo';
@@ -1392,6 +1411,33 @@ class ProyectosController extends BaseController {
 			$respuesta['http_status'] = $validacion['http_status'];
 			$respuesta['data'] = $validacion['data'];
 		}
+		return $respuesta;
+	}
+
+	public function cancelar_proyecto($parametros,$proyecto){
+		$respuesta['http_status'] = 200;
+		$respuesta['data'] = array();
+
+		$reglasCancelacion = array(
+			'fecha-cancelacion' 	=> 'date|required',
+			'motivos-cancelacion' 	=> 'required'
+		);
+
+		$validacion = Validador::validar(Input::all(), $reglasCancelacion);
+
+		if($validacion === TRUE){
+			$proyecto->cancelado = 1;
+			$proyecto->fechaCancelacion = $parametros['fecha-cancelacion'];
+			$proyecto->motivoCancelacion = $parametros['motivos-cancelacion'];
+			if(!$proyecto->save()){
+				$respuesta['http_status'] = 500;
+				$respuesta['data'] = array('data'=>'Ocurrió un error al intentar guardar los datos','code'=>'S01');
+			}
+		}else{
+			$respuesta['http_status'] = $validacion['http_status'];
+			$respuesta['data'] = $validacion['data'];
+		}
+
 		return $respuesta;
 	}
 

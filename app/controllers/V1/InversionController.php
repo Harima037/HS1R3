@@ -158,7 +158,7 @@ class InversionController extends ProyectosController {
 				
 				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),'fibap.presupuestoRequerido',
 					'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','proyectos.idEstatusProyecto',
-					'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
+					'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl','proyectos.cancelado')
 									->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
 									->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
 									->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
@@ -629,7 +629,11 @@ class InversionController extends ProyectosController {
 			
 			if($parametros['guardar'] == 'validar-proyecto'){
 				$proyecto = Proyecto::find($id);
-				if($proyecto->idEstatusProyecto == 1 || $proyecto->idEstatusProyecto == 3){
+
+				if($proyecto->cancelado){
+					$respuesta['data'] = array('data'=>'El Proyecto se encuentra cancelado');
+					throw new Exception("Proyecto cancelado", 1);
+				}elseif($proyecto->idEstatusProyecto == 1 || $proyecto->idEstatusProyecto == 3){
 					$proyecto->load('beneficiarios','componentes','actividades');
 					if(count($proyecto->beneficiarios) == 0){
 						$respuesta['data'] = array('data'=>'El proyecto debe tener al menos un beneficiario capturado.');
@@ -649,6 +653,18 @@ class InversionController extends ProyectosController {
 				}else{
 					$respuesta['data'] = array('data'=>'Este Proyecto no es editable');
 				}
+			}elseif($parametros['guardar'] == 'cancelacionproyecto'){
+				$proyecto = Proyecto::find($id);
+				if($proyecto){
+					if($proyecto->cancelado){
+						$respuesta['data'] = array('data'=>'El Proyecto ya se encuentra cancelado');
+						throw new Exception("Proyecto cancelado", 1);
+					}else{
+						$respuesta = parent::cancelar_proyecto($parametros,$proyecto);
+					}
+				}else{
+					throw new Exception("El proyecto no se encuentra disponible", 1);
+				}
 			}else{
 				//if($parametros['guardar'] != 'proyecto'){
 				if(isset($parametros['id-proyecto'])){
@@ -657,7 +673,10 @@ class InversionController extends ProyectosController {
 					$proyecto = Proyecto::find($id);
 				}
 	
-				if($proyecto->idEstatusProyecto != 1 && $proyecto->idEstatusProyecto != 3){
+				if($proyecto->cancelado){
+					$respuesta['data'] = array('data'=>'El Proyecto se encuentra cancelado');
+					throw new Exception("Proyecto cancelado", 1);
+				}elseif($proyecto->idEstatusProyecto != 1 && $proyecto->idEstatusProyecto != 3){
 					switch ($proyecto->idEstatusProyecto) {
 						case 2:
 							$respuesta['data']['data'] = 'El proyecto se encuentra en proceso de revisión, por tanto no es posible editarlo';

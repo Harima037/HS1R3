@@ -24,7 +24,11 @@ moduloDatagrid.actualizar({
         for(var i in response.data){
             var item = {};
             var clase_label = 'label-info';
-            if(response.data[i].idEstatusProyecto == 2){
+
+            if(response.data[i].cancelado){
+                clase_label = 'label-danger';
+                response.data[i].estatusProyecto = 'Cancelado';
+            }else if(response.data[i].idEstatusProyecto == 2){
                 clase_label = 'label-warning';
             }else if(response.data[i].idEstatusProyecto == 3){
                 clase_label = 'label-danger';
@@ -63,6 +67,12 @@ function editar (e){
         _success: function(response){
             var titulo_modal = response.data.clasificacion_proyecto.descripcion + ' <small>' + response.data.tipo_proyecto.descripcion + '</small>';
             $(modal_name).find(".modal-title").html(titulo_modal);
+
+            if(response.data.cancelado){
+                $(modal_name).find('.modal-header').addClass('alert-danger');
+            }else{
+                $(modal_name).find('.modal-header').removeClass('alert-danger');
+            }
 
             $('#clasificacion_proyecto').val(response.data.clasificacion_proyecto.id);
             $('#tipo_proyecto').val(response.data.tipo_proyecto.id);

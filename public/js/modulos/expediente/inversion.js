@@ -24,7 +24,11 @@ moduloDatagrid.actualizar({
         for(var i in response.data){
             var item = {};
             var clase_label = 'label-info';
-            if(response.data[i].idEstatusProyecto == 2){
+            
+            if(response.data[i].cancelado){
+                clase_label = 'label-danger';
+                response.data[i].estatusProyecto = 'Cancelado';
+            }else if(response.data[i].idEstatusProyecto == 2){
                 clase_label = 'label-warning';
             }else if(response.data[i].idEstatusProyecto == 3){
                 clase_label = 'label-danger';
