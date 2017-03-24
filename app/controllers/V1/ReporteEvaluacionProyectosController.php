@@ -67,6 +67,9 @@ class ReporteEvaluacionProyectosController extends BaseController {
 								},
 								'conteoPlanesMejora' => function($planesMejora) use ($mes){
 									$planesMejora->where('mes','<=',$mes);
+								},
+								'evaluacionProyectoObservacion'=>function($observacion)use($mes){
+									$observacion->where('mes',$mes);
 								}
 							])
 							->get();
@@ -132,7 +135,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 
 			$datos = $rows->toArray();
 			//return Response::json(array('datos'=>$datos),200);
-			$this->obtenerWord($datos,$presupuestos,$presupuesto_fuente_financiamiento,$catalogos);
+			$this->obtenerWord($datos,$presupuestos,$presupuesto_fuente_financiamiento,$catalogos,$ejercicio);
 		}catch(Exception $ex){
 			if(count($this->lista_imagenes) > 0){
 				foreach ($this->lista_imagenes as $imagen) { unlink($imagen); }
@@ -161,7 +164,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 		return $cadena;
 	}
 
-	function obtenerWord($datos,$presupuestos,$presupuesto_fuente_financiamiento,$catalogos){
+	function obtenerWord($datos,$presupuestos,$presupuesto_fuente_financiamiento,$catalogos,$ejercicio){
 		$phpWord = new \PhpOffice\PhpWord\PhpWord();
 
 		$phpWord->setDefaultFontName('Arial');
@@ -202,9 +205,10 @@ class ReporteEvaluacionProyectosController extends BaseController {
 		$phpWord->addTableStyle('TablaInfoHeader', $infoHeader);
 		$phpWord->addTableStyle('TablaEncabezado',$headerStyle);
 		$phpWord->addTitleStyle(3, ['bold'=>true,'size'=>12], ['align'=>'center']);
-
+		
 		$section = $phpWord->addSection(array('orientation'=>'portrait','size'=>'letter'));
 		$section_resumen = $phpWord->addSection(array('orientation'=>'portrait','size'=>'letter'));
+		
 	/***                <<<<<<<<<<<<<<<<<<<<  Definición de Estilos   >>>>>>>>>>>>>>>>>>>                   ***/
 	    $sectionStyle = $section_resumen->getStyle();
 		$sectionStyle->setMarginLeft(\PhpOffice\PhpWord\Shared\Converter::cmToTwip(0.75));
@@ -681,8 +685,9 @@ class ReporteEvaluacionProyectosController extends BaseController {
 				];
 			}
 
-			if(isset($proyecto['analisis_funcional'][0])){
-				$analisis_funcional = $proyecto['analisis_funcional'][0]['justificacionGlobal'];
+			if(isset($proyecto['evaluacion_proyecto_observacion']['observaciones'])){
+				//$analisis_funcional = $proyecto['analisis_funcional'][0]['justificacionGlobal'];
+				$analisis_funcional = $proyecto['evaluacion_proyecto_observacion']['observaciones'];
 			}else{
 				$analisis_funcional = 'Información no encontrada en la base de datos';
 			}
@@ -735,6 +740,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 			}
 			
 			$section->addTextBreak();
+			
 			
 			$graph = new \PHPGraphLib(650,210);
 			$avance_logrado = number_format($avance_logrado,2,'.','');
@@ -821,15 +827,36 @@ class ReporteEvaluacionProyectosController extends BaseController {
 
 		$texto_proyectos = '';
 		$proyectos_unidades_resumen = [];
-		foreach ($proyectos_unidad_responsable as $unidad => $no_proyectos) {
-			$texto_proyectos .= $unidad . ' presentó ' . $no_proyectos . ', ';
+		$proyectos_unidad_responsable_llaves = array_keys($proyectos_unidad_responsable);
+		$total = count($proyectos_unidad_responsable_llaves);
+		foreach ($proyectos_unidad_responsable_llaves as $index => $unidad) {
+			$no_proyectos = $proyectos_unidad_responsable[$unidad];
+			if($index < ($total-2)){
+				$separador = ', ';
+			}elseif($index == ($total-2)) {
+				$separador = ' y ';
+			}else{
+				$separador = '.';
+			}
+			$texto_proyectos .= str_replace(['Dirección','Laboratorio'],['la Dirección','el Laboratorio'],$unidad) . ' presentó ' . $no_proyectos . $separador;
 			$nueva_unidad = str_replace(['Dirección','á','é','í','ó','ú'],['D.','a','e','i','o','u'],$unidad);
 			$proyectos_unidades_resumen[$nueva_unidad] = $no_proyectos;
 		}
+		/*foreach ($proyectos_unidad_responsable as $unidad => $no_proyectos) {
+			$texto_proyectos .= str_replace(['Dirección','Laboratorio'],['la Dirección','el Laboratorio'],$unidad) . ' presentó ' . $no_proyectos . ', ';
+			$nueva_unidad = str_replace(['Dirección','á','é','í','ó','ú'],['D.','a','e','i','o','u'],$unidad);
+			$proyectos_unidades_resumen[$nueva_unidad] = $no_proyectos;
+		}*/
 
 		$section_resumen->addText(htmlspecialchars('ANÁLISIS GENERAL'),$titulo,$centrado);
 		$section_resumen->addTextBreak(1);
-		$section_resumen->addText(htmlspecialchars('Al mes de mes de año, encontramos que se han gestionado '.count($datos).' proyectos que fueron autorizados y liberados por la Secretaría de Hacienda. De los proyectos autorizados, '.$texto_proyectos),$texto,$justificado);
+
+		$textrun = $section_resumen->addTextRun(['lineHeight'=>1.5]);
+		$textrun->addText(htmlspecialchars('En el ejercicio '.$ejercicio.' se han gestionado '.count($datos).' proyectos autorizados y liberados por la Secretaría de Hacienda.'),$texto,$justificado);
+		$section_resumen->addTextBreak(1);
+
+		$textrun = $section_resumen->addTextRun(['lineHeight'=>1.5]);
+		$textrun->addText(htmlspecialchars('De los proyectos autorizados, '.$texto_proyectos),$texto,$justificado);
 		$section_resumen->addTextBreak(1);
 
 		$graph = new \PHPGraphLibPie(800, 400);
@@ -849,7 +876,8 @@ class ReporteEvaluacionProyectosController extends BaseController {
 		$row->addCell(11259)->addImage($chart_file_path,array('align'=>'center','width'=>'650'));
 		$section_resumen->addTextBreak(1);
 
-		$section_resumen->addText(htmlspecialchars('Con la finalidad de mejorar los procesos y servicios otorgados a la población, se tramitaron y autorizaron '.$proyectos_tipo_proyecto['INSTITUCIONAL'].' proyectos de tipo institucional y '.$proyectos_tipo_proyecto['INVERSION'].' proyectos de inversión, que además permitieron fortalecer la infraestructura del instituto.'),$texto,$justificado);
+		$textrun = $section_resumen->addTextRun(['lineHeight'=>1.5]);
+		$textrun->addText(htmlspecialchars('Con la finalidad de mejorar los procesos y servicios otorgados a la población, se tramitaron y autorizaron '.$proyectos_tipo_proyecto['INSTITUCIONAL'].' proyectos de tipo institucional y '.$proyectos_tipo_proyecto['INVERSION'].' proyectos de inversión, que además permitieron fortalecer la infraestructura del Instituto.'),$texto,$justificado);
 		$section_resumen->addTextBreak(1);
 
 		$graph = new \PHPGraphLibPie(400, 100);
@@ -871,12 +899,31 @@ class ReporteEvaluacionProyectosController extends BaseController {
 
 		$texto_proyectos = '';
 		$proyectos_tipo_recurso_resumen = [];
+
+		$conteo_recursos = 0;
+		$total_recursos = count($proyectos_tipo_recurso);
+
 		foreach ($proyectos_tipo_recurso as $tipo_recurso => $total_proyectos) {
-			$texto_proyectos .= $total_proyectos . ' proyectos fueron financiados con ' . $tipo_recurso . ', ';
+			if($conteo_recursos > 0){
+				$texto_intermedio = ' proyectos con ';
+			}else{
+				$texto_intermedio = ' fueron financiados con ';
+			}
+			if($conteo_recursos < ($total_recursos-2)){
+				$separador = ', ';
+			}elseif($conteo_recursos == ($total_recursos-2)){
+				$separador = ' y ';
+			}else{
+				$separador = '.';
+			}
+			$conteo_recursos++;
+			$texto_proyectos .= $total_proyectos . $texto_intermedio . mb_strtolower($tipo_recurso) . $separador;
 			$nuevo_tipo_recurso = str_replace('RECURSOS ','',$tipo_recurso);
 			$proyectos_tipo_recurso_resumen[$nuevo_tipo_recurso] = $total_proyectos;
 		}
-		$section_resumen->addText(htmlspecialchars('De los '.count($datos).' proyectos, '.$texto_proyectos),$texto,$justificado);
+
+		$textrun = $section_resumen->addTextRun(['lineHeight'=>1.5]);
+		$textrun->addText(htmlspecialchars('De los '.count($datos).' proyectos, '.$texto_proyectos),$texto,$justificado);
 		$section_resumen->addTextBreak(1);
 
 		$graph = new \PHPGraphLibPie(400, 100);
@@ -897,18 +944,42 @@ class ReporteEvaluacionProyectosController extends BaseController {
 		$section_resumen->addTextBreak(1);
 
 		$texto_proyectos = '';
+		$conteo_proyectos_finan = 0;
+		$total_proyectos_finan = count($proyectos_fuente_financiamiento);
 		foreach ($proyectos_fuente_financiamiento as $fuente => $total_proyectos) {
-			$texto_proyectos .= $total_proyectos . ' proyectos fueron financiados através de ' . $fuente . ', ';
+			if($conteo_proyectos_finan > 0){
+				$separador_texto = 'con ';
+			}else{
+				$separador_texto = 'fueron financiados a través de ';
+			}
+			if($conteo_proyectos_finan < ($total_proyectos_finan-2)){
+				$separador = ', ';
+			}elseif($conteo_proyectos_finan == ($total_proyectos_finan-2)){
+				$separador = ' y ';
+			}else{
+				$separador = '.';
+			}
+			if($total_proyectos > 1){
+				$proyecto_s = ' proyectos ';
+			}else{
+				$proyecto_s = ' proyecto ';
+			}
+			$conteo_proyectos_finan++;
+			$texto_proyectos .= $total_proyectos . $proyecto_s . $separador_texto . $fuente . $separador;
 		}
-		$section_resumen->addText(htmlspecialchars('En este sentido '.$texto_proyectos),$texto,$justificado);
+
+		$textrun = $section_resumen->addTextRun(['lineHeight'=>1.5]);
+		$textrun->addText(htmlspecialchars('En este sentido '.$texto_proyectos),$texto,$justificado);
 		$section_resumen->addTextBreak(1);
 
 		$graph = new \PHPGraphLib(600,600);
 		$graph->addData($proyectos_fuente_financiamiento);
-		$graph->setGradient('red', 'maroon');
+		$graph->setGradient('green', 'olive');
 		$graph->setupXAxis(50);
 		$graph->setDataValues(true);
-		$graph->setDataValueColor('navy');
+		$graph->setDataValueColor('black');
+		$graph->setGrid(false);
+		//$graph->setXValuesHorizontal(true);
 		ob_start();
 			$graph->createGraph();
 			$image_data = ob_get_contents();
@@ -922,7 +993,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 		$row->addCell(11259)->addImage($chart_file_path,array('align'=>'center'));
 		$section_resumen->addTextBreak(1);
 
-		$section_resumen->addText(htmlspecialchars('Detallado con el importa autorizado, a continuación enlistamos las fuentes y montos autorizados:'),$texto,$justificado);
+		$section_resumen->addText(htmlspecialchars('A continuación enlistamos las fuentes y montos autorizados:'),$texto,$justificado);
 		$section_resumen->addTextBreak(1);
 
 		$table = $section_resumen->addTable('TablaInfo');
@@ -954,18 +1025,41 @@ class ReporteEvaluacionProyectosController extends BaseController {
 
 		//proyectos_subfuente_financiamiento
 		$texto_proyectos = '';
+		$conteo_proyectos_subfuente = 0;
+		$total_proyectos_subfuente = count($proyectos_subfuente_financiamiento);
 		foreach ($proyectos_subfuente_financiamiento as $fuente => $total_proyectos) {
-			$texto_proyectos .= $total_proyectos . ' proyectos fueron tramitados mediante ' . $fuente . ', ';
+			if($conteo_proyectos_subfuente > 0){
+				$separador_texto = 'con ';
+			}else{
+				$separador_texto = 'fueron generados con ';
+			}
+			if($conteo_proyectos_subfuente < ($total_proyectos_subfuente-2)){
+				$separador = ', ';
+			}elseif($conteo_proyectos_subfuente == ($total_proyectos_subfuente-2)){
+				$separador = ' y ';
+			}else{
+				$separador = '.';
+			}
+			if($total_proyectos > 1){
+				$proyecto_s = ' proyectos ';
+			}else{
+				$proyecto_s = ' proyecto ';
+			}
+			$conteo_proyectos_subfuente++;
+			$texto_proyectos .= $total_proyectos . $proyecto_s . $separador_texto . $fuente . $separador;
 		}
-		$section_resumen->addText(htmlspecialchars('De acuerdo a la subfuente de financiamiento, '.$texto_proyectos),$texto,$justificado);
+
+		$textrun = $section_resumen->addTextRun(['lineHeight'=>1.5]);
+		$textrun->addText(htmlspecialchars('De acuerdo a la subfuente de financiamiento, '.$texto_proyectos),$texto,$justificado);
 		$section_resumen->addTextBreak(1);
 
 		$graph = new \PHPGraphLib(600,800);
 		$graph->addData($proyectos_subfuente_financiamiento);
-		$graph->setGradient('red', 'maroon');
+		$graph->setGradient('green', 'olive');
 		$graph->setupXAxis(50);
 		$graph->setDataValues(true);
 		$graph->setDataValueColor('navy');
+		$graph->setGrid(false);
 		ob_start();
 			$graph->createGraph();
 			$image_data = ob_get_contents();
@@ -979,11 +1073,13 @@ class ReporteEvaluacionProyectosController extends BaseController {
 		$row->addCell(11259)->addImage($chart_file_path,array('align'=>'center'));
 		$section_resumen->addTextBreak(1);
 
-		$section_resumen->addText(htmlspecialchars('De acuerdo al artículo 58 de las Normas Presupuestarias para la Administración Pública del Estado de Chiapas 2014, los proyectos se elaboraron con base al Presupuesto basado en Resultados (PbR) en el cual, se incorporaron elementos como son: objetivos, indicadores y beneficiarios, entre otros; lo cual, permite impulsar acciones de monitoreo para efectos de verificar los resultados obtenidos de la aplicación de los recursos públicos y el grado de cumplimiento de las metas. De esta manera, se podrán verificar si las actividades a realizar generaron los productos y servicios que la sociedad demanda y si éstas, impactan en el mejoramiento de su entorno, bienestar individual y colectivo de la gente.'),$texto,$justificado);
+		$textrun = $section_resumen->addTextRun(['lineHeight'=>1.5]);
+		$textrun->addText(htmlspecialchars('De acuerdo al artículo 58 de las Normas Presupuestarias para la Administración Pública del Estado de Chiapas 2014, los proyectos se elaboraron con base al Presupuesto basado en Resultados (PbR) en el cual, se incorporaron elementos como son: objetivos, indicadores y beneficiarios, entre otros; lo cual, permite impulsar acciones de monitoreo para efectos de verificar los resultados obtenidos de la aplicación de los recursos públicos y el grado de cumplimiento de las metas. De esta manera, se podrán verificar si las actividades a realizar generaron los productos y servicios que la sociedad demanda y si éstas, impactan en el mejoramiento de su entorno, bienestar individual y colectivo de la gente.'),$texto,$justificado);
 		$section_resumen->addTextBreak(1);
 
 		$total_indicadores = $cumplimiento_indicadores['Satisfactorio'] + $cumplimiento_indicadores['No Satisfactorio'];
-		$section_resumen->addText(htmlspecialchars('De los '.$total_indicadores.' indicadores programados, en '.$cumplimiento_indicadores['Satisfactorio'].' se cumplió satisfactoriamente las metas establecidas, ------; '.$cumplimiento_indicadores_no_satisfactorio['Bajo avance'].' quedaron por debajo de lo esperado y '.$cumplimiento_indicadores_no_satisfactorio['Alto avance'].' rebasaron lo proyectado.'),$texto,$justificado);
+		$textrun = $section_resumen->addTextRun(['lineHeight'=>1.5]);
+		$textrun->addText(htmlspecialchars('De los '.$total_indicadores.' indicadores programados, '.$cumplimiento_indicadores['Satisfactorio'].' se cumplió satisfactoriamente, '.$cumplimiento_indicadores_no_satisfactorio['Bajo avance'].' quedaron por debajo de lo esperado y '.$cumplimiento_indicadores_no_satisfactorio['Alto avance'].' rebasaron lo proyectado.'),$texto,$justificado);
 		$section_resumen->addTextBreak(1);
 
 		$graph = new \PHPGraphLibPie(300, 100);
@@ -1025,7 +1121,8 @@ class ReporteEvaluacionProyectosController extends BaseController {
 			$texto_proyectos .= $value['UnidadResponsable'] . ' alcanzó el ' . number_format($porcentaje_area,2) . '% de efectividad, ';
 		}
 
-		$section_resumen->addText(htmlspecialchars('En cuanto al cumplimiento por área Líder del Proyecto, tenemos que, '.$texto_proyectos.' .'),$texto,$justificado);
+		$textrun = $section_resumen->addTextRun(['lineHeight'=>1.5]);
+		$textrun->addText(htmlspecialchars('En cuanto al cumplimiento por área Líder del Proyecto, tenemos que, '.$texto_proyectos.' .'),$texto,$justificado);
 		$section_resumen->addTextBreak(1);
 
 		$graph = new \PHPGraphLib(650,200);
@@ -1033,9 +1130,9 @@ class ReporteEvaluacionProyectosController extends BaseController {
 		$graph->setBars(false);
 		$graph->setLine(true);
 		$graph->setDataPoints(true);
-		$graph->setDataPointColor('navy');
+		$graph->setDataPointColor('black');
 		$graph->setDataValues(true);
-		$graph->setDataValueColor('blue');
+		$graph->setDataValueColor('black');
 		$graph->setDataFormat('percent');
 		$graph->setXValuesHorizontal(true);
 		ob_start();
@@ -1052,7 +1149,8 @@ class ReporteEvaluacionProyectosController extends BaseController {
 		$section_resumen->addTextBreak(1);
 
 		$total_proyectos = $cumplimiento_proyecto['Satisfactorio'] + $cumplimiento_proyecto['No Satisfactorio'];
-		$section_resumen->addText(htmlspecialchars('Así tenemos que, de los '.$total_proyectos.' proyectos, '.$cumplimiento_proyecto['Satisfactorio'].' lograron un avance satisfactorio,sin embargo, '.$cumplimiento_proyecto_no_satisfactorio['Bajo avance'].' tuvieron un bajo avance y '.$cumplimiento_proyecto_no_satisfactorio['Alto avance'].' rebasaron lo programado.'),$texto,$justificado);
+		$textrun = $section_resumen->addTextRun(['lineHeight'=>1.5]);
+		$textrun->addText(htmlspecialchars('Así tenemos que, de los '.$total_proyectos.' proyectos, '.$cumplimiento_proyecto['Satisfactorio'].' lograron un avance satisfactorio,sin embargo, '.$cumplimiento_proyecto_no_satisfactorio['Bajo avance'].' tuvieron un bajo avance y '.$cumplimiento_proyecto_no_satisfactorio['Alto avance'].' rebasaron lo programado.'),$texto,$justificado);
 		$section_resumen->addTextBreak(1);
 
 		$graph = new \PHPGraphLibPie(300, 100);
