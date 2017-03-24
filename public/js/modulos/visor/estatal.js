@@ -128,6 +128,7 @@ $('#btn-filtro').on('click',function (e){
 				}
 			break;
 			case 'presup_ejercido_capitulo': graficaPresupuestoEjercidoCapitulo(); break;
+			case 'resumen_presupuesto': tablaResumenPresupuesto(); break;
 		}
 	}
 	if(titulo){
@@ -141,6 +142,9 @@ function graficaMetasCumplidas(){
 	$('#filtro-jurisdicciones').removeClass('hidden');
 	$('#panel-btn-filtro').removeClass('hidden');
 	var parametros = {grafica:'metas_cumplidas'};
+	if($('#fuente_financiamiento').val()){
+		parametros.fuente = $('#fuente_financiamiento').val();
+	}
 	if($('#unidad').val() != ''){
 		parametros.unidad = $('#unidad').val();
 	}
@@ -202,7 +206,11 @@ function graficaMetasCumplidas(){
 }
 
 function graficaMetasDireccion(){
+	$('#panel-btn-filtro').removeClass('hidden');
 	var parametros = {grafica:'metas_unidad'};
+	if($('#fuente_financiamiento').val()){
+		parametros.fuente = $('#fuente_financiamiento').val();
+	}
 	moduloResource.get(null,parametros,{
 		_success: function(response){
 			var elementos = [['Unidad Responsable', 'Metas']];
@@ -232,7 +240,11 @@ function graficaMetasDireccion(){
 }
 
 function tablaResumenPresupuesto(){
+	$('#panel-btn-filtro').removeClass('hidden');
 	var parametros = {tabla:'resumen_presupuesto'};
+	if($('#fuente_financiamiento').val()){
+		parametros.fuente = $('#fuente_financiamiento').val();
+	}
 	moduloResource.get(null,parametros,{
 		_success: function(response){
 			$('#area-graficas').empty();
@@ -282,6 +294,9 @@ function graficaPresupuestoEjercido(){
 	$('#filtro-unidades').removeClass('hidden');
 	$('#panel-btn-filtro').removeClass('hidden');
 	var parametros = {grafica:'presupuesto_ejercido'};
+	if($('#fuente_financiamiento').val()){
+		parametros.fuente = $('#fuente_financiamiento').val();
+	}
 	if($('#unidad').val() != ''){
 		parametros.unidad = $('#unidad').val();
 	}
@@ -324,7 +339,11 @@ function graficaPresupuestoEjercido(){
 }
 
 function graficaPresupuestoEjercidoCapitulo(){
+	$('#panel-btn-filtro').removeClass('hidden');
 	var parametros = {grafica:'presupuesto_ejercido_capitulo'};
+	if($('#fuente_financiamiento').val()){
+		parametros.fuente = $('#fuente_financiamiento').val();
+	}
 	moduloResource.get(null,parametros,{
 		_success: function(response){
 			var elementos = [['Capitulo', 'Presupuesto Ejercido']];
@@ -360,6 +379,9 @@ function graficaPresupuestoFuente(){
 	$('#filtro-unidades').removeClass('hidden');
 	$('#panel-btn-filtro').removeClass('hidden');
 	var parametros = {grafica:'presupuesto_fuente'};
+	if($('#fuente_financiamiento').val()){
+		parametros.fuente = $('#fuente_financiamiento').val();
+	}
 	if($('#unidad').val() != ''){
 		parametros.unidad = $('#unidad').val();
 	}
@@ -395,7 +417,11 @@ function graficaPresupuestoFuente(){
 }
 
 function graficaProyectosDireccion(){
+	$('#panel-btn-filtro').removeClass('hidden');
 	var parametros = {grafica:'proyectos_direccion'};
+	if($('#fuente_financiamiento').val()){
+		parametros.fuente = $('#fuente_financiamiento').val();
+	}
 	moduloResource.get(null,parametros,{
 		_success: function(response){
 			var elementos = [['Unidad Responsable', 'Proyectos']];
@@ -427,7 +453,11 @@ function graficaProyectosDireccion(){
 }
 
 function graficaProyectosTipo(){
+	$('#panel-btn-filtro').removeClass('hidden');
 	var parametros = {grafica:'proyectos_tipo'};
+	if($('#fuente_financiamiento').val()){
+		parametros.fuente = $('#fuente_financiamiento').val();
+	}
 	moduloResource.get(null,parametros,{
 		_success: function(response){
 			var elementos = [['Clasificacion de Proyecto', 'Proyectos']];

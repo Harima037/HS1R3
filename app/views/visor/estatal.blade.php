@@ -19,6 +19,18 @@
         <div class="panel panel-default" >
             <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> {{ $sys_mod_activo->nombre }} {{$anio_captura}}</h4></div>
             <div class="panel-body">
+                <div class="row">
+                    <div class="col-sm-6 col-sm-offset-6">
+                        <select id="fuente_financiamiento" class="form-control">
+                            <option value="">Todas las Fuentes</option>
+                            @foreach($fuentes_financiamiento as $clave => $fuente)
+                            <option value="{{$clave}}">{{$fuente}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
                 <div class="btn-group btn-group-lg btn-group-justified" role="group" aria-label="estadisticas-estatales">
                     <div class="btn-group btn-group-lg" role="group">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="fa fa-folder"></span> Proyectos <span class="caret"></span>

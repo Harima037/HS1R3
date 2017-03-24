@@ -62,7 +62,13 @@ class VisorController extends BaseController {
 		//obtenemos proyectos cancelados
 		$proyectos_cancelados_ids = Proyecto::where('cancelado','=',1)->lists('id');
 
+		$filtro_fuente = false;
+
 		$parametros = Input::all();
+
+		if(isset($parametros['fuente'])){
+			$filtro_fuente = $parametros['fuente'];
+		}
 
 		if(isset($parametros['grafica'])){
 			switch ($parametros['grafica']) {
@@ -71,6 +77,11 @@ class VisorController extends BaseController {
 						$usuario = Sentry::getUser();
 						$datos_captura = $this->obtenerDatosCaptura();
 						$anio_captura = $datos_captura['anio'];
+
+						if($filtro_fuente){
+							$proyectos_fuente = $this->obtenerListaProyectosFuente($filtro_fuente,$datos_captura['mes'],$anio_captura);
+							$rows = $rows->whereIn('proyectos.id',$proyectos_fuente);
+						}
 
 						if($usuario->claveJurisdiccion){
 							//$proyectos_ids = [];
@@ -109,7 +120,7 @@ class VisorController extends BaseController {
 										->get();
 						$total = $rows->sum('noProyectos');
 						//$queries = DB::getQueryLog();
-						//var_dump($queries);die;
+						//var_dump(last($queries));die;
 						$data = array('data'=>$rows,'total'=>$total);
 					break;
 				case 'proyectos_tipo':
@@ -117,6 +128,11 @@ class VisorController extends BaseController {
 						$usuario = Sentry::getUser();
 						$datos_captura = $this->obtenerDatosCaptura();
 						$anio_captura = $datos_captura['anio'];
+
+						if($filtro_fuente){
+							$proyectos_fuente = $this->obtenerListaProyectosFuente($filtro_fuente,$datos_captura['mes'],$anio_captura);
+							$rows = $rows->whereIn('proyectos.id',$proyectos_fuente);
+						}
 
 						if($usuario->claveJurisdiccion){
 							$componentes = ComponenteMetaMes::groupBy('idProyecto')
@@ -171,6 +187,10 @@ class VisorController extends BaseController {
 							}
 						}
 
+						if($filtro_fuente){
+							$rows = $rows->where('FF','=',$filtro_fuente);
+						}
+
 						$rows = $rows->select(DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
 											'fuenteFinan.descripcion AS fuenteFinanciamiento')
 									->leftjoin('catalogoFuenteFinanciamiento AS fuenteFinan','fuenteFinan.clave','=','FF')
@@ -190,6 +210,10 @@ class VisorController extends BaseController {
 						if($usuario->claveUnidad){
 							$unidades = explode('|',$usuario->claveUnidad);
 							$rows = $rows->whereIn('UR',$unidades);
+						}
+
+						if($filtro_fuente){
+							$rows = $rows->where('FF','=',$filtro_fuente);
 						}
 
 						$rows = $rows->select(DB::raw('sum(presupuestoEjercidoModificado) AS presupuestoEjercido'),
@@ -222,6 +246,10 @@ class VisorController extends BaseController {
 							}
 						}
 
+						if($filtro_fuente){
+							$presupuesto = $presupuesto->where('FF','=',$filtro_fuente);
+						}
+
 						$presupuesto = $presupuesto->where('mes','=',$mes_actual)
 													->where('ejercicio','=',$anio_captura)
 													->select(DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
@@ -237,6 +265,11 @@ class VisorController extends BaseController {
 						$anio_captura = $datos_captura['anio'];
 						$componentes_ids = false;
 						$actividades_ids = false;
+
+						if($filtro_fuente){
+							$proyectos_fuente = $this->obtenerListaProyectosFuente($filtro_fuente,$datos_captura['mes'],$anio_captura);
+							$rows = $rows->whereIn('proyectos.id',$proyectos_fuente);
+						}
 
 						if($usuario->claveUnidad){
 							$unidades = explode('|',$usuario->claveUnidad);
@@ -373,6 +406,11 @@ class VisorController extends BaseController {
 
 						if($unidades){
 							$proyectos_ids = $proyectos_ids->whereIn('unidadResponsable',$unidades);
+						}
+
+						if($filtro_fuente){
+							$proyectos_fuente = $this->obtenerListaProyectosFuente($filtro_fuente,$mes_actual,$anio_captura);
+							$proyectos_ids = $proyectos_ids->whereIn('proyectos.id',$proyectos_fuente);
 						}
 
 						$proyectos_ids = $proyectos_ids->lists('id');
@@ -521,6 +559,10 @@ class VisorController extends BaseController {
 				if($usuario->claveUnidad){
 					$unidades = explode('|',$usuario->claveUnidad);
 					$rows = $rows->whereIn('UR',$unidades);
+				}
+
+				if($filtro_fuente){
+					$rows = $rows->where('FF','=',$filtro_fuente);
 				}
 
 				$rows = $rows->select('unidades.descripcion AS unidadResponsable',
@@ -1020,6 +1062,48 @@ class VisorController extends BaseController {
 		}
 		
 		return Response::json($data,$http_status);
+	}
+
+	function obtenerListaProyectosFuente($fuente,$mes,$ejercicio){
+		$proyectos_fuente = CargaDatosEP01::select('proyectos.id')
+											->where('FF','=',$fuente)
+											->where('mes','=',$mes)
+											->where('cargaDatosEP01.ejercicio','=',$ejercicio)
+											->join('proyectos',function($join){
+												$join->on(
+													DB::raw("
+														concat(
+															proyectos.unidadResponsable,
+															proyectos.finalidad,
+															proyectos.funcion,
+															proyectos.subFuncion,
+															proyectos.subSubFuncion,
+															proyectos.programaSectorial,
+															proyectos.programaPresupuestario,
+															proyectos.origenAsignacion,
+															proyectos.actividadInstitucional,
+															concat(proyectos.proyectoEstrategico,LPAD(proyectos.numeroProyectoEstrategico,3,'0'))
+														)
+													"),
+													"=",
+													DB::raw("
+														concat(
+															cargaDatosEP01.UR,
+															cargaDatosEP01.FI,
+															cargaDatosEP01.FU,
+															cargaDatosEP01.SF,
+															cargaDatosEP01.SSF,
+															cargaDatosEP01.PS,
+															cargaDatosEP01.PP,
+															cargaDatosEP01.OA,
+															cargaDatosEP01.AI,
+															cargaDatosEP01.PT
+														)
+													")
+												)->whereNull('proyectos.borradoAl');
+											})
+											->lists('id');
+		return $proyectos_fuente;
 	}
 
 	/**

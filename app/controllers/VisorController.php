@@ -139,10 +139,17 @@ class VisorController extends BaseController {
 		}
 		$datos_captura = $this->obtenerDatosCaptura();
 		$anio_captura = '[ ' . Util::obtenerDescripcionMes($datos_captura['mes']) . ' del ' . $datos_captura['anio'] . ']';
+
+		$lista_fuentes = CargaDatosEP01::where('mes','=',$datos_captura['mes'])->where('ejercicio','=',$datos_captura['anio'])
+								->join('catalogoFuenteFinanciamiento AS fuenteFinan','fuenteFinan.clave','=','FF')
+								->groupBy('FF')
+								->select('FF','fuenteFinan.descripcion AS fuenteFinanciamiento')->lists('fuenteFinanciamiento','FF');
+
 		$catalogos = array( 
 			'jurisdicciones' => array('OC'=>'OFICINA CENTRAL') + Jurisdiccion::all()->lists('nombre','clave'),
 			'unidades_responsables' => UnidadResponsable::all()->lists('descripcion','clave'),
-			'anio_captura' => $anio_captura
+			'anio_captura' => $anio_captura,
+			'fuentes_financiamiento' => $lista_fuentes
 		);
 		return parent::loadIndex('VISORGEN','VIESTATAL',$catalogos);
 	}
