@@ -591,7 +591,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 			}
 
 			$total_proyecto_jurisdicciones = count($proyecto_jurisdicciones);
-
+			
 			if($oficina_central){
 				$texto_comodin = ' y Oficina Central';
 				$total_elementos = false;
@@ -667,6 +667,21 @@ class ReporteEvaluacionProyectosController extends BaseController {
 				$row = $table->addRow();
 				$row->addCell(11259)->addImage($chart_file_path,array('align'=>'center'));
 				$section->addText(htmlspecialchars('JURISDICCIÓN SANITARIA'),$titulo,$centrado);
+				////       INSERTAR TABLA DE DATOS DE GRÁFICA
+				$table = $section->addTable('TablaInfo',array('align'=>'center'));
+
+				$row = $table->addRow();
+				$row->addCell(1251,$titulo_row_span)->addText('Jurisdicción',$titulo_tabla,$centrado);
+				$row->addCell(1552,$titulo_row_span)->addText('Valor',$titulo_tabla,$centrado);
+				
+
+				foreach ($jurisdicciones_porcentajes as $value =>$valor) {
+					$row = $table->addRow();
+					$row->addCell(1251,$row_class)->addText($value,$texto_tabla,$centrado);
+					$row->addCell(1552,$row_class)->addText($valor,$texto_tabla,$centrado);
+					//$section->addText(htmlspecialchars($value.'-'.$valor),$titulo,$centrado);		////   p r u e ba
+				}
+				
 			}
 			$section->addTextBreak(1);
 			$section->addText(htmlspecialchars('AVANCE FÍSICO-FINANCIERO'),$titulo);
@@ -784,6 +799,8 @@ class ReporteEvaluacionProyectosController extends BaseController {
 			$table = $section->addTable();
 			$row = $table->addRow();
 			$row->addCell(11259)->addImage($chart_file_path,array('align'=>'center'));
+
+
 			
 			$section->addTextBreak(1);
 			

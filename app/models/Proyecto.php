@@ -693,7 +693,17 @@ class Proyecto extends BaseModel
 						'tipoProyecto.descripcion AS tipoProyectoDescripcion',
 						'cobertura.descripcion AS coberturaDescripcion', 'observaciones.observaciones'
 					)
-					->where('ejercicio',$ejercicio);
+					->where('ejercicio',$ejercicio)
+					->orderBy('proyectos.finalidad','asc')
+					->orderBy('proyectos.funcion','asc')
+					->orderBy('proyectos.subFuncion','asc')
+					->orderBy('proyectos.subSubFuncion','asc')
+					->orderBy('proyectos.unidadResponsable','asc')
+					->orderBy('proyectos.programaSectorial','asc')
+					->orderBy('proyectos.origenAsignacion','asc')
+					->orderBy('proyectos.actividadInstitucional','asc')
+					->orderBy('proyectos.proyectoEstrategico','asc')
+					->orderBy('proyectos.numeroProyectoEstrategico','asc');
 		/*if($fuente_financiamiento){
 			$query = $query->join('cargadatosep01 as ep01',function($join)use($fuente_financiamiento){
 						$join->on('ep01.UR','=','proyectos.unidadResponsable')
