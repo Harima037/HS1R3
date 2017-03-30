@@ -836,7 +836,7 @@ class ReporteEvaluacionProyectosController extends BaseController {
 						$trimestres .= $trimestre;
 					}
 				}
-				$section->addText(htmlspecialchars('Para lograr los resultados obtenidos, en este proyecto se implementó un Plan de Acción de Mejora, durante el '.$trimestres . ' trimestre.'));
+				//$section->addText(htmlspecialchars('Para lograr los resultados obtenidos, en este proyecto se implementó un Plan de Acción de Mejora, durante el '.$trimestres . ' trimestre.'));
 			}
 			
 			$section->addPageBreak();
