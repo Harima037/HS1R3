@@ -261,7 +261,7 @@ function editar(e){
             var label_html = '<div class="text-center '+label_class+'"><span class="label"><big>'+response.data.estatus+'</big></span></div>';
             $('#estatus-programacion').html(label_html);
             $('#estatus-programacion-trimestre').html(label_html);
-            if(response.data.idEstatus == 2 || response.data.idEstatus == 4 || response.data.idEstatus == 5){
+            if(response.data.idEstatus == 2 || response.data.idEstatus == 4 || response.data.idEstatus == 5 || response.data.idEstatus == '2' || response.data.idEstatus == '4' || response.data.idEstatus == '5'){
                 bloquear_controles('.informacion-meta');
             }
 
@@ -334,7 +334,7 @@ function editar(e){
                             label_html = '<div class="text-center '+label_class+'"><span class="label"><big>'+avance.estatus+'</big></span></div>';
                             $('#id-avance').val(avance.id);
 
-                            if(avance.idEstatus == 2 || avance.idEstatus == 4 || avance.idEstatus == 5){
+                            if(avance.idEstatus == 2 || avance.idEstatus == 4 || avance.idEstatus == 5 || avance.idEstatus == '2' || avance.idEstatus == '4' || avance.idEstatus == '5'){
                                 bloquear_controles('.informacion-avance');
                             }
                             
