@@ -499,6 +499,7 @@
 					@endif
 					 %</td>
 					 <td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">
+					 	@if ($jurisdicciones_mes['actividades'][$actividad['id']][$clave]['meta_global']>0)
 					 	{{
 						number_format(
 							(
@@ -510,6 +511,7 @@
 							)
 						,2)
 						}} %
+						@endif
 					 </td>
 				@else
 					<td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">0</td>

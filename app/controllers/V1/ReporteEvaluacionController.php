@@ -49,6 +49,7 @@ class ReporteEvaluacionController extends BaseController {
 				$mes_actual = date('n') - 1;
 			}
 		}
+		
 
 		$recurso = Proyecto::with(array('liderProyecto','responsableInformacion','beneficiarios.tipoBeneficiario','datosProgramaPresupuestario','datosFuncion',
 			'datosSubFuncion','objetivoPedCompleto','fuentesFinanciamiento.fuenteFinanciamiento','fuentesFinanciamiento.subFuentesFinanciamiento',
@@ -532,7 +533,7 @@ class ReporteEvaluacionController extends BaseController {
             $memoria_dato = ($memoria/1048576)." MB";
 		var_dump($memoria_dato);die;
 		*/
-		
+			
 		$pdf = PDF::setPaper('LETTER')->setOrientation('landscape')->setWarnings(false)->loadView('rendicion-cuentas.pdf.reporte-seguimiento',$dato_reporte);
 		
 		$pdf->output();

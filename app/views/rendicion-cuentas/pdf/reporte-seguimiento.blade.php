@@ -133,7 +133,7 @@
 	@if($tipo_reporte == 'analisis')
 		{{View::make('rendicion-cuentas.pdf.analisis-funcional',$datos)}}
 	@elseif($tipo_reporte == 'seg-metas')
-		{{View::make('rendicion-cuentas.pdf.seguimiento-metas-mes',$datos)}}
+		{{View::make('rendicion-cuentas.pdf.seguimiento-metas-mes',$datos)->__tostring()}}
 	@elseif($tipo_reporte == 'seg-metas-trimestre')
 		{{View::make('rendicion-cuentas.pdf.seguimiento-metas-trimestre',$datos)}}
 	@elseif($tipo_reporte == 'seg-beneficiarios')
