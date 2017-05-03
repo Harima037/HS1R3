@@ -335,6 +335,7 @@
 				 %</td>
 				 <td class="{{($tiene_desglose)?'subsubtitulo-tabla':''}}">
 				 {{
+				 	@if($jurisdicciones_mes['componentes'][$componente['id']][$clave]['meta_global']>0)
 					number_format(
 						(
 							$jurisdicciones_mes['componentes'][$componente['id']][$clave]['avance_acumulado']/
@@ -342,6 +343,7 @@
 						)
 						*100
 					,2)
+					@endif
 				}} %
 				 </td>
 			@else
