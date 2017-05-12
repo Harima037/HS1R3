@@ -38,8 +38,8 @@
 	<tr class="tabla-datos" height="50">
 		<td class="encabezado-tabla">NIVEL</td>
 		<td class="encabezado-tabla">INDICADOR</td>
-		<td class="encabezado-tabla">META<br>ACUMULADA</td>
 		<td class="encabezado-tabla">META<br>PROGRAMADA</td>
+		<td class="encabezado-tabla">META<br>ACUMULADA</td>
 		<td class="encabezado-tabla">AVANCES DEL MES</td>
 		<td class="encabezado-tabla">AVANCE ACUMULADO</td>
 		<td class="encabezado-tabla">% DE AVANCE ACUMULADO</td>
