@@ -74,9 +74,11 @@ class RendicionFassaController extends \BaseController {
 							->skip(($parametros['pagina']-1)*10)->take(10)
 							->get();
 				//
+						//$queries = DB::getQueryLog();
+						//return $last_query = end($queries);
 				$data = array('resultados'=>$total,'data'=>$rows, 'mes_actual'=>Util::obtenerMesActual());
 				$respuesta['data'] = $data;
-
+					
 				if($total<=0){
 					$respuesta['http_status'] = 404;
 					$respuesta['data'] = array('resultados'=>$total,"data"=>"No hay datos",'code'=>'W00');

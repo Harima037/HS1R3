@@ -38,6 +38,7 @@ class AutenticacionController extends Controller {
 		if(Input::all()){
 			$usuario = Input::get('usuario');
 			$parametros = Input::all();
+
 			try{
 				if(isset($parametros['recuperar-contrasena'])){
 					$rows = Sentry::getUserProvider()->createModel();
@@ -70,6 +71,7 @@ class AutenticacionController extends Controller {
 					if($User = Sentry::authenticate(array('username'=>$parametros['usuario'],'password'=>$parametros['password']),false)){
 						$redirect = Session::get('loginRedirect', '/');
 						Session::forget('loginRedirect');
+						
 						return Redirect::intended($redirect);
 					}
 				}
@@ -77,6 +79,7 @@ class AutenticacionController extends Controller {
 				$error = 'El usuario es requerido.';
 			}catch (\Cartalyst\Sentry\Users\PasswordRequiredException $e){
 				$error = 'La contraseña es requerida.';
+
 			}catch (\Cartalyst\Sentry\Users\WrongPasswordException $e){
 				$error = 'La contraseña es incorrecta.';
 			}catch (\Cartalyst\Sentry\Users\UserNotFoundException $e){

@@ -69,6 +69,7 @@ class IndicadorFassaController extends \BaseController {
 						});//->groupBy('indicadorFASSAMeta.idIndicadorFASSA');
 						//->having(DB::raw('MAX(indicadorFASSAMeta.ejercicio)'),'=',$ejercicio);
 				}
+					
 				
 				if(isset($parametros['buscar'])){
 					if($parametros['buscar']){
@@ -90,6 +91,8 @@ class IndicadorFassaController extends \BaseController {
 				//
 				$data = array('resultados'=>$total,'data'=>$rows);
 				$respuesta['data'] = $data;
+
+			
 
 				if($total<=0){
 					$respuesta['http_status'] = 404;
