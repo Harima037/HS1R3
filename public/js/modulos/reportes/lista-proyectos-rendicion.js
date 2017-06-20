@@ -18,7 +18,7 @@ moduloDatagrid.actualizar({
         var datos_grid = [];
         var mes_activo = parseInt($('#datagridProyectos').attr('data-mes-activo'));
         var mes_actual = parseInt($('#datagridProyectos').attr('data-mes-actual'));
-
+        var evaluacion;
         var trimestre = $('#datagridProyectos').attr('data-trim-activo');
 
         for(var i in response.data){
@@ -52,18 +52,24 @@ function cargar_datos_proyecto(e){
             $('#id').val(response.data.id);
 
             for(var i in response.data.evaluacion_meses){
-                var evaluacion = response.data.evaluacion_meses[i];
+                evaluacion = response.data.evaluacion_meses[i];
                 var icono = 'fa-file-pdf-o';
                 var clase = 'btn-default';
+                var firmar='';
+
                 if(evaluacion.idEstatus == 4){
                     icono = 'fa-check';
                     clase = 'btn-primary';
+                    firmar='<li><a href="#" onClick="firmarProyecto('+evaluacion.mes+')" class="btn-edit-rows"><span class="glyphicon glyphicon-edit"></span> Firmar</a> </li>';
                 }else{
                     icono = 'fa-pencil';
                     clase = 'btn-success';
+                    firmar='';
                 }
-                $('#rep_metas_'+evaluacion.mes).html('<button onClick="cargarReporte(\'seg-metas\','+evaluacion.mes+')" class="btn '+clase+'" type="button"><span class="fa '+icono+'"></span></button>');
+                $('#rep_metas_'+evaluacion.mes).html('<div class="btn-group"><button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button><ul class="dropdown-menu pull-right" role="menu"><li><a href="#" onClick="cargarReporte(\'seg-metas\','+evaluacion.mes+')" class="btn-edit-rows" type="button"><span class="fa '+icono+'"></span> Imprimir</a></li>'+firmar+'</ul></div>');
+                    
                 if(evaluacion.mes%3 == 0){
+
                     $('#rep_metas_trim_'+evaluacion.mes).html('<button onClick="cargarReporte(\'seg-metas-trimestre\','+evaluacion.mes+')" class="btn '+clase+'" type="button"><span class="fa '+icono+'"></span></button>');
                     $('#rep_benef_'+evaluacion.mes).html('<button onClick="cargarReporte(\'seg-beneficiarios\','+evaluacion.mes+')" class="btn '+clase+'" type="button"><span class="fa '+icono+'"></span></button>');
                     $('#rep_plan_'+evaluacion.mes).html('<button onClick="cargarReporte(\'plan-mejora\','+evaluacion.mes+')" class="btn '+clase+'" type="button"><span class="fa '+icono+'"></span></button>');
@@ -84,6 +90,41 @@ function cargarReporte(tipo,mes){
         var parametros = $('#id').val() + '?tipo='+tipo+'&mes='+mes;
         window.open(SERVER_HOST+'/v1/reporte-evaluacion/'+parametros);
     }
+}
+
+function firmarProyecto(mes){
+    
+    Confirm.show({
+        titulo:"¿Poner el programa en el estatus de firma?",
+        mensaje: "¿Estás seguro que desea poner el estatus de firma? Una vez hecho esto, el programa ya no es modificable, y se entiende que se aprobó y firmó.",
+        callback: function(){
+            var parametros = 'actualizarproyecto=firmar&mes='+mes;  
+            console.log("el id "+ $('#id').val()+" mes"+parametros);                
+            
+            moduloResourceProyecto.put($('#id').val(),parametros,{
+                        _success: function(response){
+                            //window.location = "../revision/segui-proyectos-inst";
+                            moduloDatagrid.actualizar();
+                            $('#modalDatosSeguimiento').modal('hide');
+                            MessageManager.show({data:'El programa ha sido ha sido puesto en el estatus de firma',type:'OK',timer:3});                  
+                        },
+                        _error: function(response){
+                            try{
+                                var json = $.parseJSON(response.responseText);
+                                if(!json.code)
+                                    MessageManager.show({code:'S03',data:"Hubo un problema al realizar la transacción, inténtelo de nuevo o contacte con soporte técnico."});
+                                else{
+                                    json.container = modal_actividad + ' .modal-body';
+                                    MessageManager.show(json);
+                                }
+                                Validation.formValidate(json.data);
+                            }catch(e){
+                                console.log(e);
+                            }
+                        }
+                    });
+                }
+        });
 }
 
 

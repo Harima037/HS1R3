@@ -351,7 +351,9 @@ class SeguimientoInstitucionalController extends BaseController {
 		{
 			//throw new Exception($parametros['actualizarproyecto'],1);
 			$estatus = 0;
+			
 			$mes_avance = Util::obtenerMesActual();
+			
 			if($mes_avance == 0){
 				$mes_avance = date('n')-1;
 				if($mes_avance == 0){ $mes_avance = 12; }
@@ -405,6 +407,11 @@ class SeguimientoInstitucionalController extends BaseController {
 			}
 			else if($parametros['actualizarproyecto']=="firmar") //Poner estatus 5 (Enviar a firma)
 			{
+				if(isset($parametros['mes'])) 
+				{
+					$mes_avance=$parametros['mes'];
+					$mes_actual=$mes_avance;
+				}				
 				$validar = DB::table('evaluacionComentarios')
                     ->where('idProyecto', '=', $id)
 					->where('mes','=',$mes_avance)

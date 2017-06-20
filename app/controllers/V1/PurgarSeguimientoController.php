@@ -50,11 +50,12 @@ class PurgarSeguimientoController extends \BaseController {
 				}
 				
 				$rows = $rows->join('evaluacionProyectoMes', function($join) use($mes_actual){
-									$join->on('proyectos.id', '=', 'evaluacionProyectoMes.idProyecto')
-									->where('evaluacionProyectoMes.mes', '=', $mes_actual)
-									->where('evaluacionProyectoMes.anio', '=', date('Y'));
+									$join->on('evaluacionProyectoMes.idProyecto','=','proyectos.id')
+										->where('evaluacionProyectoMes.mes', '=', $mes_actual)
+										->where('evaluacionProyectoMes.anio', '=', date('Y'));
 								});
 				
+
 				$rows = $rows->whereIn('evaluacionProyectoMes.idEstatus', array(1,2,3));
 
 				$usuario = Sentry::getUser();
@@ -75,9 +76,10 @@ class PurgarSeguimientoController extends \BaseController {
 					});
 					$total = $rows->count();
 				}else{				
-					$total = $rows->count();						
+					$total = $rows->count();	
+
 				}
-				
+					
 				$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 					'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto',
 					'evaluacionProyectoMes.idEstatus','catalogoEstatusProyectos.descripcion AS estatusAvance',
@@ -91,6 +93,9 @@ class PurgarSeguimientoController extends \BaseController {
 					->skip(($parametros['pagina']-1)*10)->take(10)
 					->get();
 				//
+
+					
+
 				$data = array('resultados'=>$total,'data'=>$rows);
 				$respuesta['data'] = $data;
 

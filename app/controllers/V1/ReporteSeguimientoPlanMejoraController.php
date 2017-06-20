@@ -195,9 +195,10 @@ class ReporteSeguimientoPlanMejoraController extends BaseController {
 	public function update($id){
 		$respuesta['http_status'] = 200;
 		$respuesta['data'] = array("data"=>'');
-
+		
 		try{
 			$usuario = Sentry::getUser();
+
 			$parametros = Input::all();
 
 			$ids = $parametros['ids'];

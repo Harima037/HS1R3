@@ -55,7 +55,7 @@ return array(
 		'mysql' => array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
-			'database'  => 'sire2016',
+			'database'  => 'PresupuestoAnual',
 			'username'  => 'root',
 			'password'  => '',
 			'charset'   => 'utf8',

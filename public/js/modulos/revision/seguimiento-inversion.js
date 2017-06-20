@@ -324,7 +324,7 @@ $('#btn-firmar').on('click',function(){
 	
 	Confirm.show({
 		titulo:"¿Poner el programa en el estatus de firma?",
-		mensaje: "¿Estás seguro que desea poner el estatus de firma? Una vez hecho esto, el programa ya no es modificable, y se entiende que se aprobó y firmó.",
+		mensaje: "¿Estás seguro que desea poner el estatus de firma? Una vez hecho esto, el programa ya no es modificable, y se entiende que se aprobó y firmó .",
 		callback: function(){
 			var parametros = 'actualizarproyecto=firmar';					
 			
