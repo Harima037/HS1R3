@@ -269,6 +269,7 @@ class SeguimientoProgramaController extends BaseController {
 				}
 				else
 				{
+					$trimestre_actual=$parametros['trim_firma'];
 					$recurso = EvaluacionProgramaTrimestre::where('idPrograma','=',$id)->where('trimestre','=',$trimestre_actual)->first();
 					if(is_null($recurso)){
 						$respuesta['http_status'] = 404;

@@ -66,7 +66,7 @@ function cargar_datos_proyecto(e){
                     clase = 'btn-success';
                     firmar='';
                 }
-                $('#rep_metas_'+evaluacion.mes).html('<div class="btn-group"><button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button><ul class="dropdown-menu pull-right" role="menu"><li><a href="#" onClick="cargarReporte(\'seg-metas\','+evaluacion.mes+')" class="btn-edit-rows" type="button"><span class="fa '+icono+'"></span> Imprimir</a></li>'+firmar+'</ul></div>');
+                $('#rep_metas_'+evaluacion.mes).html('<div class="btn-group" ><button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button><ul class="dropdown-menu pull-right" role="menu"><li><a href="#" onClick="cargarReporte(\'seg-metas\','+evaluacion.mes+')" class="btn-edit-rows" type="button"><span class="fa '+icono+'"></span> Imprimir</a></li>'+firmar+'</ul></div>');
                     
                 if(evaluacion.mes%3 == 0){
 
