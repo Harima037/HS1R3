@@ -13,6 +13,9 @@
 // Inicialización General para casi cualquier módulo
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/reporte-indicadores-fassa');
 var moduloDatagrid = new Datagrid("#datagridIndicadores",moduloResource,{ formatogrid:true, pagina: 1, clasificacionProyecto: 1});
+var moduloResourceProyecto = new RESTfulRequests(SERVER_HOST+'/v1/revision-rendicion-fassa');
+var firmar="";
+var tmp="";
 
 moduloDatagrid.init();
 moduloDatagrid.actualizar({
@@ -44,10 +47,16 @@ moduloDatagrid.actualizar({
                     var eval = response.data[i].registro_avance[j];
                     var trimestre = parseInt(eval.mes/3);
                     if(eval.idEstatus == 4){
-                        item['trim'+trimestre] = '<button onClick="cargarReporte('+item.id+','+eval.mes+')" class="btn btn-primary" type="button"><span class="fa fa-check"></span></button>';
+                        firmar='<li><a href="#" onClick="firmarProyecto('+item.id+','+"'avance'"+')" class="btn-edit-rows"><span class="glyphicon glyphicon-edit"></span> Firmar</a> </li>';
+
+                        tmp='<div class="btn-group" style="position:absolute"><button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" style="width:24pt;height:20pt"><span class="caret"></span></button><ul class="dropdown-menu pull-right" role="menu"><li><a href="#" onClick="cargarReporte('+item.id+','+eval.mes+')" class="btn-edit-rows" type="button"><span class="fa fa-check "></span> Imprimir</a></li>'+firmar+'</ul></div>';
+
+                        /*item['trim'+trimestre] = '<button onClick="cargarReporte('+item.id+','+eval.mes+')" class="btn btn-primary" type="button"><span class="fa fa-check"></span></button>';*/
                     }else{
-                        item['trim'+trimestre] = '<button onClick="cargarReporte('+item.id+','+eval.mes+')" class="btn btn-success" type="button"><span class="fa fa-pencil"></span></button>';
+                        /*item['trim'+trimestre] = '<button onClick="cargarReporte('+item.id+','+eval.mes+')" class="btn btn-success" type="button"><span class="fa fa-pencil"></span></button>';*/
+                        tmp='<div class="btn-group" style="position:absolute"><button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" style="width:24pt;height:20pt"><span class="caret"></span></button><ul class="dropdown-menu pull-right" role="menu"><li><a href="#" onClick="cargarReporte('+item.id+','+eval.mes+')" class="btn-edit-rows" type="button"><span class="fa fa-check "></span> Imprimir</a></li></ul></div>';
                     }
+                    item['trim'+trimestre] =tmp;
                 }
             }
             datos_grid.push(item);
@@ -106,6 +115,57 @@ function cargarReporte(id,mes){
 function cargarReporteMetas(id){
     var parametros = id + '?metas='+1;
     window.open(SERVER_HOST+'/v1/reporte-fassa/'+parametros);
+}
+
+function firmarProyecto(id,tipoRevision){
+    alert("SUMAMI");
+///////////////////////////
+    var firmar = 0;
+  
+    /* if(tipoRevision == 'meta')
+    {
+        if($('#id-estatus-meta').val()!=4)
+            MessageManager.show({data:'Debido al estatus que guarda la meta no es posible firmarla actualmente.',type:'ADV',timer:3});
+        else
+        {
+            if(comentariosArray.length>0)
+                MessageManager.show({data:'No es posible firmar la meta si tiene comentarios pendientes. Elimine primero todos los comentarios.',type:'ADV',timer:3});
+            else
+                firmar = 1;
+        }
+    }
+    else
+    if(tipoRevision == 'avance')
+    {
+        if($('#id-estatus-avance').val()!=4)
+            MessageManager.show({data:'Debido al estatus que guarda el avance no es posible firmarlo actualmente.',type:'ADV',timer:3});
+        else
+        {
+            if(comentariosArray.length>0)
+                MessageManager.show({data:'No es posible firmar el comentario si tiene comentarios pendientes. Elimine primero todos los comentarios.',type:'ADV',timer:3});
+            else
+                firmar = 1;
+        }
+    }
+    */
+   
+        Confirm.show({
+            titulo:"Firmar Avance",
+            mensaje: "¿Estás seguro de firmar el avance seleccionada(o)?",
+            callback: function(){
+                var parametros = {'actualizarproyecto':'firmar','tiporevision':tipoRevision,'idavance':id};
+                moduloResourceProyecto.put(id,parametros,{
+                        _success: function(response){
+                            MessageManager.show({data:'Se ha firmado con éxito la Meta/avance seleccionado',type:'OK',timer:3});                    
+                            moduloDatagrid.actualizar();
+                            $('#modalIndicador').modal('hide');
+                        }
+                });
+            }
+        });         
+    
+//////////////////////
+
 }
 
 /*             Extras               */
