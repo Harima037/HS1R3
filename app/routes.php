@@ -40,6 +40,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('purgar-seguimientos',array('uses' => 'PurgarSeguimientoController@index'));
 		Route::get('admin-proyectos',array('uses'=>'AdminProyectosController@index'));
 		Route::get('bitacora-seguimiento',array('uses'=>'BitacoraValidacionSeguimientoController@index'));
+		Route::get('lideres-proyecto',array('uses'=>'LideresProyectoController@index'));
 	});
 
 	Route::group(array('prefix'=>'expediente'), function(){
@@ -139,6 +140,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 
 		Route::resource('usuarios',				'V1\UsuariosController');
 		Route::resource('roles',				'V1\RolesController');
+		Route::resource('lideres-proyectos',				'V1\LideresProyectosController');
 		Route::resource('permisos',				'V1\PermisosController');
 		Route::resource('cuenta',				'V1\CuentaController');
 		Route::resource('config-seg-metas', 	'V1\ConfigurarSeguimientoController', array('only' => array('store')));
