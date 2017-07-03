@@ -30,7 +30,7 @@ $('#modalRol').on('show.bs.modal', function () {
 
 /*===================================*/
 // Implementación personalizada del módulo
-/*
+
 function editar (e){
 
     $('#modalRol').modal('show');
@@ -38,7 +38,9 @@ function editar (e){
                     _success: function(response){
 
                         $('#formRol #id').val(response.data.id);
-                        $('#formRol #name').val(response.data.name);
+                        $('#formRol #name').val(response.data.nombre);
+                        $('#formRol #email').val(response.data.email);
+                        $('#formRol #cargo').val(response.data.cargo);
 
                         permisos = response.data.permisos_array;
 
@@ -46,28 +48,15 @@ function editar (e){
                         if($('#formRol #id').val() != ''){
                             parametros.roles = [$('#formRol #id').val()];
                         }
-                        catalogoPermisosResource.get(null,parametros,{
-                            _success: function(response){
-                                    
-                                    // Cambiamos roles a usuario para formatear colores y no confundir al usuario
-                                    // Debido a que el color cyan y rojo tienen otro comportamiento en el modulo de usuarios
-                                    permisos = response.data.rol;
-                                    response.data.rol = {};
-                                    response.data.user = permisos;
-                                  
-                                    cargarCatalogoPermisos(response);
-                                    permisos = parsePermisos();                                    
-                                    buildPermissionPanel(permisos);
-                                }
-                        });                       
+                                           
 
                         buildUsuariosPanel(response.data.usuarios_array);
 
-                        $('#modalRol').find(".modal-title").html("Editar Rol");
+                        $('#modalRol').find(".modal-title").html("Editar Líder de Proyecto");
                         $('#modalRol').modal('show');
                     }
     }); 
-}*/
+}
 
 /*===================================*/
 // Configuración General para cualquier módulo
@@ -128,7 +117,7 @@ function submitModulo(){
         rolesResource.put($('#formRol #id').val(), parametros,{
                         _success: function(response){
                             rolesDatagrid.actualizar();
-                            MessageManager.show({data:'Rol actualizado con éxito',container:'#modalRol .modal-body',type:'OK',timer:4});
+                            MessageManager.show({data:'Líder de proyecto actualizado con éxito',container:'#modalRol .modal-body',type:'OK',timer:4});
                         },
                         _error: function(response){
                             try{

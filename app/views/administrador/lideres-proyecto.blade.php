@@ -101,50 +101,23 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-12">
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <span class="panel-title">
-                                            Permisos
-                                            <div class="btn-group pull-right">
-                                                <button type="button" title="Limpiar Permisos" class="btn btn-default" id="btn-limpiar-permisos">
-                                                        <span class="fa fa-trash-o"></span>
-                                                </button>
-                                                <button type="button" title="Personalizar Permisos" class="btn btn-warning " id="btn-cargar-cat-permisos">
-                                                    <span class="fa fa-shield"></span>
-                                                </button>
-                                            </div>
-                                        </span>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <table class="table" id="pnlPermissions" >                                        
-                                        <tr><td>Aún no hay permisos individuales asignados.</td></tr>
-                                    </table>
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="cargo">Cargo</label>
+                                    <input type="text" class="form-control" id="cargo" name="cargo" maxlength="255" disabled />
+                                </div>
+                            </div>
+                        </div>
+                         <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="email">Correo Electrónico</label>
+                                    <input type="text" class="form-control" id="email" name="email" maxlength="255" />
                                 </div>
                             </div>
                         </div>
                         <br>
-                        <div class="row hidden">
-                            <div class="col-sm-12">
-                                <div id="pnlUsuarios" class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <span class="panel-title">
-                                            Usuarios asignados a este Rol
-                                            <div class="btn-group pull-right">
-                                                <button type="button" title="Personalizar Permisos" class="btn btn-info " id="btn-show-usuarios" >
-                                                    <span class="fa fa-chevron-down"></span>
-                                                </button>
-                                            </div>
-                                        </span>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                    <table class="table table-striped table-hover table-condensed" style="display:none;">
-                                        <thead><tr><th>Usuario</th><th>Nombre completo</th></tr></thead>
-                                        <tbody></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+                       
                     <input type="hidden" id="id" name="id">
                     </form>
                 </div>

@@ -4,7 +4,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador, SSA\Utilerias\HelperSentry;
 use BaseController, Input, Response, DB, Sentry;
-use Role, Hash,Directorio;
+use Role, Hash,Directorio,Test;
 
 class LideresProyectosController extends \BaseController {
 	private $reglas = array(
@@ -71,30 +71,16 @@ class LideresProyectosController extends \BaseController {
 		$http_status = 200;
 		$data = array();
 
-		try{
-			$recurso = Sentry::findGroupById($id);
-			$permisos_array = $recurso->getPermissions();
+		$recurso = Directorio::find($id);
 
-
-			$permisos = array();
-
-			foreach ($permisos_array as $key =>$value) {
-				$key_data = explode('.', $key);
-				if(isset($key_data[2]))
-					$permisos[$key_data[0]][$key_data[1]][$key_data[2]] = $value;
-			}
-			$usuarios = Sentry::findAllUsersInGroup($recurso);
-			$recurso = $recurso->toArray();
-			$recurso['permisos_array'] = $permisos;
-			$recurso['usuarios_array'] = $usuarios->toArray();
-			$data = array("data"=>$recurso);
-		}catch (\Cartalyst\Sentry\Groups\GroupNotFoundException $e){
+		if(is_null($recurso)){
 			$http_status = 404;
-			$data = array("data"=>"Rol no encontrado.",'code'=>'U06');
-		}catch(\Exception $ex){
-			$http_status = 500;
-			$data = array('data'=>'Error al tratar de obtener los datos del recurso','code'=>'U01');
+			$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+		}else{
+			$data = array("data"=>$recurso->toArray());
 		}
+		
+		
 		return Response::json($data,$http_status);
 	}
 
@@ -139,48 +125,33 @@ class LideresProyectosController extends \BaseController {
 	 */
 	public function update($id)
 	{
-		//
-		$respuesta = array();
+        
+        $inputs = Input::all();     
+		$respuesta['http_status'] = 200;
+		$respuesta['data'] = array("data"=>'');
 
-		try{
-			$recurso = Sentry::findGroupById($id);
+        try {
+            
+            $lider = Directorio::find($id);
 
-			$recurso->name = Input::get('name');
+           
+            $lider->nombre = $inputs['name'];
+            $lider->email = $inputs['email'];
 
-			if(Input::get('permissions')){
-				$permissions = Input::get('permissions');
-			}else{
-				$permissions = array();
-			}
-
-			foreach ($recurso->getPermissions() as $key => $value) {
-				if(!array_key_exists($key, $permissions)){
-					$permissions[$key] = 0;
-				}
-			}
-
-			$recurso->permissions = $permissions;
-
-			if($recurso->save()){
-				$respuesta['http_status'] = 200;
-				$respuesta['data'] = array("data"=>$recurso->toArray());
-			}else{
-				$respuesta['http_status'] = 500;
-				$respuesta['data'] = array("data"=>"El grupo no pudo ser actualizado.",'code'=>'S03');
-			}
-
-		}catch (\Cartalyst\Sentry\Groups\NameRequiredException $e){
-			$respuesta['http_status'] = 500;
-			$respuesta['data'] = array('data'=>'{"field":"name","error":"Este campo es requerido"}','code'=>'U00');
-		}catch (\Cartalyst\Sentry\Groups\GroupExistsException $e){
-			$respuesta['http_status'] = 500;
-			$respuesta['data'] = array("data"=>"El grupo ya existe.",'code'=>'S01');
-		}catch (\Cartalyst\Sentry\Groups\GroupNotFoundException $e){
-			$respuesta['http_status'] = 404;
-			$respuesta['data'] = array("data"=>"No existe el recurso que quiere actualizar.",'code'=>'U06');
-		}
-
-		return Response::json($respuesta['data'],$respuesta['http_status']);
+            if($lider->save()){
+            	return $inputs;
+					$respuesta['data'] = array('data'=>$lider);
+			}else{				
+					$respuesta['http_status'] = 500;
+					$respuesta['data'] = array("data"=>'No se pudieron guardar los cambios.','code'=>'S03');
+			}          
+            
+                        
+        } catch (Exception $e) {        	
+        	return Response::json(array('data'=>'Ocurrio un error al guardar la información.','message'=>$e->getMessage(),'line'=>$e->getLine()),500);           
+        }
+        
+        return Response::json($respuesta['data'],$respuesta['http_status']);
 	}
 
 	/**
