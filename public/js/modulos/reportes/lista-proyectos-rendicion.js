@@ -50,14 +50,16 @@ function cargar_datos_proyecto(e){
             $('#funcion').text(response.data.datos_funcion.clave + ' ' + response.data.datos_funcion.descripcion);
             $('#subfuncion').text(response.data.datos_sub_funcion.clave + ' ' + response.data.datos_sub_funcion.descripcion);
             $('#id').val(response.data.id);
-
+            
+            var superuser=$('#superUser').val();
+            console.log("super user?"+superuser);
             for(var i in response.data.evaluacion_meses){
                 evaluacion = response.data.evaluacion_meses[i];
                 var icono = 'fa-file-pdf-o';
                 var clase = 'btn-default';
                 var firmar='';
 
-                if(evaluacion.idEstatus == 4){
+                if(evaluacion.idEstatus == 4 && superuser==1){
                     icono = 'fa-check';
                     clase = 'btn-primary';
                     firmar='<li><a href="#" onClick="firmarProyecto('+evaluacion.mes+')" class="btn-edit-rows"><span class="glyphicon glyphicon-edit"></span> Firmar</a> </li>';

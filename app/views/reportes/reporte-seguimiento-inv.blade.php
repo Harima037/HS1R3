@@ -20,7 +20,7 @@
             <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> {{ $sys_mod_activo->nombre }}</h4></div>
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-md-5">
+                    <div class="col-md-5"> <input type="hidden" id="superUser" name="superUser" value="{{$superusuario}}">
                         <div class="form-group">
                             <input type="text" class="form-control txt-quick-search" placeholder="Buscar">
                         </div>
@@ -120,6 +120,7 @@
                                     </div>
                                 </div>
                                 <input type="hidden" id="id" value="">
+                                 <input type="hidden" id="superUser" name="superUser" value="{{$superusuario}}">
                             </div>
                         </div>
                     </div>

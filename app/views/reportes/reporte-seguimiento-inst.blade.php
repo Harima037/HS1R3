@@ -120,6 +120,8 @@
                                     </div>
                                 </div>
                                 <input type="hidden" id="id" value="">
+                                <input type="hidden" id="superUser" name="superUser" value="{{$superusuario}}">
+
                             </div>
                         </div>
                     </div>

@@ -8,6 +8,8 @@ class SeguimientoInstitucionalController extends BaseController {
 	 * @return Response
 	 */
 	public function index(){
+		$grupoUsuario=Util::obtenerTrimestre(date('n')-1);
+
 		$datos = array(
 			'meses' => array(
 					'1' => array(
@@ -40,6 +42,7 @@ class SeguimientoInstitucionalController extends BaseController {
 		}
 		$datos['mes_actual'] = $mes_actual;
 		$datos['trimestre_avance'] = Util::obtenerTrimestre(date('n')-1);
+		$datos['grupo']=$grupoUsuario;
 		//$mes_actual = Util::obtenerMesActual();
 		//$trimestre_actual = ceil(($mes_actual/3));
 		//$datos['mes_avance'] = $mes_actual;
@@ -47,6 +50,7 @@ class SeguimientoInstitucionalController extends BaseController {
 		return parent::loadIndex('REVISION','SEGUIINST',$datos);
 	}
 	public function indexInversion(){
+		$grupoUsuario=Util::obtenerTrimestre(date('n')-1);
 		$datos = array(
 			'meses' => array(
 					'1' => array(
@@ -78,6 +82,7 @@ class SeguimientoInstitucionalController extends BaseController {
 			if($mes_actual == 0){ $mes_actual = 12; }
 		}
 		$datos['mes_actual'] = $mes_actual;
+		$datos['grupo']=$grupoUsuario;
 		$datos['trimestre_avance'] = Util::obtenerTrimestre(date('n')-1);
 		//$datos['mes_avance'] = Util::obtenerMesActual();
 		//$datos['trimestre_avance'] = Util::obtenerTrimestre();
@@ -87,7 +92,8 @@ class SeguimientoInstitucionalController extends BaseController {
 	public function rendicionCuentas($id){
 		$datos['sys_sistemas'] = SysGrupoModulo::all();
 		$datos['usuario'] = Sentry::getUser();
-
+		$grupoUsuario=Util::obtenerTrimestre(date('n')-1);
+		
 		$mes_actual = Util::obtenerMesActual();
 		if($mes_actual == 0){
 			$mes_actual = date('n') - 1 ;
@@ -169,6 +175,8 @@ class SeguimientoInstitucionalController extends BaseController {
 		}
 		$uri = 'revision.segui-rendicion-institucional';
 		
+		$datos['grupo']=$grupoUsuario;
+
 		if(Sentry::hasAccess($permiso)){
 			return View::make($uri)->with($datos);
 		}else{
