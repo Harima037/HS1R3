@@ -54,10 +54,21 @@
 		<td class="texto-medio" nowrap="nowrap">Componente {{$index+1}}</td>
 		<td class="texto-medio">{{{ $componente['indicador'] }}}</td>
 		@if(isset($avances_mes['componentes'][$componente['id']]))
-		<td class="texto-medio texto-centro">{{number_format($avances_mes['componentes'][$componente['id']]['meta_programada'],2)}}</td>
 		<td class="texto-medio texto-centro">{{number_format($avances_mes['componentes'][$componente['id']]['meta_global'],2)}}</td>
+		<td class="texto-medio texto-centro">{{number_format($avances_mes['componentes'][$componente['id']]['meta_programada'],2)}}</td>
 		<td class="texto-medio texto-centro">{{number_format($avances_mes['componentes'][$componente['id']]['avance_mes'],2)}}</td>
 		<td class="texto-medio texto-centro">{{number_format($avances_mes['componentes'][$componente['id']]['avance_acumulado'],2)}}</td>
+		<td class="texto-medio texto-centro">
+		{{
+			number_format(
+				(
+					$avances_mes['componentes'][$componente['id']]['avance_acumulado']/
+					$avances_mes['componentes'][$componente['id']]['meta_global']
+				)
+				*100
+			,2)
+		}} %
+		</td>
 		<td class="texto-medio texto-centro">
 		@if($avances_mes['componentes'][$componente['id']]['meta_programada'] > 0)
 			{{
@@ -85,17 +96,6 @@
 			@endif
 		@endif
 		 %</td>
-		<td class="texto-medio texto-centro">
-		{{
-			number_format(
-				(
-					$avances_mes['componentes'][$componente['id']]['avance_acumulado']/
-					$avances_mes['componentes'][$componente['id']]['meta_global']
-				)
-				*100
-			,2)
-		}} %
-		</td>
 		<td class="texto-medio">{{{ $avances_mes['componentes'][$componente['id']]['analisis_resultados'] }}}</td>
 		<td class="texto-medio">{{{ $avances_mes['componentes'][$componente['id']]['justificacion_acumulada'] }}}</td>
 		@else
