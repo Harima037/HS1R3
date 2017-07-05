@@ -38,14 +38,14 @@
 	<tr class="tabla-datos" height="50">
 		<td class="encabezado-tabla">NIVEL</td>
 		<td class="encabezado-tabla">INDICADOR</td>
-		<td class="encabezado-tabla">META<br>PROGRAMADA</td>
-		<td class="encabezado-tabla">META<br>ACUMULADA</td>	
+		<td class="encabezado-tabla">META<br>ANUAL</td>
+		<td class="encabezado-tabla">META<br>PROGRAMADA <br>AL MES</td>	
 		<td class="encabezado-tabla">AVANCES DEL MES</td>
-		<td class="encabezado-tabla">AVANCE ACUMULADO</td>
-		<td class="encabezado-tabla">% DE AVANCE PROGRAMADO</td>
-		<td class="encabezado-tabla">% DE AVANCE ACUMULADO</td>
-		<td class="encabezado-tabla">ANALISIS DE RESULTADOS ACUMULADO</td>
-		<td class="encabezado-tabla">JUSTIFICACIÓN ACUMULADA</td>
+		<td class="encabezado-tabla">AVANCE ACUMULADO<font size="6pt">(1)</font></td>
+		<td class="encabezado-tabla">% DE AVANCE META ANUAL<font size="6pt">(2)</font></td>
+		<td class="encabezado-tabla">% DE AVANCE PROGRAMADO AL MES<font size="6pt">(3)</font></td>
+		<td class="encabezado-tabla">ANALISIS DE RESULTADOS ACUMULADO<font size="6pt">(4)</font></td>
+		<td class="encabezado-tabla">JUSTIFICACIÓN<font size="6pt">(5)</font></td>
 	</tr>
 	</thead>
 	<tbody>
@@ -208,6 +208,24 @@
 		<td></td>
 		<td align="center">{{ $proyecto['cargoLiderProyecto'] }}</td>
 		<td></td>
+	</tr>
+</table>
+<br><br>	
+<table style="page-break-inside:avoid;">
+	<tr height="20">
+		<td align="left"><font size="7pt">(1).- Se obtiene de la suma del avances del mes reportado mas el avance acumulado del mes anterior.</font></td>
+	</tr>
+	<tr height="20">
+		<td align="left"><font size="7pt">(2).- Es el resultado de la división del avance acumulado entre la meta anual por cien.</font></td>
+	</tr>
+	<tr height="20">
+		<td align="left"><font size="7pt">(3).- Es el resultado de la división del avance acumulado entre la meta programada al mes por cien.</font></td>
+	</tr>
+	<tr height="20">
+		<td align="left"><font size="7pt">(4).-  Describe las acciones acumuladas realizadas al mes reportado.</font></td>
+	</tr>
+	<tr height="20">
+		<td align="left"><font size="7pt">(5).- Justificación de bajo o alto avance, en relación al % de avance programado (90%-110%).</font></td>
 	</tr>
 </table>
 
