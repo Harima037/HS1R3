@@ -38,12 +38,12 @@
 	<tr class="tabla-datos" height="50">
 		<td class="encabezado-tabla">NIVEL</td>
 		<td class="encabezado-tabla">INDICADOR</td>
-		<td class="encabezado-tabla">META<br>PROGRAMADA</td>
-		<td class="encabezado-tabla">AVANCES DEL MES</td>
-		<td class="encabezado-tabla">AVANCE ACUMULADO</td>
-		<td class="encabezado-tabla">% DE AVANCE ACUMULADO</td>
-		<td class="encabezado-tabla">ANALISIS DE RESULTADOS 	ACUMULADO</td>
-		<td class="encabezado-tabla">JUSTIFICACIÓN ACUMULADA</td>
+		<td class="encabezado-tabla">META<br>TRIMESTRAL</td>
+		<!--<td class="encabezado-tabla">AVANCES DEL MES</td>-->
+		<td class="encabezado-tabla">AVANCE ACUMULADO <font size="6pt">(1)</font></td>
+		<td class="encabezado-tabla">% DE AVANCE ACUMULADO<font size="6pt">(2)</font></td>
+		<td class="encabezado-tabla">ANALISIS DE RESULTADOS 	ACUMULADO<font size="6pt">(3)</font></td>
+		<td class="encabezado-tabla">JUSTIFICACIÓN<font size="6pt">(4)</font></td>
 	</tr>
 	</thead>
 	<tbody>
@@ -53,7 +53,7 @@
 		<td class="texto-medio">{{{ $componente['indicador'] }}}</td>
 		@if(isset($avances_trimestre['componentes'][$componente['id']]))
 		<td class="texto-medio texto-centro">{{number_format($avances_trimestre['componentes'][$componente['id']]['meta_programada'],2)}}</td>
-		<td class="texto-medio texto-centro">{{number_format($avances_trimestre['componentes'][$componente['id']]['avance_mes'],2)}}</td>
+		<!--<td class="texto-medio texto-centro">{{number_format($avances_trimestre['componentes'][$componente['id']]['avance_mes'],2)}}</td>-->
 		<td class="texto-medio texto-centro">{{number_format($avances_trimestre['componentes'][$componente['id']]['avance_acumulado'],2)}}</td>
 		<td class="texto-medio texto-centro">
 		@if($avances_trimestre['componentes'][$componente['id']]['meta_programada'] > 0)
@@ -100,7 +100,7 @@
 		<td class="texto-medio">{{{ $actividad['indicador'] }}}</td>
 		@if(isset($avances_trimestre['actividades'][$actividad['id']]))
 		<td class="texto-medio texto-centro">{{number_format($avances_trimestre['actividades'][$actividad['id']]['meta_programada'],2)}}</td>
-		<td class="texto-medio texto-centro">{{number_format($avances_trimestre['actividades'][$actividad['id']]['avance_mes'],2)}}</td>
+		<!--<td class="texto-medio texto-centro">{{number_format($avances_trimestre['actividades'][$actividad['id']]['avance_mes'],2)}}</td>-->
 		<td class="texto-medio texto-centro">{{number_format($avances_trimestre['actividades'][$actividad['id']]['avance_acumulado'],2)}}</td>
 		<td class="texto-medio texto-centro">
 		@if($avances_trimestre['actividades'][$actividad['id']]['meta_programada'] > 0)
@@ -178,5 +178,20 @@
 		<td></td>
 		<td align="center">{{ $proyecto['cargoLiderProyecto'] }}</td>
 		<td></td>
+	</tr>
+</table>
+<br><br>	
+<table style="page-break-inside:avoid;">
+	<tr height="20">
+		<td align="left"><font size="7pt">(1).- Se obtiene de la suma del avances del mes reportado mas el avance acumulado del mes anterior.</font></td>
+	</tr>
+	<tr height="20">
+		<td align="left"><font size="7pt">(2).- Es el resultado de la división del avance acumulado entre la meta programada al mes por cien.</font></td>
+	</tr>
+	<tr height="20">
+		<td align="left"><font size="7pt">(3).-  Describe las acciones acumuladas realizadas al mes reportado.</font></td>
+	</tr>
+	<tr height="20">
+		<td align="left"><font size="7pt">(4).- Justificación de bajo o alto avance, en relación al % de avance programado (90%-110%).</font></td>
 	</tr>
 </table>
