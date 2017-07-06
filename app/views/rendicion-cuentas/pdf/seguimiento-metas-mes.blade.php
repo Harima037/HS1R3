@@ -115,8 +115,8 @@
 		<td class="texto-medio">Actividad {{$index+1}}.{{$indice+1}}</td>
 		<td class="texto-medio">{{{ $actividad['indicador'] }}}</td>
 		@if(isset($avances_mes['actividades'][$actividad['id']]))
-		<td class="texto-medio texto-centro">{{number_format($avances_mes['actividades'][$actividad['id']]['meta_programada'],2)}}</td>
 		<td class="texto-medio texto-centro">{{number_format($avances_mes['actividades'][$actividad['id']]['meta_global'],2)}}</td>
+		<td class="texto-medio texto-centro">{{number_format($avances_mes['actividades'][$actividad['id']]['meta_programada'],2)}}</td>
 		<td class="texto-medio texto-centro">{{number_format($avances_mes['actividades'][$actividad['id']]['avance_mes'],2)}}</td>
 		<td class="texto-medio texto-centro">{{number_format($avances_mes['actividades'][$actividad['id']]['avance_acumulado'],2)}}</td>
 		<td class="texto-medio texto-centro">

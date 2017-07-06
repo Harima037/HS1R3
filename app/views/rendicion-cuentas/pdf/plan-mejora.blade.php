@@ -31,9 +31,9 @@
 	<tr>
 		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">NIVEL</th>
 		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">INDICADOR</th>
-		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">% DE AVANCE<br> ACUMULADO</th>
-		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">ANÁLISIS DE RESULTADOS </th>
-		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">JUSTIFICACIÓN</th>
+		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">% DE AVANCE<br>PROGRAMADO AL MES<font size="6pt">(1)</font></th>
+		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">ANÁLISIS DE RESULTADOS ACUMULADO <font size="6pt">(2)</font> </th>
+		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">JUSTIFICACIÓN<font size="6pt">(3)</font></th>
 		<th height="20"  colspan="2" class="encabezado-tabla" style="font-size:6;">¿REQUIERE ACCIÓN DE MEJORA?</th>
 		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">ACCIÓN <br>DE MEJORA</th>
 		<th height="20"  rowspan="2" class="encabezado-tabla" style="font-size:6;">GRUPO DE <br>TRABAJO</th>
@@ -95,12 +95,21 @@
 		<td class="texto-medio">Actividad {{$index+1}}.{{$indice+1}}</td>
 		<td class="texto-medio">{{{ $actividad['indicador'] }}}</td>
 		<td class="texto-medio texto-centro">
+			<!--				así estaba antes de pedir el cambio los de evaluación
+			round(
+				(
+					$avances_mes['actividades'][$actividad['id']]['avance_acumulado']/
+					$avances_mes['actividades'][$actividad['id']]['meta_programada']
+				)
+				*100
+			,2)
+			-->
 		@if($avances_mes['actividades'][$actividad['id']]['meta_programada'] > 0)
 			{{
 			round(
 				(
 					$avances_mes['actividades'][$actividad['id']]['avance_acumulado']/
-					$avances_mes['actividades'][$actividad['id']]['meta_programada']
+					$avances_mes['actividades'][$actividad['id']]['meta_global']
 				)
 				*100
 			,2)
@@ -165,5 +174,18 @@
 		<td>&nbsp;</td>
 		<td align="center">{{ $proyecto['cargoLiderProyecto'] }}</td>
 		<td>&nbsp;</td>
+	</tr>
+</table>
+<br><br>	
+<table style="page-break-inside:avoid;">
+	
+	<tr height="20">
+		<td align="left"><font size="7pt">(1).- Es el resultado de la división del avance acumulado entre la meta programada al mes por cien.</font></td>
+	</tr>
+	<tr height="20">
+		<td align="left"><font size="7pt">(2).-  Describe las acciones acumuladas realizadas al mes reportado.</font></td>
+	</tr>
+	<tr height="20">
+		<td align="left"><font size="7pt">(3).- Justificación de bajo o alto avance, en relación al % de avance programado (90%-110%).</font></td>
 	</tr>
 </table>
