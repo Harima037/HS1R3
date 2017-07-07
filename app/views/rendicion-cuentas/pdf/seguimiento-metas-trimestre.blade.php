@@ -41,7 +41,7 @@
 		<td class="encabezado-tabla">META<br>TRIMESTRAL</td>
 		<!--<td class="encabezado-tabla">AVANCES DEL MES</td>-->
 		<td class="encabezado-tabla">AVANCE ACUMULADO <font size="6pt">(1)</font></td>
-		<td class="encabezado-tabla">% DE AVANCE PROGRAMADO AL MES<font size="6pt">(2)</font></td>
+		<td class="encabezado-tabla">% DE AVANCE TRIMESTRAL<font size="6pt">(2)</font></td>
 		<td class="encabezado-tabla">ANALISIS DE RESULTADOS TRIMESTRAL<font size="6pt">(3)</font></td>
 		<td class="encabezado-tabla">JUSTIFICACIÓN<font size="6pt">(4)</font></td>
 	</tr>
