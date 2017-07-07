@@ -120,6 +120,18 @@
 		<td class="texto-medio texto-centro">{{number_format($avances_mes['actividades'][$actividad['id']]['avance_mes'],2)}}</td>
 		<td class="texto-medio texto-centro">{{number_format($avances_mes['actividades'][$actividad['id']]['avance_acumulado'],2)}}</td>
 		<td class="texto-medio texto-centro">
+				{{
+			number_format(
+				(
+					$avances_mes['actividades'][$actividad['id']]['avance_acumulado']/
+					$avances_mes['actividades'][$actividad['id']]['meta_global']
+				)
+				*100
+			,2)
+		}} %
+		</td>
+		<td class="texto-medio texto-centro">
+	
 		@if($avances_mes['actividades'][$actividad['id']]['meta_programada'] > 0)
 			{{
 			number_format(
@@ -145,17 +157,7 @@
 				0
 			@endif
 		@endif
-		 %</td>
-		<td class="texto-medio texto-centro">
-		{{
-			number_format(
-				(
-					$avances_mes['actividades'][$actividad['id']]['avance_acumulado']/
-					$avances_mes['actividades'][$actividad['id']]['meta_global']
-				)
-				*100
-			,2)
-		}} %
+		 %
 		</td>
 		<td class="texto-medio">{{{ $avances_mes['actividades'][$actividad['id']]['analisis_resultados'] }}}</td>
 		<td class="texto-medio">{{{ $avances_mes['actividades'][$actividad['id']]['justificacion_acumulada'] }}}</td>
