@@ -186,10 +186,10 @@
 		<td align="left"><font size="7pt">(1).- Se obtiene de la suma del avances del mes reportado mas el avance acumulado del mes anterior.</font></td>
 	</tr>
 	<tr height="20">
-		<td align="left"><font size="7pt">(2).- Es el resultado de la división del avance acumulado entre la meta programada al mes por cien.</font></td>
+		<td align="left"><font size="7pt">(2).- Es el resultado de la división del avance acumulado entre la meta trimestral al mes por cien.</font></td>
 	</tr>
 	<tr height="20">
-		<td align="left"><font size="7pt">(3).-  Describe las acciones acumuladas realizadas al mes reportado.</font></td>
+		<td align="left"><font size="7pt">(3).-  Describe las acciones acumuladas realizadas al trimestre.</font></td>
 	</tr>
 	<tr height="20">
 		<td align="left"><font size="7pt">(4).- Justificación de bajo o alto avance, en relación al % de avance programado (90%-110%).</font></td>
