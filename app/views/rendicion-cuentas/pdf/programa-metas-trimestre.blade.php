@@ -169,7 +169,7 @@
 			<td class="texto-medio">{{$indicador['nivel']}}</td>
 			<td class="texto-medio">{{$indicador['indicador']}}</td>
 			<td class="texto-medio texto-centro">{{number_format($indicador['meta_original'],2)}}</td>
-			<td class="texto-medio texto-centro">{{number_format($indicador['meta_trimestral'])}}</td>
+			<td class="texto-medio texto-centro">{{number_format($indicador['meta_trimestral'],20)}}</td>
 			<td class="texto-medio texto-centro">{{number_format($indicador['avance_trimestre'],2)}}</td>
 			<!--<td class="texto-medio texto-centro">{{number_format($indicador['avance_acumulado'],2)}}</td>-->
 			<td class="texto-medio texto-centro">
