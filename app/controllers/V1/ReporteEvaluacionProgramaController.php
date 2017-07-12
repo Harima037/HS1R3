@@ -96,8 +96,11 @@ class ReporteEvaluacionProgramaController extends BaseController {
 				$datos_indicador['avance_acumulado'] += $registro_avance->avance;
 			}
 
-			for ($i=1; $i <= $trimestre_actual ; $i++) { 
+			for ($i=1; $i <= 4 ; $i++) { 
+				if(count($metas)>=$i){
 				$datos_indicador['meta_original'] += $metas[$i];
+				$datos_indicador['meta_trimestral']=$metas[$trimestre_actual];
+				}
 			}
 
 			$datos['indicadores'][] = $datos_indicador;

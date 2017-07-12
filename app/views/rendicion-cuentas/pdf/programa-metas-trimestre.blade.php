@@ -157,9 +157,10 @@
 			<td class="encabezado-tabla">NIVEL</td>
 			<td class="encabezado-tabla">INDICADOR</td>
 			<td class="encabezado-tabla">META ORIGINAL</td>
+			<td class="encabezado-tabla">META TRIMESTRAL</td>
 			<td class="encabezado-tabla">AVANCES DEL TRIMESTRE</td>
-			<td class="encabezado-tabla">AVANCE ACUMULADO</td>
-			<td class="encabezado-tabla">% DE AVANCE ACUMULADO</td>
+			<!--<td class="encabezado-tabla">AVANCE ACUMULADO</td>-->
+			<td class="encabezado-tabla">% DE AVANCE TRIMESTRAL</td>
 			<td class="encabezado-tabla">ANALISIS DE RESULTADOS ACUMULADO</td>
 			<td class="encabezado-tabla">JUSTIFICACIÓN ACUMULADA</td>
 		</tr>
@@ -168,15 +169,16 @@
 			<td class="texto-medio">{{$indicador['nivel']}}</td>
 			<td class="texto-medio">{{$indicador['indicador']}}</td>
 			<td class="texto-medio texto-centro">{{number_format($indicador['meta_original'],2)}}</td>
+			<td class="texto-medio texto-centro">{{number_format($indicador['meta_trimestral'])}}</td>
 			<td class="texto-medio texto-centro">{{number_format($indicador['avance_trimestre'],2)}}</td>
-			<td class="texto-medio texto-centro">{{number_format($indicador['avance_acumulado'],2)}}</td>
+			<!--<td class="texto-medio texto-centro">{{number_format($indicador['avance_acumulado'],2)}}</td>-->
 			<td class="texto-medio texto-centro">
-			@if($indicador['meta_original'] > 0)
+			@if($indicador['avance_trimestre'] > 0)
 				{{
-				round(($indicador['avance_acumulado']/$indicador['meta_original'])*100,2)
+				round(($indicador['avance_trimestre']/$indicador['meta_trimestral'])*100,2)
 				}}
 			@else
-				100
+				0
 			@endif
 			 %</td>
 			<td class="texto-medio">{{$indicador['analisis_resultados']}}</td>
