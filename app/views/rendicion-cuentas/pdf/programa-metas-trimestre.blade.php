@@ -185,10 +185,11 @@
 			<td class="texto-medio">@if($indicador['avance_acumulado'] > 0)
 				{{
 				round(($indicador['avance_acumulado']/$indicador['meta_original'])*100,2)
-				}}%
+				}}
 			@else
 				0
-			@endif</td> 
+			@endif
+				%</td> 
 			<td class="texto-medio">{{$indicador['analisis_resultados']}}</td>
 			<td class="texto-medio">{{$indicador['justificacion_acumulada']}}</td>
 		</tr>
