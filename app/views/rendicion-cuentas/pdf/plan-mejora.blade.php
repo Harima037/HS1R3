@@ -109,10 +109,11 @@
 			round(
 				(
 					$avances_mes['actividades'][$actividad['id']]['avance_acumulado']/
-					$avances_mes['actividades'][$actividad['id']]['meta_global']
+					$avances_mes['actividades'][$actividad['id']]['meta_programada']
 				)
 				*100
 			,2)
+			
 			}}
 		@else
 			100
