@@ -33,6 +33,7 @@ moduloDatagrid.actualizar({
             item.trim2 = '<div style="text-align:center"><span class="fa fa-times"></span></div>';
             item.trim3 = '<div style="text-align:center"><span class="fa fa-times"></span></div>';
             item.trim4 = '<div style="text-align:center"><span class="fa fa-times"></span></div>';
+            item.cierre = '<div style="text-align:center"><span class="fa fa-times"></span></div>'; //// agregado de 2015
             
             if(response.data[i].idEstatus > 3){
                 if(response.data[i].idEstatus == 4){
@@ -49,6 +50,7 @@ moduloDatagrid.actualizar({
                     if(eval.idEstatus == 4){
                         firmar='<li><a href="#" onClick="firmarProyecto('+item.id+','+"'avance'"+')" class="btn-edit-rows"><span class="glyphicon glyphicon-edit"></span> Firmar</a> </li>';
 
+
                         tmp='<div class="btn-group" style="position:absolute"><button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" style="width:24pt;height:20pt"><span class="caret"></span></button><ul class="dropdown-menu pull-right" role="menu"><li><a href="#" onClick="cargarReporte('+item.id+','+eval.mes+')" class="btn-edit-rows" type="button"><span class="fa fa-check "></span> Imprimir</a></li>'+firmar+'</ul></div>';
 
                         /*item['trim'+trimestre] = '<button onClick="cargarReporte('+item.id+','+eval.mes+')" class="btn btn-primary" type="button"><span class="fa fa-check"></span></button>';*/
@@ -59,6 +61,13 @@ moduloDatagrid.actualizar({
                     item['trim'+trimestre] =tmp;
                 }
             }
+             if(response.data[i].idEstatusCierre){  ////////    es de la version 2015
+                if(response.data[i].idEstatusCierre == 4){
+                    item.cierre = '<button onClick="cargarReporteCierre('+item.id+')" class="btn btn-primary" type="button"><span class="fa fa-check"></span></button>';
+                }else if(response.data[i].idEstatusCierre == 5){
+                    item.cierre = '<button onClick="cargarReporteCierre('+item.id+')" class="btn btn-success" type="button"><span class="fa fa-pencil"></span></button>';
+                }
+            }                       ////// termina de la versión 2015
             datos_grid.push(item);
         }
         moduloDatagrid.cargarDatos(datos_grid);                         
@@ -109,6 +118,11 @@ function realizar_busqueda(){
 
 function cargarReporte(id,mes){
     var parametros = id + '?mes='+mes;
+    window.open(SERVER_HOST+'/v1/reporte-fassa/'+parametros);
+}
+
+function cargarReporteCierre(id){           ///// funcion de 2015
+    var parametros = id + '?cierre=1';
     window.open(SERVER_HOST+'/v1/reporte-fassa/'+parametros);
 }
 

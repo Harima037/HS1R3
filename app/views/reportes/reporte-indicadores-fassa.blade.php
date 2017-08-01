@@ -44,12 +44,13 @@
 						<th width="60">Trim 2</th>
 						<th width="60">Trim 3</th>
 						<th width="60">Trim 4</th>
+                        <th width="60">Cierre</th><!-- AGREGADO DE VERSION 2015 -->
                     </tr>
                 </thead>
                 <tbody></tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="6" class="text-right">
+                        <td colspan="8" class="text-right">
                             <b>Estatus del Reporte: </b>
                             <span class="btn btn-primary btn-xs"><span class="fa fa-check"></span></span> Registrado 
                             <span class="btn btn-success btn-xs"><span class="fa fa-pencil"></span></span> Firmado
