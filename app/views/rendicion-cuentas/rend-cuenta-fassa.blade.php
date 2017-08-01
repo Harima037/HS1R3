@@ -45,6 +45,7 @@
                         <th class="text-center" style="width:60px;">Trim 2</th>
                         <th class="text-center" style="width:60px;">Trim 3</th>
                         <th class="text-center" style="width:60px;">Trim 4</th>
+                        <th class="text-center" style="width:60px;">Cierre</th> <!-- version 2015 -->
                         <th style="width:110px;">Metas</th>
                         <th style="width:110px;">Avance</th>
                     </tr>

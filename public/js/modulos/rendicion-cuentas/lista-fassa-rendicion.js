@@ -29,6 +29,7 @@ moduloDatagrid.actualizar({
 
             var trim_cerrado = '<div class="text-center"><span class="fa fa-lock"></span></div>';
 
+
             if(response.data[i].idEstatus >= 4){
                 var trim_actual = response.mes_actual/3;
                 var trim_abierto = '<div class="text-center"><span class="fa fa-unlock"></span></div>';
@@ -61,6 +62,11 @@ moduloDatagrid.actualizar({
                 item.trim3 = trim_cerrado;
                 item.trim4 = trim_cerrado;
             }
+              if(response.cierre_fassa == 1){           ////// de version 2015
+                item.cierre = trim_abierto;
+            }else{
+                item.cierre = trim_cerrado;
+            }                                       ///// fin de version 2015
             
             var clase_estatus = '';
             switch(response.data[i].idEstatus){
@@ -110,6 +116,53 @@ moduloDatagrid.actualizar({
                     item['trim'+trim] = '<div class="text-center '+clase_desempenio+'"><span class="fa '+clase_candado+'"></span></div>';
                 }
             }
+              if(response.cierre_fassa){            //// de version 2015
+                var avance = response.data[i];
+                var clase_desempenio = '';
+                var clase_candado = '';
+                var clase_estatus = '';
+
+                if(avance.justificacionCierre){
+                    clase_desempenio = 'text-danger';
+                }else if(avance.idEstatusCierre){
+                    clase_desempenio = 'text-success';
+                }else{
+                    clase_desempenio = '';
+                }
+
+                if(response.cierre_fassa == 1){
+                    if(avance.idEstatusCierre == 2 || avance.idEstatusCierre == 4 || avance.idEstatusCierre == 5){
+                        clase_candado = 'fa-lock';
+                    }else{
+                        clase_candado = 'fa-unlock';
+                    }
+
+                    switch(avance.idEstatusCierre){
+                        case 1: clase_estatus = 'label-info'; break;
+                        case 2: clase_estatus = 'label-warning'; break;
+                        case 3: clase_estatus = 'label-danger'; break;
+                        case 4: clase_estatus = 'label-primary'; break;
+                        case 5: clase_estatus = 'label-success'; break;
+                    }
+                    if(avance.estatusCierre){
+                        item.avance = '<span class="label '+clase_estatus+'">'+avance.estatusCierre+'</span>';
+                    }else{
+                        item.avance = '<span class="text-muted">Inactivo</span>';
+                    }
+                    
+                }else{
+                    
+                    if(avance.idEstatusCierre == 4 || avance.idEstatusCierre == 5){
+                        clase_candado = 'fa-circle';
+                    }else{
+                        clase_desempenio = 'text-muted';
+                        clase_candado = 'fa-times';
+                    }
+                    item.avance = '<span class="text-muted">Inactivo</span>';
+                }
+
+                item.cierre = '<div class="text-center '+clase_desempenio+'"><span class="fa '+clase_candado+'"></span></div>';
+            }               //// fin de version 2015
 
             datos_grid.push(item);
         }
