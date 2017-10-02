@@ -514,7 +514,7 @@ class VisorController extends BaseController {
 				case 'presupuesto_vs_metas_unidad':
 						$datos_metas = $this->metasCumplidasPorUnidad();
 						$datos_presupuesto = $this->presupuestoEjercidoPorUnidad();
-
+						
 						$metas_vs_presupuesto = array();
 						foreach ($datos_metas['metas_unidad'] as $clave => $metas) {
 							$metas_vs_presupuesto[$clave] = array(
