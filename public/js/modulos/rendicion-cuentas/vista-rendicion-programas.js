@@ -13,6 +13,7 @@
 
 // Inicialización General para casi cualquier módulo
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/rend-cuenta-prog');
+var valor_trimestre;
 
 $('#btn-programa-cancelar').on('click',function(){
     window.location.href = SERVER_HOST+'/rendicion-cuentas/rend-cuenta-prog';
@@ -148,7 +149,7 @@ function seguimiento_metas(e){
                 acumulado += (parseFloat(response.data['trim'+i]) || 0);
             }
 
-            var valor_trimestre = (parseFloat(response.data['trim'+trimestre]) || 0);
+            valor_trimestre = (parseFloat(response.data['trim'+trimestre]) || 0);
 
             $('#trimestre-meta').text((valor_trimestre+0).format(2));
                 
@@ -201,14 +202,27 @@ function seguimiento_metas(e){
 $('#avance-trimestre').on('keyup',function(){ $(this).change() });
 $('#avance-trimestre').on('change',function(){
     var trimestre = $('#trimestre').val();
+     
+
 
     var avance = parseFloat($(this).val()) || 0;
     var acumulado = parseFloat($('#trimestre-avance').attr('data-valor'));
 
     var total_acumulado = avance + acumulado;
 
+
     $('#trimestre-total').attr('data-valor',total_acumulado);
     $('#trimestre-total').text(total_acumulado.format(2));
+
+    var trim_meta=$('#trimestre-meta').text();
+    var trim_avance=$('#avance-trimestre').val();
+    if(trim_avance==''){
+        trim_avance=0;
+    }
+    trim_meta=trim_meta.replace(",","");
+    trim_avance=parseFloat(trim_avance);
+    var avanceTrimestre=(trim_avance/trim_meta)*100 ;
+console.log(avanceTrimestre.toFixed(2));
 
     var total_programado = parseFloat($('#trimestre-acumulada').attr('data-valor'));
     var necesita_justificar = false;
@@ -243,7 +257,7 @@ $('#avance-trimestre').on('change',function(){
         }
     }
 
-    $('#trimestre-porcentaje').html(total_porcentaje_acumulado);
+    $('#trimestre-porcentaje').html(avanceTrimestre.toFixed(2));
 
     if(necesita_justificar){
         $('#justificacion-acumulada').attr('disabled',false);
