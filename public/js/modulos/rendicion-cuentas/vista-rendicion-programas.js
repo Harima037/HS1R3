@@ -226,7 +226,8 @@ console.log(avanceTrimestre.toFixed(2));
 
     var total_programado = parseFloat($('#trimestre-acumulada').attr('data-valor'));
     var necesita_justificar = false;
-    if(total_programado == 0 && total_acumulado ==  0){
+
+   /* if(total_programado == 0 && total_acumulado ==  0){
         total_porcentaje_acumulado = '<small class="text-success">0%</small>';
         $('#trimestre-porcentaje').attr('data-estado-avance','');
     }else{
@@ -255,9 +256,43 @@ console.log(avanceTrimestre.toFixed(2));
             total_porcentaje_acumulado = '<small class="text-success">'+total_porcentaje_acumulado+'%</small>';
             $('#trimestre-porcentaje').attr('data-estado-avance','');
         }
+    }*/
+
+    if(total_programado == 0 && total_acumulado ==  0){
+        avanceTrimestre = '<small class="text-success">0%</small>';
+        $('#trimestre-porcentaje').attr('data-estado-avance','');
+    }else{
+        if(total_programado > 0){
+            var total_porcentaje_acumulado = avanceTrimestre.toFixed(2);
+        }else{
+            if(total_acumulado > 0){
+                var total_porcentaje_acumulado = 100;
+            }else{
+                var total_porcentaje_acumulado = 0;
+            }
+        }
+        if(total_porcentaje_acumulado > 110){
+            total_porcentaje_acumulado = '<small class="text-danger"><span class="fa fa-arrow-up"></span> '+total_porcentaje_acumulado+'%</small>';
+            $('#trimestre-porcentaje').attr('data-estado-avance','1');
+            necesita_justificar = true;
+        }else if(total_porcentaje_acumulado < 90){
+            total_porcentaje_acumulado = '<small class="text-danger"><span class="fa fa-arrow-down"></span> '+total_porcentaje_acumulado+'%</small>';
+            $('#trimestre-porcentaje').attr('data-estado-avance','1');
+            necesita_justificar = true;
+        }else if(total_programado == 0 && total_porcentaje_acumulado > 0){
+            total_porcentaje_acumulado = '<small class="text-info"><span class="fa fa-arrow-up"></span> '+total_porcentaje_acumulado+'%</small>';
+            $('#trimestre-porcentaje').attr('data-estado-avance','1');
+            necesita_justificar = true;
+        }else{
+            total_porcentaje_acumulado = '<small class="text-success">'+total_porcentaje_acumulado+'%</small>';
+            $('#trimestre-porcentaje').attr('data-estado-avance','');
+        }
     }
 
-    $('#trimestre-porcentaje').html(avanceTrimestre.toFixed(2));
+    /////////
+
+
+    $('#trimestre-porcentaje').html(total_porcentaje_acumulado);
 
     if(necesita_justificar){
         $('#justificacion-acumulada').attr('disabled',false);

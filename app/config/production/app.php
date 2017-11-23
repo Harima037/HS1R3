@@ -13,5 +13,5 @@ return array(
 	|
 	*/
 
-	'debug' => false,
+	'debug' => true,
 );
