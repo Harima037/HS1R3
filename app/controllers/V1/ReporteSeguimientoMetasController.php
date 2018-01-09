@@ -75,9 +75,10 @@ class ReporteSeguimientoMetasController extends BaseController {
 			}
 			
 			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
-				'nombreTecnico',
+				'nombreTecnico','idEstatusProyecto','catalogoEstatusProyectos.descripcion as descripcionEstatusProyecto',
 				DB::raw('concat_ws(" ",sentryUsers.nombres,sentryUsers.apellidoPaterno,sentryUsers.apellidoMaterno) AS nombreRevisor'))
 				->leftjoin('sentryUsers','sentryUsers.id','=','proyectos.idUsuarioValidacionSeg')
+				->leftjoin('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
 				->orderBy('id', 'desc')
 				->skip(($parametros['pagina']-1)*10)->take(10)
 				->get();

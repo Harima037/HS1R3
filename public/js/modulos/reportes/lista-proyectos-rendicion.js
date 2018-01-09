@@ -24,9 +24,25 @@ moduloDatagrid.actualizar({
         for(var i in response.data){
             var item = {};
 
+            var clase_label = 'label-info';
+            if(response.data[i].cancelado){
+                clase_label = 'label-danger';
+                response.data[i].descripcionEstatusProyecto = 'Cancelado';
+            }else if(response.data[i].idEstatusProyecto == 2){
+                clase_label = 'label-warning';
+            }else if(response.data[i].idEstatusProyecto == 3){
+                clase_label = 'label-danger';
+            }else if(response.data[i].idEstatusProyecto == 4){
+                clase_label = 'label-primary';
+            }else if(response.data[i].idEstatusProyecto == 5){
+                clase_label = 'label-success';
+            }
+            
+
             item.id = response.data[i].id;
             item.clave = response.data[i].clavePresup;
             item.nombre_tecnico = response.data[i].nombreTecnico;
+            item.estatus = '<span class="label ' + clase_label + '">' + response.data[i].descripcionEstatusProyecto + '</span>';
             //item.revisor = response.data[i].nombreRevisor || '<span class="text-muted">Sin revisor asignado</span>';
             datos_grid.push(item);
         }

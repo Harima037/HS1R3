@@ -211,14 +211,15 @@ class RendicionProgramaController extends BaseController {
 						$query->where('trimestre','<',$trimestre_actual);
 					}))->find($parametros['id-indicador']);
 
-					$avance_acumulado = $indicador->registroAvance->sum('avance');
-					$avance_acumulado += $parametros['avance-trimestre'];
+					//$avance_acumulado = $indicador->registroAvance->sum('avance');
+					$avance_acumulado = $parametros['avance-trimestre'];
 
 					$meta_acumulada = 0;
 					$indicador_array = $indicador->toArray();
-					for ($i = 1; $i <= $trimestre_actual ; $i++) { 
+					$meta_acumulada += $indicador_array['trim'.$trimestre_actual];
+					/*for ($i = 1; $i <= $trimestre_actual ; $i++) { 
 						$meta_acumulada += $indicador_array['trim'.$i];
-					}
+					}*/
 
 					if($avance_acumulado > 0 && $meta_acumulada == 0){
 						$porcentaje_avance = 1;
@@ -352,14 +353,15 @@ class RendicionProgramaController extends BaseController {
 						$query->where('trimestre','<',$trimestre_actual);
 					}))->find($parametros['id-indicador']);
 
-					$avance_acumulado = $indicador->registroAvance->sum('avance');
-					$avance_acumulado += $parametros['avance-trimestre'];
+					//$avance_acumulado = $indicador->registroAvance->sum('avance');
+					$avance_acumulado = $parametros['avance-trimestre'];
 
 					$meta_acumulada = 0;
 					$indicador_array = $indicador->toArray();
-					for ($i = 1; $i <= $trimestre_actual ; $i++) { 
+					$meta_acumulada += $indicador_array['trim'.$trimestre_actual];
+					/*for ($i = 1; $i <= $trimestre_actual ; $i++) { 
 						$meta_acumulada += $indicador_array['trim'.$i];
-					}
+					}*/
 
 					if($avance_acumulado > 0 && $meta_acumulada == 0){
 						$porcentaje_avance = 1;

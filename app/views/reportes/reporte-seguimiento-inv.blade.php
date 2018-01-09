@@ -49,6 +49,7 @@
                         <th><input type="checkbox" class="check-select-all-rows"></th>
                         <th width="200">Clave Presupuestaria</th>
                         <th>Nombre Técnico</th>
+                        <th width="100">Estatus</th>
                         <!--th width="230">Revisor</th-->
                     </tr>
                 </thead>
