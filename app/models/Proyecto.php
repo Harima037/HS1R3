@@ -224,7 +224,7 @@ class Proyecto extends BaseModel
 					'proyectoComponentes.idProyecto','proyectoComponentes.indicador',
 					'proyectoComponentes.valorNumerador AS metaAnual','unidadesMedida.descripcion AS unidadMedida',
 					'avanceMetas.planMejora','avanceMetas.justificacionAcumulada','avanceMetas.id AS identificador',
-					DB::raw('sum(metasMes.avance) AS avanceAcumulado'))
+					DB::raw('sum(metasMes.avance) AS avanceAcumulado'), DB::raw('sum(metasMes.meta) AS metaAcumulada'))
 					->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','proyectoComponentes.idUnidadMedida')
 					->leftjoin('componenteMetasMes AS metasMes',function($join)use($mes){
 						$join->on('metasMes.idComponente','=','proyectoComponentes.id')
@@ -245,7 +245,7 @@ class Proyecto extends BaseModel
 					'componenteActividades.idProyecto','componenteActividades.indicador',
 					'componenteActividades.valorNumerador AS metaAnual','unidadesMedida.descripcion AS unidadMedida',
 					'avanceMetas.planMejora','avanceMetas.justificacionAcumulada','avanceMetas.id AS identificador',
-					DB::raw('sum(metasMes.avance) AS avanceAcumulado'))
+					DB::raw('sum(metasMes.avance) AS avanceAcumulado'), DB::raw('sum(metasMes.meta) AS metaAcumulada'))
 					->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','componenteActividades.idUnidadMedida')
 					->leftjoin('actividadMetasMes AS metasMes',function($join)use($mes){
 						$join->on('metasMes.idActividad','=','componenteActividades.id')
