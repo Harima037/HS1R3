@@ -237,12 +237,13 @@ class EP01Controller extends \BaseController {
 									$query = sprintf("
 										LOAD DATA local INFILE '%s' 
 										INTO TABLE cargaDatosEP01 
+										CHARACTER SET utf8 
 										FIELDS TERMINATED BY ',' 
 										OPTIONALLY ENCLOSED BY '\"' 
 										ESCAPED BY '\"' 
 										LINES TERMINATED BY '\\n' 
 										IGNORE 1 LINES 
-										(`UR`,`FI`,`FU`,`SF`,`SSF`,`PS`,`PP`,`OA`,`AI`,`PT`,`MPIO`,`OG`,`STG`,`FF`,`SFF`,`PF`,`CP`,
+										(`UR`,`FI`,`FU`,`SF`,`SSF`,`PS`,`PP`,`OA`,`AI`,`PT`,`MPIO`,`COGC`,`OG`,`STG`,`TR`,`FF`,`SFF`,`PF`,`CP`,
 										`DM`,`presupuestoAprobado`,`modificacionNeta`,`presupuestoModificado`,`presupuestoLiberado`,
 										`presupuestoPorLiberar`,`presupuestoMinistrado`,`presupuestoComprometidoModificado`,
 										`presupuestoDevengadoModificado`,`presupuestoEjercidoModificado`,`presupuestoPagadoModificado`,
