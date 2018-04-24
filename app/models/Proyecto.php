@@ -615,7 +615,7 @@ class Proyecto extends BaseModel
 			->leftjoin('catalogoObjetivosPED AS objetivoPED','objetivoPED.id','=','proyectos.idObjetivoPED')
 			->leftjoin('catalogoObjetivosPED AS eje','eje.clave','=',DB::raw('SUBSTRING(objetivoPED.clave,1,2)'))
 			->leftjoin('catalogoObjetivosPED AS tema','tema.clave','=',DB::raw('SUBSTRING(objetivoPED.clave,1,4)'))
-			->leftjoin('catalogoObjetivosPED AS politicaPublica','politicaPublica.clave','=',DB::raw('SUBSTRING(objetivoPED.clave,1,6)'))
+			->leftjoin('catalogoObjetivosPED AS politicaPublica','politicaPublica.clave','=',DB::raw('SUBSTRING(objetivoPED.clave,1,7)'))
 
 			->leftjoin('catalogoFuncionesGasto AS funcionGasto','funcionGasto.clave','=',DB::raw('concat_ws(".",proyectos.finalidad,proyectos.funcion)'))
 
