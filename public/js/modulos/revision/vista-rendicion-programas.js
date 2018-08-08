@@ -188,7 +188,8 @@ function seguimiento_metas(e){
             $('#trimestre-total').attr('data-valor',avance_acumulado + avance_trimestre);
             $('#trimestre-total').text((avance_acumulado + avance_trimestre).format());
 
-            calcular_porcentaje((avance_acumulado+avance_trimestre),acumulado);
+            //calcular_porcentaje((avance_acumulado+avance_trimestre),acumulado);
+            calcular_porcentaje(avance_trimestre,valor_trimestre)
 
 			$('#modalEditarAvance').modal('show');
         }

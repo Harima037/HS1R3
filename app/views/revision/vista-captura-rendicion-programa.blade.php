@@ -128,7 +128,7 @@
                 				<th rowspan="2">Trimestre</th>
 	                			<th colspan="2" class="bg-success">Meta Programada</th>
 	                			<th colspan="3" class="bg-info">Avance</th>
-	                			<th rowspan="2" width="90">Porcentaje Acumulado</th>
+	                			<th rowspan="2" width="90">Porcentaje Trimestral</th>
                 			</tr>
                 			<tr>
                 				<th class="bg-success">Acumulada</th>

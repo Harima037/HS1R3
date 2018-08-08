@@ -146,6 +146,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('config-seg-metas', 	'V1\ConfigurarSeguimientoController', array('only' => array('store')));
 		Route::resource('purgar-seguimientos',	'V1\PurgarSeguimientoController');
 		Route::resource('admin-proyectos',		'V1\AdminProyectosController', array('only' => array('index','show','update')));
+		Route::get('admin-proyectos-avances/{id}', array('uses'=>'V1\AdminProyectosController@avances'));
+		Route::put('admin-proyectos-avances/{id}', array('uses'=>'V1\AdminProyectosController@cambiarEstatusAvances'));
 		Route::resource('bitacora-seguimiento',	'V1\BitacoraValidacionSeguimientoController', array('only' => array('index')));
 		
 		Route::resource('proyectos',		'V1\ProyectosController');

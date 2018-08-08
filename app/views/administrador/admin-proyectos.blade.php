@@ -45,6 +45,7 @@
                         <th width="190px">Clave</th>
                         <th>Nombre Técnico</th>
                         <th style="width:120px;">Estatus</th>
+                        <th style="width:75px;">Avances</th>
                         <th style="text-align:center; width:85px;"><span class="fa fa-user"></span></th>
                         <th style="text-align:center; width:120px;"><span class="fa fa-calendar"></span></th>
                     </tr>
@@ -118,5 +119,82 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<div class="modal fade" id="modalDatosSeguimiento" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-85-screen">
+        <div class="modal-content modal-content-85-screen">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="modalLabel">Nuevo</h4>
+            </div>
+            <div class="modal-body">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label">Nombre Técnico</label>
+                                    <p class="form-control-static" id="nombre-proyecto"></p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label class="control-label">Programa Presupuestario</label>
+                                    <p class="form-control-static" id="programa-presupuestario"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label class="control-label">Función</label>
+                                    <p class="form-control-static" id="funcion"></p>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="form-group">
+                                    <label class="control-label">Subfunción</label>
+                                    <p class="form-control-static" id="subfuncion"></p>
+                                </div>
+                            </div>
+                            <input type="hidden" id="proyecto-id" value="">
+                        </div>
+                    </div>
+                </div>
+                <table id="tabla-reportes" class="table table-condensed table-hover table-striped">
+                    <tbody>
+                        @for($i = 0 ; $i < 6 ; $i++)
+                        <tr>
+                            <th class="text-center">{{$meses[$i]['abrev']}}</th>
+                            <td class="text-center" id="rep_metas_{{$meses[$i]['clave']}}">
+                                <select id="estatus-avance-{{$meses[$i]['clave']}}" name="estatus-avance-{{$meses[$i]['clave']}}" class="form-control estatus-avance" onChange="poner_estatus({{$meses[$i]['clave']}})">
+                                    <option value="0">Sin capturar</option>
+                                @foreach($estatus_proyectos as $estatus)
+                                    <option value="{{$estatus->id}}">{{$estatus->descripcion}}</option>
+                                @endforeach
+                                </select>
+                            </td>
+                            <th class="text-center">{{$meses[$i+6]['abrev']}}</th>
+                            <td class="text-center" id="rep_metas_{{$meses[$i+6]['clave']}}">
+                                <select id="estatus-avance-{{$meses[$i+6]['clave']}}" name="estatus-avance-{{$meses[$i+6]['clave']}}" class="form-control estatus-avance" onChange="poner_estatus({{$meses[$i+6]['clave']}})">
+                                    <option value="0">Sin capturar</option>
+                                @foreach($estatus_proyectos as $estatus)
+                                    <option value="{{$estatus->id}}">{{$estatus->descripcion}}</option>
+                                @endforeach
+                                </select>
+                            </td>
+                        </tr>
+                        @endfor
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn-cambiar-estatus-avance">Guardar</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 @parent
 @stop

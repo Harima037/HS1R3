@@ -84,6 +84,58 @@ class AdminProyectosController extends BaseController {
 		return Response::json($data,$http_status);
 	}
 
+	public function avances($id){
+		$http_status = 200;
+		$data = array();
+		
+		$recurso = Proyecto::with(array('datosFuncion','datosSubFuncion','datosProgramaPresupuestario',
+			'evaluacionMeses'))->find($id);
+
+		//=>function($query){
+			//$query->whereIn('idEstatus',array(4,5));
+		//}
+
+		if(is_null($recurso)){
+			$http_status = 404;
+			$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+		}else{
+			$data["data"] = $recurso;
+		}
+
+		return Response::json($data,$http_status);
+	}
+
+	public function cambiarEstatusAvances($id){
+		$http_status = 200;
+		$data = array();
+
+		$parametros = Input::all();
+		$recurso = Proyecto::find($id);
+
+		if(is_null($recurso)){
+			$http_status = 404;
+			$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+		}else{
+			//$data = array("data"=>"Prueba",'proy'=>$recurso,'params'=>$parametros,'code'=>'U06');
+			$estatus = $parametros['estatus'];
+			$recurso->load('evaluacionMeses');
+			foreach ($recurso->evaluacionMeses as $evaluacion) {
+				if(isset($estatus[$evaluacion->id])){
+					$evaluacion->idEstatus = $estatus[$evaluacion->id];
+					$evaluacion->save();
+				}
+			}
+			/*$recurso->idEstatusProyecto = $parametros['estatus-proyecto'];
+			if($recurso->save()){
+				$data["data"] = $recurso;
+			}else{
+				$http_status = 500;
+				$data = array("data"=>"Ocurrio un error al intentar guardar el recurso.",'code'=>'U06');
+			}*/
+		}
+		return Response::json($data,$http_status);
+	}
+
 	/**
 	 * Display the specified resource.
 	 *
