@@ -766,6 +766,10 @@ class Proyecto extends BaseModel
 
     public function analisisFuncional(){
     	return $this->hasMany('EvaluacionAnalisisFuncional','idProyecto');
+	}
+	
+	public function fichasTecnicasEvaluacion(){
+    	return $this->hasMany('FichaTecnicaEvaluacion','idProyecto');
     }
 
 	public function jefeInmediato(){
