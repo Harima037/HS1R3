@@ -209,7 +209,7 @@
 
         <tr height="29">
             <td colspan="2" valign="middle" style="text-align:center; font-weight:bold; font-size:8; background-color:#DDDDDD;">JUSTIFICACIÓN:</td>
-            <td colspan="16" valign="middle" style="font-size:8;">{{($proyecto['variable']['tipo'])?$proyecto['variable']['datos']['registro_avance']['analisisResultadosTrimestral']:''}}</td>
+            <td colspan="16" valign="middle" style="font-size:8;">{{($proyecto['variable']['tipo'])?$proyecto['variable']['datos']['registro_avance']['justificacionAcumulada']:''}}</td>
 		</tr>
 
         <tr height="37">

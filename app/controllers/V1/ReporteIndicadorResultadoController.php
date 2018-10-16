@@ -238,9 +238,24 @@ class ReporteIndicadorResultadoController extends BaseController {
 				$datos_hoja = array();
 				$datos_hoja['ejercicio'] = $datos['ejercicio'];
 				$datos_hoja['trimestre'] = $datos['trimestre'];
+
+				$justificaciones = array();
+				
 				foreach ($datos['hojas'] as $clave => $hoja) {
 					//$excel->sheet('Proyectos', function($sheet) use ( $datos_hoja, $hoja ){
-					$excel->sheet($datos['nombres_subfuncion'][$clave], function($sheet) use ( $datos_hoja, $hoja ){
+
+					foreach ($hoja['clase'] as $clasificacion) {
+						foreach($clasificacion['proyectos'] as $proyecto){
+							foreach($proyecto->componentes as $componente){
+								$justificaciones[] = array('clave'=>$proyecto->proyectoEstrategico.str_pad($proyecto->numeroProyectoEstrategico, 3,'0',STR_PAD_LEFT), 'nombre'=>rtrim($proyecto->nombreTecnico,'.'), 'justificacion'=>$componente->justificacionAcumulada);
+							}
+							foreach($proyecto->actividades as $actividad){
+								$justificaciones[] = array('clave'=>$proyecto->proyectoEstrategico.str_pad($proyecto->numeroProyectoEstrategico, 3,'0',STR_PAD_LEFT), 'nombre'=>rtrim($proyecto->nombreTecnico,'.'), 'justificacion'=>$actividad->justificacionAcumulada);
+							}
+						}
+					}
+
+					$excel->sheet($datos['nombres_subfuncion'][$clave], function($sheet) use ( $datos_hoja, $hoja, $justificaciones ){
 						$sheet->setStyle(array(
 						    'font' => array(
 						        'name'      =>  'Arial',
@@ -250,23 +265,23 @@ class ReporteIndicadorResultadoController extends BaseController {
 
 						$datos_hoja['hoja'] = $hoja;
 
-				    	$sheet->loadView('reportes.excel.indicadores-resultados',$datos_hoja);
-				    	
-				    	$sheet->mergeCells('A2:R2');
-						$sheet->mergeCells('A4:R4');
-						$sheet->cells('A2:R4',function($cells){ $cells->setAlignment('center'); });
+						$sheet->loadView('reportes.excel.indicadores-resultados',$datos_hoja);
+						
+				    	$sheet->mergeCells('A2:Q2');
+						$sheet->mergeCells('A4:Q4');
+						$sheet->cells('A2:Q4',function($cells){ $cells->setAlignment('center'); });
 						$sheet->mergeCells('A9:A10');
 						$sheet->mergeCells('B9:B10');
 						$sheet->mergeCells('D9:E10');
-						$sheet->mergeCells('F9:K9');
+						$sheet->mergeCells('F9:I9');
+						$sheet->mergeCells('J9:J10');
+						$sheet->mergeCells('K9:K10');
 						$sheet->mergeCells('L9:L10');
-						$sheet->mergeCells('M9:M10');
-						$sheet->mergeCells('N9:N10');
-						$sheet->mergeCells('O9:S9');
-						$sheet->mergeCells('C11:S11');
-						$sheet->cells('A9:S12',function($cells) { $cells->setAlignment('center'); });
-						$sheet->getStyle('A9:S12')->getAlignment()->setWrapText(true);
-						$sheet->getStyle('A9:S11')->applyFromArray(array(
+						$sheet->mergeCells('M9:Q9');
+						$sheet->mergeCells('C11:Q11');
+						$sheet->cells('A9:Q12',function($cells) { $cells->setAlignment('center'); });
+						$sheet->getStyle('A9:Q12')->getAlignment()->setWrapText(true);
+						$sheet->getStyle('A9:Q11')->applyFromArray(array(
 						    'fill' => array(
 						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
 						        'color' => array('rgb' => '28A659')
@@ -283,19 +298,19 @@ class ReporteIndicadorResultadoController extends BaseController {
 						    	)
 						    )
 						));
-						$sheet->getStyle('A9:K10')->applyFromArray(array(
+						$sheet->getStyle('A9:I10')->applyFromArray(array(
 							'fill'=>array(
 								'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
 								'color' => array('rgb' => '339966')
 							)
 						));
-						$sheet->getStyle('O9:S10')->applyFromArray(array(
+						$sheet->getStyle('M9:Q10')->applyFromArray(array(
 							'fill'=>array(
 								'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
 								'color' => array('rgb' => '339966')
 							)
 						));
-						$sheet->getStyle('A11:S11')->applyFromArray(array(
+						$sheet->getStyle('A11:Q11')->applyFromArray(array(
 						    'font' => array(
 						        'size'      =>  13,
 						        'bold'      =>  true
@@ -307,7 +322,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 						    	)
 						    )
 						));
-						$sheet->getStyle('A12:S12')->applyFromArray(array(
+						$sheet->getStyle('A12:Q12')->applyFromArray(array(
 						    'fill' => array(
 						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
 						        'color' => array('rgb' => 'DDDDDD')
@@ -329,7 +344,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 						    )
 						));
 						$total = $hoja['conteo_items'] + 13;
-						for ($i='A'; $i < 'S' ; $i++) { 
+						for ($i='A'; $i < 'Q' ; $i++) { 
 							if($i != 'D'){
 								$sheet->getStyle($i.'14:'.$i.$total)->applyFromArray(array(
 								    'font' => array( 'size' => 10),
@@ -348,40 +363,39 @@ class ReporteIndicadorResultadoController extends BaseController {
 							$cell->setValignment('center');
 						});
 
-						$sheet->getStyle('A14:S'.$total)->getAlignment()->setWrapText(true);
+						$sheet->getStyle('A14:Q'.$total)->getAlignment()->setWrapText(true);
 						$sheet->setColumnFormat(array(
 							'F14:H'.$total => '### ### ### ##0.00', //Aqui
-							'L12:N12' => '### ### ### ##0.00',
+							'J12:L12' => '### ### ### ##0.00',
 							'I12:I'.$total => '### ### ### ##0.00',
-							'J14:J'.$total => '### ### ### ##0.00',
-							'K12:N'.$total => '### ### ### ##0.00',
-						    'Q14:S'.$total => '### ### ### ##0'
+							//'J14:J'.$total => '### ### ### ##0.00',
+							//'K12:N'.$total => '### ### ### ##0.00',
+						    'O14:Q'.$total => '### ### ### ##0'
 						));
 
 						$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','A1');
 						$imagen->setWorksheet($sheet);
-						$imagen = $this->obtenerImagen('LogoInstitucional.png','R1');
+						$imagen = $this->obtenerImagen('LogoInstitucional.png','P1');
 						$imagen->setWorksheet($sheet);
 				    });
 					
 					$ultima_linea = $excel->getActiveSheet()->getHighestDataRow();
 					$rows_sumar = explode(',',$excel->getActiveSheet()->getCell('A'.$ultima_linea)->getValue());
 
-					
 					$suma_l = '';
 					$suma_m = '';
 					$suma_n = '';
 					foreach ($rows_sumar as $indice => $valor) {
-						$suma_l .= 'L'.$valor.',';
-						$suma_m .= 'M'.$valor.',';
-						$suma_n .= 'N'.$valor.',';
+						$suma_l .= 'J'.$valor.',';
+						$suma_m .= 'K'.$valor.',';
+						$suma_n .= 'L'.$valor.',';
 					}
 					
 					$excel->getActiveSheet()->setCellValue('B14','3');
 					$excel->getActiveSheet()->setCellValue('A'.$ultima_linea,null);
-					$excel->getActiveSheet()->setCellValue('L12','=SUM('.rtrim($suma_l,',').')');
-					$excel->getActiveSheet()->setCellValue('M12','=SUM('.rtrim($suma_m,',').')');
-					$excel->getActiveSheet()->setCellValue('N12','=SUM('.rtrim($suma_n,',').')');
+					$excel->getActiveSheet()->setCellValue('J12','=SUM('.rtrim($suma_l,',').')');
+					$excel->getActiveSheet()->setCellValue('K12','=SUM('.rtrim($suma_m,',').')');
+					$excel->getActiveSheet()->setCellValue('L12','=SUM('.rtrim($suma_n,',').')');
 
 					$excel->getActiveSheet()->getPageSetup()->setRowsToRepeatAtTopByStartAndEnd(1,10);
 
@@ -404,6 +418,14 @@ class ReporteIndicadorResultadoController extends BaseController {
 					$excel->getActiveSheet()->getPageMargins()->setHeader(0.9055118);
 					$excel->getActiveSheet()->getPageMargins()->setFooter(0.5118110);
 				}
+
+				//print_r($justificaciones);
+				//throw new Exception("Error Processing Request Spageete somebodur", 1);
+				
+				$excel->sheet('1.3 JUSTIFICACIONES', function($sheet) use ( $justificaciones ){
+					//$objPHPExcel->getActiveSheet()->fromArray($testArray, NULL, 'A1');
+					$sheet->fromArray($justificaciones, NULL, 'A1');
+				});
 			})->download('xlsx');
 		}catch(Exception $ex){
 			return Response::json(array('data'=>'Ocurrio un error al generar el reporte.','message'=>$ex->getMessage(),'line'=>$ex->getLine()),500);

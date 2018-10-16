@@ -56,9 +56,9 @@ function editar (e){
     $('#recomendacion').val('');
     planesDeAccionDeMejora = {};
 
-    $('#variable_tipo').val();
-    $('#variable_id_plan').val();
-    $('#variable_id').val();
+    $('#variable_tipo').val('');
+    $('#variable_id_plan').val('');
+    $('#variable_id').val('');
 
 	var parametros = {'trimestre':$('#trimestre').val(),'ejercicio':$('#ejercicio').val()};
 	
@@ -92,7 +92,7 @@ function editar (e){
                     planesDeAccionDeMejora['C-'+componente.id] = {
                         'id_plan': componente.plan_mejora[0].id,
                         'accion_mejora': componente.plan_mejora[0].accionMejora,
-                        'justificacion': componente.registro_avance[0].justificacionTrimestral
+                        'justificacion': componente.registro_avance[0].justificacionAcumulada
                     }
 
                     indicadores += '<tr onClick="seleccionar(\'componente\','+componente.id+')">';
@@ -119,7 +119,7 @@ function editar (e){
                         planesDeAccionDeMejora['A-'+actividad.id] = {
                             'id_plan': actividad.plan_mejora[0].id,
                             'accion_mejora': actividad.plan_mejora[0].accionMejora,
-                            'justificacion': actividad.registro_avance[0].justificacionTrimestral
+                            'justificacion': actividad.registro_avance[0].justificacionAcumulada
                         }
 
                         indicadores += '<tr onClick="seleccionar(\'actividad\','+actividad.id+')">';
@@ -207,9 +207,20 @@ function realizar_busqueda(){
 
 $('#btn-guardar').on('click',function (e) {
     e.preventDefault();
-    
+
     var parametros = {'trimestre':$('#trimestre').val(),'ejercicio':$('#ejercicio').val(),'id_plan':$('#variable_id_plan').val(),'tipo':$('#variable_tipo').val(),'recomendacion':$('#recomendacion').val(),'variable_id':$('#variable_id').val()};
     
+    if(!parametros.variable_id){
+        console.log('seleccionar variable');
+        MessageManager.show({data:'Selecciona un indicador',type:'ERR',timer:5}); 
+        return false;
+    }
+
+    if(!parametros.recomendacion.trim()){
+        MessageManager.show({data:'Escriba una recomendación',type:'ERR',timer:5}); 
+        return false;
+    }
+
     moduleResource.put($('#id').val(), parametros,{
         _success: function(response){
             moduleDatagrid.actualizar();
