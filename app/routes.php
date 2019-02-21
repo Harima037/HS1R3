@@ -58,6 +58,9 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('editar-programa/{id?}',array('uses'=>'ProgramaPresupuestarioController@editar'));
 
 		Route::get('indicadores-fassa',array('uses'=>'IndicadorFassaController@index'));
+
+		Route::get('estrategia-institucional',array('uses'=>'EstrategiaInstitucionalController@index'));
+		Route::get('editar-estrategia/{id?}',array('uses'=>'EstrategiaInstitucionalController@editar'));
 	});
 	
 	Route::group(array('prefix'=>'revision'), function(){
@@ -69,6 +72,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('segui-proyectos-inv',array('uses'=>'SeguimientoInstitucionalController@indexInversion'));
 		
 		Route::get('revision-programas',array('uses'=>'RevisionProgramaController@index'));
+		
 		Route::get('revision-ver-programa/{id?}',array('uses'=>'RevisionProgramaController@editar'));
 
 		Route::get('variacion-gasto',array('uses'=>'VariacionesGastoController@index'));
@@ -80,6 +84,11 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		
 		Route::get('revision-rendicion-fassa',array('uses'=>'RevisionRendicionFassaController@index'));
 		
+		Route::get('revision-estrategia-institucional',array('uses'=>'RevisionEstrategiaInstitucionalController@index')); //Villa
+		Route::get('revision-ver-estrategia/{id?}',array('uses'=>'RevisionEstrategiaInstitucionalController@editar')); //Villa
+		Route::get('seguimiento-estrategia',array('uses'=>'SeguimientoEstrategiaController@index')); //Villa
+		Route::get('avance-estrategia/{id}',array('uses'=>'SeguimientoEstrategiaController@editarAvance')); //Villa
+
 	});
 
 	Route::group(array('prefix'=>'visor'),function(){
@@ -104,10 +113,12 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('rend-cuenta-inv',array('uses'=>'SeguimientoController@indexInversion'));
 		Route::get('rend-cuenta-prog',array('uses'=>'RendicionProgramaController@index'));
 		Route::get('rend-cuenta-fassa',array('uses'=>'RendicionFassaController@index'));
+		Route::get('rend-cuenta-estra',array('uses'=>'RendicionEstrategiaController@index'));
 
 		Route::get('editar-avance/{id}',array('uses'=>'SeguimientoController@rendicionCuentas'));
 		Route::get('descargar-archivo-metas/{id}',array('uses'=>'SeguimientoController@archivoMetas'));
 		Route::get('avance-programa/{id}',array('uses'=>'RendicionProgramaController@editarAvance'));
+		Route::get('avance-estrategia/{id}',array('uses'=>'RendicionEstrategiaController@editarAvance'));
 	});
 
 	Route::group(array('prefix'=>'cargar'),function(){
@@ -162,6 +173,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('rend-cuenta-inv', 		'V1\SeguimientoController');
 		Route::resource('rend-cuenta-prog', 	'V1\RendicionProgramaController');
 		Route::resource('rend-cuenta-fassa',	'V1\RendicionFassaController');
+		Route::resource('rend-cuenta-estra',	'V1\RendicionEstrategiaController');
 
 		Route::resource('reporte-seguimiento-inst',	'V1\ReporteSeguimientoMetasController', array('only' => array('index','show')));
 		Route::resource('reporte-seg-programas',	'V1\ReporteSeguimientoProgramasController', array('only'=>array('index','show')));
@@ -193,8 +205,15 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('seguimiento-programas', 'V1\SeguimientoProgramaController');
 		Route::resource('revision-rendicion-fassa',	'V1\RevisionRendicionFassaController');
 
+		
 		Route::resource('programas-presupuestarios','V1\ProgramaPresupuestarioController');
+		Route::resource('directorio','V1\DirectorioController');
 
+		Route::resource('estrategia-institucional','V1\EstrategiaInstitucionalController');
+		Route::resource('revision-estrategia', 'V1\RevisionEstrategiaInstitucionalController');
+		Route::resource('seguimiento-estrategia', 'V1\SeguimientoEstrategiaController');
+		Route::resource('reporte-estrategia',	'V1\ReporteSeguimientoEstrategisController', array('only' => array('index')));
+		
 		Route::resource('indicadores-fassa',	'V1\IndicadorFassaController');
 
 		Route::resource('reporte-evaluacion',	'V1\ReporteEvaluacionController', 			array('only'=>array('show')));
