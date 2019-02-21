@@ -132,7 +132,7 @@ class ReporteGastoRegionalizadoController extends BaseController {
 					));
 
 					$sheet->loadView('reportes.excel.gasto-regionalizado',$datos);
-					$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','A1');
+					$imagen = $this->obtenerImagen('LogoFederal.png','A1');
 					$imagen->setWorksheet($sheet);
 					$imagen = $this->obtenerImagen('LogoInstitucional.png','T1',(-18));
 					$imagen->setWorksheet($sheet);

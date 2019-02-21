@@ -258,11 +258,11 @@ class ReporteCedulaAvanceController extends BaseController {
 		$header = $section->addHeader();
 		$table = $header->addTable('TablaEncabezado');
 		$row = $table->addRow();
-		$row->addCell(2000)->addImage('img/EscudoGobiernoChiapas.png',array('width' => 203,'height' => 70,'align'=>'left'));
+		$row->addCell(2000)->addImage('img/LogoFederal.png',array('width' => 125,'height' => 43,'align'=>'left'));
 		$cell = $row->addCell(10128);
 		$cell->addTextBreak();
 		$cell->addText(htmlspecialchars('INSTITUTO DE SALUD'),$titulo_pag,$centrado);
-		$row->addCell(2000)->addImage('img/LogoInstitucional.png',array('width' => 160,'height' => 70,'align'=>'right'));
+		$row->addCell(2000)->addImage('img/LogoInstitucional.png',array('width' => 125,'align'=>'right'));
 		$header->addTextBreak();
 
 		$footer = $section->addFooter();

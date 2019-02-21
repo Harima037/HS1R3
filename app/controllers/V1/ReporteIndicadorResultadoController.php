@@ -373,7 +373,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 						    'O14:Q'.$total => '### ### ### ##0'
 						));
 
-						$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','A1');
+						$imagen = $this->obtenerImagen('LogoFederal.png','A1');
 						$imagen->setWorksheet($sheet);
 						$imagen = $this->obtenerImagen('LogoInstitucional.png','P1');
 						$imagen->setWorksheet($sheet);

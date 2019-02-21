@@ -103,14 +103,16 @@ class ReporteCuentaPublicaController extends BaseController {
 		
 		$table = $header->addTable('TablaEncabezado');
 		$row = $table->addRow();
-		$row->addCell(3000)->addImage('img/EscudoGobiernoChiapas.png');
+		//$row->addCell(3000)->addImage('img/LogoFederal.png');
+		$row->addCell(3000)->addImage('img/LogoFederal.png',array('width' => 125,'height' => 43,'align'=>'left'));
 		$cell = $row->addCell(8128);
 		$cell->addText(htmlspecialchars('GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS'),$titulo,$centrado);
 		$cell->addTextBreak(0);
 		$cell->addText(htmlspecialchars('INSTITUTO DE SALUD'),$titulo,$centrado);
 		$cell->addTextBreak(0);
 		$cell->addText(htmlspecialchars('ANÁLISIS FUNCIONAL AL '.$trimestres[$trimestre].' TRIMESTRE DEL '.$ejercicio),$titulo,$centrado);
-		$row->addCell(3000)->addImage('img/LogoInstitucional.png');
+		//$row->addCell(3000)->addImage('img/LogoInstitucional.png');
+		$row->addCell(3000)->addImage('img/LogoInstitucional.png',array('width' => 125,'align'=>'right'));
 		
 		$table = $header->addTable('TablaClave');
 		$row = $table->addRow();

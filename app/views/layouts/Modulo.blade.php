@@ -28,9 +28,9 @@
     </div>   
     <footer class="container">
         <div  style="text-align:right;"> 
-            <img src="{{ URL::to('img/LogoInstitucional.png') }}" alt="" height="35px"> 
-            <img src="{{ URL::to('img/EscudoGobiernoChiapas.png') }}" alt="" height="35px"> 
-            <img src="{{ URL::to('img/Marca.png') }}" alt="" height="35px">
+            <img src="{{ URL::to('img/LogoFederal.png') }}" alt="" height="35px"> 
+            <img src="{{ URL::to('img/LogoInstitucional.png') }}" alt="" height="35px">
+            <!--img src="{{ URL::to('img/Marca.png') }}" alt="" height="35px"-->
         </div>
     </footer>
     

@@ -333,7 +333,7 @@ class ReporteVariacionesGastoController extends BaseController {
 						));
 						$sheet->loadView('reportes.excel.variaciones-gasto',$datos);
 						/*
-						$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','A1');
+						$imagen = $this->obtenerImagen('LogoFederal.png','A1');
 						$imagen->setWorksheet($sheet);
 						$imagen = $this->obtenerImagen('LogoInstitucional.png','G1');
 						$imagen->setWorksheet($sheet);	

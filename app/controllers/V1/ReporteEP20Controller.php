@@ -242,7 +242,7 @@ class ReporteEP20Controller extends BaseController {
 							$cells->setAlignment('center'); 
 						});
 
-						$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','A1');
+						$imagen = $this->obtenerImagen('LogoFederal.png','A1');
 						$imagen->setWorksheet($sheet);
 						$imagen = $this->obtenerImagen('LogoInstitucional.png','I1',(-15));
 						$imagen->setWorksheet($sheet);

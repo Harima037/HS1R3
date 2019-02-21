@@ -2,7 +2,7 @@ body {
     padding-top: 40px;
     padding-bottom: 40px;
     
-    background: #FFF url(../img/login-bg.jpg) no-repeat center fixed;
+    background: #FFF url(../img/login-bg.png) no-repeat center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     background-size: cover; 

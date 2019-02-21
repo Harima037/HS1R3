@@ -881,9 +881,9 @@ class FichaTecnicaEvaluacionController extends BaseController {
 
 				*/
 
-				$imagen = $this->obtenerImagen('LogoInstitucional.png','A1');
+				$imagen = $this->obtenerImagen('LogoFederal.png','A1');
 				$imagen->setWorksheet($sheet);
-				$imagen = $this->obtenerImagen('EscudoGobiernoChiapas.png','Q1',(-15));
+				$imagen = $this->obtenerImagen('LogoInstitucional.png','Q1',(-15));
 				$imagen->setWorksheet($sheet);
 			});
 			$ultima_linea = $excel->getActiveSheet()->getHighestDataRow();
