@@ -13,11 +13,11 @@ class Estrategia extends BaseModel
 	}
 
 	public function formula(){
-		return $this->belongsTo('formula','idFormula','id');
+		return $this->belongsTo('Formula','idFormula','id');
 	}
 
 	public function frecuencia(){
-		return $this->belongsTo('frecuencia','idFrecuenciaIndicador','id');
+		return $this->belongsTo('Frecuencia','idFrecuenciaIndicador','id');
 	}
 
 	public function unidadResponsable(){
@@ -33,7 +33,7 @@ class Estrategia extends BaseModel
 	}
 
 	public function ped(){
-		return $this->belongsTo('ObjetivoPed','idObjetivoPED','id');
+		return $this->belongsTo('ObjetivoPED','idObjetivoPED','id');
 	}
 
 	public function tipoIndicador(){
@@ -61,7 +61,7 @@ class Estrategia extends BaseModel
 	}
 
 	public function Usuario(){
-		return $this->belongsTo('sentryUser','creadoPor','id');
+		return $this->belongsTo('SentryUser','creadoPor','id');
 	}
 
 	public function registroAvance(){
