@@ -36,7 +36,7 @@ class EstrategiaInstitucionalController extends \BaseController {
 		'trim2' 			=> 'numeric',
 		'trim3' 			=> 'numeric',
 		'trim4' 			=> 'numeric',
-		'numerador' 		=> 'required|numeric|min:1',
+		'valorNumerador' 		=> 'required|numeric|min:1',
 	);
 
 

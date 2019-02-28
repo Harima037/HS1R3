@@ -84,7 +84,7 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <label class="control-label" for="odm">ODM</label>
+                                        <label class="control-label" for="odm">ODS</label>
                                         <select class="form-control chosen-one" id="odm" name="odm">
                                             <option value="">Selecciona un Objetivo</option>
                                             @foreach($odm as $objetivo)
