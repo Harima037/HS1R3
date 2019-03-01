@@ -268,8 +268,10 @@ class SeguimientoEstrategiaController extends BaseController {
 				}
 				else
 				{
-					
-					$trimestre_actual = Util::obtenerTrimestre();
+					if(isset($parametros['trim_firma']))
+						$trimestre_actual = $parametros['trim_firma'];
+					else	
+						$trimestre_actual = Util::obtenerTrimestre();
 					$recurso = EvaluacionEstrategiaTrimestre::where('idEstrategia','=',$id)->where('trimestre','=',$trimestre_actual)->first();
 					if(is_null($recurso)){
 						$respuesta['http_status'] = 404;

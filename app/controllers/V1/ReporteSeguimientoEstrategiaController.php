@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, View;
-use Excel, Estrategia;
+use Estrategia, PDF;
 
 class ReporteSeguimientoEstrategiaController extends BaseController {
 
@@ -29,80 +29,170 @@ class ReporteSeguimientoEstrategiaController extends BaseController {
 	 * @return Response
 	 */
 	public function index(){
-		//
-		/*$parametros = Input::all();
-		$datos = array();
+		$http_status = 200;
+		$data = array();
 
-		$mes_actual = Util::obtenerMesActual();
-		$ejercicio = Util::obtenerAnioCaptura();
+		$parametros = Input::all();
+		if(isset($parametros['formatogrid'])){
+			$rows = Estrategia::getModel();
 
-		$datos['ejercicio'] = $ejercicio;
-
-		$rows = Estrategia::getModel();
-		$rows = $rows->where('idEstatus','=',5);
-					//->where('idClasificacionProyecto','=',$parametros['clasificacion-proyecto']);
-		//
-
-		if($mes_actual == 0){
-			$mes_actual = date('n') - 1;
-		}
-		
-		$rows = $rows->leftjoin('evaluacionProyectoMes', function($join) use($mes_actual){
-							$join->on('proyectos.id', '=', 'evaluacionProyectoMes.idProyecto')
-							->where('evaluacionProyectoMes.mes', '=', $mes_actual);
-						});
-
-		$usuario = Sentry::getUser();
-		
-		if($usuario->filtrarProyectos){
-			$rows = $rows->where('idUsuarioValidacionSeg','=',$usuario->id);
-		}
-
-		if($usuario->claveUnidad){
-			$unidades = explode('|',$usuario->claveUnidad);
-			$rows = $rows->whereIn('unidadResponsable',$unidades);
-		}
-
-		$rows = $rows->with(array('componentesMetasMes'=>function($query)use($mes_actual){
-							$query->select('id','idProyecto',DB::raw('sum(meta) AS totalMeta'))
-							->where('mes','=',$mes_actual)
-							->groupBy('idProyecto','mes');
-						},'actividadesMetasMes'=>function($query)use($mes_actual){
-							$query->select('id','idProyecto',DB::raw('sum(meta) AS totalMeta'))
-							->where('mes','=',$mes_actual)
-							->groupBy('idProyecto','mes');
-						}));
-
-		$rows = $rows->select('proyectos.id','nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto',
-			DB::raw('CONCAT_WS(" ",datosRevisor.nombres,datosRevisor.apellidoPaterno,datosRevisor.apellidoMaterno) AS nombreRevisor'),
-			DB::raw('CONCAT_WS(" ",datosEnlace.nombres,datosEnlace.apellidoPaterno,datosEnlace.apellidoMaterno) AS nombreEnlace'),
-				'catalogoUnidadesResponsables.descripcion AS descripcionUnidadResponsable',
-				'catalogoEstatusProyectos.descripcion AS estatusAvance',
-				'unidadResponsable','finalidad','funcion','subFuncion','subSubFuncion','programaSectorial',
-				'programaPresupuestario','origenAsignacion','actividadInstitucional','proyectoEstrategico',
-				'numeroProyectoEstrategico')
-				->leftjoin('sentryUsers AS datosRevisor','datosRevisor.id','=','proyectos.idUsuarioValidacionSeg')
-				->leftjoin('sentryUsers AS datosEnlace','datosEnlace.id','=','proyectos.idUsuarioRendCuenta')
-				->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
-				->join('catalogoUnidadesResponsables','catalogoUnidadesResponsables.clave','=','proyectos.unidadResponsable')
-				->leftjoin('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','evaluacionProyectoMes.idEstatus')
-				->orderBy('unidadResponsable','asc')
-				->orderBy('nombreTecnico','asc')
-				->get();
-
-		
-		$datos['datos'] = $rows;
-		//var_dump($datos);die;
-		
-		
-		Excel::create('reporte-seguimiento', function($excel) use ($datos){
-			$excel->sheet('Seguimiento', function($sheet)  use ($datos){
-		        $sheet->loadView('revision.excel.reporte-seguimiento', $datos);
-		    });
-		    //$excel->getActiveSheet()->getStyle('A2:I'.(count($datos['datos'])+1))->getAlignment()->setWrapText(true);
-		    for($col = 'A'; $col !== 'G'; $col++) {
-			    $excel->getActiveSheet()->getColumnDimension($col)->setAutoSize(true);
+			if(isset($parametros['ejercicio'])){
+				$ejercicio = $parametros['ejercicio'];
+			}else{
+				$ejercicio = Util::obtenerAnioCaptura();
 			}
-		})->download('xls');*/
+
+			$rows = $rows->where('estrategia.idEstatus','=',5)->where('ejercicio',$ejercicio);
+			
+			$usuario = Sentry::getUser();
+			if($usuario->idDepartamento == 2){
+				if($usuario->filtrarProgramas){
+					$rows = $rows->where('idUsuarioValidacionSeg','=',$usuario->id);
+				}
+			}else{
+				$rows = $rows->where('idUsuarioRendCuenta','=',$usuario->id);
+			}
+			
+			$rows = $rows->with(array('registroAvance'=>function($query){
+				$query->select('id','idEstrategia','trimestre',DB::raw('sum(justificacion) AS justificacion'),
+								DB::raw('count(idEstrategia) AS registros'))->groupBy('idEstrategia','trimestre');
+			},'evaluacionTrimestre'=>function($query){
+				$query->whereIn('idEstatus',array(4,5));
+			}));
+
+			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
+			
+			$total = $rows->count();
+			
+			
+			$rows = $rows->select('estrategia.id','programaPresupuestario.descripcion AS programaPresupuestario','programaPresupuestario.clave')
+					->join('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','estrategia.claveProgramaPresupuestario')
+					->orderBy('id', 'desc')
+					->groupBy('estrategia.id')
+					->skip(($parametros['pagina']-1)*10)->take(10)
+					->get();
+
+			$data = array('resultados'=>$total,'data'=>$rows);
+
+			if($total<=0){
+				$http_status = 404;
+				$data = array('resultados'=>$total,"data"=>"No hay datos",'code'=>'W00');
+			}
+
+			return Response::json($data,$http_status);
+		}
+		
+		$rows = Estrategia::all();
+
+		if(count($rows) == 0){
+			$http_status = 404;
+			$data = array("data"=>"No hay datos",'code'=>'W00');
+		}else{
+			$data = array("data"=>$rows->toArray());
+		}
+
+		return Response::json($data,$http_status);
+	
+	}
+
+	/**
+	 * Display the specified resource.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function show($id){
+		$nombreArchivo = 'EstrategiaInstitucional';
+		$parametros =Input::all();
+		 
+		if(isset($parametros['trimestre'])){
+			$trimestre_actual = $parametros['trimestre'];
+		}else{
+			$trimestre_actual = Util::obtenerTrimestre();
+		}
+		
+		$recurso = Estrategia::with(array('registroAvance'=>function($query) use ($trimestre_actual){
+			$query->where('trimestre','<=',$trimestre_actual);
+		}))->select('estrategia.*','programaPresupuestal.descripcion as programaPresupuestario','titular.nombre as liderPrograma',
+					'titular.cargo as cargoLiderPrograma','responsable.nombre as responsableInformacion',
+					'responsable.cargo as cargoResponsableInformacion')
+		->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestal','programaPresupuestal.clave','=','estrategia.claveProgramaPresupuestario')
+		->leftjoin('vistaDirectorio as titular','titular.id','=','estrategia.idLiderPrograma')
+		->leftjoin('vistaDirectorio as responsable','responsable.id','=','estrategia.idResponsable')
+		->find($id);
+
+		
+		$datos['trimestre'] = $trimestre_actual;
+		$datos['estrategia'] = array(
+			'ejercicio' => $recurso->ejercicio,
+			'nombre' => $recurso->programaPresupuestario,
+			'fuenteInformacion' => $recurso->fuenteInformacion,
+			'liderPrograma' => $recurso->liderPrograma,
+			'cargoLiderPrograma' => $recurso->cargoLiderPrograma,
+			'responsableInformacion' => $recurso->responsableInformacion,
+			'cargoResponsableInformacion' => $recurso->cargoResponsableInformacion
+		);
+
+	
+		$datos['indicadores'] = array();
+
+		//foreach ($recurso->indicadores as $indicador) {
+			$metas = array(
+				1 => $recurso->trim1,
+				2 => $recurso->trim2,
+				3 => $recurso->trim3,
+				4 => $recurso->trim4
+			);
+
+			$datos_indicador = array(
+				'indicador' => $recurso->descripcionIndicador,
+				'meta_original' => 0,
+				'avance_trimestre' => 0,
+				'avance_acumulado' => 0,
+				'analisis_resultados' => '',
+				'justificacion_acumulada' => ''
+			);
+
+			
+
+			foreach ($recurso->registroAvance as $registro_avance) {
+				if($registro_avance->trimestre == $trimestre_actual){
+					$datos_indicador['avance_trimestre'] = $registro_avance->avance;
+					$datos_indicador['analisis_resultados'] = $registro_avance->analisisResultados;
+					$datos_indicador['justificacion_acumulada'] = $registro_avance->justificacionAcumulada;
+				}
+				$datos_indicador['avance_acumulado'] += $registro_avance->avance;
+			}
+
+			for ($i=1; $i <= 4 ; $i++) { 
+				if(count($metas)>=$i){
+				$datos_indicador['meta_original'] += $metas[$i];
+				$datos_indicador['meta_trimestral']=$metas[$trimestre_actual];
+				}
+			}
+
+			$datos['indicadores'][] = $datos_indicador;
+		//}
+
+		switch ($trimestre_actual) {
+			case 1:
+				$datos['trimestre_lbl'] = 'Primero';
+				break;
+			case 2:
+				$datos['trimestre_lbl'] = 'Segundo';
+				break;
+			case 3:
+				$datos['trimestre_lbl'] = 'Tercero';
+				break;
+			case 4:
+				$datos['trimestre_lbl'] = 'Cuarto';
+				break;
+		}
+		//return $datos;
+		$pdf = PDF::setPaper('LETTER')
+					->setOrientation('landscape')
+					->setWarnings(false)
+					->loadView('rendicion-cuentas.pdf.estrategia-metas-trimestre',$datos);
+		return $pdf->stream($nombreArchivo.'.pdf');
 	}
 }

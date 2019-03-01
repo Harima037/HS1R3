@@ -266,6 +266,9 @@ class EstrategiaInstitucionalController extends \BaseController {
 					$recurso->fuenteInformacion = $parametros['fuente-informacion'];
 					$recurso->idResponsable = $parametros['responsable'];
 
+					$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
+					$recurso->idLiderPrograma = $titular->id;
+
 					if($recurso->save()){
 						//$recurso['responsables'] = Directorio::responsablesActivos($recurso->claveUnidadResponsable)->get();
 						$respuesta['data'] = array('data'=>$recurso);
@@ -443,6 +446,9 @@ class EstrategiaInstitucionalController extends \BaseController {
 					$recurso->valorDenominador = $parametros['valorDenominador'];
 					$recurso->fuenteInformacion = $parametros['fuente-informacion'];
 					$recurso->idResponsable = $parametros['responsable'];
+
+					$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
+					$recurso->idLiderPrograma = $titular->id;
 
 					if($recurso->update()){
 						//$recurso['responsables'] = Directorio::responsablesActivos($recurso->claveUnidadResponsable)->get();

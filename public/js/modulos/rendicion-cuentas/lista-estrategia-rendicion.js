@@ -168,7 +168,7 @@ $('#btn-editar-avance').on('click',function(){
 });
 
 $('#btn-reporte').on('click',function(){
-    window.open(SERVER_HOST+'/v1/reporte-estrategia/' + $('#btn-editar-avance').attr('data-id-estrategia'));
+    window.open(SERVER_HOST+'/v1/reporte-seg-estrategia/' + $('#btn-editar-avance').attr('data-id-estrategia'));
 });
 
 /*             Extras               */

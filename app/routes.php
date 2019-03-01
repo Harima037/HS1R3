@@ -140,6 +140,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('reporte-proyectos-evaluacion',array('uses'=>'ReporteProyectosEvaluacionController@index'));
 		Route::get('seguimiento-plan-mejora',array('uses'=>'ReporteSeguimientoPlanMejoraController@index'));
 		Route::get('ficha-tecnica-evaluacion',array('uses'=>'FichaTecnicaEvaluacionController@index'));
+		Route::get('reporte-estrategia',array('uses'=>'ReporteSeguimientoEstrategiaController@index'));
 	});
 
 	Route::group(array('prefix'=>"v1"),function(){
@@ -209,16 +210,18 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('programas-presupuestarios','V1\ProgramaPresupuestarioController');
 		Route::resource('directorio','V1\DirectorioController');
 
-		Route::resource('estrategia-institucional','V1\EstrategiaInstitucionalController');
-		Route::resource('revision-estrategia', 'V1\RevisionEstrategiaInstitucionalController');
-		Route::resource('seguimiento-estrategia', 'V1\SeguimientoEstrategiaController');
-		Route::resource('reporte-estrategia',	'V1\ReporteSeguimientoEstrategisController', array('only' => array('index')));
+		Route::resource('estrategia-institucional',	'V1\EstrategiaInstitucionalController');
+		Route::resource('revision-estrategia', 		'V1\RevisionEstrategiaInstitucionalController');
+		Route::resource('seguimiento-estrategia', 	'V1\SeguimientoEstrategiaController');
+		//Route::resource('reporte-estrategia',		'V1\ReporteSeguimientoEstrategisController', array('only' => array('index', 'show')));
+		Route::resource('reporte-seg-estrategia',	'V1\ReporteSeguimientoEstrategiaController', array('only' => array('index', 'show')));
 		
 		Route::resource('indicadores-fassa',	'V1\IndicadorFassaController');
 
 		Route::resource('reporte-evaluacion',	'V1\ReporteEvaluacionController', 			array('only'=>array('show')));
 		Route::resource('reporte-programa',		'V1\ReporteEvaluacionProgramaController', 	array('only'=>array('show')));
 		Route::resource('reporte-fassa',		'V1\ReporteEvaluacionFASSAController', 		array('only'=>array('show')));
+		//Route::resource('reporte-estrategia',	'V1\ReporteEstrategiaController', 		array('only'=>array('show')));
 
 		Route::resource('reporte-ep-01',			'V1\EP01Controller');
 		Route::resource('reporte-regionalizado',	'V1\EPRegionalizadoController');
