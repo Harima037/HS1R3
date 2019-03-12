@@ -8,6 +8,6 @@ class FuenteFinanciamiento extends BaseModel
 	protected $table = "catalogoFuenteFinanciamiento";
 
 	public function fondos(){
-		return $this->hasMany('FuenteFinanciamiento','idPadre')->where('nivel','=',5);
+		return $this->hasMany('FuenteFinanciamiento','idPadre')->where('nivel','=',6);
 	}
 }
