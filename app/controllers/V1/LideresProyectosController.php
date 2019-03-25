@@ -29,21 +29,26 @@ class LideresProyectosController extends \BaseController {
 			
 			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 			
-			if(isset($parametros['buscar'])){				
-				$rows = $rows->where('nombre','like','%'.$parametros['buscar'].'%');
-				$total = $rows->count();
-			}else{
-				$total = $rows->count();						
+			if(isset($parametros['buscar'])){
+				$rows = $rows->where(function($query)use($parametros){
+					$query->where('nombre','like','%'.$parametros['buscar'].'%')->orWhere('cargo','like','%'.$parametros['buscar'].'%');
+				});
 			}
 
-			$rows = $rows->select('id','nombre','cargo')
-								->orderBy('nivel', 'desc')
+			if($parametros['filtro_activos'] === '1'){
+				$rows = $rows->whereNull('fechaFin');
+			}
+
+			$total = $rows->count();
+
+			$rows = $rows->select('id','nombre','cargo','fechaInicio','fechaFin')
+								->orderBy('idArea', 'asc')
 								->skip(($parametros['pagina']-1)*10)->take(10)
 								->get();
 			
 			
 
-			$data = array('resultados'=>$total,'data'=>$rows);
+			$data = array('resultados'=>$total,'data'=>$rows,'parametros'=>$parametros['filtro_activos']);
 
 			if($total<=0){
 				$http_status = 404;

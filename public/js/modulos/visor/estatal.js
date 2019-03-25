@@ -401,7 +401,8 @@ function graficaPresupuestoFuente(){
 			var formatter = new google.visualization.NumberFormat( {pattern: '$ #,###,###,###.##'} );
 			formatter.format(data, 1);
 
-			var options = { 
+			var options = {
+				sliceVisibilityThreshold: 0, 
 				title:'Total Presupuesto Autorizado : $ '+(parseFloat(response.total)||0).format(2),
 				legend:{position:'right',alignment:'center'},
 				chartArea:{ width:'100%',height:'100%',left:0,right:0,top:60,bottom:0 }

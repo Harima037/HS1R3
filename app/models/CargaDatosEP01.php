@@ -5,7 +5,7 @@ class CargaDatosEP01 extends BaseModel
 	public $timestamps = false;
 
 	public function scopeListarDatosReporte($query){
-		return $query->select('cargaDatosEP01.*',DB::raw('concat(UR,FI,FU,SF,SSF,PS,PP,OA,AI,PT,MPIO,OG,STG,FF,SFF,DG,CP,DM) AS clavePresupuestaria'));
+		return $query->select('cargaDatosEP01.*',DB::raw('concat(UR,FI,FU,SF,SSF,PS,PP,OA,AI,PT,MPIO,OG,STG,FF,SFF,RM,DG,CP,DM) AS clavePresupuestaria'));
 	}
 	
 	public function scopeReporteRegionalizado($query, $mes, $anio){

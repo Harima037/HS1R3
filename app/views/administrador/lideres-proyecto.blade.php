@@ -16,16 +16,55 @@
 @section('content')
 <div class="row">
 	<div class="col-md-12">
-		<div class="panel panel-default datagrid" id="datagridRoles" data-edit-row="editar">
+		<div class="panel panel-default datagrid" id="datagridResponsables" data-edit-row="editar">
             <div class="panel-heading"><h4><i class="fa {{ $sys_mod_activo->icono }}"></i> {{ $sys_mod_activo->nombre }}</h4></div>
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-lg-6 col-md-6">
+                    <div class="col-md-5">
+                        <div class="form-group">
+                            <input type="text" class="form-control txt-quick-search" placeholder="Buscar">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <select class="form-control" id="filtro_activos" name="filtro_activos">
+                                <option value="1" selected>Activos</option>
+                                <option value="0">Todos</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <button class="btn btn-default btn-quick-search" type="button"><span class="glyphicon glyphicon-search"></span></button>
+                    </div>
+
+
+                    <!--div class="col-lg-6 col-md-6">
                         <div class="input-group" style="margin:5px">                            
                             <input type="text" class="form-control txt-quick-search" placeholder="Buscar">
                             <span class="input-group-btn">
+                                <select class="form-control" id="filtro_activos" name="filtro_activos">
+                                    <option value="1" selected>Activos</option>
+                                    <option value="0">Todos</option>
+                                </select>
+                            </span>
+                            <span class="input-group-btn">
                                 <button class="btn btn-default btn-quick-search" type="button"><span class="glyphicon glyphicon-search"></span></button>
                             </span>
+                        </div>
+                    </div-->
+                    <div class="col-md-2">
+                        <div class="btn-toolbar pull-right" >
+                            <div class="btn-group" style="margin:5px">
+                                <button type="button" id="btnRolAgregar" class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> Agregar</button>
+                                <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"><span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu pull-right" role="menu">
+                                    <li><a href="#" class="btn-edit-rows"><span class="glyphicon glyphicon-edit"></span> Editar</a></li>
+                                    <li><a href="#" class="btn-edit-rows"><span class="glyphicon glyphicon-edit"></span> Dar de baja</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="#" class="btn-delete-rows"><span class="glyphicon glyphicon-remove"></span> Eliminar</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                     <!--<div class="col-lg-6">
@@ -51,6 +90,8 @@
                         <th><input type="checkbox" class="check-select-all-rows"></th>
                         <th>Nombre</th>
                         <th>Cargo</th>
+                        <th width="100">Fecha Inicio</th>
+                        <th width="100">Fecha Fin</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -103,16 +144,74 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group">
-                                    <label for="cargo">Cargo</label>
-                                    <input type="text" class="form-control" id="cargo" name="cargo" maxlength="255" disabled />
+                                    <label for="email">Correo Electrónico</label>
+                                    <input type="text" class="form-control" id="email" name="email" maxlength="255" />
                                 </div>
                             </div>
                         </div>
-                         <div class="row">
+                        <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group">
-                                    <label for="email">Correo Electrónico</label>
-                                    <input type="text" class="form-control" id="email" name="email" maxlength="255" />
+                                    <label for="cargo">Area</label>
+                                    <select class="form-control" id="area" name="area">
+                                        <option value='0'>Seleccione un area</option>
+                                        @foreach($areas as $area)
+                                            <option value="{{$area['id']}}">{{str_repeat('--',$area['nivelArbol'])}} {{$area['descripcion']}}</option>
+                                        @endforeach
+                                    </select>
+                                    <div id="alert-cargo-ocupado" class="panel panel-warning">
+                                        <div class="panel-body bg-warning">
+                                            Una persona asignada al cargo:
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="cargo">Cargo</label>
+                                    <input type="text" class="form-control" id="cargo" name="cargo" maxlength="255" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="email">Telefono</label>
+                                    <input type="text" class="form-control" id="telefono" name="telefono" maxlength="255" />
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="email">Extensión</label>
+                                    <input type="text" class="form-control" id="extension" name="extension" maxlength="255" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="email">Fecha Inicio</label>
+                                    <input type="text" class="form-control" id="fecha_inicio" name="fecha_inicio" maxlength="255" />
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label for="email">Fecha Fin</label>
+                                    <input type="text" class="form-control" id="fecha_fin" name="fecha_fin" maxlength="255" disabled />
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="form-group">
+                                    <label >Acción:</label>
+                                    <button type="button" class="btn btn-info" id="btn-nuevo-cargo">Asignar Nuevo Cargo</button>
+                                    <button type="button" class="btn btn-danger" id="btn-terminar-cargo">Terminar Cargo Actual</button>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div id="accion-terminar-cargo" class="well well-sm">
+                                fasfsadfdsf
                                 </div>
                             </div>
                         </div>
@@ -129,7 +228,6 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
     <!-- Cargar Catalogo para permisos -->
-@include('modulos-generales.catalogo-permisos')
 <!-- Dejar parent al ultimo -->
 @parent
 @stop

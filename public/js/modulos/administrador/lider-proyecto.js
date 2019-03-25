@@ -14,10 +14,30 @@
 // Inicialización General para casi cualquier módulo
 
 var permisos = [];
-var rolesResource = new RESTfulRequests(SERVER_HOST+'/v1/lideres-proyectos');
-var rolesDatagrid = new Datagrid("#datagridRoles",rolesResource);
-rolesDatagrid.init();
-rolesDatagrid.actualizar();
+var responsablesResource = new RESTfulRequests(SERVER_HOST+'/v1/lideres-proyectos');
+var responsablesDatagrid = new Datagrid("#datagridResponsables",responsablesResource);
+responsablesDatagrid.init();
+responsablesDatagrid.parametros.filtro_activos = $('#filtro_activos').val();
+responsablesDatagrid.actualizar({
+    _success: function(response){
+        responsablesDatagrid.limpiar();
+        var datos_grid = [];
+        for(var i in response.data){
+            var item = response.data[i];
+            if(!item.fechaFin){
+                item.fechaFin = '-';
+            }
+            datos_grid.push(item);
+        }
+        responsablesDatagrid.cargarDatos(datos_grid);                         
+        responsablesDatagrid.cargarTotalResultados(response.resultados,'<b>Responsables(s)</b>');
+        var total = parseInt(response.resultados/responsablesDatagrid.rxpag); 
+        var plus = parseInt(response.resultados)%responsablesDatagrid.rxpag;
+        if(plus>0) 
+            total++;
+        responsablesDatagrid.paginacion(total);
+    }
+});
 
 $('#modalRol').on('shown.bs.modal', function () {
     $('#modalRol').find('input').eq(0).focus();
@@ -27,35 +47,65 @@ $('#modalRol').on('show.bs.modal', function () {
     MessageManager.dismissAlert('#modalRol .modal-body');
 });
 
-
 /*===================================*/
 // Implementación personalizada del módulo
 
 function editar (e){
-
-    $('#modalRol').modal('show');
-    rolesResource.get(e,null,{
+    responsablesResource.get(e,null,{
                     _success: function(response){
+
+                        $('#btn-nuevo-cargo').hide();
+                        $('#btn-terminar-cargo').hide();
 
                         $('#formRol #id').val(response.data.id);
                         $('#formRol #name').val(response.data.nombre);
                         $('#formRol #email').val(response.data.email);
                         $('#formRol #cargo').val(response.data.cargo);
 
-                        permisos = response.data.permisos_array;
-
-                        var parametros = {};
-                        if($('#formRol #id').val() != ''){
-                            parametros.roles = [$('#formRol #id').val()];
+                        var extensiones = response.data.telefono.split(', ');
+                        var telefono = extensiones[0];
+                        extensiones.shift();
+                        
+                        $('#formRol #telefono').val(telefono);
+                        $('#formRol #extension').val(extensiones.join(', '));
+                        $('#formRol #area').val(response.data.idArea);
+                        $('#formRol #fecha_inicio').val(response.data.fechaInicio);
+                        $('#formRol #fecha_fin').val(response.data.fechaFin);
+                        
+                        if(response.data.fechaFin){
+                            $('#btn-nuevo-cargo').show();
+                        }else{
+                            $('#btn-terminar-cargo').show();
                         }
-                                           
-
-                        buildUsuariosPanel(response.data.usuarios_array);
 
                         $('#modalRol').find(".modal-title").html("Editar Líder de Proyecto");
                         $('#modalRol').modal('show');
                     }
     }); 
+}
+
+$('#area').on('change',function(){
+    console.log('neee');
+    //$('#alert-cargo-ocupado').alert('show');
+});
+
+$("#datagridResponsables .txt-quick-search").off('keydown');
+$("#datagridResponsables .txt-quick-search").on('keydown', function(event){
+    if (event.which == 13) {
+        realizar_busqueda();
+    }
+});
+
+$('#datagridResponsables .btn-quick-search').off('click');
+$('#datagridResponsables .btn-quick-search').on('click',function(){
+    realizar_busqueda();
+})
+
+function realizar_busqueda(){
+    responsablesDatagrid.setPagina(1);
+    responsablesDatagrid.parametros.buscar = $('.txt-quick-search').val();
+    responsablesDatagrid.parametros.filtro_activos = $('#filtro_activos').val();
+    responsablesDatagrid.actualizar();
 }
 
 /*===================================*/
@@ -91,9 +141,9 @@ function submitModulo(){
 
     var parametros = $("#formRol").serialize();
     if($('#formRol #id').val()==""){
-        rolesResource.post(parametros,{
+        responsablesResource.post(parametros,{
                         _success: function(response){
-                            rolesDatagrid.actualizar();
+                            responsablesDatagrid.actualizar();
                             MessageManager.show({data:'Rol creado con éxito',container:'#modalRol .modal-body',type:'OK',timer:4});
                             $('#formRol #id').val(response.data.id);
                         },
@@ -114,9 +164,9 @@ function submitModulo(){
                         }
         });
     }else{
-        rolesResource.put($('#formRol #id').val(), parametros,{
+        responsablesResource.put($('#formRol #id').val(), parametros,{
                         _success: function(response){
-                            rolesDatagrid.actualizar();
+                            responsablesDatagrid.actualizar();
                             MessageManager.show({data:'Líder de proyecto actualizado con éxito',container:'#modalRol .modal-body',type:'OK',timer:4});
                         },
                         _error: function(response){
