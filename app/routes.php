@@ -153,7 +153,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 
 		Route::resource('usuarios',				'V1\UsuariosController');
 		Route::resource('roles',				'V1\RolesController');
-		Route::resource('lideres-proyectos',				'V1\LideresProyectosController');
+		Route::resource('lideres-proyectos',	'V1\LideresProyectosController');
+		Route::get('buscar-responsables-area/{id}','V1\LideresProyectosController@responsableEnArea');
 		Route::resource('permisos',				'V1\PermisosController');
 		Route::resource('cuenta',				'V1\CuentaController');
 		Route::resource('config-seg-metas', 	'V1\ConfigurarSeguimientoController', array('only' => array('store')));

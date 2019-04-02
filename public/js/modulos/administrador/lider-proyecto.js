@@ -15,6 +15,7 @@
 
 var permisos = [];
 var responsablesResource = new RESTfulRequests(SERVER_HOST+'/v1/lideres-proyectos');
+var areasResource = new RESTfulRequests(SERVER_HOST+'/v1/buscar-responsables-area');
 var responsablesDatagrid = new Datagrid("#datagridResponsables",responsablesResource);
 responsablesDatagrid.init();
 responsablesDatagrid.parametros.filtro_activos = $('#filtro_activos').val();
@@ -52,41 +53,61 @@ $('#modalRol').on('show.bs.modal', function () {
 
 function editar (e){
     responsablesResource.get(e,null,{
-                    _success: function(response){
+        _success: function(response){
 
-                        $('#btn-nuevo-cargo').hide();
-                        $('#btn-terminar-cargo').hide();
+            $('#btn-nuevo-cargo').hide();
+            $('#btn-terminar-cargo').hide();
 
-                        $('#formRol #id').val(response.data.id);
-                        $('#formRol #name').val(response.data.nombre);
-                        $('#formRol #email').val(response.data.email);
-                        $('#formRol #cargo').val(response.data.cargo);
+            $('#formRol #id').val(response.data.id);
+            $('#formRol #name').val(response.data.nombre);
+            $('#formRol #email').val(response.data.email);
+            $('#formRol #cargo').val(response.data.cargo);
 
-                        var extensiones = response.data.telefono.split(', ');
-                        var telefono = extensiones[0];
-                        extensiones.shift();
-                        
-                        $('#formRol #telefono').val(telefono);
-                        $('#formRol #extension').val(extensiones.join(', '));
-                        $('#formRol #area').val(response.data.idArea);
-                        $('#formRol #fecha_inicio').val(response.data.fechaInicio);
-                        $('#formRol #fecha_fin').val(response.data.fechaFin);
-                        
-                        if(response.data.fechaFin){
-                            $('#btn-nuevo-cargo').show();
-                        }else{
-                            $('#btn-terminar-cargo').show();
-                        }
+            var extensiones = response.data.telefono.split(', ');
+            var telefono = extensiones[0];
+            extensiones.shift();
+            
+            $('#formRol #telefono').val(telefono);
+            $('#formRol #extension').val(extensiones.join(', '));
+            $('#formRol #area').val(response.data.idArea);
+            $('#formRol #fecha_inicio').val(response.data.fechaInicio);
 
-                        $('#modalRol').find(".modal-title").html("Editar Líder de Proyecto");
-                        $('#modalRol').modal('show');
-                    }
+            if(response.data.fechaFin){
+                $('#formRol #fecha_fin').val(response.data.fechaFin);
+            }else{
+                $('#formRol #fecha_fin').attr('disabled',true);
+            }
+            
+            
+            if(response.data.fechaFin){
+                $('#btn-nuevo-cargo').show();
+            }else{
+                $('#btn-terminar-cargo').show();
+            }
+
+            $('#modalRol').find(".modal-title").html("Editar Líder de Proyecto");
+            $('#modalRol').modal('show');
+        }
     }); 
 }
 
 $('#area').on('change',function(){
-    console.log('neee');
-    //$('#alert-cargo-ocupado').alert('show');
+    $('#panel-cargando-cargo-ocupado').removeClass('hidden');
+    var area_id = $('#area').val();
+    areasResource.get(area_id,null,{
+        _success: function(response){
+            console.log(response);
+            var nombres = [];
+            for (let index = 0; index < response.data.length; index++) {
+                nombres.push(response.data[index].nombre);
+            }
+            $('#panel-cargando-cargo-ocupado').addClass('hidden');
+            $('#nombre-persona-asignada').html(nombres.join(', '));
+            $('#panel-cargo-ocupado').removeClass('hidden');
+            //var extensiones = response.data.telefono.split(', ');
+            
+        }
+    }); 
 });
 
 $("#datagridResponsables .txt-quick-search").off('keydown');

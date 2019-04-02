@@ -219,11 +219,11 @@ class ReporteVariacionesGastoController extends BaseController {
 						    ),
 							'fill' => array(
 						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-						        'color' => array('rgb' => '28A659')
+						        'color' => array('rgb' => '621132')
 						    ),
 							'borders' => array(
 						    	'allborders' => array(
-						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
+						    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
 		            				'color' => array('rgb' => '000000')
 						    	)
 						    )
@@ -236,8 +236,8 @@ class ReporteVariacionesGastoController extends BaseController {
 						    ),						
 							'borders' => array(
 						    	'allborders' => array(
-						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
-		            				'color' => array('rgb' => '000000')
+						    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+		            				'color' => array('rgb' => '621132')
 						    	)
 						    )
 						));
@@ -251,12 +251,16 @@ class ReporteVariacionesGastoController extends BaseController {
 						    'font' => array(
 						        'size'      =>  11,
 						        'bold'      =>  true,
-						        'color'		=> array('rgb'=>'000000')
+						        'color'		=> array('rgb'=>'FFFFFF')
+							),
+							'fill' => array(
+						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
+						        'color' => array('rgb' => '621132')
 						    ),						
 							'borders' => array(
 						    	'allborders' => array(
-						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
-		            				'color' => array('rgb' => '000000')
+						    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+		            				'color' => array('rgb' => '621132')
 						    	)
 						    )
 						));
@@ -264,16 +268,16 @@ class ReporteVariacionesGastoController extends BaseController {
 						    'font' => array(
 						        'size'      =>  10,
 						        'bold'      =>  true,
-						        'color'		=> array('rgb'=>'FFFFFF')
+						        'color'		=> array('rgb'=>'000000')
 						    ),
 							'fill' => array(
 						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-						        'color' => array('rgb' => '28A659')
+						        'color' => array('rgb' => 'DDDDDD')
 						    ),
 							'borders' => array(
 						    	'allborders' => array(
-						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
-		            				'color' => array('rgb' => '000000')
+						    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+		            				'color' => array('rgb' => '621132')
 						    	)
 						    )
 						));
@@ -292,15 +296,15 @@ class ReporteVariacionesGastoController extends BaseController {
 							'borders' => array(
 							    'bottom' => array(
 									'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-									'color' => array('argb' => '28A659')
+									'color' => array('argb' => '621132')
 						    	),
 								'left' => array(
 									'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-									'color' => array('argb' => '28A659')
+									'color' => array('argb' => '621132')
 						    	),
 								'right' => array(
 									'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-									'color' => array('argb' => '28A659')
+									'color' => array('argb' => '621132')
 						    	)
 							 )
 						));
@@ -407,12 +411,12 @@ class ReporteVariacionesGastoController extends BaseController {
 						    ),
 							'fill' => array(
 						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-						        'color' => array('rgb' => '28A659')
+						        'color' => array('rgb' => '621132')
 						    ),
 							'borders' => array(
 						    	'allborders' => array(
-						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
-		            				'color' => array('rgb' => '000000')
+						    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+		            				'color' => array('rgb' => '621132')
 						    	)
 						    )
 						));
@@ -424,8 +428,8 @@ class ReporteVariacionesGastoController extends BaseController {
 						    ),						
 							'borders' => array(
 						    	'allborders' => array(
-						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
-		            				'color' => array('rgb' => '000000')
+						    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+		            				'color' => array('rgb' => '621132')
 						    	)
 						    )
 						));
@@ -439,12 +443,16 @@ class ReporteVariacionesGastoController extends BaseController {
 						    'font' => array(
 						        'size'      =>  11,
 						        'bold'      =>  true,
-						        'color'		=> array('rgb'=>'000000')
+						        'color'		=> array('rgb'=>'FFFFFF')
+							),
+							'fill' => array(
+						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
+						        'color' => array('rgb' => '621132')
 						    ),						
 							'borders' => array(
 						    	'allborders' => array(
-						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
-		            				'color' => array('rgb' => '000000')
+						    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+		            				'color' => array('rgb' => '621132')
 						    	)
 						    )
 						));
@@ -452,16 +460,16 @@ class ReporteVariacionesGastoController extends BaseController {
 						    'font' => array(
 						        'size'      =>  10,
 						        'bold'      =>  true,
-						        'color'		=> array('rgb'=>'FFFFFF')
+						        'color'		=> array('rgb'=>'000000')
 						    ),
 							'fill' => array(
 						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-						        'color' => array('rgb' => '28A659')
+						        'color' => array('rgb' => 'DDDDDD')
 						    ),
 							'borders' => array(
 						    	'allborders' => array(
-						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
-		            				'color' => array('rgb' => '000000')
+						    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
+		            				'color' => array('rgb' => '621132')
 						    	)
 						    )
 						));
@@ -484,15 +492,15 @@ class ReporteVariacionesGastoController extends BaseController {
 							    ),*/
 							    'bottom' => array(
 									'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-									'color' => array('argb' => '28A659')
+									'color' => array('argb' => '621132')
 						    	),
 								'left' => array(
 									'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-									'color' => array('argb' => '28A659')
+									'color' => array('argb' => '621132')
 						    	),
 								'right' => array(
 									'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-									'color' => array('argb' => '28A659')
+									'color' => array('argb' => '621132')
 						    	)
 							 )
 						));

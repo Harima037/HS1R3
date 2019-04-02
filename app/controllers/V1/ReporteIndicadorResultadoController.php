@@ -278,13 +278,13 @@ class ReporteIndicadorResultadoController extends BaseController {
 						$sheet->mergeCells('K9:K10');
 						$sheet->mergeCells('L9:L10');
 						$sheet->mergeCells('M9:Q9');
-						$sheet->mergeCells('C11:Q11');
+						$sheet->mergeCells('A11:Q11');
 						$sheet->cells('A9:Q12',function($cells) { $cells->setAlignment('center'); });
 						$sheet->getStyle('A9:Q12')->getAlignment()->setWrapText(true);
-						$sheet->getStyle('A9:Q11')->applyFromArray(array(
+						$sheet->getStyle('A9:Q10')->applyFromArray(array(
 						    'fill' => array(
 						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-						        'color' => array('rgb' => '28A659')
+						        'color' => array('rgb' => '621132')
 						    ),
 						    'font' => array(
 						        'size'      =>  8,
@@ -301,19 +301,24 @@ class ReporteIndicadorResultadoController extends BaseController {
 						$sheet->getStyle('A9:I10')->applyFromArray(array(
 							'fill'=>array(
 								'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-								'color' => array('rgb' => '339966')
+								'color' => array('rgb' => '621132')
 							)
 						));
 						$sheet->getStyle('M9:Q10')->applyFromArray(array(
 							'fill'=>array(
 								'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-								'color' => array('rgb' => '339966')
+								'color' => array('rgb' => '621132')
 							)
 						));
 						$sheet->getStyle('A11:Q11')->applyFromArray(array(
+							'fill' => array(
+						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
+						        'color' => array('rgb' => 'B09A5B')
+						    ),
 						    'font' => array(
 						        'size'      =>  13,
-						        'bold'      =>  true
+								'bold'      =>  true,
+								'color'		=> array('rgb'=>'FFFFFF')
 						    ),
 						    'borders' => array(
 						    	'top' => array(
@@ -335,11 +340,11 @@ class ReporteIndicadorResultadoController extends BaseController {
 						    'borders' => array(
 						    	'top' => array(
 						    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-	            					'color' => array('argb' => '28A659')
+	            					'color' => array('argb' => 'DDDDDD')
 						    	),
 						    	'bottom' => array(
 						    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
-	            					'color' => array('argb' => '28A659')
+	            					'color' => array('argb' => '621132')
 						    	)
 						    )
 						));
@@ -368,15 +373,15 @@ class ReporteIndicadorResultadoController extends BaseController {
 							'F14:H'.$total => '### ### ### ##0.00', //Aqui
 							'J12:L12' => '### ### ### ##0.00',
 							'I12:I'.$total => '### ### ### ##0.00',
-							//'J14:J'.$total => '### ### ### ##0.00',
+							'J14:L'.$total => '### ### ### ##0.00',
 							//'K12:N'.$total => '### ### ### ##0.00',
 						    'O14:Q'.$total => '### ### ### ##0'
 						));
 
-						$imagen = $this->obtenerImagen('LogoFederal.png','A1');
+						$imagen = $this->obtenerImagen('LogoInstitucional.png','A1');
 						$imagen->setWorksheet($sheet);
-						$imagen = $this->obtenerImagen('LogoInstitucional.png','P1');
-						$imagen->setWorksheet($sheet);
+						//$imagen = $this->obtenerImagen('LogoFederal.png','P1');
+						//$imagen->setWorksheet($sheet);
 				    });
 					
 					$ultima_linea = $excel->getActiveSheet()->getHighestDataRow();

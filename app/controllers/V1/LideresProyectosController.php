@@ -64,6 +64,22 @@ class LideresProyectosController extends \BaseController {
 		return Response::json($data,$http_status);
 	}
 
+	public function responsableEnArea($id){
+		$http_status = 200;
+		$data = array();
+
+		$recurso = Directorio::whereNull('fechaFin')->where('idArea','=',$id)->get();
+
+		if(is_null($recurso)){
+			$http_status = 404;
+			$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+		}else{
+			$data = array("data"=>$recurso->toArray());
+		}
+		
+		
+		return Response::json($data,$http_status);
+	}
 	/**
 	 * Display the specified resource.
 	 *

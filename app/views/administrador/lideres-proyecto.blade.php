@@ -159,9 +159,14 @@
                                             <option value="{{$area['id']}}">{{str_repeat('--',$area['nivelArbol'])}} {{$area['descripcion']}}</option>
                                         @endforeach
                                     </select>
-                                    <div id="alert-cargo-ocupado" class="panel panel-warning">
-                                        <div class="panel-body bg-warning">
-                                            Una persona asignada al cargo:
+                                    <div id="panel-cargando-cargo-ocupado" class="panel panel-info hidden">
+                                        <div class="panel-body bg-info" style="padding:5px;">
+                                            <span class="fa fa-cog fa-spin"></span> Cargando...
+                                        </div>
+                                    </div>
+                                    <div id="panel-cargo-ocupado" class="panel panel-warning hidden">
+                                        <div class="panel-body bg-warning" style="padding:5px;">
+                                            <span class="fa fa-warning"></span> <strong>Cargo asignado:</strong> <span id="nombre-persona-asignada"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -199,7 +204,7 @@
                             <div class="col-sm-4">
                                 <div class="form-group">
                                     <label for="email">Fecha Fin</label>
-                                    <input type="text" class="form-control" id="fecha_fin" name="fecha_fin" maxlength="255" disabled />
+                                    <input type="text" class="form-control" id="fecha_fin" name="fecha_fin" maxlength="255"/>
                                 </div>
                             </div>
                             <div class="col-sm-4">

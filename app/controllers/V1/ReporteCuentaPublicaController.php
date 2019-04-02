@@ -104,7 +104,7 @@ class ReporteCuentaPublicaController extends BaseController {
 		$table = $header->addTable('TablaEncabezado');
 		$row = $table->addRow();
 		//$row->addCell(3000)->addImage('img/LogoFederal.png');
-		$row->addCell(3000)->addImage('img/LogoFederal.png',array('width' => 125,'height' => 43,'align'=>'left'));
+		$row->addCell(3000)->addImage('img/LogoInstitucional.png',array('width' => 125,'align'=>'left'));
 		$cell = $row->addCell(8128);
 		$cell->addText(htmlspecialchars('GOBIERNO CONSTITUCIONAL DEL ESTADO DE CHIAPAS'),$titulo,$centrado);
 		$cell->addTextBreak(0);
@@ -112,7 +112,7 @@ class ReporteCuentaPublicaController extends BaseController {
 		$cell->addTextBreak(0);
 		$cell->addText(htmlspecialchars('ANÁLISIS FUNCIONAL AL '.$trimestres[$trimestre].' TRIMESTRE DEL '.$ejercicio),$titulo,$centrado);
 		//$row->addCell(3000)->addImage('img/LogoInstitucional.png');
-		$row->addCell(3000)->addImage('img/LogoInstitucional.png',array('width' => 125,'align'=>'right'));
+		//$row->addCell(3000)->addImage('img/LogoFederal.png',array('width' => 125,'align'=>'right'));
 		
 		$table = $header->addTable('TablaClave');
 		$row = $table->addRow();
@@ -191,11 +191,15 @@ class ReporteCuentaPublicaController extends BaseController {
 			if($politica_programa_anterior != $politica_programa_actual){
 				$table = $section->addTable('TablaInfo');
 
+				$estilo_tabla = array(
+					'bgcolor'=>'#621132'
+				);
+
 				$row = $table->addRow();
-				$row->addCell(3000)->addText('EJE',$titulo_tabla,$centrado);
-				$row->addCell(3000)->addText('TEMA',$titulo_tabla,$centrado);
-				$row->addCell(3065)->addText('POLÍTICA PÚBLICA',$titulo_tabla,$centrado);
-				$row->addCell(5060)->addText('PROGRAMA PRESUPUESTARIO',$titulo_tabla,$centrado);
+				$row->addCell(3000,$estilo_tabla)->addText('EJE',$titulo_tabla,$centrado);
+				$row->addCell(3000,$estilo_tabla)->addText('TEMA',$titulo_tabla,$centrado);
+				$row->addCell(3065,$estilo_tabla)->addText('POLÍTICA PÚBLICA',$titulo_tabla,$centrado);
+				$row->addCell(5060,$estilo_tabla)->addText('PROGRAMA PRESUPUESTARIO',$titulo_tabla,$centrado);
 
 				$row = $table->addRow();
 				$row->addCell(2500)->addText($elemento->ejeDescripcion);

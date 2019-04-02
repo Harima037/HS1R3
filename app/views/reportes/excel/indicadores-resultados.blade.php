@@ -72,7 +72,7 @@
 		</tr>
 		
 		<tr class="encabezado-tabla">
-			<td></td><td></td><td valign="middle" height="23">SALUD</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><!--td></td><td></td-->
+			<td valign="middle" height="23">SALUD</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><!--td></td><td></td-->
 		</tr>
 		
 		<tr>
