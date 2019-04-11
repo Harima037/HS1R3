@@ -51,8 +51,15 @@ if($('#id').val()){
             $('#lbl-frecuencia').text(response.data.frecuencia.descripcion);
             $('#lbl-unidad-responsable').text(response.data.unidad_responsable.descripcion);
             $('#lbl-programa-sectorial').text(response.data.programa_sectorial.descripcion);
-            $('#lbl-odm').text(response.data.odm.descripcion);
-            $('#lbl-vinculacion-ped').text(response.data.ped.descripcion);
+			if(response.data.odm)
+				$('#lbl-odm').text(response.data.odm.descripcion);
+			else
+				$('#lbl-odm').text("SIN DATO");
+			if(response.data.ped)	
+				$('#lbl-vinculacion-ped').text(response.data.ped.descripcion);
+			else
+				$('#lbl-vinculacion-ped').text("SIN DATO");
+				
             $('#lbl-tipo-ind').text(response.data.tipo_indicador.descripcion);
             $('#lbl-dimension').text(response.data.dimension.descripcion);
 			$('#lbl-unidad-medida').text(response.data.unidad_medida.descripcion);

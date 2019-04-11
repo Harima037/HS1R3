@@ -253,13 +253,13 @@
                                 <div class="col-sm-2">
                                     <div class="form-group">
                                         <label class="control-label" for="linea-base">Línea Base</label>
-                                        <input type="text" class="form-control" name="linea-base" id="linea-base">
+                                        <input type="number" class="form-control" name="linea-base" id="linea-base">
                                     </div>
                                 </div>
                                 <div class="col-sm-2">
                                     <div class="form-group">
                                         <label class="control-label" for="anio-base">Año Base</label>
-                                        <input type="text" class="form-control" name="anio-base" id="anio-base">
+                                        <input type="number" class="form-control" name="anio-base" id="anio-base">
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
@@ -279,34 +279,34 @@
                                                                            
                                 <div class="col-sm-3"><div class="form-group">
                                         <label for="trim1" class="control-label">Trim 1</label>
-                                        <input type="text" class="form-control valor-trimestre" name="trim1" id="trim1">
+                                        <input type="number" class="form-control valor-trimestre" name="trim1" id="trim1">
                                 </div></div>
                                 <div class="col-sm-3"><div class="form-group">
                                         <label for="trim2" class="control-label">Trim 2</label>
-                                        <input type="text" class="form-control valor-trimestre" name="trim2" id="trim2">
+                                        <input type="number" class="form-control valor-trimestre" name="trim2" id="trim2">
                                 </div></div>
                                 <div class="col-sm-3"><div class="form-group">
                                         <label for="trim3" class="control-label">Trim 3</label>
-                                        <input type="text" class="form-control valor-trimestre" name="trim3" id="trim3">
+                                        <input type="number" class="form-control valor-trimestre" name="trim3" id="trim3">
                                 </div></div>
                                 <div class="col-sm-3"><div class="form-group">
                                         <label for="trim4" class="control-label">Trim 4</label>
-                                        <input type="text" class="form-control valor-trimestre" name="trim4" id="trim4">
+                                        <input type="number" class="form-control valor-trimestre" name="trim4" id="trim4">
                                 </div></div>
                             </div>
                             <div class="row">
                                 
                                 <div class="col-sm-4"><div class="form-group">
-                                        <label for="valorNumerador" class="control-label">Numerador</label>
-                                        <input type="text" class="form-control" name="valorNumerador" id="valorNumerador">
+                                        <label for="valor-numerador" class="control-label">Numerador</label>
+                                        <input type="text" class="form-control" readOnlye='readOnly' name="valor-numerador" id="valorNumerador">
                                 </div></div>
                                 <div class="col-sm-4"><div class="form-group">
-                                        <label for="valorDenominador" class="control-label">Denominador</label>
-                                        <input type="text" class="form-control" name="valorDenominador" id="valorDenominador">
+                                        <label for="valor-denominador" class="control-label">Denominador</label>
+                                        <input type="number" class="form-control" name="valor-denominador" id="valorDenominador">
                                 </div></div>
                                 <div class="col-sm-4"><div class="form-group">
                                         <label for="meta" class="control-label">Meta</label>
-                                        <input type="text" class="form-control" name="meta" id="meta">
+                                        <input type="number" class="form-control" name="meta" id="meta">
                                 </div>
                             </div>    
 

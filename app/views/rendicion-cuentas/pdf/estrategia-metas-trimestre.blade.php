@@ -137,18 +137,19 @@
 			<tr><td class="titulo2" align="center">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td></tr>
 			<tr><td class="titulo3" align="center">SUBDIRECCIÓN DE PLANEACIÓN EN SALUD</td></tr>
 			<tr><td class="titulo3" align="center">DEPARTAMENTO DE EVALUACIÓN</td></tr>
-			<tr><td class="titulo3" align="center">ESTRATEGIA INSTITUCIONAL {{$estrategia['ejercicio']}}</td></tr>
+			<tr><td class="titulo3" align="center">INDICADORES ESTRATÉGICOS {{$estrategia['ejercicio']}}</td></tr>
 			<tr><td height="18" colspan="3" align="right" class="negrita">Formato RC-5</td></tr>
 		</table>
+		<br><br>
         <table width="100%">
 		<tr height="90" class="texto-medio texto">
-			<td width="250px">Nombre del la Estrategia Institucional : </td>
+			<td width="250px">Nombre del Indicador Estratégico : </td>
 			<td class="negrita" colspan="2">{{ $estrategia['nombre'] }}</td>
 			<td width="90px">Trimestre: </td>
 			<td class="negrita">{{ $trimestre_lbl }}</td>
 		</tr>
 	</table>
-    <br>
+    <br><br><br>
     <table width="100%">
 		<tr class="tabla-datos" height="50">
 			<td class="encabezado-tabla">INDICADOR</td>
@@ -158,7 +159,7 @@
 			<td class="encabezado-tabla">AVANCE ACUMULADO</td>
 			<td class="encabezado-tabla">% DE AVANCE TRIMESTRAL</td>
 			<td class="encabezado-tabla">% DE AVANCE ACUMULADO</td>
-			<td class="encabezado-tabla">ANALISIS DE RESULTADOS</td>
+			<td class="encabezado-tabla">ANÁLISIS DE RESULTADOS</td>
 			<td class="encabezado-tabla">JUSTIFICACIÓN</td>
 		</tr>
 		@foreach($indicadores as $indicador)
@@ -197,7 +198,7 @@
 			<td class="nota-contenido" colspan="3">{{$estrategia['fuenteInformacion']}}</td>
 		</tr>
 	</table>
-	<br><br><br>
+	<br><br><br><br><br><br><br><br>
 	<table width="100%">
 		<tr class="negrita" height="20">
 			<td width="5%"></td>

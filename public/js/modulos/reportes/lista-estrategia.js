@@ -30,6 +30,7 @@ moduloDatagrid.actualizar({
             item.id = response.data[i].id;
             item.clave = response.data[i].clave;
             item.programa = response.data[i].programaPresupuestario;
+            item.descripcion = response.data[i].descripcion;
             item.trim1 = '<span class="fa fa-times"></span>';
             item.trim2 = '<span class="fa fa-times"></span>';
             item.trim3 = '<span class="fa fa-times"></span>';

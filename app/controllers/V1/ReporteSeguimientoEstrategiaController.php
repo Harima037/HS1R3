@@ -65,7 +65,7 @@ class ReporteSeguimientoEstrategiaController extends BaseController {
 			$total = $rows->count();
 			
 			
-			$rows = $rows->select('estrategia.id','programaPresupuestario.descripcion AS programaPresupuestario','programaPresupuestario.clave')
+			$rows = $rows->select('estrategia.id','programaPresupuestario.descripcion AS programaPresupuestario', 'estrategia.descripcionIndicador as descripcion', 'programaPresupuestario.clave')
 					->join('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','estrategia.claveProgramaPresupuestario')
 					->orderBy('id', 'desc')
 					->groupBy('estrategia.id')
@@ -125,7 +125,7 @@ class ReporteSeguimientoEstrategiaController extends BaseController {
 		$datos['trimestre'] = $trimestre_actual;
 		$datos['estrategia'] = array(
 			'ejercicio' => $recurso->ejercicio,
-			'nombre' => $recurso->programaPresupuestario,
+			'nombre' => $recurso->descripcionIndicador,
 			'fuenteInformacion' => $recurso->fuenteInformacion,
 			'liderPrograma' => $recurso->liderPrograma,
 			'cargoLiderPrograma' => $recurso->cargoLiderPrograma,

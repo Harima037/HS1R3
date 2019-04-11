@@ -19,6 +19,7 @@ var trimactual = '';
 moduloDatagrid.init();
 moduloDatagrid.actualizar({
     _success: function(response){
+        console.log(response.data);
         moduloDatagrid.limpiar();
         var datos_grid = [];
         var trimestre = $('#datagridEstrategia').attr('data-trim-activo');
@@ -35,10 +36,12 @@ moduloDatagrid.actualizar({
                     estilos[j] = '';
                 }
             }
+        
 
             var item = {
                 'id':       response.data[i].id,
                 'programa': response.data[i].clave + ' ' + response.data[i].programa,
+                'descripcion': response.data[i].descripcion,
                 'trim_1':   '<div class="text-center" '+estilos[1]+'>'+((trimestre > 1)?label_miss:label_lock)+'</div>',
                 'trim_2':   '<div class="text-center" '+estilos[2]+'>'+((trimestre > 2)?label_miss:label_lock)+'</div>',
                 'trim_3':   '<div class="text-center" '+estilos[3]+'>'+((trimestre > 3)?label_miss:label_lock)+'</div>',
