@@ -45,7 +45,7 @@
                     <tr>
                         <th><input type="checkbox" class="check-select-all-rows"></th>
                         <th>Programa Presupuestario</th>
-                        <th style="width:120px;">Descripcion</th>
+                        <th style="width:400px;">Descripcion</th>
                         <th style="width:100px;">Estatus</th>
                         <th style="text-align:center; width:85px;"><span class="glyphicon glyphicon-user"></span></th>
                         <th style="text-align:center; width:100px;"><span class="glyphicon glyphicon-calendar"></span></th>

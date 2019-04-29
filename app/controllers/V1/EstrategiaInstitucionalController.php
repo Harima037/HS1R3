@@ -27,16 +27,29 @@ class EstrategiaInstitucionalController extends \BaseController {
 		'unidad-responsable'		=> 'required',
 		'programa-presupuestario'	=> 'required',
 		'programa-sectorial'		=> 'required',
-		'ejercicio'					=> 'required',
-		'tipo-ind'			=> 'required',
-		'anio-base' 		=> 'integer|min:0',
-		'linea-base' 		=> 'numeric|min:0',
-		'unidad-medida' 	=> 'required',
-		'trim1' 			=> 'numeric',
-		'trim2' 			=> 'numeric',
-		'trim3' 			=> 'numeric',
-		'trim4' 			=> 'numeric',
-		'valorNumerador' 		=> 'required|numeric|min:1',
+		'ejercicio'					=> 'required|numeric|min:2010',
+		'descripcion-indicador' 	=> 'required',
+		'numerador'				 	=> 'required',
+		'denominador'			 	=> 'required',
+		'interpretacion'		 	=> 'required',
+		'tipo-ind'					=> 'required',
+		'dimension'					=> 'required',
+		'unidad-medida' 			=> 'required',
+		'mision'	 				=> 'required',
+		'vision'	 				=> 'required',
+		'fuente-informacion'		=> 'required',
+		'responsable'				=> 'required',
+		'frecuencia'				=> 'required',
+		'formula'				=> 'required',
+		
+		'linea-base' 				=> 'required|numeric|min:0',
+		'anio-base' 				=> 'required|integer|min:2010',
+		'trim1' 					=> 'required|numeric|min:0',
+		'trim2' 					=> 'required|numeric|min:0',
+		'trim3' 					=> 'required|numeric|min:0',
+		'trim4' 					=> 'required|numeric|min:0',
+		'valor-denominador' 			=> 'required|numeric|min:1',
+		'meta' 						=> 'required|numeric|min:1',
 	);
 
 
@@ -261,8 +274,8 @@ class EstrategiaInstitucionalController extends \BaseController {
 					$recurso->trim2 = $parametros['trim2'];
 					$recurso->trim3 = $parametros['trim3'];
 					$recurso->trim4 = $parametros['trim4'];
-					$recurso->valorNumerador = $parametros['valorNumerador'];
-					$recurso->valorDenominador = $parametros['valorDenominador'];
+					$recurso->valorNumerador = $parametros['valor-numerador'];
+					$recurso->valorDenominador = $parametros['valor-denominador'];
 					$recurso->fuenteInformacion = $parametros['fuente-informacion'];
 					$recurso->idResponsable = $parametros['responsable'];
 
@@ -442,8 +455,8 @@ class EstrategiaInstitucionalController extends \BaseController {
 					$recurso->trim2 = $parametros['trim2'];
 					$recurso->trim3 = $parametros['trim3'];
 					$recurso->trim4 = $parametros['trim4'];
-					$recurso->valorNumerador = $parametros['valorNumerador'];
-					$recurso->valorDenominador = $parametros['valorDenominador'];
+					$recurso->valorNumerador = $parametros['valor-numerador'];
+					$recurso->valorDenominador = $parametros['valor-denominador'];
 					$recurso->fuenteInformacion = $parametros['fuente-informacion'];
 					$recurso->idResponsable = $parametros['responsable'];
 

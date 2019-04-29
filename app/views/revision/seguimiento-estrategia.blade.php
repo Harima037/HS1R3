@@ -36,6 +36,7 @@
                     <tr height="50">
                         <th><input type="checkbox" class="check-select-all-rows"></th>
                         <th>Programa Presupuestario</th>
+                        <th>Descripción</th>
                         <th width="70">Trim 1</th>
                         <th width="70">Trim 2</th>
                         <th width="70">Trim 3</th>

@@ -41,6 +41,7 @@
                         <th><input type="checkbox" class="check-select-all-rows"></th>
                         <th width="50">Clave</th>
                         <th>Programa Presupuestario</th>
+                        <th>Descripción</th>
 						<th width="60">Trim 1</th>
 						<th width="60">Trim 2</th>
 						<th width="60">Trim 3</th>
