@@ -155,6 +155,9 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('roles',				'V1\RolesController');
 		Route::resource('lideres-proyectos',	'V1\LideresProyectosController');
 		Route::get('buscar-responsables-area/{id}','V1\LideresProyectosController@responsableEnArea');
+		Route::get('buscar-areas-responsable/{id}','V1\LideresProyectosController@areasDelResponsable');
+		Route::get('datos-responsable/{id}',	'V1\LideresProyectosController@datosDelResponsable');
+		Route::post('guardar-responsable',		'V1\LideresProyectosController@guardarResponsable');
 		Route::resource('permisos',				'V1\PermisosController');
 		Route::resource('cuenta',				'V1\CuentaController');
 		Route::resource('config-seg-metas', 	'V1\ConfigurarSeguimientoController', array('only' => array('store')));

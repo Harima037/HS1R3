@@ -31,7 +31,8 @@ class LideresProyectoController extends BaseController {
 		}
 		
 		$catalogos = array(
-			'areas' => $areas
+			'areas' => $areas,
+			'responsables' => CatalogoDirectorio::all()
 		);
 
 		return parent::loadIndex('ADMIN','CATRESPO',$catalogos);
