@@ -83,7 +83,7 @@ class IndicadorFassaController extends \BaseController {
 					$total = $rows->count();
 				}
 
-				$rows = $rows->select('indicadorFASSA.id','indicadorFASSA.indicador','indicadorFASSA.claveNivel','sentryUsers.username','indicadorFASSA.modificadoAl')
+				$rows = $rows->select('indicadorFASSA.id','indicadorFASSA.indicador','indicadorFASSA.claveNivel','indicadorFASSA.idEstatus','sentryUsers.username','indicadorFASSA.modificadoAl')
 							->orderBy('id', 'desc')
 							->leftjoin('sentryUsers','indicadorFASSA.actualizadoPor','=','sentryUsers.id')
 							->skip(($parametros['pagina']-1)*10)->take(10)
@@ -279,16 +279,51 @@ class IndicadorFassaController extends \BaseController {
 			if($valid_result === true){
 				$parametros = Input::all();
 
-				$recurso = IndicadorFASSA::find($id);
+				if(isset($parametros['cambio_frecuencia']) && $parametros['cambio_frecuencia'] == 1)
+				{
+					$ids = array($id);
+					$rows = DB::transaction(function()use($ids){
+						IndicadorFASSAMeta::whereIn('idIndicadorFASSA',$ids)->delete();
+						$rows = IndicadorFASSA::whereIn('id',$ids)->delete();
+					});
+					
+					$recurso = new IndicadorFASSA;
+					$recurso->idEstatus = 1;
+				}else
+				{
+					$recurso = IndicadorFASSA::find($id);
+				}
 
 				//$checar_ejercicio = FALSE;
 
-				if($parametros['id-meta']){
-					$recurso_meta = IndicadorFASSAMeta::find($parametros['id-meta']);
-				}else{
-					$recurso_meta = new IndicadorFASSAMeta;
-					$recurso_meta->idEstatus = 1;
-					$recurso_meta->ejercicio = date('Y');
+				if(!isset($parametros['cambio_frecuencia']) || $parametros['cambio_frecuencia'] != 1)
+				{
+					if(isset($parametros['id-meta'])){
+						$recurso_meta = IndicadorFASSAMeta::find($parametros['id-meta']);
+					}else if(isset($parametros['estatus-indicador'])){
+						
+						$http_status = 200;
+						$data = array();
+						
+						if(is_null($recurso)){
+							$http_status = 404;
+							$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+						}else{
+							$recurso->idEstatus = $parametros['estatus-indicador'];
+							if($recurso->save()){
+								$data["data"] = $recurso;
+							}else{
+								$http_status = 500;
+								$data = array("data"=>"Ocurrio un error al intentar guardar el recurso.",'code'=>'U06');
+							}
+						}
+						return Response::json($data,$http_status);
+
+					}else{
+						$recurso_meta = new IndicadorFASSAMeta;
+						$recurso_meta->idEstatus = 1;
+						$recurso_meta->ejercicio = date('Y');
+					}
 				}
 
 				$recurso->claveNivel 				= $parametros['nivel-indicador'];
@@ -304,9 +339,21 @@ class IndicadorFassaController extends \BaseController {
 				}
 				
 				$tipo_formula = $recurso->claveTipoFormula;
+
 				
 				//if($recurso_meta->idEstatus == 1 || $recurso_meta->idEstatus == 3){
-				if($parametros['unidad-responsable'] != $recurso_meta->claveUnidadResponsable){
+				if(!isset($parametros['cambio_frecuencia']) || $parametros['cambio_frecuencia'] != 1)
+				{
+					if($parametros['unidad-responsable'] != $recurso_meta->claveUnidadResponsable){
+						$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
+						$recurso_meta->idLiderPrograma = $titular->id;
+					}
+				}else
+				{
+					$recurso_meta = new IndicadorFASSAMeta;
+					$recurso_meta->ejercicio				= date('Y');
+					$recurso_meta->idEstatus				= 1;
+
 					$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
 					$recurso_meta->idLiderPrograma = $titular->id;
 				}
@@ -314,6 +361,8 @@ class IndicadorFassaController extends \BaseController {
 				$recurso_meta->claveUnidadResponsable 	= $parametros['unidad-responsable'];
 				$recurso_meta->idResponsableInformacion	= $parametros['responsable-informacion'];
 				$recurso_meta->claveFrecuencia = $parametros['frecuencia'];
+
+				
 				
 				$respuesta = DB::transaction(function() use ($recurso,$recurso_meta){
 					$respuesta_transaction = array();

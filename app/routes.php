@@ -39,6 +39,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('config-seg-metas',array('uses' => 'ConfigurarSeguimientoController@index'));
 		Route::get('purgar-seguimientos',array('uses' => 'PurgarSeguimientoController@index'));
 		Route::get('admin-proyectos',array('uses'=>'AdminProyectosController@index'));
+		Route::get('admin-fassa',array('uses'=>'AdminFassaController@index'));
+		Route::get('admin-estrategia',array('uses'=>'AdminEstrategiaController@index'));
 		Route::get('bitacora-seguimiento',array('uses'=>'BitacoraValidacionSeguimientoController@index'));
 		Route::get('lideres-proyecto',array('uses'=>'LideresProyectoController@index'));
 	});
@@ -165,6 +167,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('admin-proyectos',		'V1\AdminProyectosController', array('only' => array('index','show','update')));
 		Route::get('admin-proyectos-avances/{id}', array('uses'=>'V1\AdminProyectosController@avances'));
 		Route::put('admin-proyectos-avances/{id}', array('uses'=>'V1\AdminProyectosController@cambiarEstatusAvances'));
+		Route::get('admin-indicadoresFASSA-avances/{id}', array('uses'=>'V1\AdminIndicadoresFASSAController@avances'));
+		Route::put('admin-indicadoresFASSA-avances/{id}', array('uses'=>'V1\AdminIndicadoresFASSAController@cambiarEstatusAvances'));
 		Route::resource('bitacora-seguimiento',	'V1\BitacoraValidacionSeguimientoController', array('only' => array('index')));
 		
 		Route::resource('proyectos',		'V1\ProyectosController');

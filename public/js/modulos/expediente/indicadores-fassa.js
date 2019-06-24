@@ -16,9 +16,11 @@ var moduloDatagrid = new Datagrid("#datagridIndicadores",moduloResource,{ format
 
 moduloDatagrid.init();
 //moduloDatagrid.actualizar();
+var frecuencia = "";
 moduloDatagrid.actualizar({
     _success: function(response){
         moduloDatagrid.limpiar();
+        var lista = Array();
         for(var i in response.data){
             var nivel = '';
             switch(response.data[i].claveNivel){
@@ -38,8 +40,17 @@ moduloDatagrid.actualizar({
             response.data[i].claveNivel = nivel;
 
             response.data[i].modificadoAl = response.data[i].modificadoAl.substring(0,11);
+
+            objeto = new Object();
+            objeto.id = response.data[i].id;
+            objeto.indicador = response.data[i].indicador;
+            objeto.claveNivel = response.data[i].claveNivel;
+            objeto.username = response.data[i].username;
+            objeto.modificadoAl = response.data[i].modificadoAl;
+            lista.push(objeto);
         }
-        moduloDatagrid.cargarDatos(response.data);                         
+        moduloDatagrid.cargarDatos(lista);                         
+        
         moduloDatagrid.cargarTotalResultados(response.resultados,'<b>Indicador(es)</b>');
         var total = parseInt(response.resultados/moduloDatagrid.rxpag); 
         var plus = parseInt(response.resultados)%moduloDatagrid.rxpag;
@@ -100,6 +111,8 @@ function editar(e){
                         $('#denominador').attr('data-valor',meta.denominador);
                         $('#porcentaje').text((parseFloat(meta.porcentaje) || 0).format(2) + ' %');
 
+                        //console.log(meta.claveFrecuencia);
+                        frecuencia = meta.claveFrecuencia;
                         $('#frecuencia').val(meta.claveFrecuencia);
                         $('#unidad-responsable').val(meta.claveUnidadResponsable);
                         $('#responsable-informacion').empty();
@@ -270,6 +283,16 @@ $('#btn-guardar-indicador').on('click',function(e){
     Validation.cleanFormErrors('#form_indicador_fassa');
 
     var parametros = $("#form_indicador_fassa").serialize();
+    if(frecuencia !== $("#form_indicador_fassa #frecuencia").val())
+    {
+        if(confirm("Se ha detectado un cambio de freciencia, Se va a eliminar todo el proceso de avance, ¿desea seguir con este proceso?"))
+        {
+            parametros = parametros + "&cambio_frecuencia=1";
+        }else
+        {
+            return;
+        }
+    }
     if($('#id').val()){
         moduloResource.put($('#id').val(), parametros,{
             _success: function(response){

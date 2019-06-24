@@ -320,21 +320,26 @@ class EstrategiaInstitucionalController extends \BaseController {
 	{
 		$http_status = 200;
 		$data = array();
+		
 
 		$parametros = Input::all();
 		$recurso = null;
 
+		
 		if($parametros){
-			if($parametros['mostrar'] == 'editar-estrategia'){
+			
+			if(isset($parametros['mostrar']) && $parametros['mostrar'] == 'editar-estrategia'){
 				$recurso = Estrategia::with('comentario')->find($id);
 				//$recurso = Estrategia::find($id);
 				if($recurso){
 					$recurso['responsables'] = Directorio::responsablesActivos($recurso->claveUnidadResponsable)->get();
 				}
 			}else{
-				$recurso = Estrategia::find($id);
+				
+				$recurso = Estrategia::with("programaPresupuestario")->find($id);
 			}
 		}
+		
 
 		if(is_null($recurso)){
 			$http_status = 404;
@@ -382,6 +387,13 @@ class EstrategiaInstitucionalController extends \BaseController {
 				}
 
 				$estrategia = Estrategia::find($id_estrategia);
+
+				if(isset($parametros['accion']) && $parametros['accion'] == "admin")
+				{
+					$estrategia->idEstatus = $parametros['estatus-programa'];
+					$estrategia->save();
+					return Response::json($respuesta['data'],$respuesta['http_status']);
+				}
 
 				if($estrategia->idEstatus != 1 && $estrategia->idEstatus != 3){
 					switch ($estrategia->idEstatus) {
