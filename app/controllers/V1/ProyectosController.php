@@ -807,7 +807,7 @@ class ProyectosController extends BaseController {
 		$respuesta['http_status'] = 200;
 		$respuesta['data'] = array();
 		$es_editar = FALSE;
-
+		
 		$validacion = Validador::validar(Input::all(), $this->reglasFinanciamiento);
 		//$validacion = TRUE;
 
@@ -821,8 +821,10 @@ class ProyectosController extends BaseController {
 			}
 
 			$fondo = FuenteFinanciamiento::find($parametros['fondo-financiamiento']);
+			$fuente = FuenteFinanciamiento::find($fondo->idPadre);
+			//aquie es
 
-			$recurso->idFuenteFinanciamiento 	= $fondo->idPadre;
+			$recurso->idFuenteFinanciamiento 	= $fuente->idPadre; //Aqui es
 			$recurso->idFondoFinanciamiento		= $parametros['fondo-financiamiento'];
 
 			if($es_editar){
