@@ -97,8 +97,8 @@
 			<td></td><td></td><td></td><td></td><td></td><td></td><!--td></td><td></td-->
 			<td valign="top"></td>
 			<td valign="top"></td>
-			<td valign="top">Formulas</td>
-			<td></td><td></td><td>Formulas</td><td></td><td></td>
+			<td valign="top"></td>
+			<td></td><td></td><td></td><td></td><td></td>
 		</tr>
 
 		<tr>
