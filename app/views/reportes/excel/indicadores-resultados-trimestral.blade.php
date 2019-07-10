@@ -144,7 +144,7 @@
 			<td></td>
 			<td></td>
 			<td>{{ '=(SUM(N'.($current_row+1).':N'.($current_row + $proyecto->totalItems).') / '.$proyecto->totalItems.')'}}</td>
-			<td> {{ $proyecto->fuentesFinanciamiento[0]['clave'] }}</td>
+			<td> </td>
 
 			<td valign="top" {{$estilo_fuente = (count($proyecto->fuentesFinanciamiento) > 1)?'style="font-weight:bold; text-decoration:underline;"':''}} >
 			{{ (count($proyecto->fuentesFinanciamiento) > 1)?'=SUM(J'.($current_row+1).':J'.($current_row+count($proyecto->fuentesFinanciamiento)).')':$proyecto->totalPresupuestoAprobado}}
@@ -245,7 +245,18 @@
 			@else
 				<td></td><td></td><td></td><td><td><td></td><td></td><td></td>
 			@endif
+			<td></td>
+			
+			@if(isset($proyecto->fuentes_financiamiento[$i]))
+			<td>{{ $proyecto->fuentes_financiamiento[$i]->clave }} </td>
+			<td>{{ $proyecto->fuentes_financiamiento[$i]->presupuestoAprobado }} </td>
+			<td>{{ $proyecto->fuentes_financiamiento[$i]->presupuestoModificado }} </td>
+			<td>{{ $proyecto->fuentes_financiamiento[$i]->presupuestoDevengado }} </td>
+			@else
 			<td></td><td></td><td></td><td></td>
+			@endif
+
+			
 
 			@if(isset($proyecto->fuentesFinanciamiento[$i]) && count($proyecto->fuentesFinanciamiento) > 1)
 				<td valign="top">{{$proyecto->fuentesFinanciamiento[$i]['presupuestoAprobado'] or 0.00}}</td>
@@ -254,7 +265,7 @@
 			@else
 				<td></td><td></td><td></td>
 			@endif
-				<td></td><td></td><td></td>
+				<td></td><td></td>
 				
 			@if(isset($proyecto->componentes[$i]))	
 				<td valign="top" style="text-align:justify;">{{{ $proyecto->componentes[$i]->justificacionAcumulada }}}</td>

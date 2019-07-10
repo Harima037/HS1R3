@@ -89,6 +89,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 						)
 					);
 				}
+				
 				/*$fuentesFinan[$fuente->idProyecto]['fuentesFinanciamiento'][] = array(
 					'descripcion' 			=> $fuente->descripcion,
 					'clave' 				=> $fuente->clave,
@@ -107,7 +108,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 				$fuentesFinan[$fuente->idProyecto]['totalPresupuestoModificado']	+= $fuente->presupuestoModificado;
 				$fuentesFinan[$fuente->idProyecto]['totalPresupuestoDevengado']		+= $fuente->presupuestoDevengado;
 			}
-
+			
 			//$queries = DB::getQueryLog();
 			//var_dump(end($queries));die;
 			//return Response::json($fuentesFinan,200);
@@ -234,7 +235,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 			];
 
 			$datos['hojas'] = $hojas;
-			return Response::json(array('data'=>$hojas),200);
+			//return Response::json(array('data'=>$hojas),200);
 			Excel::create('indicadores-resultados', function($excel) use ( $datos ){
 				$datos_hoja = array();
 				$datos_hoja['ejercicio'] = $datos['ejercicio'];
@@ -480,8 +481,12 @@ class ReporteIndicadorResultadoController extends BaseController {
 			$rows = Proyecto::reporteIndicadoresResultados($mes,$datos['ejercicio'])->get();
 			$rows_fuente_finan = Proyecto::fuentesFinanciamientoEP01($mes,$datos['ejercicio'])->get();
 			
-
+			/*$queries = \DB::getQueryLog();
+			var_dump(end($queries));die;*/
+			
 			$fuentesFinan = array();
+			$fuentesDesglose = array();
+			//return Response::json(array('data'=>$rows_fuente_finan),200);
 			foreach ($rows_fuente_finan as $fuente) {
 				if(!isset($fuentesFinan[$fuente->idProyecto])){
 					$fuentesFinan[$fuente->idProyecto] = array(
@@ -501,9 +506,8 @@ class ReporteIndicadorResultadoController extends BaseController {
 						)
 					);
 				}
+				$fuentesDesglose[$fuente->idProyecto][] = $fuente;
 				
-				
-
 				$fuentesFinan[$fuente->idProyecto]['fuentesFinanciamiento'][0]['descripcion'] 			+= $fuente->descripcion;
 				$fuentesFinan[$fuente->idProyecto]['fuentesFinanciamiento'][0]['clave'] 				+= $fuente->clave;
 				$fuentesFinan[$fuente->idProyecto]['fuentesFinanciamiento'][0]['presupuestoAprobado'] 	+= $fuente->presupuestoAprobado;
@@ -514,6 +518,9 @@ class ReporteIndicadorResultadoController extends BaseController {
 				$fuentesFinan[$fuente->idProyecto]['totalPresupuestoModificado']	+= $fuente->presupuestoModificado;
 				$fuentesFinan[$fuente->idProyecto]['totalPresupuestoDevengado']		+= $fuente->presupuestoDevengado;
 			}
+			//return Response::json(array('data'=>$fuentesDesglose),200);
+				
+			
 			
 			//$queries = DB::getQueryLog();
 			//var_dump(end($queries));die;
@@ -532,43 +539,22 @@ class ReporteIndicadorResultadoController extends BaseController {
 						'clase' => array()
 					);
 				}
-
-				/*$metaAcumulada = 0;
-				$metaAnual = 0;
-				$total_avance_anual = 0;
-				foreach ($row->componentes as $componente) {
-					$metaAcumulada = $componente->metaAcumulada;
-					$metaAnual = $componente->metaAnual;
-					if($metaAnual != 0)
-						$total_avance_anual += $metaAcumulada / $metaAnual;
-					else
-						$total_avance_anual += 0;
-				}
-				foreach ($row->actividades as $actividades) {
-					$metaAcumulada = $actividades->metaAcumulada;
-					$metaAnual = $actividades->metaAnual;
-					//$total_avance_anual += $metaAcumulada / $metaAnual;
-					if($metaAnual != 0)
-						$total_avance_anual += $metaAcumulada / $metaAnual;
-					else
-						$total_avance_anual += 0;
-				}*/
-				
-				
-				//return Response::json(array('data'=>$row),200);
 				
 				if(!isset($hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto])){
 					$hojas[$row->subFuncionClave]['clase'][$row->idClasificacionProyecto] = array('proyectos'=>array());
 					$hojas[$row->subFuncionClave]['conteo_items']++;
 				}
 				
+				$row->fuentes_financiamiento = $fuentesDesglose[$row->id];
 				$clave_fuentes = '';
 				$titulo_fuentes = '';
 				//---------------------------------------------------------------------------vvvvvvvvvvvvvvv
+				//return Response::json(array('data'=>$fuentesFinan, "id"=>$row->id),200);
 				$fuentes_del_proyecto = $fuentesFinan[$row->id];
 				$total_fuentes = count($fuentes_del_proyecto['fuentesFinanciamiento']) - 1;
 				$row->fuentesFinanciamiento = $fuentes_del_proyecto['fuentesFinanciamiento'];
 				foreach ($fuentes_del_proyecto['fuentesFinanciamiento'] as $key => $fuente) {
+					
 					$row->totalPresupuestoAprobado += $fuente['presupuestoAprobado'];
 					$row->totalPresupuestoModificado += $fuente['presupuestoModificado'];
 					$row->totalPresupuestoDevengado += $fuente['presupuestoDevengado'];
@@ -580,7 +566,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 				$row->desfaseActividades = count($row->componentes);
 
 				$total_acciones = count($row->componentes) + count($row->actividades);
-				$total_fuentes = count($row->fuentesFinanciamiento);
+				$total_fuentes = count($row->fuentes_financiamiento);
 
 				if($total_acciones > $total_fuentes){
 					$row->totalItems = $total_acciones;
@@ -592,12 +578,6 @@ class ReporteIndicadorResultadoController extends BaseController {
 				$hojas[$row->subFuncionClave]['total_presup_aprobado'] += $row->totalPresupuestoAprobado;
 				$hojas[$row->subFuncionClave]['total_presup_modificado'] += $row->totalPresupuestoModificado;
 				$hojas[$row->subFuncionClave]['total_presup_devengado'] += $row->totalPresupuestoDevengado;
-
-				/*if($row->totalItems > 0)
-					$row->avance_anual = $total_avance_anual / $row->totalItems;
-				else	
-					$row->avance_anual = 0;*/
-
 			}
 			
 			$datos['nombres_subfuncion'] = [
