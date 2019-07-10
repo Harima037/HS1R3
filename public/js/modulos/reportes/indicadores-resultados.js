@@ -209,6 +209,14 @@ $('#btn-descargar-reporte').on('click',function(){
     }
     window.open(SERVER_HOST+'/v1/rep-indicadores-resultados'+parametros);
 });
+
+$('#btn-descargar-reporte-evaluacion').on('click',function(){
+    var parametros = '?mes='+$('#mes').val()+'&ejercicio='+$('#ejercicio').val();
+    if($('.txt-quick-search').val()){
+        parametros += '&buscar='+$('.txt-quick-search').val();
+    }
+    window.open(SERVER_HOST+'/v1/rep-indicadores-trimestral'+parametros);
+});
 /*===================================*/
 // Funciones adicionales por módulo
 

@@ -193,6 +193,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('cedulas-avances',				'V1\ReporteCedulaAvanceController',array('only'=>array('index')));
 		Route::resource('indicadores-resultados',		'V1\IndicadorResultadoController');
 		Route::resource('rep-indicadores-resultados',	'V1\ReporteIndicadorResultadoController',array('only'=>array('index')));
+		Route::get('rep-indicadores-trimestral', 		array('uses'=>'V1\ReporteIndicadorResultadoController@reporteGeneral'));
 		Route::resource('gasto-regionalizado',			'V1\ReporteGastoRegionalizadoController',array('only'=>array('index')));
 		Route::resource('variacion-gasto',				'V1\VariacionesGastoController');
 		Route::resource('reporte-variacion-gasto',		'V1\ReporteVariacionesGastoController');

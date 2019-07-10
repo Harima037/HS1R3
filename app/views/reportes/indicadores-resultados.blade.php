@@ -44,9 +44,27 @@
                         <button class="btn btn-default btn-block btn-quick-search" type="button"><span class="fa fa-search"></span></button>
                     </div>
                     <div class="col-md-3">
-                        <button type="button" class="btn btn-primary btn-block" id="btn-descargar-reporte">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                Descargar Reportes
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu pull-right" role="menu">
+                                <li>
+                                    <a href="#" type="button"  id="btn-descargar-reporte">
+                                        <span class="fa fa-file-pdf-o"></span> Descargar Reporte
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" id="btn-descargar-reporte-evaluacion">
+                                        <span class="fa fa-file-pdf-o"></span> descargar evaluacion trimestral
+                                    </a> 
+                                </li>
+                            </ul>
+                        </div>
+                        <!--<button type="button" class="btn btn-primary btn-block" id="btn-descargar-reporte">
                             <span class="fa fa-file-pdf-o"></span> Descargar Reporte
-                        </button>
+                        </button>-->
                     </div>
                 </div>
                 <div class="row">

@@ -223,9 +223,13 @@ class Proyecto extends BaseModel
 				$componente->select('proyectoComponentes.id',
 					'proyectoComponentes.idProyecto','proyectoComponentes.indicador',
 					'proyectoComponentes.valorNumerador AS metaAnual','unidadesMedida.descripcion AS unidadMedida',
+					'dimensionIndicador.descripcion AS descripcionDimensionIndicador',
+					'tipoIndicadores.descripcion AS descripcionTipoIndicador',
 					'avanceMetas.planMejora','avanceMetas.justificacionAcumulada','avanceMetas.id AS identificador',
 					DB::raw('sum(metasMes.avance) AS avanceAcumulado'), DB::raw('sum(metasMes.meta) AS metaAcumulada'))
 					->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','proyectoComponentes.idUnidadMedida')
+					->leftjoin('catalogodimensionesindicador AS dimensionIndicador','dimensionIndicador.id','=','proyectoComponentes.idDimensionIndicador')
+					->leftjoin('catalogotiposindicadores AS tipoIndicadores','tipoIndicadores.id','=','proyectoComponentes.idTipoIndicador')
 					->leftjoin('componenteMetasMes AS metasMes',function($join)use($mes){
 						$join->on('metasMes.idComponente','=','proyectoComponentes.id')
 							->where('metasMes.mes','<=',$mes)
@@ -244,9 +248,13 @@ class Proyecto extends BaseModel
 				$actividad->select('componenteActividades.id','componenteActividades.idComponente',
 					'componenteActividades.idProyecto','componenteActividades.indicador',
 					'componenteActividades.valorNumerador AS metaAnual','unidadesMedida.descripcion AS unidadMedida',
+					'dimensionIndicador.descripcion AS descripcionDimensionIndicador',
+					'tipoIndicadores.descripcion AS descripcionTipoIndicador',
 					'avanceMetas.planMejora','avanceMetas.justificacionAcumulada','avanceMetas.id AS identificador',
 					DB::raw('sum(metasMes.avance) AS avanceAcumulado'), DB::raw('sum(metasMes.meta) AS metaAcumulada'))
 					->leftjoin('catalogoUnidadesMedida AS unidadesMedida','unidadesMedida.id','=','componenteActividades.idUnidadMedida')
+					->leftjoin('catalogodimensionesindicador AS dimensionIndicador','dimensionIndicador.id','=','componenteActividades.idDimensionIndicador')
+					->leftjoin('catalogotiposindicadores AS tipoIndicadores','tipoIndicadores.id','=','componenteActividades.idTipoIndicador')
 					->leftjoin('actividadMetasMes AS metasMes',function($join)use($mes){
 						$join->on('metasMes.idActividad','=','componenteActividades.id')
 							->where('metasMes.mes','<=',$mes)
@@ -282,7 +290,7 @@ class Proyecto extends BaseModel
 								DB::raw('sum(evaluacionProyectoMes.indicadorResultadoBeneficiariosF) AS indicadorResultadoBeneficiariosF'),
 								DB::raw('sum(evaluacionProyectoMes.indicadorResultadoBeneficiariosM) AS indicadorResultadoBeneficiariosM'),
 								DB::raw('sum(evaluacionProyectoMes.indicadorResultadoBeneficiarios) AS indicadorResultadoBeneficiarios'));
-			}
+			}, 'datosUnidadResponsable', 'fuentesFinanciamiento.fuenteFinanciamiento'
 			))
 			
 			->where('proyectos.idEstatusProyecto','=',5)
