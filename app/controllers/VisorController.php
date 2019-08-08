@@ -75,7 +75,7 @@ class VisorController extends BaseController {
 
 	public function indexDesempenioGeneral(){
 		$datos['usuario'] = Sentry::getUser();
-		if(!$datos['usuario']->claveJurisdiccion && $datos['usuario']['permissions']['superuser'] != 1){
+		if(!$datos['usuario']->claveJurisdiccion){
 			$datos['sys_sistemas'] = SysGrupoModulo::all();
 			return Response::view('errors.403', array(
 				'usuario'=>$datos['usuario'],
@@ -128,7 +128,9 @@ class VisorController extends BaseController {
 
 	public function indexEstatal(){
 		$datos['usuario'] = Sentry::getUser();
-		if($datos['usuario']->claveJurisdiccion || $datos['usuario']->claveUnidad){
+		
+		if(!isset($datos['usuario']['permissions']['superuser']))
+		if(!$datos['usuario']->claveUnidad){
 			$datos['sys_sistemas'] = SysGrupoModulo::all();
 			return Response::view('errors.403', array(
 				'usuario'=>$datos['usuario'],
