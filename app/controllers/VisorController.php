@@ -128,8 +128,7 @@ class VisorController extends BaseController {
 
 	public function indexEstatal(){
 		$datos['usuario'] = Sentry::getUser();
-		
-		if(!isset($datos['usuario']['permissions']['superuser']))
+		/*if(!isset($datos['usuario']['permissions']['superuser']))
 		if(!$datos['usuario']->claveUnidad){
 			$datos['sys_sistemas'] = SysGrupoModulo::all();
 			return Response::view('errors.403', array(
@@ -138,7 +137,7 @@ class VisorController extends BaseController {
 				'sys_sistemas'=>$datos['sys_sistemas'],
 				'sys_mod_activo'=>null), 403
 			);
-		}
+		}*/
 		$datos_captura = $this->obtenerDatosCaptura();
 		$anio_captura = '[ ' . Util::obtenerDescripcionMes($datos_captura['mes']) . ' del ' . $datos_captura['anio'] . ']';
 
