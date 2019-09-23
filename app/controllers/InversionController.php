@@ -40,7 +40,7 @@ class InversionController extends ProyectosController {
 		);
 
 		$datos_financiamiento = array(
-			'fuentes_financiamiento'	=> FuenteFinanciamiento::where('nivel','=',4)->get(),
+			'fuentes_financiamiento'	=> FuenteFinanciamiento::where('nivel','=',5)->with('fondos')->get(),
 			//'destino_gasto'				=> DestinoGasto::all(),
 			'subfuentes_financiamiento' => SubFuenteFinanciamiento::all()
 		);
