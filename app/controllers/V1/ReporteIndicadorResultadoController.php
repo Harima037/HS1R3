@@ -286,12 +286,14 @@ class ReporteIndicadorResultadoController extends BaseController {
 						$sheet->getStyle('A9:Q10')->applyFromArray(array(
 						    'fill' => array(
 						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-						        'color' => array('rgb' => '621132')
+								//'color' => array('rgb' => '621132')
+								'color' => array('rgb' => 'AFAFAF')
 						    ),
 						    'font' => array(
 						        'size'      =>  8,
 						        'bold'      =>  true,
-						        'color'		=> array('rgb'=>'FFFFFF')
+								//'color'		=> array('rgb'=>'FFFFFF')
+								'color'		=> array('rgb'=>'000000')
 						    ),
 						    'borders' => array(
 						    	'allborders' => array(
@@ -315,12 +317,14 @@ class ReporteIndicadorResultadoController extends BaseController {
 						$sheet->getStyle('A11:Q11')->applyFromArray(array(
 							'fill' => array(
 						        'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-						        'color' => array('rgb' => 'B09A5B')
+								//'color' => array('rgb' => 'B09A5B')
+								'color' => array('rgb' => 'AFAFAF')
 						    ),
 						    'font' => array(
-						        'size'      =>  13,
+						        'size'      =>  12,
 								'bold'      =>  true,
-								'color'		=> array('rgb'=>'FFFFFF')
+								//'color'		=> array('rgb'=>'FFFFFF')
+								'color'		=> array('rgb'=>'000000')
 						    ),
 						    'borders' => array(
 						    	'top' => array(
@@ -343,11 +347,11 @@ class ReporteIndicadorResultadoController extends BaseController {
 						    	'top' => array(
 						    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
 	            					'color' => array('argb' => 'DDDDDD')
-						    	),
-						    	'bottom' => array(
+						    	)
+						    	/*,'bottom' => array(
 						    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
 	            					'color' => array('argb' => '621132')
-						    	)
+						    	)*/
 						    )
 						));
 						$total = $hoja['conteo_items'] + 13;

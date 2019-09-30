@@ -192,7 +192,8 @@ class ReporteCuentaPublicaController extends BaseController {
 				$table = $section->addTable('TablaInfo');
 
 				$estilo_tabla = array(
-					'bgcolor'=>'#621132'
+					//'bgcolor'=>'#621132'
+					'bgcolor'=>'#AFAFAF'
 				);
 
 				$row = $table->addRow();
