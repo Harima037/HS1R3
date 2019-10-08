@@ -305,13 +305,13 @@ class ReporteIndicadorResultadoController extends BaseController {
 						$sheet->getStyle('A9:I10')->applyFromArray(array(
 							'fill'=>array(
 								'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-								'color' => array('rgb' => '621132')
+								'color' => array('rgb' => 'AFAFAF')
 							)
 						));
 						$sheet->getStyle('M9:Q10')->applyFromArray(array(
 							'fill'=>array(
 								'type'  => \PHPExcel_Style_Fill::FILL_SOLID,
-								'color' => array('rgb' => '621132')
+								'color' => array('rgb' => 'AFAFAF')
 							)
 						));
 						$sheet->getStyle('A11:Q11')->applyFromArray(array(
@@ -368,10 +368,10 @@ class ReporteIndicadorResultadoController extends BaseController {
 								));
 							}
 						}
-						$sheet->mergeCells('B14:B'.$total);
+						//$sheet->mergeCells('B14:B'.$total);
 						$sheet->cell('B14',function($cell){
 							$cell->setAlignment('center');
-							$cell->setValignment('center');
+							//$cell->setValignment('center');
 						});
 
 						$sheet->getStyle('A14:Q'.$total)->getAlignment()->setWrapText(true);
