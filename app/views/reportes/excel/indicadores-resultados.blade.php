@@ -111,7 +111,7 @@
 				{{$proyecto->proyectoEstrategico}}{{str_pad($proyecto->numeroProyectoEstrategico, 3,'0',STR_PAD_LEFT)}}
 				<!-- {{ $sum_rows[] = $current_row; }} -->
 			</td>
-			<td valign="middle" align="center">3</td>
+			<td valign="middle" align="center">{{(count($sum_rows) == 1)?'3':''}}</td>
 			<td align="center" style="font-weight:bold;text-align:justify;">{{{ rtrim($proyecto->nombreTecnico,'.') }}}</td>
 			<td></td><td></td><td></td><td></td><td></td><td></td><!--td></td><td></td-->
 			<td valign="top" {{$estilo_fuente = (count($proyecto->fuentesFinanciamiento) > 1)?'style="font-weight:bold; text-decoration:underline;"':''}} >
