@@ -16,7 +16,7 @@
             <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
 		</tr>
 		<tr>
-            <td colspan="18" style="text-align:center; font-weight:bold; font-size:10;">FICHA TÉNICA DE SEGUIMIENTO DE PROYECTOS 2018</td><!--td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td-->
+            <td colspan="18" style="text-align:center; font-weight:bold; font-size:10;">FICHA TÉNICA DE SEGUIMIENTO DE PROYECTOS {{$ejercicio}}</td><!--td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td-->
 		</tr>
 		<tr>
 			<td colspan="18" style="text-align:center; font-weight:bold; font-size:9;"> AL {{$mes['trimestre_letras']}} TRIMESTRE </td><!--td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td-->

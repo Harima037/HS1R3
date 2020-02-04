@@ -23,6 +23,7 @@ var ids_proyectos_seleccionados = {};
 var ids_caratulas_seleccionados = {};
 var ids_programas_seleccionados = {};
 var ids_indicadores_seleccionados = {};
+var ids_estrategias_seleccionados = {};
 
 $('.chosen-one').chosen({width:'100%'});
 
@@ -139,6 +140,14 @@ function editar (e){
                     llenar_lista_indicadores(response.data.indicadores);
                 }else{
                     $('#conteo-indicadores-seleccionados').text('0');
+                }
+            }
+
+            if(response.data.estrategias){
+                if(response.data.estrategias.length){
+                    llenar_lista_estrategias(response.data.estrategias);
+                }else{
+                    $('#conteo-estrategias-seleccionados').text('0');
                 }
             }
 
@@ -267,15 +276,18 @@ function resetModalModuloForm(){
     limpiar_lista_caratulas();
     limpiar_lista_programas();
     limpiar_lista_indicadores();
+    limpiar_lista_estrategias();
     reset_busqueda();
     proyectoTypeAhead.clearRemoteCache();
     caratulaTypeAhead.clearRemoteCache();
     programaTypeAhead.clearRemoteCache();
     indicadorTypeAhead.clearRemoteCache();
+    estrategiaTypeAhead.clearRemoteCache();
     ids_proyectos_seleccionados = {};
     ids_caratulas_seleccionados = {};
     ids_programas_seleccionados = {};
     ids_indicadores_seleccionados = {};
+    ids_estrategias_seleccionados = {};
 }
 
 // Funciones de permisos
@@ -304,6 +316,12 @@ $('#modalModulo #btn-limpiar-indicadores').on('click',function(e){
     e.preventDefault();
     limpiar_lista_indicadores();
 });
+
+$('#modalModulo #btn-limpiar-estrategias').on('click',function(e){
+    e.preventDefault();
+    limpiar_lista_estrategias();
+});
+
 
 $('#btn-cargar-cat-permisos').click(function(){
     var parametros = {};
@@ -576,6 +594,8 @@ function reset_busqueda(){
     $('#estatus-busqueda-programa').html('');
     $('#buscar-indicador').typeahead('val','');
     $('#estatus-busqueda-indicador').html('');
+    //$('#buscar-estrategia').typeahead('val','');
+    $('#estatus-busqueda-estrategia').html('');
 }
 
 /*
@@ -1000,6 +1020,142 @@ function crear_objeto_indicador(datos){
             estatus: object.estatus,
             seleccionado: (ids_indicadores_seleccionados[object.id])?'fa fa-check':'',
             seleccionadoLabel: (ids_indicadores_seleccionados[object.id])?'Seleccionado':'',
+            id: object.id
+        };
+    });
+}
+
+/*
+
+        Funciones para la busqueda de Estrategias Institucionales por medio del suggester (Typeahead)
+
+*/
+
+var estrategiaTypeAhead = new Bloodhound({
+    datumTokenizer: function (d) { return Bloodhound.tokenizers.whitespace(d.text); },
+    queryTokenizer: Bloodhound.tokenizers.whitespace,
+    limit: 100,
+    remote: {
+        url: SERVER_HOST+'/v1/estrategia-institucional?typeahead=1&buscar=%QUERY',
+        filter: function ( response ) {
+            return crear_objeto_estrategia(response.data);
+        },
+        ajax:{
+            beforeSend: function(jqXHR,settings){
+                if($('#departamento').val()){
+                    settings.url = settings.url + '&departamento='+$('#departamento').val();
+                }
+                if($('#id').val()){
+                    settings.url = settings.url + '&usuario='+$('#id').val();
+                }
+                $('#estatus-busqueda-estrategia').html('Buscando... <span class="fa fa-spinner fa-spin"></span>');
+            },
+            complete: function(jqXHR,textStatus){
+                $('#estatus-busqueda-estrategia').html(jqXHR.responseJSON.resultados + ' Indicadores Encontrados');
+                estrategiaTypeAhead.clearRemoteCache();
+            }
+        }
+    }
+});
+estrategiaTypeAhead.initialize();
+
+$('#buscar-estrategia').typeahead(null,{
+    minLength: 3,
+    displayKey: 'estrategia',
+    source: estrategiaTypeAhead.ttAdapter(),
+    templates: { 
+        empty: '<div class="empty-result">No se encontraron Indicadores</div>',
+        suggestion: obtener_template_estrategia()
+    }
+}).on('typeahead:selected', function (object, datum) {
+    if(!$('#tabla-lista-estrategias tbody tr[data-id="'+datum.id+'"]').length){
+        var html_row = obtener_html_tabla_estrategias(datum);
+        if($('#tr-estrategias-vacio').length){
+            $('#tr-estrategias-vacio').remove();
+        }
+        $('#tabla-lista-estrategias tbody').append(html_row);
+        $('#conteo-estrategias-seleccionados').text($('#tabla-lista-estrategias tbody tr').length);
+    }
+    reset_busqueda();
+    estrategiaTypeAhead.clearRemoteCache();
+    ids_estrategias_seleccionados[datum.id] = 1;
+}).on('typeahead:cursorchanged', function (object, datum){
+    $('.tt-suggestion.tt-suggestion-selected').removeClass('tt-suggestion-selected');
+    $('#suggest_'+datum.id).parents('.tt-suggestion').addClass('tt-suggestion-selected');
+});
+
+function quitar_estrategia(id){
+    $('#tabla-lista-estrategias tbody tr[data-id="'+id+'"]').remove();
+    if(!$('#tabla-lista-estrategias tbody tr').length){
+        $('#tabla-lista-estrategias tbody').html('<tr id="tr-estrategias-vacio"><td colspan="3"><span class="fa fa-info-circle"></span> No hay indicadores asignados</td></tr>');
+        $('#conteo-estrategias-seleccionados').text('0');
+    }else{
+        $('#conteo-estrategias-seleccionados').text($('#tabla-lista-estrategias tbody tr').length);
+    }
+    delete ids_estrategias_seleccionados[id];
+}
+
+function limpiar_lista_estrategias(){
+    $('#tabla-lista-estrategias tbody').empty();
+    $('#tabla-lista-estrategias tbody').html('<tr id="tr-estrategias-vacio"><td colspan="3"><span class="fa fa-info-circle"></span> No hay indicadores asignados</td></tr>');
+    $('#conteo-estrategias-seleccionados').text('0');
+    ids_estrategias_seleccionados = {};
+}
+
+function llenar_lista_estrategias(datos){
+    var lista_estrategias = '';
+    var estrategias = crear_objeto_estrategia(datos);
+    for(var i in estrategias){
+        lista_estrategias += obtener_html_tabla_estrategias(estrategias[i]);
+        ids_estrategias_seleccionados[estrategias[i].id] = 1;
+    }
+    if($('#tr-estrategias-vacio').length){
+        $('#tr-estrategias-vacio').remove();
+    }
+    $('#tabla-lista-estrategias tbody').append(lista_estrategias);
+    $('#conteo-estrategias-seleccionados').text(datos.length);
+}
+
+function obtener_html_tabla_estrategias(estrategia){
+    console.log(estrategia);
+    var html_row = '<tr data-id="'+estrategia.id+'" >';//data-clave-nivel="'+estrategia.claveNivel+'"
+    html_row += '<td><input type="hidden" name="estrategias[]" value="'+estrategia.id+'">'+estrategia.descripcionIndicador+'</td>';
+    html_row += '<td><button type="button" class="btn btn-danger btn-block" onClick="quitar_estrategia('+estrategia.id+')"><span class="fa fa-trash"></span></button></td>';
+    html_row += '</tr>';
+    return html_row;
+}
+
+function estrategia_seleccionado(estrategia){
+    var template = obtener_template_estrategia();
+    return template(estrategia);
+}
+
+function obtener_template_estrategia(){
+    return Handlebars.compile('<div id="suggest_{{id}}" class="item">'+
+            '<table width="100%" border="0" cellpadding="0" cellspacing="0">'+
+                '<tr>'+
+                    '<td rowspan="2" class="text-{{claseEstatus}}"><b>{{descripcionIndicador}}</b></td>'+
+                    '<td width="100px" class="label-{{claseEstatus}}"><span class="label">{{estatus}}</span></td>'+
+                '</tr>'+
+                '<tr>'+
+                    '<td>'+
+                    '<span class="pull-right"><small><span class="{{seleccionado}}"></span> {{seleccionadoLabel}}</small>&nbsp;</span>'+
+                    '</td>'+
+                '</tr>'+
+            '</table>'+
+        '</div>');
+}
+
+function crear_objeto_estrategia(datos){
+    console.log(datos);
+    var clasesEstatus = {1:'info',2:'warning',3:'danger',4:'primary',5:'success'};
+    return $.map(datos, function (object) {
+        return {
+            descripcionIndicador: object.descripcionIndicador,
+            claseEstatus: clasesEstatus[object.idEstatus],
+            estatus: object.estatus,
+            seleccionado: (ids_estrategias_seleccionados[object.id])?'fa fa-check':'',
+            seleccionadoLabel: (ids_estrategias_seleccionados[object.id])?'Seleccionado':'',
             id: object.id
         };
     });

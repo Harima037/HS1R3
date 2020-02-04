@@ -133,21 +133,21 @@ class EstrategiaInstitucionalController extends \BaseController {
 				$data = array('resultados'=>$total,"data"=>"No hay datos",'code'=>'W00');
 			}
 
-		}elseif(isset($parametros['typeahead'])){
-			$rows = Programa::getModel();
+		}else*/
+		if(isset($parametros['typeahead'])){
+			$rows = Estrategia::getModel();
 
 			if(isset($parametros['buscar'])){				
 				$rows = $rows->where(function($query)use($parametros){
-						$query->where('programaPresupuestal.descripcion','like','%'.$parametros['buscar'].'%')
-							->orWhere('programa.claveProgramaPresupuestario','like','%'.$parametros['buscar'].'%');
+						$query->where('estrategia.descripcionIndicador','like','%'.$parametros['buscar'].'%');
 					});
 			}
 
 			if(isset($parametros['unidades'])){
 				$unidades = explode(',',$parametros['unidades']);
-				$rows = $rows->whereIn('programa.claveUnidadResponsable',$unidades);
+				$rows = $rows->whereIn('estrategia.claveUnidadResponsable',$unidades);
 			}
-			$rows = $rows->where('programa.idEstatus','=',5);
+			$rows = $rows->where('estrategia.idEstatus','=',5);
 
 			if(isset($parametros['departamento'])){
 				if(isset($parametros['usuario'])){
@@ -158,13 +158,13 @@ class EstrategiaInstitucionalController extends \BaseController {
 				
 				if($parametros['departamento'] == 2){
 					$rows = $rows->where(function($query)use($id_usuario){
-						$query->whereNull('programa.idUsuarioValidacionSeg')
-							->orWhere('programa.idUsuarioValidacionSeg','=',$id_usuario);
+						$query->whereNull('estrategia.idUsuarioValidacionSeg')
+							->orWhere('estrategia.idUsuarioValidacionSeg','=',$id_usuario);
 					});
 				}else{
 					$rows = $rows->where(function($query)use($id_usuario){
-						$query->whereNull('programa.idUsuarioRendCuenta')
-							->orWhere('programa.idUsuarioRendCuenta','=',$id_usuario);
+						$query->whereNull('estrategia.idUsuarioRendCuenta')
+							->orWhere('estrategia.idUsuarioRendCuenta','=',$id_usuario);
 					});
 				}
 			}
@@ -178,7 +178,7 @@ class EstrategiaInstitucionalController extends \BaseController {
 	        }else{
 	          $data = array('resultados'=>count($rows),'data'=>$rows);
 	        }
-		}else{*/
+		}else{
 			$rows = Estrategia::all()->load("programaPresupuestario", "Estatus", "Usuario");
 
 			if(count($rows)<=0){
@@ -186,7 +186,8 @@ class EstrategiaInstitucionalController extends \BaseController {
 			  }else{
 				$data = array('resultados'=>count($rows),'data'=>$rows);
 			  }
-		//}
+		}
+
 		return Response::json($data,$http_status);
 	}
 

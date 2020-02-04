@@ -50,6 +50,14 @@ class SentryUser extends SentryModel {
         }
     }
 
+    public function estrategias(){
+        if($this->idDepartamento == 2){
+            return $this->hasMany('Estrategia','idUsuarioValidacionSeg')->contenidoSuggester();
+        }else{
+            return $this->hasMany('Estrategia','idUsuarioRendCuenta')->contenidoSuggester();
+        }
+    }
+
     public function scopeUsuariosProyectos($query){
         return $query->select('sentryUsers.id','sentryUsers.idDepartamento','usuariosProyectos.proyectos','usuariosProyectos.ejercicio')
                     ->leftjoin('usuariosProyectos','usuariosProyectos.idSentryUser','=','sentryUsers.id');

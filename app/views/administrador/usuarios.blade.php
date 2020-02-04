@@ -377,6 +377,33 @@
                         <div class="tab-pane" id="tab-progras-mas">
                             <br>
                             <label class="control-label">
+                                <span class="fa fa-search"></span> Buscar Estrategia Institucional
+                            </label>
+                            <span id="estatus-busqueda-estrategia" class="pull-right"></span>
+                            <input type="text" class="form-control" id="buscar-estrategia" autocomplete="off">
+                            <table id="tabla-lista-estrategias" class="table table-hover table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>Estrategia Insitucional</th>
+                                        <th width="55">Quitar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="tr-estrategias-vacio">
+                                        <td colspan="3"><span class="fa fa-info-circle"></span> No hay indicadores asignados</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div>
+                                <span class="pull-right">
+                                    <span class="badge" id="conteo-estrategias-seleccionados">0</span> Indicadores(s) seleccionados
+                                </span>
+                            </div>
+                            <button type="button" class="btn btn-danger" id="btn-limpiar-estrategias">
+                                <span class="fa fa-trash"></span> Quitar todos
+                            </button>
+                            <br><br>
+                            <label class="control-label">
                                 <span class="fa fa-search"></span> Buscar Programa
                             </label>
                             <span id="estatus-busqueda-programa" class="pull-right"></span>

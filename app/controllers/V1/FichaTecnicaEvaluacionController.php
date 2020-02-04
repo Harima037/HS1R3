@@ -514,12 +514,13 @@ class FichaTecnicaEvaluacionController extends BaseController {
 			12 => array('mes'=>'Diciembre',		'abrev'=>'DIC',	'trimestre'=>4, 'trimestre_letras'=>'4to')
 		);
 		
+		$datos['ejercicio'] = $ejercicio;
 		$datos['mes'] = $meses[intval($mes_actual)];
 		$datos['proyecto'] = array(
 			'lider_proyecto'=>$recurso['lider_proyecto'],
 			'responsable_informacion'=>$recurso['responsable_informacion'],
 			'coordinador_grupo_estrategico'=>$recurso['coordinador_grupo_estrategico'],
-			'subcoordinador_grupo_estrategico'=>array('nombre'=>'Dr. Carlos Díaz Jiménez','cargo'=>'Subdirector de Planeación en Salud'),
+			'subcoordinador_grupo_estrategico'=>array('nombre'=>'Dr. Carlos Díaz Jiménez','cargo'=>'Subdirector de Planeación en Salud'), //De donde, creo sacar por el puesto
 			'nombre'=>$recurso['nombreTecnico'],
 			'programa'=>$recurso['datos_programa_presupuestario']['clave'] . ' - ' . $recurso['datos_programa_presupuestario']['descripcion'],
 			'clave'=>$recurso['ClavePresupuestaria'],

@@ -18,7 +18,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use Illuminate\Database\QueryException, \Exception;
 use BaseController, Input, Response, DB, Sentry,SentryUser;
-use User, Hash, UsuarioProyecto, Proyecto, Programa, IndicadorFASSA;
+use User, Hash, UsuarioProyecto, Proyecto, Programa, IndicadorFASSA, Estrategia;
 
 class UsuariosController extends \BaseController {
 	private $reglas = array(
@@ -177,6 +177,7 @@ class UsuariosController extends \BaseController {
 				$recurso->load('proyectos');
 				$recurso->load('programas');
 				$recurso->load('indicadores');
+				$recurso->load('estrategias');
 				//$queries = DB::getQueryLog();
 				//var_dump(end($queries));die;
 
@@ -320,6 +321,19 @@ class UsuariosController extends \BaseController {
 								->update(array('idUsuarioValidacionSeg'=>$recurso->id));
 					}else{
 						IndicadorFASSA::whereIn('id',$indicadores)
+								->whereNull('idUsuarioRendCuenta')
+								->update(array('idUsuarioRendCuenta'=>$recurso->id));
+					}
+				}
+
+				if(count(Input::get('estrategias'))){
+					$estrategias = Input::get('estrategias');
+					if($recurso->idDepartamento == 2){
+						Estrategia::whereIn('id',$estrategias)
+								->whereNull('idUsuarioValidacionSeg')
+								->update(array('idUsuarioValidacionSeg'=>$recurso->id));
+					}else{
+						Estrategia::whereIn('id',$estrategias)
 								->whereNull('idUsuarioRendCuenta')
 								->update(array('idUsuarioRendCuenta'=>$recurso->id));
 					}
@@ -498,10 +512,17 @@ class UsuariosController extends \BaseController {
 					$recurso->filtrarIndicadores = NULL;
 				}
 
+				if(count(Input::get('estrategias'))){
+					$recurso->filtrarEstrategias = 1;
+				}else{
+					$recurso->filtrarEstrategias = NULL;
+				}
+
 				$caratulas = $recurso->caratulas()->lists('id');
 				$proyectos = $recurso->proyectos()->lists('id');
 				$programas = $recurso->programas()->lists('id');
 				$indicadores = $recurso->indicadores()->lists('id');
+				$estrategias = $recurso->estrategias()->lists('id');
 				
 				if(Input::get('caratulas')){ $nuevas_caratulas = Input::get('caratulas'); }
 				else{ $nuevas_caratulas = array(); }
@@ -522,6 +543,11 @@ class UsuariosController extends \BaseController {
 				else{ $nuevos_indicadores = array(); }
 				$array_indicadores['nuevos'] = array_diff($nuevos_indicadores, $indicadores);
 				$array_indicadores['borrar'] = array_diff($indicadores, $nuevos_indicadores);
+
+				if(Input::get('estrategias')){ $nuevas_estrategias = Input::get('estrategias'); }
+				else{ $nuevas_estrategias = array(); }
+				$array_estrategias['nuevos'] = array_diff($nuevas_estrategias, $estrategias);
+				$array_estrategias['borrar'] = array_diff($estrategias, $nuevas_estrategias);
 				
 				/*$recurso->load('proyectosAsignados');
 				$proyectos_asignados = NULL;
@@ -543,7 +569,7 @@ class UsuariosController extends \BaseController {
 					$recurso->proyectosAsignados()->save($proyectos_asignados);
 				}*/
 
-				$respuesta = DB::transaction(function() use ($recurso,$array_proyectos,$array_caratulas,$array_programas,$array_indicadores){
+				$respuesta = DB::transaction(function() use ($recurso,$array_proyectos,$array_caratulas,$array_programas,$array_indicadores,$array_estrategias){
 					$respuesta_transac = array();
 					if($recurso->save()){
 						if(count($array_caratulas['nuevas'])){
@@ -625,6 +651,29 @@ class UsuariosController extends \BaseController {
 										->update(array('idUsuarioRendCuenta'=>NULL));
 							}
 						}
+
+						if(count($array_estrategias['nuevos'])){
+							if($recurso->idDepartamento == 2){
+								Estrategia::whereIn('id',$array_estrategias['nuevos'])
+										->whereNull('idUsuarioValidacionSeg')
+										->update(array('idUsuarioValidacionSeg'=>$recurso->id));
+							}else{
+								Estrategia::whereIn('id',$array_estrategias['nuevos'])
+										->whereNull('idUsuarioRendCuenta')
+										->update(array('idUsuarioRendCuenta'=>$recurso->id));
+							}
+						}
+						if(count($array_estrategias['borrar'])){
+							if($recurso->idDepartamento == 2){
+								Estrategia::whereIn('id',$array_estrategias['borrar'])
+										->where('idUsuarioValidacionSeg','=',$recurso->id)
+										->update(array('idUsuarioValidacionSeg'=>NULL));
+							}else{
+								Estrategia::whereIn('id',$array_estrategias['borrar'])
+										->where('idUsuarioRendCuenta','=',$recurso->id)
+										->update(array('idUsuarioRendCuenta'=>NULL));
+							}
+						}
 						
 						$respuesta_transac['http_status'] = 200;
 						$respuesta_transac['data'] = array("data"=>$recurso->toArray());
@@ -689,6 +738,9 @@ class UsuariosController extends \BaseController {
 				
 				Programa::whereIn('idUsuarioValidacionSeg',$ids_borrar)->update(array('idUsuarioValidacionSeg'=>NULL));
 				Programa::whereIn('idUsuarioRendCuenta',$ids_borrar)->update(array('idUsuarioRendCuenta'=>NULL));
+
+				Estrategia::whereIn('idUsuarioValidacionSeg',$ids_borrar)->update(array('idUsuarioValidacionSeg'=>NULL));
+				Estrategia::whereIn('idUsuarioRendCuenta',$ids_borrar)->update(array('idUsuarioRendCuenta'=>NULL));
 
 				//SentryUser::whereIn('id',$ids_borrar)->update(array('email'=>'concat_ws("-",email,"borrado@borrado.com")'));
 				if(SentryUser::whereIn('id',$ids_borrar)->delete()){
