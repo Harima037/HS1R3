@@ -37,6 +37,7 @@
 		                			@if($jurisdiccion || $usuario->claveJurisdiccion)
 									<div class="pull-left">
 										<button type="button" class="btn btn-default" id="btn-imprimir-plan-mejora"><span class="fa fa-print"></span> Imprimir Plan de Acción de Mejora</button>
+										<button type="button" class="btn btn-success" id="btn-proyecto-pdf"><span class="fa fa-file"></span> Imprimir Proyecto</button>
 									</div>
 									@endif
 								</div>

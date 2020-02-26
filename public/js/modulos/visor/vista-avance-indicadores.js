@@ -419,6 +419,10 @@ function seguimiento_metas(e){
     });    
 }
 
+$('#btn-proyecto-pdf').on('click',function(){
+    window.open(SERVER_HOST+'/v1/reporteProyecto/'+$('#id').val());
+});
+
 $('#btn-imprimir-plan-mejora').on('click',function(){
     var parametros = '?reporte-plan-mejora=1';
     var jurisdiccion = $('#btn-proyecto-cancelar').attr('data-jurisdiccion');

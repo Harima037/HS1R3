@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Validador;
 use SSA\Utilerias\Util;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime,Mail,Excel;
-use UnidadResponsable,EvaluacionPlanMejora, Proyecto, FichaTecnicaEvaluacion;
+use UnidadResponsable,EvaluacionPlanMejora, Proyecto, FichaTecnicaEvaluacion, Directorio;
 
 class FichaTecnicaEvaluacionController extends BaseController {
 	/**
@@ -514,13 +514,16 @@ class FichaTecnicaEvaluacionController extends BaseController {
 			12 => array('mes'=>'Diciembre',		'abrev'=>'DIC',	'trimestre'=>4, 'trimestre_letras'=>'4to')
 		);
 		
+		//Obtener al subdirector de planeacion en salud
+		$subdirector_planeacion = Directorio::soloActivos()->where('idArea','=',49)->first();
+
 		$datos['ejercicio'] = $ejercicio;
 		$datos['mes'] = $meses[intval($mes_actual)];
 		$datos['proyecto'] = array(
 			'lider_proyecto'=>$recurso['lider_proyecto'],
 			'responsable_informacion'=>$recurso['responsable_informacion'],
 			'coordinador_grupo_estrategico'=>$recurso['coordinador_grupo_estrategico'],
-			'subcoordinador_grupo_estrategico'=>array('nombre'=>'Dr. Carlos Díaz Jiménez','cargo'=>'Subdirector de Planeación en Salud'), //De donde, creo sacar por el puesto
+			'subcoordinador_grupo_estrategico'=>array('nombre'=>$subdirector_planeacion->nombre,'cargo'=>$subdirector_planeacion->cargo), //Se obtiene del idArea 49->Subdireccion de Planeacion
 			'nombre'=>$recurso['nombreTecnico'],
 			'programa'=>$recurso['datos_programa_presupuestario']['clave'] . ' - ' . $recurso['datos_programa_presupuestario']['descripcion'],
 			'clave'=>$recurso['ClavePresupuestaria'],
