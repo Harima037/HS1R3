@@ -113,9 +113,18 @@ class ReporteIndicadorResultadoController extends BaseController {
 			//var_dump(end($queries));die;
 			//return Response::json($fuentesFinan,200);
 			//$rows = $rows->toArray();
-			$hojas = array();
+			$hojas = array(
+				'2.3.1.1'=>null,
+				//'2.3.1.1_justificaciones'=>null,
+				'2.3.4.1'=>null,
+				//'2.3.4.1_justificaciones'=>null,
+				'2.3.5.1'=>null,
+				//'2.3.5.1_justificaciones'=>null,
+				//'2.3.2.1'=>null,
+				//'2.3.3.1'=>null,
+			);
 			foreach ($rows as $row) {
-				if(!isset($hojas[$row->subFuncionClave])){
+				if(!$hojas[$row->subFuncionClave]){
 					$hojas[$row->subFuncionClave] = array(
 						'titulo' => $row->subFuncionDescripcion,
 						'total_presup_aprobado' => 0,
@@ -227,11 +236,16 @@ class ReporteIndicadorResultadoController extends BaseController {
 			//return Response::json($hojas,200);
 
 			$datos['nombres_subfuncion'] = [
-				'2.3.1.1'=>'Prest. serv. salud comunidad',
-				'2.3.2.1'=>'Prest. serv. salud persona',
-				'2.3.3.1'=>'Generación recursos salud',
-				'2.3.4.1'=>'Rectoría sistema salud',
-				'2.3.5.1'=>'Protección social en salud'
+				'2.3.1.1'=>'SERVICIO A LA COMUNIDAD',
+				'2.3.1.1_justificaciones'=>'COMUNIDAD JUSTIFICACIÓN',
+				'2.3.4.1'=>'RECTORÍA DEL SISTEMA',
+				'2.3.4.1_justificaciones'=>'RECTORÍA JUSTIFICACIÓN',
+				'2.3.5.1'=>'PROTECCIÓN SOCIAL EN SALUD',
+				'2.3.5.1_justificaciones'=>'PROTECCIÓN SOCIAL JUSTIFICACIÓN',
+				'2.3.2.1'=>'SERVICIO A LA PERSONA',
+				'2.3.2.1_justificaciones'=>'PERSONA JUSTIFICACIÓN',
+				'2.3.3.1'=>'GENERACION RECURSOS SALUD',
+				'2.3.3.1_justificaciones'=>'RECURSOS SALUD JUSTIFICACIÓN',
 			];
 
 			$datos['hojas'] = $hojas;
@@ -241,10 +255,11 @@ class ReporteIndicadorResultadoController extends BaseController {
 				$datos_hoja['ejercicio'] = $datos['ejercicio'];
 				$datos_hoja['trimestre'] = $datos['trimestre'];
 
-				$justificaciones = array();
+				//$justificaciones = array();
 				
 				foreach ($datos['hojas'] as $clave => $hoja) {
 					//$excel->sheet('Proyectos', function($sheet) use ( $datos_hoja, $hoja ){
+					$justificaciones = array();
 
 					foreach ($hoja['clase'] as $clasificacion) {
 						foreach($clasificacion['proyectos'] as $proyecto){
@@ -257,7 +272,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 						}
 					}
 
-					$excel->sheet($datos['nombres_subfuncion'][$clave], function($sheet) use ( $datos_hoja, $hoja, $justificaciones ){
+					$excel->sheet($datos['nombres_subfuncion'][$clave], function($sheet) use ( $datos_hoja, $hoja ){
 						$sheet->setStyle(array(
 						    'font' => array(
 						        'name'      =>  'Arial',
@@ -297,7 +312,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 						    ),
 						    'borders' => array(
 						    	'allborders' => array(
-						    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
+						    		'style' => \PHPExcel_Style_Border::BORDER_MEDIUM,
 	            					'color' => array('argb' => 'FFFFFF')
 						    	)
 						    )
@@ -361,7 +376,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 								    'font' => array( 'size' => 10),
 								    'borders' => array(
 								    	'right' => array(
-								    		'style' => \PHPExcel_Style_Border::BORDER_THIN,
+								    		'style' => \PHPExcel_Style_Border::BORDER_THICK,
 			            					'color' => array('argb' => '002060')
 								    	)
 								    )
@@ -428,15 +443,16 @@ class ReporteIndicadorResultadoController extends BaseController {
 					
 					$excel->getActiveSheet()->getPageMargins()->setHeader(0.9055118);
 					$excel->getActiveSheet()->getPageMargins()->setFooter(0.5118110);
+
+					$excel->sheet($datos['nombres_subfuncion'][$clave.'_justificaciones'], function($sheet) use ( $justificaciones ){
+						//$objPHPExcel->getActiveSheet()->fromArray($testArray, NULL, 'A1');
+						$sheet->fromArray($justificaciones, NULL, 'A1');
+					});
 				}
 
+				$excel->setActiveSheetIndex(0);
 				//print_r($justificaciones);
 				//throw new Exception("Error Processing Request Spageete somebodur", 1);
-				
-				$excel->sheet('1.3 JUSTIFICACIONES', function($sheet) use ( $justificaciones ){
-					//$objPHPExcel->getActiveSheet()->fromArray($testArray, NULL, 'A1');
-					$sheet->fromArray($justificaciones, NULL, 'A1');
-				});
 			})->download('xlsx');
 		}catch(Exception $ex){
 			return Response::json(array('data'=>'Ocurrio un error al generar el reporte.','message'=>$ex->getMessage(),'line'=>$ex->getLine()),500);

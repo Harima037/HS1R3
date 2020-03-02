@@ -19,7 +19,7 @@ namespace V1;
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, View;
-use Excel, EvaluacionAnalisisFuncional, SysConfiguracionVariable, Proyecto, SysGrupoModulo;
+use Excel, EvaluacionAnalisisFuncional, SysConfiguracionVariable, Proyecto, SysGrupoModulo, Directorio;
 
 class ReporteCuentaPublicaController extends BaseController {
 
@@ -75,7 +75,7 @@ class ReporteCuentaPublicaController extends BaseController {
 		$justificado = array('align' => 'justify');
 
 		$infoStyle = array('borderColor'=>'000000', 'borderSize'=>6);
-		$claveStyle = array('borderColor'=>'000000','borderSize'=>6,'borderTopColor'=>'FFFFFF','cellMargin'=>200,'cellMarginTop'=>0);
+		$claveStyle = array('borderColor'=>'000000','borderSize'=>8,'borderTopColor'=>'FFFFFF','cellMargin'=>5,'cellMarginTop'=>0);
 		$headerStyle = array('borderColor'=>'FFFFFF','borderSize'=>0);
 
 		$phpWord->addTableStyle('TablaInfo', $infoStyle);
@@ -116,7 +116,7 @@ class ReporteCuentaPublicaController extends BaseController {
 		
 		$table = $header->addTable('TablaClave');
 		$row = $table->addRow();
-		$row->addCell(2250)->addText(htmlspecialchars($variables['clave-institucional']));
+		$row->addCell(1500)->addText(htmlspecialchars($variables['clave-institucional']));
 
 		$header->addTextBreak();
 
@@ -216,13 +216,21 @@ class ReporteCuentaPublicaController extends BaseController {
 
 			if($elemento->totalMetas > 0){
 				if($elemento->cuentaPublica){
-					$section->addText(htmlspecialchars(trim($elemento->cuentaPublica)),$texto,$justificado);
+					$text = explode("\r\n", $elemento->cuentaPublica);
+					foreach($text as $line) {
+						$section->addText(htmlspecialchars(trim($line)),$texto,$justificado);
+					}
+					//$section->addText(htmlspecialchars(trim($elemento->cuentaPublica)),$texto,$justificado);
 				}else{
 					$section->addText(htmlspecialchars('No presentaron avances.'),$texto,$justificado);
 				}
 			}else{
 				if($elemento->cuentaPublica){
-					$section->addText(htmlspecialchars(trim($elemento->cuentaPublica)),$texto,$justificado);
+					$text = explode("\r\n", $elemento->cuentaPublica);
+					foreach($text as $line) {
+						$section->addText(htmlspecialchars(trim($line)),$texto,$justificado);
+					}
+					//$section->addText(htmlspecialchars(trim($elemento->cuentaPublica)),$texto,$justificado);
 				}else{
 					$mes_programado = 0;
 					if(isset($elemento->componentesMetasMes[0])){
@@ -255,6 +263,51 @@ class ReporteCuentaPublicaController extends BaseController {
 			}
 			$section->addTextBreak();
 		}
+
+		//Obtenemos firmantes
+		$firmantes = Directorio::soloActivos()->whereIn('idArea',[47,49,52])->orderBy('idArea')->get();
+
+		$table = $section->addTable('TablaInfo');
+
+		$estilo_tabla_firmas = array(
+			'borderColor'=>'FFFFFF',
+			'borderSize'=>6,
+			'borderBottomColor'=>'000000'
+		);
+		$estilo_espacio = array(
+			'borderColor'=>'FFFFFF',
+			'borderSize'=>0
+		);
+		$texto_firma = array(
+			'size'=>10
+		);
+		
+		$row = $table->addRow(700);
+		$row->addCell(1,$estilo_espacio)->addText('');
+		$row->addCell(1,$estilo_espacio)->addText('');
+		$row->addCell(1,$estilo_espacio)->addText('');
+		$row->addCell(1,$estilo_espacio)->addText('');
+		$row->addCell(1,$estilo_espacio)->addText('');
+		$row->addCell(1,$estilo_espacio)->addText('');
+		$row->addCell(1,$estilo_espacio)->addText('');
+
+		$row = $table->addRow();
+		$row->addCell(500,$estilo_espacio)->addText('');
+		$row->addCell(4500,$estilo_tabla_firmas)->addText((isset($firmantes[0]))?$firmantes[0]->nombre:'No especificado',$texto_firma,$centrado);
+		$row->addCell(812,$estilo_espacio)->addText('');
+		$row->addCell(4500,$estilo_tabla_firmas)->addText((isset($firmantes[1]))?$firmantes[1]->nombre:'No especificado',$texto_firma,$centrado);
+		$row->addCell(812,$estilo_espacio)->addText('');
+		$row->addCell(4500,$estilo_tabla_firmas)->addText((isset($firmantes[2]))?$firmantes[2]->nombre:'No especificado',$texto_firma,$centrado);
+		$row->addCell(500,$estilo_espacio)->addText('');
+
+		$row = $table->addRow();
+		$row->addCell(500,$estilo_espacio)->addText('');
+		$row->addCell(4500,$estilo_espacio)->addText((isset($firmantes[0]))?$firmantes[0]->cargo:'No especificado',$texto_firma,$centrado);
+		$row->addCell(812,$estilo_espacio)->addText('');
+		$row->addCell(4500,$estilo_espacio)->addText((isset($firmantes[1]))?$firmantes[1]->cargo:'No especificado',$texto_firma,$centrado);
+		$row->addCell(812,$estilo_espacio)->addText('');
+		$row->addCell(4500,$estilo_espacio)->addText((isset($firmantes[2]))?$firmantes[2]->cargo:'No especificado',$texto_firma,$centrado);
+		$row->addCell(500,$estilo_espacio)->addText('');
 
 		header('Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document');
 	    header("Content-Description: File Transfer");
