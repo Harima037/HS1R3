@@ -1276,23 +1276,23 @@ class ProyectosController extends BaseController {
 			
 		}
 		
-		if(!$es_editar){
+		/*if(!$es_editar){
 			if($selector_nivel == 'componente'){
 				$proyecto->load('componentes');
-				/*if(count($proyecto->componentes) == 2){  //Por proyecto con tres compoenentes
+				if(count($proyecto->componentes) == 2){  //Por proyecto con tres compoenentes
 					$respuesta['data']['data'] = 'El proyecto no puede tener mas de 2 componentes.';
 					throw new Exception("No esta permitido guardar mas de 2 componentes por cada proyecto", 1);
-				}*/
+				}
 			}//else{
 				//$componente->load('actividades');
-				/* Que siempre no, que si se puede tener mas de 5 actividades por componente
+				//Que siempre no, que si se puede tener mas de 5 actividades por componente
 				if(count($componente->actividades) == 5){
 					$respuesta['data']['data'] = 'El componente no puede tener mas de 5 acciones.';
 					throw new Exception("No esta permitido guardar mas de 5 acciones por cada componente", 1);
 				}
-				*/
+				
 			//}
-		}
+		}*/
 		
 		$validacion = Validador::validar(Input::all(), $reglasAccion);
 

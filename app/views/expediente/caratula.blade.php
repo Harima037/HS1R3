@@ -63,7 +63,7 @@
                     </li>
                     <li role="presentation" class="disabled">
                         <a id="tablink-componentes" href="#componentes" role="tab">
-                            Componentes <span class="badge">0 / 2</span>
+                            Componentes <span class="badge">0</span>
                         </a>
                     </li>
                 </ul>

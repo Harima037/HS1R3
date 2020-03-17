@@ -907,15 +907,15 @@ $('.btn-agregar-actividad').on('click',function(){
 $('.btn-agregar-componente').on('click',function(){
 	var componentes = $('#tablink-componentes > span').text().split('/');
 
-	if(parseInt(componentes[0]) >= parseInt(componentes[1])){
+	/*if(parseInt(componentes[0]) >= parseInt(componentes[1])){
 		MessageManager.show({code:'S03',data:"Los componentes para este proyecto ya estan completos.",timer:2});
-	}else{
+	}else{*/
 		$('#tablink-componente-actividades').attr('data-toggle','');
 		$('#tablink-componente-actividades').parent().addClass('disabled');
 		$('#lista-tabs-componente a:first').tab('show');
 		$(modal_componente).find(".modal-title").html("Nuevo Componente");
 		$(modal_componente).modal('show');
-	}
+	//}
 });
 
 /** Selects para actualizar la Clave Presupuestaria **/
@@ -1303,7 +1303,7 @@ function actualizar_grid_componentes(datos){
 		componentes.push(componente);
 	}
 
-	$('#tablink-componentes > span').text(componentes.length + ' / 2');
+	$('#tablink-componentes > span').text(componentes.length);
 
 	if(componentes.length == 0){
 		$(grid_componentes + ' > table > tbody').append('<tr><td colspan="6" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>');
