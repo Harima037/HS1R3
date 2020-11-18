@@ -472,7 +472,7 @@ class Proyecto extends BaseModel
 				$beneficiarios->select('proyectoBeneficiarios.id','proyectoBeneficiarios.idTipoBeneficiario',
 					'proyectoBeneficiarios.idProyecto',DB::raw('sum(avanceBenef.total) AS avanceTotal'),
 					//DB::raw('sum(proyectoBeneficiarios.total) AS programadoTotal',
-					DB::raw('CAST((sum(proyectoBeneficiarios.total) / (count(proyectobeneficiarios.idTipoBeneficiario)/count(distinct proyectobeneficiarios.sexo))) AS INTEGER) AS programadoTotal'),
+					DB::raw('CAST((sum(proyectoBeneficiarios.total) / (count(proyectoBeneficiarios.idTipoBeneficiario)/count(distinct proyectoBeneficiarios.sexo))) AS INTEGER) AS programadoTotal'),
 					'tipoBeneficiario.descripcion AS tipoBeneficiario')
 					->leftjoin('registroAvancesBeneficiarios AS avanceBenef',function($join)use($mes){
 						$join->on('avanceBenef.idTipoBeneficiario','=','proyectoBeneficiarios.idTipoBeneficiario')
