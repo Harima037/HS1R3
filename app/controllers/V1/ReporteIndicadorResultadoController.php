@@ -120,8 +120,8 @@ class ReporteIndicadorResultadoController extends BaseController {
 				//'2.3.4.1_justificaciones'=>null,
 				'2.3.5.1'=>null,
 				//'2.3.5.1_justificaciones'=>null,
-				//'2.3.2.1'=>null,
-				//'2.3.3.1'=>null,
+				'2.3.2.1'=>null,
+				'2.3.3.1'=>null,
 			);
 			foreach ($rows as $row) {
 				if(!$hojas[$row->subFuncionClave]){
