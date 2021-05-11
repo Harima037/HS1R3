@@ -18,7 +18,7 @@
 		<td colspan="11" class="titulo">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td>
 	</tr>
 	<tr>
-		<td colspan="11" class="titulo">DEPARTAMENTO DE INTEGRACION PROGRAMATICA PRESUPUESTAL</td>
+		<td colspan="11" class="titulo">DEPARTAMENTO DE EVALUACIÓN</td>
 	</tr>
 	
 	<tr><td height="5" colspan="15"></td></tr>
@@ -74,7 +74,7 @@
 	<tr>
 		<td colspan="2" class="encabezado">PROGRAMA ESPECIAL:</td>
 		<td colspan="13" class="dato">
-			{{ $data['programaEspecialDescripcion'] }}
+			{{ $data['origenAsignacionDescripcion'] }}
 		</td>
 	</tr>
 	<tr>
