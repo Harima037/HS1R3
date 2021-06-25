@@ -20,6 +20,8 @@ var desgloseComponenteDatagrid = new Datagrid('#datagridDesgloseComponente',proy
 
 var comentariosArray = [];
 
+var proyectoEstatusId = 0;
+
 componenteDatagrid.init();
 actividadDatagrid.init();
 desgloseComponenteDatagrid.init();
@@ -46,6 +48,8 @@ if($('#id').val()){
 	//load data
 	proyectoResource.get($('#id').val(),null,{
         _success: function(response){
+			proyectoEstatusId = response.data.idEstatusProyecto;
+
         	//inicializar_comportamiento_caratula();
         	if(response.data.lider_proyecto){
         		$('#lbl-lider-proyecto').html(response.data.lider_proyecto.nombre + '<br><small class="text-muted">'+response.data.lider_proyecto.cargo+'</small>');
@@ -1075,6 +1079,10 @@ function verdetallepresupuesto(tipoaccion, iddesglose, localidad, municipio, jur
 
 function escribirComentario(idcampo,nombrecampo,objetoconinformacion)
 {	
+	if(proyectoEstatusId != 2){
+		return false;
+	}
+
 	$('#modalComentario').find(".modal-title").html("<i class=\"fa fa-pencil-square-o\"></i> Escribir comentario");    
 	$('#lbl-nombredelcampo').html(nombrecampo);
 	$('#idcampo').val(idcampo);
@@ -1114,6 +1122,10 @@ function escribirComentario(idcampo,nombrecampo,objetoconinformacion)
 
 function escribirComentarioComponente(idcampo,nombrecampo,objetoconinformacion)
 {	
+	if(proyectoEstatusId != 2){
+		return false;
+	}
+
 	$('#modalComentario').find(".modal-title").html("<i class=\"fa fa-pencil-square-o\"></i> Escribir comentario");    
 	$('#lbl-nombredelcampo').html(nombrecampo);
 	$('#idcampo').val(idcampo);
@@ -1151,6 +1163,10 @@ function escribirComentarioComponente(idcampo,nombrecampo,objetoconinformacion)
 
 function escribirComentarioActividad(idcampo,nombrecampo,objetoconinformacion)
 {	
+	if(proyectoEstatusId != 2){
+		return false;
+	}
+
 	$('#modalComentario').find(".modal-title").html("<i class=\"fa fa-pencil-square-o\"></i> Escribir comentario");    
 	$('#lbl-nombredelcampo').html(nombrecampo);
 	$('#idcampo').val(idcampo);
@@ -1396,8 +1412,9 @@ $('#btnQuitarComentario').on('click',function(){
 });
 
 $('#btnRegresarCorregir').on('click',function(){
-	if(comentariosArray.length>0)
-	{
+	if(proyectoEstatusId > 3){
+		MessageManager.show({data:'El estatus del proyecto no permite esta acción',type:'ADV',timer:3});
+	} else if(comentariosArray.length>0){
 		Confirm.show({
 				titulo:"Regresar el proyecto para correcciones",
 				mensaje: "¿Estás seguro que desea devolver el proyecto para que éste sea corregido?",
@@ -1434,8 +1451,9 @@ $('#btnRegresarCorregir').on('click',function(){
 
 
 $('#btnAprobarProyecto').on('click',function(){
-	if(comentariosArray.length>0)
-	{
+	if(proyectoEstatusId > 3){
+		MessageManager.show({data:'El estatus del proyecto no permite esta acción',type:'ADV',timer:3});
+	} else if(comentariosArray.length>0){
 		MessageManager.show({data:'Existen comentarios sobre el proyecto, si desea autorizarlos, por favor, elimine los comentarios',type:'ADV',timer:3});		
 	}
 	else

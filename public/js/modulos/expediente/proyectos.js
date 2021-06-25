@@ -140,10 +140,17 @@ function editar (e){
 
             $('#proyecto-tab-panel-list a:first').tab('show');
 
-            $('#btn-exportar-excel').off('click');
-            $('#btn-exportar-excel').on('click',function(){
-                window.open(SERVER_HOST+'/v1/reporteProyecto/'+response.data.id);
-            });
+            if(response.data.idEstatusProyecto >= 4){
+                $('#btn-exportar-excel').show();
+                $('#btn-exportar-excel').off('click');
+                $('#btn-exportar-excel').on('click',function(){
+                    window.open(SERVER_HOST+'/v1/reporteProyecto/'+response.data.id);
+                });
+            }else{
+                $('#btn-exportar-excel').off('click');
+                $('#btn-exportar-excel').hide();
+            }
+            
 
             $('#btn-editar-proyecto').attr('data-id-proyecto',response.data.id);
 

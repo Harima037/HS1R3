@@ -29,7 +29,7 @@ class RevisionController extends BaseController {
 
 			$rows = Proyecto::getModel();
 			//$rows = $rows->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
-			$rows = $rows->wherein('idEstatusProyecto',array(2, 4));
+			$rows = $rows->wherein('idEstatusProyecto',array(2, 3, 4, 5));
 			
 			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 			
@@ -56,7 +56,7 @@ class RevisionController extends BaseController {
 			
 			$rows = $rows->select('proyectos.id',DB::raw('concat(unidadResponsable,finalidad,funcion,subfuncion,subsubfuncion,programaSectorial,programaPresupuestario,origenAsignacion,actividadInstitucional,proyectoEstrategico,LPAD(numeroProyectoEstrategico,3,"0")) as clavePresup'),
 				'nombreTecnico','catalogoClasificacionProyectos.descripcion AS clasificacionProyecto','catalogoUnidadesResponsables.descripcion AS unidadResponsable',
-				'catalogoEstatusProyectos.descripcion AS estatusProyecto','sentryUsers.username','proyectos.modificadoAl')
+				'catalogoEstatusProyectos.descripcion AS estatusProyecto','proyectos.idEstatusProyecto','sentryUsers.username','proyectos.modificadoAl')
 								->join('sentryUsers','sentryUsers.id','=','proyectos.creadoPor')
 								->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
 								->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
@@ -74,6 +74,7 @@ class RevisionController extends BaseController {
 						'clasificacionProyecto'	=> $row->clasificacionProyecto,
 						'unidadResponsable'		=> $row->unidadResponsable,
 						'estatusProyecto'		=> $row->estatusProyecto,
+						'idEstatusProyecto'		=> $row->idEstatusProyecto,
 						'username'				=> $row->username,
 						'modificadoAl'			=> date_format($row->modificadoAl,'d/m/Y')
 					);

@@ -961,16 +961,16 @@ class ProyectosController extends BaseController {
 				}
 			}
 
-			if($recurso->unidadResponsable != $parametros['unidadresponsable']){
+			if($recurso->unidadResponsable != $parametros['unidadresponsable'] || !$recurso->idLiderProyecto){
 				$titulares = Directorio::titularesActivos(array('00','01', $parametros['unidadresponsable']))->get();
 				foreach ($titulares as $titular) {
 					if($titular->claveUnidad == '00'){ //Dirección General
 						$recurso->idJefeInmediato 				= $titular->id;
 					}elseif ($titular->claveUnidad == '01') { //Dirección de Planeación y Desarrollo
 						$recurso->idJefePlaneacion 				= $titular->id;
-			  			$recurso->idCoordinadorGrupoEstrategico = $titular->id;
+						$recurso->idCoordinadorGrupoEstrategico = $titular->id;
 						//if($recurso->idLiderProyecto == NULL){
-			  			if(count($titulares) == 2){
+						if(count($titulares) == 2){
 							$recurso->idLiderProyecto = $titular->id;
 							$respuesta['data']['nombre-lider-proyecto'] = $titular->nombre;
 							$respuesta['data']['cargo-lider-proyecto'] = $titular->cargo;
