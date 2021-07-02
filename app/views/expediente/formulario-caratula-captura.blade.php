@@ -56,6 +56,41 @@
                 <input type="text" class="form-control" name="ejercicio" id="ejercicio"/>
             </div>
         </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+			<div class="form-group">
+				<label class="control-label" for="fechainicio">Fecha Inicio</label>
+				<input type="date" placeholder="aaaa-mm-dd" class="form-control" name="fechainicio" id="fechainicio"/>
+			</div>
+		</div>
+        <div class="col-sm-2">
+			<div class="form-group">
+				<label class="control-label" for="fechatermino">Fecha Termino</label>
+				<input type="date" placeholder="aaaa-mm-dd" class="form-control" name="fechatermino" id="fechatermino"/>
+			</div>
+		</div>
+		<div class="col-sm-2">
+			<div class="form-group">
+				<label class="control-label" for="tipoproyecto">Tipo de Proyecto</label>
+                <select class="form-control chosen-one" id="tipoproyecto" name="tipoproyecto">
+                    <option value="">Seleciona un tipo</option>
+                    @foreach ($tipos_proyectos as $tipo)
+                    <option value="{{$tipo->id}}">
+                        {{$tipo->descripcion}}
+                    </option>
+                    @endforeach
+                </select>
+			</div>
+		</div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="control-label" for="finalidadproyecto">Finalidad del Proyecto</label>
+                <textarea class="form-control" name="finalidadproyecto" id="finalidadproyecto"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-sm-12">
             <div class="form-group">
                 <label class="control-label" for="vinculacionped">Vinculación al PED (Plan Estatal de Desarrollo)</label>
@@ -248,7 +283,6 @@
     <input type="hidden" id="id" name="id" value="{{{ $id or '' }}}">
     <!--input type="hidden" id="id-fibap" name="id-fibap" value="{d{s{ $fibap_id or '' }d}d}"-->
     <input type="hidden" id="clasificacionproyecto" name="clasificacionproyecto" value="{{$clasificacion_proyecto_id}}">
-    <input type="hidden" id="tipoproyecto" name="tipoproyecto" value="{{$tipo_proyecto_id}}">
     <div class="row">
         <div class="col-sm-12">
             <button type="button" class="btn btn-primary pull-right" id="btn-proyecto-guardar">

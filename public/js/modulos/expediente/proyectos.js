@@ -312,15 +312,11 @@ $(modal_name).on('hide.bs.modal',function(e){
 });
 
 $('.btn-datagrid-agregar').on('click', function () {
-    $('#modalNuevoProyecto').find(".modal-title").html("Nuevo Proyecto Institucional");
-    $('#modalNuevoProyecto').modal('show');
-});
-
-$('#modalNuevoProyecto .btn-guardar').on('click', function (e) {
-    e.preventDefault();
+    window.location.href = SERVER_HOST+'/expediente/caratula';
+    /*e.preventDefault();
     $('#form_proyecto').attr('action',SERVER_HOST+'/expediente/caratula');
     $('#form_proyecto').attr('method','POST');
-    $('#form_proyecto').submit();
+    $('#form_proyecto').submit();*/
 });
 
 $('#btn-editar-proyecto').on('click',function(){

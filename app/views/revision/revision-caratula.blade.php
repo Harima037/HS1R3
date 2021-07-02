@@ -25,7 +25,7 @@
     <div class="col-md-12">
     	<div class="panel panel-default" id="datagridCaratulas">
             <div class="panel-heading">
-                <h4><i class="fa fa-file"></i> <b>{{$clasificacion_proyecto}}</b> <small>({{$tipo_proyecto}})</small></h4>
+                <h4><i class="fa fa-file"></i> <b>{{$clasificacion_proyecto}}</b>
             </div>
             <div class="panel-body" id="mensaje-espera">
                 <div class="alert alert-info">

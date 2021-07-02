@@ -59,11 +59,57 @@
                        	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
                    	</span>
                     <p id="lbl-ejercicio" class="form-control" style="height:auto"></p>
-				</div>                
+				</div>
             </div>
         </div>
-       
-        
+    </div>
+    <div class="row">
+        <div class="col-sm-2">
+			<div class="form-group">
+                <label class="control-label" for="fechainicio">Fecha Inicio</label>
+                <div class="input-group">
+                   	<span class="input-group-btn" onclick="escribirComentario('fechainicio','Fecha Inicio','lbl-fechainicio');">
+                       	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
+                   	</span>
+                    <p id="lbl-fechainicio" class="form-control" style="height:auto"></p>
+				</div>
+			</div>
+		</div>
+        <div class="col-sm-2">
+			<div class="form-group">
+                <label class="control-label" for="fechatermino">Fecha Termino</label>
+                <div class="input-group">
+                   	<span class="input-group-btn" onclick="escribirComentario('fechatermino','Fecha Termino','lbl-fechatermino');">
+                       	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
+                   	</span>
+                    <p id="lbl-fechatermino" class="form-control" style="height:auto"></p>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-2">
+			<div class="form-group">
+                <label class="control-label" for="tipoproyecto">Tipo de Proyecto</label>
+                <div class="input-group">
+                   	<span class="input-group-btn" onclick="escribirComentario('tipoproyecto','Fecha Termino','lbl-tipoproyecto');">
+                       	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
+                   	</span>
+                    <p id="lbl-tipoproyecto" class="form-control" style="height:auto"></p>
+				</div>
+			</div>
+		</div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label class="control-label" for="finalidadproyecto">Finalidad del Proyecto</label>
+                <div class="input-group">
+                   	<span class="input-group-btn" onclick="escribirComentario('finalidadproyecto','Fecha Termino','lbl-finalidadproyecto');">
+                       	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
+                   	</span>
+                    <p id="lbl-finalidadproyecto" class="form-control" style="height:auto"></p>
+				</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-sm-12">
             <div class="form-group">
                 <label class="control-label" for="lbl-vinculacionped">Vinculación al PED (Plan Estatal de Desarrollo)</label>

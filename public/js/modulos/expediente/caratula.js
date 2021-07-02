@@ -89,6 +89,11 @@ if($('#id').val()){
             $('#nombretecnico').val(response.data.nombreTecnico);
             $('#ejercicio').val(response.data.ejercicio);
 
+			$('#tipoproyecto').val(response.data.idTipoProyecto);
+			$('#fechainicio').val(response.data.fechaInicio);
+			$('#fechatermino').val(response.data.fechaTermino);
+			$('#finalidadproyecto').val(response.data.finalidadProyecto);
+
 			$('#unidad_responsable').text(response.data.unidadResponsable);
             $('#finalidad').text(response.data.finalidad);
             $('#funcion').text(response.data.funcion);
@@ -1569,7 +1574,7 @@ function mostrar_comentarios(datos){
 			}else{
 				$('#'+id_campo).parent('.form-group').addClass('has-warning');
 				var texto_lbl = $('label[for="' + id_campo + '"]').text();
-				$('label[for="' + id_campo + '"]').html('<span class="proyecto-comentario" data-placement="auto top" data-toggle="popover" data-trigger="click" data-content="'+observacion+'">'+texto_lbl+'</span>');
+				$('label[for="' + id_campo + '"]').html('<span class="proyecto-comentario" style="cursor:pointer" data-placement="auto top" data-toggle="popover" data-trigger="click" data-content="'+observacion+'">'+texto_lbl+'</span>');
 				$('label[for="' + id_campo + '"]').prepend('<span class="fa fa-warning"></span> ');
 				$('.proyecto-comentario').popover();
 			}

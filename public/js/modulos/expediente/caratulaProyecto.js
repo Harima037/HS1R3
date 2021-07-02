@@ -48,6 +48,11 @@ context.llenar_datos = function(datos){
     $('#tipoaccion').val(datos.idTipoAccion);
     $('#vinculacionped').val(datos.idObjetivoPED);
 
+	$('#tipoproyecto').val(datos.idTipoProyecto);
+	$('#fechainicio').val(datos.fechaInicio);
+	$('#fechatermino').val(datos.fechaTermino);
+	$('#finalidadproyecto').val(datos.finalidadProyecto);
+
     $('#unidadresponsable').val(datos.unidadResponsable);
     var funcion_gasto = datos.finalidad + '.' + datos.funcion + '.' + datos.subFuncion + '.' + datos.subSubFuncion;
     $('#funciongasto').val(funcion_gasto);

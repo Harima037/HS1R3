@@ -61,7 +61,7 @@ class RevisionController extends BaseController {
 								->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
 								->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
 								->join('catalogoUnidadesResponsables','catalogoUnidadesResponsables.clave','=','proyectos.unidadResponsable')
-								->orderBy('id', 'desc')
+								->orderBy('proyectos.modificadoAl','desc')
 								->skip(($parametros['pagina']-1)*10)->take(10)
 								->get();
 			$proyectos = array();
@@ -99,7 +99,7 @@ class RevisionController extends BaseController {
 								->join('catalogoClasificacionProyectos','catalogoClasificacionProyectos.id','=','proyectos.idClasificacionProyecto')
 								->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
 								->leftjoin('fibap','proyectos.id','=','fibap.idProyecto')
-								->orderBy('proyectos.id','desc')
+								->orderBy('proyectos.actualizadoAl','desc')
 								->wherein('proyectos.idClasificacionProyecto',array(2, 4))
 								->whereIn('unidadResponsable',$unidades)
 								->whereNull('fibap.id')

@@ -74,6 +74,11 @@ if($('#id').val()){
 
 			$('#lbl-nombretecnico').text(response.data.nombreTecnico);
             $('#lbl-ejercicio').text(response.data.ejercicio);
+
+			$('#lbl-tipoproyecto').text(response.data.tipo_proyecto.descripcion);
+			$('#lbl-fechainicio').text(response.data.fechaInicio);
+			$('#lbl-fechatermino').text((response.data.fechaTermino)?response.data.fechaTermino:'-');
+			$('#lbl-finalidadproyecto').text(response.data.finalidadProyecto);
 			
 			$('#lbl-tipoaccion').text(response.data.tipo_accion.descripcion);
             $('#lbl-vinculacionped').text(response.data.objetivo_ped.clave+' - '+response.data.objetivo_ped.descripcion);

@@ -31,7 +31,7 @@
     	<div class="panel panel-default" id="datagridCaratulas">
             <div class="panel-heading">
                 <h4>
-                    <i class="fa fa-file"></i> <b>{{$clasificacion_proyecto}}</b> <small>({{$tipo_proyecto}})</small>
+                    <i class="fa fa-file"></i> <b>{{$clasificacion_proyecto}}</b>
                     <span class="pull-right">
                         <button type="button" class="btn btn-danger" id="btn-cancelar-proyecto">
                             <span class="fa fa-times-circle"></span> Cancelar Proyecto

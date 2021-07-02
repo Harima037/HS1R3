@@ -10,7 +10,6 @@ class ProyectosController extends \BaseController {
 	public function index(){
 		$catalogos = array(
 				'clasificacion_proyectos'=>ClasificacionProyecto::all(),
-				'tipos_proyectos'=>TipoProyecto::all(),
 				'origenes_financiamiento' => OrigenFinanciamiento::all()
 			);
 		return parent::loadIndex('EXP','PROYECTOS',$catalogos);
@@ -125,7 +124,7 @@ class ProyectosController extends \BaseController {
 		}
 		
 		$clasificacion = ClasificacionProyecto::all()->lists('descripcion','id');
-		$tipo = TipoProyecto::all()->lists('descripcion','id');
+		//$tipo = TipoProyecto::all()->lists('descripcion','id');
 
 		$funciones_gasto = FuncionGasto::whereNull('idPadre')->with('hijos')->get();
 
@@ -134,9 +133,10 @@ class ProyectosController extends \BaseController {
 		$datos = array(
 			'firmas' => $firmas,
 			'clasificacion_proyecto_id' => $parametros['clasificacion-proyecto'],
-			'tipo_proyecto_id' => $parametros['tipo-proyecto'],
+			//'tipo_proyecto_id' => $parametros['tipo-proyecto'],
 			'clasificacion_proyecto' => $clasificacion[$parametros['clasificacion-proyecto']],
-			'tipo_proyecto' => $tipo[$parametros['tipo-proyecto']],
+			//'tipo_proyecto' => $tipo[$parametros['tipo-proyecto']],
+			'tipos_proyectos'=> TipoProyecto::all(),
 			'tipos_acciones' => TipoAccion::where('id','=',7)->get(),
 			'funciones_gasto' => $funciones_gasto,
 			'programas_sectoriales' => ProgramaSectorial::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),

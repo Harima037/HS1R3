@@ -73,19 +73,11 @@ $(modal_name).on('hide.bs.modal',function(e){
 });
 
 $('.btn-datagrid-agregar').on('click', function () {
-    $(modal_name).find(".modal-title").html("Nuevo Proyecto de Inversión");
-    $(modal_name).modal('show');
+    window.location.href = SERVER_HOST+'/expediente/caratula-inversion';
 });
 
 $('#btn-editar-proyecto').on('click',function(){
     window.location.href = SERVER_HOST+'/expediente/caratula-inversion/' + $('#btn-editar-proyecto').attr('data-id-proyecto');
-});
-
-$(modal_name+' .btn-guardar').on('click', function (e) {
-    e.preventDefault();
-    $(form_name).attr('action',SERVER_HOST+'/expediente/caratula-inversion');
-    $(form_name).attr('method','POST');
-    $(form_name).submit();
 });
 
 function cargar_datos_proyecto(e){

@@ -29,6 +29,8 @@ class ProyectosController extends BaseController {
 		'nombretecnico'				=> 'sometimes|required',
 		'ejercicio'					=> 'required',
 		'tipoproyecto'				=> 'required',
+		'fechainicio'				=> 'required',
+		'finalidadproyecto'			=> 'required',
 		'cobertura'					=> 'sometimes|required',
 		'municipio'					=> 'sometimes|required_if:cobertura,2|digits_between:1,3',
 		'region'					=> 'sometimes|required_if:cobertura,3|alpha',
@@ -919,6 +921,9 @@ class ProyectosController extends BaseController {
 			$recurso->actividadInstitucional 		= $parametros['actividadinstitucional'];
 			$recurso->proyectoEstrategico 			= $parametros['proyectoestrategico'];
 			$recurso->idTipoProyecto 				= $parametros['tipoproyecto'];
+			$recurso->fechaInicio					= $parametros['fechainicio'];
+			$recurso->fechaTermino					= ($parametros['fechatermino'])?$parametros['fechatermino']:NULL;
+			$recurso->finalidadProyecto				= $parametros['finalidadproyecto'];
 			$recurso->nombreTecnico 				= $parametros['nombretecnico'];
 			$recurso->idObjetivoPED 				= $parametros['vinculacionped'];
 			$recurso->programaPresupuestario 		= $parametros['programapresupuestario'];
