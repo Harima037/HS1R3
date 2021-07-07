@@ -101,7 +101,9 @@ class EP01Controller extends \BaseController {
 							DB::raw('SUM(presupuestoEjercidoModificado) AS presupuestoEjercidoModificado'),
 							DB::raw('SUM(presupuestoPagadoModificado) AS presupuestoPagadoModificado'),
 							DB::raw('SUM(disponibilidadFinancieraModificada) AS disponibilidadFinancieraModificada'),
-							DB::raw('SUM(disponiblePresupuestarioModificado) AS disponiblePresupuestarioModificado')
+							DB::raw('SUM(disponiblePresupuestarioModificado) AS disponiblePresupuestarioModificado'),
+							DB::raw('COUNT(DISTINCT proyectos.id) as totalProyectos'),
+							'catalogoEstatusProyectos.descripcion as estatusProyecto'
 						)
 						->leftjoin('proyectos',function($join){
 							$join->on(
@@ -136,6 +138,7 @@ class EP01Controller extends \BaseController {
 								")
 							)->whereNull('proyectos.borradoAl');
 						})
+						->leftjoin('catalogoEstatusProyectos','proyectos.idEstatusProyecto','=','catalogoEstatusProyectos.id')
 						->get();
 			Excel::create('ListaProyectos', function($excel) use ($datos){
 				$excel->sheet('Proyectos', function($sheet)  use ($datos){

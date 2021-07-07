@@ -83,6 +83,7 @@
 			<tr>
 				<th class="encabezado-tabla">Clave Presupuestaria</th>
 				<th width="50" class="encabezado-tabla">Nombre Técnico</th>
+				<th class="encabezado-tabla">Estatus Proyecto</th>
 				<th class="encabezado-tabla">Presupuesto Aprobado</th>
 				<th class="encabezado-tabla">Modificacion Neta</th>
 				<th class="encabezado-tabla">Presupuesto Modificado</th>
@@ -95,6 +96,7 @@
 				<th class="encabezado-tabla">Presupuesto Pagado Modificado</th>
 				<th class="encabezado-tabla">Disponibilidad Financiera Modificada</th>
 				<th class="encabezado-tabla">Disponible Presupuestario Modificado</th>
+				<th class="encabezado-tabla">Total Proyectos</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -102,6 +104,7 @@
 				<tr {{(!$item->nombreTecnico)?'class="proyecto-no-encontrado"':''}}>
 					<td>{{$item->clavePresupuestaria}}</td>
 					<td>{{$item->nombreTecnico}}</td>
+					<td>{{$item->estatusProyecto}}</td>
 					<td>{{$item->presupuestoAprobado}}</td>
 					<td>{{$item->modificacionNeta}}</td>
 					<td>{{$item->presupuestoModificado}}</td>
@@ -114,6 +117,7 @@
 					<td>{{$item->presupuestoPagadoModificado}}</td>
 					<td>{{$item->disponibilidadFinancieraModificada}}</td>
 					<td>{{$item->disponiblePresupuestarioModificado}}</td>
+					<td>{{$item->totalProyectos}}</td>
 				</tr>
 			@endforeach
 		</tbody>
