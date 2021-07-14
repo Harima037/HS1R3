@@ -90,7 +90,24 @@ if($('#id').val()){
             $('#subfuncion').text(response.data.datos_sub_funcion.clave.slice(-1));
             $('#subsubfuncion').text(response.data.datos_sub_sub_funcion.clave.slice(-1));
             $('#programa_sectorial').text(response.data.datos_programa_sectorial.clave );
+
             $('#programa_presupuestario').text(response.data.datos_programa_presupuestario.clave );
+			if(response.data.datos_programa_presupuestario_indicadores){
+				$('#titulo-programa-presupuestario').text(response.data.datos_programa_presupuestario.descripcion);
+				$('#panel-programa-seleccionado').show();
+				$('#tabla-indicadores-programa-presupuestario tbody').html('');
+				var html_indicadores= '';
+				for(var i in response.data.datos_programa_presupuestario_indicadores.indicadores_descripcion){
+					var indicador = response.data.datos_programa_presupuestario_indicadores.indicadores_descripcion[i];
+					html_indicadores += '<tr>';
+					html_indicadores += '<td>'+indicador.claveTipoIndicador+'</td>';
+					html_indicadores += '<td>'+indicador.descripcionIndicador+'</td>';
+					html_indicadores += '<td>'+indicador.unidadMedida+'</td>';
+					html_indicadores += '</tr>';
+				}
+				$('#tabla-indicadores-programa-presupuestario tbody').html(html_indicadores);
+			}
+			
             $('#origen_asignacion').text(response.data.datos_origen_asignacion.clave );
             $('#actividad_institucional').text(response.data.datos_actividad_institucional.clave );
             $('#proyecto_estrategico').text(response.data.datos_proyecto_estrategico.clave);
@@ -134,76 +151,73 @@ if($('#id').val()){
 			var sePusoTotales = 0;
 			var banderaCelda = 0;
 			
-			for(var cuentabeneficia in response.data.beneficiarios)
-			{
-				if(encabezado==0)
-				{
-					cadenaHTML = cadenaHTML + '<td colspan="3"><strong> &nbsp;Tipo de beneficiario: </strong></td><td colspan="9">&nbsp;'+response.data.beneficiarios[cuentabeneficia].tipo_beneficiario.descripcion+'</td><td>&nbsp;</td></tr><tr><td colspan="2" rowspan="2" align="center"><strong>Total</strong></td><td rowspan="2" align="center"><strong>Género</strong></td><td colspan="2" align="center"><strong>Zona</strong></td><td colspan="2" align="center"><strong>Población</strong></td><td colspan="5" align="center"><strong>Marginación</strong></td><td rowspan="3" align="center"> <button type="button" class="btn btn-default" id="beneficiario'+response.data.beneficiarios[cuentabeneficia].idTipoBeneficiario+'" onclick="escribirComentario(\'beneficiario'+response.data.beneficiarios[cuentabeneficia].idTipoBeneficiario+'\',\'Tipo de beneficiario\',\''+response.data.beneficiarios[cuentabeneficia].tipo_beneficiario.descripcion+'\')" ><i class="fa fa-pencil-square-o"></i>Comentar</button></td></tr><tr><td align="center"><strong>Urbana</strong></td><td align="center"><strong>Rural</strong></td><td align="center"><strong>Mestiza</strong></td><td align="center"><strong>Indígena</strong></td><td align="center"><strong>Muy Alta</strong></td><td align="center"><strong>Alta</strong></td><td align="center"><strong>Media</strong></td><td align="center"><strong>Baja</strong></td><td align="center"><strong>Muy Baja</strong></td></tr><tr>';					
+			for(var cuentabeneficia in response.data.beneficiarios){
+				if(encabezado==0){
+					if(cuentabeneficia > 0){
+						cadenaHTML = cadenaHTML + '<td style="background-color:black;" colspan="13"></td></tr><tr>';
+					}
+					cadenaHTML = cadenaHTML + '<td colspan="3"><strong> &nbsp;Tipo de Beneficiario: </strong></td><td colspan="7">&nbsp;'+response.data.beneficiarios[cuentabeneficia].tipo_beneficiario.descripcion+'</td><td style="vertical-align:middle" rowspan="2" colspan="2" align="center"> <button type="button" class="btn btn-default" id="beneficiario'+response.data.beneficiarios[cuentabeneficia].idTipoBeneficiario+'" onclick="escribirComentario(\'beneficiario'+response.data.beneficiarios[cuentabeneficia].idTipoBeneficiario+'\',\'Tipo de beneficiario\',\''+response.data.beneficiarios[cuentabeneficia].tipo_beneficiario.descripcion+'\')" ><i class="fa fa-pencil-square-o"></i>Comentar</button></td></tr><tr>';
+					if(response.data.beneficiarios[cuentabeneficia].tipo_captura){
+						cadenaHTML = cadenaHTML + '<td colspan="3"><strong> &nbsp;Tipo de Captura: </strong></td><td colspan="8">&nbsp;'+response.data.beneficiarios[cuentabeneficia].tipo_captura.descripcion+'</td></tr><tr style="background-color:whitesmoke;">';
+					}else{
+						cadenaHTML = cadenaHTML + '<td colspan="3"><strong> &nbsp;Tipo de Captura: </strong></td><td colspan="8">&nbsp;Sin Datos</td></tr><tr style="background-color:whitesmoke;">';
+					}
+					cadenaHTML = cadenaHTML + '<td colspan="2" rowspan="2" align="center"><strong>Total</strong></td><td rowspan="2" align="center"><strong>Género</strong></td><td colspan="2" align="center"><strong>Zona</strong></td><td colspan="2" align="center"><strong>Población</strong></td><td colspan="5" align="center"><strong>Marginación</strong></td></tr><tr style="background-color:whitesmoke;"><td align="center"><strong>Urbana</strong></td><td align="center"><strong>Rural</strong></td><td align="center"><strong>Mestiza</strong></td><td align="center"><strong>Indígena</strong></td><td align="center"><strong>Muy Alta</strong></td><td align="center"><strong>Alta</strong></td><td align="center"><strong>Media</strong></td><td align="center"><strong>Baja</strong></td><td align="center"><strong>Muy Baja</strong></td></tr><tr>';
 					encabezado = 1;
 				}
 																		
-				if((parseInt(cuentabeneficia,10)+2)<=cuantasFilasBeneficiarios)
-				{
+				if((parseInt(cuentabeneficia,10)+2)<=cuantasFilasBeneficiarios){
 					var siguienteIndice = parseInt(cuentabeneficia,10)+1;										
-					if(response.data.beneficiarios[cuentabeneficia].idTipoBeneficiario == response.data.beneficiarios[siguienteIndice].idTipoBeneficiario)
-					{
+					if(response.data.beneficiarios[cuentabeneficia].idTipoBeneficiario == response.data.beneficiarios[siguienteIndice].idTipoBeneficiario){
 						var sumaTotales = (parseInt(response.data.beneficiarios[cuentabeneficia].total) || 0) + (parseInt(response.data.beneficiarios[siguienteIndice].total) || 0);
-						cadenaHTML = cadenaHTML +'<td rowspan="2" align="right">'+sumaTotales+'</td>';
+						cadenaHTML = cadenaHTML +'<td rowspan="2" align="right">'+sumaTotales.format()+'</td>';
 						sePusoTotales = 1;
-					}
-					else
-					{
-						if(sePusoTotales == 0)
-						{
-							var sumaTotales = response.data.beneficiarios[cuentabeneficia].total;
-							cadenaHTML = cadenaHTML +'<td align="right">'+sumaTotales+'</td>';
-						}
-						else
-						{
+					}else{
+						if(sePusoTotales == 0){
+							var sumaTotales = parseInt(response.data.beneficiarios[cuentabeneficia].total) || 0;
+							cadenaHTML = cadenaHTML +'<td align="right">'+sumaTotales.format()+'</td>';
+						}else{
 							sePusoTotales = 0;
 							banderaCelda = 1;
 						}
 						encabezado = 0;
 					}
-				}
-				else
-				{					
-					if(sePusoTotales == 0)
-					{
-						var sumaTotales = response.data.beneficiarios[cuentabeneficia].total;	
-						cadenaHTML = cadenaHTML +'<td align="right">'+sumaTotales+'</td>';
-					}
-					else
-					{
+				}else{
+					if(sePusoTotales == 0){
+						var sumaTotales = parseInt(response.data.beneficiarios[cuentabeneficia].total) || 0;
+						cadenaHTML = cadenaHTML +'<td align="right">'+sumaTotales.format()+'</td>';
+					}else{
 						banderaCelda = 1;
 					}
 					encabezado = 0;
 				}
 				
-				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].total+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+parseInt(response.data.beneficiarios[cuentabeneficia].total).format()+'</td>';
+
 				if(response.data.beneficiarios[cuentabeneficia].sexo == 'f')
 					cadenaHTML = cadenaHTML +'<td align="center"><span class="fa fa-female"></span> Femenino</td>';
 				else
 					cadenaHTML = cadenaHTML +'<td align="center"><span class="fa fa-male"></span> Masculino</td>';
-				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].urbana+'</td>';
-				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].rural+'</td>';
-				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].mestiza+'</td>';
-				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].indigena+'</td>';
-				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].muyAlta+'</td>';
-				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].alta+'</td>';
-				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].media+'</td>';
-				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].baja+'</td>';
-				cadenaHTML = cadenaHTML +'<td align="right">'+response.data.beneficiarios[cuentabeneficia].muyBaja+'</td>';
+
+				cadenaHTML = cadenaHTML +'<td align="right">'+parseInt(response.data.beneficiarios[cuentabeneficia].urbana).format()+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+parseInt(response.data.beneficiarios[cuentabeneficia].rural).format()+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+parseInt(response.data.beneficiarios[cuentabeneficia].mestiza).format()+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+parseInt(response.data.beneficiarios[cuentabeneficia].indigena).format()+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+parseInt(response.data.beneficiarios[cuentabeneficia].muyAlta).format()+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+parseInt(response.data.beneficiarios[cuentabeneficia].alta).format()+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+parseInt(response.data.beneficiarios[cuentabeneficia].media).format()+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+parseInt(response.data.beneficiarios[cuentabeneficia].baja).format()+'</td>';
+				cadenaHTML = cadenaHTML +'<td align="right">'+parseInt(response.data.beneficiarios[cuentabeneficia].muyBaja).format()+'</td>';
 				
 				if(banderaCelda==1)
 				{
 					banderaCelda=0;
-					cadenaHTML = cadenaHTML + '<td>&nbsp;</td>';	
+					//cadenaHTML = cadenaHTML + '<td>&nbsp;</td>';	
 				}
 				
-				cadenaHTML = cadenaHTML + '</tr>';
+				cadenaHTML = cadenaHTML + '</tr><tr>';
 			}
-			cadenaHTML = cadenaHTML + '</table>';		
+			cadenaHTML = cadenaHTML + '</table>';
 			
 			$('#tabla-beneficiarios').html(cadenaHTML);		
 			
@@ -348,8 +362,27 @@ if($('#id').val()){
 					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-3"><div class="form-group"><label class="control-label" for="lbl-tipo-ind'+idComponente+'">Tipo</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'tipo-ind|'+idComponente+'\',\'Tipo\',\'lbl-tipo-ind'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-tipo-ind'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].tipo_indicador.descripcion+'</p></div></div></div>';
 				}
 				
-				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-5"><div class="form-group"><label class="control-label" for="lbl-unidad-medida'+idComponente+'">Unidad de medida</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'unidad-medida|'+idComponente+'\',\'Unidad de medida\',\'lbl-unidad-medida'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-unidad-medida'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].unidad_medida.descripcion+'</p></div></div></div>';
-				/*TERMINA SECCIÓN DE INDICADOR*/				
+				if(response.data.componentes[cuentaComponentes].unidad_medida == null){
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-5"><div class="form-group"><label class="control-label" for="lbl-unidad-medida'+idComponente+'">Unidad de medida</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'unidad-medida|'+idComponente+'\',\'Unidad de medida\',\'lbl-unidad-medida'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-unidad-medida'+idComponente+'" class="form-control" style="height:auto">&nbsp;</p></div></div></div>';
+				}else{
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-5"><div class="form-group"><label class="control-label" for="lbl-unidad-medida'+idComponente+'">Unidad de medida</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'unidad-medida|'+idComponente+'\',\'Unidad de medida\',\'lbl-unidad-medida'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-unidad-medida'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].unidad_medida.descripcion+'</p></div></div></div>';
+				}
+				
+
+				if(response.data.componentes[cuentaComponentes].comportamiento_accion == null){
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-comportamiento'+idComponente+'">Comportamiento</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'comportamiento|'+idComponente+'\',\'Comportamiento\',\'lbl-comportamiento'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-comportamiento'+idComponente+'" class="form-control" style="height:auto">&nbsp;</p></div></div></div>';
+				}else{
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-comportamiento'+idComponente+'">Comportamiento</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'comportamiento|'+idComponente+'\',\'Comportamiento\',\'lbl-comportamiento'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-comportamiento'+idComponente+'" class="form-control" style="height:auto">'+(response.data.componentes[cuentaComponentes].comportamiento_accion.clave + ' ' + response.data.componentes[cuentaComponentes].comportamiento_accion.descripcion)+'</p></div></div></div>';
+				}
+				
+				if(response.data.componentes[cuentaComponentes].tipo_valor_meta == null){
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-tipo-valor-meta'+idComponente+'">Tipo de Valor de la Meta</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'tipo-valor-meta|'+idComponente+'\',\'Tipo de Valor de la Meta\',\'lbl-tipo-valor-meta'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-tipo-valor-meta'+idComponente+'" class="form-control" style="height:auto">&nbsp;</p></div></div></div>';
+				}else{
+					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-tipo-valor-meta'+idComponente+'">Tipo de Valor de la Meta</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'tipo-valor-meta|'+idComponente+'\',\'Tipo de Valor de la Meta\',\'lbl-tipo-valor-meta'+idComponente+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-tipo-valor-meta'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].tipo_valor_meta.descripcion+'</p></div></div></div>';
+				}
+				
+				/*TERMINA SECCIÓN DE INDICADOR*/
+
 				/*COMIENZA SECCIÓN DE METAS*/				
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12 bg-info"><span class="fa fa-table"></span> <strong> Metas</strong></div>';	
 			
@@ -535,6 +568,19 @@ if($('#id').val()){
 						}else{
 							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-5"><div class="form-group"><label class="control-label" for="lbl-unidad-medidaactividad'+idActividad+'">Unidad de medida</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'unidad-medida|'+idActividad+'\',\'Unidad de medida\',\'lbl-unidad-medidaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-unidad-medidaactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].unidad_medida.descripcion+'</p></div></div></div>';
 						}
+
+						if(response.data.componentes[cuentaComponentes].actividades[indiceActividad].comportamiento_accion == null){
+							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-comportamientoactividad'+idActividad+'">Comportamiento</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'comportamiento|'+idActividad+'\',\'Comportamiento\',\'lbl-comportamientoactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-comportamientoactividad'+idActividad+'" class="form-control" style="height:auto">&nbsp;</p></div></div></div>';
+						}else{
+							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-comportamientoactividad'+idActividad+'">Comportamiento</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'comportamiento|'+idActividad+'\',\'Comportamiento\',\'lbl-comportamientoactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-comportamientoactividad'+idActividad+'" class="form-control" style="height:auto">'+(response.data.componentes[cuentaComponentes].actividades[indiceActividad].comportamiento_accion.clave + ' ' + response.data.componentes[cuentaComponentes].actividades[indiceActividad].comportamiento_accion.descripcion)+'</p></div></div></div>';
+						}
+						
+						if(response.data.componentes[cuentaComponentes].actividades[indiceActividad].tipo_valor_meta == null){
+							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-tipo-valor-metaactividad'+idActividad+'">Tipo de Valor de la Meta</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'tipo-valor-meta|'+idActividad+'\',\'Tipo de Valor de la Meta\',\'lbl-tipo-valor-metaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-tipo-valor-metaactividad'+idActividad+'" class="form-control" style="height:auto">&nbsp;</p></div></div></div>';
+						}else{
+							PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-tipo-valor-metaactividad'+idActividad+'">Tipo de Valor de la Meta</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioActividad(\'tipo-valor-meta|'+idActividad+'\',\'Tipo de Valor de la Meta\',\'lbl-tipo-valor-metaactividad'+idActividad+'\');"><span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-tipo-valor-metaactividad'+idActividad+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].actividades[indiceActividad].tipo_valor_meta.descripcion+'</p></div></div></div>';
+						}
+						
 						/*TERMINA SECCIÓN DE INDICADOR*/
 						/*COMIENZA SECCIÓN DE METAS*/
 						PanelDeActividades[contadorDeActividades] = PanelDeActividades[contadorDeActividades] + '<div class="col-sm-12 bg-info"><span class="fa fa-table"></span> <strong> Metas</strong></div>';						
@@ -2483,3 +2529,21 @@ function habilita_opciones(selector,habilitar_id,default_id){
 		$(selector).trigger("chosen:updated");
 	}
 }
+
+/**
+ * Number.prototype.format(n, x)
+ * 
+ * @param integer n: length of decimal
+ * @param integer x: length of sections
+ */
+ Number.prototype.format = function(n, x) {
+    var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\.' : '$') + ')';
+    //return this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+    var formateado = this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+    var partes = formateado.split('.');
+    if(parseInt(partes[1]) == 0){
+        return partes[0];
+    }else{
+        return formateado;
+    }
+};

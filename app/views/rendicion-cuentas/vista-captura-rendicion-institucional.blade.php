@@ -85,7 +85,7 @@
 	    			<div class="col-sm-12">
 	    				<div class="form-group">
 	    					<label class="control-label" for="finalidad">Finalidad del Proyecto</label>
-	    					<textarea id="finalidad" name="finalidad" rows="4" class="form-control"></textarea>
+							<span id="span-finalidad-proyecto" class="form-control" style="height:auto;">No se ha capturado este dato</span>
 	    				</div>
 	    			</div>
 	    			<div class="col-sm-12">

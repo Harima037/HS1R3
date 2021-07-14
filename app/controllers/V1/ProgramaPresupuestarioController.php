@@ -113,10 +113,15 @@ class ProgramaPresupuestarioController extends BaseController {
 											->join('catalogoUnidadesMedida AS unidadMedida','unidadMedida.id','=','programaIndicador.idUnidadMedida')
 											->where('idPrograma','=',$id)->get();
 				}elseif($parametros['listar'] == 'proyectos'){
-					$rows = Proyecto::select('proyectos.*','sentryUsers.username','catalogoCoberturas.descripcion AS coberturaDescripcion')
+					$programa = Programa::find($id);
+					$rows = Proyecto::select('proyectos.*','sentryUsers.username','catalogoCoberturas.descripcion AS coberturaDescripcion','catalogoEstatusProyectos.descripcion AS estatusDescripcion')
 									->leftjoin('sentryUsers','sentryUsers.id','=','proyectos.actualizadoPor')
 									->leftjoin('catalogoCoberturas','catalogoCoberturas.id','=','proyectos.idCobertura')
-									->where('proyectos.idPrograma','=',$id)->get();
+									->leftjoin('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','proyectos.idEstatusProyecto')
+									->where('proyectos.ejercicio','=',$programa->ejercicio)
+									->where('proyectos.programaPresupuestario','=',$programa->claveProgramaPresupuestario)
+									->whereNull('proyectos.borradoAl')
+									->get();
 				}elseif($parametros['listar'] == 'buscar-proyecto'){
 					$programa = Programa::find($id);
 					$rows = Proyecto::select('proyectos.*','sentryUsers.username','catalogoCoberturas.descripcion AS coberturaDescripcion')
@@ -223,6 +228,25 @@ class ProgramaPresupuestarioController extends BaseController {
 				$data = array("data"=>$rows->toArray());
 			}
 		}
+		return Response::json($data,$http_status);
+	}
+
+
+	public function obtenerPorClave($clave){
+		$http_status = 200;
+		$data = array();
+
+		$parametros = Input::all();
+
+		$recurso = Programa::where('claveProgramaPresupuestario','=',$clave)->with('programaPresupuestario','indicadoresDescripcion')->first();
+		
+		if(is_null($recurso)){
+			$http_status = 404;
+			$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+		}else{
+			$data["data"] = $recurso;
+		}
+
 		return Response::json($data,$http_status);
 	}
 

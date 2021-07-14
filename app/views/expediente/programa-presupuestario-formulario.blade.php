@@ -39,7 +39,7 @@
                             <a href="#indicadores" aria-controls="indicadores" role="tab" data-toggle="" id="tab-link-indicadores">Objetivos e Indicadores</a>
                         </li>
                         <li role="presentation" class="disabled pull-right">
-                            <a href="#proyectos" aria-controls="proyectos" role="tab" data-toggle="" id="tab-link-proyectos">Proyectos Relacionados</a>
+                            <a href="#proyectos" aria-controls="proyectos" role="tab" data-toggle="" id="tab-link-proyectos">Proyectos Relacionados <span class="badge">0</span></a>
                         </li>
                     </ul>
                     <div class="tab-content">
@@ -436,40 +436,21 @@
                         </div>
                         <div role="tabpanel" class="tab-pane" id="proyectos">
                             <br>
-                            <div class="panel panel-default datagrid" id="datagridProyectos" data-edit-row="ver_proyecto">
+                            <div class="panel panel-default" id="datagridProyectos">
                                 <div class="row">
                                     <div class="col-lg-6 col-md-6">
                                     </div>
                                     <div class="col-lg-6">
-                                        <div class="btn-toolbar pull-right" >
-                                            <div class="btn-group" style="margin:5px">
-                                                <button type="button" class="btn btn-success btn-datagrid-agregar">
-                                                    <span class="glyphicon glyphicon-plus"></span> Agregar Proyecto
-                                                </button>
-                                                <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
-                                                    <span class="caret"></span>
-                                                </button>
-                                                <ul class="dropdown-menu pull-right" role="menu">
-                                                    <!--li>
-                                                        <a href="#" class="btn-edit-rows"><span class="glyphicon glyphicon-edit"></span> Ver</a>
-                                                    </li>
-                                                    <li class="divider"></li-->
-                                                    <li>
-                                                        <a href="#" class="btn-delete-rows"><span class="glyphicon glyphicon-remove"></span> Quitar</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
-                                <table class="table table-striped table-hover">
+                                <table id="tabla-lista-proyectos" class="table table-striped table-hover">
                                     <thead>
                                         <tr>
-                                            <th><input type="checkbox" class="check-select-all-rows"></th>
-                                            <th>Clave Presupuestal</th>
+                                            <th width="1">Clave Presupuestal</th>
                                             <th>Nombre Técnico</th>
-                                            <th width="200">Cobertura</th>
-                                            <th width="100"><span class="fa fa-user"></span></th>
+                                            <th width="1">Cobertura</th>
+                                            <th width="1">Estatus</th>
+                                            <th width="1"><span class="fa fa-user"></span></th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>

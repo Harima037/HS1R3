@@ -58,81 +58,63 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-2">
-			<div class="form-group">
-				<label class="control-label" for="fechainicio">Fecha Inicio</label>
-				<input type="date" placeholder="aaaa-mm-dd" class="form-control" name="fechainicio" id="fechainicio"/>
-			</div>
-		</div>
-        <div class="col-sm-2">
-			<div class="form-group">
-				<label class="control-label" for="fechatermino">Fecha Termino</label>
-				<input type="date" placeholder="aaaa-mm-dd" class="form-control" name="fechatermino" id="fechatermino"/>
-			</div>
-		</div>
-		<div class="col-sm-2">
-			<div class="form-group">
-				<label class="control-label" for="tipoproyecto">Tipo de Proyecto</label>
-                <select class="form-control chosen-one" id="tipoproyecto" name="tipoproyecto">
-                    <option value="">Seleciona un tipo</option>
-                    @foreach ($tipos_proyectos as $tipo)
-                    <option value="{{$tipo->id}}">
-                        {{$tipo->descripcion}}
-                    </option>
-                    @endforeach
-                </select>
-			</div>
-		</div>
+        <div class="col-sm-6">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" for="fechainicio">Fecha Inicio</label>
+                        <input type="date" placeholder="aaaa-mm-dd" class="form-control" name="fechainicio" id="fechainicio"/>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" for="fechatermino">Fecha Termino</label>
+                        <input type="date" placeholder="aaaa-mm-dd" class="form-control" name="fechatermino" id="fechatermino"/>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" for="tipoproyecto">Tipo de Proyecto</label>
+                        <select class="form-control chosen-one" id="tipoproyecto" name="tipoproyecto">
+                            <option value="">Seleciona un tipo</option>
+                            @foreach ($tipos_proyectos as $tipo)
+                            <option value="{{$tipo->id}}">
+                                {{$tipo->descripcion}}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" for="cobertura">Cobertura</label>
+                        {{Form::select('cobertura',array('' =>'Selecciona una cobertura') + $coberturas->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'cobertura'))}}
+                    </div>
+                </div>
+                <div class="col-sm-8">
+                    <div id="select-estado-panel" class="form-group">
+                        <label class="control-label">Estado</label>
+                        <p class="form-control-static">Chiapas</p>
+                    </div>
+                    <div id="select-municipio-panel" class="form-group">
+                        <label class="control-label" for="municipio">Municipio</label>
+                        {{Form::select('municipio',array('' =>'Selecciona un municipio') + $municipios->lists('nombre','clave'),'',array('class'=>'form-control chosen-one','id'=>'municipio'))}}
+                    </div>
+                    <div id="select-region-panel" class="form-group">
+                        <label class="control-label" for="region">Región</label>
+                        {{Form::select('region',array('' =>'Selecciona una región') + $regiones->lists('nombre','region'),'',array('class'=>'form-control chosen-one','id'=>'region'))}}
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="col-sm-6">
             <div class="form-group">
                 <label class="control-label" for="finalidadproyecto">Finalidad del Proyecto</label>
-                <textarea class="form-control" name="finalidadproyecto" id="finalidadproyecto"></textarea>
+                <textarea rows="4" class="form-control" name="finalidadproyecto" id="finalidadproyecto"></textarea>
             </div>
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-12">
-            <div class="form-group">
-                <label class="control-label" for="vinculacionped">Vinculación al PED (Plan Estatal de Desarrollo)</label>
-                <select class="form-control chosen-one" id="vinculacionped" name="vinculacionped">
-                    <option value="">Seleciona un objetivo</option>
-                    <!-- Inicio de ejes -->
-                    @foreach ($objetivos_ped as $eje)
-                        @if(count($eje->hijos))
-                            <optgroup label="{{$eje->clave . ' ' . $eje->descripcion}}">
-                                <!-- Inicio de temas -->
-                            @foreach ($eje->hijos as $tema)
-                                @if(count($tema->hijos))
-                                    <option disabled="disabled">
-                                        {{$tema->clave . ' ' . $tema->descripcion}}
-                                    </option>
-                                    <!-- Inicio de politicas -->
-                                    @foreach ($tema->hijos as $politica)
-                                        @if(count($politica->hijos))
-                                            <option disabled="disabled">
-                                                {{$politica->clave . ' ' . $politica->descripcion}}
-                                            </option>
-                                            <!-- Inicio de objetivos -->    
-                                            @foreach ($politica->hijos as $objetivo)
-                                                <option value="{{$objetivo->id}}">
-                                                    {{$objetivo->clave . ' ' . $objetivo->descripcion}}
-                                                </option>
-                                            @endforeach
-                                            <!-- Inicio de objetivos -->
-                                            <option data-divider="true"></option>
-                                        @endif
-                                    @endforeach
-                                    <!-- Fin de politicas -->
-                                @endif
-                            @endforeach
-                            <!-- Fin de temas -->
-                            </optgroup>
-                        @endif
-                    @endforeach
-                    <!-- Fin de ejes -->
-                </select>
-            </div>
-        </div>
         <div class="col-sm-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -215,8 +197,24 @@
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label class="control-label" for="programapresupuestario">Programa Presupuestario</label>
-                            {{Form::select('programapresupuestario',array('' =>'Selecciona un programa presupuestario') + $programas_presupuestarios->lists('descripcion','clave'),0,array('class'=>'form-control chosen-one','id'=>'programapresupuestario'))}}
+                            {{Form::select('programapresupuestario',array('' =>'Selecciona un programa presupuestario') + $programas_presupuestarios->lists('programaPresupuestario','claveProgramaPresupuestario'),0,array('class'=>'form-control chosen-one','id'=>'programapresupuestario'))}}
                         </div>
+                    </div>
+                    <div id="panel-programa-seleccionado" class="col-sm-12 panel panel-primary" style="display: none; padding-left:0px; padding-right:0px;">
+                        <table id="tabla-indicadores-programa-presupuestario" class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:center;" colspan="3"><span id="titulo-programa-presupuestario">Programa Presupuestario</span></th>
+                                </tr>
+                                <tr>
+                                    <th width="1">Tipo</th>
+                                    <th>Indicador</th>
+                                    <th>Unidad de Medida</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
                     </div>
                     <div class="col-sm-6">
                         <div class="form-group">
@@ -259,24 +257,48 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-4">
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
             <div class="form-group">
-                <label class="control-label" for="cobertura">Cobertura</label>
-                {{Form::select('cobertura',array('' =>'Selecciona una cobertura') + $coberturas->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'cobertura'))}}
-            </div>
-        </div>
-        <div class="col-sm-4">
-            <div id="select-estado-panel" class="form-group">
-                <label class="control-label">Estado</label>
-                <p class="form-control-static">Chiapas</p>
-            </div>
-            <div id="select-municipio-panel" class="form-group">
-                <label class="control-label" for="municipio">Municipio</label>
-                {{Form::select('municipio',array('' =>'Selecciona un municipio') + $municipios->lists('nombre','clave'),'',array('class'=>'form-control chosen-one','id'=>'municipio'))}}
-            </div>
-            <div id="select-region-panel" class="form-group">
-                <label class="control-label" for="region">Región</label>
-                {{Form::select('region',array('' =>'Selecciona una región') + $regiones->lists('nombre','region'),'',array('class'=>'form-control chosen-one','id'=>'region'))}}
+                <label class="control-label" for="vinculacionped">Vinculación al PED (Plan Estatal de Desarrollo)</label>
+                <select class="form-control chosen-one" id="vinculacionped" name="vinculacionped">
+                    <option value="">Seleciona un objetivo</option>
+                    <!-- Inicio de ejes -->
+                    @foreach ($objetivos_ped as $eje)
+                        @if(count($eje->hijos))
+                            <optgroup label="{{$eje->clave . ' ' . $eje->descripcion}}">
+                                <!-- Inicio de temas -->
+                            @foreach ($eje->hijos as $tema)
+                                @if(count($tema->hijos))
+                                    <option disabled="disabled">
+                                        {{$tema->clave . ' ' . $tema->descripcion}}
+                                    </option>
+                                    <!-- Inicio de politicas -->
+                                    @foreach ($tema->hijos as $politica)
+                                        @if(count($politica->hijos))
+                                            <option disabled="disabled">
+                                                {{$politica->clave . ' ' . $politica->descripcion}}
+                                            </option>
+                                            <!-- Inicio de objetivos -->    
+                                            @foreach ($politica->hijos as $objetivo)
+                                                <option value="{{$objetivo->id}}">
+                                                    {{$objetivo->clave . ' ' . $objetivo->descripcion}}
+                                                </option>
+                                            @endforeach
+                                            <!-- Inicio de objetivos -->
+                                            <option data-divider="true"></option>
+                                        @endif
+                                    @endforeach
+                                    <!-- Fin de politicas -->
+                                @endif
+                            @endforeach
+                            <!-- Fin de temas -->
+                            </optgroup>
+                        @endif
+                    @endforeach
+                    <!-- Fin de ejes -->
+                </select>
             </div>
         </div>
     </div>

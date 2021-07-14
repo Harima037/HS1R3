@@ -26,6 +26,7 @@ class RevisionController extends \BaseController {
 		$catalogos = array(
 				'clasificacion_proyectos'=>ClasificacionProyecto::all(),
 				'tipos_proyectos'=>TipoProyecto::all(),
+				'estatus_proyectos'=>EstatusProyecto::where('id','>',1)->get(),
 				'origenes_financiamiento' => OrigenFinanciamiento::all()
 			);
 		return parent::loadIndex('REVISION','REVIPROY',$catalogos);

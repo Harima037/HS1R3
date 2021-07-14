@@ -114,6 +114,14 @@ class Componente extends BaseModel
 		return $this->belongsTo('UnidadMedida','idUnidadMedida');
 	}
 
+	public function comportamientoAccion(){
+		return $this->belongsTo('ComportamientoAccion','idComportamientoAccion');
+	}
+	
+	public function tipoValorMeta(){
+		return $this->belongsTo('TipoValorMeta','idTipoValorMeta');
+	}
+
 	public function entregable(){
 		return $this->belongsTo('Entregable','idEntregable');
 	}

@@ -142,6 +142,10 @@ function llenar_tabla_beneficiarios(datos){
                 total: 0,
                 desglose: {'f':{},'m':{}}
             };
+
+            if(datos[i].tipo_captura){
+                beneficiarios[datos[i].idTipoBeneficiario].tipo = datos[i].tipo_beneficiario.descripcion + ' [ '+datos[i].tipo_captura.descripcion+' ] ';
+            }
         }
         beneficiarios[datos[i].idTipoBeneficiario].total += (parseInt(datos[i].total) || 0);
         beneficiarios[datos[i].idTipoBeneficiario].desglose[datos[i].sexo] = {
@@ -324,6 +328,8 @@ function constructor_grupo_acordiones(padre,item,tipo,contenido_extra){ //tipo =
     contenido += '<span class="label label-default">Frecuencia :</span> '+((item.frecuencia)?item.frecuencia.descripcion:'')+'<br>';
     contenido += '<span class="label label-default">Tipo :</span> '+((item.tipo_indicador)?item.tipo_indicador.descripcion:'')+'<br>';
     contenido += '<span class="label label-default">Unidad de Medida :</span> '+((item.unidad_medida)?item.unidad_medida.descripcion:'')+'<br>';    
+    contenido += '<span class="label label-default">Comportamiento :</span> '+((item.comportamiento_accion)?(item.comportamiento_accion.clave +' '+ item.comportamiento_accion.descripcion):'')+'<br>';
+    contenido += '<span class="label label-default">Tipo de Valor de la Meta :</span> '+((item.tipo_valor_meta)?item.tipo_valor_meta.descripcion:'')+'<br>';
     contenido += '</div>';
     contenido += '</div>';
 

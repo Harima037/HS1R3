@@ -8,7 +8,7 @@ class Programa extends BaseModel
 	protected $table = "programa";
 
 	public function scopeContenidoSuggester($query){
-		$query->select('programa.id','programa.claveProgramaPresupuestario','programa.claveUnidadResponsable','programa.idEstatus',
+		$query->select('programa.id','programaPresupuestal.id as idProgramaPresupuestario','programa.claveProgramaPresupuestario','programa.claveUnidadResponsable','programa.idEstatus',
 				DB::raw('concat_ws(" ",programaPresupuestal.clave,programaPresupuestal.descripcion) as programaPresupuestario'),
 				DB::raw('concat_ws(" ",programa.claveUnidadResponsable,unidadResponsable.descripcion) AS unidadResponsable'),
 				'estatus.descripcion AS estatus','programa.idUsuarioValidacionSeg','programa.idUsuarioRendCuenta'
@@ -22,8 +22,7 @@ class Programa extends BaseModel
 		$query->select('programa.*',
 			DB::raw('concat_ws(" ",programaPresupuestal.clave,programaPresupuestal.descripcion) as programaPresupuestarioDescripcion'),
 			DB::raw('concat_ws(" ",programa.claveUnidadResponsable,unidadResponsable.descripcion) AS unidadResponsable'),
-			DB::raw('concat_ws(" ",ODM.clave,ODM.descripcion) AS ODM'),
-			'modalidad.clave AS claveModalidad', 'modalidad.descripcion AS modalidad', 
+			DB::raw('concat_ws(" ",ODM.clave,ODM.descripcion) AS ODM'), 'modalidad.clave AS claveModalidad', 'modalidad.descripcion AS modalidad', 
 			DB::raw('concat_ws(" ",sectorial.clave,sectorial.descripcion) AS programaSectorial'),
 			DB::raw('concat_ws(" ",objetivosPED.clave,objetivosPED.descripcion) AS objetivoPED'),
 

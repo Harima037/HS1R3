@@ -512,6 +512,7 @@ class ReporteEvaluacionController extends BaseController {
 
 		   	$datos['mes'] = $data['meses'][intval($i)];
 		   	$datos['analisis_funcional'] = $recurso['analisis_funcional'][0];
+			$datos['analisis_funcional']['finalidadProyecto'] = $recurso['finalidadProyecto'];
 
 		    $datos['planes_mejora'] = $data['planes_mejora'];
 		}

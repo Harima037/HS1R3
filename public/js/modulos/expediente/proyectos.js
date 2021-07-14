@@ -139,19 +139,7 @@ function editar (e){
             $('#datos-proyecto').show();
 
             $('#proyecto-tab-panel-list a:first').tab('show');
-
-            if(response.data.idEstatusProyecto >= 4){
-                $('#btn-exportar-excel').show();
-                $('#btn-exportar-excel').off('click');
-                $('#btn-exportar-excel').on('click',function(){
-                    window.open(SERVER_HOST+'/v1/reporteProyecto/'+response.data.id);
-                });
-            }else{
-                $('#btn-exportar-excel').off('click');
-                $('#btn-exportar-excel').hide();
-            }
             
-
             $('#btn-editar-proyecto').attr('data-id-proyecto',response.data.id);
 
             $(modal_name).modal('show');
@@ -174,6 +162,10 @@ function llenar_tabla_beneficiarios(datos){
                     sexo:0,total:0,urbana:0,rural:0,mestiza:0,indigena:0,muyAlta:0,alta:0,media:0,baja:0,muyBaja:0
                 }}
             };
+
+            if(datos[i].tipo_captura){
+                beneficiarios[datos[i].idTipoBeneficiario].tipo = datos[i].tipo_beneficiario.descripcion + ' [ '+datos[i].tipo_captura.descripcion+' ] ';
+            }
         }
         beneficiarios[datos[i].idTipoBeneficiario].total += (parseInt(datos[i].total) || 0);
         beneficiarios[datos[i].idTipoBeneficiario].desglose[datos[i].sexo] = {
@@ -449,7 +441,9 @@ function constructor_grupo_acordiones(padre,item,tipo,contenido_extra){ //tipo =
     contenido += '<span class="label label-default">Dimensión :</span> '+((item.dimension)?item.dimension.descripcion:'')+'<br>';
     contenido += '<span class="label label-default">Frecuencia :</span> '+((item.frecuencia)?item.frecuencia.descripcion:'')+'<br>';
     contenido += '<span class="label label-default">Tipo :</span> '+((item.tipo_indicador)?item.tipo_indicador.descripcion:'')+'<br>';
-    contenido += '<span class="label label-default">Unidad de Medida :</span> '+((item.unidad_medida)?item.unidad_medida.descripcion:'')+'<br>';    
+    contenido += '<span class="label label-default">Unidad de Medida :</span> '+((item.unidad_medida)?item.unidad_medida.descripcion:'')+'<br>';
+    contenido += '<span class="label label-default">Comportamiento :</span> '+((item.comportamiento_accion)?(item.comportamiento_accion.clave +' '+ item.comportamiento_accion.descripcion):'')+'<br>';
+    contenido += '<span class="label label-default">Tipo de Valor de la Meta :</span> '+((item.tipo_valor_meta)?item.tipo_valor_meta.descripcion:'')+'<br>';
     contenido += '</div>';
     contenido += '</div>';
 

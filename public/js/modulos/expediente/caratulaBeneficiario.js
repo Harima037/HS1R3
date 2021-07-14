@@ -117,6 +117,9 @@ context.mostrar_datos = function(datos){
 	$('#tipobeneficiario').val(datos[0].idTipoBeneficiario);
     $('#tipobeneficiario').trigger('chosen:updated');
 
+	$('#tipocaptura').val(datos[0].idTipoCaptura);
+    $('#tipocaptura').trigger('chosen:updated');
+
     $('#id-beneficiario').val(datos[0].idTipoBeneficiario);
 
     var sexo;
@@ -129,7 +132,7 @@ context.mostrar_datos = function(datos){
     }
     
     for(var sexo in beneficiarios ){
-        total += beneficiarios[sexo].total || 0;
+        total += parseInt(beneficiarios[sexo].total) || 0;
         $('#totalbeneficiarios'+sexo).val(beneficiarios[sexo].total || 0);
         $('#urbana'+sexo).val(beneficiarios[sexo].urbana || 0);
         $('#rural'+sexo).val(beneficiarios[sexo].rural || 0);
@@ -141,7 +144,7 @@ context.mostrar_datos = function(datos){
         $('#baja'+sexo).val(beneficiarios[sexo].baja || 0);
         $('#muybaja'+sexo).val(beneficiarios[sexo].muyBaja || 0);
     }
-    $('#totalbeneficiarios').text(total);
+    $('#totalbeneficiarios').text(total.format());
     $('.fem,.masc').change();
 
 	$(modal_beneficiario).modal('show');
@@ -215,11 +218,11 @@ function llenar_datagrid_beneficiarios(datos){
 		}
 
 		if(datos[indx].sexo == 'f'){
-			beneficiario.totalF = datos[indx].total;
-			beneficiario.total += datos[indx].total;
+			beneficiario.totalF = parseInt(datos[indx].total) || 0;
+			beneficiario.total += parseInt(datos[indx].total) || 0;
 		}else{
-			beneficiario.totalM = datos[indx].total;
-			beneficiario.total += datos[indx].total;
+			beneficiario.totalM = parseInt(datos[indx].total) || 0;
+			beneficiario.total += parseInt(datos[indx].total) || 0;
 		}
 		
 		//beneficiarios.push(beneficiario);
@@ -227,6 +230,9 @@ function llenar_datagrid_beneficiarios(datos){
 	}
 	
 	for(var i in beneficiarios){
+		beneficiarios[i].totalM = beneficiarios[i].totalM.format();
+		beneficiarios[i].totalF = beneficiarios[i].totalF.format();
+		beneficiarios[i].total = beneficiarios[i].total.format();
 		beneficiarios_grid.push(beneficiarios[i]);
 	}
 	
@@ -260,5 +266,23 @@ function reset_modal_form(){
 	$(modal_beneficiario + ' .chosen-one').trigger('chosen:updated');
 	$(form_beneficiario + ' span.form-control').text('');
 }
+
+/**
+ * Number.prototype.format(n, x)
+ * 
+ * @param integer n: length of decimal
+ * @param integer x: length of sections
+ */
+ Number.prototype.format = function(n, x) {
+    var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\.' : '$') + ')';
+    //return this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+    var formateado = this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+    var partes = formateado.split('.');
+    if(parseInt(partes[1]) == 0){
+        return partes[0];
+    }else{
+        return formateado;
+    }
+};
 
 })(caratulaBeneficiario);

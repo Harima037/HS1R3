@@ -4,7 +4,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception;
-use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
+use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, Programa, 
 	FibapDatosProyecto, Titular, ComponenteDesglose, ActividadDesglose, ProyectoComentario, Accion, DistribucionPresupuesto, ProyectoFinanciamiento;
 
 class RevisionController extends BaseController {
@@ -29,7 +29,12 @@ class RevisionController extends BaseController {
 
 			$rows = Proyecto::getModel();
 			//$rows = $rows->where('unidadResponsable','=',Sentry::getUser()->claveUnidad);
-			$rows = $rows->wherein('idEstatusProyecto',array(2, 3, 4, 5));
+			if(isset($parametros['estatusProyecto']) && $parametros['estatusProyecto']){
+				$rows = $rows->wherein('idEstatusProyecto',array($parametros['estatusProyecto']));
+			}else{
+				$rows = $rows->wherein('idEstatusProyecto',array(2, 3, 4, 5));
+			}
+			
 			
 			if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 			
@@ -217,9 +222,12 @@ class RevisionController extends BaseController {
 			
 		}else{
 			$recurso = Proyecto::contenidoCompleto()->find($id);
-			$recurso->componentes->load('unidadMedida','dimension','tipoIndicador','metasMes','formula','frecuencia','actividades','entregable','entregableTipo','entregableAccion','accion.partidas','accion.propuestasFinanciamiento.origen','accion.distribucionPresupuesto','accion.desglosePresupuestoComponente');
+			$recurso->componentes->load('comportamientoAccion','tipoValorMeta','unidadMedida','dimension','tipoIndicador','metasMes','formula','frecuencia','actividades','entregable','entregableTipo','entregableAccion','accion.partidas','accion.propuestasFinanciamiento.origen','accion.distribucionPresupuesto','accion.desglosePresupuestoComponente');
 			$recurso->load('fuentesFinanciamiento.fondoFinanciamiento','fuentesFinanciamiento.fuenteFinanciamiento','fuentesFinanciamiento.subFuentesFinanciamiento');
+			$recurso->beneficiarios->load('tipoCaptura');
 			$recurso->load('comentarios');
+
+			$recurso->datos_programa_presupuestario_indicadores = Programa::where('claveProgramaPresupuestario','=',$recurso->programaPresupuestario)->where('idEstatus','=',5)->with('indicadoresDescripcion')->first();
 			
 			if($recurso->idClasificacionProyecto == 2){
 				$recurso->load('fibap');
@@ -237,7 +245,7 @@ class RevisionController extends BaseController {
 			
 			/*$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion','desgloseCompleto'));*/
 			foreach ($recurso->componentes as $key => $componente) {
-				$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida','metasMes','accion.partidas','accion.propuestasFinanciamiento.origen','accion.distribucionPresupuesto','accion.desglosePresupuestoActividad'));
+				$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','comportamientoAccion','tipoValorMeta','unidadMedida','metasMes','accion.partidas','accion.propuestasFinanciamiento.origen','accion.distribucionPresupuesto','accion.desglosePresupuestoActividad'));
 			}
 			
 			if($recurso->idCobertura == 1){ //Cobertura Estado => Todos las Jurisdicciones

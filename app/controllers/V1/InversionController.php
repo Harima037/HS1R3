@@ -249,14 +249,15 @@ class InversionController extends ProyectosController {
 					*/
 					$recurso = Proyecto::contenidoCompleto()->find($id);
 					if($recurso){
+						$recurso->beneficiarios->load('tipoCaptura');
 						$recurso->load('fibap');
 						if($recurso->fibap){
 							$recurso->fibap->load('documentos','propuestasFinanciamiento','antecedentesFinancieros','distribucionPresupuestoAgrupado');
 							$recurso->fibap->distribucionPresupuestoAgrupado->load('objetoGasto');
 						}
-						$recurso->componentes->load('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion');
+						$recurso->componentes->load('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','comportamientoAccion','tipoValorMeta','entregable','entregableTipo','entregableAccion');
 						foreach ($recurso->componentes as $key => $componente) {
-							$recurso->componentes[$key]->actividades->load('formula','dimension','frecuencia','tipoIndicador','unidadMedida');
+							$recurso->componentes[$key]->actividades->load('formula','dimension','frecuencia','tipoIndicador','unidadMedida','comportamientoAccion','tipoValorMeta');
 						}
 					}
 					/*$queries = count(DB::getQueryLog()) - $queries;
@@ -602,6 +603,9 @@ class InversionController extends ProyectosController {
 			}
 			if(strpos($ex->getMessage(), '{"field":') !== FALSE){
 				$respuesta['data']['code'] = 'U00';
+				$respuesta['data']['data'] = $ex->getMessage();
+			}else if(strpos($ex->getMessage(), 'La Clave asignada al proyecto ya existe') !== FALSE){
+				//$respuesta['data']['code'] = 'U00';
 				$respuesta['data']['data'] = $ex->getMessage();
 			}else{
 				$respuesta['data']['ex'] = $ex->getMessage();
@@ -1012,6 +1016,9 @@ class InversionController extends ProyectosController {
 			}
 			if(strpos($ex->getMessage(), '{"field":') !== FALSE){
 				$respuesta['data']['code'] = 'U00';
+				$respuesta['data']['data'] = $ex->getMessage();
+			}else if(strpos($ex->getMessage(), 'La Clave asignada al proyecto ya existe') !== FALSE){
+				//$respuesta['data']['code'] = 'U00';
 				$respuesta['data']['data'] = $ex->getMessage();
 			}else{
 				$respuesta['data']['ex'] = $ex->getMessage();

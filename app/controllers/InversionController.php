@@ -70,6 +70,8 @@ class InversionController extends ProyectosController {
 			'frecuencias'	 			=> Frecuencia::all(),
 			'tipos_indicador' 			=> TipoIndicador::all(),
 			'unidades_medida' 			=> UnidadMedida::all(),
+			'comportamientos_accion' 	=> ComportamientoAccion::select('id',DB::raw("concat(clave,' ',descripcion) as descripcion"))->get(),
+			'tipos_valor_meta' 			=> TipoValorMeta::all(),
 			'objetos_gasto'				=> ObjetoGasto::whereNull('idPadre')->with('hijos')->get(),
 			'origenes_financiamiento' 	=> $origenes_financiamiento,
 			'jurisdicciones' 			=> array('OC'=>'O.C.'),

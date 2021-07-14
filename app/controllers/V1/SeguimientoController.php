@@ -50,7 +50,7 @@ class SeguimientoController extends BaseController {
 	);
 
 	private $reglasAnalisisFuncional = array(
-		'finalidad'		=> 'required',
+		//'finalidad'		=> 'required',
 		'analisis-resultado'		=> 'required',
 		'analisis-beneficiarios'	=> 'required',
 		'justificacion-global'		=> 'required'
@@ -388,7 +388,7 @@ class SeguimientoController extends BaseController {
 						$recurso = new EvaluacionAnalisisFuncional;
 						$recurso->mes 					= $mes_actual;
 						$recurso->idProyecto 			= $parametros['id-proyecto'];
-						$recurso->finalidadProyecto		= $parametros['finalidad'];
+						//$recurso->finalidadProyecto		= $parametros['finalidad'];
 						$recurso->analisisResultado 	= $parametros['analisis-resultado'];
 						$recurso->beneficiarios 		= $parametros['analisis-beneficiarios'];
 						$recurso->justificacionGlobal 	= $parametros['justificacion-global'];
@@ -600,7 +600,7 @@ class SeguimientoController extends BaseController {
 						//
 						$mes_actual = Util::obtenerMesActual();
 						$recurso = EvaluacionAnalisisFuncional::find($id);
-						$recurso->finalidadProyecto		= $parametros['finalidad'];
+						//$recurso->finalidadProyecto		= $parametros['finalidad'];
 						$recurso->analisisResultado 	= $parametros['analisis-resultado'];
 						$recurso->beneficiarios 		= $parametros['analisis-beneficiarios'];
 						$recurso->justificacionGlobal 	= $parametros['justificacion-global'];

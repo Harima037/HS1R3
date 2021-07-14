@@ -13,6 +13,7 @@
 =====================================*/
 // Declaracion de variables
 var proyectoResource = new RESTfulRequests(SERVER_HOST+'/v1/proyectos');
+var programaResource = new RESTfulRequests(SERVER_HOST+'/v1/programa-presupuestario-clave');
 
 var componenteDatagrid = new Datagrid("#datagridComponentes",proyectoResource);
 var actividadDatagrid = new Datagrid('#datagridActividades',proyectoResource);
@@ -111,6 +112,7 @@ if($('#id').val()){
             $('#funciongasto').val(response.data.finalidad+ '.' + response.data.funcion+ '.' + response.data.subFuncion+ '.' + response.data.subSubFuncion);
             $('#programasectorial').val(response.data.programaSectorial);
             $('#programapresupuestario').val(response.data.programaPresupuestario);
+			$('#programapresupuestario').change();
             //$('#programaespecial').val(response.data.programaEspecial);
             $('#origenasignacion').val(response.data.origenAsignacion);
             $('#actividadinstitucional').val(response.data.actividadInstitucional);
@@ -283,12 +285,16 @@ function editar_componente(e){
 			$('#frecuencia-componente').val(response.data.idFrecuenciaIndicador);
 			$('#tipo-ind-componente').val(response.data.idTipoIndicador);
 			$('#unidad-medida-componente').val(response.data.idUnidadMedida);
+			$('#comportamiento-componente').val(response.data.idComportamientoAccion);
+			$('#tipo-valor-meta-componente').val(response.data.idTipoValorMeta);
 
 			$('#formula-componente').trigger('chosen:updated');
 			$('#dimension-componente').trigger('chosen:updated');
 			$('#frecuencia-componente').trigger('chosen:updated');
 			$('#tipo-ind-componente').trigger('chosen:updated');
 			$('#unidad-medida-componente').trigger('chosen:updated');
+			$('#comportamiento-componente').trigger('chosen:updated');
+			$('#tipo-valor-meta-componente').trigger('chosen:updated');
 
 			$('#entregable').val(response.data.idEntregable);
 			$('#entregable').chosen().change();
@@ -451,6 +457,9 @@ function editar_beneficiario(e){
 			$('#tipobeneficiario').val(response.data[0].idTipoBeneficiario);
             $('#tipobeneficiario').trigger('chosen:updated');
 
+			$('#tipocaptura').val(response.data[0].idTipoCaptura);
+            $('#tipocaptura').trigger('chosen:updated');
+
             $('#id-beneficiario').val(response.data[0].idTipoBeneficiario);
 
             var sexo;
@@ -514,12 +523,16 @@ function editar_actividad(e){
 			$('#frecuencia-actividad').val(response.data.idFrecuenciaIndicador);
 			$('#tipo-ind-actividad').val(response.data.idTipoIndicador);
 			$('#unidad-medida-actividad').val(response.data.idUnidadMedida);
+			$('#comportamiento-actividad').val(response.data.idComportamientoAccion);
+			$('#tipo-valor-meta-actividad').val(response.data.idTipoValorMeta);
 
 			$('#formula-actividad').trigger('chosen:updated');
 			$('#dimension-actividad').trigger('chosen:updated');
 			$('#frecuencia-actividad').trigger('chosen:updated');
 			$('#tipo-ind-actividad').trigger('chosen:updated');
 			$('#unidad-medida-actividad').trigger('chosen:updated');
+			$('#comportamiento-actividad').trigger('chosen:updated');
+			$('#tipo-valor-meta-actividad').trigger('chosen:updated');
 
 			$(form_actividad + ' .metas-mes').attr('data-meta-id','');
 
@@ -943,9 +956,34 @@ $('#funciongasto').on('change',function(){
 $('#programasectorial').on('change',function(){
 	actualiza_clave('programa_sectorial',$(this).val(),'-');
 });
+
 $('#programapresupuestario').on('change',function(){
 	actualiza_clave('programa_presupuestario',$(this).val(),'---');
+	if($(this).val()){
+		programaResource.get($(this).val(),null,{
+			_success: function(response){
+				$('#titulo-programa-presupuestario').text(response.data.programa_presupuestario.descripcion);
+				$('#panel-programa-seleccionado').show();
+				$('#tabla-indicadores-programa-presupuestario tbody').html('');
+				var html_indicadores= '';
+				for(var i in response.data.indicadores_descripcion){
+					var indicador = response.data.indicadores_descripcion[i];
+					html_indicadores += '<tr>';
+					html_indicadores += '<td>'+indicador.claveTipoIndicador+'</td>';
+					html_indicadores += '<td>'+indicador.descripcionIndicador+'</td>';
+					html_indicadores += '<td>'+indicador.unidadMedida+'</td>';
+					html_indicadores += '</tr>';
+				}
+				$('#tabla-indicadores-programa-presupuestario tbody').html(html_indicadores);
+			}
+		});	
+	}else{
+		$('#panel-programa-seleccionado').hide();
+		$('#tabla-indicadores-programa-presupuestario tbody').html('');
+		$('#titulo-programa-presupuestario').text('');
+	}
 });
+
 $('#origenasignacion').on('change',function(){
 	actualiza_clave('origen_asignacion',$(this).val(),'--');
 });

@@ -217,6 +217,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 
 		
 		Route::resource('programas-presupuestarios','V1\ProgramaPresupuestarioController');
+		Route::get('programa-presupuestario-clave/{clave}', array('uses'=>'V1\ProgramaPresupuestarioController@obtenerPorClave'));
 		Route::resource('directorio','V1\DirectorioController');
 
 		Route::resource('estrategia-institucional',	'V1\EstrategiaInstitucionalController');

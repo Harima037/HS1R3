@@ -36,7 +36,9 @@ class ProyectosController extends \BaseController {
 			'dimensiones' => Dimension::all(),
 			'frecuencias' => Frecuencia::all(),
 			'tipos_indicador' => TipoIndicador::all(),
-			'unidades_medida' => UnidadMedida::all()
+			'unidades_medida' => UnidadMedida::all(),
+			'comportamientos_accion' => ComportamientoAccion::select('id',DB::raw("concat(clave,' ',descripcion) as descripcion"))->get(),
+			'tipos_valor_meta' => TipoValorMeta::all()
 		);
 
 		//Se Pre-carga formulario general de la caratula
@@ -140,7 +142,8 @@ class ProyectosController extends \BaseController {
 			'tipos_acciones' => TipoAccion::where('id','=',7)->get(),
 			'funciones_gasto' => $funciones_gasto,
 			'programas_sectoriales' => ProgramaSectorial::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
-			'programas_presupuestarios' => ProgramaPresupuestario::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
+			//'programas_presupuestarios' => ProgramaPresupuestario::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
+			'programas_presupuestarios' => Programa::where('programa.idEstatus','=',5)->contenidoSuggester()->get(),
 			'programas_especiales' => ProgramaEspecial::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
 			'actividades_institucionales' => ActividadInstitucional::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
 			'proyectos_estrategicos' => ProyectoEstrategico::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
@@ -167,7 +170,8 @@ class ProyectosController extends \BaseController {
 		}
 
 		$datos_beneficiarios = array(
-			'tipos_beneficiarios' => TipoBeneficiario::all()
+			'tipos_beneficiarios' => TipoBeneficiario::all(),
+			'tipos_captura' => TipoCaptura::all()
 		);
 		$datos_benef['formulario_beneficiarios'] = View::make('expediente.formulario-beneficiario',$datos_beneficiarios);
 		$datos['grid_beneficiarios'] = View::make('expediente.formulario-caratula-beneficiarios',$datos_benef);

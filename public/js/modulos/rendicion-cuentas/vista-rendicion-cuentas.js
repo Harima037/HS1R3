@@ -1015,6 +1015,10 @@ function llenar_grid_acciones(response){
             }
         }
     }
+
+    if(response.data.finalidadProyecto){
+        $('#span-finalidad-proyecto').text(response.data.finalidadProyecto);
+    }
 }
 /********************************************************************************************************************************
         Fin: Seguimiento de Metas
@@ -1356,7 +1360,7 @@ if($('#id-analisis').val()){
     var parametros = 'mostrar=analisis-funcional';
     moduloResource.get($('#id-analisis').val(),parametros,{
         _success: function(response){
-            $('#finalidad').val(response.data.finalidadProyecto);
+            //$('#finalidad').val(response.data.finalidadProyecto);
             $('#analisis-resultado').val(response.data.analisisResultado);
             $('#analisis-beneficiarios').val(response.data.beneficiarios);
             $('#justificacion-global').val(response.data.justificacionGlobal);
@@ -1387,6 +1391,7 @@ if($('#id-analisis').val()){
     });
 }
 $('#btn-guadar-analisis-funcional').on('click',function(){
+    Validation.cleanFormErrors('#form_analisis');
     var parametros = $('#form_analisis').serialize();
     parametros += '&guardar=analisis-funcional&id-proyecto='+$('#id').val();
     if($('#id-analisis').val()){

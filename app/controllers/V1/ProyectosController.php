@@ -29,7 +29,8 @@ class ProyectosController extends BaseController {
 		'nombretecnico'				=> 'sometimes|required',
 		'ejercicio'					=> 'required',
 		'tipoproyecto'				=> 'required',
-		'fechainicio'				=> 'required',
+		'fechainicio'				=> 'required|date',
+		'fechatermino'				=> 'required|date',
 		'finalidadproyecto'			=> 'required',
 		'cobertura'					=> 'sometimes|required',
 		'municipio'					=> 'sometimes|required_if:cobertura,2|digits_between:1,3',
@@ -46,6 +47,7 @@ class ProyectosController extends BaseController {
 	
 	private $reglasBeneficiarios = array(
 		'tipobeneficiario'			=> 'required',
+		'tipocaptura'				=> 'required',
 		'totalbeneficiariosf'		=> 'required|integer|min:0',
 		'totalbeneficiariosm'		=> 'required|integer|min:0',
 		'altaf' 					=> 'required|integer|min:0',
@@ -321,9 +323,10 @@ class ProyectosController extends BaseController {
 			}elseif($parametros['ver'] == 'proyecto'){
 				$recurso = Proyecto::contenidoCompleto()->find($id);
 				if($recurso){
-					$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','entregable','entregableTipo','entregableAccion','desgloseCompleto'));
+					$recurso->beneficiarios->load('tipoCaptura');
+					$recurso->componentes->load(array('actividades','formula','dimension','frecuencia','tipoIndicador','unidadMedida','comportamientoAccion','tipoValorMeta','entregable','entregableTipo','entregableAccion','desgloseCompleto'));
 					foreach ($recurso->componentes as $key => $componente) {
-						$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida'));
+						$recurso->componentes[$key]->actividades->load(array('formula','dimension','frecuencia','tipoIndicador','unidadMedida','comportamientoAccion','tipoValorMeta'));
 					}
 				}
 
@@ -458,6 +461,9 @@ class ProyectosController extends BaseController {
 			}
 			if(strpos($ex->getMessage(), '{"field":') !== FALSE){
 				$respuesta['data']['code'] = 'U00';
+				$respuesta['data']['data'] = $ex->getMessage();
+			}else if(strpos($ex->getMessage(), 'La Clave asignada al proyecto ya existe') !== FALSE){
+				//$respuesta['data']['code'] = 'U00';
 				$respuesta['data']['data'] = $ex->getMessage();
 			}else{
 				$respuesta['data']['ex'] = $ex->getMessage();
@@ -620,6 +626,9 @@ class ProyectosController extends BaseController {
 			}
 			if(strpos($ex->getMessage(), '{"field":') !== FALSE){
 				$respuesta['data']['code'] = 'U00';
+				$respuesta['data']['data'] = $ex->getMessage();
+			}else if(strpos($ex->getMessage(), 'La Clave asignada al proyecto ya existe') !== FALSE){
+				//$respuesta['data']['code'] = 'U00';
 				$respuesta['data']['data'] = $ex->getMessage();
 			}else{
 				$respuesta['data']['ex'] = $ex->getMessage();
@@ -868,7 +877,7 @@ class ProyectosController extends BaseController {
 		$es_editar = FALSE;
 
 		$validacion = Validador::validar(Input::all(), $this->reglasProyecto);
-		
+
 		if($validacion === TRUE){
 
 			if($id){
@@ -995,6 +1004,29 @@ class ProyectosController extends BaseController {
 				$recurso->totalBeneficiariosM = 0;
 			}
 			
+			$prueba_proyecto_existe = Proyecto::where('unidadResponsable','=',$recurso->unidadResponsable)
+												->where('finalidad','=',$recurso->finalidad)
+												->where('funcion','=',$recurso->funcion)
+												->where('subFuncion','=',$recurso->subFuncion)
+												->where('subSubFuncion','=',$recurso->subSubFuncion)
+												->where('programaSectorial','=',$recurso->programaSectorial)
+												->where('programaPresupuestario','=',$recurso->programaPresupuestario)
+												->where('origenAsignacion','=',$recurso->origenAsignacion)
+												->where('actividadInstitucional','=',$recurso->actividadInstitucional)
+												->where('proyectoEstrategico','=',$recurso->proyectoEstrategico)
+												->where('numeroProyectoEstrategico','=',$recurso->numeroProyectoEstrategico)
+												->whereNull('borradoAl');
+
+			if($es_editar){
+				$prueba_proyecto_existe = $prueba_proyecto_existe->where('id','!=',$recurso->id);
+			}
+
+			$prueba_proyecto_existe = $prueba_proyecto_existe->first();
+
+			if($prueba_proyecto_existe){
+				throw new Exception("La Clave asignada al proyecto ya existe", 1);
+			}
+
 			//, $componentes, $fibap, $beneficiarios,  
 			DB::transaction(function() use ($recurso, $respuesta, $nuevas_jurisdicciones, $es_editar){
 				if($recurso->save()){
@@ -1114,6 +1146,7 @@ class ProyectosController extends BaseController {
 			if($es_editar){
 				foreach ($beneficiarios as $key => $item) {
 					$beneficiarios[$key]->idTipoBeneficiario	= 	$parametros['tipobeneficiario'];
+					$beneficiarios[$key]->idTipoCaptura			= 	$parametros['tipocaptura'];
 					$beneficiarios[$key]->total 				= 	$parametros['totalbeneficiarios'.$item->sexo];
 					$beneficiarios[$key]->urbana 				= 	$parametros['urbana'.$item->sexo];
 					$beneficiarios[$key]->rural 				= 	$parametros['rural'.$item->sexo];
@@ -1130,6 +1163,7 @@ class ProyectosController extends BaseController {
 				if($parametros['totalbeneficiariosf'] > 0){
 					$beneficiarioF = new Beneficiario;
 					$beneficiarioF->idTipoBeneficiario	= $parametros['tipobeneficiario'];
+					$beneficiarioF->idTipoCaptura		= $parametros['tipocaptura'];
 					$beneficiarioF->total 				= $parametros['totalbeneficiariosf'];
 					$beneficiarioF->sexo 				= 'f';
 					$beneficiarioF->urbana 				= $parametros['urbanaf'];
@@ -1147,6 +1181,7 @@ class ProyectosController extends BaseController {
 				if($parametros['totalbeneficiariosm'] > 0){
 					$beneficiarioM = new Beneficiario;
 					$beneficiarioM->idTipoBeneficiario	= $parametros['tipobeneficiario'];
+					$beneficiarioF->idTipoCaptura		= $parametros['tipocaptura'];
 					$beneficiarioM->total 				= $parametros['totalbeneficiariosm'];
 					$beneficiarioM->sexo 				= 'm';
 					$beneficiarioM->urbana 				= $parametros['urbanam'];
@@ -1315,6 +1350,8 @@ class ProyectosController extends BaseController {
 			$recurso->idFrecuenciaIndicador = $parametros['frecuencia-'.$selector];
 			$recurso->idTipoIndicador 		= $parametros['tipo-ind-'.$selector];
 			$recurso->idUnidadMedida 		= $parametros['unidad-medida-'.$selector];
+			$recurso->idComportamientoAccion = $parametros['comportamiento-'.$selector];
+			$recurso->idTipoValorMeta 		= $parametros['tipo-valor-meta-'.$selector];
 			$recurso->metaIndicador 		= ($parametros['meta-'.$selector])?$parametros['meta-'.$selector]:NULL;
 			$recurso->numeroTrim1 			= ($parametros['trim1-'.$selector])?$parametros['trim1-'.$selector]:NULL;
 			$recurso->numeroTrim2 			= ($parametros['trim2-'.$selector])?$parametros['trim2-'.$selector]:NULL;

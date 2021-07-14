@@ -2,8 +2,14 @@
 
 @section('title-page') {{ $sys_mod_activo->nombre }} @stop
 
+@section('css')
+@parent
+<link href="{{ URL::to('css/chosen.bootstrap.min.css') }}" rel="stylesheet" type="text/css" media="screen">
+@stop
+
 @section('js')
 @parent
+<script src="{{ URL::to('js/dependencias/chosen.jquery.min.js') }}"></script>
 <script src="{{ URL::to('js/lib/Confirm.js')}}"></script>
 <script src="{{ URL::to('js/lib/Validation.js')}}"></script>
 <script src="{{ URL::to('js/modulos/revision/revision-proyectos.js')}}"></script>
@@ -20,22 +26,32 @@
             <div class="panel-body">
                 <div class="row">
                     <div class="col-lg-6 col-md-6">
-                        <div class="input-group" style="margin:5px">                            
+                        <div class="input-group" style="margin:5px">
                             <input type="text" class="form-control txt-quick-search" placeholder="Buscar">
                             <span class="input-group-btn">
                                 <button class="btn btn-default btn-quick-search" type="button"><span class="glyphicon glyphicon-search"></span></button>
                             </span>
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-lg-3 col-md-3">
+                        <div class="input-group" style="margin:5px; width:100%;">
+                            <select class="form-control chosen-one" id="select-filtro-estatus" name="select-filtro-estatus" onchange="filtrarPorEstatus()">
+                                <option value="">Seleciona un estatus</option>
+                                @foreach ($estatus_proyectos as $estatus)
+                                <option value="{{$estatus->id}}">
+                                    {{$estatus->descripcion}}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3">
                         <div class="btn-toolbar pull-right" >
                             @section('panel-botones')
                                 <div class="btn-group" style="margin:5px">
                                     <button type="button" class="btn btn-success btn-edit-rows">
                                         <span class="glyphicon glyphicon-search"></span> Revisar proyecto
                                     </button>
-                                   
-                                   
                                 </div>
                             @show
                         </div>
@@ -85,9 +101,6 @@
 @stop
 
 @section('modals')
-
-
-
     <div class="modal fade" id="modalCaratulas" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true" data-backdrop="static">
         <div class="modal-dialog modal-dialog-85-screen">
             <div class="modal-content modal-content-85-screen">
@@ -434,6 +447,10 @@
                             <button type="button" class="btn btn-success" id="btn-firmar-proyecto">
                                 <span class="glyphicon glyphicon-pencil"></span> Firmar proyecto
                             </button>
+                            &nbsp;
+                            <button type="button" class="btn btn-info" id="btn-exportar-excel">
+                                <span class="fa fa-file"></span> Imprimir Reporte
+                            </button>    
                         </div>
                     </div>
                 </div>

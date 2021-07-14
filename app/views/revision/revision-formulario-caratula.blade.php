@@ -64,39 +64,84 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-2">
-			<div class="form-group">
-                <label class="control-label" for="fechainicio">Fecha Inicio</label>
-                <div class="input-group">
-                   	<span class="input-group-btn" onclick="escribirComentario('fechainicio','Fecha Inicio','lbl-fechainicio');">
-                       	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
-                   	</span>
-                    <p id="lbl-fechainicio" class="form-control" style="height:auto"></p>
-				</div>
-			</div>
-		</div>
-        <div class="col-sm-2">
-			<div class="form-group">
-                <label class="control-label" for="fechatermino">Fecha Termino</label>
-                <div class="input-group">
-                   	<span class="input-group-btn" onclick="escribirComentario('fechatermino','Fecha Termino','lbl-fechatermino');">
-                       	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
-                   	</span>
-                    <p id="lbl-fechatermino" class="form-control" style="height:auto"></p>
-				</div>
-			</div>
-		</div>
-		<div class="col-sm-2">
-			<div class="form-group">
-                <label class="control-label" for="tipoproyecto">Tipo de Proyecto</label>
-                <div class="input-group">
-                   	<span class="input-group-btn" onclick="escribirComentario('tipoproyecto','Fecha Termino','lbl-tipoproyecto');">
-                       	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
-                   	</span>
-                    <p id="lbl-tipoproyecto" class="form-control" style="height:auto"></p>
-				</div>
-			</div>
-		</div>
+        <div class="col-sm-6">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" for="fechainicio">Fecha Inicio</label>
+                        <div class="input-group">
+                            <span class="input-group-btn" onclick="escribirComentario('fechainicio','Fecha Inicio','lbl-fechainicio');">
+                                <span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
+                            </span>
+                            <p id="lbl-fechainicio" class="form-control" style="height:auto"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" for="fechatermino">Fecha Termino</label>
+                        <div class="input-group">
+                            <span class="input-group-btn" onclick="escribirComentario('fechatermino','Fecha Termino','lbl-fechatermino');">
+                                <span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
+                            </span>
+                            <p id="lbl-fechatermino" class="form-control" style="height:auto"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label class="control-label" for="tipoproyecto">Tipo de Proyecto</label>
+                        <div class="input-group">
+                            <span class="input-group-btn" onclick="escribirComentario('tipoproyecto','Fecha Termino','lbl-tipoproyecto');">
+                                <span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
+                            </span>
+                            <p id="lbl-tipoproyecto" class="form-control" style="height:auto"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label class="control-label" for="lbl-cobertura">Cobertura</label>
+                        <div class="input-group">
+                            <span class="input-group-btn" onclick="escribirComentario('cobertura','Cobertura','lbl-cobertura');">
+                                <span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
+                            </span>
+                            <p id="lbl-cobertura" class="form-control" style="height:auto"></p>
+                        </div>
+                                        
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div id="select-estado-panel" class="form-group">
+                        <label class="control-label" for="lbl-estado">Estado</label>
+                        <div class="input-group">
+                            <span class="input-group-btn" onclick="escribirComentario('estado','Estado','lbl-estado');">
+                                <span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
+                            </span>
+                            <p id="lbl-estado" class="form-control" style="height:auto">Chiapas</p>
+                        </div>                
+                    </div>
+                    <div id="select-municipio-panel" class="form-group">
+                        <label class="control-label" for="lbl-municipio">Municipio</label>
+                        <div class="input-group">
+                            <span class="input-group-btn" onclick="escribirComentario('municipio','Municipio','lbl-municipio');">
+                                <span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
+                            </span>
+                            <p id="lbl-municipio" class="form-control" style="height:auto"></p>
+                        </div>                 
+                    </div>
+                    <div id="select-region-panel" class="form-group">
+                        <label class="control-label" for="lbl-region">Región</label>
+                        <div class="input-group">
+                            <span class="input-group-btn" onclick="escribirComentario('region','Región','lbl-region');">
+                                <span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
+                            </span>
+                            <p id="lbl-region" class="form-control" style="height:auto"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="col-sm-6">
             <div class="form-group">
                 <label class="control-label" for="finalidadproyecto">Finalidad del Proyecto</label>
@@ -110,19 +155,6 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-sm-12">
-            <div class="form-group">
-                <label class="control-label" for="lbl-vinculacionped">Vinculación al PED (Plan Estatal de Desarrollo)</label>
-                <div class="input-group">
-                   	<span class="input-group-btn" onclick="escribirComentario('vinculacionped','Vinculación al PED (Plan Estatal de Desarrollo)','lbl-vinculacionped');">
-                       	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
-                   	</span>
-                    <p id="lbl-vinculacionped" class="form-control" style="height:auto"></p>
-				</div>
-                
-            </div>
-        </div>
-        
         <div class="col-sm-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -194,6 +226,22 @@
 							</div>
                          </div>
                     </div>
+                    <div id="panel-programa-seleccionado" class="col-sm-12 panel panel-primary" style="display: none; padding-left:0px; padding-right:0px;">
+                        <table id="tabla-indicadores-programa-presupuestario" class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th style="text-align:center;" colspan="3"><span id="titulo-programa-presupuestario">Programa Presupuestario</span></th>
+                                </tr>
+                                <tr>
+                                    <th width="1">Tipo</th>
+                                    <th>Indicador</th>
+                                    <th>Unidad de Medida</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                     <div class="col-sm-6">
                         <div class="form-group">
                             <label class="control-label" for="lbl-origenasignacion">Origen Asignación</label>
@@ -241,46 +289,18 @@
                 </div>
             </div>
         </div>
-        <div class="col-sm-6">
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
             <div class="form-group">
-                <label class="control-label" for="lbl-cobertura">Cobertura</label>
+                <label class="control-label" for="lbl-vinculacionped">Vinculación al PED (Plan Estatal de Desarrollo)</label>
                 <div class="input-group">
-                   	<span class="input-group-btn" onclick="escribirComentario('cobertura','Cobertura','lbl-cobertura');">
+                   	<span class="input-group-btn" onclick="escribirComentario('vinculacionped','Vinculación al PED (Plan Estatal de Desarrollo)','lbl-vinculacionped');">
                        	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
                    	</span>
-                    <p id="lbl-cobertura" class="form-control" style="height:auto"></p>
+                    <p id="lbl-vinculacionped" class="form-control" style="height:auto"></p>
 				</div>
-                                
-            </div>
-        </div>
-        <div class="col-sm-6">
-            <div id="select-estado-panel" class="form-group">
-                <label class="control-label" for="lbl-estado">Estado</label>
-                <div class="input-group">
-                   	<span class="input-group-btn" onclick="escribirComentario('estado','Estado','lbl-estado');">
-                       	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
-                   	</span>
-                    <p id="lbl-estado" class="form-control" style="height:auto">Chiapas</p>
-				</div>                
-            </div>
-            <div id="select-municipio-panel" class="form-group">
-                <label class="control-label" for="lbl-municipio">Municipio</label>
-                <div class="input-group">
-                   	<span class="input-group-btn" onclick="escribirComentario('municipio','Municipio','lbl-municipio');">
-                       	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
-                   	</span>
-                    <p id="lbl-municipio" class="form-control" style="height:auto"></p>
-				</div>                 
-            </div>
-            <div id="select-region-panel" class="form-group">
-                <label class="control-label" for="lbl-region">Región</label>
-                <div class="input-group">
-                   	<span class="input-group-btn" onclick="escribirComentario('region','Región','lbl-region');">
-                       	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
-                   	</span>
-                    <p id="lbl-region" class="form-control" style="height:auto"></p>
-				</div>
-                 
+                
             </div>
         </div>
     </div>

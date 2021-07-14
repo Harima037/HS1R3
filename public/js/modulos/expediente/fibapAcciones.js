@@ -568,6 +568,8 @@ context.mostrar_datos = function(datos){
     $('#frecuencia-accion').val(elemento.idFrecuenciaIndicador);
     $('#tipo-ind-accion').val(elemento.idTipoIndicador);
     $('#unidad-medida-accion').val(elemento.idUnidadMedida);
+    $('#comportamiento-accion').val(elemento.idComportamientoAccion);
+    $('#tipo-valor-meta-accion').val(elemento.idTipoValorMeta);
     
     if(elemento.idEntregable){
         $('#entregable').val(elemento.idEntregable);

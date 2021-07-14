@@ -7,7 +7,13 @@
 	            {{Form::select('tipobeneficiario',array('' =>'Selecciona uno') + $tipos_beneficiarios->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'tipobeneficiario'))}}
 	        </div>
 	    </div>
-	    <div class="col-sm-8">
+		<div class="col-sm-4">
+			<div class="form-group">
+	            <label class="control-label" for="tipocaptura">Tipo de Captura</label>
+	            {{Form::select('tipocaptura',array('' =>'Selecciona uno') + $tipos_captura->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'tipocaptura'))}}
+	        </div>
+	    </div>
+	    <div class="col-sm-4">
 	    	<div class="form-group">
 	    		<label class="control-label">Estadisticas de Población</label><br>
 	        	<div class="btn-group">

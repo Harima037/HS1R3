@@ -292,12 +292,6 @@
                                 <div role="tabpanel" class="tab-pane" id="tab-componente"></div>
                             </div>
                         </div>
-                        <div>
-                            <br>
-                            <button type="button" class="btn btn-success" id="btn-exportar-excel">
-                                <span class="fa fa-file"></span> Imprimir Reporte
-                            </button>
-                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

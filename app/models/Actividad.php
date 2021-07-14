@@ -95,6 +95,15 @@ class Actividad extends BaseModel
 	public function unidadMedida(){
 		return $this->belongsTo('UnidadMedida','idUnidadMedida');
 	}
+
+	public function comportamientoAccion(){
+		return $this->belongsTo('ComportamientoAccion','idComportamientoAccion');
+	}
+	
+	public function tipoValorMeta(){
+		return $this->belongsTo('TipoValorMeta','idTipoValorMeta');
+	}
+
 	public function comentarios(){
     	return $this->hasMany('EvaluacionComentario','idElemento')->where('tipoElemento','=',3);
     }

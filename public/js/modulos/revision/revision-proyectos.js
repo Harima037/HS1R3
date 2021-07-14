@@ -16,6 +16,9 @@
 //var fibapResource = new RESTfulRequests(SERVER_HOST+'/v1/fibap');
 var moduloResource = new RESTfulRequests(SERVER_HOST+'/v1/revision-proyectos');
 var moduloDatagrid = new Datagrid("#datagridCaratulas",moduloResource);
+
+$('.chosen-one').chosen({width:'100%',search_contains:true,enable_split_word_search:true,no_results_text: "No se econtraron resultados para "});
+
 moduloDatagrid.init();
 moduloDatagrid.actualizar({
     _success: function(response){
@@ -58,6 +61,31 @@ moduloDatagrid.actualizar({
         moduloDatagrid.paginacion(total);
     }
 });
+
+function filtrarPorEstatus(){
+    realizar_busqueda();
+}
+
+$("#datagridSeguimientos .txt-quick-search").off('keydown');
+$("#datagridSeguimientos .txt-quick-search").on('keydown', function(event){
+    if (event.which == 13) {
+        realizar_busqueda();
+    }
+});
+
+$('#datagridSeguimientos .btn-quick-search').off('click');
+$('#datagridSeguimientos .btn-quick-search').on('click',function(){
+    realizar_busqueda();
+})
+
+function realizar_busqueda(){
+    moduloDatagrid.setPagina(1);
+    moduloDatagrid.parametros.buscar = $('.txt-quick-search').val();
+    moduloDatagrid.parametros.estatusProyecto = $('#select-filtro-estatus').val();
+    moduloDatagrid.actualizar();
+}
+
+
 var modal_name = '#modalCaratulas';
 var form_name = '#form_caratula';
 /*===================================*/
@@ -210,7 +238,17 @@ function editar (e){
 	            $('#btn-firmar-proyecto').show();
 			else
 			    $('#btn-firmar-proyecto').hide();
-						
+			
+            if(response.data.idEstatusProyecto >= 4){
+                $('#btn-exportar-excel').show();
+                $('#btn-exportar-excel').off('click');
+                $('#btn-exportar-excel').on('click',function(){
+                    window.open(SERVER_HOST+'/v1/reporteProyecto/'+response.data.id);
+                });
+            }else{
+                $('#btn-exportar-excel').off('click');
+                $('#btn-exportar-excel').hide();
+            }
 			
             
             $('#datos-formulario').hide();
@@ -516,6 +554,9 @@ function constructor_grupo_acordiones(padre,item,tipo,contenido_extra){ //tipo =
     contenido += '<span class="label label-default">Frecuencia :</span> '+((item.frecuencia)?item.frecuencia.descripcion:'')+'<br>';
     contenido += '<span class="label label-default">Tipo :</span> '+((item.tipo_indicador)?item.tipo_indicador.descripcion:'')+'<br>';
     contenido += '<span class="label label-default">Unidad de Medida :</span> '+((item.unidad_medida)?item.unidad_medida.descripcion:'')+'<br>';    
+    contenido += '<span class="label label-default">Comportamiento :</span> '+((item.comportamiento_accion)?(item.comportamiento_accion.clave +' '+ item.comportamiento_accion.descripcion):'')+'<br>';
+    contenido += '<span class="label label-default">Tipo de Valor de la Meta :</span> '+((item.tipo_valor_meta)?item.tipo_valor_meta.descripcion:'')+'<br>';
+
     contenido += '</div>';
     contenido += '</div>';
 
