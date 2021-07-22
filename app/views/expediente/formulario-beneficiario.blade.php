@@ -21,14 +21,12 @@
 						<span class="fa fa-download"></span> Descargar Archivos <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu" role="menu">
-						<li>
-							<a href="{{ URL::to('archivos/estadistica_de_poblacion_2015.pdf') }}" target="_blank">
-							<span class="fa fa-file-pdf-o"></span> Estadistica de Población</a>
-						</li>
-						<li>
-							<a href="{{ URL::to('archivos/poblacion_jurisdiccional_2015.pdf') }}" target="_blank">
-							<span class="fa fa-file-pdf-o"></span> Población Jurisdiccional</a>
-						</li>
+						@foreach($archivos as $archivo)
+							<li>
+								<a href="{{ URL::to('ver-archivo/'.$archivo->id) }}" target="_blank">
+								<span class="fa fa-file-pdf-o"></span> {{$archivo->titulo}}</a>
+							</li>
+                        @endforeach
 					</ul>
 				</div>
 	    	</div>

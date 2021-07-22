@@ -113,6 +113,11 @@ if($('#id').val()){
             $('#proyecto_estrategico').text(response.data.datos_proyecto_estrategico.clave);
             $('#no_proyecto_estrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
 			//Termina Clave presupuestaria
+			//estrategia_estatal
+			$('#lbl-estrategiapnd').text((response.data.estrategia_nacional)?response.data.estrategia_nacional.descripcion:'Sin Datos');
+			$('#lbl-objetivoestrategico').text((response.data.objetivo_estrategico)?response.data.objetivo_estrategico.descripcion:'Sin Datos');
+			$('#lbl-alineacion').text((response.data.estrategia_estatal)?response.data.estrategia_estatal.claveAlineacion:'Sin Datos');
+			$('#lbl-estrategiaestatal').text((response.data.estrategia_estatal)?response.data.estrategia_estatal.claveEstrategia+' '+response.data.estrategia_estatal.descripcion:'Sin Datos');
             
 			$('#lbl-unidadresponsable').text(response.data.datos_unidad_responsable.clave+' - '+response.data.datos_unidad_responsable.descripcion);
 			$('#lbl-funciongasto').text(response.data.datos_sub_sub_funcion.clave+' - '+response.data.datos_sub_sub_funcion.descripcion);
@@ -143,7 +148,19 @@ if($('#id').val()){
 				$('#select-estado-panel').hide();
 				$('#select-municipio-panel').hide();
 				$('#select-region-panel').hide();
-			}			
+			}
+
+			var archivos = response.data.archivos_normatividad;
+			if(archivos.length > 0){
+                var html_body = '';
+                for(var i in archivos){
+                    var archivo = archivos[i];
+                    html_body += '<tr><td>'+archivo.titulo+'</td><td><a href="'+SERVER_HOST+'/ver-archivo/'+archivo.id+'" target="_blank">'+archivo.nombre+'</a></td></tr>';
+                }
+                $('#tabla-lista-archivos tbody').html(html_body);
+            }else{
+                $('#tabla-lista-archivos tbody').html('<tr><td colspan="3" style="text-align:center;">No se encontraron archivos</td></tr>')
+            }
 			
 			var cuantasFilasBeneficiarios = response.data.beneficiarios.length;			
 			var cadenaHTML = '<table width=100% class="table table-bordered table-condensed"><tr>';
@@ -330,15 +347,24 @@ if($('#id').val()){
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<br><div class="col-sm-12 bg-info"><span class="fa fa-crosshairs"></span> <strong>Objetivo</strong></div>';
 				if(response.data.idClasificacionProyecto==2)
 				{
-					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-entregable'+idComponente+'">Entregable</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'entregable|'+idComponente+'\',\'Entregable\',\'lbl-entregable'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-entregable'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].entregable.descripcion+'</p></div></div></div>';
+					if(response.data.componentes[cuentaComponentes].entregable){
+						TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-entregable'+idComponente+'">Entregable</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'entregable|'+idComponente+'\',\'Entregable\',\'lbl-entregable'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-entregable'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].entregable.descripcion+'</p></div></div></div>';
+					}else{
+						TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-entregable'+idComponente+'">Entregable</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'entregable|'+idComponente+'\',\'Entregable\',\'lbl-entregable'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-entregable'+idComponente+'" class="form-control" style="height:auto"></p></div></div></div>';
+					}
 					
 					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-entregabletipo'+idComponente+'">Tipo</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'entregabletipo|'+idComponente+'\',\'Tipo\',\'lbl-entregabletipo'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-entregabletipo'+idComponente+'" class="form-control" style="height:auto">';
-					if(response.data.componentes[cuentaComponentes].entregable_tipo)
+					if(response.data.componentes[cuentaComponentes].entregable_tipo){
 						TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + response.data.componentes[cuentaComponentes].entregable_tipo.descripcion;
-					
+					}
 					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '</p></div></div></div>';
+
+					if(response.data.componentes[cuentaComponentes].entregable_accion){
+						TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-entregableaccion'+idComponente+'">Acción</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'entregableaccion|'+idComponente+'\',\'Acción\',\'lbl-entregableaccion'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-entregableaccion'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].entregable_accion.descripcion+'</p></div></div></div>';
+					}else{
+						TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-entregableaccion'+idComponente+'">Acción</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'entregableaccion|'+idComponente+'\',\'Acción\',\'lbl-entregableaccion'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-entregableaccion'+idComponente+'" class="form-control" style="height:auto"></p></div></div></div>';
+					}
 					
-					TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-4"><div class="form-group"><label class="control-label" for="lbl-entregableaccion'+idComponente+'">Acción</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'entregableaccion|'+idComponente+'\',\'Acción\',\'lbl-entregableaccion'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-entregableaccion'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].entregable_accion.descripcion+'</p></div></div></div>';
 				}
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-descripcion'+idComponente+'">Descripción</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'descripcion-obj|'+idComponente+'\',\'Descripción\',\'lbl-descripcion-obj'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-descripcion-obj'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].objetivo+'</p></div></div></div>';
 				TabComponente[contadorDeTabs] = TabComponente[contadorDeTabs] + '<div class="col-sm-12"><div class="form-group"><label class="control-label" for="lbl-mediosverificacion'+idComponente+'">Medios de verificación</label><div class="input-group"><span class="input-group-btn" onclick="escribirComentarioComponente(\'verificacion|'+idComponente+'\',\'Medios de verificación\',\'lbl-verificacion'+idComponente+'\');"><span class="btn btn-default"><i class="fa fa-pencil-square-o"></i></span></span><p id="lbl-verificacion'+idComponente+'" class="form-control" style="height:auto">'+response.data.componentes[cuentaComponentes].mediosVerificacion+'</p></div></div></div>';
@@ -831,6 +857,12 @@ if($('#id').val()){
 						$(objetoAColorear).removeClass('btn-default');
 						$(objetoAColorear).addClass('btn-warning');	
 					}
+					else if(idCampo.substr(0,12)=='normatividad')
+					{
+						objetoAColorear = '#'+idCampo;
+						$(objetoAColorear).removeClass('btn-default');
+						$(objetoAColorear).addClass('btn-warning');	
+					}
 					else if(idCampo.substr(0,10)=='documentos')
 					{
 						objetoAColorear = '#'+idCampo;
@@ -928,10 +960,6 @@ if($('#id').val()){
 			{
 				$('#mensajes-sin-duenio').addClass('hidden');
 			}
-			
-
-			            
-            
         }
     });
 }
@@ -1143,6 +1171,8 @@ function escribirComentario(idcampo,nombrecampo,objetoconinformacion)
 		$('#lbl-informacioncampo').text(objetoconinformacion);
 	else if(idcampo.substr(0,12) == 'beneficiario')
 		$('#lbl-informacioncampo').text(objetoconinformacion);
+	else if(idcampo.substr(0,12) == 'normatividad')
+		$('#lbl-informacioncampo').text(objetoconinformacion);
 	else if(idcampo.substr(0,10) == 'documentos')
 		$('#lbl-informacioncampo').text(objetoconinformacion);
 	else if(idcampo.substr(0,12) == 'antecedentes')
@@ -1292,6 +1322,12 @@ $('#btnGuardarComentario').on('click',function(){
 						$(objetoAColorear).removeClass('btn-default');
 						$(objetoAColorear).addClass('btn-warning');	
 					}
+					else if($('#idcampo').val().substr(0,12)=='normatividad')
+					{
+						var objetoAColorear = '#'+objetoQueSeColorea;
+						$(objetoAColorear).removeClass('btn-default');
+						$(objetoAColorear).addClass('btn-warning');	
+					}
 					else if($('#idcampo').val().substr(0,10)=='documentos')
 					{
 						var objetoAColorear = '#'+objetoQueSeColorea;
@@ -1414,6 +1450,12 @@ $('#btnQuitarComentario').on('click',function(){
 								$(objetoADesColorear).addClass('btn-default');					
 							}
 							else if($('#idcampo').val().substr(0,12)=='beneficiario')
+							{
+								objetoADesColorear = '#'+objetoADesColorear;
+								$(objetoADesColorear).removeClass('btn-warning');
+								$(objetoADesColorear).addClass('btn-default');	
+							}
+							else if($('#idcampo').val().substr(0,12)=='normatividad')
 							{
 								objetoADesColorear = '#'+objetoADesColorear;
 								$(objetoADesColorear).removeClass('btn-warning');

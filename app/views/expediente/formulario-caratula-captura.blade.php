@@ -261,44 +261,43 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="form-group">
-                <label class="control-label" for="vinculacionped">Vinculación al PED (Plan Estatal de Desarrollo)</label>
-                <select class="form-control chosen-one" id="vinculacionped" name="vinculacionped">
-                    <option value="">Seleciona un objetivo</option>
-                    <!-- Inicio de ejes -->
-                    @foreach ($objetivos_ped as $eje)
-                        @if(count($eje->hijos))
-                            <optgroup label="{{$eje->clave . ' ' . $eje->descripcion}}">
-                                <!-- Inicio de temas -->
-                            @foreach ($eje->hijos as $tema)
-                                @if(count($tema->hijos))
-                                    <option disabled="disabled">
-                                        {{$tema->clave . ' ' . $tema->descripcion}}
-                                    </option>
-                                    <!-- Inicio de politicas -->
-                                    @foreach ($tema->hijos as $politica)
-                                        @if(count($politica->hijos))
-                                            <option disabled="disabled">
-                                                {{$politica->clave . ' ' . $politica->descripcion}}
-                                            </option>
-                                            <!-- Inicio de objetivos -->    
-                                            @foreach ($politica->hijos as $objetivo)
-                                                <option value="{{$objetivo->id}}">
-                                                    {{$objetivo->clave . ' ' . $objetivo->descripcion}}
-                                                </option>
-                                            @endforeach
-                                            <!-- Inicio de objetivos -->
-                                            <option data-divider="true"></option>
-                                        @endif
-                                    @endforeach
-                                    <!-- Fin de politicas -->
-                                @endif
-                            @endforeach
-                            <!-- Fin de temas -->
-                            </optgroup>
-                        @endif
-                    @endforeach
-                    <!-- Fin de ejes -->
-                </select>
+                <label class="control-label" for="estrategiapnd">Estrategia del Objetivo del Plan Nacional</label>
+                {{Form::select('estrategiapnd',array('' =>'Selecciona una Alineación') + $estrategias_nacionales->lists('descripcion','id'),0,array('class'=>'form-control chosen-one','id'=>'estrategiapnd'))}}
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label class="control-label" for="objetivoestrategico">Objetivo Estrategico</label>
+                {{Form::select('objetivoestrategico',array('' =>'Selecciona un Objetivo Estrategico') + $objetivos_estrategicos->lists('descripcion','id'),0,array('class'=>'form-control chosen-one','id'=>'objetivoestrategico'))}}
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="row">
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label class="control-label" for="alineacion">Alineación</label>
+                        {{Form::select('alineacion',array('' =>'Selecciona una Alineación') + $alineaciones->lists('claveAlineacion','idObjetivoPED'),0,array('class'=>'form-control chosen-one','id'=>'alineacion'))}}
+                    </div>
+                </div>
+                <div class="col-sm-9">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label" for="estrategiaestatal">Estrategia del Plan Estatal</label>
+                                <select class="form-control chosen-one" id="estrategiaestatal" name="estrategiaestatal">
+                                    <option value="">Selecciona una Alineación</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label" for="vinculacionped">Objetivo del Plan Estatal</label>
+                                <input type="hidden" id="vinculacionped" name="vinculacionped">
+                                <div id="panel-objetivo-ped">Selecciona una Alineación</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

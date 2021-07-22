@@ -20,6 +20,7 @@
 <script src="{{ URL::to('js/modulos/expediente/fibapAcciones.js')}}"></script>
 <script src="{{ URL::to('js/modulos/expediente/fuenteFinanciamiento.js')}}"></script>
 <script src="{{ URL::to('js/modulos/expediente/caratula-inversion.js')}}"></script>
+<script src="{{ URL::to('js/modulos/expediente/caratulaArchivos.js')}}"></script>
 @stop
 
 @section('aside')
@@ -77,6 +78,11 @@
                     <li role="presentation" class="disabled">
                         <a href="#acciones-fibap" aria-controls="acciones-fibap" role="tab" data-toggle="" id="tab-link-acciones-fibap">
                             <span class="fa fa-square-o"></span> Acciones <span class="badge">0</span>
+                        </a>
+                    </li>
+                    <li role="presentation" class="disabled">
+                        <a href="#normatividad" aria-controls="normatividad" role="tab" data-toggle="" id="tab-link-normatividad">
+                            Archivo(s) - Normatividad <span class="badge">0</span>
                         </a>
                     </li>
                 </ul>
@@ -137,6 +143,10 @@
                                 </button>
                             </div>
                         </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="normatividad">
+                        <br>
+                        {{$formulario_normatividad}}
                     </div>
                 </div>
             </div>

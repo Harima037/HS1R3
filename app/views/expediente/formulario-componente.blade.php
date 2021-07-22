@@ -164,6 +164,24 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <div clasS="form-group">
+                                <label class="control-label" for="comportamiento-{{$identificador}}">
+                                    Comportamiento
+                                </label>
+                                {{Form::select('comportamiento-'.$identificador,array(''=>'Seleccione un comportamiento') + $comportamientos_accion->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'comportamiento-'.$identificador))}}
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div clasS="form-group">
+                                <label class="control-label" for="tipo-valor-meta-{{$identificador}}">
+                                    Tipo de Valor de la Meta
+                                </label>
+                                {{Form::select('tipo-valor-meta-'.$identificador,array(''=>'Seleccione un tipo') + $tipos_valor_meta->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'tipo-valor-meta-'.$identificador))}}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

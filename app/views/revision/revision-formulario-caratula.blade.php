@@ -293,14 +293,65 @@
     <div class="row">
         <div class="col-sm-12">
             <div class="form-group">
-                <label class="control-label" for="lbl-vinculacionped">Vinculación al PED (Plan Estatal de Desarrollo)</label>
+                <label class="control-label" for="lbl-estrategiapnd">Estrategia del Objetivo del Plan Nacional</label>
                 <div class="input-group">
-                   	<span class="input-group-btn" onclick="escribirComentario('vinculacionped','Vinculación al PED (Plan Estatal de Desarrollo)','lbl-vinculacionped');">
+                   	<span class="input-group-btn" onclick="escribirComentario('estrategiapnd','Estrategia del Objetivo del Plan Nacional','lbl-estrategiapnd');">
                        	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
                    	</span>
-                    <p id="lbl-vinculacionped" class="form-control" style="height:auto"></p>
+                    <p id="lbl-estrategiapnd" class="form-control" style="height:auto"></p>
 				</div>
-                
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label class="control-label" for="lbl-objetivoestrategico">Objetivo Estrategico</label>
+                <div class="input-group">
+                   	<span class="input-group-btn" onclick="escribirComentario('objetivoestrategico','Objetivo Estrategico','lbl-objetivoestrategico');">
+                       	<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
+                   	</span>
+                    <p id="lbl-objetivoestrategico" class="form-control" style="height:auto"></p>
+				</div>
+            </div>
+        </div>
+        <div class="col-sm-12">
+            <div class="row">
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label class="control-label" for="lbl-alineacion">Alineación</label>
+                        <div class="input-group">
+                            <span class="input-group-btn" onclick="escribirComentario('alineacion','Alineación','lbl-alineacion');">
+                                <span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
+                            </span>
+                            <p id="lbl-alineacion" class="form-control" style="height:auto"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-9">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label" for="lbl-estrategiaestatal">Estrategia del Plan Estatal</label>
+                                <div class="input-group">
+                                    <span class="input-group-btn" onclick="escribirComentario('estrategiaestatal','Estrategia del Plan Estatal','lbl-estrategiaestatal');">
+                                        <span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
+                                    </span>
+                                    <p id="lbl-estrategiaestatal" class="form-control" style="height:auto"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="form-group">
+                                <label class="control-label" for="lbl-vinculacionped">Objetivo del Plan Estatal</label>
+                                <div class="input-group">
+                                    <span class="input-group-btn" onclick="escribirComentario('vinculacionped','Objetivo del Plan Estatal','lbl-vinculacionped');">
+                                        <span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span>
+                                    </span>
+                                    <p id="lbl-vinculacionped" class="form-control" style="height:auto"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

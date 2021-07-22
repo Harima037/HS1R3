@@ -17,6 +17,7 @@
 <script src="{{ URL::to('js/modulos/expediente/fuenteFinanciamiento.js')}}"></script>
 <script src="{{ URL::to('js/modulos/expediente/metasMesCSV.js')}}"></script>
 <script src="{{ URL::to('js/modulos/expediente/caratula.js')}}"></script>
+<script src="{{ URL::to('js/modulos/expediente/caratulaArchivos.js')}}"></script>
 @stop
 
 @section('aside')
@@ -64,6 +65,11 @@
                     <li role="presentation" class="disabled">
                         <a id="tablink-componentes" href="#componentes" role="tab">
                             Componentes <span class="badge">0</span>
+                        </a>
+                    </li>
+                    <li role="presentation" class="disabled">
+                        <a id="tablink-normatividad" href="#normatividad" role="tab">
+                            Archivo(s) - Normatividad <span class="badge">0</span>
                         </a>
                     </li>
                 </ul>
@@ -116,6 +122,10 @@
                                 </button>
                             </div>
                         </div>
+                    </div>
+                    <div role="tabpanel" class="tab-pane" id="normatividad">
+                        <br>
+                        {{$formulario_normatividad}}
                     </div>
                 </div>
             </div>

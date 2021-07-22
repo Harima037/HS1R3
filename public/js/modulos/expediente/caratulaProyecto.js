@@ -47,6 +47,10 @@ context.llenar_datos = function(datos){
     $('#ejercicio').val(datos.ejercicio);
     $('#tipoaccion').val(datos.idTipoAccion);
     $('#vinculacionped').val(datos.idObjetivoPED);
+	$('#estrategiapnd').val(datos.idEstrategiaNacional);
+	$('#objetivoestrategico').val(datos.idObjetivoEstrategico);
+	$('#alineacion').val(datos.idObjetivoPED);
+	$('#estrategiaestatal').val(datos.idEstrategiaEstatal);
 
 	$('#tipoproyecto').val(datos.idTipoProyecto);
 	$('#fechainicio').val(datos.fechaInicio);
@@ -82,6 +86,7 @@ context.llenar_datos = function(datos){
     $('#origenasignacion').change();
 	$('.chosen-one').trigger('chosen:updated');
     $('.chosen-one').chosen().change();
+	//$('#estrategiaestatal').trigger('chosen:updated');
 }
 
 context.init = function(){

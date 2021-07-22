@@ -883,8 +883,23 @@ class Proyecto extends BaseModel
 
 	public function objetivoPedCompleto(){
 		return $this->belongsTo('ObjetivoPED','idObjetivoPED')->with('padre');
-	}	
+	}
 
+	public function estrategiaNacional(){
+		return $this->belongsTo('EstrategiaNacional','idEstrategiaNacional');
+	}
+
+	public function objetivoEstrategico(){
+		return $this->belongsTo('ObjetivoEstrategico','idObjetivoEstrategico');
+	}
+
+	public function estrategiaEstatal(){
+		return $this->belongsTo('EstrategiaEstatal','idEstrategiaEstatal');
+	}
+
+	public function archivosNormatividad(){
+		return $this->hasMany('ControlArchivos','idPadre')->where('claveGrupo','NORM-PROY');
+	}
 	/*public function tipoBeneficiario(){
 		return $this->belongsTo('TipoBeneficiario','idTipoBeneficiario');
 	}*/

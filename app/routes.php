@@ -25,6 +25,8 @@ Route::group(array('before'=>'auth.sentry'), function(){
 	Route::get('dashboard', array('uses' => 'DashboardController@index'));
 	Route::get('/', array('uses' => 'DashboardController@index'));
 
+	Route::resource('ver-archivo', 	'ControlArchivosController', array('only' => array('show')));
+
 	Route::get('configurar/cuenta',array('uses'=>'CuentaController@index'));
 
 	Route::group(array('prefix'=>'root','before'=>'auth.root'),function(){
@@ -43,12 +45,13 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::get('admin-estrategia',array('uses'=>'AdminEstrategiaController@index'));
 		Route::get('bitacora-seguimiento',array('uses'=>'BitacoraValidacionSeguimientoController@index'));
 		Route::get('lideres-proyecto',array('uses'=>'LideresProyectoController@index'));
+		Route::get('archivos-estadistica-poblacion',array('uses'=>'EstadisticasPoblacionController@index'));
 	});
 
 	Route::group(array('prefix'=>'expediente'), function(){
 		Route::get('proyectos',array('uses'=>'ProyectosController@index'));
 		Route::any('caratula/{id?}',array('uses'=>'ProyectosController@caratula'));
-		
+
 		Route::get('inversion',array('uses'=>'InversionController@index'));
 		Route::any('caratula-inversion/{id?}',array('uses'=>'InversionController@caratula'));
 		Route::any('descargar-archivo-municipios/{id}',array('uses'=>'InversionController@archivoMunicipios'));
@@ -156,6 +159,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('usuarios',				'V1\UsuariosController');
 		Route::resource('roles',				'V1\RolesController');
 		Route::resource('lideres-proyectos',	'V1\LideresProyectosController');
+		Route::get('ped-estrategia-por-alineacion/{clave}', 'V1\ProyectosController@obtener_catalogos_alineacion');
 		Route::get('buscar-responsables-area/{id}','V1\LideresProyectosController@responsableEnArea');
 		Route::get('buscar-areas-responsable/{id}','V1\LideresProyectosController@areasDelResponsable');
 		Route::get('datos-responsable/{id}',	'V1\LideresProyectosController@datosDelResponsable');
@@ -165,6 +169,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('config-seg-metas', 	'V1\ConfigurarSeguimientoController', array('only' => array('store')));
 		Route::resource('purgar-seguimientos',	'V1\PurgarSeguimientoController');
 		Route::resource('admin-proyectos',		'V1\AdminProyectosController', array('only' => array('index','show','update')));
+		Route::resource('archivos-estadistica-poblacion', 'V1\EstadisticasPoblacionController', array('only' => array('index','store','destroy')));
 		Route::get('admin-proyectos-avances/{id}', array('uses'=>'V1\AdminProyectosController@avances'));
 		Route::put('admin-proyectos-avances/{id}', array('uses'=>'V1\AdminProyectosController@cambiarEstatusAvances'));
 		Route::get('admin-indicadoresFASSA-avances/{id}', array('uses'=>'V1\AdminIndicadoresFASSAController@avances'));
@@ -175,6 +180,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('inversion',		'V1\InversionController');
 		Route::resource('reporteProyecto',	'V1\ReporteProyectoController', array('only' => array('show')));
 		Route::resource('fibap',			'V1\FibapController');
+		Route::resource('archivos-normatividad-proyectos', 'V1\ArchivosNormatividadController', array('only' => array('index','store','destroy')));
 
 		Route::resource('visor', 			'V1\VisorController', array('only' => array('index','show','store','update')));
 

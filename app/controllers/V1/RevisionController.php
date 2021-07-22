@@ -223,9 +223,9 @@ class RevisionController extends BaseController {
 		}else{
 			$recurso = Proyecto::contenidoCompleto()->find($id);
 			$recurso->componentes->load('comportamientoAccion','tipoValorMeta','unidadMedida','dimension','tipoIndicador','metasMes','formula','frecuencia','actividades','entregable','entregableTipo','entregableAccion','accion.partidas','accion.propuestasFinanciamiento.origen','accion.distribucionPresupuesto','accion.desglosePresupuestoComponente');
-			$recurso->load('fuentesFinanciamiento.fondoFinanciamiento','fuentesFinanciamiento.fuenteFinanciamiento','fuentesFinanciamiento.subFuentesFinanciamiento');
+			$recurso->load('fuentesFinanciamiento.fondoFinanciamiento','fuentesFinanciamiento.fuenteFinanciamiento','fuentesFinanciamiento.subFuentesFinanciamiento','estrategiaNacional','objetivoEstrategico','estrategiaEstatal');
 			$recurso->beneficiarios->load('tipoCaptura');
-			$recurso->load('comentarios');
+			$recurso->load('comentarios','archivosNormatividad');
 
 			$recurso->datos_programa_presupuestario_indicadores = Programa::where('claveProgramaPresupuestario','=',$recurso->programaPresupuestario)->where('idEstatus','=',5)->with('indicadoresDescripcion')->first();
 			

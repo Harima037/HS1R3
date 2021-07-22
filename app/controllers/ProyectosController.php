@@ -130,7 +130,7 @@ class ProyectosController extends \BaseController {
 
 		$funciones_gasto = FuncionGasto::whereNull('idPadre')->with('hijos')->get();
 
-		$objetivos_ped = ObjetivoPED::whereNull('idPadre')->with('hijos')->get();
+		//$objetivos_ped = ObjetivoPED::whereNull('idPadre')->with('hijos')->get();
 
 		$datos = array(
 			'firmas' => $firmas,
@@ -147,11 +147,15 @@ class ProyectosController extends \BaseController {
 			'programas_especiales' => ProgramaEspecial::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
 			'actividades_institucionales' => ActividadInstitucional::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
 			'proyectos_estrategicos' => ProyectoEstrategico::select('clave',DB::raw('concat(clave," ",descripcion) as descripcion'))->get(),
-			'objetivos_ped' => $objetivos_ped,
 			'coberturas' => Cobertura::all(),
 			//'tipos_beneficiarios' => TipoBeneficiario::all(),
 			'municipios' => Municipio::all(),
-			'regiones' => Region::all()
+			'regiones' => Region::all(),
+			//'objetivos_ped' => $objetivos_ped,
+			'objetivos_estrategicos' => ObjetivoEstrategico::all(),
+			'alineaciones' => EstrategiaEstatal::select('claveAlineacion','idObjetivoPED')->groupBy('claveAlineacion')->get(),
+			'estrategias_nacionales' => EstrategiaNacional::all(),
+			//'estrategias_estatales' => EstrategiaEstatal::all(),
 		);
 		
 		if(Sentry::getUser()->claveUnidad){
@@ -171,7 +175,8 @@ class ProyectosController extends \BaseController {
 
 		$datos_beneficiarios = array(
 			'tipos_beneficiarios' => TipoBeneficiario::all(),
-			'tipos_captura' => TipoCaptura::all()
+			'tipos_captura' => TipoCaptura::all(),
+			'archivos' => ControlArchivos::where('claveGrupo','EST-POB')->get()
 		);
 		$datos_benef['formulario_beneficiarios'] = View::make('expediente.formulario-beneficiario',$datos_beneficiarios);
 		$datos['grid_beneficiarios'] = View::make('expediente.formulario-caratula-beneficiarios',$datos_benef);
@@ -182,6 +187,8 @@ class ProyectosController extends \BaseController {
 
 		//Se Pre-carga formulario general de la caratula
 		$datos['formulario'] = View::make('expediente.formulario-caratula-captura',$datos);
+
+		$datos['formulario_normatividad'] = View::make('expediente.formulario-caratula-normatividad',[]);
 
 		return $datos;
 	}

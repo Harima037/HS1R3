@@ -12,6 +12,7 @@
 =====================================*/
 // Declaracion de variables
 var proyectoResource = new RESTfulRequests(SERVER_HOST+'/v1/inversion');
+var catalogosAlineacionResource = new RESTfulRequests(SERVER_HOST+'/v1/ped-estrategia-por-alineacion');
 
 var comentarios = {
 	componentes: {},
@@ -34,6 +35,8 @@ var modal_accion  = '#modal-accion';
 var modal_beneficiario = '#modalBeneficiario';
 var modal_cancelar_proyecto = '#modalCancelarProyecto';
 
+var estrategia_seleccionada = '';
+
 $('.chosen-one').chosen({width:'100%'});
 
 window.onload = function () { 
@@ -52,6 +55,8 @@ if($('#id').val()){
         	caratulaProyecto.llenar_datos(response.data);
         	caratulaBeneficiario.init(response.data.id,proyectoResource);
 
+			estrategia_seleccionada = response.data.idEstrategiaEstatal;
+			
 	       	cambiar_icono_tabs('#tab-link-caratula','fa-check-square-o');
 
             $('#tab-link-datos-fibap').attr('data-toggle','tab');
@@ -60,10 +65,15 @@ if($('#id').val()){
 			$('#tab-link-caratula-beneficiarios').parent().removeClass('disabled');
 			$('#tablink-fuentes-financiamiento').attr('data-toggle','tab');
 			$('#tablink-fuentes-financiamiento').parent().removeClass('disabled');
+			$('#tab-link-normatividad').attr('data-toggle','tab');
+			$('#tab-link-normatividad').parent().removeClass('disabled');
 
 			/*if(response.extras.municipios){
         		fibapAcciones.cargar_municipios(response.extras.municipios);
         	}*/
+			caratulaArchivos.init();
+			caratulaArchivos.badgeElement = $('#tab-link-normatividad > span');
+			caratulaArchivos.cargarListadoArchivos();
 
 			if(response.data.cancelado){
 				$('#btn-cancelar-proyecto').hide();
@@ -142,6 +152,62 @@ if($('#id').val()){
 $('#btn-proyecto-cancelar').on('click',function(){
 	window.location.href = SERVER_HOST+'/expediente/inversion';
 });
+
+$('#alineacion').on('change',function(){
+	var clave = $('#alineacion').val();
+	if(clave){
+		catalogosAlineacionResource.get(clave,null,{
+			_success: function(response){
+				
+				$('#estrategiaestatal').val('');
+				llenar_select_estrategias(response.data.estrategias,estrategia_seleccionada)
+				
+				llenar_datos_objetico_ped(response.data.objetivo);
+			}
+		});
+	}else{
+		$('#estrategiaestatal').val('');
+		$('#estrategiaestatal').html('<option value="">Selecciona una Alineación</option>');
+		$('#estrategiaestatal').trigger('chosen:updated');
+		///
+		$('#panel-objetivo-ped').html('Selecciona una Alineación');
+		$('#vinculacionped').val('');
+	}
+});
+
+function llenar_datos_objetico_ped(objetivo){
+	var html_objetivo_ped = '';
+	html_objetivo_ped = '<ul style="list-style-type:none; padding-left: 0px;"><li style="font-weight: bold;font-size: large;">'+objetivo.padre.padre.padre.clave+' '+objetivo.padre.padre.padre.descripcion+'</li>';
+	html_objetivo_ped += '<li><ul style="list-style-type:none; padding-left: 0px;"><li style="font-weight: bold;font-size: medium;">'+objetivo.padre.padre.clave+' '+objetivo.padre.padre.descripcion+'</li>';
+	html_objetivo_ped += '<li><ul style="list-style-type:none; padding-left: 0px;"><li style="font-weight: bold;font-size: medium;font-style: italic;">'+objetivo.padre.clave+' '+objetivo.padre.descripcion+'</li>';
+	html_objetivo_ped += '<li><ul style="list-style-type:none; padding-left: 0px;"><li style="font-size: large;">'+objetivo.clave+' '+objetivo.descripcion+'</li>';
+	html_objetivo_ped += '</ul></li></ul></li></ul></li></li></ul>';
+
+	$('#panel-objetivo-ped').html(html_objetivo_ped);
+	$('#vinculacionped').val(objetivo.id);
+}
+
+function llenar_select_estrategias(estrategias, selected = ''){
+	var html_opciones = '<option value="">Selecciona una Estrategia</option>';
+	for(var i in estrategias){
+		var estrategia = estrategias[i];
+		html_opciones += '<option value="'+estrategia.id+'">';
+		html_opciones += estrategia.claveEstrategia + ' ' + estrategia.descripcion;
+		html_opciones += '</option>';
+	}
+	$('#estrategiaestatal').html('');
+	$('#estrategiaestatal').html(html_opciones);
+
+	if(selected){
+		$('#estrategiaestatal').val(selected);
+	}
+
+	$('#estrategiaestatal').trigger('chosen:updated');
+}
+
+function eliminarArchivo(id){
+	caratulaArchivos.eliminarArchivo(id);
+}
 
 /***********************************************************************************************
 							Funciones de Edición de datos de DataGrid
@@ -490,6 +556,9 @@ $('#btn-proyecto-guardar').on('click',function(){
 				$('#tab-link-caratula-beneficiarios').parent().removeClass('disabled');
 				$('#tablink-fuentes-financiamiento').attr('data-toggle','tab');
 				$('#tablink-fuentes-financiamiento').parent().removeClass('disabled');
+				$('#tab-link-normatividad').attr('data-toggle','tab');
+				$('#tab-link-normatividad').parent().removeClass('disabled');
+
 				if(response.extras){
 					if(response.extras.jurisdicciones){
 						fibapAcciones.actualizar_metas_mes(response.extras.jurisdicciones);
@@ -500,7 +569,12 @@ $('#btn-proyecto-guardar').on('click',function(){
 	            		fibapAcciones.llenar_select_responsables(response.extras.responsables);
 	            	}
 				}
+
 				fuenteFinanciamiento.init(proyectoResource,$('#id').val());
+
+				caratulaArchivos.init();
+				caratulaArchivos.badgeElement = $('#tab-link-normatividad > span');
+				caratulaArchivos.cargarListadoArchivos();
 	        },
 	        _error: function(response){
 	            try{
@@ -839,6 +913,9 @@ function mostrar_comentarios(datos){
 				$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"]').addClass('text-warning');
 				$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"] td:eq(1)').prepend('<span class="fa fa-warning"></span> ');
 				$('#datagridBeneficiarios tr[data-id="'+id_campo.substring(12)+'"]').attr('data-comentario',observacion);
+			}else if(id_campo.substring(0,12) == 'normatividad'){
+				$('#normatividad-revision').removeClass('hidden');
+				$('#normatividad-revision-comentario').text(observacion);
 			}else if(id_campo.substring(0,14) == 'financiamiento'){
 				$('#datagridFuenteFinanciamiento tr[data-id="'+id_campo.substring(14)+'"]').addClass('text-warning');
 				$('#datagridFuenteFinanciamiento tr[data-id="'+id_campo.substring(14)+'"] td:eq(1)').prepend('<span class="fa fa-warning"></span> ');

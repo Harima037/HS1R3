@@ -20,7 +20,7 @@ use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception;
 use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
 	FibapDatosProyecto, Directorio, ComponenteDesglose, Accion, PropuestaFinanciamiento, DistribucionPresupuesto, DesgloseMetasMes, 
-	DesgloseBeneficiario, ProyectoFinanciamiento, ProyectoFinanciamientoSubFuente,FuenteFinanciamiento,SentryUser;
+	DesgloseBeneficiario, ProyectoFinanciamiento, ProyectoFinanciamientoSubFuente,FuenteFinanciamiento,SentryUser, EstrategiaEstatal, ObjetivoPED;
 
 class ProyectosController extends BaseController {
 	private $reglasProyecto = array(
@@ -42,7 +42,11 @@ class ProyectosController extends BaseController {
 		'origenasignacion'			=> 'required|alpha_num|size:2',
 		'actividadinstitucional'	=> 'required|alpha_num|size:3',
 		'proyectoestrategico'		=> 'required|alpha_num|size:1',
-		'vinculacionped'			=> 'sometimes|required'
+		'vinculacionped'			=> 'sometimes|required',
+		'estrategiapnd'				=> 'required',
+		'alineacion'				=> 'required',
+		'objetivoestrategico' 		=> 'required',
+		'estrategiaestatal' 		=> 'required',
 	);
 	
 	private $reglasBeneficiarios = array(
@@ -338,8 +342,10 @@ class ProyectosController extends BaseController {
 			$recurso = Proyecto::with('componentes','beneficiarios','clasificacionProyecto','tipoProyecto','estatusProyecto',
 									'jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico',
 									'fuentesFinanciamiento.fondoFinanciamiento','fuentesFinanciamiento.fuenteFinanciamiento',
-									'fuentesFinanciamiento.subFuentesFinanciamiento')
+									'fuentesFinanciamiento.subFuentesFinanciamiento','objetivoPed.padre')
 								->find($id);
+			
+			$estrategias = EstrategiaEstatal::where('idObjetivoPED',$recurso->idObjetivoPED)->get();
 
 			$recurso->componentes->load('unidadMedida');
 			if($recurso->idEstatusProyecto == 3){
@@ -363,6 +369,7 @@ class ProyectosController extends BaseController {
 			if(!$parametros){
 				$recurso['jurisdicciones'] = array('OC'=>'O.C.') + $jurisdicciones->lists('clave','clave');
 				$recurso['responsables'] = $responsables;
+				$recurso['estrategias'] = $estrategias;
 			}
 			$data["data"] = $recurso;
 		}
@@ -934,9 +941,13 @@ class ProyectosController extends BaseController {
 			$recurso->fechaTermino					= ($parametros['fechatermino'])?$parametros['fechatermino']:NULL;
 			$recurso->finalidadProyecto				= $parametros['finalidadproyecto'];
 			$recurso->nombreTecnico 				= $parametros['nombretecnico'];
-			$recurso->idObjetivoPED 				= $parametros['vinculacionped'];
 			$recurso->programaPresupuestario 		= $parametros['programapresupuestario'];
-			
+
+			$recurso->idObjetivoPED 				= $parametros['vinculacionped'];
+			$recurso->idEstrategiaNacional			= $parametros['estrategiapnd'];
+			$recurso->idObjetivoEstrategico			= $parametros['objetivoestrategico'];
+			$recurso->idEstrategiaEstatal			= $parametros['estrategiaestatal'];
+
 			if($recurso->idEstatusProyecto == NULL){
 				$recurso->idEstatusProyecto 		= 1;
 			}
@@ -1483,6 +1494,24 @@ class ProyectosController extends BaseController {
 		}
 
 		return $respuesta;
+	}
+
+	public function obtener_catalogos_alineacion($clave){
+		$http_status = 200;
+		$data = array();
+
+		$estrategias = EstrategiaEstatal::where('idObjetivoPED',$clave)->get();
+		
+		$objetivo_ped = ObjetivoPED::with('padre')->where('id',$clave)->first();
+
+		if(is_null($estrategias)){
+			$http_status = 404;
+			$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
+		}else{
+			$data = array("data" => array('estrategias'=>$estrategias, 'objetivo'=>$objetivo_ped));
+		}
+		
+		return Response::json($data,$http_status);
 	}
 
 }
