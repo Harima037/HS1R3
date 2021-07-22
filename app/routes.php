@@ -159,7 +159,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('usuarios',				'V1\UsuariosController');
 		Route::resource('roles',				'V1\RolesController');
 		Route::resource('lideres-proyectos',	'V1\LideresProyectosController');
-		Route::get('ped-estrategia-por-alineacion/{clave}', 'V1\ProyectosController@obtener_catalogos_alineacion');
+		Route::get('ped-estrategia-por-alineacion/{clave}', 'V1\ProyectosController@obtenerCatalogosAlineacion');
 		Route::get('buscar-responsables-area/{id}','V1\LideresProyectosController@responsableEnArea');
 		Route::get('buscar-areas-responsable/{id}','V1\LideresProyectosController@areasDelResponsable');
 		Route::get('datos-responsable/{id}',	'V1\LideresProyectosController@datosDelResponsable');

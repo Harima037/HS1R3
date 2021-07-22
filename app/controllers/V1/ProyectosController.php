@@ -1496,7 +1496,7 @@ class ProyectosController extends BaseController {
 		return $respuesta;
 	}
 
-	public function obtener_catalogos_alineacion($clave){
+	public function obtenerCatalogosAlineacion($clave){
 		$http_status = 200;
 		$data = array();
 
