@@ -82,7 +82,7 @@ class EstadisticasPoblacionController extends \BaseController {
                         $recurso->nombre = $nombreArchivo;
                         $recurso->directorio = '/estadistica-poblacion/';
                         $recurso->claveGrupo = 'EST-POB';
-                        $recurso->extension = 'PDF';
+                        $recurso->extension = 'pdf';
                         $recurso->save();
 
                         $respuesta['data'] = $recurso;

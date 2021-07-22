@@ -86,7 +86,7 @@ class ArchivosNormatividadController extends \BaseController {
                         $recurso->directorio = '/normatividad-proyectos/';
                         $recurso->claveGrupo = 'NORM-PROY';
 						$recurso->idPadre = $parametros['id-proyecto'];
-                        $recurso->extension = 'PDF';
+                        $recurso->extension = 'pdf';
                         $recurso->save();
 
                         $respuesta['data'] = $recurso;
