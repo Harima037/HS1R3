@@ -8,8 +8,8 @@ class Beneficiario extends BaseModel
 	protected $table = "proyectoBeneficiarios";
 
 	public function scopeConDescripcion($query){
-		return $query->join('catalogoTiposBeneficiarios AS tipoBeneficiario','tipoBeneficiario.id','=','proyectoBeneficiarios.idTipoBeneficiario')
-					->join('catalogoTiposCaptura AS tipoCaptura','tipoCaptura.id','=','proyectoBeneficiarios.idTipoCaptura')
+		return $query->leftJoin('catalogoTiposBeneficiarios AS tipoBeneficiario','tipoBeneficiario.id','=','proyectoBeneficiarios.idTipoBeneficiario')
+					->leftJoin('catalogoTiposCaptura AS tipoCaptura','tipoCaptura.id','=','proyectoBeneficiarios.idTipoCaptura')
 					->select('proyectoBeneficiarios.*','tipoBeneficiario.descripcion AS tipoBeneficiario','tipoCaptura.descripcion AS tipoCaptura');
 	}
 
