@@ -72,7 +72,7 @@ class Estrategia extends BaseModel
 	}
 
 	public function Usuario(){
-		return $this->belongsTo('SentryUser','creadoPor','id');
+		return $this->belongsTo('SentryUser','creadoPor','id')->withTrashed();
 	}
 
 	public function registroAvance(){
