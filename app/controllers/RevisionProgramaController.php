@@ -21,6 +21,7 @@ class RevisionProgramaController extends \BaseController {
 			'tipos_indicador' 			=> TipoIndicador::all(),
 			'unidades_medida' 			=> UnidadMedida::all(),
 			'comportamientos_accion' 	=> ComportamientoAccion::select('id',DB::raw("concat(clave,' ',descripcion) as descripcion"))->get(),
+			'tipos_valor_meta' 			=> TipoValorMeta::all(),
 			'ambitos'					=> array(
 											array('clave'=>'E','descripcion'=>'Estatal'),
 											array('clave'=>'F','descripcion'=>'Federal')
