@@ -20,6 +20,7 @@ class ProgramaPresupuestarioController extends \BaseController {
 			'frecuencias' 				=> Frecuencia::all(),
 			'tipos_indicador' 			=> TipoIndicador::all(),
 			'unidades_medida' 			=> UnidadMedida::all(),
+			'comportamientos_accion' 	=> ComportamientoAccion::select('id',DB::raw("concat(clave,' ',descripcion) as descripcion"))->get(),
 			'ambitos'					=> array(
 											array('clave'=>'E','descripcion'=>'Estatal'),
 											array('clave'=>'F','descripcion'=>'Federal')
