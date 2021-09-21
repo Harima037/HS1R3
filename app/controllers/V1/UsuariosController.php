@@ -57,12 +57,13 @@ class UsuariosController extends \BaseController {
 					});
 				}
 
-				if(Sentry::getUser()->idDepartamento){
+				/*if(Sentry::getUser()->idDepartamento){
 					$rows = $rows->where(function($query){
 								$query->where('idDepartamento','=',Sentry::getUser()->idDepartamento)
-									  ->orWhere('idDepartamento','=',3);
+									  ->orWhere('idDepartamento','=',3)
+									  ->orWhereNull('idDepartamento');
 							});
-				}
+				}*/
 
 				if(isset($parametros['buscar'])){
 					if($parametros['buscar']){
