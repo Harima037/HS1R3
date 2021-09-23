@@ -313,7 +313,14 @@ class ReporteCuentaPublicaController extends BaseController {
 	    header("Content-Description: File Transfer");
 		header('Content-Disposition: attachment; filename="CuentaPublica.docx"');
 	    
-	    $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
-	    $objWriter->save('php://output');
+		$usuario = Sentry::getUser();
+		\PhpOffice\PhpWord\Settings::setZipClass(\PhpOffice\PhpWord\Settings::PCLZIP);
+	    $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007', $download = true);
+
+		$temp_file = storage_path('CuentaPublica'.$usuario->id.'.docx');
+		$objWriter->save($temp_file);
+	    //$objWriter->save('php://output');
+		readfile($temp_file);
+        unlink($temp_file);
 	}
 }
