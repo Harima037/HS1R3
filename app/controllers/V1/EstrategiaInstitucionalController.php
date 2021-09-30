@@ -19,13 +19,13 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception,DateTime;
-use Estrategia, ProgramaArbolProblema, ProgramaArbolObjetivo, ProgramaIndicador,Titular,Directorio,Proyecto;
+use Estrategia, EstrategiaMetaAnio, ProgramaArbolProblema, ProgramaArbolObjetivo, ProgramaIndicador,Titular,Directorio,Proyecto;
 
 class EstrategiaInstitucionalController extends \BaseController {
 
 	private $reglasEstrategia = array(
 		'unidad-responsable'		=> 'required',
-		'programa-presupuestario'	=> 'required',
+		'estrategia-pnd'			=> 'required',
 		'programa-sectorial'		=> 'required',
 		'ejercicio'					=> 'required|numeric|min:2010',
 		'descripcion-indicador' 	=> 'required',
@@ -35,8 +35,7 @@ class EstrategiaInstitucionalController extends \BaseController {
 		'tipo-ind'					=> 'required',
 		'dimension'					=> 'required',
 		'unidad-medida' 			=> 'required',
-		'mision'	 				=> 'required',
-		'vision'	 				=> 'required',
+		'objetivo-estrategico'	 	=> 'required',
 		'fuente-informacion'		=> 'required',
 		'responsable'				=> 'required',
 		'frecuencia'				=> 'required',
@@ -179,7 +178,7 @@ class EstrategiaInstitucionalController extends \BaseController {
 	          $data = array('resultados'=>count($rows),'data'=>$rows);
 	        }
 		}else{
-			$rows = Estrategia::all()->load("programaPresupuestario", "Estatus", "Usuario");
+			$rows = Estrategia::all()->load("estrategiaNacional", "Estatus", "Usuario");
 
 			if(count($rows)<=0){
 				$data = array('resultados'=>0,"data"=>array());
@@ -239,7 +238,7 @@ class EstrategiaInstitucionalController extends \BaseController {
 				$validacion = Validador::validar(Input::all(), $this->reglasEstrategia);
 				if($validacion === TRUE){
 					$estrategia = Estrategia::where('ejercicio','=',$parametros['ejercicio'])
-										->where('claveProgramaPresupuestario','=',$parametros['programa-presupuestario'])->get();
+										->where('idEstrategiaNacional','=',$parametros['estrategia-pnd'])->get();
 
 					if(count($estrategia)){
 						$respuesta['data']['data'] = 'Esta estrategia institucional ya se encentra capturado';
@@ -250,14 +249,13 @@ class EstrategiaInstitucionalController extends \BaseController {
 
 					$recurso->claveUnidadResponsable = $parametros['unidad-responsable'];
 					$recurso->claveProgramaSectorial = $parametros['programa-sectorial'];
-					$recurso->claveProgramaPresupuestario = $parametros['programa-presupuestario'];
+					$recurso->idEstrategiaNacional = $parametros['estrategia-pnd'];
 					$recurso->ejercicio = $parametros['ejercicio'];
 					$recurso->idEstatus = 1;
 
 					$recurso->idObjetivoPED = ($parametros['vinculacion-ped'])?$parametros['vinculacion-ped']:NULL;
 					$recurso->idOdm = ($parametros['odm'])?$parametros['odm']:NULL;
-					$recurso->mision = $parametros['mision'];
-					$recurso->vision = $parametros['vision'];
+					$recurso->objetivoEstrategico = $parametros['objetivo-estrategico'];
 					$recurso->descripcionIndicador = $parametros['descripcion-indicador'];
 					$recurso->numerador = $parametros['numerador'];
 					$recurso->denominador = $parametros['denominador'];
@@ -279,14 +277,42 @@ class EstrategiaInstitucionalController extends \BaseController {
 					$recurso->valorDenominador = $parametros['valor-denominador'];
 					$recurso->fuenteInformacion = $parametros['fuente-informacion'];
 					$recurso->idResponsable = $parametros['responsable'];
+					$recurso->idComportamientoAccion = $parametros['comportamiento-meta-estrategia'] ;
+					$recurso->idTipoValorMeta = $parametros['tipo-valor-meta-estrategia'];
 
 					$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
 					$recurso->idLiderPrograma = $titular->id;
 
+					DB::beginTransaction();
+
 					if($recurso->save()){
+						$lista_anios = $parametros['lista-meta-anios'];
+						$lista_array = explode('|',$lista_anios);
+						
+						$lista_anios = [];
+
+						foreach ($lista_array as $anio) {
+							if($anio){
+								$item = new EstrategiaMetaAnio();
+								
+								$item->anio				= $parametros['meta-anio-'.$anio];	
+								$item->numerador		= $parametros['meta-numerador-'.$anio];
+								$item->denominador		= $parametros['meta-denominador-'.$anio];
+								$item->metaIndicador	= $parametros['meta-indicador-'.$anio];
+								
+								$lista_anios[] = $item;
+							}
+						}
+
+						if(count($lista_anios) > 0){
+							$recurso->metasAnios()->saveMany($lista_anios);
+						}
+
+						DB::commit();
 						//$recurso['responsables'] = Directorio::responsablesActivos($recurso->claveUnidadResponsable)->get();
 						$respuesta['data'] = array('data'=>$recurso);
 					}else{
+						DB::rollback();
 						$respuesta['http_status'] = 500;
 						$respuesta['data'] = array('data'=>'Error al intentar guardar el programa','code'=>'S01');
 					}
@@ -298,6 +324,7 @@ class EstrategiaInstitucionalController extends \BaseController {
 			}
 			
 		}catch(\Exception $ex){
+			DB::rollback();
 			$respuesta['http_status'] = 500;
 			if($respuesta['data']['data'] == ''){
 				$respuesta['data']['data'] = 'Ocurrio un error al intentar almacenar los datos.';
@@ -330,14 +357,14 @@ class EstrategiaInstitucionalController extends \BaseController {
 		if($parametros){
 			
 			if(isset($parametros['mostrar']) && $parametros['mostrar'] == 'editar-estrategia'){
-				$recurso = Estrategia::with('comentario')->find($id);
+				$recurso = Estrategia::with('metasAnios','comentario')->find($id);
 				//$recurso = Estrategia::find($id);
 				if($recurso){
 					$recurso['responsables'] = Directorio::responsablesActivos($recurso->claveUnidadResponsable)->get();
 				}
 			}else{
 				
-				$recurso = Estrategia::with("programaPresupuestario")->find($id);
+				$recurso = Estrategia::with("estrategiaNacional")->find($id);
 			}
 		}
 		
@@ -420,11 +447,11 @@ class EstrategiaInstitucionalController extends \BaseController {
 
 				$recurso->idEstatus = 2;
 				if($recurso->save()){
-					$respuesta['data']['data'] = 'El Programa Presupuestario fue enviado a revisión';
+					$respuesta['data']['data'] = 'La Estrategia fue enviada a revisión';
 				}else{
 					$respuesta['http_status'] = 500;
 					$respuesta['data']['code'] = 'S01';
-					$respuesta['data']['data'] = 'No fue posible enviar el programa a revisión';
+					$respuesta['data']['data'] = 'No fue posible enviar la estrategia a revisión';
 				}
 				
 			}else if($parametros['guardar'] == 'estrategia'){
@@ -443,14 +470,13 @@ class EstrategiaInstitucionalController extends \BaseController {
 
 					$recurso->claveUnidadResponsable = $parametros['unidad-responsable'];
 					$recurso->claveProgramaSectorial = $parametros['programa-sectorial'];
-					$recurso->claveProgramaPresupuestario = $parametros['programa-presupuestario'];
+					$recurso->idEstrategiaNacional = $parametros['estrategia-pnd'];
 					$recurso->ejercicio = $parametros['ejercicio'];
 					$recurso->idEstatus = 1;
 
 					$recurso->idObjetivoPED = ($parametros['vinculacion-ped'])?$parametros['vinculacion-ped']:NULL;
 					$recurso->idOdm = ($parametros['odm'])?$parametros['odm']:NULL;
-					$recurso->mision = $parametros['mision'];
-					$recurso->vision = $parametros['vision'];
+					$recurso->objetivoEstrategico = $parametros['objetivo-estrategico'];
 					$recurso->descripcionIndicador = $parametros['descripcion-indicador'];
 					$recurso->numerador = $parametros['numerador'];
 					$recurso->denominador = $parametros['denominador'];
@@ -472,14 +498,64 @@ class EstrategiaInstitucionalController extends \BaseController {
 					$recurso->valorDenominador = $parametros['valor-denominador'];
 					$recurso->fuenteInformacion = $parametros['fuente-informacion'];
 					$recurso->idResponsable = $parametros['responsable'];
+					$recurso->idComportamientoAccion = $parametros['comportamiento-meta-estrategia'] ;
+					$recurso->idTipoValorMeta = $parametros['tipo-valor-meta-estrategia'];
 
 					$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
 					$recurso->idLiderPrograma = $titular->id;
 
+					DB::beginTransaction();
+
 					if($recurso->update()){
+
+						$string_lista_anios = $parametros['lista-meta-anios'];
+
+						$lista_anios_array = explode('|',$string_lista_anios);
+						$anios_guardados = $recurso->metasAnios;
+
+						if(!$lista_anios_array[count($lista_anios_array)-1]){
+							array_pop($lista_anios_array);
+						}
+
+						$guardar_anios = [];
+						$eliminar_anios = [];
+
+						$total_anios = (count($recurso->metasAnios) > count($lista_anios_array))?count($recurso->metasAnios):count($lista_anios_array);
+
+						for ($i=0; $i < $total_anios ; $i++) { 
+							if(isset($lista_anios_array[$i])){
+								$anio = $lista_anios_array[$i];
+
+								if(isset($anios_guardados[$i])){
+									$item = $anios_guardados[$i];
+								}else{
+									$item = new EstrategiaMetaAnio();
+								}
+								
+								$item->anio				= $parametros['meta-anio-'.$anio];	
+								$item->numerador		= $parametros['meta-numerador-'.$anio];
+								$item->denominador		= $parametros['meta-denominador-'.$anio];
+								$item->metaIndicador	= $parametros['meta-indicador-'.$anio];
+
+								$guardar_anios[] = $item;
+							}else{
+								$eliminar_anios[] = $anios_guardados[$i]->id;
+							}
+						}
+
+						if(count($guardar_anios) > 0){
+							$recurso->metasAnios()->saveMany($guardar_anios);
+						}
+
+						if(count($eliminar_anios)){
+							$recurso->metasAnios()->whereIn('id',$eliminar_anios)->delete();
+						}
+
+						DB::commit();
 						//$recurso['responsables'] = Directorio::responsablesActivos($recurso->claveUnidadResponsable)->get();
 						$respuesta['data'] = array('data'=>$recurso);
 					}else{
+						DB::rollback();
 						$respuesta['http_status'] = 500;
 						$respuesta['data'] = array('data'=>'Error al intentar guardar el programa','code'=>'S01');
 					}
@@ -491,6 +567,7 @@ class EstrategiaInstitucionalController extends \BaseController {
 			}
 			
 		}catch(\Exception $ex){
+			DB::rollback();
 			$respuesta['http_status'] = 500;
 			if($respuesta['data']['data'] == ''){
 				$respuesta['data']['data'] = 'Ocurrio un error al intentar almacenar los datos.';

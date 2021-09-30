@@ -40,7 +40,7 @@ if($('#id').val()){
     var parametros = {'mostrar':'editar-estrategia'};
     moduloResource.get($('#id').val(),parametros,{
         _success:function(response){
-            $('#programa-presupuestario').val(response.data.claveProgramaPresupuestario);
+            $('#estrategia-pnd').val(response.data.idEstrategiaNacional);
             $('#unidad-responsable').val(response.data.claveUnidadResponsable);
             $('#programa-sectorial').val(response.data.claveProgramaSectorial);
             $('#ejercicio').val(response.data.ejercicio);
@@ -53,8 +53,7 @@ if($('#id').val()){
             $('#tipo-ind').val(response.data.idTipoIndicador);
             $('#dimension').val(response.data.idDimensionIndicador);
             $('#unidad-medida').val(response.data.idUnidadMedida);
-            $('#mision').val(response.data.mision);
-            $('#vision').val(response.data.vision);
+            $('#objetivo-estrategico').val(response.data.objetivoEstrategico);
             $('#linea-base').val(response.data.lineaBase);
             $('#anio-base').val(response.data.anioBase);
             $('#formula').val(response.data.idFormula);
@@ -66,8 +65,9 @@ if($('#id').val()){
             $('#valorNumerador').val(response.data.valorNumerador);
             $('#valorDenominador').val(response.data.valorDenominador);
             $('#meta').val(response.data.metaIndicador);
+            $('#comportamiento-meta-estrategia').val(response.data.idComportamientoAccion);
+            $('#tipo-valor-meta-estrategia').val(response.data.idTipoValorMeta);
         
-            
             $('#responsable').on('change',function(){
                 if($(this).val()){
                     var cargo = $('#responsable option:selected').attr('data-cargo');
@@ -83,7 +83,27 @@ if($('#id').val()){
             $('#responsable').change();
             $('#responsable').trigger('chosen:updated');
 
-            
+            if(response.data.metas_anios && response.data.metas_anios.length > 0){
+                for(var i in response.data.metas_anios){
+                    var item = response.data.metas_anios[i];
+
+                    var lista_anio = $('#lista-meta-anios').val();
+                    lista_anio += item.anio+'|';
+                    
+                    var table_row = '<tr id="meta_row_'+item.anio+'">';
+                    table_row += '<td><div class="input-group"><span class="input-group-addon">'+item.anio+'</span><input type="hidden" id="meta-anio-'+item.anio+'" name="meta-anio-'+item.anio+'" value="'+item.anio+'"><span class="input-group-addon"></span></div></td>';
+                    table_row += '<td><input type="number" class="form-control" id="meta-numerador-'+item.anio+'" name="meta-numerador-'+item.anio+'" value="'+item.numerador+'"></td>';
+                    table_row += '<td><input type="number" class="form-control" id="meta-denominador-'+item.anio+'" name="meta-denominador-'+item.anio+'" value="'+item.denominador+'"></td>';
+                    table_row += '<td><input type="number" class="form-control" id="meta-indicador-'+item.anio+'" name="meta-indicador-'+item.anio+'" value="'+item.metaIndicador+'"></td>';
+                    table_row += '<td><button type="button" class="btn btn-danger" onClick="eliminar_anio_meta('+item.anio+')"><span class="fa fa-trash"></span></button></td>';
+                    table_row += '</tr>';
+
+                    $('#lista-meta-anios').val(lista_anio);
+                    $('#tabla-anios-metas-indicadores tbody').append(table_row);
+                    $('#txt-anio-agregar').val('');
+                }
+            }
+
             //resetear_borrar();
 
             if(response.data.idEstatus != 1 && response.data.idEstatus != 3){
@@ -241,6 +261,46 @@ function editar_indicador(e){
 }
 
 /****************************************************************** Funciones de Botones ********************************************************************/
+
+$("#txt-anio-agregar").on("keydown", function (e) {
+    if (e.keyCode === 13) {  //checks whether the pressed key is "Enter"
+        agregar_anio_meta();
+    }
+});
+
+$('#btn-agregar-anio').on('click',function(){
+    agregar_anio_meta();
+});
+
+function agregar_anio_meta(){
+    var anio = $('#txt-anio-agregar').val();
+
+    if(anio && anio.length == 4){
+        if(!$('#meta_row_'+anio).length){
+            var lista_anio = $('#lista-meta-anios').val();
+            lista_anio += anio+'|';
+            $('#lista-meta-anios').val(lista_anio);
+            
+            var table_row = '<tr id="meta_row_'+anio+'">';
+            table_row += '<td><div class="input-group"><span class="input-group-addon">'+anio+'</span><input type="hidden" id="meta-anio-'+anio+'" name="meta-anio-'+anio+'" value="'+anio+'"><span class="input-group-addon"></span></div></td>';
+            table_row += '<td><input type="number" class="form-control" id="meta-numerador-'+anio+'" name="meta-numerador-'+anio+'"></td>';
+            table_row += '<td><input type="number" class="form-control" id="meta-denominador-'+anio+'" name="meta-denominador-'+anio+'"></td>';
+            table_row += '<td><input type="number" class="form-control" id="meta-indicador-'+anio+'" name="meta-indicador-'+anio+'"></td>';
+            table_row += '<td><button type="button" class="btn btn-danger" onClick="eliminar_anio_meta('+anio+')"><span class="fa fa-trash"></span></button></td>';
+            table_row += '</tr>';
+
+            $('#tabla-anios-metas-indicadores tbody').append(table_row);
+            $('#txt-anio-agregar').val('');
+        }
+    }
+}
+
+function eliminar_anio_meta(anio){
+    var lista_anio = $('#lista-meta-anios').val();
+    lista_anio = lista_anio.replace(anio+'|','');
+    $('#lista-meta-anios').val(lista_anio);
+    $('#meta_row_'+anio+'').remove();
+}
 
 $('#btn-estrategia-guardar').on('click',function(){
     Validation.cleanFormErrors(form_programa);

@@ -36,8 +36,8 @@
                     </ul>
                     <div class="tab-content">
                         <div role="tabpanel" class="tab-pane active" id="panel-estrategia-institucional">
-                            <br>
-                            <form id="form_estrategia_datos">
+                        <br>
+                        <form id="form_estrategia_datos">
                             <div class="row">
                                 <div class="col-sm-5">
                                     <div class="form-group">
@@ -71,13 +71,8 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <label class="control-label" for="programa-presupuestario">Programa Presupuestario</label>
-                                        <select class="form-control chosen-one" id="programa-presupuestario" name="programa-presupuestario">
-                                            <option value="">Selecciona un Programa</option>
-                                            @foreach($programas_presupuestarios as $programa)
-                                                <option value="{{$programa->clave}}">{{$programa->clave}} {{$programa->descripcion}}</option>
-                                            @endforeach
-                                        </select>
+                                        <label class="control-label" for="estrategia-pnd">Estrategia del Objetivo del Plan Nacional</label>
+                                        {{Form::select('estrategia-pnd',array('' =>'Selecciona una Estrategia') + $estrategias_nacionales->lists('descripcion','id'),0,array('class'=>'form-control chosen-one','id'=>'estrategia-pnd'))}}
                                     </div>
                                 </div>
                             </div>
@@ -211,17 +206,8 @@
                             
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <label class="control-label" for="mision">Misión:</label>
-                                        <textarea class="form-control" id="mision" name="mision" rows="5"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label class="control-label" for="vision">Visión:</label>
-                                        <textarea class="form-control" id="vision" name="vision" rows="5"></textarea>
+                                        <label class="control-label" for="objetivo-estrategico">Objetivo Estratégico:</label>
+                                        <textarea class="form-control" id="objetivo-estrategico" name="objetivo-estrategico" rows="5"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -295,7 +281,6 @@
                                 </div></div>
                             </div>
                             <div class="row">
-                                
                                 <div class="col-sm-4"><div class="form-group">
                                         <label for="valor-numerador" class="control-label">Numerador</label>
                                         <input type="text" class="form-control" readOnlye='readOnly' name="valor-numerador" id="valorNumerador">
@@ -307,20 +292,76 @@
                                 <div class="col-sm-4"><div class="form-group">
                                         <label for="meta" class="control-label">Meta</label>
                                         <input type="number" class="form-control" name="meta" id="meta">
-                                </div>
-                            </div>    
-
+                                </div></div>
                             </div>
-                            </form>
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <button type="button" class="btn btn-primary pull-right" id="btn-estrategia-guardar">
-                                        <span class="fa fa-save"></span> Guardar datos de la Estrategia Institucional
-                                    </button>
+                                    <div class="well well-sm">
+                                        <div class="row">
+                                            <div class="col-sm-8">
+                                                <table class="table table-condensed table-bordered table-striped" id="tabla-anios-metas-indicadores">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="text-align:center;" width="1">Año</th>
+                                                            <th style="text-align:center;">Numerador</th>
+                                                            <th style="text-align:center;">Denominador</th>
+                                                            <th style="text-align:center;">Meta del Indicador</th>
+                                                            <th style="text-align:center;" width="1">
+                                                                <span class="fa fa-exclamation"></span>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <td colspan="5" style="text-align:center;">
+                                                                <div class="input-group" style="width:40%; margin:0 auto 0 auto;">
+                                                                    <input type="number" class="form-control" placeholder="Año" id="txt-anio-agregar">
+                                                                    <span class="input-group-btn">
+                                                                        <button type="button" class="btn btn-info" id="btn-agregar-anio">
+                                                                            <span class="fa fa-plus"></span> Agregar Año
+                                                                        </button>
+                                                                    </span>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="row">
+                                                    <input type="hidden" id="lista-meta-anios" name="lista-meta-anios">
+                                                    <div class="col-sm-12">
+                                                        <div clasS="form-group">
+                                                            <label class="control-label" for="comportamiento-meta-estrategia">
+                                                                Comportamiento
+                                                            </label>
+                                                            {{Form::select('comportamiento-meta-estrategia',array(''=>'Seleccione un comportamiento') + $comportamientos_accion->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'comportamiento-meta-estrategia'))}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div clasS="form-group">
+                                                            <label class="control-label" for="tipo-valor-meta-estrategia">
+                                                                Tipo de Valor de la Meta
+                                                            </label>
+                                                            {{Form::select('tipo-valor-meta-estrategia',array(''=>'Seleccione un tipo') + $tipos_valor_meta->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'tipo-valor-meta-estrategia'))}}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                        </form>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <button type="button" class="btn btn-primary pull-right" id="btn-estrategia-guardar">
+                                    <span class="fa fa-save"></span> Guardar datos de la Estrategia Institucional
+                                </button>
+                            </div>
                         </div>
-                        
+                        </div>
                     </div>
                 </div>
             </div>

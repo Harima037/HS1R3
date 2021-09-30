@@ -35,9 +35,8 @@ moduloDatagrid.actualizar({
             }
 
             item.id = registro.id;
-            item.programa = registro.claveProgramaPresupuestario + ' ' + registro.programa_presupuestario.descripcion;
             //item.clave = registro.claveProgramaPresupuestario+" - "+registro.claveProgramaSectorial+" - "+registro.claveProgramaPresupuestario;
-            item.descripcion = registro.descripcionIndicador;
+            item.indicador = registro.descripcionIndicador;
             //item.fecha_termino = registro.fechaTermino;
             item.estatus = '<span class="label ' + clase_label + '">' + registro.estatus.descripcion + '</span>';
             item.usuario = registro.usuario.username;

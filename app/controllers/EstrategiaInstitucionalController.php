@@ -15,6 +15,7 @@ class EstrategiaInstitucionalController extends \BaseController {
 			);
 		return parent::loadIndex('EXP','ESTINST',$catalogos);
     }
+
     public function loadIndex($sys_sis_llave,$sys_mod_llave = NULL,$datos_extra = array()){
 		return parent::loadIndex($sys_sis_llave, $sys_mod_llave, $datos_extra);
 	}
@@ -27,13 +28,15 @@ class EstrategiaInstitucionalController extends \BaseController {
 			'frecuencias' 				=> Frecuencia::all(),
 			'tipos_indicador' 			=> TipoIndicador::all(),
 			'unidades_medida' 			=> UnidadMedida::all(),
+			'comportamientos_accion' 	=> ComportamientoAccion::select('id',DB::raw("concat(clave,' ',descripcion) as descripcion"))->get(),
+			'tipos_valor_meta' 			=> TipoValorMeta::all()
 		);
-		$datos['identificador'] = 'estrategia-institucional'; //El identificador se agrega al id de los elementos del formulario
+		//$datos['identificador'] = 'estrategia-institucional'; //El identificador se agrega al id de los elementos del formulario
 		
 		$datos['id'] = $id;
 		//$datos['formulario_estrategia'] = View::make('expediente.formulario-componente',$datos_programa);
 		$datos['odm'] = ObjetivoDesarrolloMilenio::whereNull('idPadre')->with('hijos')->get();
-		$datos['programas_presupuestarios'] = ProgramaPresupuestario::all();
+		$datos['estrategias_nacionales'] = EstrategiaNacional::all();
 
 		if(Sentry::getUser()->claveUnidad){
 			$unidades = explode('|',Sentry::getUser()->claveUnidad);

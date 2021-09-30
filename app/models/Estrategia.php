@@ -6,21 +6,33 @@ class Estrategia extends BaseModel
 	use SoftDeletingTrait;
 	protected $dates = ['borradoAl'];
 	protected $table = "estrategia";
-	protected $guarded = array('claveProgramaPresupuestario', 'claveUnidadResponsable', 'claveProgramaSectorial', 'idOdm', 'idObjetivoPED', 'idEstatus', 'ejercicio', 'mision', 'vision', 'descripcionIndicador', 'numerador', 'denominador', 'interpretacion', 'idTipoIndicador', 'idDimensionIndicador', 'idUnidadMedida', 'metaIndicador', 'lineaBase', 'anioBase', 'idFormula', 'idFrecuenciaIndicador', 'trim1', 'trim2', 'trim3', 'trim4', 'valorNumerador', 'valorDenominador', 'idResponsable', 'fuenteInformacion');
+	protected $guarded = array('idEstrategiaNacional', 'claveUnidadResponsable', 'claveProgramaSectorial', 'idOdm', 'idObjetivoPED', 'idEstatus', 'ejercicio', 'mision', 'vision', 'descripcionIndicador', 'numerador', 'denominador', 'interpretacion', 'idTipoIndicador', 'idDimensionIndicador', 'idUnidadMedida', 'metaIndicador', 'lineaBase', 'anioBase', 'idFormula', 'idFrecuenciaIndicador', 'trim1', 'trim2', 'trim3', 'trim4', 'valorNumerador', 'valorDenominador', 'idResponsable', 'fuenteInformacion','idComportamientoAccion','idTipoValorMeta');
 
 	public function scopeContenidoSuggester($query){
-		$query->select('estrategia.id','estrategia.claveProgramaPresupuestario','estrategia.descripcionIndicador','estrategia.claveUnidadResponsable','estrategia.idEstatus',
-				DB::raw('concat_ws(" ",programaPresupuestal.clave,programaPresupuestal.descripcion) as programaPresupuestario'),
+		$query->select('estrategia.id','estrategia.idEstrategiaNacional','estrategia.descripcionIndicador','estrategia.claveUnidadResponsable','estrategia.idEstatus',
+				DB::raw('estrategiaNacional.descripcion as estrategiaNacional'),
 				DB::raw('concat_ws(" ",estrategia.claveUnidadResponsable,unidadResponsable.descripcion) AS unidadResponsable'),
 				'estatus.descripcion AS estatus','estrategia.idUsuarioValidacionSeg','estrategia.idUsuarioRendCuenta'
 			)
-			->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestal','programaPresupuestal.clave','=','estrategia.claveProgramaPresupuestario')
+			->leftjoin('catalogoEstrategiasNacionales AS estrategiaNacional','estrategiaNacional.id','=','estrategia.idEstrategiaNacional')
 			->leftjoin('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','estrategia.claveUnidadResponsable')
 			->leftjoin('catalogoEstatusProyectos AS estatus','estatus.id','=','estrategia.idEstatus');
 	}
 
-	public function programaPresupuestario(){
-		return $this->belongsTo('ProgramaPresupuestario','claveProgramaPresupuestario','clave');
+	public function metasAnios(){
+		return $this->hasMany('EstrategiaMetaAnio','idEstrategia')->orderBy('anio');
+	}
+
+	public function comportamientoAccion(){
+		return $this->belongsTo('ComportamientoAccion','idComportamientoAccion');
+	}
+	
+	public function tipoValorMeta(){
+		return $this->belongsTo('TipoValorMeta','idTipoValorMeta');
+	}
+
+	public function estrategiaNacional(){
+		return $this->belongsTo('EstrategiaNacional','idEstrategiaNacional','id');
 	}
 
 	public function formula(){

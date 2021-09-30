@@ -55,9 +55,8 @@
             <table class="table table-striped table-hover">
                 <thead>
                     <tr>
-                        <th><input type="checkbox" class="check-select-all-rows"></th>
-                        <th>Programa Presupuestario</th>
-                        <th>Descripción</th>
+                        <th><input type="checkbox" class="check-select-all-rows"></th>                        
+                        <th>Indicador</th>
                         <th style="width:100px;">Estatus</th>
                         <th style="text-align:center; width:85px;"><span class="glyphicon glyphicon-user"></span></th>
                         <th style="text-align:center; width:120px;"><span class="glyphicon glyphicon-calendar"></span></th>
