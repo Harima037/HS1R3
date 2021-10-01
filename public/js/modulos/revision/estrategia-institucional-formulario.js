@@ -29,8 +29,7 @@ if($('#id').val()){
             
             
             $('#lbl-ejercicio').text(response.data.ejercicio);
-            $('#lbl-mision').text(response.data.mision);
-            $('#lbl-vision').text(response.data.vision);
+            $('#lbl-objetivo-estrategico').text(response.data.objetivoEstrategico);
             $('#lbl-descripcion-indicador').text(response.data.descripcionIndicador);
             $('#lbl-numerador').text(response.data.numerador);
             $('#lbl-denominador').text(response.data.denominador);
@@ -46,11 +45,30 @@ if($('#id').val()){
             $('#lbl-valorDenominador').text(response.data.valorDenominador);
             $('#lbl-fuente-informacion').text(response.data.fuenteInformacion);
             
-            $('#lbl-programa-presupuestario').text(response.data.programa_presupuestario.descripcion);
+            $('#lbl-estrategia-pnd').text(response.data.estrategia_nacional.descripcion);
             $('#lbl-formula').text(response.data.formula.descripcion);
             $('#lbl-frecuencia').text(response.data.frecuencia.descripcion);
             $('#lbl-unidad-responsable').text(response.data.unidad_responsable.descripcion);
             $('#lbl-programa-sectorial').text(response.data.programa_sectorial.descripcion);
+
+			$('#lbl-comportamiento-meta-estrategia').text((response.data.comportamiento_accion)?response.data.comportamiento_accion.descripcion:'Sin Datos');
+			$('#lbl-tipo-valor-meta-estrategia').text((response.data.tipo_valor_meta)?response.data.tipo_valor_meta.descripcion:'Sin Datos');
+
+			if(response.data.metas_anios && response.data.metas_anios.length > 0){
+                for(var i in response.data.metas_anios){
+                    var item = response.data.metas_anios[i];
+                    //<p id="lbl-meta" name="lbl-meta" class="form-control" style="height:auto">&nbsp;</p>
+                    var table_row = '<tr id="meta_row_'+item.anio+'">';
+                    table_row += '<td><p class="form-control" style="height:auto;">'+item.anio+'</p></td>';
+                    table_row += '<td><p class="form-control" style="height:auto;">'+item.numerador+'</p></td>';
+                    table_row += '<td><p class="form-control" style="height:auto;">'+item.denominador+'</p></td>';
+                    table_row += '<td><p class="form-control" style="height:auto;">'+item.metaIndicador+'</p></td>';
+                    table_row += '</tr>';
+
+                    $('#tabla-anios-metas-indicadores tbody').append(table_row);
+                }
+            }
+
 			if(response.data.odm)
 				$('#lbl-odm').text(response.data.odm.descripcion);
 			else

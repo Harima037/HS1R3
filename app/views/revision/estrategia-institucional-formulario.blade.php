@@ -86,11 +86,11 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <label class="control-label" for="lbl-programa-presupuestario">Programa Presupuestario</label>
+                                        <label class="control-label" for="lbl-estrategia-pnd">Estrategia del Objetivo del Plan Nacional</label>
                                         <div class="input-group">
-						                   	<span class="input-group-btn" onclick="escribirComentario('programa-presupuestario','Programa Presupuestario','lbl-programa-presupuestario');">
+						                   	<span class="input-group-btn" onclick="escribirComentario('estrategia-pnd','Estrategia del Objetivo del Plan Nacional','lbl-estrategia-pnd');">
                        						<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span>
-                                            <p id="lbl-programa-presupuestario" name="lbl-programa-presupuestario" class="form-control" style="height:auto"></p>
+                                            <p id="lbl-estrategia-pnd" name="lbl-estrategia-pnd" class="form-control" style="height:auto"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -211,24 +211,12 @@
                             
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <label class="control-label" for="lbl-mision">Misión:</label>
-                                        <textarea class="form-control" id="lbl-mision" name="lbl-mision" rows="5" class="disabled"></textarea>
+                                        <label class="control-label" for="lbl-objetivo-estrategico">Objetivo Estratégico:</label>
+                                        <textarea class="form-control" id="lbl-objetivo-estrategico" name="lbl-objetivo-estrategico" rows="5" class="disabled"></textarea>
                                     </div>
                                 </div>
                                 <div class="col-sm-12">
-                                    <button type="button" class="btn btn-default" id="btnvision" onclick="escribirComentario('mision','Misión','lbl-mision')" ><i class="fa fa-pencil-square-o"></i> Comentar Misión</button>
-                                </div>
-                            </div>
-                            <div class="row">
-                                
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <label class="control-label" for="lbl-vision">Visión:</label>
-                                        <textarea class="form-control" id="lbl-vision" name="lbl-vision" rows="5" class="disabled"></textarea>
-                                    </div>
-                                </div>
-                                <div class="col-sm-12">
-                                    <button type="button" class="btn btn-default" id="btnvision" onclick="escribirComentario('vision','Visión','lbl-vision')" ><i class="fa fa-pencil-square-o"></i> Comentar Visión</button>
+                                    <button type="button" class="btn btn-default" id="btnvision" onclick="escribirComentario('objetivo-estrategico','Objetivo Estratégico','lbl-objetivo-estrategico')" ><i class="fa fa-pencil-square-o"></i> Comentar Objetivo Estratégico</button>
                                 </div>
                             </div>
                             <div class="row">
@@ -392,6 +380,60 @@
                                     
                                 </div>          
                             </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="well well-sm">
+                                        <div class="row">
+                                            <div class="col-sm-8">
+                                                <table class="table table-condensed table-bordered table-striped" id="tabla-anios-metas-indicadores">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="text-align:center;" width="1">Año</th>
+                                                            <th style="text-align:center;">Numerador</th>
+                                                            <th style="text-align:center;">Denominador</th>
+                                                            <th style="text-align:center;">Meta del Indicador</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <td colspan="4" style="text-align:center;">
+                                                                <button type="button" class="btn btn-default" id="btnaniosmetas" onclick="escribirComentario('anios-metas','Metas por Año','lbl-anios-metas')" ><i class="fa fa-pencil-square-o"></i> Comentar Metas por Año</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <label class="control-label" for="lbl-comportamiento-meta-estrategia">Comportamiento</label>
+                                                            <div class="input-group">
+                                                                <span class="input-group-btn" onclick="escribirComentario('comportamiento-meta-estrategia','Comportamiento','lbl-comportamiento-meta-estrategia');">
+                                                                <span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span>
+                                                                <p id="lbl-comportamiento-meta-estrategia" name="lbl-comportamiento-meta-estrategia" class="form-control" style="height:auto">&nbsp;</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="form-group">
+                                                            <label class="control-label" for="lbl-tipo-valor-meta-estrategia">Tipo de Valor de la Meta</label>
+                                                            <div class="input-group">
+                                                                <span class="input-group-btn" onclick="escribirComentario('tipo-valor-meta-estrategia','Tipo de Valor de la Meta','lbl-tipo-valor-meta-estrategia');">
+                                                                <span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span>
+                                                                <p id="lbl-tipo-valor-meta-estrategia" name="lbl-tipo-valor-meta-estrategia" class="form-control" style="height:auto">&nbsp;</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
                             </form>
                             
                         </div>
@@ -405,7 +447,6 @@
                         <button type="button" class="btn btn-default" id="btn-estrategia-cancelar">
                             <span class="fa fa-chevron-left"></span> Regresar a la lista de estrategias Institucionales
                         </button>
-                        
                     </div>
                 </div>
             </div>

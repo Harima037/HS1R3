@@ -32,7 +32,7 @@ moduloDatagrid.actualizar({
             }
 
             item.id = response.data[i].id;
-            item.programa = response.data[i].clave + ' ' + response.data[i].estrategia;
+            //item.programa = response.data[i].clave + ' ' + response.data[i].estrategia;
             item.descripcion = response.data[i].descripcion;
             item.estatus = '<span class="label ' + clase_label + '">' + response.data[i].estatus + '</span>';
             item.usuario = response.data[i].username;

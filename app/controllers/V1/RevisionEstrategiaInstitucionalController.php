@@ -24,11 +24,11 @@ class RevisionEstrategiaInstitucionalController extends BaseController {
 		if(isset($parametros['formatogrid'])){
 
            
-				$rows = Estrategia::getModel()->wherein('estrategia.idEstatus',array(2, 4));
+				$rows = Estrategia::getModel()->whereIn('estrategia.idEstatus',array(2, 4));
 
-				if(Sentry::getUser()->claveProgramaPresupuestario){
+				/*if(Sentry::getUser()->claveProgramaPresupuestario){
 					$rows = $rows->where('claveProgramaPresupuestario','=',Sentry::getUser()->claveProgramaPresupuestario);
-				}
+				}*/
 				
 				if($parametros['pagina']==0){ $parametros['pagina'] = 1; }
 				
@@ -39,11 +39,12 @@ class RevisionEstrategiaInstitucionalController extends BaseController {
 					$total = $rows->count();
 				}
 				
-				$rows = $rows->select('estrategia.id','catalogoProgramasPresupuestales.clave','catalogoProgramasPresupuestales.descripcion AS estrategia', 'estrategia.descripcionIndicador as descripcion',
+				$rows = $rows->select('estrategia.id','catalogoEstrategiasNacionales.descripcion AS estrategia', 'estrategia.descripcionIndicador as descripcion',
 							'estrategia.idEstatus','catalogoEstatusProyectos.descripcion as estatus','sentryUsers.username','estrategia.modificadoAl')
-							->join('sentryUsers','sentryUsers.id','=','estrategia.actualizadoPor')
-							->join('catalogoProgramasPresupuestales','catalogoProgramasPresupuestales.clave','=','estrategia.claveProgramaPresupuestario')
-							->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','estrategia.idEstatus')
+							->leftjoin('sentryUsers','sentryUsers.id','=','estrategia.actualizadoPor')
+							//->join('catalogoProgramasPresupuestales','catalogoProgramasPresupuestales.clave','=','estrategia.claveProgramaPresupuestario')
+							->leftjoin('catalogoEstrategiasNacionales','catalogoEstrategiasNacionales.id','=','estrategia.idEstrategiaNacional')
+							->leftjoin('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','estrategia.idEstatus')
 							//->where('programa.idEstatus','<',5)
 							
 							->orderBy('id', 'desc')
@@ -87,8 +88,7 @@ class RevisionEstrategiaInstitucionalController extends BaseController {
 
 		if($parametros){
 			if($parametros['mostrar'] == 'editar-estrategia'){
-				$recurso = Estrategia::find($id)->load("programaPresupuestario", "formula", "frecuencia", "unidadResponsable", "programaSectorial", "odm", "ped", "tipoIndicador", "dimension", "unidadMedida", "comentario", "responsable");
-				
+				$recurso = Estrategia::find($id)->load("estrategiaNacional", "formula", "frecuencia", "unidadResponsable", "programaSectorial", "odm", "ped", "tipoIndicador", "dimension", "unidadMedida", "metasAnios", "comportamientoAccion", "tipoValorMeta","comentario", "responsable");
 			}else{
 				$recurso = Estrategia::find($id);
 			}

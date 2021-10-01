@@ -49,8 +49,7 @@
                 <thead>
                     <tr>
                         <th><input type="checkbox" class="check-select-all-rows"></th>
-                        <th width="350px">Pograma Presupuestario</th>
-                        <th width="250px">Descripción</th>
+                        <th>Descripción</th>
                         <th width="100px">Estatus</th>
                         <!--<th width="50px"></th>-->
                         <th width="100px" style="text-align:center; width:85px;"><span class="fa fa-user"></span></th>
@@ -96,10 +95,9 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    
                     <div class="col-sm-12">
-                        <label class="control-label">Programa Presupuesto</label>
-                        <p class="form-control-static" id="nombre-programa"></p>
+                        <label class="control-label">Descripción Indicador</label>
+                        <p class="form-control-static" id="descripcion-indicador"></p>
                     </div>
                     <form action="" id="form_programa">
                         <div class="col-sm-12">

@@ -42,7 +42,7 @@ moduloDatagrid.actualizar({
             }
 
             item.id = registro.id;
-            item.programa = registro.claveProgramaPresupuestario + ' ' + registro.programa_presupuestario.descripcion;
+            //item.programa = registro.claveProgramaPresupuestario + ' ' + registro.programa_presupuestario.descripcion;
             //item.clave = registro.claveProgramaPresupuestario+" - "+registro.claveProgramaSectorial+" - "+registro.claveProgramaPresupuestario;
             item.descripcion = registro.descripcionIndicador;
             //item.fecha_termino = registro.fechaTermino;
@@ -167,9 +167,9 @@ function poner_estatus(mes){
 function editar (e){
     moduloResource.get(e,{ "cambia_estatus": 1},{
         _success: function(response){
-            $('#modalEditarEstrategia').find(".modal-title").text('Editar Proyecto');
+            $('#modalEditarEstrategia').find(".modal-title").text('Editar Estrategia');
 
-            $('#nombre-programa').text(response.data.programa_presupuestario.descripcion);
+            $('#descripcion-indicador').text(response.data.descripcionIndicador);
 
             $('#estatus-programa').val(response.data.idEstatus);
 
