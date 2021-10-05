@@ -529,14 +529,15 @@ class SeguimientoController extends BaseController {
 											->first();
 						if($usuario){
 							if($usuario->email){
-								$data['usuario'] = $usuario;
+								/*$data['usuario'] = $usuario;
 								$data['proyecto'] = $recurso;
 								$data['mes_captura'] = Util::obtenerDescripcionMes(Util::obtenerMesActual());
 
 								Mail::send('emails.rendicion-cuentas.proyecto-a-revision', $data, function($message) use ($usuario){
 									$message->to($usuario->email,$usuario->nombres)->subject('SIRE:: Seguimiento enviado a revisión');
 								});
-								$respuesta['notas'] = 'Con correo enviado';	
+								$respuesta['notas'] = 'Con correo enviado';	*/
+								$respuesta['notas'] = 'Envio de correos desactivado temporalmente';	
 							}else{
 								$respuesta['notas'] = 'El usuario no tiene un correo electronico asignado';	
 							}

@@ -257,7 +257,7 @@ class SeguimientoInstitucionalController extends BaseController {
 					$query->where('mes','=',$mes_actual);
 				}))->where('idProyecto','=',$parametros['id-proyecto'])->where('idTipoBeneficiario','=',$id)->get();
 			}elseif ($parametros['mostrar'] == 'analisis-funcional') {
-				$recurso = EvaluacionAnalisisFuncional::with('comentarios')->find($id);
+				$recurso = EvaluacionAnalisisFuncional::select('evaluacionAnalisisFuncional.id','evaluacionAnalisisFuncional.idProyecto','evaluacionAnalisisFuncional.mes','evaluacionAnalisisFuncional.analisisResultado','evaluacionAnalisisFuncional.beneficiarios','evaluacionAnalisisFuncional.justificacionGlobal','evaluacionAnalisisFuncional.cuentaPublica','proyectos.finalidadProyecto')->with('comentarios')->leftjoin('proyectos','proyectos.id','=','evaluacionAnalisisFuncional.idProyecto')->find($id);
 			}elseif ($parametros['mostrar'] == 'comentarios-proyecto-mes') {
 				$recurso = EvaluacionComentario::where('idProyecto','=',$id)
 											->where('mes','=',$parametros['mes'])
@@ -462,7 +462,7 @@ class SeguimientoInstitucionalController extends BaseController {
 											->where('mes','=',$mes_actual)->first();
 					if($usuario){
 						if($usuario->email){
-							$data['usuario'] = $usuario;
+							/*$data['usuario'] = $usuario;
 							$data['proyecto'] = $proyecto;
 							$data['mes_captura'] = Util::obtenerDescripcionMes($mes_actual);
 							$data['estatus'] = $avance_mes->idEstatus;
@@ -479,7 +479,8 @@ class SeguimientoInstitucionalController extends BaseController {
 								$message->to($usuario->email,$usuario->nombres)->subject('SIRE:: Avance de Metas revisado ('.$estatus_label.')');
 							});
 							
-							$respuesta['data']['notas'] = 'Con correo enviado';
+							$respuesta['data']['notas'] = 'Con correo enviado';*/
+							$respuesta['data']['notas'] = 'Envio de correo desactivado temporalmente';
 						}else{
 							$respuesta['data']['notas'] = 'El usuario no cuenta con correo electronico';
 						}

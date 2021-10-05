@@ -64,7 +64,7 @@
                 
                 	<div class="col-sm-12">
 	    				<div class="form-group">
-	    					<label class="control-label" for="lbl-analisis-resultado">Finalidad del proyecto </label>
+	    					<label class="control-label" for="lbl-finalidad">Finalidad del proyecto </label>
 	    					<p id="lbl-finalidad" name="lbl-finalidad" style="height:auto" class="form-control"></p>
                             <p align="right"><button type="button" class="btn btn-default" onclick="escribirComentario('finalidad','Finalidad del Proyecto','lbl-finalidad','4','id-analisis');"><span class="fa fa-edit"></span> Comentar Finalidad del proyecto</button></p>
 	    				</div>

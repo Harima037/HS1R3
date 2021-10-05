@@ -58,12 +58,14 @@ class AutenticacionController extends Controller {
 					}
 
 					if($User) {
-						$data['usuario'] = $User;
+						/*$data['usuario'] = $User;
 						$data['token'] = $User->getResetPasswordCode();
 						Mail::send('emails.auth.reset_pass', $data, function($message) use ($User){
 							$message->to($User->email,$User->nombres)->subject('SIRE:: Recuperar Contraseña');
 						});
-						$info = 'Se ha enviado un correo electrónico a ['.$User->email.'] con los pasos a seguir para recuperar su contraseña.';
+						$info = 'Se ha enviado un correo electrónico a ['.$User->email.'] con los pasos a seguir para recuperar su contraseña.';*/
+
+						$info = 'Envio de correos desactivado temporalmente.';
 					}else{
 						$error = 'No se encontraron los datos del usuario.';
 					}

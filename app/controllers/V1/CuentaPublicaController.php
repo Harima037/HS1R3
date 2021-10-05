@@ -112,8 +112,8 @@ class CuentaPublicaController extends \BaseController {
 		$http_status = 200;
 		$data = array();
 
-		$recurso = EvaluacionAnalisisFuncional::find($id);
-
+		//$recurso = EvaluacionAnalisisFuncional::find($id);
+		$recurso = EvaluacionAnalisisFuncional::select('evaluacionAnalisisFuncional.id','evaluacionAnalisisFuncional.idProyecto','evaluacionAnalisisFuncional.mes','evaluacionAnalisisFuncional.analisisResultado','evaluacionAnalisisFuncional.beneficiarios','evaluacionAnalisisFuncional.justificacionGlobal','evaluacionAnalisisFuncional.cuentaPublica','proyectos.finalidadProyecto')->leftjoin('proyectos','proyectos.id','=','evaluacionAnalisisFuncional.idProyecto')->find($id);
 		if(is_null($recurso)){
 			$http_status = 404;
 			$data = array("data"=>"No existe el recurso que quiere solicitar.",'code'=>'U06');
