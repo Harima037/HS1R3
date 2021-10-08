@@ -122,6 +122,7 @@ class ReporteIndicadorResultadoController extends BaseController {
 				//'2.3.5.1_justificaciones'=>null,
 				'2.3.2.1'=>null,
 				'2.3.3.1'=>null,
+				'4.4.1.1'=>null,
 			);
 			foreach ($rows as $row) {
 				if(!$hojas[$row->subFuncionClave]){
@@ -246,6 +247,8 @@ class ReporteIndicadorResultadoController extends BaseController {
 				'2.3.2.1_justificaciones'=>'PERSONA JUSTIFICACIÓN',
 				'2.3.3.1'=>'GENERACION RECURSOS SALUD',
 				'2.3.3.1_justificaciones'=>'RECURSOS SALUD JUSTIFICACIÓN',
+				'4.4.1.1'=>'ADEUDOS EJERCICIOS ANTERIORES',
+				'4.4.1.1_justificaciones'=>'ADEUDOS FISCALES JUSTIFICACIÓN',
 			];
 
 			$datos['hojas'] = $hojas;
