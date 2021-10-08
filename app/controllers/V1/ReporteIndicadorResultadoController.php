@@ -252,8 +252,11 @@ class ReporteIndicadorResultadoController extends BaseController {
 			];
 
 			$datos['hojas'] = $hojas;
+
+			$usuario = Sentry::getUser();
+			$file_name = 'indicadores-resultados-'.$usuario->id;
 			//return Response::json(array('data'=>$hojas),200);
-			Excel::create('indicadores-resultados', function($excel) use ( $datos ){
+			Excel::create($file_name, function($excel) use ( $datos ){
 				$datos_hoja = array();
 				$datos_hoja['ejercicio'] = $datos['ejercicio'];
 				$datos_hoja['trimestre'] = $datos['trimestre'];
@@ -456,7 +459,17 @@ class ReporteIndicadorResultadoController extends BaseController {
 				$excel->setActiveSheetIndex(0);
 				//print_r($justificaciones);
 				//throw new Exception("Error Processing Request Spageete somebodur", 1);
-			})->download('xlsx');
+			//})->download('xlsx');
+			})->store('xlsx', storage_path());
+
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+			header("Content-Description: File Transfer");
+			header('Content-Disposition: attachment; filename="IndicadoresResultados.xlsx"');
+
+			$temp_file = storage_path($file_name.'.xlsx');
+			
+			readfile($temp_file);
+			unlink($temp_file);
 		}catch(Exception $ex){
 			return Response::json(array('data'=>'Ocurrio un error al generar el reporte.','message'=>$ex->getMessage(),'line'=>$ex->getLine()),500);
 		}
@@ -608,7 +621,8 @@ class ReporteIndicadorResultadoController extends BaseController {
 				'2.3.2.1'=>'Prest. serv. salud persona',
 				'2.3.3.1'=>'Generación recursos salud',
 				'2.3.4.1'=>'Rectoría sistema salud',
-				'2.3.5.1'=>'Protección social en salud'
+				'2.3.5.1'=>'Protección social en salud',
+				'4.4.1.1'=>'Adeudos ejercicios anteriores',
 			];
 
 			//array_pop($hojas);
@@ -616,7 +630,10 @@ class ReporteIndicadorResultadoController extends BaseController {
 
 			$datos['hojas'] = $hojas;
 			//return Response::json(array('data'=>$hojas),200);
-			Excel::create('indicadores-resultados', function($excel) use ( $datos ){
+			$usuario = Sentry::getUser();
+			$file_name = 'indicadores-resultados-trimestral-'.$usuario->id;
+
+			Excel::create($file_name, function($excel) use ( $datos ){
 				$datos_hoja = array();
 				$datos_hoja['ejercicio'] = $datos['ejercicio'];
 				$datos_hoja['trimestre'] = $datos['trimestre'];
@@ -840,7 +857,18 @@ class ReporteIndicadorResultadoController extends BaseController {
 					//$objPHPExcel->getActiveSheet()->fromArray($testArray, NULL, 'A1');
 					$sheet->fromArray($justificaciones, NULL, 'A1');
 				});
-			})->download('xlsx');
+			//})->download('xlsx');
+			})->store('xlsx', storage_path());
+
+			header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+			header("Content-Description: File Transfer");
+			header('Content-Disposition: attachment; filename="IndicadoresResultadosTrimestral.xlsx"');
+
+			$temp_file = storage_path($file_name.'.xlsx');
+			
+			readfile($temp_file);
+			unlink($temp_file);
+
 		}catch(Exception $ex){
 			return Response::json(array('data'=>'Ocurrio un error al generar el reporte.','message'=>$ex->getMessage(),'line'=>$ex->getLine()),500);
 		}

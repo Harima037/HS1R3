@@ -172,17 +172,26 @@
 			<td class="texto-medio texto-centro">{{number_format($indicador['avance_acumulado'],2)}}</td>
 			<td class="texto-medio texto-centro">
 			@if($indicador['avance_trimestre'] > 0)
-				{{
-				round(($indicador['avance_trimestre']/$indicador['meta_trimestral'])*100,2)
-				}}
+				@if($indicador['meta_trimestral'] <= 0)
+					100
+				@else
+					{{
+						round(($indicador['avance_trimestre']/$indicador['meta_trimestral'])*100,2) 
+					}}
+				@endif
 			@else
 				0
 			@endif
 			 %</td>
-			<td class="texto-medio">@if($indicador['avance_acumulado'] > 0)
-				{{
-				round(($indicador['avance_acumulado']/$indicador['meta_original'])*100,2)
-				}}
+			<td class="texto-medio">
+			@if($indicador['avance_acumulado'] > 0)
+				@if($indicador['meta_original'] <= 0)
+					100
+				@else
+					{{
+						round(($indicador['avance_acumulado']/$indicador['meta_original'])*100,2)
+					}}
+				@endif
 			@else
 				0
 			@endif
