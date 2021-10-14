@@ -57,7 +57,7 @@ if($('#id').val()){
             $('#lbl-programa-presupuestario').text(response.data.programaPresupuestarioDescripcion);
             $('#lbl-unidad-responsable').text(response.data.unidadResponsable);
             $('#lbl-ejercicio').text(response.data.ejercicio);
-            $('#lbl-odm').text(response.data.ODM);
+            $('#lbl-ods').text(response.data.ODS);
             $('#lbl-modalidad').text(response.data.claveModalidad+' '+response.data.modalidad);
             $('#lbl-fecha-inicio').text(response.data.fechaInicio);
             $('#lbl-fecha-termino').text(response.data.fechaTermino);

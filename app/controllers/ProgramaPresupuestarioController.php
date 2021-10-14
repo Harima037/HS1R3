@@ -31,7 +31,7 @@ class ProgramaPresupuestarioController extends \BaseController {
 		
 		$datos['id'] = $id;
 		$datos['formulario_programa'] = View::make('expediente.formulario-componente',$datos_programa);
-		$datos['odm'] = ObjetivoDesarrolloMilenio::whereNull('idPadre')->with('hijos')->get();
+		$datos['ods'] = ObjetivoDesarrolloSostenible::all();
 		$datos['modalidades'] = Modalidad::all();
 		$datos['programas_presupuestarios'] = ProgramaPresupuestario::all();
 

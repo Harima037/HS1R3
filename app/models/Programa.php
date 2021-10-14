@@ -22,7 +22,7 @@ class Programa extends BaseModel
 		$query->select('programa.*',
 			DB::raw('concat_ws(" ",programaPresupuestal.clave,programaPresupuestal.descripcion) as programaPresupuestarioDescripcion'),
 			DB::raw('concat_ws(" ",programa.claveUnidadResponsable,unidadResponsable.descripcion) AS unidadResponsable'),
-			DB::raw('concat_ws(" ",ODM.clave,ODM.descripcion) AS ODM'), 'modalidad.clave AS claveModalidad', 'modalidad.descripcion AS modalidad', 
+			DB::raw('concat_ws(" ",ODS.clave,ODS.descripcion) AS ODS'), 'modalidad.clave AS claveModalidad', 'modalidad.descripcion AS modalidad', 
 			DB::raw('concat_ws(" ",sectorial.clave,sectorial.descripcion) AS programaSectorial'),
 			DB::raw('concat_ws(" ",objetivosPED.clave,objetivosPED.descripcion) AS objetivoPED'),
 
@@ -34,7 +34,7 @@ class Programa extends BaseModel
 			'titular.nombre AS liderPrograma','titular.email AS liderCorreo','titular.telefono AS liderTelefono', 'responsable.nombre AS nombreResponsable', 'responsable.cargo AS cargoResponsable')
 				->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestal','programaPresupuestal.clave','=','programa.claveProgramaPresupuestario')
 				->leftjoin('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','programa.claveUnidadResponsable')
-				->leftjoin('catalogoODM as ODM','ODM.id','=','programa.idOdm')
+				->leftjoin('catalogoObjetivosDesarrolloSostenible as ODS','ODS.id','=','programa.idOds')
 				->leftjoin('catalogoModalidad as modalidad','modalidad.id','=','programa.idModalidad')
 				->leftjoin('catalogoProgramasSectoriales as sectorial','sectorial.clave','=','programa.claveProgramaSectorial')
 				->leftjoin('catalogoObjetivosPED as objetivosPED','objetivosPED.id','=','programa.idObjetivoPED')

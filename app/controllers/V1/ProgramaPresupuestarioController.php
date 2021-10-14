@@ -353,7 +353,7 @@ class ProgramaPresupuestarioController extends BaseController {
 
 					$recurso->idObjetivoPED = ($parametros['vinculacion-ped'])?$parametros['vinculacion-ped']:NULL;
 					$recurso->idObjetivoPND = ($parametros['vinculacion-pnd'])?$parametros['vinculacion-pnd']:NULL;
-					$recurso->idOdm = ($parametros['odm'])?$parametros['odm']:NULL;
+					$recurso->idOds = ($parametros['ods'])?$parametros['ods']:NULL;
 					$recurso->idModalidad = ($parametros['modalidad'])?$parametros['modalidad']:NULL;
 					$recurso->fechaInicio = ($parametros['fecha-inicio'])?$parametros['fecha-inicio']:NULL;
 					$recurso->fechaTermino = ($parametros['fecha-termino'])?$parametros['fecha-termino']:NULL;
@@ -592,7 +592,7 @@ class ProgramaPresupuestarioController extends BaseController {
 
 					$recurso->idObjetivoPED = ($parametros['vinculacion-ped'])?$parametros['vinculacion-ped']:NULL;
 					$recurso->idObjetivoPND = ($parametros['vinculacion-pnd'])?$parametros['vinculacion-pnd']:NULL;
-					$recurso->idOdm = ($parametros['odm'])?$parametros['odm']:NULL;
+					$recurso->idOds = ($parametros['ods'])?$parametros['ods']:NULL;
 					$recurso->idModalidad = ($parametros['modalidad'])?$parametros['modalidad']:NULL;
 					$recurso->fechaInicio = ($parametros['fecha-inicio'])?$parametros['fecha-inicio']:NULL;
 					$recurso->fechaTermino = ($parametros['fecha-termino'])?$parametros['fecha-termino']:NULL;
