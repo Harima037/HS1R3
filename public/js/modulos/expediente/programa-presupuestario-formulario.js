@@ -281,6 +281,8 @@ function editar_indicador(e){
             $('#denominador-programa').val(response.data.valorDenominador);
             $('#linea-base-programa').val(response.data.lineaBase);
             $('#anio-base-programa').val(response.data.anioBase);
+            $('#comportamiento-programa').val(response.data.idComportamientoAccion);
+            $('#tipo-valor-meta-programa').val(response.data.idTipoValorMeta);
 
             $('#id-indicador').val(response.data.id);
 

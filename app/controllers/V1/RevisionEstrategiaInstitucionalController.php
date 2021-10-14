@@ -88,7 +88,7 @@ class RevisionEstrategiaInstitucionalController extends BaseController {
 
 		if($parametros){
 			if($parametros['mostrar'] == 'editar-estrategia'){
-				$recurso = Estrategia::find($id)->load("estrategiaNacional", "formula", "frecuencia", "unidadResponsable", "programaSectorial", "odm", "ped", "tipoIndicador", "dimension", "unidadMedida", "metasAnios", "comportamientoAccion", "tipoValorMeta","comentario", "responsable");
+				$recurso = Estrategia::find($id)->load("estrategiaNacional", "formula", "frecuencia", "unidadResponsable", "programaSectorial", "ods", "ped", "tipoIndicador", "dimension", "unidadMedida", "metasAnios", "comportamientoAccion", "tipoValorMeta","comentario", "responsable");
 			}else{
 				$recurso = Estrategia::find($id);
 			}

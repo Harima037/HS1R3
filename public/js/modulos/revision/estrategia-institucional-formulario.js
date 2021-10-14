@@ -69,10 +69,10 @@ if($('#id').val()){
                 }
             }
 
-			if(response.data.odm)
-				$('#lbl-odm').text(response.data.odm.descripcion);
+			if(response.data.ods)
+				$('#lbl-ods').text(response.data.ods.descripcion);
 			else
-				$('#lbl-odm').text("SIN DATO");
+				$('#lbl-ods').text("SIN DATO");
 			if(response.data.ped)	
 				$('#lbl-vinculacion-ped').text(response.data.ped.descripcion);
 			else

@@ -386,6 +386,9 @@ class LideresProyectosController extends \BaseController {
 				//Proyecto::where('unidadResponsable','=',$unidades_responsables[$cargo->idArea])->update(['idLiderProyecto'=>$cargo->id]);
 				DB::table('proyectos')->where('unidadResponsable','=',$unidades_responsables[$cargo->idArea])->update(array('idLiderProyecto'=>$cargo->id));
 			}
+
+			//Actualizar Estrategias en lider del programa
+			DB::table('estrategia')->where('claveUnidadResponsable','=',$unidades_responsables[$cargo->idArea])->update(array('idLiderPrograma'=>$cargo->id));
 		}
 	}
 

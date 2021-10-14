@@ -98,11 +98,11 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="form-group">
-                                        <label class="control-label" for="lbl-odm">ODM</label>
+                                        <label class="control-label" for="lbl-ods">ODS</label>
                                         <div class="input-group">
-						                   	<span class="input-group-btn" onclick="escribirComentario('odm','ODM','lbl-odm');">
+						                   	<span class="input-group-btn" onclick="escribirComentario('ods','ODS','lbl-ods');">
                        						<span class="btn btn-default"> <i class="fa fa-pencil-square-o"></i></span></span>
-                                            <p id="lbl-odm" name="lbl-odm" class="form-control" style="height:auto"></p>
+                                            <p id="lbl-ods" name="lbl-ods" class="form-control" style="height:auto"></p>
                                         </div>
                                     </div>
                                 </div>

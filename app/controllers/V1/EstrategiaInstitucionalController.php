@@ -254,7 +254,7 @@ class EstrategiaInstitucionalController extends \BaseController {
 					$recurso->idEstatus = 1;
 
 					$recurso->idObjetivoPED = ($parametros['vinculacion-ped'])?$parametros['vinculacion-ped']:NULL;
-					$recurso->idOdm = ($parametros['odm'])?$parametros['odm']:NULL;
+					$recurso->idOds = ($parametros['ods'])?$parametros['ods']:NULL;
 					$recurso->objetivoEstrategico = $parametros['objetivo-estrategico'];
 					$recurso->descripcionIndicador = $parametros['descripcion-indicador'];
 					$recurso->numerador = $parametros['numerador'];
@@ -281,7 +281,11 @@ class EstrategiaInstitucionalController extends \BaseController {
 					$recurso->idTipoValorMeta = $parametros['tipo-valor-meta-estrategia'];
 
 					$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
-					$recurso->idLiderPrograma = $titular->id;
+					if($titular){
+						$recurso->idLiderPrograma = $titular->id;
+					}else{
+						$recurso->idLiderPrograma = null;
+					}
 
 					DB::beginTransaction();
 
@@ -472,10 +476,10 @@ class EstrategiaInstitucionalController extends \BaseController {
 					$recurso->claveProgramaSectorial = $parametros['programa-sectorial'];
 					$recurso->idEstrategiaNacional = $parametros['estrategia-pnd'];
 					$recurso->ejercicio = $parametros['ejercicio'];
-					$recurso->idEstatus = 1;
+					//$recurso->idEstatus = 1;
 
 					$recurso->idObjetivoPED = ($parametros['vinculacion-ped'])?$parametros['vinculacion-ped']:NULL;
-					$recurso->idOdm = ($parametros['odm'])?$parametros['odm']:NULL;
+					$recurso->idOds = ($parametros['ods'])?$parametros['ods']:NULL;
 					$recurso->objetivoEstrategico = $parametros['objetivo-estrategico'];
 					$recurso->descripcionIndicador = $parametros['descripcion-indicador'];
 					$recurso->numerador = $parametros['numerador'];
@@ -502,7 +506,11 @@ class EstrategiaInstitucionalController extends \BaseController {
 					$recurso->idTipoValorMeta = $parametros['tipo-valor-meta-estrategia'];
 
 					$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
-					$recurso->idLiderPrograma = $titular->id;
+					if($titular){
+						$recurso->idLiderPrograma = $titular->id;
+					}else{
+						$recurso->idLiderPrograma = null;
+					}
 
 					DB::beginTransaction();
 
@@ -576,6 +584,7 @@ class EstrategiaInstitucionalController extends \BaseController {
 			if(!isset($respuesta['data']['code'])){
 				$respuesta['data']['code'] = 'S03';
 			}
+			$respuesta['data']['line'] = $ex->getLine();
 		}
 		return Response::json($respuesta['data'],$respuesta['http_status']);
 	}

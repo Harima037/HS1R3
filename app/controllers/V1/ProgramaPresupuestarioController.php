@@ -453,6 +453,8 @@ class ProgramaPresupuestarioController extends BaseController {
 					$recurso->idDimensionIndicador 	= ($parametros['dimension-programa'])?$parametros['dimension-programa']:NULL;
 					$recurso->idFrecuenciaIndicador = ($parametros['frecuencia-programa'])?$parametros['frecuencia-programa']:NULL;
 					$recurso->idTipoIndicador 		= ($parametros['tipo-ind-programa'])?$parametros['tipo-ind-programa']:NULL;
+					$recurso->idComportamientoAccion = ($parametros['comportamiento-programa'])?$parametros['comportamiento-programa']:NULL;
+					$recurso->idTipoValorMeta 		= ($parametros['tipo-valor-meta-programa'])?$parametros['tipo-valor-meta-programa']:NULL;
 					
 					$recurso->idUnidadMedida 		= ($parametros['unidad-medida-programa'])?$parametros['unidad-medida-programa']:NULL;
 					$recurso->metaIndicador 		= $parametros['meta-programa'];
@@ -751,6 +753,8 @@ class ProgramaPresupuestarioController extends BaseController {
 					$recurso->idDimensionIndicador 	= ($parametros['dimension-programa'])?$parametros['dimension-programa']:NULL;
 					$recurso->idFrecuenciaIndicador = ($parametros['frecuencia-programa'])?$parametros['frecuencia-programa']:NULL;
 					$recurso->idTipoIndicador 		= ($parametros['tipo-ind-programa'])?$parametros['tipo-ind-programa']:NULL;
+					$recurso->idComportamientoAccion = ($parametros['comportamiento-programa'])?$parametros['comportamiento-programa']:NULL;
+					$recurso->idTipoValorMeta 		= ($parametros['tipo-valor-meta-programa'])?$parametros['tipo-valor-meta-programa']:NULL;
 					
 					$recurso->idUnidadMedida 		= ($parametros['unidad-medida-programa'])?$parametros['unidad-medida-programa']:NULL;
 					$recurso->metaIndicador 		= $parametros['meta-programa'];

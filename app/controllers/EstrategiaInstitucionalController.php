@@ -35,7 +35,8 @@ class EstrategiaInstitucionalController extends \BaseController {
 		
 		$datos['id'] = $id;
 		//$datos['formulario_estrategia'] = View::make('expediente.formulario-componente',$datos_programa);
-		$datos['odm'] = ObjetivoDesarrolloMilenio::whereNull('idPadre')->with('hijos')->get();
+		//$datos['odm'] = ObjetivoDesarrolloMilenio::whereNull('idPadre')->with('hijos')->get();
+		$datos['ods'] = ObjetivoDesarrolloSostenible::all();
 		$datos['estrategias_nacionales'] = EstrategiaNacional::all();
 
 		if(Sentry::getUser()->claveUnidad){

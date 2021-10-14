@@ -80,18 +80,10 @@
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <label class="control-label" for="odm">ODS</label>
-                                        <select class="form-control chosen-one" id="odm" name="odm">
+                                        <select class="form-control chosen-one" id="ods" name="ods">
                                             <option value="">Selecciona un Objetivo</option>
-                                            @foreach($odm as $objetivo)
-                                                @if(count($objetivo->hijos))
-                                                    <optgroup label="{{$objetivo->clave}} {{$objetivo->descripcion}}">
-                                                        @foreach($objetivo->hijos as $hijo)
-                                                            <option value="{{$hijo->id}}">{{$hijo->clave}} {{$hijo->descripcion}}</option>
-                                                        @endforeach
-                                                    </optgroup>
-                                                @else
-                                                    <option value="{{$objetivo->id}}">{{$objetivo->clave}} {{$objetivo->descripcion}}</option>
-                                                @endif
+                                            @foreach($ods as $objetivo)
+                                                <option value="{{$objetivo->id}}">{{$objetivo->clave}} {{$objetivo->descripcion}}</option>
                                             @endforeach
                                         </select>
                                     </div>

@@ -44,7 +44,7 @@ if($('#id').val()){
             $('#unidad-responsable').val(response.data.claveUnidadResponsable);
             $('#programa-sectorial').val(response.data.claveProgramaSectorial);
             $('#ejercicio').val(response.data.ejercicio);
-            $('#odm').val(response.data.idOdm);
+            $('#ods').val(response.data.idOds);
             $('#vinculacion-ped').val(response.data.idObjetivoPED);
             $('#descripcion-indicador').val(response.data.descripcionIndicador);
             $('#numerador').val(response.data.numerador);

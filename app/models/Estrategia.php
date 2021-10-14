@@ -6,7 +6,7 @@ class Estrategia extends BaseModel
 	use SoftDeletingTrait;
 	protected $dates = ['borradoAl'];
 	protected $table = "estrategia";
-	protected $guarded = array('idEstrategiaNacional', 'claveUnidadResponsable', 'claveProgramaSectorial', 'idOdm', 'idObjetivoPED', 'idEstatus', 'ejercicio', 'mision', 'vision', 'descripcionIndicador', 'numerador', 'denominador', 'interpretacion', 'idTipoIndicador', 'idDimensionIndicador', 'idUnidadMedida', 'metaIndicador', 'lineaBase', 'anioBase', 'idFormula', 'idFrecuenciaIndicador', 'trim1', 'trim2', 'trim3', 'trim4', 'valorNumerador', 'valorDenominador', 'idResponsable', 'fuenteInformacion','idComportamientoAccion','idTipoValorMeta');
+	protected $guarded = array('idEstrategiaNacional', 'claveUnidadResponsable', 'claveProgramaSectorial', 'idOds', 'idObjetivoPED', 'idEstatus', 'ejercicio', 'mision', 'vision', 'descripcionIndicador', 'numerador', 'denominador', 'interpretacion', 'idTipoIndicador', 'idDimensionIndicador', 'idUnidadMedida', 'metaIndicador', 'lineaBase', 'anioBase', 'idFormula', 'idFrecuenciaIndicador', 'trim1', 'trim2', 'trim3', 'trim4', 'valorNumerador', 'valorDenominador', 'idResponsable', 'fuenteInformacion','idComportamientoAccion','idTipoValorMeta');
 
 	public function scopeContenidoSuggester($query){
 		$query->select('estrategia.id','estrategia.idEstrategiaNacional','estrategia.descripcionIndicador','estrategia.claveUnidadResponsable','estrategia.idEstatus',
@@ -51,8 +51,8 @@ class Estrategia extends BaseModel
 		return $this->belongsTo('ProgramaSectorial','claveProgramaSectorial','clave');
 	}
 
-	public function odm(){
-		return $this->belongsTo('ObjetivoDesarrolloMilenio','idOdm','id');
+	public function ods(){
+		return $this->belongsTo('ObjetivoDesarrolloSostenible','idOds','id');
 	}
 
 	public function ped(){
