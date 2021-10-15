@@ -365,8 +365,15 @@ class ProgramaPresupuestarioController extends BaseController {
 					$recurso->justificacionPrograma = ($parametros['justificacion-programa'])?$parametros['justificacion-programa']:NULL;
 					
 					//$titular = Titular::where('claveUnidad','=',$parametros['unidad-responsable'])->first();
+					$subdires = Directorio::titularesActivos(array('01'))->first();
+					$recurso->idJefePlaneacion 				= $subdires->id;
+					$recurso->idCoordinadorGrupoEstrategico = $subdires->id;
+					
 					$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
-					$recurso->idLiderPrograma = $titular->id;
+					if($titular){
+						$recurso->idLiderPrograma = $titular->id;
+					}
+					
 
 					if($recurso->save()){
 						$recurso['responsables'] = Directorio::responsablesActivos($recurso->claveUnidadResponsable)->get();
@@ -604,8 +611,14 @@ class ProgramaPresupuestarioController extends BaseController {
 					$recurso->justificacionPrograma = ($parametros['justificacion-programa'])?$parametros['justificacion-programa']:NULL;
 
 					//$titular = Titular::where('claveUnidad','=',$parametros['unidad-responsable'])->first();
+					$subdires = Directorio::titularesActivos(array('01'))->first();
+					$recurso->idJefePlaneacion 				= $subdires->id;
+					$recurso->idCoordinadorGrupoEstrategico = $subdires->id;
+					
 					$titular = Directorio::titularesActivos(array($parametros['unidad-responsable']))->first();
-					$recurso->idLiderPrograma = $titular->id;
+					if($titular){
+						$recurso->idLiderPrograma = $titular->id;
+					}
 
 					if($recurso->save()){
 						if($actualizar_responsables){

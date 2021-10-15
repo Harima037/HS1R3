@@ -218,6 +218,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('segui-proyectos-inv',  'V1\SeguimientoInstitucionalController');
 		
 		Route::resource('revision-programas',	 'V1\RevisionProgramaController');
+		Route::resource('reporte-programa-presupuestario', 'V1\ReporteProgramaController', array('only'=>array('show')));
 		Route::resource('seguimiento-programas', 'V1\SeguimientoProgramaController');
 		Route::resource('revision-rendicion-fassa',	'V1\RevisionRendicionFassaController');
 
@@ -229,7 +230,7 @@ Route::group(array('before'=>'auth.sentry'), function(){
 		Route::resource('estrategia-institucional',	'V1\EstrategiaInstitucionalController');
 		Route::resource('revision-estrategia', 		'V1\RevisionEstrategiaInstitucionalController');
 		Route::resource('seguimiento-estrategia', 	'V1\SeguimientoEstrategiaController');
-		//Route::resource('reporte-estrategia',		'V1\ReporteSeguimientoEstrategisController', array('only' => array('index', 'show')));
+		Route::resource('reporte-estrategia-institucional', 'V1\ReporteEstrategiaController', array('only'=>array('show')));
 		Route::resource('reporte-seg-estrategia',	'V1\ReporteSeguimientoEstrategiaController', array('only' => array('index', 'show')));
 		
 		Route::resource('indicadores-fassa',	'V1\IndicadorFassaController');

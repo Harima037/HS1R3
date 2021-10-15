@@ -47,6 +47,16 @@ if($('#id').val()){
         _success:function(response){
 			
 			//console.log(response.data);
+			if(response.data.idEstatus >= 4){
+                $('#btn-exportar-pdf').show();
+                $('#btn-exportar-pdf').off('click');
+                $('#btn-exportar-pdf').on('click',function(){
+                    window.open(SERVER_HOST+'/v1/reporte-programa-presupuestario/'+response.data.id);
+                });
+            }else{
+                $('#btn-exportar-pdf').off('click');
+                $('#btn-exportar-pdf').hide();
+            }
 			
 			$('#idEstatusPrograma').val(response.data.idEstatus);
 			

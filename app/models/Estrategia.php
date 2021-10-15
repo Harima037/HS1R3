@@ -19,6 +19,28 @@ class Estrategia extends BaseModel
 			->leftjoin('catalogoEstatusProyectos AS estatus','estatus.id','=','estrategia.idEstatus');
 	}
 
+	public function scopeContenidoReporte($query){
+		$query->select('estrategia.*', DB::raw('estrategiaNacional.descripcion as estrategiaNacional'), 
+					DB::raw('concat_ws(" ",estrategia.claveUnidadResponsable,unidadResponsable.descripcion) AS unidadResponsable'),
+					'programaSectorial.descripcion AS programaSectorial', 'ODS.descripcion AS ods','objetivoPED.descripcion as objetivoPED',
+					'formula.descripcion AS formula','dimension.descripcion AS dimension','frecuencia.descripcion AS frecuencia','tipoIndicador.descripcion AS tipoIndicador',
+    				'unidadMedida.descripcion AS unidadMedida','comportamientoAccion.descripcion as comportamientoAccion','tipoValorMeta.descripcion AS tipoValorMeta'
+				)
+				->leftJoin('catalogoEstrategiasNacionales AS estrategiaNacional','estrategiaNacional.id','=','estrategia.idEstrategiaNacional')
+				->leftjoin('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','estrategia.claveUnidadResponsable')
+				->leftjoin('catalogoProgramasSectoriales AS programaSectorial','programaSectorial.clave','=','estrategia.claveProgramaSectorial')
+				->leftjoin('catalogoObjetivosDesarrolloSostenible as ODS','ODS.id','=','estrategia.idOds')
+				->leftjoin('catalogoObjetivosPED AS objetivoPED','objetivoPED.id','=','estrategia.idObjetivoPED')
+				->leftjoin('catalogoFormulas AS formula','formula.id','=','estrategia.idFormula')
+				->leftjoin('catalogoDimensionesIndicador AS dimension','dimension.id','=','estrategia.idDimensionIndicador')
+				->leftjoin('catalogoFrecuenciasIndicador AS frecuencia','frecuencia.id','=','estrategia.idFrecuenciaIndicador')
+				->leftjoin('catalogoTiposIndicadores AS tipoIndicador','tipoIndicador.id','=','estrategia.idTipoIndicador')
+				->leftjoin('catalogoUnidadesMedida AS unidadMedida','unidadMedida.id','=','estrategia.idUnidadMedida')
+				->leftjoin('catalogoTiposValorMeta AS tipoValorMeta','tipoValorMeta.id','=','idTipoValorMeta')
+				->leftjoin('catalogoComportamientosAccion AS comportamientoAccion','comportamientoAccion.id','=','idComportamientoAccion')
+				;
+	}
+
 	public function metasAnios(){
 		return $this->hasMany('EstrategiaMetaAnio','idEstrategia')->orderBy('anio');
 	}

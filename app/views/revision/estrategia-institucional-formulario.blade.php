@@ -38,6 +38,9 @@
                         </ul>
                     </div>
                 </div>
+                <!--div class="btn-toolbar pull-right" style="margin:5px">
+                    <button type="button" class="btn btn-info" id="btn-exportar-pdf"><span class="fa fa-file"></span> Imprimir Reporte</button>
+                </div-->
                 <div role="tabpanel">
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active">

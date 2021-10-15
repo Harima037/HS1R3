@@ -103,14 +103,15 @@ class ReporteProyectoController extends BaseController {
 			}
 
 			if($recurso->idClasificacionProyecto == 1){
-				if($recurso->idPrograma){
+				$recurso['programaPresupuestarioAsignado'] = FALSE;
+				/*if($recurso->idPrograma){
 					$programa = Programa::with('arbolProblemas','arbolObjetivos','indicadoresDescripcion')
 										->contenidoDetalle()
 										->find($recurso->idPrograma);
 					$recurso['programaPresupuestarioAsignado'] = $programa;
 				}else{
 					$recurso['programaPresupuestarioAsignado'] = FALSE;
-				}
+				}*/
 			}else{
 				$recurso['programaPresupuestarioAsignado'] = FALSE;
 			}
