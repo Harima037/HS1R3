@@ -115,7 +115,7 @@ if($('#id').val()){
 			//Termina Clave presupuestaria
 			//estrategia_estatal
 			$('#lbl-estrategiapnd').text((response.data.estrategia_nacional)?response.data.estrategia_nacional.descripcion:'Sin Datos');
-			$('#lbl-objetivoestrategico').text((response.data.objetivo_estrategico)?response.data.objetivo_estrategico.descripcion:'Sin Datos');
+			$('#lbl-objetivoestrategico').text((response.data.objetivo_estrategico)?response.data.objetivo_estrategico.objetivoEstrategico:'Sin Datos');
 			$('#lbl-alineacion').text((response.data.estrategia_estatal)?response.data.estrategia_estatal.claveAlineacion:'Sin Datos');
 			$('#lbl-estrategiaestatal').text((response.data.estrategia_estatal)?response.data.estrategia_estatal.claveEstrategia+' '+response.data.estrategia_estatal.descripcion:'Sin Datos');
             

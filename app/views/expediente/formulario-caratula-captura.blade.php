@@ -268,7 +268,7 @@
         <div class="col-sm-12">
             <div class="form-group">
                 <label class="control-label" for="objetivoestrategico">Objetivo Estrategico</label>
-                {{Form::select('objetivoestrategico',array('' =>'Selecciona un Objetivo Estrategico') + $objetivos_estrategicos->lists('descripcion','id'),0,array('class'=>'form-control chosen-one','id'=>'objetivoestrategico'))}}
+                {{Form::select('objetivoestrategico',array('' =>'Selecciona un Objetivo Estrategico') + $objetivos_estrategicos->lists('objetivoEstrategico','id'),0,array('class'=>'form-control chosen-one','id'=>'objetivoestrategico'))}}
             </div>
         </div>
         <div class="col-sm-12">

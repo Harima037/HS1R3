@@ -890,7 +890,8 @@ class Proyecto extends BaseModel
 	}
 
 	public function objetivoEstrategico(){
-		return $this->belongsTo('ObjetivoEstrategico','idObjetivoEstrategico');
+		return $this->belongsTo('Estrategia','idObjetivoEstrategico');
+		//return $this->belongsTo('ObjetivoEstrategico','idObjetivoEstrategico');
 	}
 
 	public function estrategiaEstatal(){
