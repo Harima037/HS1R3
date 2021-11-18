@@ -72,7 +72,7 @@
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2" class="encabezado">PROGRAMA ESPECIAL:</td>
+		<td colspan="2" class="encabezado">ORIGEN DE ASIGNACIÓN:</td>
 		<td colspan="13" class="dato">
 			{{ $data['origenAsignacionDescripcion'] }}
 		</td>
