@@ -18,7 +18,7 @@ namespace V1;
 
 use SSA\Utilerias\Util;
 use SSA\Utilerias\Validador;
-use BaseController, Input, Response, DB, Sentry, View;
+use BaseController, Input, Response, DB, Sentry, View, DateTime;
 use Excel,PDF, Proyecto, FIBAP, ComponenteMetaMes, ActividadMetaMes,DocumentoSoporte,OrigenFinanciamiento, Programa,ComponenteDesglose,Jurisdiccion;
 
 class ReporteProyectoController extends BaseController {
@@ -298,7 +298,23 @@ class ReporteProyectoController extends BaseController {
 		}elseif($reporte == 'fibap'){
 			$pdf->setPaper('LETTER')->setOrientation('portrait')->setWarnings(false);
 		}
-		
+
+		$font = \Font_Metrics::get_font("helvetica", "bold");
+
+		$pdf->output();
+		$dom_pdf = $pdf->getDomPDF();
+		$canvas = $dom_pdf->get_canvas();
+
+		$width = $canvas->get_width();
+		$heigth = $canvas->get_height();
+		$color = array(0.565, 0.565, 0.565);
+		$date = new DateTime();
+		$timestamp = $date->getTimestamp();
+
+		$canvas->page_text(10, $heigth-20, "CARATULA DEL PROYECTO: ".$recurso->ClavePresupuestaria, $font, 8, array(0, 0, 0));
+		$canvas->page_text($width-75, $heigth-20, "Página {PAGE_NUM} de {PAGE_COUNT}", $font, 8, array(0, 0, 0));
+		$canvas->page_text(($width/2)-50,$heigth-20,"SSA".$timestamp, $font, 8, $color);
+
 		return $pdf->stream($nombreArchivo.'.pdf');
 
 
