@@ -7,9 +7,21 @@
             margin-top: 0.3em;
             margin-left: 0.6em;
             margin-right: 0.6em;
-            margin-bottom: 0.3em;
+            margin-bottom: 1.6em;
         }
-		
+
+		body{
+			margin-top:15.3em;
+		}
+
+		header {
+			position: fixed;
+			top: 0cm;
+			left: 0cm;
+			right: 0cm;
+			height: 2cm;
+        }
+
         .misma-linea{
         	display: inline-block;
         }
@@ -88,25 +100,27 @@
 	</style>
 </head>
 <body class="cuerpo">
+	<header>
+		<table class="tabla" width="100%">
+			<tr><td colspan="8"></td></tr>
+			<tr>
+				<td rowspan="8" class="imagen izquierda">
+					<img src="{{ public_path().'/img/LogoFederal.png' }}" width="150">
+				</td>
+				<td class="titulo">GOBIERNO DEL ESTADO DE CHIAPAS</td>
+				<td rowspan="8" class="imagen derecha">
+					<img src="{{ public_path().'/img/LogoInstitucional.png' }}" width="150">
+				</td>
+			</tr>
+			<tr><td class="titulo">SECRETARÍA DE SALUD</td></tr>
+			<tr><td class="titulo">INSTITUTO DE SALUD</td></tr>
+			<tr><td class="titulo">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td></tr>
+			<tr><td class="titulo">DEPARTAMENTO DE INTEGRACION PROGRAMATICA PRESUPUESTAL</td></tr>
+			<tr><td class="titulo">SISTEMA PRESUPUESTARIO {{$data['programaPresupuestarioAsignado']['ejercicio']}}</td></tr>
+			<tr><td class="titulo"><strong>PROGRAMA PRESUPUESTARIO</strong></td></tr>
+		</table>
+	</header>
 
-	<table class="tabla" width="100%">
-		<tr><td colspan="8"></td></tr>
-		<tr>
-			<td rowspan="8" class="imagen izquierda">
-				<img src="{{ public_path().'/img/LogoFederal.png' }}" width="150">
-			</td>
-			<td class="titulo">GOBIERNO DEL ESTADO DE CHIAPAS</td>
-			<td rowspan="8" class="imagen derecha">
-				<img src="{{ public_path().'/img/LogoInstitucional.png' }}" width="150">
-			</td>
-		</tr>
-		<tr><td class="titulo">SECRETARÍA DE SALUD</td></tr>
-		<tr><td class="titulo">INSTITUTO DE SALUD</td></tr>
-		<tr><td class="titulo">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td></tr>
-		<tr><td class="titulo">DEPARTAMENTO DE INTEGRACION PROGRAMATICA PRESUPUESTAL</td></tr>
-		<tr><td class="titulo">SISTEMA PRESUPUESTARIO {{$data['programaPresupuestarioAsignado']['ejercicio']}}</td></tr>
-		<tr><td class="titulo"><strong>PROGRAMA PRESUPUESTARIO</strong></td></tr>
-	</table>
 	<table class="tabla" width="100%">
 		<tr>
 			<td class="encabezado">DATOS GENERALES</td>
@@ -276,6 +290,8 @@
 			<td colspan="5" class="dato">{{$indicador->supuestos}}</td>
 		</tr>
 		<tr><td colspan="6" height="5">&nbsp;</td></tr>
+	</table>
+	<table class="tabla" width="100%" style="page-break-inside: avoid;">
 		<tr>
 			<td colspan="6" class="encabezado texto-centro">
 			INDICADORES DEL {{($indicador->claveTipoIndicador == 'F')?'FIN':'PROPOSITO'}} PP.{{$data['programaPresupuestarioAsignado']['claveProgramaPresupuestario']}}
@@ -327,11 +343,15 @@
 			<td class="dato"></td>
 		</tr>
 		<tr><td colspan="6" height="5">&nbsp;</td></tr>
+	</table>
+	<table class="tabla" width="100%" style="page-break-inside: avoid;">
 		<tr>
+			<td width="10%">&nbsp;</td>
 			<td colspan="5" class="encabezado texto-centro">PROGRAMACIÓN TRIMESTRAL:</td>
-			<td></td>
+			<td width="10%">&nbsp;</td>
 		</tr>
 		<tr>
+			<td></td>
 			<td class="encabezado texto-centro">PRIMER TRIMESTRE:</td>
 			<td class="encabezado texto-centro">SEGUNDO TRIMESTRE:</td>
 			<td class="encabezado texto-centro">TERCER TRIMESTRE:</td>
@@ -340,6 +360,7 @@
 			<td></td>
 		</tr>
 		<tr>
+			<td></td>
 			<td class="dato">{{number_format($indicador->trim1)}}</td>
 			<td class="dato">{{number_format($indicador->trim2)}}</td>
 			<td class="dato">{{number_format($indicador->trim3)}}</td>
@@ -347,7 +368,7 @@
 			<td class="dato">{{number_format($indicador->valorNumerador)}}</td>
 			<td></td>
 		</tr>
-		<tr><td colspan="6" height="5">&nbsp;</td></tr>
+		<tr><td colspan="7" height="5">&nbsp;</td></tr>
 	</table>
 	@endforeach
 	<table class="tabla" width="100%" style="page-break-inside: avoid;">

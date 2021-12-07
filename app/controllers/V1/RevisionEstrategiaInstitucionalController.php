@@ -24,7 +24,7 @@ class RevisionEstrategiaInstitucionalController extends BaseController {
 		if(isset($parametros['formatogrid'])){
 
            
-				$rows = Estrategia::getModel()->whereIn('estrategia.idEstatus',array(2, 4));
+				$rows = Estrategia::getModel()->whereIn('estrategia.idEstatus',array(2, 4, 5));
 
 				/*if(Sentry::getUser()->claveProgramaPresupuestario){
 					$rows = $rows->where('claveProgramaPresupuestario','=',Sentry::getUser()->claveProgramaPresupuestario);

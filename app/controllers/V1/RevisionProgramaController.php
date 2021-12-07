@@ -62,7 +62,7 @@ class RevisionProgramaController extends BaseController {
 							->join('catalogoProgramasPresupuestales','catalogoProgramasPresupuestales.clave','=','programa.claveProgramaPresupuestario')
 							->join('catalogoEstatusProyectos','catalogoEstatusProyectos.id','=','programa.idEstatus')
 							//->where('programa.idEstatus','<',5)
-							->wherein('programa.idEstatus',array(2, 4))
+							->wherein('programa.idEstatus',array(2, 4, 5))
 							->orderBy('id', 'desc')
 							->skip(($parametros['pagina']-1)*10)->take(10)
 							->get();

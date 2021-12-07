@@ -55,7 +55,7 @@ if($('#id').val()){
             $('#lbl-valorDenominador').text(response.data.valorDenominador);
             $('#lbl-fuente-informacion').text(response.data.fuenteInformacion);
             
-            $('#lbl-estrategia-pnd').text(response.data.estrategia_nacional.descripcion);
+            $('#lbl-estrategia-pnd').text((response.data.estrategia_nacional)?response.data.estrategia_nacional.descripcion:'---');
             $('#lbl-formula').text(response.data.formula.descripcion);
             $('#lbl-frecuencia').text(response.data.frecuencia.descripcion);
             $('#lbl-unidad-responsable').text(response.data.unidad_responsable.descripcion);
