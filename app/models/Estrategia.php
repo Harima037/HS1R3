@@ -24,7 +24,9 @@ class Estrategia extends BaseModel
 					DB::raw('concat_ws(" ",estrategia.claveUnidadResponsable,unidadResponsable.descripcion) AS unidadResponsable'),
 					'programaSectorial.descripcion AS programaSectorial', 'ODS.descripcion AS ods','objetivoPED.descripcion as objetivoPED',
 					'formula.descripcion AS formula','dimension.descripcion AS dimension','frecuencia.descripcion AS frecuencia','tipoIndicador.descripcion AS tipoIndicador',
-    				'unidadMedida.descripcion AS unidadMedida','comportamientoAccion.descripcion as comportamientoAccion','tipoValorMeta.descripcion AS tipoValorMeta'
+    				'unidadMedida.descripcion AS unidadMedida','comportamientoAccion.descripcion as comportamientoAccion','tipoValorMeta.descripcion AS tipoValorMeta',
+					'responsable.nombre AS nombreResponsable', 	'responsable.cargo AS cargoResponsable',
+					'liderPrograma.nombre AS liderPrograma',	'liderPrograma.cargo AS liderProgramaCargo'
 				)
 				->leftJoin('catalogoEstrategiasNacionales AS estrategiaNacional','estrategiaNacional.id','=','estrategia.idEstrategiaNacional')
 				->leftjoin('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','estrategia.claveUnidadResponsable')
@@ -38,6 +40,9 @@ class Estrategia extends BaseModel
 				->leftjoin('catalogoUnidadesMedida AS unidadMedida','unidadMedida.id','=','estrategia.idUnidadMedida')
 				->leftjoin('catalogoTiposValorMeta AS tipoValorMeta','tipoValorMeta.id','=','idTipoValorMeta')
 				->leftjoin('catalogoComportamientosAccion AS comportamientoAccion','comportamientoAccion.id','=','idComportamientoAccion')
+
+				->leftjoin('vistaDirectorio As responsable','responsable.id','=','estrategia.idResponsable')
+				->leftjoin('vistaDirectorio AS liderPrograma','liderPrograma.id','=','estrategia.idLiderPrograma')
 				;
 	}
 
