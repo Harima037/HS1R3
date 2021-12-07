@@ -9,6 +9,19 @@
             margin-right: 0.6em;
             margin-bottom: 1.6em;
         }
+
+		body{
+			margin-top:10.3em;
+		}
+
+		header {
+			position: fixed;
+			top: 0cm;
+			left: 0cm;
+			right: 0cm;
+			height: 2cm;
+        }
+
         .misma-linea{
         	display: inline-block;
         }
@@ -90,11 +103,32 @@
 
 	@if($reporte == 'caratula')
 
-		@if($data['programaPresupuestarioAsignado'])
-			{{View::make('expediente.pdf.programa-presupuestario',array('data'=>$data))}}
-			<div style="page-break-after:always;"></div>
-		@endif
-
+		<header>
+			<table class="tabla" width="100%">
+				<tr>
+					<td rowspan="5" class="imagen izquierda">
+						<img src="{{ public_path().'/img/LogoFederal.png' }}" width="150">
+					</td>
+					<td colspan="11" class="titulo">GOBIERNO DEL ESTADO DE CHIAPAS</td>
+					<td colspan="3" rowspan="5" class="imagen derecha">
+						<img src="{{ public_path().'/img/LogoInstitucional.png' }}" width="150">
+					</td>
+				</tr>
+				<tr>
+					<td colspan="11" class="titulo">SECRETARÍA DE SALUD</td>
+				</tr>
+				<tr>
+					<td colspan="11" class="titulo">INSTITUTO DE SALUD</td>
+				</tr>
+				<tr>
+					<td colspan="11" class="titulo">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td>
+				</tr>
+				<tr>
+					<td colspan="11" class="titulo">DEPARTAMENTO DE EVALUACIÓN</td>
+				</tr>
+			</table>
+		</header>
+		
 		{{View::make('expediente.pdf.caratula',array('data'=>$data))}}
 
 		<div style="page-break-after:always;"></div>

@@ -73,6 +73,9 @@ class Proyecto extends BaseModel
 					->leftjoin('catalogoActividades AS actividadInstitucional','actividadInstitucional.clave','=','proyectos.actividadInstitucional')
 					->leftjoin('catalogoProyectosEstrategicos AS proyectoEstrategico','proyectoEstrategico.clave','=','proyectos.proyectoEstrategico')
 					->leftjoin('catalogoObjetivosPED AS objetivoPED','objetivoPED.id','=','proyectos.idObjetivoPED')
+					->leftjoin('catalogoEstrategiasEstatales AS estrategiaEstatal','estrategiaEstatal.id','=','proyectos.idEstrategiaEstatal')
+					->leftjoin('catalogoEstrategiasNacionales AS estrategiaNacional','estrategiaNacional.id','=','proyectos.idEstrategiaNacional')
+					->leftjoin('estrategia AS objetivoEstrategico','objetivoEstrategico.id','=','proyectos.idObjetivoEstrategico')
 
 					->leftjoin('catalogoObjetivosPED AS ejeRector','ejeRector.clave','=',DB::raw('SUBSTRING(objetivoPED.clave,1,4)'))
 					->leftjoin('catalogoObjetivosPED AS politicaPublica','politicaPublica.clave','=',DB::raw('SUBSTRING(objetivoPED.clave,1,6)'))
@@ -108,6 +111,11 @@ class Proyecto extends BaseModel
 						DB::raw('concat_ws(" ",tipoProyecto.clave,tipoProyecto.descripcion) AS tipoProyectoDescripcion'),
 						DB::raw('concat_ws(" ",cobertura.clave,cobertura.descripcion) AS coberturaDescripcion'),
 
+						DB::raw('concat_ws(" ",estrategiaEstatal.claveEstrategia,estrategiaEstatal.descripcion) AS estrategiaEstatalDescripcion'),
+						'estrategiaNacional.descripcion AS estrategiaNacionalDescripcion',
+						'estrategiaEstatal.claveAlineacion AS claveAlineacion',
+						'objetivoEstrategico.objetivoEstrategico AS objetivoEstrategico',
+						
 						'cobertura.clave AS claveCobertura',
 
 						'municipio.nombre AS municipioDescripcion', 'region.nombre AS regionDescripcion',

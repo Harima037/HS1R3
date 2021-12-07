@@ -1,141 +1,142 @@
 <table class="tabla" width="100%">
+	<tr><td height="5" colspan="6"></td></tr>
 	<tr>
-		<td rowspan="5" class="imagen izquierda">
-			<img src="{{ public_path().'/img/LogoFederal.png' }}" width="150">
-		</td>
-		<td colspan="11" class="titulo">GOBIERNO DEL ESTADO DE CHIAPAS</td>
-		<td colspan="3" rowspan="5" class="imagen derecha">
-			<img src="{{ public_path().'/img/LogoInstitucional.png' }}" width="150">
-		</td>
-	</tr>
-	<tr>
-		<td colspan="11" class="titulo">SECRETARÍA DE SALUD</td>
-	</tr>
-	<tr>
-		<td colspan="11" class="titulo">INSTITUTO DE SALUD</td>
-	</tr>
-	<tr>
-		<td colspan="11" class="titulo">DIRECCIÓN DE PLANEACIÓN Y DESARROLLO</td>
-	</tr>
-	<tr>
-		<td colspan="11" class="titulo">DEPARTAMENTO DE EVALUACIÓN</td>
-	</tr>
-	
-	<tr><td height="5" colspan="15"></td></tr>
-
-	<tr>
-		<td colspan="15" align="center" class="encabezado">
+		<td colspan="6" align="center" class="encabezado">
 			PROYECTO {{ ($data['idClasificacionProyecto'] == 2) ? 'DE INVERSIÓN':'INSTITUCIONAL' }}
 		</td>
 	</tr>
-	<tr><td height="5" colspan="15"></td></tr>
+	<tr><td height="5" colspan="6"></td></tr>
 	<tr>
-		<td colspan="2" class="encabezado">UNIDAD RESPONSABLE</td>
-		<td colspan="13" class="dato">
+		<td class="encabezado">UNIDAD RESPONSABLE</td>
+		<td colspan="5" class="dato">
 			{{ $data['unidadResponsableDescripcion'] }}
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2" class="encabezado">FINALIDAD:</td>
-		<td colspan="13" class="dato">
+		<td class="encabezado">FINALIDAD:</td>
+		<td colspan="5" class="dato">
 			{{ $data['finalidadDescripcion'] }}
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2" class="encabezado">FUNCIÓN:</td>
-		<td colspan="13" class="dato">
+		<td class="encabezado">FUNCIÓN:</td>
+		<td colspan="5" class="dato">
 			{{ $data['funcionDescripcion'] }}
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2" class="encabezado">SUB FUNCIÓN:</td>
-		<td colspan="13" class="dato">
+		<td class="encabezado">SUB FUNCIÓN:</td>
+		<td colspan="5" class="dato">
 			{{ $data['subFuncionDescripcion'] }}
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2" class="encabezado">SUB SUB FUNCIÓN:</td>
-		<td colspan="13" class="dato">
+		<td class="encabezado">SUB SUB FUNCIÓN:</td>
+		<td colspan="5" class="dato">
 			{{ $data['subSubFuncionDescripcion'] }}
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2" class="encabezado">PROGRAMA SECTORIAL:</td>
-		<td colspan="13" class="dato">
+		<td class="encabezado">PROGRAMA SECTORIAL:</td>
+		<td colspan="5" class="dato">
 			{{ $data['programaSectorialDescripcion'] }}
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2" class="encabezado">PROGRAMA PRESUPUESTARIO:</td>
-		<td colspan="13" class="dato">
+		<td class="encabezado">PROGRAMA PRESUPUESTARIO:</td>
+		<td colspan="5" class="dato">
 			{{ $data['programaPresupuestarioDescripcion'] }}
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2" class="encabezado">ORIGEN DE ASIGNACIÓN:</td>
-		<td colspan="13" class="dato">
+		<td class="encabezado">ORIGEN DE ASIGNACIÓN:</td>
+		<td colspan="5" class="dato">
 			{{ $data['origenAsignacionDescripcion'] }}
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2" class="encabezado">ACTIVIDAD INSTITUCIONAL:</td>
-		<td colspan="13" class="dato">
+		<td class="encabezado">ACTIVIDAD INSTITUCIONAL:</td>
+		<td colspan="5" class="dato">
 			{{ $data['actividadInstitucionalDescripcion'] }}
 		</td>
 	</tr>
 	<tr>
-		<td colspan="2" class="encabezado">PROYECTO ESTRATEGICO:</td>
-		<td class="dato" colspan="3">
-			{{ $data['proyectoEstrategicoDescripcion'] }}
-		</td>
-		<td colspan="3" class="encabezado">NÚMERO DE PROYECTO ESTRATEGICO:</td>
+		<td class="encabezado">PROYECTO ESTRATEGICO:</td>
+		<td class="dato">{{ $data['proyectoEstrategicoDescripcion'] }}</td>
+		<td class="encabezado" width="1" style="white-space:nowrap;">NÚMERO DE PROYECTO ESTRATEGICO:</td>
 		<td class="dato">{{ $data['numeroProyectoEstrategico'] }}</td>
-		<td colspan="2" class="encabezado">VINCULACIÓN AL PED:</td>
-		<td class="dato" colspan="4">{{ $data['objetivoPEDDescripcion'] }}</td>
+		<td colspan="2"></td>
 	</tr>
+	<tr><td height="5" colspan="6"></td></tr>
+</table>
 
-	<tr><td height="5" colspan="15"></td></tr>
-
+<table class="tabla" width="100%">
+	<tr>
+		<td class="encabezado">ESTRATEGIA DEL OBJETIVO DEL PLAN NACIONAL:</td>
+		<td colspan="5" class="dato">
+			{{ $data['estrategiaNacionalDescripcion'] }}
+		</td>
+	</tr>
+	<tr>
+		<td class="encabezado">OBJETIVO ESTRATEGICO:</td>
+		<td colspan="5" class="dato">
+			{{ $data['objetivoEstrategico'] }}
+		</td>
+	</tr>
+	<tr>
+		<td class="encabezado">ALINEACIÓN:</td>
+		<td class="dato" width="1" style="white-space:nowrap;">{{ $data['claveAlineacion'] }}</td>
+		<td class="encabezado" width="1" style="white-space:nowrap;">ESTRATEGIA DEL PLAN ESTATAL:</td>
+		<td class="dato">{{ $data['estrategiaEstatalDescripcion'] }}</td>
+		<td class="encabezado" width="1" style="white-space:nowrap;">OBJETIVO DEL PLAN ESTATAL:</td>
+		<td class="dato">{{ $data['objetivoPEDDescripcion'] }}</td>
+	</tr>
+	<tr><td height="5" colspan="6"></td></tr>
+</table>
+<table class="tabla" width="100%">
 	<tr>
 		<td width="180" class="encabezado">NOMBRE TÉCNICO:</td>
-		<td colspan="11" class="dato">{{ $data['nombreTecnico'] }}</td>
-		<td colspan="3"></td>
+		<td colspan="9" class="dato">{{ $data['nombreTecnico'] }}</td>
+	</tr>
+	<tr>
+		<td class="encabezado">FINALIDAD DEL PROYECTO:</td>
+		<td colspan="9" class="dato">{{ $data['finalidadProyecto'] }}</td>
 	</tr>
 	<tr>
 		<td class="encabezado">TIPO DE PROYECTO:</td>
 		<td class="dato" width="70">{{ $data['tipoProyectoDescripcion'] }}</td>
-		<td colspan="2" class="encabezado">COBERTURA:</td>
+		<td class="encabezado">COBERTURA:</td>
 		<td class="dato">{{ $data['coberturaDescripcion'] }}</td>
-		<td colspan="2" class="encabezado">TIPO DE ACCIÓN:	</td>
+		<td class="encabezado">TIPO DE ACCIÓN:	</td>
 		<td class="dato">{{ $data['tipoAccionDescripcion'] }}</td>
-		<td colspan="7"></td>
+		<td class="encabezado">FECHA INICIO:</td>
+		<td class="dato">{{ $data['fechaInicio'] }}</td>
+		<td class="encabezado">FECHA TERMINO:	</td>
+		<td class="dato">{{ $data['fechaTermino'] }}</td>
 	</tr>
 
-	<tr><td height="5" colspan="15"></td></tr>
+	<tr><td height="5" colspan="10"></td></tr>
 
 	<tr>
 		<td colspan="2" class="encabezado">LIDER DEL PROYECTO:</td>
-		<td colspan="9" class="dato">{{ $data['liderProyecto'] }}</td>
-		<td colspan="4"></td>
+		<td colspan="8" class="dato">{{ $data['liderProyecto'] }}</td>
 	</tr>
 	<tr>
 		<td colspan="2" class="encabezado">JEFE INMEDIATO AL LIDER:</td>
-		<td colspan="9" class="dato">{{ $data['jefeInmediato'] }}</td>
-		<td colspan="4"></td>
+		<td colspan="8" class="dato">{{ $data['jefeInmediato'] }}</td>
 	</tr>
 	<tr>
 		<td colspan="2" class="encabezado">JEFE DE PLANEACIÓN:</td>
-		<td colspan="9" class="dato">{{ $data['jefePlaneacion'] }}</td>
-		<td colspan="4"></td>
+		<td colspan="8" class="dato">{{ $data['jefePlaneacion'] }}</td>
 	</tr>
 	<tr>
 		<td colspan="2" class="encabezado">COORDINADOR DEL GRUPO ESTRATEGICO:</td>
-		<td colspan="9" class="dato">{{ $data['coordinadorGrupoEstrategico'] }}</td>
-		<td colspan="4"></td>
+		<td colspan="8" class="dato">{{ $data['coordinadorGrupoEstrategico'] }}</td>
 	</tr>
 
-	<tr><td height="5" colspan="15"></td></tr>
-
+	<tr><td height="5" colspan="10"></td></tr>
+</table>
+<table class="tabla" width="100%">
 	<tr>
 		<td colspan="15" align="center" class="encabezado">BENEFICIARIOS</td>
 	</tr>

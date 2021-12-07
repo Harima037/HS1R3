@@ -1,4 +1,4 @@
-<table class="tabla" width="100%">
+<!--table class="tabla" width="100%">
 	<tr>
 		<td rowspan="5" class="imagen izquierda" width="150">
 			<img src="{{ public_path().'/img/LogoFederal.png' }}" width="150">
@@ -20,9 +20,9 @@
 	<tr>
 		<td height="18" class="titulo" align="center">PROGRAMACIÓN DE INDICADORES {{$data['ejercicio']}}</td>
 	</tr>
-</table>
-<br>
-<table class="tabla" width="100%">
+</table-->
+<!--table class="tabla" width="100%">
+	<thead>
 	<tr>
 		<td>Nombre del proyecto:</td>
 		<td height="10"><b>{{ $data['nombreTecnico'] }}</b></td>
@@ -30,30 +30,48 @@
 		<td><b>{{ $data['ClavePresupuestaria'] }}</b></td>
 		<td><b>Formato RC-1</b></td>
 	</tr>
-</table>
-<br>
+</thead>
+</table-->
 <table class="tabla" width="100%">
-	<tr>
-		<th class="encabezado-tabla" rowspan="2">NIVEL</th>
-		<th class="encabezado-tabla" rowspan="2">INDICADOR</th>
-		<th class="encabezado-tabla" rowspan="2">UNIDAD DE MEDIDA</th>
-		<th class="encabezado-tabla" rowspan="2">TOTAL PROGRAMADO</th>
-		<th class="encabezado-tabla" colspan="12">PROGRAMADO</th>
-	</tr>
-	<tr>
-		<th class="encabezado-tabla">ENERO</th>
-		<th class="encabezado-tabla">FEBRERO</th>
-		<th class="encabezado-tabla">MARZO</th>
-		<th class="encabezado-tabla">ABRIL</th>
-		<th class="encabezado-tabla">MAYO</th>
-		<th class="encabezado-tabla">JUNIO</th>
-		<th class="encabezado-tabla">JULIO</th>
-		<th class="encabezado-tabla">AGOSTO</th>
-		<th class="encabezado-tabla">SEPTIEMBRE</th>
-		<th class="encabezado-tabla">OCTUBRE</th>
-		<th class="encabezado-tabla">NOVIEMBRE</th>
-		<th class="encabezado-tabla">DICIEMBRE</th>
-	</tr>
+	<thead>
+		<tr>
+			<td height="18" colspan="16" class="titulo" align="center">PROGRAMACIÓN DE INDICADORES {{$data['ejercicio']}}</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td style="text-align:right;">Nombre del proyecto:</td>
+			<td colspan="5" height="10"><b>{{ $data['nombreTecnico'] }}</b></td>
+			<td style="text-align:right;" colspan="3">Clave presupuestaria:</td>
+			<td colspan="3"><b>{{ $data['ClavePresupuestaria'] }}</b></td>
+			<td colspan="2"></td>
+			<td><b>Formato RC-1</b></td>
+		</tr>
+		<tr>
+			<th colspan="16" height="5"></th>
+		</tr>
+		<tr>
+			<th class="encabezado-tabla" rowspan="2">NIVEL</th>
+			<th class="encabezado-tabla" rowspan="2">INDICADOR</th>
+			<th class="encabezado-tabla" rowspan="2">UNIDAD DE MEDIDA</th>
+			<th class="encabezado-tabla" rowspan="2">TOTAL PROGRAMADO</th>
+			<th class="encabezado-tabla" colspan="12">PROGRAMADO</th>
+		</tr>
+		<tr>
+			<th class="encabezado-tabla">ENERO</th>
+			<th class="encabezado-tabla">FEBRERO</th>
+			<th class="encabezado-tabla">MARZO</th>
+			<th class="encabezado-tabla">ABRIL</th>
+			<th class="encabezado-tabla">MAYO</th>
+			<th class="encabezado-tabla">JUNIO</th>
+			<th class="encabezado-tabla">JULIO</th>
+			<th class="encabezado-tabla">AGOSTO</th>
+			<th class="encabezado-tabla">SEPTIEMBRE</th>
+			<th class="encabezado-tabla">OCTUBRE</th>
+			<th class="encabezado-tabla">NOVIEMBRE</th>
+			<th class="encabezado-tabla">DICIEMBRE</th>
+		</tr>
+	</thead>
+<tbody>
 	@foreach( $data['componentesCompletoDescripcion'] as $index => $componente)
 	<tr style="background-color:#DDDDDD;">
 		<td class="dato-metas" >Componente {{$index+1}}</td>
@@ -133,6 +151,7 @@
 	<tr>
 		<td colspan="16"><b>FUENTE DE INFORMACIÓN:</b> {{$data['fuenteInformacion']}}</td>
 	</tr>
+</tbody>
 </table>
 <br>
 <table class="table" width="100%"  style="page-break-inside: avoid;">
