@@ -138,10 +138,11 @@
 </table>
 <table class="tabla" width="100%">
 	<tr>
-		<td colspan="15" align="center" class="encabezado">BENEFICIARIOS</td>
+		<td colspan="16" align="center" class="encabezado">BENEFICIARIOS</td>
 	</tr>
 	<tr>
-		<td rowspan="2" valign="middle" class="encabezado">DESCRIPCIÓN DE BENEFICIARIO</td>
+		<td rowspan="2" align="center" valign="middle" class="encabezado">DESCRIPCIÓN DE BENEFICIARIO</td>
+		<td rowspan="2" valign="middle" class="encabezado">TIPO DE CAPTURA</td>
 		<td rowspan="2" colspan="2" align="center" valign="middle" class="encabezado">TOTAL</td>
 		<td rowspan="2" class="encabezado" align="center" valign="middle">GENERO</td>
 		<td colspan="2" align="center" class="encabezado">ZONA</td>
@@ -155,16 +156,17 @@
 		<td align="center" class="encabezado">INDIGENA</td>
 		<td align="center" class="encabezado">INMIGRANTE</td>
 		<td align="center" class="encabezado">OTROS</td>
-		<td align="center" width="60" class="encabezado">MUY ALTA</td>
+		<td align="center" class="encabezado">MUY ALTA</td>
 		<td align="center" class="encabezado">ALTA</td>
-		<td align="center" width="60" class="encabezado">MEDIA</td>
-		<td align="center" width="60" class="encabezado">BAJA</td>
-		<td align="center" width="60" class="encabezado">MUY BAJA</td>
+		<td align="center" class="encabezado">MEDIA</td>
+		<td align="center" class="encabezado">BAJA</td>
+		<td align="center" class="encabezado">MUY BAJA</td>
 	</tr>
 
 	@foreach ($data['beneficiarios'] as $key => $beneficiario)
 	<tr>
 		<td class="dato" rowspan="2" valign="middle">{{ $beneficiario['tipo'] }}</td>
+		<td class="dato" rowspan="2" valign="middle">{{ $beneficiario['tipoCaptura'] }}</td>
 		<td class="dato" rowspan="2" valign="middle">{{ number_format($beneficiario['total']) }}</td>
 		@foreach ($beneficiario['desglose'] as $key => $desglose)
 			@if($key == 'm')
@@ -190,7 +192,7 @@
 		@endforeach
 	</tr>	
 	@endforeach
-	<tr><td height="15" colspan="15"></td></tr>
+	<tr><td height="15" colspan="16"></td></tr>
 </table>
 
 <div style="page-break-after:always;"></div>
@@ -280,14 +282,21 @@
 	</tr>
 	<tr>
 		<td class="encabezado">NUMERADOR:</td>
-		<td colspan="2" class="dato">{{ number_format($componente->valorNumerador) }}</td>
-		<td colspan="2" class="encabezado">DENOMINADOR:</td>
-		<td colspan="2" class="dato">{{ number_format($componente->valorDenominador) }}</td>
-		<td colspan="2" class="encabezado">LÍNEA BASE:</td>
-		<td colspan="2" class="dato">{{ number_format($componente->lineaBase) }}</td>
-		<td colspan="2" class="encabezado">AÑO LÍNEA BASE:</td>
-		<td colspan="2" class="dato">{{ $componente->anioBase }}</td>
+		<td colspan="3" class="encabezado">DENOMINADOR:</td>
+		<td colspan="3" class="encabezado">LÍNEA BASE:</td>
+		<td colspan="3" class="encabezado">AÑO LÍNEA BASE:</td>
+		<td colspan="2" class="encabezado">COMPORTAMIENTO:</td>
+		<td colspan="3" class="dato">{{ $componente->comportamientoDescripcion }}</td>
 	</tr>
+	<tr>
+		<td class="dato">{{ number_format($componente->valorNumerador) }}</td>
+		<td colspan="3" class="dato">{{ number_format($componente->valorDenominador) }}</td>
+		<td colspan="3" class="dato">{{ number_format($componente->lineaBase) }}</td>
+		<td colspan="3" class="dato">{{ $componente->anioBase }}</td>
+		<td colspan="2" class="encabezado">TIPO DE VALOR DE LA META:</td>
+		<td colspan="3" class="dato">{{ $componente->tipoValorMetaDescripcion }}</td>
+	</tr>
+
 </table>
 
 @if(count($componente->desglose_completo))
@@ -449,13 +458,19 @@
 	</tr>
 	<tr>
 		<td class="encabezado">NUMERADOR:</td>
-		<td colspan="2" class="dato">{{ number_format($actividad->valorNumerador) }}</td>
-		<td colspan="2" class="encabezado">DENOMINADOR:</td>
-		<td colspan="2" class="dato">{{ number_format($actividad->valorDenominador) }}</td>
-		<td colspan="2" class="encabezado">LÍNEA BASE:</td>
-		<td colspan="2" class="dato">{{ number_format($actividad->lineaBase) }}</td>
-		<td colspan="2" class="encabezado">AÑO LÍNEA BASE:</td>
-		<td colspan="2" class="dato">{{ $actividad->anioBase }}</td>
+		<td colspan="3" class="encabezado">DENOMINADOR:</td>
+		<td colspan="3" class="encabezado">LÍNEA BASE:</td>
+		<td colspan="3" class="encabezado">AÑO LÍNEA BASE:</td>
+		<td colspan="2" class="encabezado">COMPORTAMIENTO:</td>
+		<td colspan="3" class="dato">{{ $actividad->comportamientoDescripcion }}</td>
+	</tr>
+	<tr>
+		<td class="dato">{{ number_format($actividad->valorNumerador) }}</td>
+		<td colspan="3" class="dato">{{ number_format($actividad->valorDenominador) }}</td>
+		<td colspan="3" class="dato">{{ number_format($actividad->lineaBase) }}</td>
+		<td colspan="3" class="dato">{{ $actividad->anioBase }}</td>
+		<td colspan="2" class="encabezado">TIPO DE VALOR DE LA META:</td>
+		<td colspan="3" class="dato">{{ $actividad->tipoValorMetaDescripcion }}</td>
 	</tr>
 	<tr>
 		<td class="encabezado">INDICADOR DEL COMPONENTE</td>

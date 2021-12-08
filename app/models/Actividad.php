@@ -17,9 +17,11 @@ class Actividad extends BaseModel
 					->leftjoin('catalogoFrecuenciasIndicador AS frecuencia','frecuencia.id','=','componenteActividades.idFrecuenciaIndicador')
 					->leftjoin('catalogoTiposIndicadores AS tipoIndicador','tipoIndicador.id','=','componenteActividades.idTipoIndicador')
 					->leftjoin('catalogoUnidadesMedida AS unidadMedida','unidadMedida.id','=','componenteActividades.idUnidadMedida')
+					->leftjoin('catalogoComportamientosAccion AS comportamiento','comportamiento.id','=','componenteActividades.idComportamientoAccion')
+					->leftjoin('catalogoTiposValorMeta AS tipoValorMeta','tipoValorMeta.id','=','componenteActividades.idTipoValorMeta')
     				->select('componenteActividades.*','formula.descripcion AS formula','dimension.descripcion AS dimension',
     					'frecuencia.descripcion AS frecuencia','tipoIndicador.descripcion AS tipoIndicador',
-    					'unidadMedida.descripcion AS unidadMedida');
+    					'unidadMedida.descripcion AS unidadMedida','comportamiento.descripcion AS comportamientoDescripcion','tipoValorMeta.descripcion AS tipoValorMetaDescripcion');
 	}
 	
 	public function scopeMostrarDatos($query){

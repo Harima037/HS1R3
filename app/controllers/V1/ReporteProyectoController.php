@@ -127,6 +127,7 @@ class ReporteProyectoController extends BaseController {
 		 		if(!isset($beneficiarios[$beneficiario->idTipoBeneficiario])){
 					$beneficiarios[$beneficiario->idTipoBeneficiario] = array(
 							'tipo' => $beneficiario->tipoBeneficiario,
+							'tipoCaptura' => $beneficiario->tipoCaptura,
 							'total' => $beneficiario->total,
 							'desglose' => array('f'=>array(),'m'=>array())
 						);

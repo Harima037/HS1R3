@@ -21,10 +21,13 @@ class Componente extends BaseModel
 					->leftjoin('catalogoEntregables AS entregable','entregable.id','=','proyectoComponentes.idEntregable')
     				->leftjoin('catalogoEntregablesTipos AS entregableTipo','entregableTipo.id','=','proyectoComponentes.idEntregableTipo')
     				->leftjoin('catalogoEntregablesAcciones AS entregableAccion','entregableAccion.id','=','proyectoComponentes.idEntregableAccion')
+					->leftjoin('catalogoComportamientosAccion AS comportamiento','comportamiento.id','=','proyectoComponentes.idComportamientoAccion')
+					->leftjoin('catalogoTiposValorMeta AS tipoValorMeta','tipoValorMeta.id','=','proyectoComponentes.idTipoValorMeta')
     				->select('proyectoComponentes.*','formula.descripcion AS formula','dimension.descripcion AS dimension',
     					'frecuencia.descripcion AS frecuencia','tipoIndicador.descripcion AS tipoIndicador',
     					'unidadMedida.descripcion AS unidadMedida','entregable.descripcion AS entregable',
-    					'entregableTipo.descripcion AS entregableTipo','entregableAccion.descripcion AS entregableAccion');
+    					'entregableTipo.descripcion AS entregableTipo','entregableAccion.descripcion AS entregableAccion',
+						'comportamiento.descripcion AS comportamientoDescripcion','tipoValorMeta.descripcion AS tipoValorMetaDescripcion');
 	}
 
 	public function scopeMostrarDatos($query){
