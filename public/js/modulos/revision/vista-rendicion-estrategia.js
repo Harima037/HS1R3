@@ -47,7 +47,7 @@ if($('#id').val()){
     var parametros = {mostrar:'datos-programa-presupuestario'};
     moduloResource.get($('#id').val(),parametros,{
         _success: function (response){
-            $('#lbl-programa-presup').text(response.data.claveProgramaPresupuestario + ' ' + response.data.programaPresupuestario);
+            $('#lbl-descripcion').text(response.data.descripcionIndicador);
             $('#lbl-unidad-responsable').text(response.data.claveUnidadResponsable + ' ' + response.data.unidadResponsable);
         }
     });

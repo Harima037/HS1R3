@@ -83,7 +83,7 @@ class SeguimientoEstrategiaController extends BaseController {
 									DB::raw('count(estrategia.trim2) AS trim2'),
 									DB::raw('count(estrategia.trim3) AS trim3'),
 									DB::raw('count(estrategia.trim4) AS trim4'))
-									->join('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','estrategia.claveProgramaPresupuestario')
+									->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','estrategia.claveProgramaPresupuestario')
 									->orderBy('id', 'desc')
 									->groupBy('estrategia.id')
 									->skip(($parametros['pagina']-1)*10)->take(10)
@@ -126,7 +126,7 @@ class SeguimientoEstrategiaController extends BaseController {
 
 		if(isset($parametros['mostrar'])){
 			if($parametros['mostrar'] == 'datos-programa-presupuestario'){
-				$recurso = Estrategia::join('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','estrategia.claveProgramaPresupuestario')
+				$recurso = Estrategia::leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','estrategia.claveProgramaPresupuestario')
 					->join('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','estrategia.claveUnidadResponsable')
 					->select('estrategia.*','programaPresupuestario.descripcion AS programaPresupuestario','unidadResponsable.descripcion AS unidadResponsable')
 					->find($id);
@@ -143,7 +143,7 @@ class SeguimientoEstrategiaController extends BaseController {
 						$query->where('trimestre','=',$trimestre_actual);
 					}))
 					->join('catalogoTiposIndicadores AS TipoIndicador','TipoIndicador.id','=','estrategia.idTipoIndicador')
-					->join('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','estrategia.claveProgramaPresupuestario')
+					->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','estrategia.claveProgramaPresupuestario')
 					->join('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','estrategia.claveUnidadResponsable')
 					->select('estrategia.*','programaPresupuestario.descripcion AS programaPresupuestario','unidadResponsable.descripcion AS unidadResponsable', 'TipoIndicador.descripcion as TipoIndicadorMeta')
 					->find($id);

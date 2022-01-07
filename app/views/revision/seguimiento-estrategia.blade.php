@@ -35,7 +35,6 @@
                 <thead>
                     <tr height="50">
                         <th><input type="checkbox" class="check-select-all-rows"></th>
-                        <th>Programa Presupuestario</th>
                         <th>Descripción</th>
                         <th width="70">Trim 1</th>
                         <th width="70">Trim 2</th>
@@ -88,8 +87,8 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group">
-                                        <label class="control-label">Programa Presupuestario</label>
-                                        <p class="form-control-static" id="programa-presupuestario"></p>
+                                        <label class="control-label">Descripción</label>
+                                        <p class="form-control-static" id="lbl-descripcion"></p>
                                     </div>
                                 </div>
                                 <div class="col-sm-6">

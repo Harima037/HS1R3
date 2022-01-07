@@ -21,8 +21,8 @@
     <div class="row">
         <div class="col-sm-8">
             <div class="form-group">
-                <label class="control-label">Programa Presupuestario</label>
-                <p id="lbl-programa-presup" class="form-control-static"></p>
+                <label class="control-label">Descripción</label>
+                <p id="lbl-descripcion" class="form-control-static"></p>
             </div>
         </div>
         <div class="col-sm-4">

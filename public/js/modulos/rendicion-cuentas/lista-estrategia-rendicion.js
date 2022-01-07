@@ -35,7 +35,7 @@ moduloDatagrid.actualizar({
 
             var item = {
                 'id':       response.data[i].id,
-                'programa': response.data[i].clave + ' ' + response.data[i].programa,
+                //'programa': response.data[i].clave + ' ' + response.data[i].programa,
                 'descripcion': response.data[i].descripcion,
                 'trim_1':   '<div class="text-center" '+estilos[1]+'>'+((trimestre > 1)?label_miss:label_lock)+'</div>',
                 'trim_2':   '<div class="text-center" '+estilos[2]+'>'+((trimestre > 2)?label_miss:label_lock)+'</div>',
@@ -89,7 +89,7 @@ function cargar_datos_estrategia(e){
         _success: function(response){
             $('#modalDatosSeguimiento').find(".modal-title").html('Detalles del avance');
 
-            $('#programa-presupuestario').text(response.data.claveProgramaPresupuestario + ' ' +response.data.programaPresupuestario);
+            $('#lbl-descripcion').text(response.data.descripcionIndicador);
             $('#unidad-responsable').text(response.data.claveUnidadResponsable + ' ' + response.data.unidadResponsable);
             
             var datos_programa = {};
