@@ -39,8 +39,6 @@
                 <thead>
                     <tr height="50">
                         <th><input type="checkbox" class="check-select-all-rows"></th>
-                        <th width="50">Clave</th>
-                        <th>Programa Presupuestario</th>
                         <th>Descripción</th>
 						<th width="60">Trim 1</th>
 						<th width="60">Trim 2</th>
@@ -51,7 +49,7 @@
                 <tbody></tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="7" class="text-right">
+                        <td colspan="5" class="text-right">
                             <b>Estatus del Reporte: </b>
                             <span class="btn btn-primary btn-xs"><span class="fa fa-check"></span></span> Registrado 
                             <span class="btn btn-success btn-xs"><span class="fa fa-pencil"></span></span> Firmado

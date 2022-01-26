@@ -65,8 +65,7 @@ class ReporteSeguimientoEstrategiaController extends BaseController {
 			$total = $rows->count();
 			
 			
-			$rows = $rows->select('estrategia.id','programaPresupuestario.descripcion AS programaPresupuestario', 'estrategia.descripcionIndicador as descripcion', 'programaPresupuestario.clave')
-					->join('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','estrategia.claveProgramaPresupuestario')
+			$rows = $rows->select('estrategia.id','estrategia.descripcionIndicador as descripcion')
 					->orderBy('id', 'desc')
 					->groupBy('estrategia.id')
 					->skip(($parametros['pagina']-1)*10)->take(10)
