@@ -108,9 +108,9 @@ if($('#id').val()){
 				$('#tabla-indicadores-programa-presupuestario tbody').html(html_indicadores);
 			}
 			
-            $('#origen_asignacion').text(response.data.datos_origen_asignacion.clave );
-            $('#actividad_institucional').text(response.data.datos_actividad_institucional.clave );
-            $('#proyecto_estrategico').text(response.data.datos_proyecto_estrategico.clave);
+            $('#origen_asignacion').text((response.data.datos_origen_asignacion)?response.data.datos_origen_asignacion.clave:'--' );
+            $('#actividad_institucional').text((response.data.datos_actividad_institucional)?response.data.datos_actividad_institucional.clave:'--' );
+            $('#proyecto_estrategico').text((response.data.datos_proyecto_estrategico)?response.data.datos_proyecto_estrategico.clave:'--');
             $('#no_proyecto_estrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
 			//Termina Clave presupuestaria
 			//estrategia_estatal
@@ -118,14 +118,43 @@ if($('#id').val()){
 			$('#lbl-objetivoestrategico').text((response.data.objetivo_estrategico)?response.data.objetivo_estrategico.objetivoEstrategico:'Sin Datos');
 			$('#lbl-alineacion').text((response.data.estrategia_estatal)?response.data.estrategia_estatal.claveAlineacion:'Sin Datos');
 			$('#lbl-estrategiaestatal').text((response.data.estrategia_estatal)?response.data.estrategia_estatal.claveEstrategia+' '+response.data.estrategia_estatal.descripcion:'Sin Datos');
-            
-			$('#lbl-unidadresponsable').text(response.data.datos_unidad_responsable.clave+' - '+response.data.datos_unidad_responsable.descripcion);
-			$('#lbl-funciongasto').text(response.data.datos_sub_sub_funcion.clave+' - '+response.data.datos_sub_sub_funcion.descripcion);
-			$('#lbl-programasectorial').text(response.data.datos_programa_sectorial.clave+' - '+response.data.datos_programa_sectorial.descripcion);			
-			$('#lbl-programapresupuestario').text(response.data.datos_programa_presupuestario.clave+' - '+response.data.datos_programa_presupuestario.descripcion);
-			$('#lbl-origenasignacion').text(response.data.datos_origen_asignacion.clave+' - '+response.data.datos_origen_asignacion.descripcion);			
-			$('#lbl-actividadinstitucional').text(response.data.datos_actividad_institucional.clave+' - '+response.data.datos_actividad_institucional.descripcion);			
-			$('#lbl-proyectoestrategico').text(response.data.datos_proyecto_estrategico.clave+' - '+response.data.datos_proyecto_estrategico.descripcion);           
+			
+			var unidad_responsable_descripcion = '';
+            if(response.data.datos_unidad_responsable){
+                unidad_responsable_descripcion = response.data.datos_unidad_responsable.clave + ' - ' + response.data.datos_unidad_responsable.descripcion;
+            }
+            var sub_sub_funcion_descripcion = '';
+            if(response.data.datos_sub_sub_funcion){
+                sub_sub_funcion_descripcion = response.data.datos_sub_sub_funcion.clave + ' - ' + response.data.datos_sub_sub_funcion.descripcion;
+            }
+            var programa_sectorial_descripcion = '';
+            if(response.data.datos_programa_sectorial){
+                programa_sectorial_descripcion = response.data.datos_programa_sectorial.clave + ' - ' + response.data.datos_programa_sectorial.descripcion;
+            }
+            var programa_presupuestario_descripcion = '';
+            if(response.data.datos_programa_presupuestario){
+                programa_presupuestario_descripcion = response.data.datos_programa_presupuestario.clave + ' - ' + response.data.datos_programa_presupuestario.descripcion;
+            }
+            var origen_asignacion_descripcion = '';
+            if(response.data.datos_origen_asignacion){
+                origen_asignacion_descripcion = response.data.datos_origen_asignacion.clave + ' - ' + response.data.datos_origen_asignacion.descripcion;
+            }
+            var actividad_institucional_descripcion = '';
+            if(response.data.datos_actividad_institucional){
+                actividad_institucional_descripcion = response.data.datos_actividad_institucional.clave + ' - ' + response.data.datos_actividad_institucional.descripcion;
+            }
+            var proyecto_estrategico_descripcion = '';
+            if(response.data.datos_proyecto_estrategico){
+                proyecto_estrategico_descripcion = response.data.datos_proyecto_estrategico.clave + ' - ' + response.data.datos_proyecto_estrategico.descripcion;
+            }
+
+			$('#lbl-unidadresponsable').text(unidad_responsable_descripcion);
+			$('#lbl-funciongasto').text(sub_sub_funcion_descripcion);
+			$('#lbl-programasectorial').text(programa_sectorial_descripcion);			
+			$('#lbl-programapresupuestario').text(programa_presupuestario_descripcion);
+			$('#lbl-origenasignacion').text(origen_asignacion_descripcion);			
+			$('#lbl-actividadinstitucional').text(actividad_institucional_descripcion);			
+			$('#lbl-proyectoestrategico').text(proyecto_estrategico_descripcion);           
             $('#lbl-numeroproyectoestrategico').text(("000" + response.data.numeroProyectoEstrategico).slice(-3));
 			
             $('#lbl-cobertura').text(response.data.cobertura.descripcion);
