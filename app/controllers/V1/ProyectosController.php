@@ -1192,7 +1192,7 @@ class ProyectosController extends BaseController {
 				if($parametros['totalbeneficiariosm'] > 0){
 					$beneficiarioM = new Beneficiario;
 					$beneficiarioM->idTipoBeneficiario	= $parametros['tipobeneficiario'];
-					$beneficiarioF->idTipoCaptura		= $parametros['tipocaptura'];
+					$beneficiarioM->idTipoCaptura		= $parametros['tipocaptura'];
 					$beneficiarioM->total 				= $parametros['totalbeneficiariosm'];
 					$beneficiarioM->sexo 				= 'm';
 					$beneficiarioM->urbana 				= $parametros['urbanam'];
