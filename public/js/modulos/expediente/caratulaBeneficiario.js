@@ -43,28 +43,27 @@ context.init = function(id,resource){
 		$(this).change();
 	});
 	$('.benef-totales').on('change',function(){
-		sumar_valores('.benef-totales','#totalbeneficiarios');
+		/*sumar_valores('.benef-totales','#totalbeneficiarios');*/
 	});
-	$('.fem,.masc').on('keyup',function(){
-		$(this).change();
-	});
-	$('.fem').on('change',function(){
+	$('.benef-desglose').on('keyup',function(){ $(this).change() });
+	$('.benef-desglose').on('change',function(){
 		if($(this).hasClass('sub-total-zona')){
-			sumar_valores('.sub-total-zona.fem','#total-zona-f');
+			sumar_valores('.sub-total-zona','#total-zona');
 		}else if($(this).hasClass('sub-total-poblacion')){
-			sumar_valores('.sub-total-poblacion.fem','#total-poblacion-f');
+			sumar_valores('.sub-total-poblacion','#total-poblacion');
 		}else if($(this).hasClass('sub-total-marginacion')){
-			sumar_valores('.sub-total-marginacion.fem','#total-marginacion-f');
+			sumar_valores('.sub-total-marginacion','#total-marginacion');
 		}
 	});
-	$('.masc').on('change',function(){
-		if($(this).hasClass('sub-total-zona')){
-			sumar_valores('.sub-total-zona.masc','#total-zona-m');
-		}else if($(this).hasClass('sub-total-poblacion')){
-			sumar_valores('.sub-total-poblacion.masc','#total-poblacion-m');
-		}else if($(this).hasClass('sub-total-marginacion')){
-			sumar_valores('.sub-total-marginacion.masc','#total-marginacion-m');
+
+	$('#tipobeneficiariocabecera').on('change',function(){
+		var id = $(this).val();
+		if(id){
+			$('#tipobeneficiario option.option-default-label').text('Seleccione una opción');
+		}else{
+			$('#tipobeneficiario option.option-default-label').text('Seleccione primero un Tipo de Beneficiario');
 		}
+		habilita_opciones('#tipobeneficiario',$(this).val());
 	});
 
 	$("#datagridBeneficiarios .btn-delete-rows").unbind('click');
@@ -109,44 +108,39 @@ context.init = function(id,resource){
 context.mostrar_datos = function(datos){
 	$(modal_beneficiario).find('.modal-title').html('Editar Beneficiario');
 
-	if($('#datagridBeneficiarios tr[data-id="'+datos[0].idTipoBeneficiario+'"]').attr('data-comentario')){
-		var comentario = $('#datagridBeneficiarios tr[data-id="'+datos[0].idTipoBeneficiario+'"]').attr('data-comentario');
+	if($('#datagridBeneficiarios tr[data-id="'+datos.id+'"]').attr('data-comentario')){
+		var comentario = $('#datagridBeneficiarios tr[data-id="'+datos.id+'"]').attr('data-comentario');
 		MessageManager.show({data:comentario,container: modal_beneficiario + ' .modal-body',type:'ADV'});
 	}
 
-	$('#tipobeneficiario').val(datos[0].idTipoBeneficiario);
+	if(datos.tipo_beneficiario){
+		$('#tipobeneficiariocabecera').val(datos.tipo_beneficiario.clave_grupo);
+		$('#tipobeneficiariocabecera').trigger('chosen:updated');
+		$('#tipobeneficiariocabecera').change();
+	}
+
+	$('#tipobeneficiario').val(datos.idTipoBeneficiario);
     $('#tipobeneficiario').trigger('chosen:updated');
 
-	$('#tipocaptura').val(datos[0].idTipoCaptura);
+	$('#tipocaptura').val(datos.idTipoCaptura);
     $('#tipocaptura').trigger('chosen:updated');
 
-    $('#id-beneficiario').val(datos[0].idTipoBeneficiario);
-
-    var sexo;
-    var total = 0;
-
-    var beneficiarios = {'f':{},'m':{}};
-
-    for(var i in datos){
-    	beneficiarios[datos[i].sexo] = datos[i];
-    }
+    $('#id-beneficiario').val(datos.id);
     
-    for(var sexo in beneficiarios ){
-        total += parseInt(beneficiarios[sexo].total) || 0;
-        $('#totalbeneficiarios'+sexo).val(beneficiarios[sexo].total || 0);
-        $('#urbana'+sexo).val(beneficiarios[sexo].urbana || 0);
-        $('#rural'+sexo).val(beneficiarios[sexo].rural || 0);
-        $('#mestiza'+sexo).val(beneficiarios[sexo].mestiza || 0);
-        $('#indigena'+sexo).val(beneficiarios[sexo].indigena || 0);
-        $('#muyalta'+sexo).val(beneficiarios[sexo].muyAlta || 0);
-        $('#alta'+sexo).val(beneficiarios[sexo].alta || 0);
-        $('#media'+sexo).val(beneficiarios[sexo].media || 0);
-        $('#baja'+sexo).val(beneficiarios[sexo].baja || 0);
-        $('#muybaja'+sexo).val(beneficiarios[sexo].muyBaja || 0);
-    }
-    $('#totalbeneficiarios').text(total.format());
-    $('.fem,.masc').change();
-
+	$('#totalbeneficiarios').val(datos.total || 0);
+	$('#urbana').val(datos.urbana || 0);
+	$('#rural').val(datos.rural || 0);
+	$('#mestiza').val(datos.mestiza || 0);
+	$('#indigena').val(datos.indigena || 0);
+	$('#muyalta').val(datos.muyAlta || 0);
+	$('#alta').val(datos.alta || 0);
+	$('#media').val(datos.media || 0);
+	$('#baja').val(datos.baja || 0);
+	$('#muybaja').val(datos.muyBaja || 0);
+    
+	$('#urbana').change();
+	$('#mestiza').change();
+	$('#muyalta').change();
 	$(modal_beneficiario).modal('show');
 }
 
@@ -156,43 +150,24 @@ context.llenar_datagrid = function(datos){
 
 context.checar_errores = function(){
 	var errores = false;
-	if(parseInt($('#totalbeneficiariosf').val()).format() != $('#total-zona-f').text()){
-		Validation.printFieldsErrors('total-zona-f','Los subtotales de Zona no concuerdan.');
+	if(parseInt($('#totalbeneficiarios').val()).format() != $('#total-zona').text()){
+		Validation.printFieldsErrors('total-zona','Los subtotales de Zona no concuerdan.');
 		errores = true;
 	}else{
-		Validation.cleanFieldErrors('total-zona-f');
+		Validation.cleanFieldErrors('total-zona');
 	}
-	if(parseInt($('#totalbeneficiariosm').val()).format() != $('#total-zona-m').text()){
-		Validation.printFieldsErrors('total-zona-m','Los subtotales de Zona no concuerdan.');
+	if(parseInt($('#totalbeneficiarios').val()).format() != $('#total-poblacion').text()){
+		Validation.printFieldsErrors('total-poblacion','Los subtotales de Población no concuerdan.');
 		errores = true;
 	}else{
-		Validation.cleanFieldErrors('total-zona-m');
+		Validation.cleanFieldErrors('total-poblacion');
 	}
-	if(parseInt($('#totalbeneficiariosf').val()).format() != $('#total-poblacion-f').text()){
-		Validation.printFieldsErrors('total-poblacion-f','Los subtotales de Población no concuerdan.');
+	if(parseInt($('#totalbeneficiarios').val()).format() != $('#total-marginacion').text()){
+		Validation.printFieldsErrors('total-marginacion','Los subtotales de Marginación no concuerdan.');
 		errores = true;
 	}else{
-		Validation.cleanFieldErrors('total-poblacion-f');
+		Validation.cleanFieldErrors('total-marginacion');
 	}
-	if(parseInt($('#totalbeneficiariosm').val()).format() != $('#total-poblacion-m').text()){
-		Validation.printFieldsErrors('total-poblacion-m','Los subtotales de Población no concuerdan.');
-		errores = true;
-	}else{
-		Validation.cleanFieldErrors('total-poblacion-m');
-	}
-	if(parseInt($('#totalbeneficiariosf').val()).format() != $('#total-marginacion-f').text()){
-		Validation.printFieldsErrors('total-marginacion-f','Los subtotales de Marginación no concuerdan.');
-		errores = true;
-	}else{
-		Validation.cleanFieldErrors('total-marginacion-f');
-	}
-	if(parseInt($('#totalbeneficiariosm').val()).format() != $('#total-marginacion-m').text()){
-		Validation.printFieldsErrors('total-marginacion-m','Los subtotales de Marginación no concuerdan.');
-		errores = true;
-	}else{
-		Validation.cleanFieldErrors('total-marginacion-m');
-	}
-
 	return errores;
 }
 
@@ -201,43 +176,22 @@ context.checar_errores = function(){
 ************************************************************************************************/
 function llenar_datagrid_beneficiarios(datos){
 	$('#datagridBeneficiarios > table > tbody').empty();
-	
+
 	var beneficiarios_grid = [];
-	var beneficiarios = [];
 	var beneficiario;
 	for(var indx in datos){
-		if(beneficiarios[datos[indx].idTipoBeneficiario]){
-			beneficiario = beneficiarios[datos[indx].idTipoBeneficiario];
-		}else{
-			beneficiario = {};
-			beneficiario.id = datos[indx].idTipoBeneficiario;
-			beneficiario.tipoBeneficiario = datos[indx].tipo_beneficiario.descripcion;
-			beneficiario.totalF = 0;
-			beneficiario.totalM = 0;
-			beneficiario.total = 0;
-		}
+		beneficiario = {};
 
-		if(datos[indx].sexo == 'f'){
-			beneficiario.totalF = parseInt(datos[indx].total) || 0;
-			beneficiario.total += parseInt(datos[indx].total) || 0;
-		}else{
-			beneficiario.totalM = parseInt(datos[indx].total) || 0;
-			beneficiario.total += parseInt(datos[indx].total) || 0;
-		}
-		
-		//beneficiarios.push(beneficiario);
-		beneficiarios[datos[indx].idTipoBeneficiario] = beneficiario;
-	}
-	
-	for(var i in beneficiarios){
-		beneficiarios[i].totalM = beneficiarios[i].totalM.format();
-		beneficiarios[i].totalF = beneficiarios[i].totalF.format();
-		beneficiarios[i].total = beneficiarios[i].total.format();
-		beneficiarios_grid.push(beneficiarios[i]);
+		beneficiario.id = datos[indx].id;
+		beneficiario.tipo_captura = (datos[indx].tipo_captura)?datos[indx].tipo_captura.descripcion:'--';
+		beneficiario.clave = (datos[indx].tipo_beneficiario)?datos[indx].tipo_beneficiario.clave:'--';
+		beneficiario.grupo = (datos[indx].tipo_beneficiario)?datos[indx].tipo_beneficiario.grupo:'---';
+		beneficiario.tipoBeneficiario = (datos[indx].tipo_beneficiario)?datos[indx].tipo_beneficiario.descripcion:'No Encontrado';
+		beneficiario.total = (parseInt(datos[indx].total) || 0).format();
+		beneficiarios_grid.push(beneficiario);
 	}
 	
 	$('#tab-link-caratula-beneficiarios > span.badge').text(beneficiarios_grid.length);
-
 
 	if(beneficiarios_grid.length == 0){
 		$('#datagridBeneficiarios > table > tbody').html('<tr><td colspan="5" style="text-align:left"><i class="fa fa-info-circle"></i> No se encontraron datos guardados</td></tr>');
@@ -258,6 +212,24 @@ function sumar_valores(identificador,resultado){
 	}
 }
 
+function habilita_opciones(selector,habilitar_id,default_id){
+	var suma = $(selector + ' option[data-habilita-id="' + habilitar_id + '"]').length;
+
+	$(selector + ' option[data-habilita-id]').attr('disabled',true).addClass('hidden');
+
+	$(selector + ' option[data-habilita-id="' + habilitar_id + '"]').attr('disabled',false).removeClass('hidden');
+	if(suma == 0 && default_id){
+		$(selector + ' option[data-habilita-id="' + default_id + '"]').attr('disabled',false).removeClass('hidden');
+	}
+
+	$(selector).val('');
+	$(selector).change();
+
+	if($(selector).hasClass('chosen-one')){
+		$(selector).trigger("chosen:updated");
+	}
+}
+
 function reset_modal_form(){
     $(form_beneficiario).get(0).reset();
     Validation.cleanFormErrors(form_beneficiario);
@@ -265,6 +237,7 @@ function reset_modal_form(){
 	$('#id-beneficiario').val('');
 	$(modal_beneficiario + ' .chosen-one').trigger('chosen:updated');
 	$(form_beneficiario + ' span.form-control').text('');
+	$('#tipobeneficiariocabecera').change();
 }
 
 /**

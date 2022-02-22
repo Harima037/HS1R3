@@ -40,7 +40,7 @@ context.mostrar_datos = function(datos){
                 ("000" + datos.numeroProyectoEstrategico).slice(-3);
 
     var unidad_responsable_descripcion = '';
-    if(response.data.datos_unidad_responsable){
+    if(datos.datos_unidad_responsable){
         unidad_responsable_descripcion = datos.datos_unidad_responsable.clave + ' - ' + datos.datos_unidad_responsable.descripcion;
     }
     var finalidad_descripcion = '';
@@ -174,63 +174,47 @@ context.mostrar_datos = function(datos){
 ************************************************************************************************/
 function llenar_tabla_beneficiarios(datos){
     $('#tabla_beneficiarios tbody').empty();
-    var beneficiarios = {};
-    for(var i in datos){
-        if(!beneficiarios[datos[i].idTipoBeneficiario]){
-            beneficiarios[datos[i].idTipoBeneficiario] = {
-                id: datos[i].idTipoBeneficiario,
-                tipo: datos[i].tipo_beneficiario.descripcion,
-                total: 0,
-                desglose: {'f':{},'m':{}}
-            };
+    var beneficiarios = [];
+    for(var i in datos){ 
+        var label_descripcion = '';
+        if(datos[i].tipo_captura){
+            label_descripcion = datos[i].tipo_beneficiario.grupo + ' - ' + datos[i].tipo_beneficiario.descripcion + ' [ '+datos[i].tipo_captura.descripcion+' ] ';
+        }else{
+            label_descripcion = datos[i].tipo_beneficiario.grupo + ' - ' + datos[i].tipo_beneficiario.descripcion + ' [ No Capturado ] ';
+        }
 
-            if(datos[i].tipo_captura){
-                beneficiarios[datos[i].idTipoBeneficiario].tipo = datos[i].tipo_beneficiario.descripcion + ' [ '+datos[i].tipo_captura.descripcion+' ] ';
-            }
-        }
-        beneficiarios[datos[i].idTipoBeneficiario].total += (parseInt(datos[i].total) || 0);
-        beneficiarios[datos[i].idTipoBeneficiario].desglose[datos[i].sexo] = {
-            sexo: datos[i].sexo,
+        beneficiarios.push({
+            id: datos[i].idTipoBeneficiario,
+            tipo: label_descripcion,
             total: (parseInt(datos[i].total) || 0),
-            urbana: (parseInt(datos[i].urbana) || 0),
-            rural: (parseInt(datos[i].rural) || 0),
-            mestiza: (parseInt(datos[i].mestiza) || 0),
-            indigena: (parseInt(datos[i].indigena) || 0),
-            muyAlta: (parseInt(datos[i].muyAlta) || 0),
-            alta: (parseInt(datos[i].alta) || 0),
-            media: (parseInt(datos[i].media) || 0),
-            baja: (parseInt(datos[i].baja) || 0),
-            muyBaja: (parseInt(datos[i].muyBaja) || 0)
-        }
+            desglose: {
+                total: (parseInt(datos[i].total) || 0),
+                urbana: (parseInt(datos[i].urbana) || 0),
+                rural: (parseInt(datos[i].rural) || 0),
+                mestiza: (parseInt(datos[i].mestiza) || 0),
+                indigena: (parseInt(datos[i].indigena) || 0),
+                muyAlta: (parseInt(datos[i].muyAlta) || 0),
+                alta: (parseInt(datos[i].alta) || 0),
+                media: (parseInt(datos[i].media) || 0),
+                baja: (parseInt(datos[i].baja) || 0),
+                muyBaja: (parseInt(datos[i].muyBaja) || 0)
+            }
+        });
     }
     var rows = '';
     for(var i in beneficiarios){
-        rows += '<tr class="bg-primary"><th colspan="10">' + beneficiarios[i].tipo + '</th><th>' + beneficiarios[i].total.format() + '</th></tr>'
+        rows += '<tr class="bg-primary"><th colspan="9">' + beneficiarios[i].tipo + '</th><th>' + beneficiarios[i].total.format() + '</th></tr>'
         rows += '<tr>';
-        rows += '<th><span class="fa fa-female"></span></th>';
-        rows += '<td>' + ( beneficiarios[i].desglose['f'].urbana || 0 ).format() + '</td>';
-        rows += '<td>' + ( beneficiarios[i].desglose['f'].rural || 0 ).format() + '</td>';
-        rows += '<td class="bg-info">' + ( beneficiarios[i].desglose['f'].mestiza || 0 ).format() + '</td>';
-        rows += '<td class="bg-info">' + ( beneficiarios[i].desglose['f'].indigena || 0 ).format() + '</td>';
-        rows += '<td class="bg-success">' + ( beneficiarios[i].desglose['f'].muyAlta || 0 ).format() + '</td>';
-        rows += '<td class="bg-success">' + ( beneficiarios[i].desglose['f'].alta || 0 ).format() + '</td>';
-        rows += '<td class="bg-success">' + ( beneficiarios[i].desglose['f'].media || 0 ).format() + '</td>';
-        rows += '<td class="bg-success">' + ( beneficiarios[i].desglose['f'].baja || 0 ).format() + '</td>';
-        rows += '<td class="bg-success">' + ( beneficiarios[i].desglose['f'].muyBaja || 0 ).format() + '</td>';
-        rows += '<td>' + ( beneficiarios[i].desglose['f'].total || 0 ).format() + '</td>';
-        rows += '</tr>';
-        rows += '<tr>';
-        rows += '<th><span class="fa fa-male"></span></th>';
-        rows += '<td>' + ( beneficiarios[i].desglose['m'].urbana || 0 ).format() + '</td>';
-        rows += '<td>' + ( beneficiarios[i].desglose['m'].rural || 0 ).format() + '</td>';
-        rows += '<td class="bg-info">' + ( beneficiarios[i].desglose['m'].mestiza || 0 ).format() + '</td>';
-        rows += '<td class="bg-info">' + ( beneficiarios[i].desglose['m'].indigena || 0 ).format() + '</td>';
-        rows += '<td class="bg-success">' + ( beneficiarios[i].desglose['m'].muyAlta || 0 ).format() + '</td>';
-        rows += '<td class="bg-success">' + ( beneficiarios[i].desglose['m'].alta || 0 ).format() + '</td>';
-        rows += '<td class="bg-success">' + ( beneficiarios[i].desglose['m'].media || 0 ).format() + '</td>';
-        rows += '<td class="bg-success">' + ( beneficiarios[i].desglose['m'].baja || 0 ).format() + '</td>';
-        rows += '<td class="bg-success">' + ( beneficiarios[i].desglose['m'].muyBaja || 0 ).format() + '</td>';
-        rows += '<td>' + ( beneficiarios[i].desglose['m'].total || 0 ).format() + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose.urbana.format() || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose.rural.format() || 0 ) + '</td>';
+        rows += '<td class="bg-info">' + ( beneficiarios[i].desglose.mestiza.format() || 0 ) + '</td>';
+        rows += '<td class="bg-info">' + ( beneficiarios[i].desglose.indigena.format() || 0 ) + '</td>';
+        rows += '<td class="bg-success">' + ( beneficiarios[i].desglose.muyAlta.format() || 0 ) + '</td>';
+        rows += '<td class="bg-success">' + ( beneficiarios[i].desglose.alta.format() || 0 ) + '</td>';
+        rows += '<td class="bg-success">' + ( beneficiarios[i].desglose.media.format() || 0 ) + '</td>';
+        rows += '<td class="bg-success">' + ( beneficiarios[i].desglose.baja.format() || 0 ) + '</td>';
+        rows += '<td class="bg-success">' + ( beneficiarios[i].desglose.muyBaja.format() || 0 ) + '</td>';
+        rows += '<td>' + ( beneficiarios[i].desglose.total.format() || 0 ) + '</td>';
         rows += '</tr>';
     }
     $('#tabla_beneficiarios tbody').html(rows);

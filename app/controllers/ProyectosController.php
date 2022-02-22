@@ -175,6 +175,7 @@ class ProyectosController extends \BaseController {
 		}
 
 		$datos_beneficiarios = array(
+			'tipos_beneficiarios_cabecera' => TipoBeneficiario::select('clave_grupo as clave','grupo as descripcion')->groupBy('grupo')->get(),
 			'tipos_beneficiarios' => TipoBeneficiario::all(),
 			'tipos_captura' => TipoCaptura::all(),
 			'archivos' => ControlArchivos::where('claveGrupo','EST-POB')->get()

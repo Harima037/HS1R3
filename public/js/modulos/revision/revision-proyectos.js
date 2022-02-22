@@ -178,12 +178,59 @@ function editar (e){
             $('#lbl_jefe_ṕlaneacion').text((response.data.jefe_planeacion)?response.data.jefe_planeacion.nombre:'No asignado');
             $('#lbl_coordinador_grupo').text((response.data.coordinador_grupo_estrategico)?response.data.coordinador_grupo_estrategico.nombre:'No asignado');
 			
+            $('#tabla_beneficiarios tbody').empty();
+            var beneficiarios = [];
+            for(var i in response.data.beneficiarios){ 
+                var dato = response.data.beneficiarios[i];
+                var label_descripcion = '';
+                if(dato.tipo_captura){
+                    label_descripcion = dato.tipo_beneficiario.grupo + ' - ' + dato.tipo_beneficiario.descripcion + ' [ '+dato.tipo_captura.descripcion+' ] ';
+                }else{
+                    label_descripcion = dato.tipo_beneficiario.grupo + ' - ' + dato.tipo_beneficiario.descripcion + ' [ No Capturado ] ';
+                }
+
+                beneficiarios.push({
+                    id: dato.idTipoBeneficiario,
+                    tipo: label_descripcion,
+                    total: (parseInt(dato.total) || 0),
+                    desglose: {
+                        total: (parseInt(dato.total) || 0),
+                        urbana: (parseInt(dato.urbana) || 0),
+                        rural: (parseInt(dato.rural) || 0),
+                        mestiza: (parseInt(dato.mestiza) || 0),
+                        indigena: (parseInt(dato.indigena) || 0),
+                        muyAlta: (parseInt(dato.muyAlta) || 0),
+                        alta: (parseInt(dato.alta) || 0),
+                        media: (parseInt(dato.media) || 0),
+                        baja: (parseInt(dato.baja) || 0),
+                        muyBaja: (parseInt(dato.muyBaja) || 0)
+                    }
+                });
+            }
+            var rows = '';
+            for(var i in beneficiarios){
+                rows += '<tr class="bg-primary"><th colspan="9">' + beneficiarios[i].tipo + '</th><th>' + beneficiarios[i].total.format() + '</th></tr>'
+                rows += '<tr>';
+                rows += '<td>' + ( beneficiarios[i].desglose.urbana.format() || 0 ) + '</td>';
+                rows += '<td>' + ( beneficiarios[i].desglose.rural.format() || 0 ) + '</td>';
+                rows += '<td class="bg-info">' + ( beneficiarios[i].desglose.mestiza.format() || 0 ) + '</td>';
+                rows += '<td class="bg-info">' + ( beneficiarios[i].desglose.indigena.format() || 0 ) + '</td>';
+                rows += '<td class="bg-success">' + ( beneficiarios[i].desglose.muyAlta.format() || 0 ) + '</td>';
+                rows += '<td class="bg-success">' + ( beneficiarios[i].desglose.alta.format() || 0 ) + '</td>';
+                rows += '<td class="bg-success">' + ( beneficiarios[i].desglose.media.format() || 0 ) + '</td>';
+                rows += '<td class="bg-success">' + ( beneficiarios[i].desglose.baja.format() || 0 ) + '</td>';
+                rows += '<td class="bg-success">' + ( beneficiarios[i].desglose.muyBaja.format() || 0 ) + '</td>';
+                rows += '<td>' + ( beneficiarios[i].desglose.total.format() || 0 ) + '</td>';
+                rows += '</tr>';
+            }
+            $('#tabla_beneficiarios tbody').html(rows);
+            /*
 			var cuantasFilasBeneficiarios = response.data.beneficiarios.length;			
 			var cadenaHTML = '<table width=100% class="table table-bordered table-condensed"><tr>';
 			var encabezado = 0;
 			var sePusoTotales = 0;
 			var banderaCelda = 0;
-			
+			//
 			for(var cuentabeneficia in response.data.beneficiarios)
 			{
 				if(encabezado==0)
@@ -254,7 +301,7 @@ function editar (e){
 				cadenaHTML = cadenaHTML + '</tr>';
 			}
 			cadenaHTML = cadenaHTML + '</table>';		
-			$('#datos-beneficiarios').html(cadenaHTML);
+			$('#datos-beneficiarios').html(cadenaHTML);*/
 			
             $('#id').val(response.data.id);
 

@@ -12,7 +12,14 @@ class DesgloseBeneficiario extends BaseModel
 	}
 
 	public function scopeConDescripcion($query){
-		return $query->select('desgloseBeneficiarios.*','tipoBeneficiario.descripcion AS tipoBeneficiario')
-				->join('catalogoTiposBeneficiarios AS tipoBeneficiario','tipoBeneficiario.id','=','desgloseBeneficiarios.idTipoBeneficiario');
+		return $query->select('desgloseBeneficiarios.*','tipoBeneficiario.descripcion AS tipoBeneficiario','tipoBeneficiario.grupo as grupo','tipoCaptura.descripcion AS tipoCaptura')
+				->leftJoin('catalogoTiposBeneficiarios AS tipoBeneficiario','tipoBeneficiario.id','=','desgloseBeneficiarios.idTipoBeneficiario')
+				->leftJoin('proyectoComponentes AS componentes','componentes.id','=','desgloseBeneficiarios.idComponente')
+				->leftJoin('proyectoBeneficiarios AS beneficiarios',function($join){
+																		$join->on('beneficiarios.idProyecto','=','componentes.idProyecto')
+																			->on('beneficiarios.idTipoBeneficiario','=','desgloseBeneficiarios.idTipoBeneficiario')
+																			->whereNull('beneficiarios.borradoAl');
+																	})
+				->leftJoin('catalogoTiposCaptura AS tipoCaptura','tipoCaptura.id','=','beneficiarios.idTipoCaptura');
 	}
 }

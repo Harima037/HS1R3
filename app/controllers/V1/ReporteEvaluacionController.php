@@ -391,7 +391,9 @@ class ReporteEvaluacionController extends BaseController {
 				if(!isset($data['beneficiarios'][$beneficiario['idTipoBeneficiario']])){
 					$data['beneficiarios'][$beneficiario['idTipoBeneficiario']] = array(
 						'id' => $beneficiario['idTipoBeneficiario'],
-						'tipoBeneficiario' => $beneficiario['tipo_beneficiario']['descripcion']
+						'grupo' => $beneficiario['tipo_beneficiario']['grupo'],
+						'tipoBeneficiario' => $beneficiario['tipo_beneficiario']['descripcion'],
+						'sexo' => $beneficiario['sexo'],
 					);
 				}
 

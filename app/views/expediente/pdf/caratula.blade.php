@@ -141,9 +141,10 @@
 		<td colspan="16" align="center" class="encabezado">BENEFICIARIOS</td>
 	</tr>
 	<tr>
+	<td rowspan="2" align="center" valign="middle" class="encabezado">GRUPO</td>
 		<td rowspan="2" align="center" valign="middle" class="encabezado">DESCRIPCIÓN DE BENEFICIARIO</td>
 		<td rowspan="2" valign="middle" class="encabezado">TIPO DE CAPTURA</td>
-		<td rowspan="2" colspan="2" align="center" valign="middle" class="encabezado">TOTAL</td>
+		<td rowspan="2" align="center" valign="middle" class="encabezado">TOTAL</td>
 		<td rowspan="2" class="encabezado" align="center" valign="middle">GENERO</td>
 		<td colspan="2" align="center" class="encabezado">ZONA</td>
 		<td colspan="4" align="center" class="encabezado">POBLACIÓN</td>
@@ -165,31 +166,29 @@
 
 	@foreach ($data['beneficiarios'] as $key => $beneficiario)
 	<tr>
-		<td class="dato" rowspan="2" valign="middle">{{ $beneficiario['tipo'] }}</td>
-		<td class="dato" rowspan="2" valign="middle">{{ $beneficiario['tipoCaptura'] }}</td>
-		<td class="dato" rowspan="2" valign="middle">{{ number_format($beneficiario['total']) }}</td>
-		@foreach ($beneficiario['desglose'] as $key => $desglose)
-			@if($key == 'm')
-				</tr><tr>
-			@endif
-				<td class="dato">{{ (isset($desglose['total']))? number_format($desglose['total']) : 0 }}</td>
-			@if($key == 'f')
-				<td class="dato">FEMENINO</td>
+		<td class="dato" valign="middle">{{ $beneficiario['grupo'] }}</td>
+		<td class="dato" valign="middle">{{ $beneficiario['tipo'] }}</td>
+		<td class="dato" valign="middle">{{ $beneficiario['tipoCaptura'] }}</td>
+		<td class="dato" valign="middle">{{ number_format($beneficiario['total']) }}</td>
+		<td class="dato">
+			@if($beneficiario['sexo'] == 'f')
+				FEMENINO
 			@else
-				<td class="dato">MASCULINO</td>
+				MASCULINO
 			@endif
-			<td class="dato">{{ (isset($desglose['urbana']))? number_format($desglose['urbana']) : 0 }}</td>
-			<td class="dato">{{ (isset($desglose['rural']))? number_format($desglose['rural']) : 0 }}</td>
-			<td class="dato">{{ (isset($desglose['mestiza']))? number_format($desglose['mestiza']) : 0 }}</td>
-			<td class="dato">{{ (isset($desglose['indigena']))? number_format($desglose['indigena']) : 0 }}</td>
-			<td class="dato">{{ (isset($desglose['inmigrante']))? number_format($desglose['inmigrante']) : 0 }}</td>
-			<td class="dato">{{ (isset($desglose['otros']))? number_format($desglose['otros']) : 0 }}</td>
-			<td class="dato">{{ (isset($desglose['muyAlta']))? number_format($desglose['muyAlta']) : 0 }}</td>
-			<td class="dato">{{ (isset($desglose['alta']))? number_format($desglose['alta']) : 0 }}</td>
-			<td class="dato">{{ (isset($desglose['media']))? number_format($desglose['media']) : 0 }}</td>
-			<td class="dato">{{ (isset($desglose['baja']))? number_format($desglose['baja']) : 0 }}</td>
-			<td class="dato">{{ (isset($desglose['muyBaja']))? number_format($desglose['muyBaja']) : 0 }}</td>
-		@endforeach
+		</td>
+		<td class="dato">{{ (isset($beneficiario['urbana']))? number_format($beneficiario['urbana']) : 0 }}</td>
+		<td class="dato">{{ (isset($beneficiario['rural']))? number_format($beneficiario['rural']) : 0 }}</td>
+		<td class="dato">{{ (isset($beneficiario['mestiza']))? number_format($beneficiario['mestiza']) : 0 }}</td>
+		<td class="dato">{{ (isset($beneficiario['indigena']))? number_format($beneficiario['indigena']) : 0 }}</td>
+		<td class="dato">{{ (isset($beneficiario['inmigrante']))? number_format($beneficiario['inmigrante']) : 0 }}</td>
+		<td class="dato">{{ (isset($beneficiario['otros']))? number_format($beneficiario['otros']) : 0 }}</td>
+		<td class="dato">{{ (isset($beneficiario['muyAlta']))? number_format($beneficiario['muyAlta']) : 0 }}</td>
+		<td class="dato">{{ (isset($beneficiario['alta']))? number_format($beneficiario['alta']) : 0 }}</td>
+		<td class="dato">{{ (isset($beneficiario['media']))? number_format($beneficiario['media']) : 0 }}</td>
+		<td class="dato">{{ (isset($beneficiario['baja']))? number_format($beneficiario['baja']) : 0 }}</td>
+		<td class="dato">{{ (isset($beneficiario['muyBaja']))? number_format($beneficiario['muyBaja']) : 0 }}</td>
+		
 	</tr>	
 	@endforeach
 	<tr><td height="15" colspan="16"></td></tr>

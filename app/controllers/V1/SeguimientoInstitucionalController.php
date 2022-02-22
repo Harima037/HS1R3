@@ -51,7 +51,7 @@ class SeguimientoInstitucionalController extends BaseController {
 					$rows = Beneficiario::with(array('comentarios','registroAvance'=>function($query){
 						$query->select('id','idProyectoBeneficiario','idTipoBeneficiario','sexo',DB::raw('sum(total) AS total'))
 								->groupBy('idTipoBeneficiario','sexo');
-					},'tipoBeneficiario'))->where('idProyecto','=',$parametros['idProyecto'])->get();
+					},'tipoBeneficiario','tipoCaptura'))->where('idProyecto','=',$parametros['idProyecto'])->get();
 					$total = count($rows);
 				}
 			}else{

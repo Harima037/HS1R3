@@ -3,18 +3,41 @@
 	<div class="row">
 		<div class="col-sm-4">
 			<div class="form-group">
-	            <label class="control-label" for="tipobeneficiario">Tipo de Beneficiario</label>
-	            {{Form::select('tipobeneficiario',array('' =>'Selecciona uno') + $tipos_beneficiarios->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'tipobeneficiario'))}}
+	            <label class="control-label" for="tipobeneficiariocabecera">Tipo de Beneficiario</label>
+	            {{Form::select('tipobeneficiariocabecera',array('' =>'Seleccione uno') + $tipos_beneficiarios_cabecera->lists('descripcion','clave'),'',array('class'=>'form-control chosen-one','id'=>'tipobeneficiariocabecera'))}}
 	        </div>
 	    </div>
+		<div class="col-sm-8">
+			<div class="form-group">
+	            <label class="control-label" for="tipobeneficiario">Detalle Beneficiario</label>
+				<select class="form-control chosen-one" id="tipobeneficiario" name="tipobeneficiario">
+					<option value="" class="option-default-label">Seleccione primero un Tipo de Beneficiario</option>
+					@foreach ($tipos_beneficiarios as $detalle)
+                                <option value="{{$detalle->id}}" data-habilita-id="{{$detalle->clave_grupo}}" class="hidden" disabled>
+								{{$detalle->clave}} {{$detalle->descripcion}}
+                                </option>
+                    @endforeach
+				</select>
+	        </div>
+	    </div>
+    </div>
+    <div class="row">
 		<div class="col-sm-4">
 			<div class="form-group">
 	            <label class="control-label" for="tipocaptura">Tipo de Captura</label>
 	            {{Form::select('tipocaptura',array('' =>'Selecciona uno') + $tipos_captura->lists('descripcion','id'),'',array('class'=>'form-control chosen-one','id'=>'tipocaptura'))}}
 	        </div>
 	    </div>
-	    <div class="col-sm-4">
-	    	<div class="form-group">
+		<div class="col-sm-4">
+			<div class="form-group">
+                <label class="control-label" for="totalbeneficiarios">Total</label>
+                <div class="form-group">
+                    <input type="number" class="form-control benef-totales" name="totalbeneficiarios" id="totalbeneficiarios">
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+			<div class="form-group">
 	    		<label class="control-label">Estadisticas de Población</label><br>
 	        	<div class="btn-group">
 					<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -30,32 +53,6 @@
 					</ul>
 				</div>
 	    	</div>
-        </div>
-    </div>
-    <div class="row">
-	    <div class="col-sm-4">
-            <div class="form-group">
-                <label class="control-label" for="totalbeneficiariosf">Femenino</label>
-                <div class="input-group">
-                    <span class="input-group-addon"><span class="fa fa-female"></span></span>
-                    <input type="number" class="form-control benef-totales" name="totalbeneficiariosf" id="totalbeneficiariosf">
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-4">
-            <div class="form-group">
-                <label class="control-label" for="totalbeneficiariosm">Masculino</label>
-                <div class="input-group">
-                    <span class="input-group-addon"><span class="fa fa-male"></span></span>
-                    <input type="number" class="form-control benef-totales" name="totalbeneficiariosm" id="totalbeneficiariosm">
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-4">
-            <div class="form-group">
-                <label class="control-label"><span class="fa fa-link"></span> Total</label>
-                <span id="totalbeneficiarios" class="form-control"></span>
-            </div>
         </div>
 	    <div class="col-sm-12">
 	    	<div role="tabpanel">
@@ -77,7 +74,6 @@
 						<table class="table table-striped table-condensed">
 							<thead>
 								<tr>
-									<th></th>
 									<th>Urbana</th>
 									<th>Rural</th>
 									<th><span class="fa fa-link"></span> Total</th>
@@ -85,35 +81,18 @@
 							</thead>
 							<tbody>
 								<tr>
-									<td><span class="fa fa-female fa-2x"></span></td>
 									<td>
 										<div class="form-group">
-											<input type="number" class="form-control sub-total-zona fem" name="urbanaf" id="urbanaf">
+											<input type="number" class="form-control benef-desglose sub-total-zona" name="urbana" id="urbana">
 										</div>
 									</td>
 									<td>
 										<div class="form-group">
-											<input type="number" class="form-control sub-total-zona fem" name="ruralf" id="ruralf">
+											<input type="number" class="form-control benef-desglose sub-total-zona" name="rural" id="rural">
 										</div>
 									</td>
 									<td>
-										<div class="form-group"><span id="total-zona-f" class=""></span></div>
-									</td>
-								</tr>
-								<tr>
-									<td><span class="fa fa-male fa-2x"></span></td>
-									<td>
-										<div class="form-group">
-											<input type="number" class="form-control  sub-total-zona masc" name="urbanam" id="urbanam">
-										</div>
-									</td>
-									<td>
-										<div class="form-group">
-											<input type="number" class="form-control sub-total-zona masc" name="ruralm" id="ruralm">
-										</div>
-									</td>
-									<td>
-										<div class="form-group"><span id="total-zona-m" class=""></span></div>
+										<div class="form-group"><span id="total-zona" class=""></span></div>
 									</td>
 								</tr>
 							</tbody>
@@ -124,7 +103,6 @@
 						<table class="table table-striped table-condensed">
 							<thead>
 								<tr>
-									<th></th>
 									<th>Mestiza</th>
 									<th>Indigena</th>
 									<th><span class="fa fa-link"></span> Total</th>
@@ -132,41 +110,22 @@
 							</thead>
 							<tbody>
 								<tr>
-									<td><span class="fa fa-female fa-2x"></span></td>
 									<td>
 										<div class="form-group">
-											<input type="number" class="form-control sub-total-poblacion fem" name="mestizaf" id="mestizaf">
+											<input type="number" class="form-control benef-desglose sub-total-poblacion" name="mestiza" id="mestiza">
 										</div>
 									</td>
 									<td>
 										<div class="form-group">
-											<input type="number" class="form-control sub-total-poblacion fem" name="indigenaf" id="indigenaf">
+											<input type="number" class="form-control benef-desglose sub-total-poblacion" name="indigena" id="indigena">
 										</div>
 									</td>
 									<td>
 										<div class="form-group">
-											<span id="total-poblacion-f" class=""></span>
+											<span id="total-poblacion" class=""></span>
 										</div>
 									</td>
 								</tr>
-								<tr>
-									<td><span class="fa fa-male fa-2x"></span></td>
-					                <td>
-					                    <div class="form-group">
-											<input type="number" class="form-control sub-total-poblacion masc" name="mestizam" id="mestizam">
-					                    </div>
-					                </td>
-					                <td>
-					                    <div class="form-group">
-											<input type="number" class="form-control sub-total-poblacion masc" name="indigenam" id="indigenam">
-					                    </div>
-					                </td>
-					                <td>
-					                	<div class="form-group">
-											<span id="total-poblacion-m" class=""></span>
-										</div>
-					                </td>
-					            </tr>
 							</tbody>
 				        </table>
 					</div>
@@ -175,7 +134,6 @@
 						<table class="table table-striped table-condensed">
 							<thead>
 								<tr>
-									<th width="10"></th>
 					                <th>Muy alta</th>
 					                <th>Alta</th>
 					                <th>Media</th>
@@ -185,75 +143,42 @@
 							</thead>
 				            <tbody>
 				            	<tr>
-				            		<td><span class="fa fa-female fa-2x"></span></td>
 				            		<td>
 				            			<div class="form-group">
-											<input type="number" class="form-control sub-total-marginacion fem" name="muyaltaf" id="muyaltaf">
+											<input type="number" class="form-control benef-desglose sub-total-marginacion" name="muyalta" id="muyalta">
 				                    	</div>
 				                	</td>
 				                    <td>
 										<div class="form-group">
-											<input type="number" class="form-control sub-total-marginacion fem" name="altaf" id="altaf">
+											<input type="number" class="form-control benef-desglose sub-total-marginacion" name="alta" id="alta">
 				                    	</div>
 				                	</td>
 				                    <td>
 										<div class="form-group">
-											<input type="number" class="form-control sub-total-marginacion fem" name="mediaf" id="mediaf">
+											<input type="number" class="form-control benef-desglose sub-total-marginacion" name="media" id="media">
 				                    	</div>
 				                	</td>
 				                    <td>
 										<div class="form-group">
-											<input type="number" class="form-control sub-total-marginacion fem" name="bajaf" id="bajaf">
+											<input type="number" class="form-control benef-desglose sub-total-marginacion" name="baja" id="baja">
 				                    	</div>
 				                	</td>
 				                    <td>
 										<div class="form-group">
-											<input type="number" class="form-control sub-total-marginacion fem" name="muybajaf" id="muybajaf">
+											<input type="number" class="form-control benef-desglose sub-total-marginacion" name="muybaja" id="muybaja">
 				                    	</div>
 				                	</td>
 				            	</tr>
-				            	<tr>
-				            		<td><span class="fa fa-male fa-2x"></span></td>
-					                <td>
-					                    <div class="form-group">
-											<input type="number" class="form-control sub-total-marginacion masc" name="muyaltam" id="muyaltam">
-					                    </div>
-					                </td>
-					                <td>
-					                    <div class="form-group">
-											<input type="number" class="form-control sub-total-marginacion masc" name="altam" id="altam">
-					                    </div>
-					                </td>
-					                <td>
-					                    <div class="form-group">
-											<input type="number" class="form-control sub-total-marginacion masc" name="mediam" id="mediam">
-					                    </div>
-					                </td>
-					                <td>
-					                    <div class="form-group">
-											<input type="number" class="form-control sub-total-marginacion masc" name="bajam" id="bajam">
-					                    </div>
-					                </td>
-					                <td>
-					                    <div class="form-group">
-											<input type="number" class="form-control sub-total-marginacion masc" name="muybajam" id="muybajam">
-					                    </div>
-					                </td>
-					            </tr>
 				            </tbody>
 				            <tfoot>
 				            	<tr>
-					                <th colspan="2"><span class="fa fa-link"></span> Total</th>
+					                <th><span class="fa fa-link"></span> Total</th>
 					                <td colspan="2">
 					                	<div class="form-group">
-					                		<span class="fa fa-female"></span> <span id="total-marginacion-f" class=""></span>
+					                		<span id="total-marginacion" class=""></span>
 					                	</div>
 					                </td>
-					                <td colspan="2">
-					                	<div class="form-group">
-					                		<span class="fa fa-male"></span> <span id="total-marginacion-m" class=""></span>
-					                	</div>
-					                </td>
+					                <td colspan="2"></td>
 					            </tr>
 				            </tfoot>
 				        </table>

@@ -263,11 +263,14 @@ class InversionController extends ProyectosController {
 					/*$queries = count(DB::getQueryLog()) - $queries;
 					$data['total_queries'] = $queries;*/
 				}elseif($parametros['mostrar'] == 'editar-proyecto'){
-					$recurso = Proyecto::with('jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico',
-										'fibap.documentos','beneficiarios.tipoBeneficiario',
+					$recurso = Proyecto::with(['jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico',
+										'fibap.documentos',
 										'fuentesFinanciamiento.fondoFinanciamiento',
 										'fuentesFinanciamiento.fuenteFinanciamiento',
-										'fuentesFinanciamiento.subFuentesFinanciamiento')
+										'fuentesFinanciamiento.subFuentesFinanciamiento',
+										'beneficiarios'=>function($benef){
+											return $benef->with('tipoBeneficiario','tipoCaptura');
+										}])
 										->find($id);
 					if($recurso->idEstatusProyecto == 3){
 						$recurso->load('comentarios');
@@ -293,8 +296,7 @@ class InversionController extends ProyectosController {
 					}
 
 				}elseif($parametros['mostrar'] == 'editar-beneficiario'){
-					$recurso = Beneficiario::where('idProyecto','=',$parametros['id-proyecto'])
-											->where('idTipoBeneficiario','=',$id)->get();
+					$recurso = Beneficiario::with('tipoBeneficiario')->where('idProyecto','=',$parametros['id-proyecto'])->where('id','=',$id)->first();
 				}elseif ($parametros['mostrar'] == 'editar-antecedente') {
 					$recurso = AntecedenteFinanciero::find($id);
 				}elseif ($parametros['mostrar'] == 'editar-accion') {
@@ -1261,16 +1263,18 @@ class InversionController extends ProyectosController {
 						
 						$componente_desgloses = ComponenteDesglose::whereIn('idComponente',$componentes)->lists('id');
 						$actividad_desgloses = ActividadDesglose::whereIn('idActividad',$actividades)->lists('id');
+
+						$tipos_beneficiarios = Beneficiario::whereIn('id',$ids)->get()->lists('idTipoBeneficiario');
 						
 						DesgloseBeneficiario::whereIn('idComponenteDesglose',$componente_desgloses)
-											->whereIn('idTipoBeneficiario',$ids)
+											->whereIn('idTipoBeneficiario',$tipos_beneficiarios)
 											->delete();
 						ActividadDesgloseBeneficiario::whereIn('idActividadDesglose',$actividad_desgloses)
-											->whereIn('idTipoBeneficiario',$ids)
+											->whereIn('idTipoBeneficiario',$tipos_beneficiarios)
 											->delete();
-						return Beneficiario::whereIn('idTipoBeneficiario',$ids)
-									->where('idProyecto','=',$id_padre)
-									->delete();
+						return Beneficiario::whereIn('id',$ids)
+											->where('idProyecto','=',$id_padre)
+											->delete();
 					});
 				}elseif($parametros['eliminar'] == 'antecedente'){ //Eliminar Antecedente(s)
 					/***
@@ -2240,6 +2244,11 @@ class InversionController extends ProyectosController {
 			$fibap->load('acciones','proyecto.beneficiarios');
 			if(!isset($parametros['beneficiarios'])){
 				$parametros['beneficiarios'] = array();
+			}
+
+			foreach ($parametros['beneficiarios'] as $tipo_beneficiario => $desglose_sexo) {
+				$parametros['beneficiarios'][$tipo_beneficiario]['f'] = (isset($desglose_sexo['f']))?$desglose_sexo['f']:0;
+				$parametros['beneficiarios'][$tipo_beneficiario]['m'] = (isset($desglose_sexo['m']))?$desglose_sexo['m']:0;
 			}
 
 			if($es_editar){

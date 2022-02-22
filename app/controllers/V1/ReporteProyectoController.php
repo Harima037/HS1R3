@@ -124,30 +124,24 @@ class ReporteProyectoController extends BaseController {
 	 	if($reporte == 'caratula' || $reporte == 'fibap'){
 	 		$beneficiarios = array();
 		 	foreach ($recurso['beneficiariosDescripcion'] as $key => $beneficiario) {
-		 		if(!isset($beneficiarios[$beneficiario->idTipoBeneficiario])){
-					$beneficiarios[$beneficiario->idTipoBeneficiario] = array(
-							'tipo' => $beneficiario->tipoBeneficiario,
-							'tipoCaptura' => $beneficiario->tipoCaptura,
-							'total' => $beneficiario->total,
-							'desglose' => array('f'=>array(),'m'=>array())
-						);
-		 		}else{
-		 			$beneficiarios[$beneficiario->idTipoBeneficiario]['total'] += $beneficiario->total;
-		 		}
-
-		 		$beneficiarios[$beneficiario->idTipoBeneficiario]['desglose'][$beneficiario->sexo] = array(
-					'total' 	 => $beneficiario->total,
-					'urbana'	 => $beneficiario->urbana,
-					'rural'		 => $beneficiario->rural,
-					'mestiza' 	 => $beneficiario->mestiza,
-					'indigena' 	 => $beneficiario->indigena,
-					'inmigrante' => $beneficiario->inmigrante,
-					'otros'		 => $beneficiario->otros,
-					'muyAlta'	 => $beneficiario->muyAlta,
-					'alta'		 => $beneficiario->alta,
-					'media'		 => $beneficiario->media,
-					'baja'		 => $beneficiario->baja,
-					'muyBaja'	 => $beneficiario->muyBaja,
+		 		$beneficiarios[$beneficiario->id] = array(
+					'grupo' 		=> $beneficiario->grupo,
+					'tipo' 			=> $beneficiario->tipoBeneficiario,
+					'tipoCaptura' 	=> $beneficiario->tipoCaptura,
+					'total' 		=> $beneficiario->total,
+					'sexo'		 	=> $beneficiario->sexo,
+					'total' 	 	=> $beneficiario->total,
+					'urbana'	 	=> $beneficiario->urbana,
+					'rural'		 	=> $beneficiario->rural,
+					'mestiza' 	 	=> $beneficiario->mestiza,
+					'indigena' 	 	=> $beneficiario->indigena,
+					'inmigrante' 	=> $beneficiario->inmigrante,
+					'otros'		 	=> $beneficiario->otros,
+					'muyAlta'	 	=> $beneficiario->muyAlta,
+					'alta'		 	=> $beneficiario->alta,
+					'media'		 	=> $beneficiario->media,
+					'baja'		 	=> $beneficiario->baja,
+					'muyBaja'	 	=> $beneficiario->muyBaja,
 				);
 		 	}
 		 	$recurso['beneficiarios'] = $beneficiarios;

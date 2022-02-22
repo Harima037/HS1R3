@@ -18,7 +18,7 @@ namespace V1;
 
 use SSA\Utilerias\Validador;
 use BaseController, Input, Response, DB, Sentry, Hash, Exception;
-use Proyecto, Componente, Actividad, Beneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
+use Proyecto, Componente, Actividad, Beneficiario, TipoBeneficiario, FIBAP, ComponenteMetaMes, ActividadMetaMes, Region, Municipio, Jurisdiccion, 
 	FibapDatosProyecto, Directorio, ComponenteDesglose, Accion, PropuestaFinanciamiento, DistribucionPresupuesto, DesgloseMetasMes, 
 	DesgloseBeneficiario, ProyectoFinanciamiento, ProyectoFinanciamientoSubFuente,FuenteFinanciamiento,SentryUser, EstrategiaEstatal, ObjetivoPED;
 
@@ -52,26 +52,16 @@ class ProyectosController extends BaseController {
 	private $reglasBeneficiarios = array(
 		'tipobeneficiario'			=> 'required',
 		'tipocaptura'				=> 'required',
-		'totalbeneficiariosf'		=> 'required|integer|min:0',
-		'totalbeneficiariosm'		=> 'required|integer|min:0',
-		'altaf' 					=> 'required|integer|min:0',
-		'altam' 					=> 'required|integer|min:0',
-		'bajaf' 					=> 'required|integer|min:0',
-		'bajam' 					=> 'required|integer|min:0',
-		'indigenaf'					=> 'required|integer|min:0',
-		'indigenam'					=> 'required|integer|min:0',
-		'mediaf' 					=> 'required|integer|min:0',
-		'mediam' 					=> 'required|integer|min:0',
-		'mestizaf' 					=> 'required|integer|min:0',
-		'mestizam'					=> 'required|integer|min:0',
-		'muyaltaf' 					=> 'required|integer|min:0',
-		'muyaltam' 					=> 'required|integer|min:0',
-		'muybajaf' 					=> 'required|integer|min:0',
-		'muybajam' 					=> 'required|integer|min:0',
-		'ruralf' 					=> 'required|integer|min:0',
-		'ruralm' 					=> 'required|integer|min:0',
-		'urbanaf' 					=> 'required|integer|min:0',
-		'urbanam' 					=> 'required|integer|min:0'
+		'totalbeneficiarios'		=> 'required|integer|min:0',
+		'alta' 						=> 'required|integer|min:0',
+		'baja' 						=> 'required|integer|min:0',
+		'indigena'					=> 'required|integer|min:0',
+		'media' 					=> 'required|integer|min:0',
+		'mestiza' 					=> 'required|integer|min:0',
+		'muyalta' 					=> 'required|integer|min:0',
+		'muybaja' 					=> 'required|integer|min:0',
+		'rural' 					=> 'required|integer|min:0',
+		'urbana' 					=> 'required|integer|min:0'
 	);
 	
 	private $reglasFuenteInformacion = array(
@@ -322,8 +312,7 @@ class ProyectosController extends BaseController {
 				$recurso = Actividad::with('metasMes')->find($id);
 
 			}elseif($parametros['ver'] == 'beneficiario'){
-				$recurso = Beneficiario::where('idProyecto','=',$parametros['id-proyecto'])
-										->where('idTipoBeneficiario','=',$id)->get();
+				$recurso = Beneficiario::with('tipoBeneficiario')->where('idProyecto','=',$parametros['id-proyecto'])->find($id);
 			}elseif($parametros['ver'] == 'proyecto'){
 				$recurso = Proyecto::contenidoCompleto()->find($id);
 				if($recurso){
@@ -339,10 +328,13 @@ class ProyectosController extends BaseController {
 				$recurso = $recurso[0];
 			}
 		}else{
-			$recurso = Proyecto::with('componentes','beneficiarios','clasificacionProyecto','tipoProyecto','estatusProyecto',
+			$recurso = Proyecto::with(['componentes','clasificacionProyecto','tipoProyecto','estatusProyecto',
 									'jefeInmediato','liderProyecto','jefePlaneacion','coordinadorGrupoEstrategico',
 									'fuentesFinanciamiento.fondoFinanciamiento','fuentesFinanciamiento.fuenteFinanciamiento',
-									'fuentesFinanciamiento.subFuentesFinanciamiento','objetivoPed.padre')
+									'fuentesFinanciamiento.subFuentesFinanciamiento','objetivoPed.padre',
+									'beneficiarios'=>function($benef){
+										return $benef->with('tipoBeneficiario','tipoCaptura');
+									}])
 								->find($id);
 			
 			$estrategias = EstrategiaEstatal::where('idObjetivoPED',$recurso->idObjetivoPED)->get();
@@ -721,7 +713,7 @@ class ProyectosController extends BaseController {
 				}elseif($parametros['eliminar'] == 'beneficiario'){
 					$id_padre = $parametros['id-proyecto'];
 					$rows = DB::transaction(function() use ($ids,$id_padre){
-						return Beneficiario::whereIn('idTipoBeneficiario',$ids)
+						return Beneficiario::whereIn('id',$ids)
 									->where('idProyecto','=',$id_padre)
 									->delete();
 					});
@@ -1118,29 +1110,21 @@ class ProyectosController extends BaseController {
 			$nuevo_beneficiario = 0;
 			$viejo_beneficiario = 0;
 
-			$suma_zona_f = $parametros['urbanaf'] + $parametros['ruralf'];
-			$suma_zona_m = $parametros['urbanam'] + $parametros['ruralm'];
-			$suma_poblacion_f = $parametros['mestizaf'] + $parametros['indigenaf'];
-			$suma_poblacion_m = $parametros['mestizam'] + $parametros['indigenam'];
-			$suma_marginacion_f = $parametros['muyaltaf'] + $parametros['altaf'] + $parametros['mediaf'] + $parametros['bajaf'] + $parametros['muybajaf'];
-			$suma_marginacion_m = $parametros['muyaltam'] + $parametros['altam'] + $parametros['mediam'] + $parametros['bajam'] + $parametros['muybajam'];
+			$suma_zona = $parametros['urbana'] + $parametros['rural'];
+			$suma_poblacion = $parametros['mestiza'] + $parametros['indigena'];
+			$suma_marginacion = $parametros['muyalta'] + $parametros['alta'] + $parametros['media'] + $parametros['baja'] + $parametros['muybaja'];
 
-			if($parametros['totalbeneficiariosf'] != $suma_zona_f || $parametros['totalbeneficiariosf'] != $suma_poblacion_f || $parametros['totalbeneficiariosf'] != $suma_marginacion_f){
-				throw new Exception('{"field":"totalbeneficiariosf","error":"Hay totales capturados en el desglose para este beneficiario que no concuerda con este total."}', 1);
+			if($parametros['totalbeneficiarios'] != $suma_zona || $parametros['totalbeneficiarios'] != $suma_poblacion || $parametros['totalbeneficiarios'] != $suma_marginacion){
+				throw new Exception('{"field":"totalbeneficiarios","error":"Hay totales capturados en el desglose para este beneficiario que no concuerda con este total."}', 1);
 			}
-
-			if($parametros['totalbeneficiariosm'] != $suma_zona_m || $parametros['totalbeneficiariosm'] != $suma_poblacion_m || $parametros['totalbeneficiariosm'] != $suma_marginacion_m){
-				throw new Exception('{"field":"totalbeneficiariosm","error":"Hay totales capturados en el desglose para este beneficiario que no concuerda con este total."}', 1);
-			}			
 
 			if($id){
 				$es_editar = TRUE;
 				$proyecto = Proyecto::with('beneficiarios')->find($parametros['id-proyecto']);
-				$beneficiarios = Beneficiario::where('idProyecto','=',$parametros['id-proyecto'])->
-								where('idTipoBeneficiario','=',$id)->get();
-				if($parametros['tipobeneficiario'] != $id){
+				$beneficiario = Beneficiario::where('idProyecto','=',$parametros['id-proyecto'])->where('id','=',$id)->first();
+				if($parametros['tipobeneficiario'] != $beneficiario->idTipoBeneficiario){
 					$nuevo_beneficiario = $parametros['tipobeneficiario'];
-					$viejo_beneficiario = $beneficiarios[0]->idTipoBeneficiario;
+					$viejo_beneficiario = $beneficiario->idTipoBeneficiario;
 				}
 			}else{
 				$proyecto = Proyecto::find($parametros['id-proyecto']);
@@ -1154,74 +1138,60 @@ class ProyectosController extends BaseController {
 				}
 			}
 
+			$tipo_beneficiario = TipoBeneficiario::find($parametros['tipobeneficiario']);
+			$sexo = 'A';
+			if(str_contains(strtolower($tipo_beneficiario->descripcion),'mujer') || str_contains(strtolower($tipo_beneficiario->descripcion),'niña')){
+				$sexo = 'f';
+			}else if(str_contains(strtolower($tipo_beneficiario->descripcion),'hombre') || str_contains(strtolower($tipo_beneficiario->descripcion),'niño')){
+				$sexo = 'm';
+			}
+
 			if($es_editar){
-				foreach ($beneficiarios as $key => $item) {
-					$beneficiarios[$key]->idTipoBeneficiario	= 	$parametros['tipobeneficiario'];
-					$beneficiarios[$key]->idTipoCaptura			= 	$parametros['tipocaptura'];
-					$beneficiarios[$key]->total 				= 	$parametros['totalbeneficiarios'.$item->sexo];
-					$beneficiarios[$key]->urbana 				= 	$parametros['urbana'.$item->sexo];
-					$beneficiarios[$key]->rural 				= 	$parametros['rural'.$item->sexo];
-					$beneficiarios[$key]->mestiza 				= 	$parametros['mestiza'.$item->sexo];
-					$beneficiarios[$key]->indigena 				= 	$parametros['indigena'.$item->sexo];
-					$beneficiarios[$key]->muyAlta 				= 	$parametros['muyalta'.$item->sexo];
-					$beneficiarios[$key]->alta 					= 	$parametros['alta'.$item->sexo];
-					$beneficiarios[$key]->media 				= 	$parametros['media'.$item->sexo];
-					$beneficiarios[$key]->baja 					= 	$parametros['baja'.$item->sexo];
-					$beneficiarios[$key]->muyBaja 				= 	$parametros['muybaja'.$item->sexo];
-					$recurso[] = $beneficiarios[$key];
-				}
+				$beneficiario->idTipoBeneficiario	= 	$parametros['tipobeneficiario'];
+				$beneficiario->idTipoCaptura		= 	$parametros['tipocaptura'];
+				$beneficiario->total 				= 	$parametros['totalbeneficiarios'];
+				$beneficiario->sexo 				= 	$sexo;
+				$beneficiario->urbana 				= 	$parametros['urbana'];
+				$beneficiario->rural 				= 	$parametros['rural'];
+				$beneficiario->mestiza 				= 	$parametros['mestiza'];
+				$beneficiario->indigena 			= 	$parametros['indigena'];
+				$beneficiario->muyAlta 				= 	$parametros['muyalta'];
+				$beneficiario->alta 				= 	$parametros['alta'];
+				$beneficiario->media 				= 	$parametros['media'];
+				$beneficiario->baja 				= 	$parametros['baja'];
+				$beneficiario->muyBaja 				= 	$parametros['muybaja'];
 			}else{
-				if($parametros['totalbeneficiariosf'] > 0){
-					$beneficiarioF = new Beneficiario;
-					$beneficiarioF->idTipoBeneficiario	= $parametros['tipobeneficiario'];
-					$beneficiarioF->idTipoCaptura		= $parametros['tipocaptura'];
-					$beneficiarioF->total 				= $parametros['totalbeneficiariosf'];
-					$beneficiarioF->sexo 				= 'f';
-					$beneficiarioF->urbana 				= $parametros['urbanaf'];
-					$beneficiarioF->rural 				= $parametros['ruralf'];
-					$beneficiarioF->mestiza 			= $parametros['mestizaf'];
-					$beneficiarioF->indigena 			= $parametros['indigenaf'];
-					$beneficiarioF->muyAlta 			= $parametros['muyaltaf'];
-					$beneficiarioF->alta 				= $parametros['altaf'];
-					$beneficiarioF->media 				= $parametros['mediaf'];
-					$beneficiarioF->baja 				= $parametros['bajaf'];
-					$beneficiarioF->muyBaja 			= $parametros['muybajaf'];
-
-					$recurso[] = $beneficiarioF;
-				}
-				if($parametros['totalbeneficiariosm'] > 0){
-					$beneficiarioM = new Beneficiario;
-					$beneficiarioM->idTipoBeneficiario	= $parametros['tipobeneficiario'];
-					$beneficiarioM->idTipoCaptura		= $parametros['tipocaptura'];
-					$beneficiarioM->total 				= $parametros['totalbeneficiariosm'];
-					$beneficiarioM->sexo 				= 'm';
-					$beneficiarioM->urbana 				= $parametros['urbanam'];
-					$beneficiarioM->rural 				= $parametros['ruralm'];
-					$beneficiarioM->mestiza 			= $parametros['mestizam'];
-					$beneficiarioM->indigena 			= $parametros['indigenam'];
-					$beneficiarioM->muyAlta 			= $parametros['muyaltam'];
-					$beneficiarioM->alta 				= $parametros['altam'];
-					$beneficiarioM->media 				= $parametros['mediam'];
-					$beneficiarioM->baja 				= $parametros['bajam'];
-					$beneficiarioM->muyBaja 			= $parametros['muybajam'];
-
-					$recurso[] = $beneficiarioM;
+				if($parametros['totalbeneficiarios'] > 0){
+					$beneficiario = new Beneficiario;
+					$beneficiario->idTipoBeneficiario	= $parametros['tipobeneficiario'];
+					$beneficiario->idTipoCaptura		= $parametros['tipocaptura'];
+					$beneficiario->total 				= $parametros['totalbeneficiarios'];
+					$beneficiario->sexo 				= $sexo;
+					$beneficiario->urbana 				= $parametros['urbana'];
+					$beneficiario->rural 				= $parametros['rural'];
+					$beneficiario->mestiza 				= $parametros['mestiza'];
+					$beneficiario->indigena 			= $parametros['indigena'];
+					$beneficiario->muyAlta 				= $parametros['muyalta'];
+					$beneficiario->alta 				= $parametros['alta'];
+					$beneficiario->media 				= $parametros['media'];
+					$beneficiario->baja 				= $parametros['baja'];
+					$beneficiario->muyBaja 				= $parametros['muybaja'];
 				}
 			}
 
-			$respuesta['data']['data'] = DB::transaction(function() use ($recurso, $proyecto, $es_editar, $viejo_beneficiario){
-				if(!$proyecto->beneficiarios()->saveMany($recurso)){
+			$respuesta['data']['data'] = DB::transaction(function() use ($beneficiario, $proyecto, $es_editar, $viejo_beneficiario){
+				if(!$proyecto->beneficiarios()->save($beneficiario)){
 					throw new Exception("Error al intentar guardar los beneficiarios del proyecto", 1);
 				}
 				$suma = 0;
 				$suma_f = 0;
 				$suma_m = 0;
-				foreach ($proyecto->beneficiarios as $beneficiario) {
-					$suma += $beneficiario->total;
-					if($beneficiario->sexo == 'f'){
-						$suma_f += $beneficiario->total;
-					}else{
-						$suma_m += $beneficiario->total;
+				foreach ($proyecto->beneficiarios as $proyecto_beneficiario) {
+					$suma += $proyecto_beneficiario->total;
+					if($proyecto_beneficiario->sexo == 'f'){
+						$suma_f += $proyecto_beneficiario->total;
+					}else if($proyecto_beneficiario->sexo == 'm'){
+						$suma_m += $proyecto_beneficiario->total;
 					}
 				}
 				$proyecto->totalBeneficiarios = $suma;
@@ -1231,7 +1201,7 @@ class ProyectosController extends BaseController {
 				if(!$proyecto->save()){
 					throw new Exception("Error al intentar actualizar los totales de los beneficiarios del proyecto", 1);
 				}
-				$proyecto->load('beneficiarios');
+				$proyecto->load('beneficiarios.tipoCaptura');
 				
 				if($proyecto->idClasificacionProyecto == 2 && $es_editar){
 					$componentes_ids = $proyecto->componentes->lists('id');
@@ -1240,7 +1210,7 @@ class ProyectosController extends BaseController {
 						if(count($desgloses_componente)){
 							DesgloseBeneficiario::whereIn('idComponenteDesglose',$desgloses_componente)
 												->where('idTipoBeneficiario','=',$viejo_beneficiario)
-												->update(['idTipoBeneficiario'=>$recurso[0]->idTipoBeneficiario]);
+												->update(['idTipoBeneficiario'=>$beneficiario->idTipoBeneficiario]);
 						}
 					}
 				}

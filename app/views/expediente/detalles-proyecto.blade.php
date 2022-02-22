@@ -144,7 +144,6 @@
                                     <thead>
                                         <tr>
                                             <!--th nowrap="nowrap" rowspan="2">Descripción de Beneficiario</th-->
-                                            <th rowspan="2"></th>
                                             <th colspan="2">Zona</th>
                                             <th colspan="2" class="bg-info">Población</th>
                                             <th colspan="5" class="bg-success">Marginación</th>

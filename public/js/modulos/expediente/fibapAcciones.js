@@ -452,7 +452,7 @@ context.mostrar_datos_presupuesto = function(datos){
 
     for(var indx in desglose.beneficiarios){
         var beneficiario = desglose.beneficiarios[indx];
-        $('#beneficiarios-'+beneficiario.idTipoBeneficiario+'-f').val(beneficiario.totalF);
+        $('#beneficiarios-'+beneficiario.idTipoBeneficiario+'-f').val(beneficiario.totalF).change();
         $('#beneficiarios-'+beneficiario.idTipoBeneficiario+'-m').val(beneficiario.totalM).change();
     }
 
@@ -735,32 +735,28 @@ context.actualizar_lista_beneficiarios = function(datos){
     var beneficiarios = [];
     var beneficiario;
     for(var indx in datos){
-        if(beneficiarios[datos[indx].idTipoBeneficiario]){
-            beneficiario = beneficiarios[datos[indx].idTipoBeneficiario];
-        }else{
-            beneficiario = {};
-            beneficiario.id = datos[indx].idTipoBeneficiario;
-            beneficiario.tipoBeneficiario = datos[indx].tipo_beneficiario.descripcion;
-            beneficiario.totalF = 0;
-            beneficiario.totalM = 0;
-        }
+        beneficiario = {};
+        beneficiario.id = datos[indx].id;
+        beneficiario.tipoCaptura = (datos[indx].tipo_captura)?datos[indx].tipo_captura.descripcion:'No Capturado'
+        beneficiario.grupo = datos[indx].tipo_beneficiario.grupo;
+        beneficiario.tipoBeneficiario = datos[indx].tipo_beneficiario.descripcion;
+        beneficiario.idTipoBeneficiario = datos[indx].tipo_beneficiario.id;
+        beneficiario.sexo = datos[indx].sexo;
+        beneficiario.total = datos[indx].total;
 
-        if(datos[indx].sexo == 'f'){
-            beneficiario.totalF = datos[indx].total;
-        }else{
-            beneficiario.totalM = datos[indx].total;
-        }
-        
-        beneficiarios[datos[indx].idTipoBeneficiario] = beneficiario;
+        beneficiarios.push(beneficiario);
     }
     $('#tabla_beneficiarios > tbody').empty();
     var html = '';
     for(var i in beneficiarios){
         html += '<tr>';
+        html += '<td>' + beneficiarios[i].tipoCaptura + '</td>';
+        html += '<td>' + beneficiarios[i].grupo + '</td>';
         html += '<td>' + beneficiarios[i].tipoBeneficiario + '</td>';
-        html += '<td><div class="form-group"><input type="number" min="0" class="form-control benef-totales-accion" name="beneficiarios[' + beneficiarios[i].id + '][f]" id="beneficiarios-' + beneficiarios[i].id + '-f" data-tipo-beneficiario="' + beneficiarios[i].id + '"></div></td>';
-        html += '<td><div class="form-group"><input type="number" min="0" class="form-control benef-totales-accion" name="beneficiarios[' + beneficiarios[i].id + '][m]" id="beneficiarios-' + beneficiarios[i].id + '-m" data-tipo-beneficiario="' + beneficiarios[i].id + '"></div></td>';
-        html += '<td><span id="beneficiarios-' + beneficiarios[i].id + '-total">0</span></td>';
+        //html += '<td><div class="form-group"><input type="number" min="0" class="form-control benef-totales-accion" name="beneficiarios[' + beneficiarios[i].id + '][f]" id="beneficiarios-' + beneficiarios[i].id + '-f" data-tipo-beneficiario="' + beneficiarios[i].id + '"></div></td>';
+        //html += '<td><div class="form-group"><input type="number" min="0" class="form-control benef-totales-accion" name="beneficiarios[' + beneficiarios[i].id + '][m]" id="beneficiarios-' + beneficiarios[i].id + '-m" data-tipo-beneficiario="' + beneficiarios[i].id + '"></div></td>';
+        //html += '<td><span id="beneficiarios-' + beneficiarios[i].id + '-total">0</span></td>';
+        html += '<td><div class="form-group"><input type="number" min="0" class="form-control benef-totales-accion" name="beneficiarios[' + beneficiarios[i].idTipoBeneficiario + ']['+beneficiarios[i].sexo+']" id="beneficiarios-' + beneficiarios[i].idTipoBeneficiario + '-'+beneficiarios[i].sexo+'" data-tipo-beneficiario="' + beneficiarios[i].idTipoBeneficiario + '"></div></td>';
         html += '</tr>';
     }
     $('#tabla_beneficiarios > tbody').html(html);

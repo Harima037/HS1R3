@@ -178,7 +178,9 @@ class RevisionController extends BaseController {
 
 			}elseif($parametros['ver'] == 'proyecto'){
 
-				$recurso = Proyecto::contenidoCompleto()->find($id);
+				$recurso = Proyecto::contenidoCompleto()->with(['beneficiarios'=>function($beneficiarios){
+																					return $beneficiarios->with('tipoBeneficiario','tipoCaptura');
+																				}])->find($id);
 				//$comentarios = ProyectoComentario::where('idProyecto', '=', $id)->get();								
 				if($recurso){					
 					if($recurso->idClasificacionProyecto == 2){
@@ -200,9 +202,13 @@ class RevisionController extends BaseController {
 			}elseif($parametros['ver'] == 'detalles-presupuesto'){
 
 				if($parametros['tipo-accion'] == 'componente'){
-					$desglose = ComponenteDesglose::with('metasMes','beneficiarios.tipoBeneficiario')->find($id);
+					$desglose = ComponenteDesglose::with(['metasMes','beneficiarios'=>function($beneficiarios){
+																					return $beneficiarios->conDescripcion();
+																				}])->find($id);
 				}else{
-					$desglose = ActividadDesglose::with('metasMes','beneficiarios.tipoBeneficiario')->find($id);
+					$desglose = ActividadDesglose::with(['metasMes','beneficiarios'=>function($beneficiarios){
+																					return $beneficiarios->conDescripcion();
+																				}])->find($id);
 				}
 				
 				$recurso = Accion::with('partidas')->find($desglose->idAccion);

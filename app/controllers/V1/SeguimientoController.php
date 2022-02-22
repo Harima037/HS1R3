@@ -100,7 +100,7 @@ class SeguimientoController extends BaseController {
 					$rows = Beneficiario::with(array('registroAvance'=>function($query){
 						$query->select('id','idProyectoBeneficiario','idTipoBeneficiario','sexo',DB::raw('sum(total) AS total'))
 								->groupBy('idTipoBeneficiario','sexo');
-					},'tipoBeneficiario','comentarios'))->where('idProyecto','=',$parametros['idProyecto'])->get();
+					},'tipoBeneficiario','tipoCaptura','comentarios'))->where('idProyecto','=',$parametros['idProyecto'])->get();
 					$total = count($rows);
 				}
 			}else{

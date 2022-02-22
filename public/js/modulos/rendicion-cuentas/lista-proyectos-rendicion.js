@@ -79,7 +79,9 @@ moduloDatagrid.actualizar({
                             estado_actual = 1;
                         }
                     }else{
-                        estatus_anteriores[evaluacion_mes.mes] = {idEstatus:evaluacion_mes.idEstatus,planMejora:parseInt(evaluacion_mes.planMejora)};
+                        if(parseInt(evaluacion_mes.mes) > 0){
+                            estatus_anteriores[evaluacion_mes.mes] = {idEstatus:evaluacion_mes.idEstatus,planMejora:parseInt(evaluacion_mes.planMejora)};
+                        }
                     }
                 }
             }else{
@@ -105,10 +107,12 @@ moduloDatagrid.actualizar({
             for(var j in response.data[i].registro_avance){
                 var avance = response.data[i].registro_avance[j];
                 var clase_icono = (avance.mes != mes_activo)?'fa-circle':(estado_actual != 0)?'fa-lock':'fa-unlock';
-                if(parseInt(avance.planMejora) > 0){
-                    item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-danger" '+meses_capturados[avance.mes]+'><span class="fa '+clase_icono+'"></span></div>';
-                }else{
-                    item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-success" '+meses_capturados[avance.mes]+'><span class="fa '+clase_icono+'"></span></div>';
+                if(avance.mes > 0){
+                    if(parseInt(avance.planMejora) > 0){
+                        item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-danger" '+meses_capturados[avance.mes]+'><span class="fa '+clase_icono+'"></span></div>';
+                    }else{
+                        item['mes_'+avance.mes] = '<div id="grid-mes-'+avance.mes+'" class="text-center text-success" '+meses_capturados[avance.mes]+'><span class="fa '+clase_icono+'"></span></div>';
+                    }
                 }
             }
             datos_grid.push(item);
@@ -171,18 +175,20 @@ function cargar_datos_proyecto(e){
                 //var sumatorias_trimestres = ;
                 for(var j in componente.registro_avance){
                     var avance = componente.registro_avance[j];
-                    var trimestre = Math.ceil(parseFloat(avance.mes/3));
-                    var ajuste = (trimestre - 1) * 3;
-                    var mes_del_trimestre = avance.mes - ajuste;
-                    if(avance.planMejora){
-                        var colo_texto = 'text-danger';
-                    }else{
-                        var colo_texto = 'text-primary';
+                    if(avance.mes > 0){
+                        var trimestre = Math.ceil(parseFloat(avance.mes/3));
+                        var ajuste = (trimestre - 1) * 3;
+                        var mes_del_trimestre = avance.mes - ajuste;
+                        if(avance.planMejora){
+                            var colo_texto = 'text-danger';
+                        }else{
+                            var colo_texto = 'text-primary';
+                        }
+                        var celda = '<span class="'+colo_texto+'">'+parseFloat(avance.avanceMes).format(2)+'</span>';
+                        $('#avance-trim-'+trimestre+' > tbody > tr[data-nivel="1"][data-id="'+componente.id+'"] > td[data-trim-mes="'+mes_del_trimestre+'"]').html(celda);
+                        sumatoria_componente[trimestre] += parseFloat(avance.avanceMes);
+                        total_trimestres[trimestre][avance.mes] = (parseFloat(total_trimestres[trimestre][avance.mes]) || 0) + parseFloat(avance.avanceMes);
                     }
-                    var celda = '<span class="'+colo_texto+'">'+parseFloat(avance.avanceMes).format(2)+'</span>';
-                    $('#avance-trim-'+trimestre+' > tbody > tr[data-nivel="1"][data-id="'+componente.id+'"] > td[data-trim-mes="'+mes_del_trimestre+'"]').html(celda);
-                    sumatoria_componente[trimestre] += parseFloat(avance.avanceMes);
-                    total_trimestres[trimestre][avance.mes] = (parseFloat(total_trimestres[trimestre][avance.mes]) || 0) + parseFloat(avance.avanceMes);
                 }
                 for(var j in sumatoria_componente){
                     if(j > 1){
@@ -195,18 +201,20 @@ function cargar_datos_proyecto(e){
                     var sumatoria_actividad = {1:0,2:0,3:0,4:0};
                     for(var j in actividad.registro_avance){
                         var avance = actividad.registro_avance[j];
-                        var trimestre = Math.ceil(parseFloat(avance.mes/3));
-                        var ajuste = (trimestre - 1) * 3;
-                        var mes_del_trimestre = avance.mes - ajuste;
-                        if(avance.planMejora){
-                            var colo_texto = 'text-danger';
-                        }else{
-                            var colo_texto = 'text-primary';
+                        if(avance.mes > 0){
+                            var trimestre = Math.ceil(parseFloat(avance.mes/3));
+                            var ajuste = (trimestre - 1) * 3;
+                            var mes_del_trimestre = avance.mes - ajuste;
+                            if(avance.planMejora){
+                                var colo_texto = 'text-danger';
+                            }else{
+                                var colo_texto = 'text-primary';
+                            }
+                            var celda = '<span class="'+colo_texto+'">'+parseFloat(avance.avanceMes).format(2)+'</span>';
+                            $('#avance-trim-'+trimestre+' > tbody > tr[data-nivel="2"][data-id="'+actividad.id+'"] > td[data-trim-mes="'+mes_del_trimestre+'"]').html(celda);
+                            sumatoria_actividad[trimestre] += parseFloat(avance.avanceMes);
+                            total_trimestres[trimestre][avance.mes] = (parseFloat(total_trimestres[trimestre][avance.mes]) || 0) + parseFloat(avance.avanceMes);
                         }
-                        var celda = '<span class="'+colo_texto+'">'+parseFloat(avance.avanceMes).format(2)+'</span>';
-                        $('#avance-trim-'+trimestre+' > tbody > tr[data-nivel="2"][data-id="'+actividad.id+'"] > td[data-trim-mes="'+mes_del_trimestre+'"]').html(celda);
-                        sumatoria_actividad[trimestre] += parseFloat(avance.avanceMes);
-                        total_trimestres[trimestre][avance.mes] = (parseFloat(total_trimestres[trimestre][avance.mes]) || 0) + parseFloat(avance.avanceMes);
                     }
                     for(var j in sumatoria_actividad){
                         if(j > 1){
@@ -232,16 +240,11 @@ function cargar_datos_proyecto(e){
                 var beneficiarios = response.data.beneficiarios;
                 var lista_beneficiarios = {};
                 for(var j in beneficiarios){
-                    if(!lista_beneficiarios[beneficiarios[j].idTipoBeneficiario]){
-                        lista_beneficiarios[beneficiarios[j].idTipoBeneficiario] = {
-                            id: beneficiarios[j].idTipoBeneficiario,
-                            tipo: beneficiarios[j].tipo_beneficiario.descripcion,
-                            total: 0,
-                            desglose: {'f':{},'m':{}}
-                        };
-                    }
-                    lista_beneficiarios[beneficiarios[j].idTipoBeneficiario].total += beneficiarios[j].total;
-                    lista_beneficiarios[beneficiarios[j].idTipoBeneficiario].desglose[beneficiarios[j].sexo] = {
+                    lista_beneficiarios[beneficiarios[j].id] = {
+                        id: beneficiarios[j].id,
+                        grupo: beneficiarios[j].tipo_beneficiario.grupo,
+                        tipo: beneficiarios[j].tipo_beneficiario.descripcion,
+                        total: beneficiarios[j].total,
                         sexo: beneficiarios[j].sexo,
                         total: beneficiarios[j].total,
                         urbana: beneficiarios[j].urbana,
@@ -255,42 +258,27 @@ function cargar_datos_proyecto(e){
                         media: beneficiarios[j].media,
                         baja: beneficiarios[j].baja,
                         muyBaja: beneficiarios[j].muyBaja
-                    }
+                    };
                 }
                 var rows = '';
                 
                 for(var j in lista_beneficiarios){
                     rows += '<tr>';
-                    rows += '<td rowspan="2">' + lista_beneficiarios[j].tipo + '</td>';
-                    rows += '<td rowspan="2">' + parseInt(lista_beneficiarios[j].total).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].total) || 0 ).format() + '</td>';
-                    rows += '<th>Femenino</th>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].urbana) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].rural) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].mestiza) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].indigena) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].inmigrante) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].otros) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].muyAlta) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].alta) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].media) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].baja) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['f'].muyBaja) || 0 ).format() + '</td>';
-                    rows += '</tr>';
-                    rows += '<tr>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].total) || 0 ).format() + '</td>';
-                    rows += '<th>Masculino</th>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].urbana) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].rural) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].mestiza) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].indigena) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].inmigrante) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].otros) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].muyAlta) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].alta) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].media) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].baja) || 0 ).format() + '</td>';
-                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].desglose['m'].muyBaja) || 0 ).format() + '</td>';
+                    rows += '<td>' + lista_beneficiarios[j].grupo + '</td>';
+                    rows += '<td>' + lista_beneficiarios[j].tipo + '</td>';
+                    rows += '<td>' + parseInt(lista_beneficiarios[j].total).format() + '</td>';
+                    rows += '<th>' + ((lista_beneficiarios[j].sexo == 'f')?'Femenino':'Masculino') + '</th>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].urbana) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].rural) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].mestiza) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].indigena) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].inmigrante) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].otros) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].muyAlta) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].alta) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].media) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].baja) || 0 ).format() + '</td>';
+                    rows += '<td>' + ( parseInt(lista_beneficiarios[j].muyBaja) || 0 ).format() + '</td>';
                     rows += '</tr>';
                 }
                 $('.tabla-avance-beneficiarios tbody').empty();

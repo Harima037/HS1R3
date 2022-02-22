@@ -253,9 +253,11 @@
                                     <table id="tabla_beneficiarios" class="table table-condensed table-hover">
                                         <thead>
                                             <tr>
+                                                <th width="20%">Tipo Captura</th>
+                                                <th width="20%">Grupo</th>
                                                 <th>Tipo Beneficiario</th>
-                                                <th width="20%"><span class="fa fa-female"></span> Femenino</th>
-                                                <th width="20%"><span class="fa fa-male"></span> Masculino</th>
+                                                <!--th width="20%"><span class="fa fa-female"></span> Femenino</th-->
+                                                <!--th width="20%"><span class="fa fa-male"></span> Masculino</th-->
                                                 <th width="20%">Total</th>
                                             </tr>
                                         </thead>

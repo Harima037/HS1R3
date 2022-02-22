@@ -202,7 +202,8 @@ if($('#id').val()){
 					if(cuentabeneficia > 0){
 						cadenaHTML = cadenaHTML + '<td style="background-color:black;" colspan="13"></td></tr><tr>';
 					}
-					cadenaHTML = cadenaHTML + '<td colspan="3"><strong> &nbsp;Tipo de Beneficiario: </strong></td><td colspan="7">&nbsp;'+response.data.beneficiarios[cuentabeneficia].tipo_beneficiario.descripcion+'</td><td style="vertical-align:middle" rowspan="2" colspan="2" align="center"> <button type="button" class="btn btn-default" id="beneficiario'+response.data.beneficiarios[cuentabeneficia].idTipoBeneficiario+'" onclick="escribirComentario(\'beneficiario'+response.data.beneficiarios[cuentabeneficia].idTipoBeneficiario+'\',\'Tipo de beneficiario\',\''+response.data.beneficiarios[cuentabeneficia].tipo_beneficiario.descripcion+'\')" ><i class="fa fa-pencil-square-o"></i>Comentar</button></td></tr><tr>';
+					cadenaHTML = cadenaHTML + '<td colspan="3"><strong> &nbsp;Grupo: </strong></td><td colspan="7">&nbsp;'+response.data.beneficiarios[cuentabeneficia].tipo_beneficiario.grupo+'</td><td style="vertical-align:middle" rowspan="3" colspan="2" align="center"> <button type="button" class="btn btn-default" id="beneficiario'+response.data.beneficiarios[cuentabeneficia].id+'" onclick="escribirComentario(\'beneficiario'+response.data.beneficiarios[cuentabeneficia].id+'\',\'Tipo de beneficiario\',\''+response.data.beneficiarios[cuentabeneficia].tipo_beneficiario.descripcion+'\')" ><i class="fa fa-pencil-square-o"></i>Comentar</button></td></tr><tr>';
+					cadenaHTML = cadenaHTML + '<td colspan="3"><strong> &nbsp;Tipo de Beneficiario: </strong></td><td colspan="7">&nbsp;'+response.data.beneficiarios[cuentabeneficia].tipo_beneficiario.descripcion+'</td></tr><tr>';
 					if(response.data.beneficiarios[cuentabeneficia].tipo_captura){
 						cadenaHTML = cadenaHTML + '<td colspan="3"><strong> &nbsp;Tipo de Captura: </strong></td><td colspan="8">&nbsp;'+response.data.beneficiarios[cuentabeneficia].tipo_captura.descripcion+'</td></tr><tr style="background-color:whitesmoke;">';
 					}else{
@@ -216,12 +217,12 @@ if($('#id').val()){
 					var siguienteIndice = parseInt(cuentabeneficia,10)+1;										
 					if(response.data.beneficiarios[cuentabeneficia].idTipoBeneficiario == response.data.beneficiarios[siguienteIndice].idTipoBeneficiario){
 						var sumaTotales = (parseInt(response.data.beneficiarios[cuentabeneficia].total) || 0) + (parseInt(response.data.beneficiarios[siguienteIndice].total) || 0);
-						cadenaHTML = cadenaHTML +'<td rowspan="2" align="right">'+sumaTotales.format()+'</td>';
+						cadenaHTML = cadenaHTML +'<td colspan="2" rowspan="2" align="right">'+sumaTotales.format()+'</td>';
 						sePusoTotales = 1;
 					}else{
 						if(sePusoTotales == 0){
 							var sumaTotales = parseInt(response.data.beneficiarios[cuentabeneficia].total) || 0;
-							cadenaHTML = cadenaHTML +'<td align="right">'+sumaTotales.format()+'</td>';
+							cadenaHTML = cadenaHTML +'<td colspan="2" align="right">'+sumaTotales.format()+'</td>';
 						}else{
 							sePusoTotales = 0;
 							banderaCelda = 1;
@@ -231,14 +232,14 @@ if($('#id').val()){
 				}else{
 					if(sePusoTotales == 0){
 						var sumaTotales = parseInt(response.data.beneficiarios[cuentabeneficia].total) || 0;
-						cadenaHTML = cadenaHTML +'<td align="right">'+sumaTotales.format()+'</td>';
+						cadenaHTML = cadenaHTML +'<td colspan="2" align="right">'+sumaTotales.format()+'</td>';
 					}else{
 						banderaCelda = 1;
 					}
 					encabezado = 0;
 				}
 				
-				cadenaHTML = cadenaHTML +'<td align="right">'+parseInt(response.data.beneficiarios[cuentabeneficia].total).format()+'</td>';
+				//cadenaHTML = cadenaHTML +'<td align="right">'+parseInt(response.data.beneficiarios[cuentabeneficia].total).format()+'</td>';
 
 				if(response.data.beneficiarios[cuentabeneficia].sexo == 'f')
 					cadenaHTML = cadenaHTML +'<td align="center"><span class="fa fa-female"></span> Femenino</td>';
@@ -1024,37 +1025,45 @@ function elementoBorrado(id, campo, observacion, fila){
 
 function construyebeneficiarios(datos){
 	//console.log(datos);
-	
-    var beneficiarios = [];
+	var beneficiarios = [];
     var beneficiario;
-	var acumulaF = 0;
-	var acumulaM = 0;
-	
+	var totalBenef = 0;
     for(var indx in datos){
-       beneficiario = {};
-       beneficiario.id = datos[indx].idTipoBeneficiario;
-       beneficiario.tipoBeneficiario = datos[indx].tipo_beneficiario.descripcion;
-       beneficiario.totalF = datos[indx].totalF;
-       beneficiario.totalM = datos[indx].totalM;
+        beneficiario = {};
+        beneficiario.id = datos[indx].id;
+        beneficiario.tipoCaptura = (datos[indx].tipoCaptura)?datos[indx].tipoCaptura:'No Capturado'
+        beneficiario.grupo = (datos[indx].grupo)?datos[indx].grupo:'No Capturado';
+        beneficiario.tipoBeneficiario = (datos[indx].tipoBeneficiario)?datos[indx].tipoBeneficiario:'No Capturado';
+        beneficiario.idTipoBeneficiario = datos[indx].idTipoBeneficiario;
+        beneficiario.sexo = datos[indx].sexo;
 
-	   acumulaF += beneficiario.totalF;
-	   acumulaM += beneficiario.totalM;
-	   beneficiarios[datos[indx].idTipoBeneficiario] = beneficiario;
+		var total = 0;
+		if(datos[indx].totalF){
+			total = parseInt(datos[indx].totalF) || 0;
+		}else{
+			total = parseInt(datos[indx].totalM) || 0;
+		}
+        beneficiario.total = total;
+
+		totalBenef += beneficiario.total;
+
+        beneficiarios.push(beneficiario);
     }
     $('#tabla_beneficiarios > tbody').empty();
     var html = '';
     for(var i in beneficiarios){
         html += '<tr>';
+        html += '<td>' + beneficiarios[i].tipoCaptura + '</td>';
+        html += '<td>' + beneficiarios[i].grupo + '</td>';
         html += '<td>' + beneficiarios[i].tipoBeneficiario + '</td>';
-        html += '<td><div class="form-group"><input type="text" class="form-control" name="beneficiarios[' + beneficiarios[i].id + '][f]" id="beneficiarios-' + beneficiarios[i].id + '-f" data-tipo-beneficiario="' + beneficiarios[i].id + '" value="'+beneficiarios[i].totalF+'"></div></td>';
-        html += '<td><div class="form-group"><input type="text" class="form-control" name="beneficiarios[' + beneficiarios[i].id + '][m]" id="beneficiarios-' + beneficiarios[i].id + '-m" data-tipo-beneficiario="' + beneficiarios[i].id + '" value="'+beneficiarios[i].totalM+'"></div></td>';
-        html += '<td><span id="beneficiarios-' + beneficiarios[i].id + '-total">';
-		html += beneficiarios[i].totalF+beneficiarios[i].totalM;
-		'</span></td>';
+        //html += '<td><div class="form-group"><input type="number" min="0" class="form-control benef-totales-accion" name="beneficiarios[' + beneficiarios[i].id + '][f]" id="beneficiarios-' + beneficiarios[i].id + '-f" data-tipo-beneficiario="' + beneficiarios[i].id + '"></div></td>';
+        //html += '<td><div class="form-group"><input type="number" min="0" class="form-control benef-totales-accion" name="beneficiarios[' + beneficiarios[i].id + '][m]" id="beneficiarios-' + beneficiarios[i].id + '-m" data-tipo-beneficiario="' + beneficiarios[i].id + '"></div></td>';
+        //html += '<td><span id="beneficiarios-' + beneficiarios[i].id + '-total">0</span></td>';
+        html += '<td><div class="form-group"><input type="number" readonly class="form-control benef-totales-accion" name="beneficiarios[' + beneficiarios[i].id + ']['+beneficiarios[i].sexo+']" id="beneficiarios-' + beneficiarios[i].id + '-'+beneficiarios[i].sexo+'" data-tipo-beneficiario="' + beneficiarios[i].idTipoBeneficiario + '" value="'+beneficiarios[i].total.format()+'"></div></td>';
         html += '</tr>';
     }
     $('#tabla_beneficiarios > tbody').html(html);
-	$('#total-beneficiarios-lbl').html(acumulaF+acumulaM);       
+	$('#total-beneficiarios-lbl').html(totalBenef.format());
 }
 
 

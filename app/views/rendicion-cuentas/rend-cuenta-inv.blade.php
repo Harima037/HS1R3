@@ -170,8 +170,9 @@
                                                 <table id='beneficiarios-trim-{{$trim}}' class="table table-stripped table-condensed table-hover tabla-avance-beneficiarios">
                                                     <thead>
                                                         <tr>
-                                                            <th nowrap="nowrap" rowspan="2">Descripción de Beneficiario</th>
-                                                            <th colspan="2" rowspan="2">Total</th>
+                                                            <th rowspan="2">Grupo</th>
+                                                            <th rowspan="2">Descripción de Beneficiario</th>
+                                                            <th rowspan="2">Total</th>
                                                             <th rowspan="2">Genero</th>
                                                             <th colspan="2">Zona</th>
                                                             <th colspan="4">Población</th>

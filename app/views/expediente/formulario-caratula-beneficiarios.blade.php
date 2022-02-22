@@ -33,10 +33,11 @@
                 <thead>
                     <tr>
                         <th><input type="checkbox" class="check-select-all-rows"></th>
-                        <th>Tipo Beneficiario</th>
-                        <th>Total Femenino</th>
-                        <th>Total Masculino</th>
-                        <th>Total</th>
+                        <th width="150">Tipo Captura</th>
+                        <th width="70">Clave</th>
+                        <th width="300">Grupo</th>
+                        <th>Descripción</th>
+                        <th width="150">Total</th>
                     </tr>
                 </thead>
                 <tbody>

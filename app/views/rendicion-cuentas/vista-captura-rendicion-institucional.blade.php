@@ -137,19 +137,13 @@
 	            <table class="table table-striped table-hover table-bordered">
 	                <thead>
 	                	<tr>
-	                		<th rowspan="2"><input type="checkbox" class="check-select-all-rows"></th>
-	                        <th rowspan="2">Beneficiario</th>
-	                        <th colspan="2">Femenino</th>
-	                        <th colspan="2">Masculino</th>
-	                        <th rowspan="2">Total</th>
-	                        <th rowspan="2">Acumulado</th>
+	                		<th><input type="checkbox" class="check-select-all-rows"></th>
+							<th width="200px">Grupo</th>
+	                        <th>Beneficiario</th>
+							<th width="125px">Tipo Captura</th>
+	                        <th width="180px">Total Programado</th>
+	                        <th width="180px">Total Acumulado</th>
 	                	</tr>
-	                    <tr>
-	                        <th>Total</th>
-							<th>Acumulado</th>
-	                        <th>Total</th>
-	                        <th>Acumulado</th>
-	                    </tr>
 	                </thead>
 	                <tbody>
 	                    <tr><td></td><td colspan="6" style="text-align:left"><i class="fa fa-info-circle"></i> No hay datos</td></tr>
@@ -593,6 +587,7 @@
 		<table class="table table-condensed table-bordered">
     		<thead>
     			<tr>
+					<th>Grupo</th>
     				<th>Beneficiario</th>
     				<th width="240px"></th>
 					<th width="143px">Total Femenino</th>
@@ -602,6 +597,7 @@
     		</thead>
     		<tbody>
     			<tr>
+					<td rowspan="2" id="grupo-beneficiario" data-valor="0"></td>
     				<td rowspan="2" id="tipo-beneficiario" data-valor="0"></td>
     				<th class="text-right">Programado</th>
     				<td class="cant-benficiarios" id="total-f" data-valor="0">0</td>

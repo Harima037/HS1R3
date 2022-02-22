@@ -1085,6 +1085,7 @@ if((parseInt($('#mes').val()) % 3) == 0){
 
                 $('#modalBeneficiario').find(".modal-title").html('Seguimiento de Beneficiarios');
                 var beneficiario = response.data.beneficiario[0].tipo_beneficiario;
+                $('#grupo-beneficiario').text(beneficiario.grupo);
                 $('#tipo-beneficiario').text(beneficiario.descripcion);
                 $('#id-beneficiario').val(beneficiario.id);
                 var suma = 0;
@@ -1295,47 +1296,28 @@ if((parseInt($('#mes').val()) % 3) == 0){
         for(var i in response.data){
             var beneficiario = response.data[i];
 
-            if(!datos_grid[beneficiario.idTipoBeneficiario]){
-                datos_grid[beneficiario.idTipoBeneficiario] = {
-                    'id': beneficiario.idTipoBeneficiario,
-                    'tipoBeneficiario': beneficiario.tipo_beneficiario.descripcion,
-                    'f': 0,
-                    'f-avance':0,
-                    'm': 0,
-                    'm-avance':0,
-                    'total': 0,
-                    'total-avance':0
-                };
-            }else{
-                datos_grid[beneficiario.idTipoBeneficiario]['f'] = (parseInt(datos_grid[beneficiario.idTipoBeneficiario]['f']) || 0);
-                datos_grid[beneficiario.idTipoBeneficiario]['f-avance'] = (parseInt(datos_grid[beneficiario.idTipoBeneficiario]['f-avance']) || 0);
-                datos_grid[beneficiario.idTipoBeneficiario]['m'] = (parseInt(datos_grid[beneficiario.idTipoBeneficiario]['m']) || 0);
-                datos_grid[beneficiario.idTipoBeneficiario]['m-avance'] = (parseInt(datos_grid[beneficiario.idTipoBeneficiario]['m-avance']) || 0);
-                datos_grid[beneficiario.idTipoBeneficiario]['total'] = (parseInt(datos_grid[beneficiario.idTipoBeneficiario]['total']) || 0);
-                datos_grid[beneficiario.idTipoBeneficiario]['total-avance'] = (parseInt(datos_grid[beneficiario.idTipoBeneficiario]['total-avance']) || 0);
-            }
+            datos_grid[beneficiario.id] = {
+                'id': beneficiario.idTipoBeneficiario,
+                'grupo': beneficiario.tipo_beneficiario.grupo,
+                'tipoBeneficiario': beneficiario.tipo_beneficiario.descripcion,
+                'tipoCaptura': (beneficiario.tipo_captura)?beneficiario.tipo_captura.descripcion:'Sin Datos',
+                'total': parseInt(beneficiario.total) || 0,
+                'total-avance':0
+            };
 
             if(beneficiario.registro_avance.length){
                 var avance = beneficiario.registro_avance[0];
-                datos_grid[beneficiario.idTipoBeneficiario][beneficiario.sexo+'-avance'] += parseInt(avance.total) || 0;
-                datos_grid[beneficiario.idTipoBeneficiario]['total-avance'] += parseInt(avance.total) || 0;
+                datos_grid[beneficiario.id]['total-avance'] += parseInt(avance.total) || 0;
             }
 
             if(beneficiario.comentarios.length){
-                datos_grid[beneficiario.idTipoBeneficiario]['tipoBeneficiario'] = '<span class="fa fa-warning"></span> '+beneficiario.tipo_beneficiario.descripcion;
+                datos_grid[beneficiario.id]['grupo'] = '<span class="fa fa-warning"></span> '+beneficiario.tipo_beneficiario.grupo;
             }
-
-            datos_grid[beneficiario.idTipoBeneficiario][beneficiario.sexo] += parseInt(beneficiario.total) || 0;
-            datos_grid[beneficiario.idTipoBeneficiario]['total'] += parseInt(beneficiario.total) || 0;
         }
         var datos = [];
 
         for(var i in datos_grid){
-            datos_grid[i].f = datos_grid[i].f.format();
-            datos_grid[i].m = datos_grid[i].m.format();
             datos_grid[i].total = datos_grid[i].total.format();
-            datos_grid[i]['f-avance'] = datos_grid[i]['f-avance'].format();
-            datos_grid[i]['m-avance'] = datos_grid[i]['m-avance'].format();
             datos_grid[i]['total-avance'] = datos_grid[i]['total-avance'].format();
 
             datos.push(datos_grid[i]);
