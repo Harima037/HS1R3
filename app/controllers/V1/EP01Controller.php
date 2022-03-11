@@ -246,7 +246,7 @@ class EP01Controller extends \BaseController {
 										ESCAPED BY '\"' 
 										LINES TERMINATED BY '\\n' 
 										IGNORE 1 LINES 
-										(`UR`,`FI`,`FU`,`SF`,`SSF`,`PS`,`PP`,`OA`,`AI`,`PT`,`MPIO`,`COGC`,`OG`,`STG`,`TR`,`FF`,`SFF`,`RM`,`PF`,`CP`,
+										(`UR`,`FI`,`FU`,`SF`,`SSF`,`PS`,`PP`,`OA`,`AI`,`PT`,`MPIO`,`GA`,`COGC`,`GASTO`,`GTO`,`AG`,`TG`,`TR`,`FF`,`SFF`,`RM`,`PF`,`CP`,
 										`DM`,`presupuestoAprobado`,`modificacionNeta`,`presupuestoModificado`,`presupuestoLiberado`,
 										`presupuestoPorLiberar`,`presupuestoMinistrado`,`presupuestoComprometidoModificado`,
 										`presupuestoDevengadoModificado`,`presupuestoEjercidoModificado`,`presupuestoPagadoModificado`,
