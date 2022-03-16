@@ -508,7 +508,7 @@
 		<td></td>
 		<th class="texto-centro">Coordinador General del Grupo Estratégico.</th>
 		<td></td>
-		<th class="texto-centro">Responsable de la Unida de Planeación u Homólogo.</th>
+		<th class="texto-centro">Responsable de la Unidad de Planeación u Homólogo.</th>
 		<td></td>
 	</tr>
 	<tr><td height="15" colspan="5"></td></tr>
