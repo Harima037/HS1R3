@@ -68,10 +68,10 @@ class RendicionEstrategiaController extends BaseController {
 
 				$total = $rows->count();
 				
-				$rows = $rows->select('estrategia.id','programaPresupuestario.descripcion AS programa', 'estrategia.descripcionIndicador as descripcion', 'programaPresupuestario.clave',
+				$rows = $rows->select('estrategia.id','estrategia.descripcionIndicador as descripcion', //'programaPresupuestario.descripcion AS programa','programaPresupuestario.clave',
 									DB::raw('count(estrategia.trim1) AS trim1'),DB::raw('count(estrategia.trim2) AS trim2'),
 									DB::raw('count(estrategia.trim3) AS trim3'),DB::raw('count(estrategia.trim4) AS trim4'))
-									->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','estrategia.claveProgramaPresupuestario')
+									//->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','estrategia.claveProgramaPresupuestario')
 									//->leftjoin('programaIndicador','programaIndicador.idPrograma','=','programa.id')
 									->orderBy('id', 'desc')
 									->groupBy('estrategia.id')
