@@ -68,10 +68,10 @@ class RendicionEstrategiaController extends BaseController {
 
 				$total = $rows->count();
 				
-				$rows = $rows->select('estrategia.id','programaPresupuestario.descripcion AS programa', 'estrategia.descripcionIndicador as descripcion', 'programaPresupuestario.clave',
+				$rows = $rows->select('estrategia.id','estrategia.descripcionIndicador as descripcion', //'programaPresupuestario.descripcion AS programa','programaPresupuestario.clave',
 									DB::raw('count(estrategia.trim1) AS trim1'),DB::raw('count(estrategia.trim2) AS trim2'),
 									DB::raw('count(estrategia.trim3) AS trim3'),DB::raw('count(estrategia.trim4) AS trim4'))
-									->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','estrategia.claveProgramaPresupuestario')
+									//->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','estrategia.claveProgramaPresupuestario')
 									//->leftjoin('programaIndicador','programaIndicador.idPrograma','=','programa.id')
 									->orderBy('id', 'desc')
 									->groupBy('estrategia.id')
@@ -115,9 +115,9 @@ class RendicionEstrategiaController extends BaseController {
 
 		if(isset($parametros['mostrar'])){
 			if($parametros['mostrar'] == 'datos-estrategia-presupuestario'){
-				$recurso = Estrategia::leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','estrategia.claveProgramaPresupuestario')
-					->join('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','estrategia.claveUnidadResponsable')
-					->select('estrategia.*','programaPresupuestario.descripcion AS programaPresupuestario','unidadResponsable.descripcion AS unidadResponsable')
+				$recurso = Estrategia::join('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','estrategia.claveUnidadResponsable')
+					//leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','estrategia.claveProgramaPresupuestario')
+					->select('estrategia.*','unidadResponsable.descripcion AS unidadResponsable')//,'programaPresupuestario.descripcion AS programaPresupuestario'
 					->find($id);
 			}elseif($parametros['mostrar'] == 'datos-estrategia-avance'){
 				$mes_del_trimestre = Util::obtenerMesTrimestre();
@@ -131,9 +131,9 @@ class RendicionEstrategiaController extends BaseController {
 						$query->where('trimestre','=',$trimestre_actual);
                     }))
                     ->join('catalogoTiposIndicadores AS TipoIndicador','TipoIndicador.id','=','estrategia.idTipoIndicador')
-					->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','estrategia.claveProgramaPresupuestario')
+					//->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestario','programaPresupuestario.clave','=','estrategia.claveProgramaPresupuestario')
 					->join('catalogoUnidadesResponsables AS unidadResponsable','unidadResponsable.clave','=','estrategia.claveUnidadResponsable')
-					->select('estrategia.*','programaPresupuestario.descripcion AS programaPresupuestario','unidadResponsable.descripcion AS unidadResponsable', 'TipoIndicador.descripcion as TipoIndicadorMeta')
+					->select('estrategia.*','unidadResponsable.descripcion AS unidadResponsable', 'TipoIndicador.descripcion as TipoIndicadorMeta')//'programaPresupuestario.descripcion AS programaPresupuestario',
 					->find($id);
 			}elseif($parametros['mostrar'] == 'datos-metas-avance'){
 				$trimestre_actual = Util::obtenerTrimestre();

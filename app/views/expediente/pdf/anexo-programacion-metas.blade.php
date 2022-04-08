@@ -160,7 +160,7 @@
 		<td></td>
 		<th class="texto-centro">Responsable del Programa.</th>
 		<td></td>
-		<th class="texto-centro">Director.</th>
+		<th class="texto-centro">Líder del Proyecto.</th>
 		<td></td>
 	</tr>
 	<tr><td height="8" colspan="5"></td></tr>
