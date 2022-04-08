@@ -112,10 +112,10 @@ class ReporteSeguimientoEstrategiaController extends BaseController {
 		
 		$recurso = Estrategia::with(array('registroAvance'=>function($query) use ($trimestre_actual){
 			$query->where('trimestre','<=',$trimestre_actual);
-		}))->select('estrategia.*','programaPresupuestal.descripcion as programaPresupuestario','titular.nombre as liderPrograma',
+		}))->select('estrategia.*','titular.nombre as liderPrograma', //'programaPresupuestal.descripcion as programaPresupuestario',
 					'titular.cargo as cargoLiderPrograma','responsable.nombre as responsableInformacion',
 					'responsable.cargo as cargoResponsableInformacion')
-		->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestal','programaPresupuestal.clave','=','estrategia.claveProgramaPresupuestario')
+		//->leftjoin('catalogoProgramasPresupuestales AS programaPresupuestal','programaPresupuestal.clave','=','estrategia.claveProgramaPresupuestario')
 		->leftjoin('vistaDirectorio as titular','titular.id','=','estrategia.idLiderPrograma')
 		->leftjoin('vistaDirectorio as responsable','responsable.id','=','estrategia.idResponsable')
 		->find($id);

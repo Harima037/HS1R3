@@ -267,6 +267,10 @@ class ReporteIndicadorResultadoController extends BaseController {
 					//$excel->sheet('Proyectos', function($sheet) use ( $datos_hoja, $hoja ){
 					$justificaciones = array();
 
+					if(!$hoja){
+						continue;
+					}
+
 					foreach ($hoja['clase'] as $clasificacion) {
 						foreach($clasificacion['proyectos'] as $proyecto){
 							foreach($proyecto->componentes as $componente){

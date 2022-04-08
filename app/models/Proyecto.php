@@ -279,16 +279,17 @@ class Proyecto extends BaseModel
 			}
 			,'beneficiariosDescripcion'=>function($beneficiario) use ($mes){
 				$beneficiario->leftjoin('registroAvancesBeneficiarios as avanceBenef',function($join)use($mes){
-					$join->on('avanceBenef.idProyectoBeneficiario','=','proyectoBeneficiarios.id')
-						->on('avanceBenef.idTipoBeneficiario','=','proyectoBeneficiarios.idTipoBeneficiario')
-						->where('avanceBenef.mes','<=',$mes)
-						->whereNull('avanceBenef.borradoAl');
-				})
-				->select('proyectoBeneficiarios.id','proyectoBeneficiarios.idProyecto','proyectoBeneficiarios.idTipoBeneficiario',
-					DB::raw('sum(avanceBenef.total) AS avanceBeneficiario'),
-					DB::raw('sum(if(avanceBenef.sexo = "f",avanceBenef.total,0)) AS avanceBeneficiarioF'),DB::raw('sum(if(avanceBenef.sexo = "m",avanceBenef.total,0)) AS avanceBeneficiarioM'),
-					'tipoBeneficiario.descripcion AS tipoBeneficiario')
-				->groupBy('proyectoBeneficiarios.idProyecto','proyectoBeneficiarios.idTipoBeneficiario');
+								$join->on('avanceBenef.idProyectoBeneficiario','=','proyectoBeneficiarios.id')
+									->on('avanceBenef.idTipoBeneficiario','=','proyectoBeneficiarios.idTipoBeneficiario')
+									->where('avanceBenef.mes','<=',$mes)
+									->whereNull('avanceBenef.borradoAl');
+							})
+							->select('proyectoBeneficiarios.id','proyectoBeneficiarios.idProyecto', //'proyectoBeneficiarios.idTipoBeneficiario',
+								DB::raw('sum(avanceBenef.total) AS avanceBeneficiario'),
+								DB::raw('sum(if(avanceBenef.sexo = "f",avanceBenef.total,0)) AS avanceBeneficiarioF'),DB::raw('sum(if(avanceBenef.sexo = "m",avanceBenef.total,0)) AS avanceBeneficiarioM'),
+								'tipoBeneficiario.grupo AS tipoBeneficiario')
+							//->groupBy('proyectoBeneficiarios.idProyecto','proyectoBeneficiarios.idTipoBeneficiario')
+							->groupBy('proyectoBeneficiarios.idProyecto','tipoBeneficiario.grupo'); //,'proyectoBeneficiarios.sexo'
 			},'evaluacionMes'=>function($evaluacionMes)use($mes){
 				$evaluacionMes->where('evaluacionProyectoMes.mes','<=',$mes)
 							->where('evaluacionProyectoMes.idEstatus','>=',4)
