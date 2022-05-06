@@ -23,19 +23,21 @@
                                     </div>
                                 </div>
                             </div>
-                            <form id="formPermisos">
-                            <table id="table-list-permission" class="table table-striped table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Grupo</th>
-                                        <th>Modulo</th>
-                                        <th>Permisos <a rel="popover" class="popover-dismiss" href="#" id="permissions-help" data-toggle="popover"  data-placement="bottom" data-content="<span class='label label-info'>Asignado x Rol</span> <span class='label label-success'>Permitir</span> <span class='label label-danger'>Denegar</span>" title="Colores de permisos"><i class="fa fa-question-circle"></i></a> </th>
-                                        <!--th>C</th><th>R</th><th>U</th><th>D</th-->
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                            </form>
+                            <div style="overflow:auto; height:500px;">
+                                <form id="formPermisos">
+                                    <table id="table-list-permission" class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Grupo</th>
+                                                <th>Modulo</th>
+                                                <th>Permisos <a rel="popover" class="popover-dismiss" href="#" id="permissions-help" data-toggle="popover"  data-placement="bottom" data-content="<span class='label label-info'>Asignado x Rol</span> <span class='label label-success'>Permitir</span> <span class='label label-danger'>Denegar</span>" title="Colores de permisos"><i class="fa fa-question-circle"></i></a> </th>
+                                                <!--th>C</th><th>R</th><th>U</th><th>D</th-->
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>

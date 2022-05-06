@@ -35,9 +35,14 @@ class ReporteSeguimientoMetasController extends BaseController {
 	    // Get the user groups
 	    $groups = $user->getGroups();
 	    for($i=0;$i<count($groups);$i++){
-	    	if ($groups[$i]->id==1||$groups[$i]->id==3||$groups[$i]->id==7||$groups[$i]->id==18||$groups[$i]->id==20){
-	    		$datos['superusuario']=1;
-	    	}
+			$datos_permisos = json_decode($groups[$i],true);
+			if(isset($datos_permisos['permissions']['REPORTES.REPSEGINST.S']) && $datos_permisos['permissions']['REPORTES.REPSEGINST.S'] == 1){
+				$datos['superusuario'] = 1; 
+				break;
+			}
+	    	/*if ($groups[$i]->id==1||$groups[$i]->id==3||$groups[$i]->id==7||$groups[$i]->id==18||$groups[$i]->id==20){
+	    		$datos['superusuario']=1; 
+	    	}*/
 	    }
 
 	   
@@ -97,9 +102,14 @@ class ReporteSeguimientoMetasController extends BaseController {
 	    // Get the user groups
 	    $groups = $user->getGroups();
 	    for($i=0;$i<count($groups);$i++){
-	    	if ($groups[$i]->id==1||$groups[$i]->id==3||$groups[$i]->id==7||$groups[$i]->id==18||$groups[$i]->id==20){
+			$datos_permisos = json_decode($groups[$i],true);
+			if(isset($datos_permisos['permissions']['REPORTES.REPSEGINV.S']) && $datos_permisos['permissions']['REPORTES.REPSEGINV.S'] == 1){
+				$datos['superusuario'] = 1; 
+				break;
+			}
+	    	/*if ($groups[$i]->id==1||$groups[$i]->id==3||$groups[$i]->id==7||$groups[$i]->id==18||$groups[$i]->id==20){
 	    		$datos['superusuario']=1;
-	    	}
+	    	}*/
 	    }
 
 	   

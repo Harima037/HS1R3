@@ -75,19 +75,26 @@ function cargar_datos_proyecto(e){
                 var clase = 'btn-default';
                 var firmar='';
 
-                if(evaluacion.idEstatus == 4 && superuser==1){
+                if(evaluacion.idEstatus == 4){
                     icono = 'fa-check';
                     clase = 'btn-primary';
-                    firmar='<li><a href="#" onClick="firmarProyecto('+evaluacion.mes+')" class="btn-edit-rows"><span class="glyphicon glyphicon-edit"></span> Firmar</a> </li>';
-                }else{
+                }else if(evaluacion.idEstatus == 5){
                     icono = 'fa-pencil';
                     clase = 'btn-success';
-                    firmar='';
                 }
-                $('#rep_metas_'+evaluacion.mes).html('<div class="btn-group" ><button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button><ul class="dropdown-menu pull-right" role="menu"><li><a href="#" onClick="cargarReporte(\'seg-metas\','+evaluacion.mes+')" class="btn-edit-rows" type="button"><span class="fa '+icono+'"></span> Imprimir</a></li>'+firmar+'</ul></div>');
+
+                if(evaluacion.idEstatus == 4 && superuser==1){
+                    firmar='<li><a href="#" onClick="firmarProyecto('+evaluacion.mes+')" class="btn-edit-rows"><span class="glyphicon glyphicon-edit"></span> Firmar</a> </li>';
+                }
+
+                if(firmar){
+                    $('#rep_metas_'+evaluacion.mes).html('<div class="btn-group" ><button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button><ul class="dropdown-menu pull-right" role="menu"><li><a href="#" onClick="cargarReporte(\'seg-metas\','+evaluacion.mes+')" class="btn-edit-rows" type="button"><span class="fa '+icono+'"></span> Imprimir</a></li>'+firmar+'</ul></div>');
+                }else{
+                    $('#rep_metas_'+evaluacion.mes).html('<button onClick="cargarReporte(\'seg-metas\','+evaluacion.mes+')" class="btn '+clase+'" type="button"><span class="fa '+icono+'"></span></button>');
+                }
+                
                     
                 if(evaluacion.mes%3 == 0){
-
                     $('#rep_metas_trim_'+evaluacion.mes).html('<button onClick="cargarReporte(\'seg-metas-trimestre\','+evaluacion.mes+')" class="btn '+clase+'" type="button"><span class="fa '+icono+'"></span></button>');
                     $('#rep_benef_'+evaluacion.mes).html('<button onClick="cargarReporte(\'seg-beneficiarios\','+evaluacion.mes+')" class="btn '+clase+'" type="button"><span class="fa '+icono+'"></span></button>');
                     $('#rep_plan_'+evaluacion.mes).html('<button onClick="cargarReporte(\'plan-mejora\','+evaluacion.mes+')" class="btn '+clase+'" type="button"><span class="fa '+icono+'"></span></button>');
