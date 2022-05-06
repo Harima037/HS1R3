@@ -44,9 +44,13 @@ class ReporteSeguimientoMetasController extends BaseController {
 	    		$datos['superusuario']=1; 
 	    	}*/
 	    }
-
+		$permiso_usuario = json_decode($usr_tmp,true);
+		if(isset($permiso_usuario['permissions']['REPORTES.REPSEGINST.S']) && isset($permiso_usuario['permissions']['REPORTES.REPSEGINST.S']) == -1){
+			$datos['superusuario'] = 0; 
+		}else if(isset($permiso_usuario['permissions']['REPORTES.REPSEGINST.S']) && isset($permiso_usuario['permissions']['REPORTES.REPSEGINST.S']) == 1){
+			$datos['superusuario'] = 1; 
+		}
 	   
-		
 		if ($usr_tmp->id<3){		/// si es root o admin
 			$datos['superusuario']=1;
 		}
