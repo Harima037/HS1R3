@@ -185,7 +185,7 @@ class VisorController extends BaseController {
 								$unidad = array($parametros['unidad']);
 								$rows = $rows->where('UR',$unidad);
 							}
-						}
+						} 
 
 						if($filtro_fuente){
 							$rows = $rows->where('FF','=',$filtro_fuente);
@@ -193,8 +193,12 @@ class VisorController extends BaseController {
 
 						$rows = $rows->select(DB::raw('sum(presupuestoModificado) AS presupuestoModificado'),
 											'fuenteFinan.descripcion AS fuenteFinanciamiento')
-									->leftjoin('catalogoFuenteFinanciamiento AS fuenteFinan','fuenteFinan.clave','=','FF')
+									->leftjoin('catalogoFuenteFinanciamiento AS fuenteFinan',function($join){
+										$join->on('fuenteFinan.fuente','=','FF')->on('fuenteFinan.ramo','=','RM')->on(DB::raw('SUBSTRING(fuenteFinan.fondo,1,2)'),'=','PF');
+									})
 									->groupBy('FF')
+									->groupBy('RM')
+									->groupBy('PF')
 									->get();
 						$total = $rows->sum('presupuestoModificado');
 						$data = array('data'=>$rows,'total'=>$total,'datos_captura'=>$datos_captura);
@@ -218,7 +222,7 @@ class VisorController extends BaseController {
 
 						$rows = $rows->select(DB::raw('sum(presupuestoEjercidoModificado) AS presupuestoEjercido'),
 											'capitulo.descripcion AS capitulo','capitulo.clave')
-									->leftjoin('catalogoObjetosGasto AS objetoGasto','objetoGasto.clave','=','OG')
+									->leftjoin('catalogoObjetosGasto AS objetoGasto','objetoGasto.clave','=','GASTO')
 									->leftjoin('catalogoObjetosGasto AS partida','partida.id','=','objetoGasto.idPadre')
 									->leftjoin('catalogoObjetosGasto AS concepto','concepto.id','=','partida.idPadre')
 									->leftjoin('catalogoObjetosGasto AS capitulo','capitulo.id','=','concepto.idPadre')
