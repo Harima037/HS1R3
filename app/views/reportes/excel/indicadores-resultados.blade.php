@@ -96,7 +96,7 @@
 			<td></td><td></td>
 			<td height="20" align="center" valign="top" style="font-size:12; font-weight:bold;">
 			@if($idClasificacion == '1')
-				PROYECTOS INSTITUCIONALES:
+				PROYECTOS DE GASTO CORRIENTE:
 			@else
 				PROYECTOS DE INVERSIÓN:
 			@endif
