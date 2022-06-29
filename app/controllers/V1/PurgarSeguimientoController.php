@@ -52,7 +52,8 @@ class PurgarSeguimientoController extends \BaseController {
 				$rows = $rows->join('evaluacionProyectoMes', function($join) use($mes_actual){
 									$join->on('evaluacionProyectoMes.idProyecto','=','proyectos.id')
 										->where('evaluacionProyectoMes.mes', '=', $mes_actual)
-										->where('evaluacionProyectoMes.anio', '=', date('Y'));
+										->where('evaluacionProyectoMes.anio', '=', date('Y'))
+										->whereNull('evaluacionProyectoMes.borradoAl');
 								});
 				
 
