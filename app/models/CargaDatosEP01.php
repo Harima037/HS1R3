@@ -30,7 +30,8 @@ class CargaDatosEP01 extends BaseModel
 				'tipoRecurso.clave AS claveTipoRecurso','tipoRecurso.descripcion AS tipoRecurso')
 				->groupBy(DB::raw('concat(UR,FI,FU,SF,SSF,PS,PP,OA,AI,PT,FF,SFF)'))
 				->leftJoin('catalogoFuenteFinanciamiento AS fuente',function($join){
-					$join->on('fuente.clave','=','FF')->whereNull('fuente.borradoAl');
+					//$join->on('fuente.clave','=','FF')->whereNull('fuente.borradoAl');
+					$join->on('fuente.fuente','=','FF')->on('fuente.ramo','=','RM')->on(DB::raw('SUBSTRING(fuente.fondo,1,2)'),'=','PF')->whereNull('fuente.borradoAl');
 				})
 				->leftJoin('catalogoSubFuenteFinanciamiento AS subfuente',function($join){
 					$join->on('subfuente.clave','=','SFF')->whereNull('subfuente.borradoAl');
