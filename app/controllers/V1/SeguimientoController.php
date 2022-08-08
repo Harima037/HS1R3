@@ -1186,8 +1186,8 @@ class SeguimientoController extends BaseController {
 			if(trim($parametros['justificacion-acumulada']) == ''){
 				$faltan_campos[] = json_encode(array('field'=>'justificacion-acumulada','error'=>'Este campo es requerido.'));
 			}else{
-				if(strlen($parametros['justificacion-acumulada']) > 500){
-					$faltan_campos[] = json_encode(array('field'=>'justificacion-acumulada','error'=>'Solo se pueden capturar un máximo de 500 caracteres.'));
+				if(strlen($parametros['justificacion-acumulada']) > 5000){
+					$faltan_campos[] = json_encode(array('field'=>'justificacion-acumulada','error'=>'Solo se pueden capturar un máximo de 5000 caracteres.'));
 				}else{
 					$registro_avance->justificacionAcumulada = $parametros['justificacion-acumulada'];
 				}
@@ -1211,8 +1211,8 @@ class SeguimientoController extends BaseController {
 		if(trim($parametros['analisis-resultados']) == ''){
 			$faltan_campos[] = json_encode(array('field'=>'analisis-resultados','error'=>'Este campo es requerido.'));
 		}else{
-			if(strlen($parametros['analisis-resultados']) > 500){
-				$faltan_campos[] = json_encode(array('field'=>'analisis-resultados','error'=>'Solo se pueden capturar un máximo de 500 caracteres.'));
+			if(strlen($parametros['analisis-resultados']) > 5000){
+				$faltan_campos[] = json_encode(array('field'=>'analisis-resultados','error'=>'Solo se pueden capturar un máximo de 5000 caracteres.'));
 			}else{
 				$registro_avance->analisisResultados = $parametros['analisis-resultados'];
 			}
@@ -1234,8 +1234,8 @@ class SeguimientoController extends BaseController {
 			if(trim($parametros['analisis-resultados-trimestral']) == ''){
 				$faltan_campos[] = json_encode(array('field'=>'analisis-resultados-trimestral','error'=>'Este campo es requerido.'));
 			}else{
-				if(strlen($parametros['analisis-resultados-trimestral']) > 500){
-					$faltan_campos[] = json_encode(array('field'=>'analisis-resultados-trimestral','error'=>'Solo se pueden capturar un máximo de 500 caracteres.'));
+				if(strlen($parametros['analisis-resultados-trimestral']) > 5000){
+					$faltan_campos[] = json_encode(array('field'=>'analisis-resultados-trimestral','error'=>'Solo se pueden capturar un máximo de 5000 caracteres.'));
 				}else{
 					$registro_avance->analisisResultadosTrimestral = $parametros['analisis-resultados-trimestral'];
 				}
@@ -1243,8 +1243,8 @@ class SeguimientoController extends BaseController {
 
 			if(isset($parametros['justificacion-trimestral'])){
 				if(trim($parametros['justificacion-trimestral']) != ''){
-					if(strlen($parametros['justificacion-trimestral']) > 500){
-						$faltan_campos[] = json_encode(array('field'=>'justificacion-trimestral','error'=>'Solo se pueden capturar un máximo de 500 caracteres.'));
+					if(strlen($parametros['justificacion-trimestral']) > 5000){
+						$faltan_campos[] = json_encode(array('field'=>'justificacion-trimestral','error'=>'Solo se pueden capturar un máximo de 5000 caracteres.'));
 					}else{
 						$registro_avance->justificacionTrimestral = $parametros['justificacion-trimestral'];
 					}

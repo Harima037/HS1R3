@@ -285,22 +285,22 @@ function seguimiento_metas(e){
                 $('#id-avance').val(response.data.registro_avance[0].id);
                 $('#analisis-resultados').val(response.data.registro_avance[0].analisisResultados);
                 $('#analisis-resultados-contador').text(response.data.registro_avance[0].analisisResultados.length);
-                checar_longitud_maxima('#analisis-resultados-contador',response.data.registro_avance[0].analisisResultados.length,500);
+                checar_longitud_maxima('#analisis-resultados-contador',response.data.registro_avance[0].analisisResultados.length,5000);
                 $('#justificacion-acumulada').val(response.data.registro_avance[0].justificacionAcumulada);
                 $('#justificacion-acumulada-contador').text(response.data.registro_avance[0].justificacionAcumulada.length);
-                checar_longitud_maxima('#justificacion-acumulada-contador',response.data.registro_avance[0].justificacionAcumulada.length,500);
+                checar_longitud_maxima('#justificacion-acumulada-contador',response.data.registro_avance[0].justificacionAcumulada.length,5000);
 
                 if((parseInt($('#mes').val()) % 3) == 0){
                     if(response.data.registro_avance[0].analisisResultadosTrimestral){
                         $('#analisis-resultados-trimestral').val(response.data.registro_avance[0].analisisResultadosTrimestral);
                         $('#analisis-resultados-trimestral-contador').text(response.data.registro_avance[0].analisisResultadosTrimestral.length);
-                        checar_longitud_maxima('#analisis-resultados-trimestral-contador',response.data.registro_avance[0].analisisResultadosTrimestral.length,500);
+                        checar_longitud_maxima('#analisis-resultados-trimestral-contador',response.data.registro_avance[0].analisisResultadosTrimestral.length,5000);
                     }
                     
                     if(response.data.registro_avance[0].justificacionTrimestral){
                         $('#justificacion-trimestral').val(response.data.registro_avance[0].justificacionTrimestral);
                         $('#justificacion-trimestral-contador').text(response.data.registro_avance[0].justificacionTrimestral.length);
-                        checar_longitud_maxima('#justificacion-trimestral-contador',response.data.registro_avance[0].justificacionTrimestral.length,500);
+                        checar_longitud_maxima('#justificacion-trimestral-contador',response.data.registro_avance[0].justificacionTrimestral.length,5000);
                     }
                 }
             }
@@ -381,22 +381,22 @@ function seguimiento_metas(e){
 
 $('#analisis-resultados').on('keyup',function(){
     $('#analisis-resultados-contador').text($('#analisis-resultados').val().length);
-    checar_longitud_maxima('#analisis-resultados-contador',$('#analisis-resultados').val().length,500);
+    checar_longitud_maxima('#analisis-resultados-contador',$('#analisis-resultados').val().length,5000);
 });
 
 $('#justificacion-acumulada').on('keyup',function(){
     $('#justificacion-acumulada-contador').text($('#justificacion-acumulada').val().length);
-    checar_longitud_maxima('#justificacion-acumulada-contador',$('#justificacion-acumulada').val().length,500);
+    checar_longitud_maxima('#justificacion-acumulada-contador',$('#justificacion-acumulada').val().length,5000);
 });
 
 $('#analisis-resultados-trimestral').on('keyup',function(){
     $('#analisis-resultados-trimestral-contador').text($('#analisis-resultados-trimestral').val().length);
-    checar_longitud_maxima('#analisis-resultados-trimestral-contador',$('#analisis-resultados-trimestral').val().length,500);
+    checar_longitud_maxima('#analisis-resultados-trimestral-contador',$('#analisis-resultados-trimestral').val().length,5000);
 });
 
 $('#justificacion-trimestral').on('keyup',function(){
     $('#justificacion-trimestral-contador').text($('#justificacion-trimestral').val().length);
-    checar_longitud_maxima('#justificacion-trimestral-contador',$('#justificacion-trimestral').val().length,500);
+    checar_longitud_maxima('#justificacion-trimestral-contador',$('#justificacion-trimestral').val().length,5000);
 });
 
 function checar_longitud_maxima(identificador,valor_asignado,valor_maximo){
@@ -861,13 +861,13 @@ $('#modalEditarAvance').on('hide.bs.modal',function(e){
     $('input.avance-mes').attr('disabled',false);
     $('#analisis-resultados-contador').text('0');
     $('#justificacion-acumulada-contador').text('0');
-    checar_longitud_maxima('#analisis-resultados-contador',$('#analisis-resultados').val().length,500);
-    checar_longitud_maxima('#justificacion-acumulada-contador',$('#analisis-resultados').val().length,500);
+    checar_longitud_maxima('#analisis-resultados-contador',$('#analisis-resultados').val().length,5000);
+    checar_longitud_maxima('#justificacion-acumulada-contador',$('#analisis-resultados').val().length,5000);
     if((parseInt($('#mes').val()) % 3) == 0){
         $('#analisis-resultados-trimestral-contador').text('0');
         $('#justificacion-trimestral-contador').text('0');
-        checar_longitud_maxima('#analisis-resultados-trimestral-contador',$('#analisis-resultados-trimestral').val().length,500);
-        checar_longitud_maxima('#justificacion-trimestral-contador',$('#analisis-resultados-trimestral').val().length,500);
+        checar_longitud_maxima('#analisis-resultados-trimestral-contador',$('#analisis-resultados-trimestral').val().length,5000);
+        checar_longitud_maxima('#justificacion-trimestral-contador',$('#analisis-resultados-trimestral').val().length,5000);
     }
     
     //$('span.nueva-cantidad').text('');
